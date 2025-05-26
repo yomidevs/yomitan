@@ -184,7 +184,8 @@ export class YomitanApi {
                         const {text, type, markers} = parsedBody;
 
                         const ankiTemplate = await this._getAnkiTemplate(optionsFull.profiles[optionsFull.profileCurrent].options);
-                        const commonData = await this._createCommonData(text, type, optionsFull.profileCurrent);
+                        const dictionaryEntries = await this._getDictionaryEntries(text, type, optionsFull.profileCurrent);
+                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries);
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessDocument = parseHTML('').document;
                         const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument);
@@ -194,7 +195,7 @@ export class YomitanApi {
                         /** @type {Record<string, string>} */
                         const ankiFieldsResults = {};
                         for (const marker of markers) {
-                            const templateResult = templateRenderer.render(ankiTemplate, {marker: marker, commonData: commonData}, 'ankiNote');
+                            const templateResult = templateRenderer.render(ankiTemplate, {marker: marker, commonData: commonDatas[0]}, 'ankiNote');
                             ankiFieldsResults[marker] = templateResult.result;
                         }
                         result = ankiFieldsResults;
@@ -228,54 +229,37 @@ export class YomitanApi {
      * @param {string} text
      * @param {import('settings.js').AnkiCardFormatType} type
      * @param {number} profileIndex
-     * @returns {Promise<import('anki-note-builder.js').CommonData>}
+     * @returns {Promise<import('dictionary.js').DictionaryEntry[]>}
      */
-    async _createCommonData(text, type, profileIndex) {
+    async _getDictionaryEntries(text, type, profileIndex) {
         if (type === 'term') {
             const invokeParams = {
                 text: text,
                 details: {},
                 optionsContext: {index: profileIndex},
             };
-            const dictionaryEntries = (await this._invoke('termsFind', invokeParams)).dictionaryEntries;
-            /** @type {import('anki-note-builder.js').CommonData} */
-            return {
-                dictionaryEntry: dictionaryEntries[0],
-                resultOutputMode: 'group',
-                cardFormat: {
-                    type: 'term',
-                    name: 'Test',
-                    deck: 'Test',
-                    model: 'Test',
-                    fields: {
-                        test: {value: '{expression}', overwriteMode: 'overwrite'},
-                    },
-                    icon: 'big-circle',
-                },
-                glossaryLayoutMode: 'default',
-                compactTags: false,
-                context: {
-                    url: '',
-                    documentTitle: 'Yomitan API',
-                    query: text,
-                    fullQuery: text,
-                    sentence: {
-                        text: text,
-                        offset: 0,
-                    },
-                },
-                dictionaryStylesMap: new Map(),
-            };
+            return (await this._invoke('termsFind', invokeParams)).dictionaryEntries;
         } else {
             const invokeParams = {
                 text: text,
                 details: {},
                 optionsContext: {index: profileIndex},
             };
-            const dictionaryEntries = (await this._invoke('kanjiFind', invokeParams));
-            /** @type {import('anki-note-builder.js').CommonData} */
-            return {
-                dictionaryEntry: dictionaryEntries[0],
+            return await this._invoke('kanjiFind', invokeParams);
+        }
+    }
+
+    /**
+     * @param {string} text
+     * @param {import('dictionary.js').DictionaryEntry[]} dictionaryEntries
+     * @returns {Promise<import('anki-note-builder.js').CommonData[]>}
+     */
+    async _createCommonDatas(text, dictionaryEntries) {
+        /** @type {import('anki-note-builder.js').CommonData[]} */
+        const commonDatas = [];
+        for (const dictionaryEntry of dictionaryEntries) {
+            commonDatas.push({
+                dictionaryEntry: dictionaryEntry,
                 resultOutputMode: 'group',
                 cardFormat: {
                     type: 'term',
@@ -290,16 +274,17 @@ export class YomitanApi {
                 context: {
                     url: '',
                     documentTitle: '',
-                    query: '',
-                    fullQuery: '',
+                    query: text,
+                    fullQuery: text,
                     sentence: {
-                        text: '',
+                        text: text,
                         offset: 0,
                     },
                 },
                 dictionaryStylesMap: new Map(),
-            };
+            });
         }
+        return commonDatas;
     }
 
     /**
