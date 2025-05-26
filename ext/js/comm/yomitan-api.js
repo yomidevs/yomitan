@@ -130,8 +130,7 @@ export class YomitanApi {
         console.log('Yomitan API _onMessage');
         console.log(message);
 
-        const {action, params, sequence, data} = /** @type {import('core').SerializableObject} */ (message);
-        if (typeof sequence !== 'number') { return; }
+        const {action, params} = /** @type {import('core').SerializableObject} */ (message);
 
         if (this._port !== null) {
             const invokeParams = {
@@ -140,16 +139,8 @@ export class YomitanApi {
                 optionsContext: {index: 0},
             };
             const term = await this._invoke('termsFind', invokeParams);
-            this._port.postMessage({action, params, data: JSON.stringify(term.dictionaryEntries), sequence});
+            this._port.postMessage({action, params, data: JSON.stringify(term.dictionaryEntries)});
         }
-
-        const invocation = this._invocations.get(sequence);
-        if (typeof invocation === 'undefined') { return; }
-
-        const {resolve, timer} = invocation;
-        clearTimeout(timer);
-        resolve(data);
-        this._invocations.delete(sequence);
     }
 
     /**
