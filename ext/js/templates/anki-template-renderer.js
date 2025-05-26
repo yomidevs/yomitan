@@ -34,8 +34,9 @@ import {TemplateRenderer} from './template-renderer.js';
 export class AnkiTemplateRenderer {
     /**
      * Creates a new instance of the class.
+     * @param {Document} document
      */
-    constructor() {
+    constructor(document) {
         /** @type {CssStyleApplier} */
         this._structuredContentStyleApplier = new CssStyleApplier('/data/structured-content-style.json');
         /** @type {CssStyleApplier} */
@@ -54,6 +55,8 @@ export class AnkiTemplateRenderer {
         this._cleanupCallbacks = [];
         /** @type {?HTMLElement} */
         this._temporaryElement = null;
+        /** @type {Document} */
+        this._document = document;
     }
 
     /**
@@ -562,7 +565,7 @@ export class AnkiTemplateRenderer {
     _getTemporaryElement() {
         let element = this._temporaryElement;
         if (element === null) {
-            element = document.createElement('div');
+            element = this._document.createElement('div');
             this._temporaryElement = element;
         }
         return element;
@@ -606,7 +609,7 @@ export class AnkiTemplateRenderer {
      */
     _normalizeHtml(root, styleApplier, datasetKeyIgnorePattern) {
         const {ELEMENT_NODE, TEXT_NODE} = Node;
-        const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+        const treeWalker = this._document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
         /** @type {HTMLElement[]} */
         const elements = [];
         /** @type {Text[]} */
@@ -644,10 +647,10 @@ export class AnkiTemplateRenderer {
         if (parts.length <= 1) { return; }
         const {parentNode} = textNode;
         if (parentNode === null) { return; }
-        const fragment = document.createDocumentFragment();
+        const fragment = this._document.createDocumentFragment();
         for (let i = 0, ii = parts.length; i < ii; ++i) {
-            if (i > 0) { fragment.appendChild(document.createElement('br')); }
-            fragment.appendChild(document.createTextNode(parts[i]));
+            if (i > 0) { fragment.appendChild(this._document.createElement('br')); }
+            fragment.appendChild(this._document.createTextNode(parts[i]));
         }
         parentNode.replaceChild(fragment, textNode);
     }
@@ -658,7 +661,7 @@ export class AnkiTemplateRenderer {
      */
     _createStructuredContentGenerator(data) {
         const contentManager = new AnkiTemplateRendererContentManager(this._mediaProvider, data);
-        const instance = new StructuredContentGenerator(contentManager, document);
+        const instance = new StructuredContentGenerator(contentManager, this._document);
         this._cleanupCallbacks.push(() => contentManager.unloadAll());
         return instance;
     }

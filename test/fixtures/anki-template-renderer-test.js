@@ -27,7 +27,7 @@ vi.stubGlobal('fetch', fetch);
  */
 export async function createAnkiTemplateRendererTest() {
     const test = createDomTest(void 0);
-    const ankiTemplateRenderer = new AnkiTemplateRenderer();
+    const ankiTemplateRenderer = new AnkiTemplateRenderer(document);
     await ankiTemplateRenderer.prepare();
     /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, ankiTemplateRenderer: AnkiTemplateRenderer}>} */
     // eslint-disable-next-line sonarjs/prefer-immediate-return
