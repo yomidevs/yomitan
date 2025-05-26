@@ -137,14 +137,18 @@ export class YomitanApi {
             }
 
             try {
+                /** @type {?object} */
                 const parsedBody = parseJson(body);
 
                 let result = null;
                 let statusCode = 200;
                 switch (action) {
                     case 'termsFind':
-                        // @ts-expect-error - Better to let fail than to type correctly
-                        result = await this._invoke(action, parsedBody);
+                        result = await this._invoke(
+                            action,
+                            // @ts-expect-error - parsedBody can't reasonable be validated for ts
+                            parsedBody,
+                        );
                         break;
                     default:
                         statusCode = 400;
