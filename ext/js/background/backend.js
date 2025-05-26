@@ -62,8 +62,6 @@ export class Backend {
         this._anki = new AnkiConnect();
         /** @type {Mecab} */
         this._mecab = new Mecab();
-        /** @type {YomitanApi} */
-        this._yomitanApi = new YomitanApi();
 
         if (!chrome.offscreen) {
             /** @type {?OffscreenProxy} */
@@ -206,6 +204,9 @@ export class Backend {
             ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
             ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)],
         ]));
+
+        /** @type {YomitanApi} */
+        this._yomitanApi = new YomitanApi(this._apiMap);
     }
 
     /**

@@ -15,14 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 
 /** */
 export class YomitanApi {
-    /** */
-    constructor() {
+    /**
+     * @param {import('api').ApiMap} apiMap
+     */
+    constructor(apiMap) {
         /** @type {?chrome.runtime.Port} */
         this._port = null;
         /** @type {number} */
@@ -41,6 +45,8 @@ export class YomitanApi {
         this._enabled = false;
         /** @type {?Promise<void>} */
         this._setupPortPromise = null;
+        /** @type {import('api').ApiMap} */
+        this._apiMap = apiMap;
     }
 
     /**
@@ -128,8 +134,13 @@ export class YomitanApi {
         if (typeof sequence !== 'number') { return; }
 
         if (this._port !== null) {
-            const placeholder_data = 'placeholder data';
-            this._port.postMessage({action, params, data: placeholder_data, sequence});
+            const invokeParams = {
+                text: 'わかる',
+                details: {},
+                optionsContext: {index: 0},
+            };
+            const term = await this._invoke('termsFind', invokeParams);
+            this._port.postMessage({action, params, data: JSON.stringify(term.dictionaryEntries), sequence});
         }
 
         const invocation = this._invocations.get(sequence);
@@ -216,5 +227,35 @@ export class YomitanApi {
         this._eventListeners.removeAllEventListeners();
         this._sequence = 0;
         this._setupPortPromise = null;
+    }
+
+    /**
+     * @template {import('api').ApiNames} TAction
+     * @template {import('api').ApiParams<TAction>} TParams
+     * @param {TAction} action
+     * @param {TParams} params
+     * @returns {Promise<import('api').ApiReturn<TAction>>}
+     */
+    _invoke(action, params) {
+        return new Promise((resolve, reject) => {
+            try {
+                invokeApiMapHandler(this._apiMap, action, params, [{}], (response) => {
+                    if (response !== null && typeof response === 'object') {
+                        const {error} = /** @type {import('core').UnknownObject} */ (response);
+                        if (typeof error !== 'undefined') {
+                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */(error)));
+                        } else {
+                            const {result} = /** @type {import('core').UnknownObject} */ (response);
+                            resolve(/** @type {import('api').ApiReturn<TAction>} */(result));
+                        }
+                    } else {
+                        const message = response === null ? 'Unexpected null response. You may need to refresh the page.' : `Unexpected response of type ${typeof response}. You may need to refresh the page.`;
+                        reject(new Error(`${message} (${JSON.stringify(action)})`));
+                    }
+                });
+            } catch (e) {
+                reject(e);
+            }
+        });
     }
 }
