@@ -26,5 +26,5 @@ export type kanjiEntriesInput = {
 export type ankiFieldsInput = {
     text: string;
     type: 'term' | 'kanji';
-    handlebar: string;
+    markers: [string];
 };

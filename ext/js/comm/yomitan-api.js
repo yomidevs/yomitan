@@ -181,18 +181,23 @@ export class YomitanApi {
                     case 'ankiFields': {
                         /** @type {import('yomitan-api.js').ankiFieldsInput} */
                         // @ts-expect-error - Allow this to error
-                        const {text, type, handlebar} = parsedBody;
+                        const {text, type, markers} = parsedBody;
 
                         const ankiTemplate = await this._getAnkiTemplate(optionsFull.profiles[optionsFull.profileCurrent].options);
-                        const inputCommonData = await this._createCommonData(text, type, optionsFull.profileCurrent);
+                        const commonData = await this._createCommonData(text, type, optionsFull.profileCurrent);
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessDocument = parseHTML('').document;
                         const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument);
                         await ankiTemplateRenderer.prepare();
                         const templateRenderer = ankiTemplateRenderer.templateRenderer;
 
-                        const templateResult = templateRenderer.render(ankiTemplate, {marker: handlebar, commonData: inputCommonData}, 'ankiNote');
-                        result = templateResult.result;
+                        /** @type {Record<string, string>} */
+                        const ankiFieldsResults = {};
+                        for (const marker of markers) {
+                            const templateResult = templateRenderer.render(ankiTemplate, {marker: marker, commonData: commonData}, 'ankiNote');
+                            ankiFieldsResults[marker] = templateResult.result;
+                        }
+                        result = ankiFieldsResults;
                         break;
                     }
                     default:
