@@ -158,6 +158,21 @@ export class YomitanApi {
                         );
                         break;
                     }
+                    case 'kanjiEntries': {
+                        /** @type {import('yomitan-api.js').kanjiEntriesInput} */
+                        // @ts-expect-error - Allow this to error
+                        const {character, profileIndex} = parsedBody;
+                        const invokeParams = {
+                            text: character,
+                            details: {},
+                            optionsContext: {index: profileIndex},
+                        };
+                        result = await this._invoke(
+                            'kanjiFind',
+                            invokeParams,
+                        );
+                        break;
+                    }
                     default:
                         statusCode = 400;
                 }
