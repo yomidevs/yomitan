@@ -136,6 +136,8 @@ export class YomitanApi {
                 return;
             }
 
+            const optionsFull = await this._invoke('optionsGetFull', void 0);
+
             try {
                 /** @type {?object} */
                 const parsedBody = parseJson(body);
@@ -146,11 +148,11 @@ export class YomitanApi {
                     case 'termEntries': {
                         /** @type {import('yomitan-api.js').termEntriesInput} */
                         // @ts-expect-error - Allow this to error
-                        const {term, profileIndex} = parsedBody;
+                        const {term} = parsedBody;
                         const invokeParams = {
                             text: term,
                             details: {},
-                            optionsContext: {index: profileIndex},
+                            optionsContext: {index: optionsFull.profileCurrent},
                         };
                         result = await this._invoke(
                             'termsFind',
@@ -161,11 +163,11 @@ export class YomitanApi {
                     case 'kanjiEntries': {
                         /** @type {import('yomitan-api.js').kanjiEntriesInput} */
                         // @ts-expect-error - Allow this to error
-                        const {character, profileIndex} = parsedBody;
+                        const {character} = parsedBody;
                         const invokeParams = {
                             text: character,
                             details: {},
-                            optionsContext: {index: profileIndex},
+                            optionsContext: {index: optionsFull.profileCurrent},
                         };
                         result = await this._invoke(
                             'kanjiFind',

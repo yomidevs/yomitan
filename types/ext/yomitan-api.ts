@@ -17,10 +17,8 @@
 
 export type termEntriesInput = {
     term: string;
-    profileIndex: number;
 };
 
 export type kanjiEntriesInput = {
     character: string;
-    profileIndex: number;
 };
