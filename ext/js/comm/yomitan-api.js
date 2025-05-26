@@ -21,6 +21,9 @@ import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
+import {createAnkiNoteData} from '../data/anki-note-data-creator.js';
+import {getDynamicTemplates} from '../data/anki-template-util.js';
+import {TemplateRenderer} from '../templates/template-renderer.js';
 
 /** */
 export class YomitanApi {
@@ -175,6 +178,23 @@ export class YomitanApi {
                         );
                         break;
                     }
+                    case 'ankiFields': {
+                        /** @type {import('yomitan-api.js').ankiFieldsInput} */
+                        // @ts-expect-error - Allow this to error
+                        const {text, type, handlebar} = parsedBody;
+
+                        const ankiTemplate = await this._getAnkiTemplate(optionsFull.profiles[optionsFull.profileCurrent].options);
+                        const inputCommonData = await this._createCommonData(text, type, optionsFull.profileCurrent);
+                        const templateRenderer = new TemplateRenderer();
+                        templateRenderer.registerDataType('ankiNote', {
+                            modifier: ({marker, commonData}) => createAnkiNoteData(marker, commonData),
+                            composeData: ({marker}, commonData) => ({marker, commonData}),
+                        });
+
+                        const templateResult = templateRenderer.render(ankiTemplate, {marker: handlebar, commonData: inputCommonData}, 'ankiNote');
+                        result = templateResult;
+                        break;
+                    }
                     default:
                         statusCode = 400;
                 }
@@ -184,6 +204,102 @@ export class YomitanApi {
                 log.error(error);
                 this._port.postMessage({action, params, body, data: JSON.stringify(error), responseStatusCode: 500});
             }
+        }
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @returns {Promise<string>}
+     */
+    async _getAnkiTemplate(options) {
+        let staticTemplates = options.anki.fieldTemplates;
+        if (typeof staticTemplates !== 'string') { staticTemplates = await this._invoke('getDefaultAnkiFieldTemplates', void 0); }
+        const dictionaryInfo = await this._invoke('getDictionaryInfo', void 0);
+        const dynamicTemplates = getDynamicTemplates(options, dictionaryInfo);
+        return staticTemplates + '\n' + dynamicTemplates;
+    }
+
+    /**
+     * @param {string} text
+     * @param {import('settings.js').AnkiCardFormatType} type
+     * @param {number} profileIndex
+     * @returns {Promise<import('anki-note-builder.js').CommonData>}
+     */
+    async _createCommonData(text, type, profileIndex) {
+        if (type === 'term') {
+            const invokeParams = {
+                text: text,
+                details: {},
+                optionsContext: {index: profileIndex},
+            };
+            const dictionaryEntries = (await this._invoke('termsFind', invokeParams)).dictionaryEntries;
+            /** @type {import('anki-note-builder.js').CommonData} */
+            return {
+                dictionaryEntry: dictionaryEntries[0],
+                resultOutputMode: 'group',
+                cardFormat: {
+                    type: 'term',
+                    name: 'Test',
+                    deck: 'Test',
+                    model: 'Test',
+                    fields: {
+                        test: {value: '{expression}', overwriteMode: 'overwrite'},
+                    },
+                    icon: 'big-circle',
+                },
+                glossaryLayoutMode: 'default',
+                compactTags: false,
+                context: {
+                    url: '',
+                    documentTitle: 'Yomitan API',
+                    query: text,
+                    fullQuery: text,
+                    sentence: {
+                        text: text,
+                        offset: 0,
+                    },
+                },
+                dictionaryStylesMap: new Map(),
+            };
+        } else {
+            /** @type {import('anki-note-builder.js').CommonData} */
+            return {
+                dictionaryEntry: {
+                    type: 'kanji',
+                    character: '',
+                    dictionary: '',
+                    dictionaryIndex: 0,
+                    dictionaryAlias: '',
+                    onyomi: [],
+                    kunyomi: [],
+                    tags: [],
+                    stats: {},
+                    definitions: [],
+                    frequencies: [],
+                },
+                resultOutputMode: 'group',
+                cardFormat: {
+                    type: 'term',
+                    name: '',
+                    deck: '',
+                    model: '',
+                    fields: {},
+                    icon: 'big-circle',
+                },
+                glossaryLayoutMode: 'default',
+                compactTags: false,
+                context: {
+                    url: '',
+                    documentTitle: '',
+                    query: '',
+                    fullQuery: '',
+                    sentence: {
+                        text: '',
+                        offset: 0,
+                    },
+                },
+                dictionaryStylesMap: new Map(),
+            };
         }
     }
 

@@ -22,3 +22,9 @@ export type termEntriesInput = {
 export type kanjiEntriesInput = {
     character: string;
 };
+
+export type ankiFieldsInput = {
+    text: string;
+    type: 'term' | 'kanji';
+    handlebar: string;
+};
