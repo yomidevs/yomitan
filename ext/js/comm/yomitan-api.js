@@ -143,13 +143,21 @@ export class YomitanApi {
                 let result = null;
                 let statusCode = 200;
                 switch (action) {
-                    case 'termsFind':
+                    case 'termEntries': {
+                        /** @type {import('yomitan-api.js').termEntriesInput} */
+                        // @ts-expect-error - Allow this to error
+                        const {term, profileIndex} = parsedBody;
+                        const invokeParams = {
+                            text: term,
+                            details: {},
+                            optionsContext: {index: profileIndex},
+                        };
                         result = await this._invoke(
-                            action,
-                            // @ts-expect-error - parsedBody can't reasonable be validated for ts
-                            parsedBody,
+                            'termsFind',
+                            invokeParams,
                         );
                         break;
+                    }
                     default:
                         statusCode = 400;
                 }
