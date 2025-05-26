@@ -179,6 +179,7 @@ export class YomitanApi {
 
                 this._port.postMessage({action, params, body, data: result, responseStatusCode: statusCode});
             } catch (error) {
+                log.error(error);
                 this._port.postMessage({action, params, body, data: JSON.stringify(error), responseStatusCode: 500});
             }
         }
