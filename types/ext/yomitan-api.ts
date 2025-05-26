@@ -27,4 +27,5 @@ export type ankiFieldsInput = {
     text: string;
     type: 'term' | 'kanji';
     markers: [string];
+    maxEntries: number;
 };

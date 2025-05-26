@@ -181,10 +181,13 @@ export class YomitanApi {
                     case 'ankiFields': {
                         /** @type {import('yomitan-api.js').ankiFieldsInput} */
                         // @ts-expect-error - Allow this to error
-                        const {text, type, markers} = parsedBody;
+                        const {text, type, markers, maxEntries} = parsedBody;
 
                         const ankiTemplate = await this._getAnkiTemplate(optionsFull.profiles[optionsFull.profileCurrent].options);
-                        const dictionaryEntries = await this._getDictionaryEntries(text, type, optionsFull.profileCurrent);
+                        let dictionaryEntries = await this._getDictionaryEntries(text, type, optionsFull.profileCurrent);
+                        if (maxEntries > 0) {
+                            dictionaryEntries = dictionaryEntries.slice(0, maxEntries);
+                        }
                         const commonDatas = await this._createCommonDatas(text, dictionaryEntries);
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessDocument = parseHTML('').document;
