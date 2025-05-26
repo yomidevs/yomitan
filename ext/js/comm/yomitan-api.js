@@ -192,11 +192,16 @@ export class YomitanApi {
                         await ankiTemplateRenderer.prepare();
                         const templateRenderer = ankiTemplateRenderer.templateRenderer;
 
-                        /** @type {Record<string, string>} */
-                        const ankiFieldsResults = {};
-                        for (const marker of markers) {
-                            const templateResult = templateRenderer.render(ankiTemplate, {marker: marker, commonData: commonDatas[0]}, 'ankiNote');
-                            ankiFieldsResults[marker] = templateResult.result;
+                        /** @type {Array<Record<string, string[]>>} */
+                        const ankiFieldsResults = [];
+                        for (const commonData of commonDatas) {
+                            /** @type {Record<string, string[]>} */
+                            const ankiFieldsResult = {};
+                            for (const marker of markers) {
+                                const templateResult = templateRenderer.render(ankiTemplate, {marker: marker, commonData: commonData}, 'ankiNote');
+                                ankiFieldsResult[marker] = [templateResult.result];
+                            }
+                            ankiFieldsResults.push(ankiFieldsResult);
                         }
                         result = ankiFieldsResults;
                         break;
