@@ -18,6 +18,7 @@
 import {invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {parseJson} from '../core/json.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 
@@ -127,19 +128,32 @@ export class YomitanApi {
      */
     async _onMessage(message) {
         if (typeof message !== 'object' || message === null) { return; }
-        console.log('Yomitan API _onMessage');
-        console.log(message);
-
-        const {action, params} = /** @type {import('core').SerializableObject} */ (message);
 
         if (this._port !== null) {
-            const invokeParams = {
-                text: 'わかる',
-                details: {},
-                optionsContext: {index: 0},
-            };
-            const term = await this._invoke('termsFind', invokeParams);
-            this._port.postMessage({action, params, data: JSON.stringify(term.dictionaryEntries)});
+            const {action, params, body} = /** @type {import('core').SerializableObject} */ (message);
+            if (typeof action !== 'string' || typeof params !== 'object' || typeof body !== 'string') {
+                this._port.postMessage({action, params, body, data: 'null', responseStatusCode: 400});
+                return;
+            }
+
+            try {
+                const parsedBody = parseJson(body);
+
+                let result = null;
+                let statusCode = 200;
+                switch (action) {
+                    case 'termsFind':
+                        // @ts-expect-error - Better to let fail than to type correctly
+                        result = await this._invoke(action, parsedBody);
+                        break;
+                    default:
+                        statusCode = 400;
+                }
+
+                this._port.postMessage({action, params, body, data: JSON.stringify(result), responseStatusCode: statusCode});
+            } catch (error) {
+                this._port.postMessage({action, params, body, data: JSON.stringify(error), responseStatusCode: 500});
+            }
         }
     }
 
