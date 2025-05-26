@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {parseHTML} from '../../lib/linkedom.js';
 import {invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
-import {createAnkiNoteData} from '../data/anki-note-data-creator.js';
 import {getDynamicTemplates} from '../data/anki-template-util.js';
-import {TemplateRenderer} from '../templates/template-renderer.js';
+import {AnkiTemplateRenderer} from '../templates/anki-template-renderer.js';
 
 /** */
 export class YomitanApi {
@@ -185,14 +185,14 @@ export class YomitanApi {
 
                         const ankiTemplate = await this._getAnkiTemplate(optionsFull.profiles[optionsFull.profileCurrent].options);
                         const inputCommonData = await this._createCommonData(text, type, optionsFull.profileCurrent);
-                        const templateRenderer = new TemplateRenderer();
-                        templateRenderer.registerDataType('ankiNote', {
-                            modifier: ({marker, commonData}) => createAnkiNoteData(marker, commonData),
-                            composeData: ({marker}, commonData) => ({marker, commonData}),
-                        });
+                        // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
+                        const domlessDocument = parseHTML('').document;
+                        const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument);
+                        await ankiTemplateRenderer.prepare();
+                        const templateRenderer = ankiTemplateRenderer.templateRenderer;
 
                         const templateResult = templateRenderer.render(ankiTemplate, {marker: handlebar, commonData: inputCommonData}, 'ankiNote');
-                        result = templateResult;
+                        result = templateResult.result;
                         break;
                     }
                     default:
