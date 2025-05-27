@@ -145,7 +145,7 @@ export class YomitanApi {
 
             try {
                 /** @type {?object} */
-                const parsedBody = parseJson(body);
+                const parsedBody = body.length > 0 ? parseJson(body) : null;
 
                 let result = null;
                 let statusCode = 200;
