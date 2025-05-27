@@ -305,7 +305,7 @@ export class YomitanApi {
             throw new Error('Missing Yomitan API URL');
         }
         try {
-            const response = await fetch(url + '/remoteVersion', {
+            const response = await fetch(url + '/serverVersion', {
                 method: 'POST',
             });
             /** @type {import('yomitan-api.js').remoteVersionResponse} */
