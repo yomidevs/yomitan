@@ -353,7 +353,9 @@ type ApiSurface = {
         return: true;
     };
     testYomitanApi: {
-        params: void;
+        params: {
+            url: string;
+        };
         return: true;
     };
     isTextLookupWorthy: {

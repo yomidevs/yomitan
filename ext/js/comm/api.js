@@ -347,10 +347,11 @@ export class API {
     }
 
     /**
+     * @param {string} url
      * @returns {Promise<import('api').ApiReturn<'testYomitanApi'>>}
      */
-    testYomitanApi() {
-        return this._invoke('testYomitanApi', void 0);
+    testYomitanApi(url) {
+        return this._invoke('testYomitanApi', {url});
     }
 
     /**
