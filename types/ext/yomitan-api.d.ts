@@ -29,3 +29,7 @@ export type ankiFieldsInput = {
     markers: [string];
     maxEntries: number;
 };
+
+export type remoteVersionResponse = {
+    version: number;
+};

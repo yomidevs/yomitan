@@ -19,7 +19,7 @@ import {parseHTML} from '../../lib/linkedom.js';
 import {invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {parseJson} from '../core/json.js';
+import {parseJson, readResponseJson} from '../core/json.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {getDynamicTemplates} from '../data/anki-template-util.js';
@@ -102,12 +102,14 @@ export class YomitanApi {
     }
 
     /**
+     * @param {string} url
      * @returns {Promise<?number>}
      */
-    async getRemoteVersion() {
+    async getRemoteVersion(url) {
         if (this._port === null) {
             await this.startApiServer();
         }
+        await this._updateRemoteVersion(url);
         return this._remoteVersion;
     }
 
@@ -296,6 +298,27 @@ export class YomitanApi {
     }
 
     /**
+     * @param {string} url
+     */
+    async _updateRemoteVersion(url) {
+        if (!url) {
+            throw new Error('Missing Yomitan API URL');
+        }
+        try {
+            const response = await fetch(url + '/remoteVersion', {
+                method: 'POST',
+            });
+            /** @type {import('yomitan-api.js').remoteVersionResponse} */
+            const {version} = await readResponseJson(response);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            this._remoteVersion = version;
+        } catch (e) {
+            log.error(e);
+            throw new Error('Failed to fetch. Try again in a moment. The nativemessaging component can take a few seconds to start.');
+        }
+    }
+
+    /**
      * @returns {void}
      */
     _onDisconnect() {
@@ -334,28 +357,6 @@ export class YomitanApi {
         this._eventListeners.addListener(port.onMessage, this._onMessage.bind(this));
         this._eventListeners.addListener(port.onDisconnect, this._onDisconnect.bind(this));
         this._port = port;
-
-        this._remoteVersion = 1;
-
-        // try {
-        //     const data = await this._invoke('get_version', {});
-        //     if (typeof data !== 'object' || data === null) {
-        //         throw new Error('Invalid version');
-        //     }
-        //     const {version} = /** @type {import('core').SerializableObject} */ (data);
-        //     if (typeof version !== 'number') {
-        //         throw new Error('Invalid version');
-        //     }
-        //     this._remoteVersion = version;
-        //     if (version !== this._version) {
-        //         throw new Error(`Unsupported Yomitan Api native messenger version ${version}. Yomitan supports version ${this._version}.`);
-        //     }
-        // } catch (e) {
-        //     if (this._port === port) {
-        //         this._clearPort();
-        //     }
-        //     throw e;
-        // }
     }
 
     /**
