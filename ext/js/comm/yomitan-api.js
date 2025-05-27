@@ -150,6 +150,11 @@ export class YomitanApi {
                 let result = null;
                 let statusCode = 200;
                 switch (action) {
+                    case 'yomitanVersion': {
+                        const {version} = chrome.runtime.getManifest();
+                        result = {version: version};
+                        break;
+                    }
                     case 'termEntries': {
                         /** @type {import('yomitan-api.js').termEntriesInput} */
                         // @ts-expect-error - Allow this to error
