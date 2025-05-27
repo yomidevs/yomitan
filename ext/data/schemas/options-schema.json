@@ -128,7 +128,8 @@
                                     "fontFamily",
                                     "fontSize",
                                     "lineHeight",
-                                    "enableYomitanApi"
+                                    "enableYomitanApi",
+                                    "yomitanApiServer"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -341,6 +342,10 @@
                                     "enableYomitanApi": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "yomitanApiServer": {
+                                        "type": "string",
+                                        "default": "http://127.0.0.1:8766"
                                     }
                                 }
                             },
