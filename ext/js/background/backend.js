@@ -1028,7 +1028,7 @@ export class Backend {
             }
         } finally {
             // Disconnect if the connection was previously disconnected
-            if (disconnect && this._yomitanApi.isEnabled() && this._yomitanApi.isActive()) {
+            if (disconnect && this._yomitanApi.isEnabled()) {
                 this._yomitanApi.disconnect();
             }
         }
