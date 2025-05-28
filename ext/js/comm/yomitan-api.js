@@ -33,10 +33,6 @@ export class YomitanApi {
     constructor(apiMap) {
         /** @type {?chrome.runtime.Port} */
         this._port = null;
-        /** @type {number} */
-        this._sequence = 0;
-        /** @type {Map<number, {resolve: (value: unknown) => void, reject: (reason?: unknown) => void, timer: import('core').Timeout}>} */
-        this._invocations = new Map();
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
         /** @type {number} */
@@ -85,13 +81,6 @@ export class YomitanApi {
      */
     isConnected() {
         return (this._port !== null);
-    }
-
-    /**
-     * @returns {boolean}
-     */
-    isActive() {
-        return (this._invocations.size > 0);
     }
 
     /**
@@ -315,7 +304,7 @@ export class YomitanApi {
             });
             /** @type {import('yomitan-api.js').remoteVersionResponse} */
             const {version} = await readResponseJson(response);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
             this._remoteVersion = version;
         } catch (e) {
             log.error(e);
@@ -330,10 +319,7 @@ export class YomitanApi {
         if (this._port === null) { return; }
         const e = chrome.runtime.lastError;
         const error = new Error(e ? e.message : 'Yomitan Api disconnected');
-        for (const {reject, timer} of this._invocations.values()) {
-            clearTimeout(timer);
-            reject(error);
-        }
+        log.error(error);
         this._clearPort();
     }
 
@@ -372,9 +358,7 @@ export class YomitanApi {
             this._port.disconnect();
             this._port = null;
         }
-        this._invocations.clear();
         this._eventListeners.removeAllEventListeners();
-        this._sequence = 0;
         this._setupPortPromise = null;
     }
 
