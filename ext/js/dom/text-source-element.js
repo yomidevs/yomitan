@@ -69,6 +69,14 @@ export class TextSourceElement {
     }
 
     /**
+     * The string representing the element's constrained text value.
+     * @type {string}
+     */
+    get content() {
+        return this._content;
+    }
+
+    /**
      * The text start offset position within the full content.
      * @type {number}
      */
