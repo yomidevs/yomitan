@@ -1098,7 +1098,7 @@ export class TextScanner extends EventDispatcher {
 
         eventListenerInfos.push(this._getSelectionChangeCheckUserSelectionListener());
 
-        for (const [...args] of eventListenerInfos) {
+        for (const args of eventListenerInfos) {
             this._eventListeners.addEventListener(...args);
         }
     }
