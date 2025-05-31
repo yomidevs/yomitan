@@ -127,7 +127,9 @@
                                     "stickySearchHeader",
                                     "fontFamily",
                                     "fontSize",
-                                    "lineHeight"
+                                    "lineHeight",
+                                    "enableYomitanApi",
+                                    "yomitanApiServer"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -336,6 +338,14 @@
                                     "stickySearchHeader": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "enableYomitanApi": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "yomitanApiServer": {
+                                        "type": "string",
+                                        "default": "http://127.0.0.1:8766"
                                     }
                                 }
                             },

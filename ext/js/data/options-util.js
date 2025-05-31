@@ -576,6 +576,7 @@ export class OptionsUtil {
             this._updateVersion62,
             this._updateVersion63,
             this._updateVersion64,
+            this._updateVersion65,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1720,6 +1721,18 @@ export class OptionsUtil {
                         break;
                 }
             }
+        }
+    }
+
+    /**
+     *  - Added general.enableYomitanApi
+     *  - Added general.yomitanApiServer
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion65(options) {
+        for (const profile of options.profiles) {
+            profile.options.general.enableYomitanApi = false;
+            profile.options.general.yomitanApiServer = 'http://127.0.0.1:8766';
         }
     }
 
