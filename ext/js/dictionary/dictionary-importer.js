@@ -24,12 +24,12 @@ import {
     ZipReader as ZipReader0,
     configure,
 } from '../../lib/zip.js';
-import {compareRevisions} from './dictionary-data-util.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {toError} from '../core/to-error.js';
 import {stringReverse} from '../core/utilities.js';
 import {getFileExtensionFromImageMediaType, getImageMediaTypeFromFileName} from '../media/media-util.js';
+import {compareRevisions} from './dictionary-data-util.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 const BlobWriter = /** @type {typeof import('@zip.js/zip.js').BlobWriter} */ (/** @type {unknown} */ (BlobWriter0));
@@ -64,6 +64,28 @@ export class DictionaryImporter {
         if (!dictionaryDatabase.isPrepared()) {
             throw new Error('Database is not ready');
         }
+
+        /** @type {Error[]} */
+        const errors = [];
+        const maxTransactionLength = 1000;
+
+        /**
+         * @template {import('dictionary-database').ObjectStoreName} T
+         * @param {T} objectStoreName
+         * @param {import('dictionary-database').ObjectStoreData<T>[]} entries
+         */
+        const bulkAdd = async (objectStoreName, entries) => {
+            const ii = entries.length;
+            for (let i = 0; i < ii; i += maxTransactionLength) {
+                const count = Math.min(maxTransactionLength, ii - i);
+
+                try {
+                    await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
+                } catch (e) {
+                    errors.push(toError(e));
+                }
+            }
+        };
 
         this._progressReset();
 
@@ -105,66 +127,129 @@ export class DictionaryImporter {
         const {termFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
 
         // Load data
-        this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
-        const termList = await (
-            version === 1 ?
-            this._readFileSequence(termFiles, this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
-            this._readFileSequence(termFiles, this._convertTermBankEntryV3.bind(this), dataBankSchemas[0], dictionaryTitle)
-        );
-        const termMetaList = await this._readFileSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
-        const kanjiList = await (
-            version === 1 ?
-            this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
-            this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
-        );
-        const kanjiMetaList = await this._readFileSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
-        const tagList = await this._readFileSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
-        this._addOldIndexTags(index, tagList, dictionaryTitle);
-
-        // Prefix wildcard support
         const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
-        if (prefixWildcardsSupported) {
-            for (const entry of termList) {
-                entry.expressionReverse = stringReverse(entry.expression);
-                entry.readingReverse = stringReverse(entry.reading);
-            }
-        }
+        this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
 
-        // Extended data support
-        this._progressNextStep(termList.length);
-        const formatProgressInterval = 1000;
+        let termListLength = 0;
         /** @type {import('dictionary-importer').ImportRequirement[]} */
         const requirements = [];
-        for (let i = 0, ii = termList.length; i < ii; ++i) {
-            const entry = termList[i];
-            const glossaryList = entry.glossary;
-            for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
-                const glossary = glossaryList[j];
-                if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
-                glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+        for (const termFile of termFiles) {
+            let termList = await (
+                version === 1 ?
+                this._readFileSequence([termFile], this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
+                this._readFileSequence([termFile], this._convertTermBankEntryV3.bind(this), dataBankSchemas[0], dictionaryTitle)
+            );
+
+            // Prefix wildcard support
+            if (prefixWildcardsSupported) {
+                for (const entry of termList) {
+                    entry.expressionReverse = stringReverse(entry.expression);
+                    entry.readingReverse = stringReverse(entry.reading);
+                }
             }
-            if ((i % formatProgressInterval) === 0) {
-                this._progressData.index = i;
-                this._progress();
+
+            // Extended data support
+            for (let i = 0, ii = termList.length; i < ii; ++i) {
+                const entry = termList[i];
+                const glossaryList = entry.glossary;
+                for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
+                    const glossary = glossaryList[j];
+                    if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
+                    glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+                }
             }
+
+            await bulkAdd('terms', termList);
+            termListLength += termList.length;
+
+            this._progress();
+
+            termList = [];
         }
-        this._progress();
+
+        /** @type {import('dictionary-importer').SummaryMetaCount} */
+        let termMetaListLength = {total: 0};
+        {
+            let termMetaList = await this._readFileSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
+
+            await bulkAdd('termMeta', termMetaList);
+            termMetaListLength = this._getMetaCounts(termMetaList);
+
+            this._progressData.index += termMetaFiles.length - 1;
+            this._progress();
+
+            termMetaList = [];
+        }
+
+        let kanjiListLength = 0;
+        {
+            let kanjiList = await (
+                version === 1 ?
+                this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
+                this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
+            );
+
+            await bulkAdd('kanji', kanjiList);
+            kanjiListLength = kanjiList.length;
+
+            this._progressData.index += kanjiFiles.length - 1;
+            this._progress();
+
+            kanjiList = [];
+        }
+
+        /** @type {import('dictionary-importer').SummaryMetaCount} */
+        let kanjiMetaListLength = {total: 0};
+        {
+            let kanjiMetaList = await this._readFileSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
+
+            await bulkAdd('kanjiMeta', kanjiMetaList);
+            kanjiMetaListLength = this._getMetaCounts(kanjiMetaList);
+
+            this._progressData.index += kanjiMetaFiles.length - 1;
+            this._progress();
+
+            kanjiMetaList = [];
+        }
+
+        let tagListLength = 0;
+        {
+            let tagList = await this._readFileSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
+            this._addOldIndexTags(index, tagList, dictionaryTitle);
+
+            await bulkAdd('tagMeta', tagList);
+            tagListLength = tagList.length;
+
+            this._progressData.index += tagFiles.length - 1;
+            this._progress();
+
+            tagList = [];
+        }
 
         // Async requirements
         this._progressNextStep(requirements.length);
-        const {media} = await this._resolveAsyncRequirements(requirements, fileMap);
+
+        let mediaLength = 0;
+        {
+            let {media} = await this._resolveAsyncRequirements(requirements, fileMap);
+
+            await bulkAdd('media', media);
+            mediaLength = media.length;
+
+            media = [];
+        }
 
         // Add dictionary descriptor
-        this._progressNextStep(termList.length + termMetaList.length + kanjiList.length + kanjiMetaList.length + tagList.length + media.length);
+        this._progressNextStep(0);
 
         /** @type {import('dictionary-importer').SummaryCounts} */
         const counts = {
-            terms: {total: termList.length},
-            termMeta: this._getMetaCounts(termMetaList),
-            kanji: {total: kanjiList.length},
-            kanjiMeta: this._getMetaCounts(kanjiMetaList),
-            tagMeta: {total: tagList.length},
-            media: {total: media.length},
+            terms: {total: termListLength},
+            termMeta: termMetaListLength,
+            kanji: {total: kanjiListLength},
+            kanjiMeta: kanjiMetaListLength,
+            tagMeta: {total: tagListLength},
+            media: {total: mediaLength},
         };
 
         const stylesFileName = 'styles.css';
@@ -187,39 +272,6 @@ export class DictionaryImporter {
 
         const summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
-
-        // Add data
-        /** @type {Error[]} */
-        const errors = [];
-        const maxTransactionLength = 1000;
-
-        /**
-         * @template {import('dictionary-database').ObjectStoreName} T
-         * @param {T} objectStoreName
-         * @param {import('dictionary-database').ObjectStoreData<T>[]} entries
-         */
-        const bulkAdd = async (objectStoreName, entries) => {
-            const ii = entries.length;
-            for (let i = 0; i < ii; i += maxTransactionLength) {
-                const count = Math.min(maxTransactionLength, ii - i);
-
-                try {
-                    await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
-                } catch (e) {
-                    errors.push(toError(e));
-                }
-
-                this._progressData.index += count;
-                this._progress();
-            }
-        };
-
-        await bulkAdd('terms', termList);
-        await bulkAdd('termMeta', termMetaList);
-        await bulkAdd('kanji', kanjiList);
-        await bulkAdd('kanjiMeta', kanjiMetaList);
-        await bulkAdd('tagMeta', tagList);
-        await bulkAdd('media', media);
 
         this._progress();
 
@@ -854,6 +906,7 @@ export class DictionaryImporter {
         }
         return results;
     }
+
 
     /**
      * @param {import('dictionary-database').DatabaseTermMeta[]|import('dictionary-database').DatabaseKanjiMeta[]} metaList
