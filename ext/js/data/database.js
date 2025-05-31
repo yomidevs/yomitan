@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {toError} from '../core/to-error.js';
+
 /**
  * @template {string} TObjectStoreName
  */
@@ -47,6 +49,12 @@ export class Database {
                     this._upgrade(db, transaction, oldVersion, structure);
                 }
             });
+            if (this._db.objectStoreNames.length === 0) {
+                this.close();
+                await Database.deleteDatabase(databaseName);
+                this._isOpening = false;
+                await this.open(databaseName, version, structure);
+            }
         } finally {
             this._isOpening = false;
         }
