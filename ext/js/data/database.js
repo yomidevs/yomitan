@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {toError} from '../core/to-error.js';
+
 /**
  * @template {string} TObjectStoreName
  */
@@ -47,6 +49,12 @@ export class Database {
                     this._upgrade(db, transaction, oldVersion, structure);
                 }
             });
+            if (this._db.objectStoreNames.length === 0) {
+                this.close();
+                await Database.deleteDatabase(databaseName);
+                this._isOpening = false;
+                await this.open(databaseName, version, structure);
+            }
         } finally {
             this._isOpening = false;
         }
@@ -91,7 +99,11 @@ export class Database {
         if (this._db === null) {
             throw new Error(this._isOpening ? 'Database not ready' : 'Database not open');
         }
-        return this._db.transaction(storeNames, mode);
+        try {
+            return this._db.transaction(storeNames, mode);
+        } catch (e) {
+            throw new Error(toError(e).message + '\nDatabase transaction error, you may need to Delete All dictionaries to reset the database or manually delete the Indexed DB database.');
+        }
     }
 
     /**
