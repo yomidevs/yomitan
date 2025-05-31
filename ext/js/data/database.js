@@ -91,7 +91,11 @@ export class Database {
         if (this._db === null) {
             throw new Error(this._isOpening ? 'Database not ready' : 'Database not open');
         }
-        return this._db.transaction(storeNames, mode);
+        try {
+            return this._db.transaction(storeNames, mode);
+        } catch (e) {
+            throw new Error(toError(e).message + '\nDatabase transaction error, you may need to Delete All dictionaries to reset the database or manually delete the Indexed DB database.');
+        }
     }
 
     /**
