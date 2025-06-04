@@ -244,7 +244,35 @@
             }
         ]
     },
-    "he": {
+
+    "haw": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "pukui-elbert-1986",
+                "description": "English to Hawaiian Dictionary from Pukui-Elbert in 1986",
+                "homepage": "https://github.com/bee-san/awesome-hawaiian-language",
+                "downloadUrl": "https://github.com/bee-san/awesome-hawaiian-language/releases/download/0.0.1/Pukui-Elbert-1986-Deduped-Yomitan.zip"
+            },
+            {
+                "name": "combined-dictionary",
+                "description": "English to Hawaiian Dictionary from from Stephen (Kepano) Trussel",
+                "homepage": "https://github.com/bee-san/awesome-hawaiian-language",
+                "downloadUrl": "https://github.com/bee-san/awesome-hawaiian-language/releases/download/0.0.1/yomitan-combined-dict.zip"
+            },
+            {
+                
+                "name": "hawaiian-place-names-2002",
+                "description": "Hawaiian Place Names, published 2002",
+                "homepage": "https://github.com/bee-san/awesome-hawaiian-language",
+                "downloadUrl": "https://github.com/bee-san/awesome-hawaiian-language/releases/download/0.0.1/Hawaii-place-names-2002-yomitan.zip"
+             }
+        ]
+    },
+     "he": {
         "frequency": [],
         "grammar": [],
         "kanji": [],
