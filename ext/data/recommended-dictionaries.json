@@ -244,7 +244,6 @@
             }
         ]
     },
-
     "haw": {
         "frequency": [],
         "grammar": [],
@@ -264,15 +263,14 @@
                 "downloadUrl": "https://github.com/bee-san/awesome-hawaiian-language/releases/download/0.0.1/yomitan-combined-dict.zip"
             },
             {
-                
                 "name": "hawaiian-place-names-2002",
                 "description": "Hawaiian Place Names, published 2002",
                 "homepage": "https://github.com/bee-san/awesome-hawaiian-language",
                 "downloadUrl": "https://github.com/bee-san/awesome-hawaiian-language/releases/download/0.0.1/Hawaii-place-names-2002-yomitan.zip"
-             }
+            }
         ]
     },
-     "he": {
+    "he": {
         "frequency": [],
         "grammar": [],
         "kanji": [],
