@@ -97,6 +97,9 @@ type AllTextProcessors = {
             convertHaToTaMarbuta: TextProcessor<boolean>;
         };
     };
+    bg: {
+        pre: CapitalizationPreprocessors;
+    };
     cs: {
         pre: CapitalizationPreprocessors;
     };
@@ -143,6 +146,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor & {
             convertLatinToGreek: TextProcessor<boolean>;
         };
+    };
+    haw: {
+        pre: CapitalizationPreprocessors;
     };
     he: Record<string, never>;
     hi: Record<string, never>;

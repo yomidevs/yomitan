@@ -2027,7 +2027,7 @@ export class Display extends EventDispatcher {
      * @param {import('settings').ProfileOptions} options
      */
     _updateContentTextScanner(options) {
-        if (!options.scanning.enablePopupSearch) {
+        if (!options.scanning.enablePopupSearch || (!options.scanning.enableOnSearchPage && this._pageType === 'search')) {
             if (this._contentTextScanner !== null) {
                 this._contentTextScanner.setEnabled(false);
                 this._contentTextScanner.clearSelection();

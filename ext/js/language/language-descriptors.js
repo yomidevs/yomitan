@@ -113,6 +113,13 @@ const languageDescriptors = [
         languageTransforms: arabicTransforms,
     },
     {
+        iso: 'bg',
+        iso639_3: 'bul',
+        name: 'Bulgarian',
+        exampleText: 'чета',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'cs',
         iso639_3: 'ces',
         name: 'Czech',
@@ -223,6 +230,14 @@ const languageDescriptors = [
             convertLatinToGreek,
         },
         languageTransforms: ancientGreekTransforms,
+    },
+    {
+        // no 2 letter iso for hawaiian
+        iso: 'haw',
+        iso639_3: 'haw',
+        name: 'Hawaiian',
+        exampleText: 'heluhelu',
+        textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'he',

@@ -505,7 +505,7 @@ export class TextScanner extends EventDispatcher {
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
-            } else if (showEmpty || (textSource !== null && isAltText && await this._isTextLookupWorthy(textSource.fullContent))) {
+            } else if (showEmpty || (textSource !== null && isAltText && await this._isTextLookupWorthy(textSource.content))) {
                 // Shows a "No results found" message
                 dictionaryEntries = [];
                 sentence = {text: '', offset: 0};
@@ -1098,7 +1098,7 @@ export class TextScanner extends EventDispatcher {
 
         eventListenerInfos.push(this._getSelectionChangeCheckUserSelectionListener());
 
-        for (const [...args] of eventListenerInfos) {
+        for (const args of eventListenerInfos) {
             this._eventListeners.addEventListener(...args);
         }
     }

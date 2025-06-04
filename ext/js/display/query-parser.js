@@ -118,8 +118,9 @@ export class QueryParser extends EventDispatcher {
             }
             this._textScanner.language = language;
             this._textScanner.setOptions(scanning);
+            this._textScanner.setEnabled(true);
         }
-        this._textScanner.setEnabled(true);
+
         if (selectedParserChanged && this._parseResults.length > 0) {
             this._renderParseResult();
         }
