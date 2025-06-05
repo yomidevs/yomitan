@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
- * Copyright (C) 2020-2022  Yomichan Authors
+ * Copyright (C) 2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,15 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {AnkiTemplateRenderer} from './anki-template-renderer.js';
-import {TemplateRendererFrameApi} from './template-renderer-frame-api.js';
+export type termEntriesInput = {
+    term: string;
+};
 
-/** Entry point. */
-async function main() {
-    const ankiTemplateRenderer = new AnkiTemplateRenderer(document);
-    await ankiTemplateRenderer.prepare();
-    const templateRendererFrameApi = new TemplateRendererFrameApi(ankiTemplateRenderer.templateRenderer);
-    templateRendererFrameApi.prepare();
-}
+export type kanjiEntriesInput = {
+    character: string;
+};
 
-await main();
+export type ankiFieldsInput = {
+    text: string;
+    type: 'term' | 'kanji';
+    markers: [string];
+    maxEntries: number;
+};
+
+export type remoteVersionResponse = {
+    version: number;
+};

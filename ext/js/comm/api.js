@@ -347,6 +347,14 @@ export class API {
     }
 
     /**
+     * @param {string} url
+     * @returns {Promise<import('api').ApiReturn<'testYomitanApi'>>}
+     */
+    testYomitanApi(url) {
+        return this._invoke('testYomitanApi', {url});
+    }
+
+    /**
      * @param {import('api').ApiParam<'isTextLookupWorthy', 'text'>} text
      * @param {import('api').ApiParam<'isTextLookupWorthy', 'language'>} language
      * @returns {Promise<import('api').ApiReturn<'isTextLookupWorthy'>>}
