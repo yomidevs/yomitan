@@ -63,7 +63,7 @@ jobs:
         uses: cardinalby/schema-validator-action@2166123eb256fa40baef7e22ab1379708425efc7 # v3.1.1
         with:
           file: ext/manifest.json
-          schema: "https://json.schemastore.org/chrome-manifest.json"
+          schema: ./dev/data/chrome-manifest-schema.json
           fixSchemas: true
 
   bench:
