@@ -241,6 +241,9 @@ type AllTextProcessors = {
     tr: {
         pre: CapitalizationPreprocessors;
     };
+    tok: {
+        pre: CapitalizationPreprocessors;
+    };
     uk: {
         pre: CapitalizationPreprocessors;
     };
