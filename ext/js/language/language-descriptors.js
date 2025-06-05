@@ -473,6 +473,13 @@ const languageDescriptors = [
         textPreprocessors: capitalizationPreprocessors,
     },
     {
+        iso: 'tok',
+        iso639_3: 'tok',
+        name: 'Toki Pona',
+        exampleText: 'wile',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'uk',
         iso639_3: 'ukr',
         name: 'Ukrainian',
