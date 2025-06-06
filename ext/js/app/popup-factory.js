@@ -63,6 +63,7 @@ export class PopupFactory {
             ['popupFactorySetCustomOuterCss',    this._onApiSetCustomOuterCss.bind(this)],
             ['popupFactoryGetFrameSize',         this._onApiGetFrameSize.bind(this)],
             ['popupFactorySetFrameSize',         this._onApiSetFrameSize.bind(this)],
+            ['popupFactoryIsPointerOver',        this._onApiIsPointerOver.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -349,6 +350,12 @@ export class PopupFactory {
     async _onApiSetFrameSize({id, width, height}) {
         const popup = this._getPopup(id);
         return await popup.setFrameSize(width, height);
+    }
+
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryIsPointerOver'>} */
+    async _onApiIsPointerOver({id}) {
+        const popup = this._getPopup(id);
+        return popup.isPointerOver();
     }
 
     // Private functions
