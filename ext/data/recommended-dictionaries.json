@@ -673,21 +673,7 @@
             }
         ]
     },
-    "tr": {
-        "frequency": [],
-        "grammar": [],
-        "kanji": [],
-        "pronunciation": [],
-        "terms": [
-            {
-                "name": "kty-tr-en",
-                "description": "Turkish to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-tr-en.zip"
-            }
-        ]
-    },
-       "tok": {
+    "tok": {
         "frequency": [],
         "grammar": [],
         "kanji": [],
@@ -782,6 +768,20 @@
                 "description": "Toki Pona to Turkish dictionary",
                 "homepage": "https://github.com/bee-san/awesome-toki-pona",
                 "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.1/toki-pona-to-turkish.zip"
+            }
+        ]
+    },
+    "tr": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-tr-en",
+                "description": "Turkish to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-tr-en.zip"
             }
         ]
     },
