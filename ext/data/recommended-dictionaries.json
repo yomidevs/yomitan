@@ -687,35 +687,7 @@
             }
         ]
     },
-    "uk": {
-        "frequency": [],
-        "grammar": [],
-        "kanji": [],
-        "pronunciation": [],
-        "terms": [
-            {
-                "name": "kty-uk-en",
-                "description": "Ukranian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-uk-en.zip"
-            }
-        ]
-    },
-    "vi": {
-        "frequency": [],
-        "grammar": [],
-        "kanji": [],
-        "pronunciation": [],
-        "terms": [
-            {
-                "name": "kty-vi-en",
-                "description": "Vietnamese to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-vi-en.zip"
-            }
-        ]
-    },
-    "tok": {
+       "tok": {
         "frequency": [],
         "grammar": [],
         "kanji": [],
@@ -810,6 +782,34 @@
                 "description": "Toki Pona to Turkish dictionary",
                 "homepage": "https://github.com/bee-san/awesome-toki-pona",
                 "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.1/toki-pona-to-turkish.zip"
+            }
+        ]
+    },
+    "uk": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-uk-en",
+                "description": "Ukranian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-uk-en.zip"
+            }
+        ]
+    },
+    "vi": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-vi-en",
+                "description": "Vietnamese to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-vi-en.zip"
             }
         ]
     },
