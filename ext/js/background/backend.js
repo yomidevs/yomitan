@@ -20,6 +20,7 @@ import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
+import {YomitanApi} from '../comm/yomitan-api.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {fetchText} from '../core/fetch-utilities.js';
@@ -179,6 +180,7 @@ export class Backend {
             ['isTabSearchPopup',             this._onApiIsTabSearchPopup.bind(this)],
             ['triggerDatabaseUpdated',       this._onApiTriggerDatabaseUpdated.bind(this)],
             ['testMecab',                    this._onApiTestMecab.bind(this)],
+            ['testYomitanApi',               this._onApiTestYomitanApi.bind(this)],
             ['isTextLookupWorthy',           this._onApiIsTextLookupWorthy.bind(this)],
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
@@ -202,6 +204,9 @@ export class Backend {
             ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
             ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)],
         ]));
+
+        /** @type {YomitanApi} */
+        this._yomitanApi = new YomitanApi(this._apiMap);
     }
 
     /**
@@ -994,6 +999,43 @@ export class Backend {
         return true;
     }
 
+    /** @type {import('api').ApiHandler<'testYomitanApi'>} */
+    async _onApiTestYomitanApi({url}) {
+        if (!this._yomitanApi.isEnabled()) {
+            throw new Error('Yomitan Api not enabled');
+        }
+
+        let permissionsOkay = false;
+        try {
+            permissionsOkay = await hasPermissions({permissions: ['nativeMessaging']});
+        } catch (e) {
+            // NOP
+        }
+        if (!permissionsOkay) {
+            throw new Error('Insufficient permissions');
+        }
+
+        const disconnect = !this._yomitanApi.isConnected();
+        try {
+            const version = await this._yomitanApi.getRemoteVersion(url);
+            if (version === null) {
+                throw new Error('Could not connect to native Yomitan API component');
+            }
+
+            const localVersion = this._yomitanApi.getLocalVersion();
+            if (version !== localVersion) {
+                throw new Error(`Yomitan API component version not supported: ${version}`);
+            }
+        } finally {
+            // Disconnect if the connection was previously disconnected
+            if (disconnect && this._yomitanApi.isEnabled()) {
+                this._yomitanApi.disconnect();
+            }
+        }
+
+        return true;
+    }
+
     /** @type {import('api').ApiHandler<'isTextLookupWorthy'>} */
     _onApiIsTextLookupWorthy({text, language}) {
         return isTextLookupWorthy(text, language);
@@ -1404,6 +1446,8 @@ export class Backend {
         this._anki.apiKey = apiKey;
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
+
+        void this._yomitanApi.setEnabled(options.general.enableYomitanApi && enabled);
 
         if (options.clipboard.enableBackgroundMonitor && enabled) {
             this._clipboardMonitor.start();

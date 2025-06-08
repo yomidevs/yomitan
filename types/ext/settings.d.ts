@@ -151,6 +151,7 @@ export type GeneralOptions = {
     sortFrequencyDictionary: string | null;
     sortFrequencyDictionaryOrder: SortFrequencyDictionaryOrder;
     stickySearchHeader: boolean;
+    enableYomitanApi: boolean;
 };
 
 export type PopupWindowOptions = {

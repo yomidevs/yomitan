@@ -312,6 +312,8 @@ function createProfileOptionsUpdatedTestData1() {
             sortFrequencyDictionary: null,
             sortFrequencyDictionaryOrder: 'descending',
             stickySearchHeader: false,
+            enableYomitanApi: false,
+            yomitanApiServer: 'http://127.0.0.1:8766',
         },
         audio: {
             enabled: true,
@@ -687,7 +689,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 64,
+        version: 65,
         global: {
             database: {
                 prefixWildcardsSupported: false,
