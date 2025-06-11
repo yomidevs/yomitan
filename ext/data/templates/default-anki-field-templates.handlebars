@@ -341,17 +341,29 @@
     {{~#if (op ">" definition.frequencies.length 0)~}}
         <ul style="text-align: left;">
         {{~#each definition.frequencies~}}
-            <li>
-            {{~#if (op "!==" ../definition.type "kanji")~}}
-                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
-                    {{~furigana expression reading~}}
-                ) {{/if~}}
-            {{~/if~}}
-            {{~dictionaryAlias}}: {{frequency~}}
-            </li>
+            {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                <li>
+                {{~#if (op "!==" ../definition.type "kanji")~}}
+                    {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
+                        {{~furigana expression reading~}}
+                    ) {{/if~}}
+                {{~/if~}}
+                {{~dictionaryAlias}}: {{frequency~}}
+                </li>
+            {{~/unless~}}
         {{~/each~}}
         </ul>
     {{~/if~}}
+{{/inline}}
+
+{{#*inline "single-frequency-number"}}
+    {{~#if (op ">" definition.frequencyNumbers.length 0)~}}
+        {{~#each definition.frequencyNumbers~}}
+            {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                    {{frequency~}}
+            {{~/unless~}}
+        {{~/each~}}
+    {{/if}}
 {{/inline}}
 
 {{#*inline "frequency-harmonic-rank"}}
