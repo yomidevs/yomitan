@@ -137,10 +137,12 @@
 {{~#*inline "glossary-plain"~}}
     {{~#scope~}}
         {{~#each definition.definitions~}}
-            {{~#unless ../noDictionaryTag~}}
-                ({{dictionaryAlias}})<br>
+            {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                {{~#unless ../noDictionaryTag~}}
+                    ({{dictionaryAlias}})<br>
+                {{~/unless~}}
+                {{#each glossary}}{{{formatGlossaryPlain ../dictionary .}}}{{#unless @last}}<br>{{/unless}}{{/each}}{{#unless @last}}<br>{{/unless}}
             {{~/unless~}}
-            {{#each glossary}}{{{formatGlossaryPlain ../dictionary .}}}{{#unless @last}}<br>{{/unless}}{{/each}}{{#unless @last}}<br>{{/unless}}
         {{~/each~}}
     {{~/scope~}}
 {{~/inline~}}

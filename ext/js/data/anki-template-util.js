@@ -135,6 +135,14 @@ export function getDynamicTemplates(options, dictionaryInfo) {
 {{#*inline "single-glossary-${getKebabCase(dictionary.name)}-brief"}}
     {{~> glossary selectedDictionary='${escapeDictName(dictionary.name)}' brief=true}}
 {{/inline}}
+
+{{#*inline "single-glossary-${getKebabCase(dictionary.name)}-plain"}}
+    {{~> glossary-plain selectedDictionary='${escapeDictName(dictionary.name)}'}}
+{{/inline}}
+
+{{#*inline "single-glossary-${getKebabCase(dictionary.name)}-plain-no-dictionary"}}
+    {{~> glossary-plain-no-dictionary selectedDictionary='${escapeDictName(dictionary.name)}' noDictionaryTag=true}}
+{{/inline}}
 `;
     }
     return dynamicTemplates;
