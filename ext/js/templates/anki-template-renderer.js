@@ -627,7 +627,7 @@ export class AnkiTemplateRenderer {
             .replaceAll(/<(span|a|ruby)(\s.*?>|>)/g, ' ') // tags that usually signify some change in content
             .replaceAll(/<rt(\s.*?>|>)/g, '[') // ruby start
             .replaceAll('</rt>', ']') // ruby end
-            .replaceAll(/<.*?>/g, '') // remove all remaining tags
+            .replaceAll(/<.*?>/gs, '') // remove all remaining tags
             .replaceAll(/\n+/g, '<br>') // convert newlines into linebreaks and condense newlines
             .replaceAll(/^(\s*<br>\s*|\s)*/g, '') // remove leading linebreaks and whitespace
             .replaceAll('<br>', '<br>\n');
