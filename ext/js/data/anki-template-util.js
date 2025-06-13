@@ -45,6 +45,8 @@ export function getStandardFieldMarkers(type, language = 'ja') {
                 'glossary',
                 'glossary-brief',
                 'glossary-no-dictionary',
+                'glossary-plain',
+                'glossary-plain-no-dictionary',
                 'glossary-first',
                 'glossary-first-brief',
                 'glossary-first-no-dictionary',

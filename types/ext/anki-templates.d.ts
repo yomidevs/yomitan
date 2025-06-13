@@ -187,6 +187,7 @@ export type TermDictionaryEntry = {
     readonly reading: string | string[];
     readonly expressions: TermHeadword[];
     readonly glossary?: DictionaryData.TermGlossary[];
+    readonly glossaryPlain?: string[];
     readonly glossaryScopedStyles?: string;
     readonly dictScopedStyles?: string;
     readonly definitionTags?: Tag[];

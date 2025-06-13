@@ -96,6 +96,7 @@ export class AnkiTemplateRenderer {
             ['concat',           this._concat.bind(this)],
             ['pitchCategories',  this._pitchCategories.bind(this)],
             ['formatGlossary',   this._formatGlossary.bind(this)],
+            ['formatGlossaryPlain', this._formatGlossaryPlain.bind(this)],
             ['hasMedia',         this._hasMedia.bind(this)],
             ['getMedia',         this._getMedia.bind(this)],
             ['pronunciation',    this._pronunciation.bind(this)],
@@ -584,6 +585,14 @@ export class AnkiTemplateRenderer {
      * @param {Element} node
      * @returns {string}
      */
+    _getStructuredContentText(node) {
+        return this._getText(node, this._structuredContentStyleApplier, this._structuredContentDatasetKeyIgnorePattern);
+    }
+
+    /**
+     * @param {Element} node
+     * @returns {string}
+     */
     _getPronunciationHtml(node) {
         return this._getHtml(node, this._pronunciationStyleApplier, null);
     }
@@ -599,6 +608,29 @@ export class AnkiTemplateRenderer {
         container.appendChild(node);
         this._normalizeHtml(container, styleApplier, datasetKeyIgnorePattern);
         const result = container.innerHTML;
+        container.textContent = '';
+        return this._safeString(result);
+    }
+
+    /**
+     * @param {Element} node
+     * @param {CssStyleApplier} styleApplier
+     * @param {?RegExp} datasetKeyIgnorePattern
+     * @returns {string}
+     */
+    _getText(node, styleApplier, datasetKeyIgnorePattern) {
+        const container = this._getTemporaryElement();
+        container.appendChild(node);
+        this._normalizeHtml(container, styleApplier, datasetKeyIgnorePattern);
+        const result = container.innerHTML
+            .replaceAll(/<(div|li|ol|ul|br|details|summary|hr)(\s.*?>|>)/g, '\n') // tags that usually cause line breaks
+            .replaceAll(/<(span|a|ruby)(\s.*?>|>)/g, ' ') // tags that usually signify some change in content
+            .replaceAll(/<rt(\s.*?>|>)/g, '[') // ruby start
+            .replaceAll('</rt>', ']') // ruby end
+            .replaceAll(/<.*?>/g, '') // remove all remaining tags
+            .replaceAll(/\n+/g, '<br>') // convert newlines into linebreaks and condense newlines
+            .replaceAll(/^(\s*<br>\s*|\s)*/g, '') // remove leading linebreaks and whitespace
+            .replaceAll('<br>', '<br>\n');
         container.textContent = '';
         return this._safeString(result);
     }
@@ -714,6 +746,74 @@ export class AnkiTemplateRenderer {
         const structuredContentGenerator = this._createStructuredContentGenerator(data);
         const node = structuredContentGenerator.createStructuredContent(content.content, dictionary);
         return node !== null ? this._getStructuredContentHtml(node) : '';
+    }
+
+    /**
+     * @type {import('template-renderer').HelperFunction<string>}
+     */
+    _formatGlossaryPlain(args, _context, options) {
+        const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
+        const data = this._getNoteDataFromOptions(options);
+        if (typeof content === 'string') { return this._safeString(content); }
+        if (!(typeof content === 'object' && content !== null)) { return ''; }
+        const structuredContentGenerator = this._createStructuredContentGenerator(data);
+        switch (content.type) {
+            case 'image': return '';
+            case 'structured-content': {
+                const glossaryStrings = this._extractGlossaryData(content, structuredContentGenerator);
+                if (glossaryStrings.length > 0) {
+                    return glossaryStrings.join('<br>\n');
+                } else {
+                    const node = structuredContentGenerator.createStructuredContent(content.content, dictionary);
+                    return node !== null ? this._getStructuredContentText(node) : '';
+                }
+            }
+            case 'text': return this._safeString(content.text);
+        }
+        return '';
+    }
+
+    /**
+     * @param {import('dictionary-data').TermGlossaryStructuredContent} content
+     * @param {StructuredContentGenerator} structuredContentGenerator
+     * @returns {string[]}
+     */
+    _extractGlossaryData(content, structuredContentGenerator) {
+        /** @type {import('structured-content.js').Content[]} */
+        const glossaryContentQueue = [];
+        const structuredContentQueue = [content.content];
+        while (structuredContentQueue.length > 0) {
+            const structuredContent = structuredContentQueue.pop();
+            if (Array.isArray(structuredContent)) {
+                structuredContentQueue.push(...structuredContent);
+            } else if (typeof structuredContent === 'object' && structuredContent.content) {
+                // @ts-expect-error - Checking if `data` exists
+                if (structuredContent.data?.content === 'glossary') {
+                    glossaryContentQueue.push(structuredContent);
+                    continue;
+                }
+                structuredContentQueue.push(structuredContent.content);
+            }
+        }
+
+        /** @type {string[]} */
+        const rawGlossaryContent = [];
+        while (glossaryContentQueue.length > 0) {
+            const structuredGloss = glossaryContentQueue.pop();
+            if (typeof structuredGloss === 'string') {
+                rawGlossaryContent.push(structuredGloss);
+            } else if (Array.isArray(structuredGloss)) {
+                glossaryContentQueue.push(...structuredGloss);
+            } else if (typeof structuredGloss === 'object' && structuredGloss.content) {
+                if (structuredGloss.tag === 'ruby') {
+                    const node = structuredContentGenerator.createStructuredContent(structuredGloss.content, '');
+                    rawGlossaryContent.push(node !== null ? this._getStructuredContentText(node) : '');
+                    continue;
+                }
+                glossaryContentQueue.push(structuredGloss.content);
+            }
+        }
+        return rawGlossaryContent;
     }
 
     /**
