@@ -605,6 +605,12 @@
               "frequency": 26
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
+            }
+          ],
           "frequencyHarmonic": 1,
           "frequencyAverage": 1,
           "pitches": [],
@@ -927,6 +933,12 @@
               "frequency": "twenty-seven"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
+            }
+          ],
           "frequencyHarmonic": 1,
           "frequencyAverage": 1,
           "pitches": [],
@@ -1239,6 +1251,12 @@
               "reading": "うつ",
               "hasReading": true,
               "frequency": 28
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
             }
           ],
           "frequencyHarmonic": 2,
@@ -1554,6 +1572,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -1867,6 +1891,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -2178,6 +2208,12 @@
               "reading": "ぶつ",
               "hasReading": true,
               "frequency": "twenty-nine"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
             }
           ],
           "frequencyHarmonic": 2,
@@ -2497,6 +2533,12 @@
               "frequency": 26
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
+            }
+          ],
           "frequencyHarmonic": 1,
           "frequencyAverage": 1,
           "pitches": [],
@@ -2817,6 +2859,12 @@
               "reading": "ダース",
               "hasReading": true,
               "frequency": "twenty-seven"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -3161,6 +3209,12 @@
               "reading": "うちこむ",
               "hasReading": true,
               "frequency": 30
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
             }
           ],
           "frequencyHarmonic": 3,
@@ -3584,6 +3638,12 @@
               "frequency": "thirty-one"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -4003,6 +4063,12 @@
               "reading": "うちこむ",
               "hasReading": true,
               "frequency": 30
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
             }
           ],
           "frequencyHarmonic": 3,
@@ -4426,6 +4492,12 @@
               "frequency": "thirty-one"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -4822,6 +4894,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -5138,6 +5216,12 @@
               "reading": "ぶつ",
               "hasReading": true,
               "frequency": "twenty-nine"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
             }
           ],
           "frequencyHarmonic": 2,
@@ -5458,6 +5542,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -5776,6 +5866,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -6091,6 +6187,12 @@
               "reading": "だ",
               "hasReading": true,
               "frequency": 26
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -6415,6 +6517,12 @@
               "frequency": "twenty-seven"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
+            }
+          ],
           "frequencyHarmonic": 1,
           "frequencyAverage": 1,
           "pitches": [],
@@ -6576,6 +6684,7 @@
             }
           ],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -6892,6 +7001,12 @@
               "reading": "だ",
               "hasReading": true,
               "frequency": 26
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -7221,6 +7336,12 @@
               "frequency": "twenty-seven"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
+            }
+          ],
           "frequencyHarmonic": 1,
           "frequencyAverage": 1,
           "pitches": [],
@@ -7532,6 +7653,12 @@
               "reading": "だ",
               "hasReading": true,
               "frequency": 26
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -7848,6 +7975,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -8159,6 +8292,12 @@
               "reading": "うつ",
               "hasReading": true,
               "frequency": 28
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
             }
           ],
           "frequencyHarmonic": 2,
@@ -8479,6 +8618,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -8790,6 +8935,12 @@
               "reading": "ぶつ",
               "hasReading": true,
               "frequency": "twenty-nine"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
             }
           ],
           "frequencyHarmonic": 2,
@@ -9140,6 +9291,12 @@
               "frequency": 30
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -9561,6 +9718,12 @@
               "frequency": 30
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -9957,6 +10120,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -10273,6 +10442,12 @@
               "reading": "うつ",
               "hasReading": true,
               "frequency": 28
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
             }
           ],
           "frequencyHarmonic": 2,
@@ -10621,6 +10796,12 @@
               "reading": "ぶちこむ",
               "hasReading": true,
               "frequency": "thirty-one"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
             }
           ],
           "frequencyHarmonic": 3,
@@ -11044,6 +11225,12 @@
               "frequency": "thirty-one"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -11440,6 +11627,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -11758,6 +11951,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -11923,6 +12122,7 @@
             }
           ],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -12322,6 +12522,12 @@
               "reading": "うちこむ",
               "hasReading": true,
               "frequency": 30
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
             }
           ],
           "frequencyHarmonic": 3,
@@ -12772,6 +12978,12 @@
               "frequency": "thirty-one"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -13195,6 +13407,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -13548,6 +13766,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -13858,6 +14082,12 @@
               "reading": "だ",
               "hasReading": true,
               "frequency": 26
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -14179,6 +14409,12 @@
               "reading": "ダース",
               "hasReading": true,
               "frequency": "twenty-seven"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -14830,6 +15066,12 @@
               "reading": "ぶちこむ",
               "hasReading": true,
               "frequency": "thirty-one"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
             }
           ],
           "frequencyHarmonic": 3,
@@ -15559,6 +15801,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -15863,6 +16111,12 @@
               "reading": "だ",
               "hasReading": true,
               "frequency": 26
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -16177,6 +16431,12 @@
               "reading": "ダース",
               "hasReading": true,
               "frequency": "twenty-seven"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -16538,6 +16798,12 @@
               "frequency": 30
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -16978,6 +17244,12 @@
               "reading": "ぶちこむ",
               "hasReading": true,
               "frequency": "thirty-one"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
             }
           ],
           "frequencyHarmonic": 3,
@@ -17422,6 +17694,12 @@
               "frequency": 30
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -17864,6 +18142,12 @@
               "frequency": "thirty-one"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -18260,6 +18544,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -18576,6 +18866,12 @@
               "reading": "ぶつ",
               "hasReading": true,
               "frequency": "twenty-nine"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
             }
           ],
           "frequencyHarmonic": 2,
@@ -18896,6 +19192,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -19214,6 +19516,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -19529,6 +19837,12 @@
               "reading": "だ",
               "hasReading": true,
               "frequency": 26
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -19851,6 +20165,12 @@
               "reading": "ダース",
               "hasReading": true,
               "frequency": "twenty-seven"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -20197,6 +20517,12 @@
               "frequency": 30
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -20616,6 +20942,12 @@
               "reading": "ぶちこむ",
               "hasReading": true,
               "frequency": "thirty-one"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
             }
           ],
           "frequencyHarmonic": 3,
@@ -21039,6 +21371,12 @@
               "frequency": 30
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -21460,6 +21798,12 @@
               "frequency": "thirty-one"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -21856,6 +22200,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -22172,6 +22522,12 @@
               "reading": "ぶつ",
               "hasReading": true,
               "frequency": "twenty-nine"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
             }
           ],
           "frequencyHarmonic": 2,
@@ -22492,6 +22848,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -22810,6 +23172,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -23125,6 +23493,12 @@
               "reading": "だ",
               "hasReading": true,
               "frequency": 26
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -23447,6 +23821,12 @@
               "reading": "ダース",
               "hasReading": true,
               "frequency": "twenty-seven"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -23793,6 +24173,12 @@
               "frequency": 30
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -24212,6 +24598,12 @@
               "reading": "ぶちこむ",
               "hasReading": true,
               "frequency": "thirty-one"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
             }
           ],
           "frequencyHarmonic": 3,
@@ -24635,6 +25027,12 @@
               "frequency": 30
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -25056,6 +25454,12 @@
               "frequency": "thirty-one"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -25452,6 +25856,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -25768,6 +26178,12 @@
               "reading": "ぶつ",
               "hasReading": true,
               "frequency": "twenty-nine"
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
             }
           ],
           "frequencyHarmonic": 2,
@@ -26088,6 +26504,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -26406,6 +26828,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -26721,6 +27149,12 @@
               "reading": "だ",
               "hasReading": true,
               "frequency": 26
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
             }
           ],
           "frequencyHarmonic": 1,
@@ -27045,6 +27479,12 @@
               "frequency": "twenty-seven"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 1
+            }
+          ],
           "frequencyHarmonic": 1,
           "frequencyAverage": 1,
           "pitches": [],
@@ -27205,6 +27645,7 @@
             }
           ],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -27364,6 +27805,7 @@
             }
           ],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -27532,6 +27974,7 @@
             }
           ],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -28193,6 +28636,12 @@
               "frequency": "thirty-one"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 3
+            }
+          ],
           "frequencyHarmonic": 3,
           "frequencyAverage": 3,
           "pitches": [
@@ -28920,6 +29369,12 @@
               "frequency": "twenty-nine"
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -29088,6 +29543,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [
@@ -29381,6 +29837,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [
@@ -29568,6 +30025,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [
@@ -29755,6 +30213,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [
@@ -29942,6 +30401,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [
@@ -30135,6 +30595,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [
@@ -30372,6 +30833,7 @@
             }
           ],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -30511,6 +30973,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -30612,6 +31075,7 @@
           "definitionTags": [],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -30725,6 +31189,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -30838,6 +31303,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -31152,6 +31618,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -31463,6 +31935,12 @@
               "reading": "うつ",
               "hasReading": true,
               "frequency": 28
+            }
+          ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
             }
           ],
           "frequencyHarmonic": 2,
@@ -31783,6 +32261,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -32096,6 +32580,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -32252,6 +32742,7 @@
             }
           ],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -32566,6 +33057,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -32879,6 +33376,12 @@
               "frequency": 28
             }
           ],
+          "frequencyNumbers": [
+            {
+              "dictionary": "Test Dictionary 2",
+              "frequency": 2
+            }
+          ],
           "frequencyHarmonic": 2,
           "frequencyAverage": 2,
           "pitches": [],
@@ -33013,6 +33516,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -33130,6 +33634,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -33243,6 +33748,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -33360,6 +33866,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -33473,6 +33980,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -33586,6 +34094,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -33694,6 +34203,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -33807,6 +34317,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
@@ -33915,6 +34426,7 @@
           ],
           "termTags": [],
           "frequencies": [],
+          "frequencyNumbers": [],
           "frequencyHarmonic": -1,
           "frequencyAverage": -1,
           "pitches": [],
