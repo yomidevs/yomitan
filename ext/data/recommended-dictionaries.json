@@ -572,6 +572,12 @@
                 "description": "Russian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
                 "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ru-en.zip"
+            },
+            {
+                "name": "opr-ru-en",
+                "description": "OpenRussian is a user-contributed, libre Russian dictionary including the accents, examples, audio, related words and synonyms.",
+                "homepage": "https://github.com/ImenaOphelia/openrussian-to-yomitan",
+                "downloadUrl": "https://github.com/ImenaOphelia/openrussian-to-yomitan/releases/latest/download/opr-ru-en.zip"
             }
         ]
     },
