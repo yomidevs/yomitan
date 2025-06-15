@@ -1,0 +1,16 @@
+{{~#*inline "glossary-plain"~}}
+    {{~#scope~}}
+        {{~#each definition.definitions~}}
+            {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                {{~#unless ../noDictionaryTag~}}
+                    ({{dictionaryAlias}})<br>
+                {{~/unless~}}
+                {{#each glossary}}{{{formatGlossaryPlain ../dictionary .}}}{{#unless @last}}<br>{{/unless}}{{/each}}{{#unless @last}}<br>{{/unless}}
+            {{~/unless~}}
+        {{~/each~}}
+    {{~/scope~}}
+{{~/inline~}}
+
+{{#*inline "glossary-plain-no-dictionary"~}}
+    {{~> glossary-plain noDictionaryTag=true ~}}
+{{/inline}}
