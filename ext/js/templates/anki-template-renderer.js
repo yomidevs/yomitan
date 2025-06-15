@@ -36,8 +36,9 @@ export class AnkiTemplateRenderer {
     /**
      * Creates a new instance of the class.
      * @param {Document} document
+     * @param {Window} window
      */
-    constructor(document) {
+    constructor(document, window) {
         /** @type {CssStyleApplier} */
         this._structuredContentStyleApplier = new CssStyleApplier('/data/structured-content-style.json');
         /** @type {CssStyleApplier} */
@@ -58,6 +59,8 @@ export class AnkiTemplateRenderer {
         this._temporaryElement = null;
         /** @type {Document} */
         this._document = document;
+        /** @type {Window} */
+        this._window = window;
     }
 
     /**
@@ -663,7 +666,7 @@ export class AnkiTemplateRenderer {
      */
     _createStructuredContentGenerator(data) {
         const contentManager = new AnkiTemplateRendererContentManager(this._mediaProvider, data);
-        const instance = new StructuredContentGenerator(contentManager, this._document);
+        const instance = new StructuredContentGenerator(contentManager, this._document, this._window);
         this._cleanupCallbacks.push(() => contentManager.unloadAll());
         return instance;
     }

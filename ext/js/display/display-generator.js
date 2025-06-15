@@ -38,7 +38,7 @@ export class DisplayGenerator {
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
         /** @type {StructuredContentGenerator} */
-        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
+        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document, window);
         /** @type {string} */
         this._language = 'ja';
     }
