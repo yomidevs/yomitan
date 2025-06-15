@@ -20,7 +20,7 @@ import {Handlebars} from '../../lib/handlebars.js';
 import {NodeFilter} from '../../lib/linkedom.js';
 import {createAnkiNoteData} from '../data/anki-note-data-creator.js';
 import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
-import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationGraphJJ, createPronunciationText} from '../display/pronunciation-generator.js';
+import {PronunciationGenerator} from '../display/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../display/structured-content-generator.js';
 import {CssStyleApplier} from '../dom/css-style-applier.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../language/ja/japanese.js';
@@ -36,8 +36,9 @@ export class AnkiTemplateRenderer {
     /**
      * Creates a new instance of the class.
      * @param {Document} document
+     * @param {Window} window
      */
-    constructor(document) {
+    constructor(document, window) {
         /** @type {CssStyleApplier} */
         this._structuredContentStyleApplier = new CssStyleApplier('/data/structured-content-style.json');
         /** @type {CssStyleApplier} */
@@ -58,6 +59,10 @@ export class AnkiTemplateRenderer {
         this._temporaryElement = null;
         /** @type {Document} */
         this._document = document;
+        /** @type {Window} */
+        this._window = window;
+        /** @type {PronunciationGenerator} */
+        this._pronunciationGenerator = new PronunciationGenerator(this._document);
     }
 
     /**
@@ -663,7 +668,7 @@ export class AnkiTemplateRenderer {
      */
     _createStructuredContentGenerator(data) {
         const contentManager = new AnkiTemplateRendererContentManager(this._mediaProvider, data);
-        const instance = new StructuredContentGenerator(contentManager, this._document);
+        const instance = new StructuredContentGenerator(contentManager, this._document, this._window);
         this._cleanupCallbacks.push(() => contentManager.unloadAll());
         return instance;
     }
@@ -752,14 +757,14 @@ export class AnkiTemplateRenderer {
             {
                 const nasalPositions = this._getValidNumberArray(options.hash.nasalPositions);
                 const devoicePositions = this._getValidNumberArray(options.hash.devoicePositions);
-                return this._getPronunciationHtml(createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
             }
             case 'graph':
-                return this._getPronunciationHtml(createPronunciationGraph(morae, downstepPosition));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraph(morae, downstepPosition));
             case 'graph-jj':
-                return this._getPronunciationHtml(createPronunciationGraphJJ(morae, downstepPosition));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraphJJ(morae, downstepPosition));
             case 'position':
-                return this._getPronunciationHtml(createPronunciationDownstepPosition(downstepPosition));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationDownstepPosition(downstepPosition));
             default:
                 return '';
         }

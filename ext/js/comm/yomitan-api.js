@@ -187,7 +187,9 @@ export class YomitanApi {
                         const commonDatas = await this._createCommonDatas(text, dictionaryEntries);
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessDocument = parseHTML('').document;
-                        const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument);
+                        // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
+                        const domlessWindow = parseHTML('').window;
+                        const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument, domlessWindow);
                         await ankiTemplateRenderer.prepare();
                         const templateRenderer = ankiTemplateRenderer.templateRenderer;
 

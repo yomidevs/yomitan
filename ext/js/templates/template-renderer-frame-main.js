@@ -21,7 +21,7 @@ import {TemplateRendererFrameApi} from './template-renderer-frame-api.js';
 
 /** Entry point. */
 async function main() {
-    const ankiTemplateRenderer = new AnkiTemplateRenderer(document);
+    const ankiTemplateRenderer = new AnkiTemplateRenderer(document, window);
     await ankiTemplateRenderer.prepare();
     const templateRendererFrameApi = new TemplateRendererFrameApi(ankiTemplateRenderer.templateRenderer);
     templateRendererFrameApi.prepare();

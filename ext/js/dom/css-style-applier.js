@@ -17,6 +17,8 @@
  */
 
 import {readResponseJson} from '../core/json.js';
+import {log} from '../core/log.js';
+import {toError} from '../core/to-error.js';
 
 /**
  * This class is used to apply CSS styles to elements using a consistent method
@@ -80,7 +82,12 @@ export class CssStyleApplier {
             if (className === null || className.length === 0) { continue; }
             let cssTextNew = '';
             for (const {selectors, styles} of this._getCandidateCssRulesForClass(className)) {
-                if (!element.matches(selectors)) { continue; }
+                try { // `css-select` used by `linkedom` in the Yomitan API does not support some pseudo elements and may error
+                    if (!element.matches(selectors)) { continue; }
+                } catch (e) {
+                    log.log('Failed to match css selectors: ' + selectors + '\n' + toError(e).message);
+                    continue;
+                }
                 cssTextNew += this._getCssText(styles);
             }
             cssTextNew += element.style.cssText;
