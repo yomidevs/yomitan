@@ -22,7 +22,7 @@ import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKan
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji} from '../language/ja/japanese.js';
 import {getLanguageFromText} from '../language/text-utilities.js';
-import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './pronunciation-generator.js';
+import {PronunciationGenerator} from './pronunciation-generator.js';
 import {StructuredContentGenerator} from './structured-content-generator.js';
 
 export class DisplayGenerator {
@@ -39,6 +39,8 @@ export class DisplayGenerator {
         this._templates = new HtmlTemplateCollection();
         /** @type {StructuredContentGenerator} */
         this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document, window);
+        /** @type {PronunciationGenerator} */
+        this._pronunciationGenerator = new PronunciationGenerator(document);
         /** @type {string} */
         this._language = 'ja';
     }
@@ -816,15 +818,15 @@ export class DisplayGenerator {
         this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
 
         n = this._querySelector(node, '.pronunciation-downstep-notation-container');
-        n.appendChild(createPronunciationDownstepPosition(position));
+        n.appendChild(this._pronunciationGenerator.createPronunciationDownstepPosition(position));
 
         n = this._querySelector(node, '.pronunciation-text-container');
 
         n.lang = this._language;
-        n.appendChild(createPronunciationText(morae, position, nasalPositions, devoicePositions));
+        n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, position, nasalPositions, devoicePositions));
 
         n = this._querySelector(node, '.pronunciation-graph-container');
-        n.appendChild(createPronunciationGraph(morae, position));
+        n.appendChild(this._pronunciationGenerator.createPronunciationGraph(morae, position));
 
         return node;
     }
