@@ -206,9 +206,6 @@ export class ProfileController {
             deleteCount: 0,
             items: [newProfile],
         }]);
-
-        // Update profile index
-        this._settingsController.profileIndex = index;
     }
 
     /**
