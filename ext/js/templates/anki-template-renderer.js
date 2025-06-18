@@ -556,8 +556,8 @@ export class AnkiTemplateRenderer {
             const {reading, wordClasses} = headwords[headwordIndex];
             const isVerbOrAdjective = isNonNounVerbOrAdjective(wordClasses);
             const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
-            for (const {position} of pitches) {
-                const category = getPitchCategory(reading, position, isVerbOrAdjective);
+            for (const {positions} of pitches) {
+                const category = getPitchCategory(reading, positions, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);
                 }
@@ -843,12 +843,12 @@ export class AnkiTemplateRenderer {
      * @type {import('template-renderer').HelperFunction<string>}
      */
     _pronunciation(_args, _context, options) {
-        const {format, reading, downstepPosition} = options.hash;
+        const {format, reading, pitchPositions} = options.hash;
 
         if (
             typeof reading !== 'string' ||
             reading.length === 0 ||
-            typeof downstepPosition !== 'number'
+            (typeof pitchPositions !== 'number' && typeof pitchPositions !== 'string')
         ) {
             return '';
         }
@@ -859,14 +859,14 @@ export class AnkiTemplateRenderer {
             {
                 const nasalPositions = this._getValidNumberArray(options.hash.nasalPositions);
                 const devoicePositions = this._getValidNumberArray(options.hash.devoicePositions);
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationText(morae, pitchPositions, nasalPositions, devoicePositions));
             }
             case 'graph':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraph(morae, downstepPosition));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraph(morae, pitchPositions));
             case 'graph-jj':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraphJJ(morae, downstepPosition));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraphJJ(morae, pitchPositions));
             case 'position':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationDownstepPosition(downstepPosition));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationDownstepPosition(pitchPositions));
             default:
                 return '';
         }

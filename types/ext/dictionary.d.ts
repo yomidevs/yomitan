@@ -415,7 +415,7 @@ export type PitchAccent = {
     /**
      * Position of the downstep, as a number of mora.
      */
-    position: number;
+    positions: number | string;
     /**
      * Positions of morae with a nasal sound.
      */

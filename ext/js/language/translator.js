@@ -1258,7 +1258,7 @@ export class Translator {
                                 const devoicePositions = this._toNumberArray(devoice);
                                 pitches.push({
                                     type: 'pitch-accent',
-                                    position,
+                                    positions: position,
                                     nasalPositions,
                                     devoicePositions,
                                     tags: tags2,

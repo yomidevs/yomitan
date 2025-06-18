@@ -799,13 +799,13 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createPronunciationPitchAccent(pitchAccent, details) {
-        const {position, nasalPositions, devoicePositions, tags} = pitchAccent;
+        const {positions, nasalPositions, devoicePositions, tags} = pitchAccent;
         const {reading, exclusiveTerms, exclusiveReadings} = details;
         const morae = getKanaMorae(reading);
 
         const node = this._instantiate('pronunciation');
 
-        node.dataset.pitchAccentDownstepPosition = `${position}`;
+        node.dataset.pitchAccentDownstepPosition = `${positions}`;
         node.dataset.pronunciationType = pitchAccent.type;
         if (nasalPositions.length > 0) { node.dataset.nasalMoraPosition = nasalPositions.join(' '); }
         if (devoicePositions.length > 0) { node.dataset.devoiceMoraPosition = devoicePositions.join(' '); }
@@ -818,15 +818,15 @@ export class DisplayGenerator {
         this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
 
         n = this._querySelector(node, '.pronunciation-downstep-notation-container');
-        n.appendChild(this._pronunciationGenerator.createPronunciationDownstepPosition(position));
+        n.appendChild(this._pronunciationGenerator.createPronunciationDownstepPosition(positions));
 
         n = this._querySelector(node, '.pronunciation-text-container');
 
         n.lang = this._language;
-        n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, position, nasalPositions, devoicePositions));
+        n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, positions, nasalPositions, devoicePositions));
 
         n = this._querySelector(node, '.pronunciation-graph-container');
-        n.appendChild(this._pronunciationGenerator.createPronunciationGraph(morae, position));
+        n.appendChild(this._pronunciationGenerator.createPronunciationGraph(morae, positions));
 
         return node;
     }
@@ -1138,7 +1138,7 @@ export class DisplayGenerator {
             if (termPronunciation.headwordIndex !== headwordIndex) { continue; }
             for (const pronunciation of termPronunciation.pronunciations) {
                 if (pronunciation.type !== 'pitch-accent') { continue; }
-                const category = getPitchCategory(reading, pronunciation.position, isVerbOrAdjective);
+                const category = getPitchCategory(reading, pronunciation.positions, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);
                 }

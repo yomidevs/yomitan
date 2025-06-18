@@ -249,12 +249,12 @@ function getPitches(dictionaryEntry) {
             for (const groupedPronunciation of pronunciations) {
                 const {pronunciation} = groupedPronunciation;
                 if (pronunciation.type !== 'pitch-accent') { continue; }
-                const {position, nasalPositions, devoicePositions, tags} = pronunciation;
+                const {positions, nasalPositions, devoicePositions, tags} = pronunciation;
                 const {terms, reading, exclusiveTerms, exclusiveReadings} = groupedPronunciation;
                 pitches.push({
                     expressions: terms,
                     reading,
-                    position,
+                    positions,
                     nasalPositions,
                     devoicePositions,
                     tags: convertPitchTags(tags),
@@ -662,10 +662,10 @@ function getTermPitches(dictionaryEntry) {
  */
 function getTermPitchesInner(pitches) {
     const results = [];
-    for (const {position, tags} of pitches) {
+    for (const {positions, tags} of pitches) {
         const cachedTags = createCachedValue(convertTags.bind(null, tags));
         results.push({
-            position,
+            positions,
             get tags() { return getCachedValue(cachedTags); },
         });
     }
