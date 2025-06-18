@@ -578,6 +578,7 @@ export class OptionsUtil {
             this._updateVersion64,
             this._updateVersion65,
             this._updateVersion66,
+            this._updateVersion67,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1738,11 +1739,19 @@ export class OptionsUtil {
     }
 
     /**
-     *  - Changed pitch-accent-item param name
+     *  - Added glossary-plain handlebars
      *  @type {import('options-util').UpdateFunction}
      */
     async _updateVersion66(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v66.handlebars');
+    }
+
+    /**
+     *  - Changed pitch-accent-item param name
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion67(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v67.handlebars');
     }
 
     /**
