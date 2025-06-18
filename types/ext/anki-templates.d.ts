@@ -88,7 +88,7 @@ export type PitchGroup = {
 export type Pitch = {
     expressions: string[];
     reading: string;
-    position: number;
+    positions: number | string;
     nasalPositions: number[];
     devoicePositions: number[];
     tags: PitchTag[];
@@ -263,7 +263,7 @@ export type TermPitchAccent = {
 };
 
 export type PitchAccent = {
-    position: number;
+    positions: number | string;
     tags: Tag[];
 };
 

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {getKanaDiacriticInfo, isMoraPitchHigh} from '../language/ja/japanese.js';
+import {getDownstepPositions, getKanaDiacriticInfo, isMoraPitchHigh} from '../language/ja/japanese.js';
 
 export class PronunciationGenerator {
     /**
@@ -30,12 +30,12 @@ export class PronunciationGenerator {
 
     /**
      * @param {string[]} morae
-     * @param {number} downstepPosition
+     * @param {number | string} pitchPositions
      * @param {number[]} nasalPositions
      * @param {number[]} devoicePositions
      * @returns {HTMLSpanElement}
      */
-    createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions) {
+    createPronunciationText(morae, pitchPositions, nasalPositions, devoicePositions) {
         const nasalPositionsSet = nasalPositions.length > 0 ? new Set(nasalPositions) : null;
         const devoicePositionsSet = devoicePositions.length > 0 ? new Set(devoicePositions) : null;
         const container = this._document.createElement('span');
@@ -43,8 +43,8 @@ export class PronunciationGenerator {
         for (let i = 0, ii = morae.length; i < ii; ++i) {
             const i1 = i + 1;
             const mora = morae[i];
-            const highPitch = isMoraPitchHigh(i, downstepPosition);
-            const highPitchNext = isMoraPitchHigh(i1, downstepPosition);
+            const highPitch = isMoraPitchHigh(i, pitchPositions);
+            const highPitchNext = isMoraPitchHigh(i1, pitchPositions);
             const nasal = nasalPositionsSet !== null && nasalPositionsSet.has(i1);
             const devoice = devoicePositionsSet !== null && devoicePositionsSet.has(i1);
 
@@ -109,10 +109,10 @@ export class PronunciationGenerator {
 
     /**
      * @param {string[]} morae
-     * @param {number} downstepPosition
+     * @param {number | string} pitchPositions
      * @returns {SVGSVGElement}
      */
-    createPronunciationGraph(morae, downstepPosition) {
+    createPronunciationGraph(morae, pitchPositions) {
         const ii = morae.length;
 
         const svgns = 'http://www.w3.org/2000/svg';
@@ -132,8 +132,8 @@ export class PronunciationGenerator {
 
         const pathPoints = [];
         for (let i = 0; i < ii; ++i) {
-            const highPitch = isMoraPitchHigh(i, downstepPosition);
-            const highPitchNext = isMoraPitchHigh(i + 1, downstepPosition);
+            const highPitch = isMoraPitchHigh(i, pitchPositions);
+            const highPitchNext = isMoraPitchHigh(i + 1, pitchPositions);
             const x = i * 50 + 25;
             const y = highPitch ? 25 : 75;
             if (highPitch && !highPitchNext) {
@@ -149,7 +149,7 @@ export class PronunciationGenerator {
 
         pathPoints.splice(0, ii - 1);
         {
-            const highPitch = isMoraPitchHigh(ii, downstepPosition);
+            const highPitch = isMoraPitchHigh(ii, pitchPositions);
             const x = ii * 50 + 25;
             const y = highPitch ? 25 : 75;
             this._addGraphTriangle(svg, svgns, x, y);
@@ -163,11 +163,12 @@ export class PronunciationGenerator {
     }
 
     /**
-     * @param {number} downstepPosition
+     * @param {number | string} downstepPositions
      * @returns {HTMLSpanElement}
      */
-    createPronunciationDownstepPosition(downstepPosition) {
-        const downstepPositionString = `${downstepPosition}`;
+    createPronunciationDownstepPosition(downstepPositions) {
+        const downsteps = typeof downstepPositions === 'string' ? getDownstepPositions(downstepPositions) : downstepPositions;
+        const downstepPositionString = `${downsteps}`;
 
         const n1 = this._document.createElement('span');
         n1.className = 'pronunciation-downstep-notation';
@@ -198,11 +199,11 @@ export class PronunciationGenerator {
     /**
      * Create a pronounciation graph in the style of Jidoujisho
      * @param {string[]} mora
-     * @param {number} downstepPosition
+     * @param {number | string} pitchPositions
      * @returns {SVGSVGElement}
      */
-    createPronunciationGraphJJ(mora, downstepPosition) {
-        const patt = this._pitchValueToPattJJ(mora.length, downstepPosition);
+    createPronunciationGraphJJ(mora, pitchPositions) {
+        const patt = this._pitchValueToPattJJ(mora.length, pitchPositions);
 
         const positions = Math.max(mora.length, patt.length);
         const stepWidth = 35;
@@ -325,10 +326,11 @@ export class PronunciationGenerator {
     /**
      * Get H&L pattern
      * @param {number} numberOfMora
-     * @param {number} pitchValue
+     * @param {number | string} pitchValue
      * @returns {string}
      */
     _pitchValueToPattJJ(numberOfMora, pitchValue) {
+        if (typeof pitchValue === 'string') { return pitchValue + pitchValue[pitchValue.length - 1]; }
         if (numberOfMora >= 1) {
             if (pitchValue === 0) {
                 // Heiban

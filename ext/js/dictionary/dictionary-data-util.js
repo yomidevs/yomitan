@@ -461,7 +461,7 @@ function arePronunciationsEquivalent({pronunciation: pronunciation1}, pronunciat
             // This cast is valid based on the type check at the start of the function.
             const pitchAccent2 = /** @type {import('dictionary').PitchAccent} */ (pronunciation2);
             return (
-                pronunciation1.position === pitchAccent2.position &&
+                pronunciation1.positions === pitchAccent2.positions &&
                 areArraysEqual(pronunciation1.nasalPositions, pitchAccent2.nasalPositions) &&
                 areArraysEqual(pronunciation1.devoicePositions, pitchAccent2.devoicePositions)
             );
