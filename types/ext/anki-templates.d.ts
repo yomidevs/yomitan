@@ -194,6 +194,7 @@ export type TermDictionaryEntry = {
     readonly termTags?: Tag[];
     readonly definitions?: TermDefinition[];
     readonly frequencies: TermFrequency[];
+    readonly frequencyNumbers: FrequencyNumber[];
     readonly frequencyHarmonic: number;
     readonly frequencyAverage: number;
     readonly pitches: TermPitchAccent[];
@@ -248,6 +249,11 @@ export type TermFrequency = {
     reading: string;
     hasReading: boolean;
     frequency: number | string;
+};
+
+export type FrequencyNumber = {
+    dictionary: string;
+    frequency: number;
 };
 
 export type TermPitchAccent = {

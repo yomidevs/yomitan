@@ -122,8 +122,8 @@ export function getDynamicTemplates(options, dictionaryInfo) {
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary.name);
         if (!dictionary.enabled) { continue; }
         const totalTerms = currentDictionaryInfo?.counts?.terms?.total;
-        if (!totalTerms || totalTerms === 0) { continue; }
-        dynamicTemplates += `
+        if (totalTerms && totalTerms > 0) {
+            dynamicTemplates += `
 {{#*inline "single-glossary-${getKebabCase(dictionary.name)}"}}
     {{~> glossary selectedDictionary='${escapeDictName(dictionary.name)}'}}
 {{/inline}}
@@ -144,6 +144,18 @@ export function getDynamicTemplates(options, dictionaryInfo) {
     {{~> glossary-plain-no-dictionary selectedDictionary='${escapeDictName(dictionary.name)}' noDictionaryTag=true}}
 {{/inline}}
 `;
+        }
+        const totalMeta = currentDictionaryInfo?.counts?.termMeta;
+        if (totalMeta && totalMeta.freq && totalMeta.freq > 0) {
+            dynamicTemplates += `
+{{#*inline "single-frequency-number-${getKebabCase(dictionary.name)}"}}
+    {{~> single-frequency-number selectedDictionary='${escapeDictName(dictionary.name)}'}}
+{{/inline}}
+{{#*inline "single-frequency-${getKebabCase(dictionary.name)}"}}
+    {{~> frequencies selectedDictionary='${escapeDictName(dictionary.name)}'}}
+{{/inline}}
+`;
+        }
     }
     return dynamicTemplates;
 }
@@ -159,8 +171,13 @@ export function getDynamicFieldMarkers(dictionaries, dictionaryInfo) {
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary.name);
         if (!dictionary.enabled) { continue; }
         const totalTerms = currentDictionaryInfo?.counts?.terms?.total;
-        if (!totalTerms || totalTerms === 0) { continue; }
-        markers.push(`single-glossary-${getKebabCase(dictionary.name)}`);
+        if (totalTerms && totalTerms > 0) {
+            markers.push(`single-glossary-${getKebabCase(dictionary.name)}`);
+        }
+        const totalMeta = currentDictionaryInfo?.counts?.termMeta;
+        if (totalMeta && totalMeta.freq && totalMeta.freq > 0) {
+            markers.push(`single-frequency-number-${getKebabCase(dictionary.name)}`);
+        }
     }
     return markers;
 }
