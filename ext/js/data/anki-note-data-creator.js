@@ -183,7 +183,7 @@ function getFrequencyNumbers(dictionaryEntry) {
         previousDictionary = dictionary;
 
         if (displayValue !== null) {
-            const frequencyMatch = displayValue.match(/\d+/);
+            const frequencyMatch = displayValue.match(/^\d+/);
             if (frequencyMatch !== null) {
                 const frequencyParsed = Number.parseInt(frequencyMatch[0], 10);
                 if (frequencyParsed > 0) {

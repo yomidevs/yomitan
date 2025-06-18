@@ -24,12 +24,15 @@ export class StructuredContentGenerator {
     /**
      * @param {import('./display-content-manager.js').DisplayContentManager|import('../templates/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} contentManager
      * @param {Document} document
+     * @param {Window} window
      */
-    constructor(contentManager, document) {
+    constructor(contentManager, document, window) {
         /** @type {import('./display-content-manager.js').DisplayContentManager|import('../templates/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} */
         this._contentManager = contentManager;
         /** @type {Document} */
         this._document = document;
+        /** @type {Window} */
+        this._window = window;
     }
 
     /**
@@ -114,7 +117,7 @@ export class StructuredContentGenerator {
         if (this._contentManager instanceof DisplayContentManager) {
             node.addEventListener('click', () => {
                 if (this._contentManager instanceof DisplayContentManager) {
-                    void this._contentManager.openMediaInTab(path, dictionary, window);
+                    void this._contentManager.openMediaInTab(path, dictionary, this._window);
                 }
             });
         }
@@ -150,7 +153,7 @@ export class StructuredContentGenerator {
                 /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
             if (sizeUnits === 'em' && (hasPreferredWidth || hasPreferredHeight)) {
                 const emSize = 14; // We could Number.parseFloat(getComputedStyle(document.documentElement).fontSize); here for more accuracy but it would cause a layout and be extremely slow; possible improvement would be to calculate and cache the value
-                const scaleFactor = 2 * window.devicePixelRatio;
+                const scaleFactor = 2 * this._window.devicePixelRatio;
                 image.style.width = `${usedWidth}em`;
                 image.style.height = `${usedWidth * invAspectRatio}em`;
                 image.width = usedWidth * emSize * scaleFactor;
