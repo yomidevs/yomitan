@@ -577,6 +577,7 @@ export class OptionsUtil {
             this._updateVersion63,
             this._updateVersion64,
             this._updateVersion65,
+            this._updateVersion66,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1734,6 +1735,14 @@ export class OptionsUtil {
             profile.options.general.enableYomitanApi = false;
             profile.options.general.yomitanApiServer = 'http://127.0.0.1:8766';
         }
+    }
+
+    /**
+     *  - Added glossary-plain handlebars
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion66(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v66.handlebars');
     }
 
     /**
