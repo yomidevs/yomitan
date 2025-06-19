@@ -53,7 +53,7 @@ export class SearchSuggestionController {
      * Renders the list of search suggestions.
      * @param {string[] | Promise<string[]>} suggestions
      */
-    async _renderSuggestions(suggestions) {
+    async renderSuggestions(suggestions) {
         console.log('Rendering suggestions:', suggestions);
         this._suggestionsList.innerHTML = '';
 
@@ -73,7 +73,6 @@ export class SearchSuggestionController {
             this._suggestionsList.style.top = `${rect.bottom}px`;
             this._suggestionsList.style.left = `${rect.left}px`;
             this._suggestionsList.style.width = `${rect.width}px`;
-            console.log('Positioned suggestions at:', rect);
         }
 
         for (const suggestion of suggestionArray) {
@@ -102,6 +101,7 @@ export class SearchSuggestionController {
         /** @type {Map<string, {term: string, score: number, dictionaryIndex: number}>} */
         const suggestions = new Map();
 
+        console.log(this._trie.size())
         // Get suggestions from the trie (what we've already seen)
         const trieSuggestions = this._trie.getSuggestions(input);
         for (const suggestion of trieSuggestions) {

@@ -28,14 +28,17 @@ export class SearchDisplayController {
      * @param {import('./display.js').Display} display
      * @param {import('./display-audio.js').DisplayAudio} displayAudio
      * @param {import('./search-persistent-state-controller.js').SearchPersistentStateController} searchPersistentStateController
+     * @param {import('./search-suggestion-controller.js').SearchSuggestionController} searchSuggestionController
      */
-    constructor(display, displayAudio, searchPersistentStateController) {
+    constructor(display, displayAudio, searchPersistentStateController, searchSuggestionController) {
         /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {import('./display-audio.js').DisplayAudio} */
         this._displayAudio = displayAudio;
         /** @type {import('./search-persistent-state-controller.js').SearchPersistentStateController} */
         this._searchPersistentStateController = searchPersistentStateController;
+        /** @type {import('./search-suggestion-controller.js').SearchSuggestionController} */
+        this._searchSuggestionController = searchSuggestionController;
         /** @type {HTMLButtonElement} */
         this._searchButton = querySelectorNotNull(document, '#search-button');
         /** @type {HTMLButtonElement} */
@@ -82,6 +85,10 @@ export class SearchDisplayController {
             ['searchDisplayControllerSetMode', this._onMessageSetMode.bind(this)],
             ['searchDisplayControllerUpdateSearchQuery', this._onExternalSearchUpdate.bind(this)],
         ]);
+        /** @type {HTMLUListElement} */
+        this._suggestionListElement = document.createElement('ul');
+        this._suggestionListElement.id = 'search-suggestions';
+        document.body.appendChild(this._suggestionListElement);
     }
 
     /** */
@@ -89,6 +96,11 @@ export class SearchDisplayController {
         await this._display.updateOptions();
 
         this._searchPersistentStateController.on('modeChange', this._onModeChange.bind(this));
+
+        // Initialize suggestion controller in background without waiting
+        this._searchSuggestionController.prepare().catch((e) => {
+            console.error('Failed to initialize suggestion controller:', e);
+        });
 
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         this._display.application.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -249,13 +261,15 @@ export class SearchDisplayController {
     /**
      * @param {InputEvent} e
      */
-    _onSearchInput(e) {
+    async _onSearchInput(e) {
         this._updateSearchHeight(true);
 
         const element = /** @type {HTMLTextAreaElement} */ (e.currentTarget);
         if (this._wanakanaEnabled) {
             this._searchTextKanaConversion(element, e);
         }
+        const suggestions = await this._searchSuggestionController.getSuggestions(element.value);
+        await this._searchSuggestionController.renderSuggestions(suggestions);
     }
 
     /**
