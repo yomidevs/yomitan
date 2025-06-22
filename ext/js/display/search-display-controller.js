@@ -61,6 +61,8 @@ export class SearchDisplayController {
         this._profileSelect = querySelectorNotNull(document, '#profile-select');
         /** @type {HTMLElement} */
         this._wanakanaSearchOption = querySelectorNotNull(document, '#search-option-wanakana');
+        /** @type {HTMLInputElement} */
+        this._searchSuggestionsEnableCheckbox = querySelectorNotNull(document, '#search-suggestions-enable');
         /** @type {EventListenerCollection} */
         this._queryInputEvents = new EventListenerCollection();
         /** @type {boolean} */
@@ -89,6 +91,8 @@ export class SearchDisplayController {
         this._suggestionListElement = document.createElement('ul');
         this._suggestionListElement.id = 'search-suggestions';
         document.body.appendChild(this._suggestionListElement);
+        /** @type {boolean} */
+        this._searchSuggestionsEnabled = false;
     }
 
     /** */
@@ -128,6 +132,7 @@ export class SearchDisplayController {
         this._clipboardMonitor.on('change', this._onClipboardMonitorChange.bind(this));
         this._clipboardMonitorEnableCheckbox.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
         this._stickyHeaderEnableCheckbox.addEventListener('change', this._onStickyHeaderEnableChange.bind(this));
+        this._searchSuggestionsEnableCheckbox.addEventListener('change', this._onSearchSuggestionsEnableChange.bind(this));
         this._display.hotkeyHandler.on('keydownNonHotkey', this._onKeyDown.bind(this));
 
         this._profileSelect.addEventListener('change', this._onProfileSelectChange.bind(this), false);
@@ -214,12 +219,13 @@ export class SearchDisplayController {
      * @param {import('settings').ProfileOptions} options
      */
     _updateSearchSettings(options) {
-        const {language, enableWanakana, stickySearchHeader} = options.general;
+        const {language, enableWanakana, stickySearchHeader, enableSearchSuggestions} = options.general;
         const wanakanaEnabled = language === 'ja' && enableWanakana;
+        const searchSuggestionsEnabled = language === 'ja' && enableSearchSuggestions;
         this._wanakanaEnableCheckbox.checked = wanakanaEnabled;
         this._wanakanaSearchOption.style.display = language === 'ja' ? '' : 'none';
         this._setWanakanaEnabled(wanakanaEnabled);
-        this._setStickyHeaderEnabled(stickySearchHeader);
+        this._setSearchSuggestionsEnabled(searchSuggestionsEnabled);
     }
 
     /**
@@ -268,8 +274,15 @@ export class SearchDisplayController {
         if (this._wanakanaEnabled) {
             this._searchTextKanaConversion(element, e);
         }
-        const suggestions = await this._searchSuggestionController.getSuggestions(element.value);
-        await this._searchSuggestionController.renderSuggestions(suggestions);
+        if (this._searchSuggestionsEnabled) {
+            const suggestions = await this._searchSuggestionController.getSuggestions(element.value);
+
+            // Only render if we have suggestions, or if we don't have any suggestions currently displayed
+            const currentSuggestions = this._searchSuggestionController._suggestionsList.children.length;
+            if (suggestions.length > 0 || currentSuggestions === 0) {
+                await this._searchSuggestionController.renderSuggestions(suggestions);
+            }
+        }
     }
 
     /**
@@ -433,6 +446,36 @@ export class SearchDisplayController {
     _setStickyHeaderEnabled(stickySearchHeaderEnabled) {
         this._stickyHeaderEnableCheckbox.checked = stickySearchHeaderEnabled;
     }
+
+    /**
+     * @param {Event} e
+     */
+    _onSearchSuggestionsEnableChange(e) {
+        const element = /** @type {HTMLInputElement} */ (e.target);
+        const value = element.checked;
+        this._setSearchSuggestionsEnabled(value);
+        /** @type {import('settings-modifications').ScopedModificationSet} */
+        const modification = {
+            action: 'set',
+            path: 'general.enableSearchSuggestions',
+            value,
+            scope: 'profile',
+            optionsContext: this._display.getOptionsContext(),
+        };
+        void this._display.application.api.modifySettings([modification], 'search');
+    }
+
+    /**
+     * @param {boolean} searchSuggestionsEnabled
+     */
+    _setSearchSuggestionsEnabled(searchSuggestionsEnabled) {
+        this._searchSuggestionsEnabled = searchSuggestionsEnabled;
+        this._searchSuggestionsEnableCheckbox.checked = searchSuggestionsEnabled;
+        if (!searchSuggestionsEnabled && this._searchSuggestionController) {
+            this._searchSuggestionController.hideSuggestions();
+        }
+    }
+
 
     /** */
     _onModeChange() {

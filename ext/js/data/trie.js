@@ -66,7 +66,6 @@ export class Trie {
         if (word.length === 0) {
             return;
         }
-
         let currNode = this._root;
         for (const ch of word) {
             if (!currNode.children[ch]) {
@@ -74,7 +73,6 @@ export class Trie {
             }
             currNode = currNode.children[ch];
         }
-
         if (!currNode.isEnd) {
             currNode.isEnd = true;
             this._size++;
@@ -192,20 +190,15 @@ export class Trie {
             }
             return false;
         }
-
         const char = word[idx];
         const childNode = node.children[char];
-
         if (!childNode) {
             return false;
         }
-
         const shouldDeleteChild = this._deleteHelper(childNode, word, idx + 1);
-
         if (shouldDeleteChild && !childNode.isEnd && Object.keys(childNode.children).length === 0) {
             delete node.children[char];
         }
-
         return shouldDeleteChild;
     }
 
@@ -262,14 +255,12 @@ export class Trie {
             if (Object.keys(node.children).length === 0) {
                 return 0;
             }
-
             let maxHeight = 0;
             for (const child of Object.values(node.children)) {
                 maxHeight = Math.max(maxHeight, getHeightHelper(child));
             }
             return maxHeight + 1;
         };
-
         return getHeightHelper(this._root);
     }
 
@@ -286,7 +277,6 @@ export class Trie {
             }
             return count;
         };
-
         return countNodes(this._root);
     }
 
