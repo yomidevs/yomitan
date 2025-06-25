@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2023-2025  Yomitan Authors
- * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 /**
  * Trie Node.
@@ -216,7 +216,7 @@ export class Trie {
         this._size = 0;
     }
 
-    // Testing functions
+    // Testing functions / future use
 
     /** @returns {string[]} */
     getAllWords() {
@@ -292,30 +292,5 @@ export class Trie {
      */
     serialize() {
         return JSON.stringify(this._root);
-    }
-
-    /**
-     * Deserializes a trie from a JSON string or object.
-     * @param {string|object} data
-     * @returns {Trie}
-     */
-    static deserialize(data) {
-        /**
-         * @param {any} obj
-         * @returns {TrieNode}
-         */
-        const revive = (obj) => {
-            const node = new TrieNode();
-            node._isEnd = obj && (obj._isEnd || obj.isEnd) || false;
-            const children = obj && (obj._children || obj.children) || {};
-            for (const key in children) {
-                node._children[key] = revive(children[key]);
-            }
-            return node;
-        };
-        const trie = new Trie();
-        const rootObj = typeof data === 'string' ? JSON.parse(data) : data;
-        trie._root = revive(rootObj);
-        return trie;
     }
 }

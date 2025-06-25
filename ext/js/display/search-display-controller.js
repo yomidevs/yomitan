@@ -102,9 +102,7 @@ export class SearchDisplayController {
         this._searchPersistentStateController.on('modeChange', this._onModeChange.bind(this));
 
         // Initialize suggestion controller in background without waiting
-        this._searchSuggestionController.prepare().catch((e) => {
-            console.error('Failed to initialize suggestion controller:', e);
-        });
+        this._searchSuggestionController.prepare().catch(() => {});
 
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         this._display.application.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -226,6 +224,7 @@ export class SearchDisplayController {
         this._wanakanaSearchOption.style.display = language === 'ja' ? '' : 'none';
         this._setWanakanaEnabled(wanakanaEnabled);
         this._setSearchSuggestionsEnabled(searchSuggestionsEnabled);
+        this._setStickyHeaderEnabled(stickySearchHeader);
     }
 
     /**
@@ -277,9 +276,7 @@ export class SearchDisplayController {
         if (this._searchSuggestionsEnabled) {
             const suggestions = await this._searchSuggestionController.getSuggestions(element.value);
 
-            // Only render if we have suggestions, or if we don't have any suggestions currently displayed
-            const currentSuggestions = this._searchSuggestionController._suggestionsList.children.length;
-            if (suggestions.length > 0 || currentSuggestions === 0) {
+            if (suggestions.length > 0) {
                 await this._searchSuggestionController.renderSuggestions(suggestions);
             }
         }
