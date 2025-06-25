@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2023-2025  Yomitan Authors
- * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +20,9 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {convertToKana} from '../language/ja/japanese-wanakana.js';
 import {isStringEntirelyKana} from '../language/ja/japanese.js';
+
+// Suggestion list size limit for autocomplete UI
+const SUGGESTION_LIMIT = 10;
 
 /**
  * Controller for managing search suggestions using a trie.
@@ -50,6 +52,14 @@ export class SearchSuggestionController {
         /** @type {Map<string, Set<string>>} */
         this._readingToKanji = new Map();
 
+        // Performance monitoring
+        /** @type {number} */
+        this._trieUsageCount = 0;
+        /** @type {number} */
+        this._databaseUsageCount = 0;
+        /** @type {number} */
+        this._totalRequests = 0;
+
         this._setupClickOutsideListener();
     }
 
@@ -62,16 +72,15 @@ export class SearchSuggestionController {
     }
 
     /**
-    * Renders the list of search suggestions.
-    * @param {string[] | Promise<string[]>} suggestions
-    */
+     * Renders the list of search suggestions.
+     * @param {string[] | Promise<string[]>} suggestions
+     */
     async renderSuggestions(suggestions) {
         if (this._isSelectingSuggestion) {
             return;
         }
 
         try {
-            //console.log('Rendering suggestions:', suggestions);
             this._suggestionsList.innerHTML = '';
             const suggestionArray = Array.isArray(suggestions) ? suggestions : await suggestions;
 
@@ -79,14 +88,11 @@ export class SearchSuggestionController {
             if (suggestionArray.length === 0) {
                 const currentSuggestions = this._suggestionsList.children.length;
                 if (currentSuggestions > 0) {
-                    console.log('Ignoring empty suggestions since we already have', currentSuggestions, 'suggestions displayed');
                     return;
                 }
-                console.log('No suggestions to display - suggestions array:', suggestions);
                 this._suggestionsList.style.display = 'none';
                 return;
             }
-
             this._suggestionsList.style.display = 'block';
             const searchTextbox = document.getElementById('search-textbox');
             if (searchTextbox instanceof HTMLTextAreaElement) {
@@ -123,9 +129,7 @@ export class SearchSuggestionController {
                 fragment.appendChild(li);
             }
             this._suggestionsList.appendChild(fragment);
-            console.log('Successfully rendered suggestions, list display:', this._suggestionsList.style.display);
         } catch (e) {
-            console.error('Error rendering suggestions:', e);
             this._suggestionsList.style.display = 'none';
         }
     }
@@ -137,202 +141,93 @@ export class SearchSuggestionController {
      */
     async getSuggestions(input) {
         try {
-            // Check if search suggestions are enabled
+            this._totalRequests++;
             const options = this._display.getOptions();
-            if (!options || !options.general.enableSearchSuggestions) {
-                return [];
-            }
+            if (!this._areSuggestionsEnabled(options) || !options) { return []; }
 
-            // Use Yomitan's existing conversion logic (same as _onSearchInput)
-            let searchInput = input;
-            if (options.general.language === 'ja' && options.general.enableWanakana) {
-                // Use the same conversion as the search input handler
-                searchInput = convertToKana(input);
-            }
+            const searchInput = this._normalizeInput(input, options);
 
-            console.log('Getting suggestions for:', searchInput);
-            /** @type {Map<string, {term: string, score: number, dictionaryIndex: number}>} */
-            const suggestions = new Map();
-
-            // If input is empty, return most recent/popular words
             if (searchInput.length === 0) {
-                return await this._getPopularSuggestions(options);
+                return await this._getPopularSuggestions();
             }
 
-            console.log(this._trie.size())
+            const suggestions = this._getTrieSuggestions(searchInput);
 
-            // 1. Try trie with the converted input (same logic as database)
-            const trieSuggestions = this._trie.getSuggestions(searchInput);
+            this._addKanjiEquivalentsIfNeeded(searchInput, suggestions);
 
-            // If input is hiragana, also check for kanji equivalents
-            if (isStringEntirelyKana(searchInput) && this._readingToKanji.has(searchInput)) {
-                const kanjiSet = this._readingToKanji.get(searchInput);
-                if (kanjiSet) {
-                    for (const kanji of kanjiSet) {
-                        trieSuggestions.push(kanji);
+            if (suggestions.length >= SUGGESTION_LIMIT) {
+                this._trieUsageCount++;
+                this._logPerformanceStats();
+                return this._sortAndLimitSuggestions(suggestions, searchInput, options, 'trie');
+            }
+
+            // Fallback to DB
+            this._databaseUsageCount++;
+            /** @type {{ entries: { reading: string, term: string }[], suggestions: string[] }} */
+            const dbResult = await this._getDatabaseSuggestions(searchInput, options);
+            /** @type {{ reading: string, term: string }[]} */
+            const dbEntries = dbResult.entries;
+            /** @type {string[]} */
+            let dbsuggestions = dbResult.suggestions;
+            // Add kanji terms for prefix-matching readings
+            const kanjiSuggestions = [];
+            if (isStringEntirelyKana(searchInput)) {
+                for (const entry of dbEntries) {
+                    if (
+                        entry.reading &&
+                        entry.reading.startsWith(/** @type {string} */ (searchInput)) &&
+                        entry.term &&
+                        entry.term !== entry.reading &&
+                        this._containsKanji(entry.term)
+                    ) {
+                        kanjiSuggestions.push(entry.term);
                     }
                 }
             }
+            dbsuggestions = [...new Set([...dbsuggestions, ...kanjiSuggestions])];
 
-            if (trieSuggestions.length >= 10) {
-                console.log("returning trie suggestions.")
-
-                // ALWAYS apply hiragana→kanji mapping, regardless of frequency settings
-                if (isStringEntirelyKana(searchInput) && this._readingToKanji.has(searchInput)) {
-                    const kanjiSet = this._readingToKanji.get(searchInput);
-                    if (kanjiSet) {
-                        for (const kanji of kanjiSet) {
-                            trieSuggestions.push(kanji);
-                        }
-                    }
-                }
-
-                const frequencyDictionary = options.general.sortFrequencyDictionary;
-                if (frequencyDictionary) {
-                    const sortedSuggestions = await this._sortSuggestionsWithFrequency(trieSuggestions, searchInput, options, 'trie');
-                    console.log("heres tries suggestions", sortedSuggestions)
-                    const uniqueSuggestions = [...new Set(sortedSuggestions)].slice(0, 10);
-                    return uniqueSuggestions;
-                } else {
-                    // Even without frequency dictionary, sort by exact matches and length
-                    const result = trieSuggestions.sort((a, b) => {
-                        // Prioritize exact matches
-                        const isExactMatchA = a === searchInput;
-                        const isExactMatchB = b === searchInput;
-                        if (isExactMatchA && !isExactMatchB) return -1;
-                        if (!isExactMatchA && isExactMatchB) return 1;
-
-                        // Then by length
-                        return a.length - b.length;
-                    });
-                    console.log('No frequency dictionary, returning trie suggestions:', result);
-                    const uniqueResult = [...new Set(result)].slice(0, 10);
-                    return uniqueResult;
-                }
-            }
-
-            console.log("not enough trie, going to db:", trieSuggestions)
-
-            // 2. Search the dictionary with the SAME converted input
-            if (searchInput.length > 0) {
-                if (options !== null) {
-                    /** @type {Map<string, number>} */
-                    const dictionaryMap = new Map();
-                    let index = 0;
-                    for (const {name, enabled} of options.dictionaries) {
-                        if (enabled) {
-                            dictionaryMap.set(name, index++);
-                        }
-                    }
-
-                    try {
-                        const entries = await this._dictionaryDatabase.findTermsBulk([searchInput], new Set(dictionaryMap.keys()), 'prefix');
-                        for (const entry of entries) {
-                            const dictionaryIndex = dictionaryMap.get(entry.dictionary) ?? -1;
-                            const existing = suggestions.get(entry.term);
-                            // Keep the entry with the highest score and lowest dictionary index
-                            if (!existing || entry.score > existing.score || (entry.score === existing.score && dictionaryIndex < existing.dictionaryIndex)) {
-                                suggestions.set(entry.term, {
-                                    term: entry.term,
-                                    score: entry.score,
-                                    dictionaryIndex,
-                                });
-                            }
-
-                            // Store both term and reading in trie for future matching
-                            this._termScores.set(entry.term, entry.score);
-                            this._trie.insert(entry.term);
-
-                            // Also store the reading if it exists and is different
-                            if (entry.reading && entry.reading !== entry.term) {
-                                this._trie.insert(entry.reading);
-                                this._termScores.set(entry.reading, entry.score);
-
-                                // Map reading to kanji
-                                if (!this._readingToKanji.has(entry.reading)) {
-                                    this._readingToKanji.set(entry.reading, new Set());
-                                }
-                                const kanjiSet = this._readingToKanji.get(entry.reading);
-                                if (kanjiSet) {
-                                    kanjiSet.add(entry.term);
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Error fetching real-time suggestions:', e);
-                        return [];
-                    }
-                }
-            }
-
-            // Sort by score (descending) and dictionary index (ascending)
-            const result = await this._sortSuggestionsByScore(suggestions);
-
-            // Apply frequency sorting if enabled
-            const frequencyDictionary = options.general.sortFrequencyDictionary;
-            if (frequencyDictionary && result.length > 0) {
-                return await this._sortSuggestionsWithFrequency(result, input, options, 'database');
-            }
-            // Return the result if no frequency sorting is needed
-            const uniqueResult = [...new Set(result)].slice(0, 10);
-            return uniqueResult;
-        } catch (error) {
-            console.error('Error in getSuggestions:', error);
-            // Graceful fallback: return empty array so normal search still works
+            this._logPerformanceStats();
+            return this._sortAndLimitSuggestions(dbsuggestions, searchInput, options, 'database');
+        } catch (e) {
             return [];
         }
     }
 
     /**
      * Gets popular/most recent suggestions when input is empty.
-     * @param {import('settings').ProfileOptions} options The profile options.
-     * @returns {Promise<string[]>} Array of popular suggestions.
+     * @returns {Promise<string[]>}
      */
-    async _getPopularSuggestions(options) {
+    async _getPopularSuggestions() {
         // Return terms with highest user frequency first
-        const popularTerms = [...this._userFrequency.entries()]
+        return [...this._userFrequency.entries()]
             .sort((a, b) => b[1] - a[1])
             .map(([term]) => term)
-            .slice(0, 10);
-
-        // // If we don't have enough user frequency data, add some common terms
-        // if (popularTerms.length < 10) {
-        //     const commonTerms = ['日本', '日本語', '英語', '中国語', '韓国語', 'フランス語', 'ドイツ語', 'スペイン語', 'イタリア語', 'ロシア語'];
-        //     for (const term of commonTerms) {
-        //         if (!popularTerms.includes(term)) {
-        //             popularTerms.push(term);
-        //         }
-        //         if (popularTerms.length >= 10) break;
-        //     }
-        // }
-
-        return popularTerms;
+            .slice(0, SUGGESTION_LIMIT);
     }
 
     /**
-     * Sorts suggestions by score and dictionary index.
-     * @param {Map<string, {term: string, score: number, dictionaryIndex: number}>} suggestions The suggestions map.
-     * @returns {Promise<string[]>} Array of sorted terms.
+     * @param {Map<string, { term: string, score: number, dictionaryIndex: number }>} suggestions
+     * @returns {Promise<string[]>}
      */
     async _sortSuggestionsByScore(suggestions) {
         const options = this._display.getOptions();
         const frequencyDictionary = options?.general.sortFrequencyDictionary;
 
-        // Get frequency data if available
-        let frequencyMap = new Map();
+        // Get frequency data from installed frequency dictionaries if enabled
+        /** @type {Map<string, number>} */
+        const frequencyMap = new Map();
         if (frequencyDictionary) {
             try {
-                // Replace line 304 with:
-                const termReadingList = [...suggestions.keys()].map(term => ({term, reading: null}));
+                const termReadingList = [...suggestions.keys()].map((term) => ({term, reading: null}));
                 const frequencies = await this._display.application.api.getTermFrequencies(termReadingList, [frequencyDictionary]);
                 for (const freq of frequencies) {
                     frequencyMap.set(freq.term, freq.frequency);
                 }
             } catch (e) {
-                console.warn('Failed to get frequency data for score sorting:', e);
+                // Ignore frequency data errors
             }
         }
-
+        /** @type {Array<{ term: string, score: number, dictionaryIndex: number }>} */
         return [...suggestions.values()]
             .sort((a, b) => {
                 const freqA = this._userFrequency.get(a.term) || 0;
@@ -350,54 +245,39 @@ export class SearchSuggestionController {
                 return a.dictionaryIndex - b.dictionaryIndex;
             })
             .map((item) => item.term)
-            .slice(0, 10);
+            .slice(0, SUGGESTION_LIMIT);
     }
 
     /**
      * Sorts suggestions with frequency data.
-     * @param {string[]} suggestions The suggestions to sort.
-     * @param {string} input The input text.
-     * @param {import('settings').ProfileOptions} options The profile options.
-     * @param {string} source The source of suggestions ('trie' or 'database').
-     * @returns {Promise<string[]>} Array of sorted suggestions.
+     * @param {string[]} suggestions
+     * @param {string} input
+     * @param {import('settings').ProfileOptions} options
+     * @param {string} _source
+     * @returns {Promise<string[]>}
      */
-    async _sortSuggestionsWithFrequency(suggestions, input, options, source) {
+    async _sortSuggestionsWithFrequency(suggestions, input, options, _source) {
         const frequencyDictionary = options.general.sortFrequencyDictionary;
         if (!frequencyDictionary) {
-            return suggestions;
+            return suggestions.slice(0, SUGGESTION_LIMIT);
         }
 
         try {
-            const termReadingList = suggestions.map(term => ({term, reading: null}));
+            // Use ALL suggestions for frequency lookup, including kanji terms
+            const termReadingList = suggestions.map((term) => ({term, reading: null}));
             const frequencies = await this._display.application.api.getTermFrequencies(termReadingList, [frequencyDictionary]);
 
-            // Create frequency map
+            /** @type {Map<string, number>} */
             const frequencyMap = new Map();
             for (const freq of frequencies) {
                 frequencyMap.set(freq.term, freq.frequency);
             }
 
-            // Sort with frequency data
-            console.log('Frequency dictionary:', frequencyDictionary);
-            console.log('Original suggestions count:', suggestions.length);
-            console.log('Term reading list:', termReadingList);
-            console.log('Frequencies returned:', frequencies);
-            console.log('Frequency map:', frequencyMap);
-            console.log('Final sorted suggestions:', suggestions);
-            return suggestions.sort((a, b) => this._compareSuggestions(a, b, input, frequencyMap, source));
+            const sorted = suggestions.sort((a, b) => this._compareSuggestions(a, b, input, frequencyMap));
+            return sorted.slice(0, SUGGESTION_LIMIT);
         } catch (e) {
-            console.warn(`Failed to get frequency data for ${source} suggestions:`, e);
-            return suggestions;
+            return suggestions.slice(0, SUGGESTION_LIMIT);
         }
-    }
-
-    /**
-     * Checks if a string contains kanji characters.
-     * @param {string} text
-     * @returns {boolean}
-     */
-    _containsKanji(text) {
-        return /[\u4e00-\u9faf]/.test(text);
     }
 
     /**
@@ -406,10 +286,9 @@ export class SearchSuggestionController {
      * @param {string} b Second suggestion.
      * @param {string} input The input text.
      * @param {Map<string, number>} frequencyMap The frequency map.
-     * @param {string} source The source of suggestions.
-     * @returns {number} Comparison result.
+     * @returns {number} result.
      */
-    _compareSuggestions(a, b, input, frequencyMap, source) {
+    _compareSuggestions(a, b, input, frequencyMap) {
         const freqA = frequencyMap.get(a) || 0;
         const freqB = frequencyMap.get(b) || 0;
         const userFreqA = this._userFrequency.get(a) || 0;
@@ -417,17 +296,25 @@ export class SearchSuggestionController {
         const scoreA = this._termScores.get(a) || 0;
         const scoreB = this._termScores.get(b) || 0;
 
-        // 1. Prioritize exact matches (like Yomitan does)
+        // 1. Prioritize exact matches
         const isExactMatchA = a === input;
         const isExactMatchB = b === input;
-        if (isExactMatchA && !isExactMatchB) return -1;
-        if (!isExactMatchA && isExactMatchB) return 1;
+        if (isExactMatchA && !isExactMatchB) { return -1; }
+        if (!isExactMatchA && isExactMatchB) { return 1; }
 
-        // 2. Prioritize shorter terms (like Yomitan does)
+        // 2. Prioritize kanji terms for kana input
+        if (isStringEntirelyKana(input)) {
+            const isKanjiA = this._containsKanji(a);
+            const isKanjiB = this._containsKanji(b);
+            if (isKanjiA && !isKanjiB) { return -1; }
+            if (!isKanjiA && isKanjiB) { return 1; }
+        }
+
+        // 3. Prioritize shorter terms
         const lengthDiff = a.length - b.length;
-        if (lengthDiff !== 0) return lengthDiff;
+        if (lengthDiff !== 0) { return lengthDiff; }
 
-        // 3. Use Yomitan's weighting: frequency + score + user frequency
+        // 4. Use Yomitans weighting: frequency + score + user frequency
         const weightedScoreA = (freqA * 0.6) + (scoreA * 0.25) + (userFreqA * 100 * 0.15);
         const weightedScoreB = (freqB * 0.6) + (scoreB * 0.25) + (userFreqB * 100 * 0.15);
 
@@ -435,8 +322,8 @@ export class SearchSuggestionController {
     }
 
     /**
-    * Sets up event listener to hide suggestions when clicking outside the search area.
-    */
+     * Sets up event listener to hide suggestions when clicking outside the search area.
+     */
     _setupClickOutsideListener() {
         document.addEventListener('click', (event) => {
             const searchTextbox = document.getElementById('search-textbox');
@@ -455,5 +342,198 @@ export class SearchSuggestionController {
     /** */
     hideSuggestions() {
         this._suggestionsList.style.display = 'none';
+    }
+
+    // --- Helper methods ---
+
+    /**
+     * Checks if search suggestions are enabled in the options.
+     * @param {import('settings').ProfileOptions | null} options
+     * @returns {boolean}
+     */
+    _areSuggestionsEnabled(options) {
+        return !!(options && options.general && options.general.enableSearchSuggestions);
+    }
+
+    /**
+     * Normalizes the input string based on language and settings.
+     * @param {string} input
+     * @param {import('settings').ProfileOptions} options
+     * @returns {string}
+     */
+    _normalizeInput(input, options) {
+        if (options.general.language === 'ja' && options.general.enableWanakana) {
+            return convertToKana(input);
+        }
+        return input;
+    }
+
+    /**
+     * Gets suggestions from the Trie for the given input.
+     * @param {string} searchInput
+     * @returns {string[]}
+     */
+    _getTrieSuggestions(searchInput) {
+        return this._trie.getSuggestions(searchInput);
+    }
+
+    /**
+     * Adds kanji equivalents to the suggestions if the input is kana.
+     * @param {string} searchInput
+     * @param {string[]} suggestions
+     * @returns {void}
+     */
+    _addKanjiEquivalentsIfNeeded(searchInput, suggestions) {
+        if (isStringEntirelyKana(searchInput)) {
+            for (const [reading, kanjiSet] of this._readingToKanji.entries()) {
+                if (reading.startsWith(searchInput)) {
+                    for (const kanji of kanjiSet) {
+                        if (!suggestions.includes(kanji)) {
+                            suggestions.push(kanji);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets suggestions from the database for the given input.
+     * @param {string} searchInput
+     * @param {import('settings').ProfileOptions} options
+     * @returns {Promise<{entries: any[], suggestions: string[]}>}
+     */
+    async _getDatabaseSuggestions(searchInput, options) {
+        /** @type {Map<string, { term: string, score: number, dictionaryIndex: number }>} */
+        const suggestions = new Map();
+        if (!options) { return {entries: [], suggestions: []}; }
+
+        /** @type {Map<string, number>} */
+        const dictionaryMap = new Map();
+        let index = 0;
+        for (const {name, enabled} of options.dictionaries) {
+            if (enabled) {
+                dictionaryMap.set(name, index++);
+            }
+        }
+        /** @type {{ term: string, score: number, dictionary: string, reading?: string }[]} */
+        let entries = [];
+        try {
+            entries = await this._dictionaryDatabase.findTermsBulk([searchInput], new Set(dictionaryMap.keys()), 'prefix');
+            for (const entry of entries) {
+                const dictionaryIndex = dictionaryMap.get(entry.dictionary) ?? -1;
+                const existing = suggestions.get(entry.term);
+                if (!existing || entry.score > existing.score || (entry.score === existing.score && dictionaryIndex < existing.dictionaryIndex)) {
+                    suggestions.set(entry.term, {
+                        term: entry.term,
+                        score: entry.score,
+                        dictionaryIndex,
+                    });
+                }
+
+                this._termScores.set(entry.term, entry.score);
+                this._trie.insert(entry.term);
+
+                if (entry.reading && entry.reading !== entry.term) {
+                    this._trie.insert(entry.reading);
+                    this._termScores.set(entry.reading, entry.score);
+
+                    if (!this._readingToKanji.has(entry.reading)) {
+                        this._readingToKanji.set(entry.reading, new Set());
+                    }
+                    const kanjiSet = this._readingToKanji.get(entry.reading);
+                    if (kanjiSet) {
+                        kanjiSet.add(entry.term);
+                    }
+                }
+            }
+
+            // Sort by score and dictionary index
+            const sortedEntries = await this._sortSuggestionsByScore(suggestions);
+            const sortedSuggestions = sortedEntries
+                .slice(0, SUGGESTION_LIMIT);
+
+            return {entries, suggestions: sortedSuggestions};
+        } catch (e) {
+            return {entries: [], suggestions: /** @type {string[]} */ []};
+        }
+    }
+
+    /**
+     * Sorts and limits the suggestions array.
+     * @param {string[] | Map<string, {term: string, score: number, dictionaryIndex: number}>} suggestions
+     * @param {string} searchInput
+     * @param {import('settings').ProfileOptions} options
+     * @param {string} source
+     * @returns {Promise<string[]> | string[]}
+     */
+    _sortAndLimitSuggestions(suggestions, searchInput, options, source) {
+        if (suggestions instanceof Map) {
+            suggestions = [...suggestions.values()].map((item) => item.term);
+        }
+        const uniqueSuggestions = [...new Set(suggestions)];
+
+        const frequencyDictionary = options.general.sortFrequencyDictionary;
+        if (frequencyDictionary && uniqueSuggestions.length > 0) {
+            return this._sortSuggestionsWithFrequency(uniqueSuggestions, searchInput, options, source);
+        } else {
+            uniqueSuggestions.sort((a, b) => {
+                const isExactMatchA = a === searchInput;
+                const isExactMatchB = b === searchInput;
+                if (isExactMatchA && !isExactMatchB) { return -1; }
+                if (!isExactMatchA && isExactMatchB) { return 1; }
+
+                // Prioritize kanji terms that are likely matches for the input
+                const isKanjiA = this._containsKanji(a);
+                const isKanjiB = this._containsKanji(b);
+                if (isKanjiA && !isKanjiB) { return -1; }
+                if (!isKanjiA && isKanjiB) { return 1; }
+
+                return a.length - b.length;
+            });
+            return uniqueSuggestions.slice(0, SUGGESTION_LIMIT);
+        }
+    }
+
+    /**
+     * Checks if a string contains kanji characters.
+     * @param {string} text
+     * @returns {boolean}
+     */
+    _containsKanji(text) {
+        return /[\u4e00-\u9faf]/.test(text);
+    }
+
+    // performance monitoring
+
+    /**
+     * Logs performance statistics periodically.
+     */
+    _logPerformanceStats() {
+        if (this._totalRequests % 10 === 0) {
+            this._trieUsageCount = 0;
+            this._databaseUsageCount = 0;
+        }
+    }
+
+    /**
+     * Gets the current size of the Trie.
+     * @returns {number}
+     */
+    getTrieSize() {
+        return this._trie.size();
+    }
+
+    /**
+     * Gets performance statistics.
+     * @returns {{trieUsage: number, databaseUsage: number, totalRequests: number, trieSize: number}}
+     */
+    getPerformanceStats() {
+        return {
+            trieUsage: this._trieUsageCount,
+            databaseUsage: this._databaseUsageCount,
+            totalRequests: this._totalRequests,
+            trieSize: this._trie.size(),
+        };
     }
 }
