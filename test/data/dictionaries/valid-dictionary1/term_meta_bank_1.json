@@ -50,6 +50,31 @@
         "打ち込む",
         "pitch",
         {
+            "reading": "うちこむ",
+            "pitches": [
+                {"position": "HHHH"},
+                {"position": "HHHL"},
+                {"position": "HHLH"},
+                {"position": "HHLL"},
+                {"position": "HLHH"},
+                {"position": "HLHL"},
+                {"position": "HLLH"},
+                {"position": "HLLL"},
+                {"position": "LHHH"},
+                {"position": "LHHL"},
+                {"position": "LHLH"},
+                {"position": "LHLL"},
+                {"position": "LLHH"},
+                {"position": "LLHL"},
+                {"position": "LLLH"},
+                {"position": "LLLL"}
+            ]
+        }
+    ],
+    [
+        "打ち込む",
+        "pitch",
+        {
             "reading": "ぶちこむ",
             "pitches": [
                 {"position": 0},
