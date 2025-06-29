@@ -402,7 +402,7 @@ export function getDownstepPositions(pitchString) {
         }
     }
     if (downsteps.length === 0) {
-        downsteps.push(-1);
+        downsteps.push(pitchString.startsWith('L') ? 0 : -1);
     }
     return downsteps;
 }
