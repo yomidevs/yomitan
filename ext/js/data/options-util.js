@@ -579,6 +579,7 @@ export class OptionsUtil {
             this._updateVersion65,
             this._updateVersion66,
             this._updateVersion67,
+            this._updateVersion68,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1747,11 +1748,19 @@ export class OptionsUtil {
     }
 
     /**
-     *  - Changed pitch-accent-item param name
+     * - Added dynamic handlebars for single frequency dictionaries.
      *  @type {import('options-util').UpdateFunction}
      */
     async _updateVersion67(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v67.handlebars');
+    }
+
+    /**
+     *  - Changed pitch-accent-item param name
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion68(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v68.handlebars');
     }
 
     /**

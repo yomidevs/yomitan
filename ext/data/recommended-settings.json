@@ -286,24 +286,29 @@
                 "value": [
                     [
                         {
-                            "pattern": "l'",
+                            "pattern": "l('|’)",
                             "ignoreCase": true,
                             "replacement": ""
                         },
                         {
-                            "pattern": "j'",
+                            "pattern": "j('|’)",
                             "ignoreCase": true,
                             "replacement": ""
                         },
                         {
-                            "pattern": "d'",
+                            "pattern": "d('|’)",
+                            "ignoreCase": true,
+                            "replacement": ""
+                        },
+                        {
+                            "pattern": "s('|’)",
                             "ignoreCase": true,
                             "replacement": ""
                         }
                     ]
                 ]
             },
-            "description": "Separating the l', j', d' from the word."
+            "description": "Separating the l', j', d', s' from the word."
         },
         {
             "modification": {

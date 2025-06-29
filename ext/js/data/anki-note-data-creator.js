@@ -171,7 +171,7 @@ function getPublicContext(context) {
 
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
- * @returns {number[]}
+ * @returns {import('anki-templates').FrequencyNumber[]}
  */
 function getFrequencyNumbers(dictionaryEntry) {
     let previousDictionary;
@@ -187,13 +187,13 @@ function getFrequencyNumbers(dictionaryEntry) {
             if (frequencyMatch !== null) {
                 const frequencyParsed = Number.parseInt(frequencyMatch[0], 10);
                 if (frequencyParsed > 0) {
-                    frequencies.push(frequencyParsed);
+                    frequencies.push({dictionary: dictionary, frequency: frequencyParsed});
                     continue;
                 }
             }
         }
         if (frequency > 0) {
-            frequencies.push(frequency);
+            frequencies.push({dictionary: dictionary, frequency: frequency});
         }
     }
     return frequencies;
@@ -212,7 +212,7 @@ function getFrequencyHarmonic(dictionaryEntry) {
 
     let total = 0;
     for (const frequency of frequencies) {
-        total += 1 / frequency;
+        total += 1 / frequency.frequency;
     }
     return Math.floor(frequencies.length / total);
 }
@@ -230,7 +230,7 @@ function getFrequencyAverage(dictionaryEntry) {
 
     let total = 0;
     for (const frequency of frequencies) {
-        total += frequency;
+        total += frequency.frequency;
     }
     return Math.floor(total / frequencies.length);
 }
@@ -441,6 +441,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
     const termTags = createCachedValue(getTermTags.bind(null, dictionaryEntry, type));
     const expressions = createCachedValue(getTermExpressions.bind(null, dictionaryEntry));
     const frequencies = createCachedValue(getTermFrequencies.bind(null, dictionaryEntry));
+    const frequencyNumbers = createCachedValue(getFrequencyNumbers.bind(null, dictionaryEntry));
     const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry));
     const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry));
     const pitches = createCachedValue(getTermPitches.bind(null, dictionaryEntry));
@@ -483,6 +484,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
         get termTags() { return getCachedValue(termTags); },
         get definitions() { return getCachedValue(commonInfo).definitions; },
         get frequencies() { return getCachedValue(frequencies); },
+        get frequencyNumbers() { return getCachedValue(frequencyNumbers); },
         get frequencyHarmonic() { return getCachedValue(frequencyHarmonic); },
         get frequencyAverage() { return getCachedValue(frequencyAverage); },
         get pitches() { return getCachedValue(pitches); },
