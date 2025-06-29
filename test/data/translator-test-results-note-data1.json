@@ -3068,6 +3068,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -3240,11 +3317,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -3322,11 +3488,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -3922,6 +4280,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -4094,11 +4529,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -4176,11 +4700,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -9148,6 +9864,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -9320,11 +10113,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -9402,11 +10284,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -9572,6 +10646,83 @@
                     },
                     {
                       "positions": 3,
+                      "tags": []
+                    }
+                  ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
                       "tags": []
                     }
                   ]
@@ -9747,11 +10898,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -9829,11 +11069,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -12343,6 +13775,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -12553,11 +14062,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -12617,11 +14215,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -14623,6 +16413,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -15100,6 +16967,83 @@
             },
             {
               "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
+            },
+            {
+              "index": 2,
               "expressionIndex": 1,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -15135,6 +17079,18 @@
             },
             {
               "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 2,
               "expressionIndex": 1,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -15204,6 +17160,230 @@
                 "expressions": [
                   "打ち込む"
                 ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
                 "reading": "ぶちこむ",
                 "positions": 0,
                 "nasalPositions": [],
@@ -15231,7 +17411,7 @@
             ]
           }
         ],
-        "pitchCount": 4,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -16655,6 +18835,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -16827,11 +19084,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -16909,11 +19255,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -17551,6 +20089,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -17723,11 +20338,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -17805,11 +20509,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -20374,6 +23270,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -20546,11 +23519,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -20628,11 +23690,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -21228,6 +24482,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -21400,11 +24731,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -21482,11 +24902,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -24030,6 +27642,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -24202,11 +27891,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -24284,11 +28062,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -24884,6 +28854,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -25056,11 +29103,100 @@
                   "tags": []
                 }
               ]
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
             }
           ],
           "phoneticTranscriptions": [
             {
               "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
               "expressionIndex": 0,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -25138,11 +29274,203 @@
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
               }
             ]
           }
         ],
-        "pitchCount": 2,
+        "pitchCount": 18,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -28191,6 +32519,83 @@
                       "tags": []
                     }
                   ]
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryAlias": "termsDictAlias",
+                  "dictionaryOrder": {
+                    "index": 0
+                  },
+                  "expression": "打ち込む",
+                  "reading": "うちこむ",
+                  "pitches": [
+                    {
+                      "positions": "HHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HLLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LHLL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLHL",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "LLLL",
+                      "tags": []
+                    }
+                  ]
                 }
               ],
               "furiganaSegments": [
@@ -28668,6 +33073,83 @@
             },
             {
               "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "pitches": [
+                {
+                  "positions": "HHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "HLLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LHLL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLHL",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLH",
+                  "tags": []
+                },
+                {
+                  "positions": "LLLL",
+                  "tags": []
+                }
+              ]
+            },
+            {
+              "index": 2,
               "expressionIndex": 1,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -28703,6 +33185,18 @@
             },
             {
               "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
+              "dictionaryOrder": {
+                "index": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 2,
               "expressionIndex": 1,
               "dictionary": "Test Dictionary 2",
               "dictionaryAlias": "termsDictAlias",
@@ -28772,6 +33266,230 @@
                 "expressions": [
                   "打ち込む"
                 ],
+                "reading": "うちこむ",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
                 "reading": "ぶちこむ",
                 "positions": 0,
                 "nasalPositions": [],
@@ -28799,7 +33517,7 @@
             ]
           }
         ],
-        "pitchCount": 4,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",

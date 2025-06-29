@@ -1841,6 +1841,127 @@
                 "tags": []
               }
             ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
           }
         ],
         "frequencies": [
@@ -2232,6 +2353,127 @@
               {
                 "type": "pitch-accent",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
@@ -5085,6 +5327,127 @@
                 "tags": []
               }
             ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
           }
         ],
         "frequencies": [
@@ -5278,6 +5641,127 @@
               {
                 "type": "pitch-accent",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
@@ -7471,6 +7955,127 @@
                 "tags": []
               }
             ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
           }
         ],
         "frequencies": [
@@ -8912,6 +9517,127 @@
           },
           {
             "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          },
+          {
+            "index": 2,
             "headwordIndex": 1,
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
@@ -10002,6 +10728,127 @@
                 "tags": []
               }
             ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
           }
         ],
         "frequencies": [
@@ -10435,6 +11282,127 @@
               {
                 "type": "pitch-accent",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
@@ -11938,6 +12906,127 @@
                 "tags": []
               }
             ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
           }
         ],
         "frequencies": [
@@ -12333,6 +13422,127 @@
               {
                 "type": "pitch-accent",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
@@ -13829,6 +15039,127 @@
                 "tags": []
               }
             ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
           }
         ],
         "frequencies": [
@@ -14224,6 +15555,127 @@
               {
                 "type": "pitch-accent",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": []
@@ -16254,6 +17706,127 @@
           },
           {
             "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          },
+          {
+            "index": 2,
             "headwordIndex": 1,
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,

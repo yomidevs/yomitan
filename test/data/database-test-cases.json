@@ -22,9 +22,9 @@
         "total": 15
       },
       "termMeta": {
-        "total": 39,
+        "total": 40,
         "freq": 31,
-        "pitch": 7,
+        "pitch": 8,
         "ipa": 1
       },
       "terms": {
@@ -38,7 +38,7 @@
         "kanji": 2,
         "kanjiMeta": 6,
         "terms": 34,
-        "termMeta": 39,
+        "termMeta": 40,
         "tagMeta": 15,
         "media": 6
       }
@@ -47,7 +47,7 @@
       "kanji": 2,
       "kanjiMeta": 6,
       "terms": 34,
-      "termMeta": 39,
+      "termMeta": 40,
       "tagMeta": 15,
       "media": 6
     }
@@ -616,7 +616,7 @@
           }
         ],
         "expectedResults": {
-          "total": 12,
+          "total": 13,
           "modes": [
             [
               "freq",
@@ -624,7 +624,7 @@
             ],
             [
               "pitch",
-              2
+              3
             ]
           ]
         }
