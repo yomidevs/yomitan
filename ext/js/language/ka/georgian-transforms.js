@@ -62,6 +62,3 @@ export const georgianTransforms = {
     },
   },
 };
-    },
-  },
-};
