@@ -27,7 +27,7 @@ const vowelRestorationRules = [
 ];
 
 // Helper to check adjective vowel endings (except ი)
-function endsWithVowelExceptI(word) {
+function endsWithVowelExceptI(word: string): boolean {
   return /[აეოუუ]$/.test(word);
 }
 
