@@ -1,3 +1,4 @@
+// @ts-check
 // georgian-transforms.js
 import { suffixInflection } from "../language-transforms.js";
 
@@ -26,10 +27,16 @@ const vowelRestorationRules = [
   suffixInflection("გ", "გა", ["n", "adj"], ["n", "adj"]),
 ];
 
-// Helper to check adjective vowel endings (except ი)
-function endsWithVowelExceptI(word: string): boolean {
+
+/**
+ * @param {string} word
+ * @returns {boolean}
+ */
+function endsWithVowelExceptI(word) {
   return /[აეოუუ]$/.test(word);
 }
+
+
 
 export const georgianTransforms = {
   language: "kat",
