@@ -38,24 +38,11 @@ function endsWithVowelExceptI(word) {
 
 
 
+
 export const georgianTransforms = {
   language: "kat",
   conditions: {},
   transforms: {
-    adjectiveNoDecline: {
-      name: "adj-no-decline",
-      description: "If adjective ends with vowel except ი, no declension",
-      rules: [
-        {
-          apply: (word, pos) => {
-            if (pos === "adj" && endsWithVowelExceptI(word)) {
-              return [word];
-            }
-            return null;
-          }
-        }
-      ],
-    },
     nounAdjSuffixStripping: {
       name: "noun-adj-suffix-stripping",
       description: "Strip Georgian noun and adjective declension suffixes",
@@ -72,6 +59,9 @@ export const georgianTransforms = {
       name: "vowel-restoration",
       description: "Restore truncated vowels if applicable",
       rules: vowelRestorationRules,
+    },
+  },
+};
     },
   },
 };
