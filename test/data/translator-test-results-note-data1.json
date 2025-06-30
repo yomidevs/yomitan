@@ -3532,7 +3532,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -3579,7 +3581,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -3627,8 +3631,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -4744,7 +4752,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -4791,7 +4801,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -4839,8 +4851,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -10328,7 +10344,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -10375,7 +10393,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -10423,8 +10443,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -11113,7 +11137,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -11160,7 +11186,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -11208,8 +11236,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -14259,7 +14291,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -14306,7 +14340,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -14354,8 +14390,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -17205,7 +17245,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": [
@@ -17260,7 +17302,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -17316,8 +17360,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": [
@@ -19299,7 +19347,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -19346,7 +19396,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -19394,8 +19446,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -20553,7 +20609,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -20600,7 +20658,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -20648,8 +20708,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -23734,7 +23798,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -23781,7 +23847,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -23829,8 +23897,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -24946,7 +25018,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -24993,7 +25067,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -25041,8 +25117,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -28106,7 +28186,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -28153,7 +28235,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -28201,8 +28285,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -29318,7 +29406,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -29365,7 +29455,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -29413,8 +29505,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": []
@@ -33311,7 +33407,9 @@
                 "reading": "うちこむ",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": [
@@ -33366,7 +33464,9 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": [],
                 "exclusiveExpressions": [],
@@ -33422,8 +33522,12 @@
                 ],
                 "reading": "うちこむ",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": [],
                 "exclusiveExpressions": [],
                 "exclusiveReadings": [

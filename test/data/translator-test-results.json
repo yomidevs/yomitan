@@ -1874,7 +1874,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -1901,7 +1903,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -1929,8 +1933,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -2391,7 +2399,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -2418,7 +2428,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -2446,8 +2458,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -5360,7 +5376,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -5387,7 +5405,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -5415,8 +5435,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -5679,7 +5703,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -5706,7 +5732,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -5734,8 +5762,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -7988,7 +8020,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -8015,7 +8049,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -8043,8 +8079,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -9547,7 +9587,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -9574,7 +9616,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -9602,8 +9646,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -10761,7 +10809,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -10788,7 +10838,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -10816,8 +10868,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -11320,7 +11376,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -11347,7 +11405,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -11375,8 +11435,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -12939,7 +13003,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -12966,7 +13032,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -12994,8 +13062,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -13460,7 +13532,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -13487,7 +13561,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -13515,8 +13591,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -15072,7 +15152,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -15099,7 +15181,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -15127,8 +15211,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -15593,7 +15681,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -15620,7 +15710,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -15648,8 +15740,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -17736,7 +17832,9 @@
                 "type": "pitch-accent",
                 "positions": "HHLL",
                 "nasalPositions": [],
-                "devoicePositions": [],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
@@ -17763,7 +17861,9 @@
               {
                 "type": "pitch-accent",
                 "positions": "HLLL",
-                "nasalPositions": [],
+                "nasalPositions": [
+                  3
+                ],
                 "devoicePositions": [],
                 "tags": []
               },
@@ -17791,8 +17891,12 @@
               {
                 "type": "pitch-accent",
                 "positions": "LHLL",
-                "nasalPositions": [],
-                "devoicePositions": [],
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
                 "tags": []
               },
               {
