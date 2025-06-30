@@ -49,7 +49,7 @@ import {
 } from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
-import {georgianTransforms} from "./ka/georgian-transforms.js";
+import {georgianTransforms} from './ka/georgian-transforms.js';
 import {disassembleHangul, reassembleHangul} from './ko/korean-text-processors.js';
 import {koreanTransforms} from './ko/korean-transforms.js';
 import {processDiphtongs} from './la/latin-text-preprocessors.js';
@@ -324,9 +324,9 @@ const languageDescriptors = [
         languageTransforms: japaneseTransforms,
     },
     {
-        iso: 'ka',          
-        iso639_3: 'kat',    
-        name: 'Georgian',   
+        iso: 'ka',
+        iso639_3: 'kat',
+        name: 'Georgian',
         exampleText: 'კითხვა', // Georgian for “read”
         languageTransforms: georgianTransforms,
     },
