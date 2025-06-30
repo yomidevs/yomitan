@@ -328,7 +328,6 @@ const languageDescriptors = [
         iso639_3: 'kat',    
         name: 'Georgian',   
         exampleText: 'კითხვა', // Georgian for “read”
-        textPreprocessors: capitalizationPreprocessors,
         languageTransforms: georgianTransforms
     },
     {
