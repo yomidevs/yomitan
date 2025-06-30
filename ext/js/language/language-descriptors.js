@@ -323,6 +323,12 @@ const languageDescriptors = [
         languageTransforms: japaneseTransforms,
     },
     {
+       iso: 'ka',           
+       iso639_3: 'kat',     
+       name: 'Georgian',    
+       exampleText: 'კითხვა', 
+    },
+    {
         iso: 'kn',
         iso639_3: 'kan',
         name: 'Kannada',
