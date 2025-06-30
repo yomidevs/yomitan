@@ -328,7 +328,7 @@ const languageDescriptors = [
         iso639_3: 'kat',    
         name: 'Georgian',   
         exampleText: 'კითხვა', // Georgian for “read”
-        languageTransforms: georgianTransforms
+        languageTransforms: georgianTransforms,
     },
     {
         iso: 'kn',
