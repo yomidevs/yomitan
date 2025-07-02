@@ -46,7 +46,38 @@ const vowelRestorationRules = [
 
 export const georgianTransforms = {
     language: 'kat',
-    conditions: {},
+    conditions: {
+  v: {
+        name: 'Verb',
+        isDictionaryForm: true,
+        subConditions: ['v_phr'],
+    },
+    v_phr: {
+        name: 'Phrasal verb',
+        isDictionaryForm: true,
+    },
+    n: {
+        name: 'Noun',
+        isDictionaryForm: true,
+        subConditions: ['np', 'ns'],
+    },
+    np: {
+        name: 'Noun plural',
+        isDictionaryForm: true,
+    },
+    ns: {
+        name: 'Noun singular',
+        isDictionaryForm: true,
+    },
+    adj: {
+        name: 'Adjective',
+        isDictionaryForm: true,
+    },
+    adv: {
+        name: 'Adverb',
+        isDictionaryForm: true,
+    },
+},
     transforms: {
         nounAdjSuffixStripping: {
             name: 'noun-adj-suffix-stripping',
