@@ -50,11 +50,6 @@ export const georgianTransforms = {
   v: {
         name: 'Verb',
         isDictionaryForm: true,
-        subConditions: ['v_phr'],
-    },
-    v_phr: {
-        name: 'Phrasal verb',
-        isDictionaryForm: true,
     },
     n: {
         name: 'Noun',
