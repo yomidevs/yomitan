@@ -689,7 +689,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 67,
+        version: 68,
         global: {
             database: {
                 prefixWildcardsSupported: false,

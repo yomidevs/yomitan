@@ -352,24 +352,28 @@ export function isStringPartiallyJapanese(str) {
 
 /**
  * @param {number} moraIndex
- * @param {number} pitchAccentDownstepPosition
+ * @param {number | string} pitchAccentValue
  * @returns {boolean}
  */
-export function isMoraPitchHigh(moraIndex, pitchAccentDownstepPosition) {
-    switch (pitchAccentDownstepPosition) {
+export function isMoraPitchHigh(moraIndex, pitchAccentValue) {
+    if (typeof pitchAccentValue === 'string') {
+        return pitchAccentValue[moraIndex] === 'H';
+    }
+    switch (pitchAccentValue) {
         case 0: return (moraIndex > 0);
         case 1: return (moraIndex < 1);
-        default: return (moraIndex > 0 && moraIndex < pitchAccentDownstepPosition);
+        default: return (moraIndex > 0 && moraIndex < pitchAccentValue);
     }
 }
 
 /**
  * @param {string} text
- * @param {number} pitchAccentDownstepPosition
+ * @param {number | string} pitchAccentValue
  * @param {boolean} isVerbOrAdjective
  * @returns {?import('japanese-util').PitchCategory}
  */
-export function getPitchCategory(text, pitchAccentDownstepPosition, isVerbOrAdjective) {
+export function getPitchCategory(text, pitchAccentValue, isVerbOrAdjective) {
+    const pitchAccentDownstepPosition = typeof pitchAccentValue === 'string' ? getDownstepPositions(pitchAccentValue)[0] : pitchAccentValue;
     if (pitchAccentDownstepPosition === 0) {
         return 'heiban';
     }
@@ -383,6 +387,24 @@ export function getPitchCategory(text, pitchAccentDownstepPosition, isVerbOrAdje
         return pitchAccentDownstepPosition >= getKanaMoraCount(text) ? 'odaka' : 'nakadaka';
     }
     return null;
+}
+
+/**
+ * @param {string} pitchString
+ * @returns {number[]}
+ */
+export function getDownstepPositions(pitchString) {
+    const downsteps = [];
+    const moraCount = pitchString.length;
+    for (let i = 0; i < moraCount; i++) {
+        if (i > 0 && pitchString[i - 1] === 'H' && pitchString[i] === 'L') {
+            downsteps.push(i);
+        }
+    }
+    if (downsteps.length === 0) {
+        downsteps.push(pitchString.startsWith('L') ? 0 : -1);
+    }
+    return downsteps;
 }
 
 /**
