@@ -56,7 +56,7 @@ export class TemplateRendererMediaProvider {
         const data = this._getMediaData(media, args, namedArgs);
         if (data !== null) {
             const result = this._getFormattedValue(data, namedArgs);
-            if (typeof result === 'string') { return result.replaceAll('\n', '<br>'); }
+            if (typeof result === 'string') { return result.replaceAll('\n', '<br>\n'); }
         }
         const defaultValue = namedArgs.default;
         return defaultValue === null || typeof defaultValue === 'string' ? defaultValue : '';
