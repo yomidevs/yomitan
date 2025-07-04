@@ -72,7 +72,7 @@ export const georgianTransforms = {
             name: 'Adverb',
             isDictionaryForm: true,
         },
-      },
+    },
     transforms: {
         nounAdjSuffixStripping: {
             name: 'noun-adj-suffix-stripping',
