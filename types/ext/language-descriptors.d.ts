@@ -183,7 +183,7 @@ type AllTextProcessors = {
             standardizeKanji: TextProcessor<boolean>;
         };
     };
-    ka:Record<string, never>;
+    ka: Record<string, never>;
     ko: {
         pre: {
             disassembleHangul: TextProcessor<boolean>;
