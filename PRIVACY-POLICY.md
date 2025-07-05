@@ -46,4 +46,4 @@ Local applications may request data from Yomitan through the Yomitan API for ext
 
 [Mecab](https://taku910.github.io/mecab/) connectivity is available for text parsing. Yomitan may send **search query text** to Mecab for parsing.
 
-Mecab does not distribute any data, all data stays on your device.
+Mecab does not distribute any data; all data stays on your device.
