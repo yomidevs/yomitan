@@ -1832,6 +1832,11 @@ code.anki-field-marker {
     width: 100%;
 }
 
+#generate-anki-notes-buttons-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
 .code {
     flex: 0 0 auto;
     width: 100%;
