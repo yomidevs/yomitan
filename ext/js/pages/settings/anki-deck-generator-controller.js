@@ -93,6 +93,8 @@ export class AnkiDeckGeneratorController {
         this._defaultFieldTemplates = await this._settingsController.application.api.getDefaultAnkiFieldTemplates();
 
         /** @type {HTMLButtonElement} */
+        const parseWordsButton = querySelectorNotNull(document, '#generate-anki-notes-parse-button');
+        /** @type {HTMLButtonElement} */
         const dedupeWordsButton = querySelectorNotNull(document, '#generate-anki-notes-dedupe-button');
         /** @type {HTMLButtonElement} */
         const testRenderButton = querySelectorNotNull(document, '#generate-anki-notes-test-render-button');
@@ -110,6 +112,7 @@ export class AnkiDeckGeneratorController {
         this._sendToAnkiConfirmModal = this._modalController.getModal('generate-anki-notes-send-to-anki');
         this._exportConfirmModal = this._modalController.getModal('generate-anki-notes-export');
 
+        parseWordsButton.addEventListener('click', this._onParse.bind(this), false);
         dedupeWordsButton.addEventListener('click', this._onDedupe.bind(this), false);
         testRenderButton.addEventListener('click', this._onRender.bind(this), false);
         sendToAnkiButton.addEventListener('click', this._onSendToAnki.bind(this), false);
@@ -130,6 +133,28 @@ export class AnkiDeckGeneratorController {
     }
 
     // Private
+
+    /** */
+    async _onParse() {
+        // const words = this._wordInputTextarea.value.split('\n');
+        const options = await this._settingsController.getOptions();
+        const optionsContext = this._settingsController.getOptionsContext();
+        const parserResult = await this._application.api.parseText(this._wordInputTextarea.value, optionsContext, options.scanning.length, !options.parsing.enableMecabParser, options.parsing.enableMecabParser);
+        const parsedText = parserResult[0].content;
+
+        const parsedParts = [];
+        for (const parsedTextLine of parsedText) {
+            let combinedSegments = '';
+            for (const parsedTextSegment of parsedTextLine) {
+                combinedSegments += parsedTextSegment.text;
+            }
+            combinedSegments = combinedSegments.trim();
+            if (combinedSegments.length > 0) {
+                parsedParts.push(combinedSegments);
+            }
+        }
+        this._wordInputTextarea.value = parsedParts.join('\n');
+    }
 
     /** */
     _onDedupe() {
