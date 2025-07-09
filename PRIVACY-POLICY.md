@@ -8,7 +8,7 @@ Some features require sending data to third party services. These features and w
 
 Required to play pronunciation audio for terms.
 
-Audio playback may send the **term, reading, and/or language** for any dictionary entry term where the `Play Audio` speaker button is pressed.
+Audio playback may send the **term, reading, and/or language** for any dictionary entry term where the `Play Audio` speaker button is pressed. Personally identifying information is never sent.
 
 The following audio sources are provided by default (availability may vary based on the selected language):
 
@@ -44,6 +44,6 @@ Local applications may request data from Yomitan through the Yomitan API for ext
 
 ## Mecab (disabled by default)
 
-[Mecab](https://taku910.github.io/mecab/) connectivity is available for text parsing. Yomitan may send **search query text** to Mecab for parsing.
+[Mecab](https://taku910.github.io/mecab/) connectivity is available for text parsing. Yomitan may send **search query text** to Mecab for parsing. Personally identifying information is never sent.
 
 Mecab does not distribute any data; all data stays on your device.
