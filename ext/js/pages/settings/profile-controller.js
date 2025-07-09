@@ -429,7 +429,7 @@ export class ProfileController {
 
         const settingsProfileIndex = this._settingsController.profileIndex;
 
-        // Udpate UI
+        // Update UI
         this._updateProfileSelectOptions();
         void this.setDefaultProfile(profileCurrent);
 
@@ -442,7 +442,7 @@ export class ProfileController {
             void this._profileConditionsUI.prepare(settingsProfileIndex);
         }
 
-        // Udpate profile entries
+        // Update profile entries
         for (const entry of this._profileEntryList) {
             entry.cleanup();
         }
