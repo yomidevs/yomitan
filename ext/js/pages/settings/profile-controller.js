@@ -431,6 +431,7 @@ export class ProfileController {
 
         // Udpate UI
         this._updateProfileSelectOptions();
+        void this.setDefaultProfile(profileCurrent);
 
         /** @type {HTMLSelectElement} */ (this._profileActiveSelect).value = `${profileCurrent}`;
 
