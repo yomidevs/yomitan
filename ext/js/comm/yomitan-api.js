@@ -182,17 +182,21 @@ export class YomitanApi {
                         // @ts-expect-error - Allow this to error
                         const {text, type, markers, maxEntries} = parsedBody;
 
-                        const ankiTemplate = await this._getAnkiTemplate(optionsFull.profiles[optionsFull.profileCurrent].options);
+                        const profileOptions = optionsFull.profiles[optionsFull.profileCurrent].options;
+
+                        const ankiTemplate = await this._getAnkiTemplate(profileOptions);
                         let dictionaryEntries = await this._getDictionaryEntries(text, type, optionsFull.profileCurrent);
                         if (maxEntries > 0) {
                             dictionaryEntries = dictionaryEntries.slice(0, maxEntries);
                         }
-                        const dictionaryMedia = await this._fetchDictionaryMedia(dictionaryEntries);
-                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia);
+
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessDocument = parseHTML('').document;
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessWindow = parseHTML('').window;
+
+                        const dictionaryMedia = await this._fetchDictionaryMedia(dictionaryEntries);
+                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia, profileOptions, domlessDocument);
                         const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument, domlessWindow);
                         await ankiTemplateRenderer.prepare();
                         const templateRenderer = ankiTemplateRenderer.templateRenderer;
@@ -297,9 +301,11 @@ export class YomitanApi {
      * @param {string} text
      * @param {import('dictionary.js').DictionaryEntry[]} dictionaryEntries
      * @param {import('yomitan-api.js').apiMediaDetails[]} media
+     * @param {import('settings').ProfileOptions} options
+     * @param {Document} document
      * @returns {Promise<import('anki-note-builder.js').CommonData[]>}
      */
-    async _createCommonDatas(text, dictionaryEntries, media) {
+    async _createCommonDatas(text, dictionaryEntries, media, options, document) {
         /** @type {import('anki-note-builder.js').CommonData[]} */
         const commonDatas = [];
         for (const dictionaryEntry of dictionaryEntries) {
@@ -346,10 +352,49 @@ export class YomitanApi {
                     textFurigana: [],
                     dictionaryMedia: dictionaryMedia,
                 },
-                dictionaryStylesMap: new Map(),
+                dictionaryStylesMap: this._getDictionaryStylesMapDomless(options.dictionaries, document),
             });
         }
         return commonDatas;
+    }
+
+    /**
+     * @param {import('settings').DictionariesOptions} dictionaries
+     * @param {Document} domlessDocument
+     * @returns {Map<string, string>}
+     */
+    _getDictionaryStylesMapDomless(dictionaries, domlessDocument) {
+        const styleMap = new Map();
+        for (const dictionary of dictionaries) {
+            const {name, styles} = dictionary;
+            if (typeof styles === 'string') {
+                styleMap.set(name, this._sanitizeCSSDomless(styles, domlessDocument));
+            }
+        }
+        return styleMap;
+    }
+
+    /**
+     * @param {string} css
+     * @param {Document} domlessDocument
+     * @returns {string}
+     */
+    _sanitizeCSSDomless(css, domlessDocument) {
+        // Since this does not parse any CSS explicitly it should not error
+        // But there is no guarantee linkedom will not error
+        try {
+            const style = domlessDocument.createElement('style');
+            // eslint-disable-next-line no-unsanitized/property
+            style.innerHTML = css;
+            domlessDocument.appendChild(style);
+            const styleSheet = style.sheet;
+            if (styleSheet !== null) {
+                return [...styleSheet.cssRules].map((rule) => rule.cssText || '').join('\n');
+            }
+        } catch (e) {
+            log.log('Failed to sanitize css: ' + toError(e).message);
+        }
+        return '';
     }
 
     /**
