@@ -23,6 +23,7 @@ import {parseJson, readResponseJson} from '../core/json.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {getDynamicTemplates} from '../data/anki-template-util.js';
+import {getDictionaryEntryMedia} from '../pages/settings/anki-deck-generator-controller.js';
 import {AnkiTemplateRenderer} from '../templates/anki-template-renderer.js';
 
 /** */
@@ -261,6 +262,21 @@ export class YomitanApi {
      * @returns {Promise<import('anki-note-builder.js').CommonData[]>}
      */
     async _createCommonDatas(text, dictionaryEntries) {
+        /** @type {import('anki-templates.js').DictionaryMedia} */
+        const dictionaryEntriesMedia = {};
+        for (const dictionaryEntry of dictionaryEntries) {
+            const dictionaryEntryMedia = getDictionaryEntryMedia(dictionaryEntry);
+            for (const dictionaryMedia of dictionaryEntryMedia) {
+                const pathSplit = dictionaryMedia.path.split('/');
+                const dictionaryEntriesMedia2 = (
+                    Object.hasOwn(dictionaryEntriesMedia, dictionaryMedia.dictionary) ?
+                    (dictionaryEntriesMedia[dictionaryMedia.dictionary]) :
+                    (dictionaryEntriesMedia[dictionaryMedia.dictionary] = {})
+                );
+                dictionaryEntriesMedia2[dictionaryMedia.path] = {value: pathSplit[pathSplit.length - 1]};
+            }
+        }
+
         /** @type {import('anki-note-builder.js').CommonData[]} */
         const commonDatas = [];
         for (const dictionaryEntry of dictionaryEntries) {
@@ -286,6 +302,11 @@ export class YomitanApi {
                         text: text,
                         offset: 0,
                     },
+                },
+                media: {
+                    audio: {value: ''},
+                    textFurigana: [],
+                    dictionaryMedia: dictionaryEntriesMedia,
                 },
                 dictionaryStylesMap: new Map(),
             });
