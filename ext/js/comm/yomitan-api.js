@@ -187,7 +187,7 @@ export class YomitanApi {
                         if (maxEntries > 0) {
                             dictionaryEntries = dictionaryEntries.slice(0, maxEntries);
                         }
-                        const dictionaryMedia = await this._fetchMedia(dictionaryEntries);
+                        const dictionaryMedia = await this._fetchDictionaryMedia(dictionaryEntries);
                         const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia);
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessDocument = parseHTML('').document;
@@ -266,7 +266,7 @@ export class YomitanApi {
      * @param {import('dictionary.js').DictionaryEntry[]} dictionaryEntries
      * @returns {Promise<import('yomitan-api.js').apiMediaDetails[]>}
      */
-    async _fetchMedia(dictionaryEntries) {
+    async _fetchDictionaryMedia(dictionaryEntries) {
         const media = [];
         let mediaCount = 0;
         for (const dictionaryEntry of dictionaryEntries) {
