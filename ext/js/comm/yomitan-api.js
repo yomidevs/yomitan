@@ -272,8 +272,15 @@ export class YomitanApi {
             const dictionaryMedia = {};
             const dictionaryEntryMedias = getDictionaryEntryMedia(dictionaryEntry);
             for (const dictionaryEntryMedia of dictionaryEntryMedias) {
+                const mediaRequestTargets = [{
+                    path: dictionaryEntryMedia.path,
+                    dictionary: dictionaryEntryMedia.dictionary,
+                }];
+                const mediaFileData = await this._invoke('getMedia', {
+                    targets: mediaRequestTargets,
+                });
                 const timestamp = Date.now();
-                const ankiFilename = generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${mediaCount}`, getFileExtensionFromImageMediaType(dictionaryEntryMedia.path) ?? '', timestamp);
+                const ankiFilename = generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${mediaCount}`, getFileExtensionFromImageMediaType(mediaFileData[0].mediaType) ?? '', timestamp);
                 mediaCount += 1;
                 const dictionaryEntryMedia2 = (
                     Object.hasOwn(dictionaryMedia, dictionaryEntryMedia.dictionary) ?
