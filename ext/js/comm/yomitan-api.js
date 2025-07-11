@@ -23,6 +23,8 @@ import {parseJson, readResponseJson} from '../core/json.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {getDynamicTemplates} from '../data/anki-template-util.js';
+import {generateAnkiNoteMediaFileName} from '../data/anki-util.js';
+import {getFileExtensionFromImageMediaType} from '../media/media-util.js';
 import {getDictionaryEntryMedia} from '../pages/settings/anki-deck-generator-controller.js';
 import {AnkiTemplateRenderer} from '../templates/anki-template-renderer.js';
 
@@ -264,18 +266,21 @@ export class YomitanApi {
     async _createCommonDatas(text, dictionaryEntries) {
         /** @type {import('anki-note-builder.js').CommonData[]} */
         const commonDatas = [];
+        let mediaCount = 0;
         for (const dictionaryEntry of dictionaryEntries) {
-        /** @type {import('anki-templates.js').DictionaryMedia} */
+            /** @type {import('anki-templates.js').DictionaryMedia} */
             const dictionaryMedia = {};
             const dictionaryEntryMedias = getDictionaryEntryMedia(dictionaryEntry);
             for (const dictionaryEntryMedia of dictionaryEntryMedias) {
-                const pathSplit = dictionaryEntryMedia.path.split('/');
+                const timestamp = Date.now();
+                const ankiFilename = generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${mediaCount}`, getFileExtensionFromImageMediaType(dictionaryEntryMedia.path) ?? '', timestamp);
+                mediaCount += 1;
                 const dictionaryEntryMedia2 = (
                     Object.hasOwn(dictionaryMedia, dictionaryEntryMedia.dictionary) ?
                     (dictionaryMedia[dictionaryEntryMedia.dictionary]) :
                     (dictionaryMedia[dictionaryEntryMedia.dictionary] = {})
                 );
-                dictionaryEntryMedia2[dictionaryEntryMedia.path] = {value: pathSplit[pathSplit.length - 1]};
+                dictionaryEntryMedia2[dictionaryEntryMedia.path] = {value: ankiFilename};
             }
 
             commonDatas.push({
