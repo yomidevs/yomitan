@@ -187,7 +187,8 @@ export class YomitanApi {
                         if (maxEntries > 0) {
                             dictionaryEntries = dictionaryEntries.slice(0, maxEntries);
                         }
-                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries);
+                        const media = await this._fetchMedia(dictionaryEntries);
+                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, media);
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessDocument = parseHTML('').document;
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
@@ -259,35 +260,59 @@ export class YomitanApi {
     }
 
     /**
+     * @param {import('dictionary.js').DictionaryEntry[]} dictionaryEntries
+     * @returns {Promise<import('yomitan-api.js').apiMediaDetails[]>}
+     */
+    async _fetchMedia(dictionaryEntries) {
+        const media = [];
+        let mediaCount = 0;
+        for (const dictionaryEntry of dictionaryEntries) {
+            const dictionaryEntryMedias = getDictionaryEntryMedia(dictionaryEntry);
+            const mediaRequestTargets = dictionaryEntryMedias.map((x) => { return {path: x.path, dictionary: x.dictionary}; });
+            const mediaFilesData = await this._invoke('getMedia', {
+                targets: mediaRequestTargets,
+            });
+            for (const mediaFileData of mediaFilesData) {
+                const timestamp = Date.now();
+                const ankiFilename = generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${mediaCount}`, getFileExtensionFromImageMediaType(mediaFileData.mediaType) ?? '', timestamp);
+                media.push({
+                    dictionary: mediaFileData.dictionary,
+                    path: mediaFileData.path,
+                    mediaType: mediaFileData.mediaType,
+                    width: mediaFileData.width,
+                    height: mediaFileData.height,
+                    content: mediaFileData.content,
+                    ankiFilename: ankiFilename,
+                });
+                mediaCount += 1;
+            }
+        }
+        return media;
+    }
+
+    /**
      * @param {string} text
      * @param {import('dictionary.js').DictionaryEntry[]} dictionaryEntries
+     * @param {import('yomitan-api.js').apiMediaDetails[]} media
      * @returns {Promise<import('anki-note-builder.js').CommonData[]>}
      */
-    async _createCommonDatas(text, dictionaryEntries) {
+    async _createCommonDatas(text, dictionaryEntries, media) {
         /** @type {import('anki-note-builder.js').CommonData[]} */
         const commonDatas = [];
-        let mediaCount = 0;
         for (const dictionaryEntry of dictionaryEntries) {
             /** @type {import('anki-templates.js').DictionaryMedia} */
             const dictionaryMedia = {};
             const dictionaryEntryMedias = getDictionaryEntryMedia(dictionaryEntry);
             for (const dictionaryEntryMedia of dictionaryEntryMedias) {
-                const mediaRequestTargets = [{
-                    path: dictionaryEntryMedia.path,
-                    dictionary: dictionaryEntryMedia.dictionary,
-                }];
-                const mediaFileData = await this._invoke('getMedia', {
-                    targets: mediaRequestTargets,
-                });
-                const timestamp = Date.now();
-                const ankiFilename = generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${mediaCount}`, getFileExtensionFromImageMediaType(mediaFileData[0].mediaType) ?? '', timestamp);
-                mediaCount += 1;
-                const dictionaryEntryMedia2 = (
-                    Object.hasOwn(dictionaryMedia, dictionaryEntryMedia.dictionary) ?
-                    (dictionaryMedia[dictionaryEntryMedia.dictionary]) :
-                    (dictionaryMedia[dictionaryEntryMedia.dictionary] = {})
-                );
-                dictionaryEntryMedia2[dictionaryEntryMedia.path] = {value: ankiFilename};
+                const mediaFile = media.find((x) => x.dictionary === dictionaryEntryMedia.dictionary && x.path === dictionaryEntryMedia.path);
+                if (!mediaFile) {
+                    log.error('Failed to find media for commonDatas generation');
+                    continue;
+                }
+                if (!Object.hasOwn(dictionaryMedia, dictionaryEntryMedia.dictionary)) {
+                    dictionaryMedia[dictionaryEntryMedia.dictionary] = {};
+                }
+                dictionaryMedia[dictionaryEntryMedia.dictionary][dictionaryEntryMedia.path] = {value: mediaFile.ankiFilename};
             }
 
             commonDatas.push({

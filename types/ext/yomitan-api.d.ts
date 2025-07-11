@@ -33,3 +33,13 @@ export type ankiFieldsInput = {
 export type remoteVersionResponse = {
     version: number;
 };
+
+export type apiMediaDetails = {
+    dictionary: string;
+    path: string;
+    mediaType: string;
+    width: number;
+    height: number;
+    content: TContentType;
+    ankiFilename: string;
+};
