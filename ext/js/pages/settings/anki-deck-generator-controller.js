@@ -607,6 +607,7 @@ export function getDictionaryEntryMedia(dictionaryEntry) {
     if (dictionaryEntry.type !== 'term') {
         return [];
     }
+    /** @type {Array<import('anki-note-builder').RequirementDictionaryMedia>} */
     const media = [];
     const definitions = dictionaryEntry.definitions;
     for (const definition of definitions) {
