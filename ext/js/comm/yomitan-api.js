@@ -262,24 +262,22 @@ export class YomitanApi {
      * @returns {Promise<import('anki-note-builder.js').CommonData[]>}
      */
     async _createCommonDatas(text, dictionaryEntries) {
-        /** @type {import('anki-templates.js').DictionaryMedia} */
-        const dictionaryEntriesMedia = {};
-        for (const dictionaryEntry of dictionaryEntries) {
-            const dictionaryEntryMedia = getDictionaryEntryMedia(dictionaryEntry);
-            for (const dictionaryMedia of dictionaryEntryMedia) {
-                const pathSplit = dictionaryMedia.path.split('/');
-                const dictionaryEntriesMedia2 = (
-                    Object.hasOwn(dictionaryEntriesMedia, dictionaryMedia.dictionary) ?
-                    (dictionaryEntriesMedia[dictionaryMedia.dictionary]) :
-                    (dictionaryEntriesMedia[dictionaryMedia.dictionary] = {})
-                );
-                dictionaryEntriesMedia2[dictionaryMedia.path] = {value: pathSplit[pathSplit.length - 1]};
-            }
-        }
-
         /** @type {import('anki-note-builder.js').CommonData[]} */
         const commonDatas = [];
         for (const dictionaryEntry of dictionaryEntries) {
+        /** @type {import('anki-templates.js').DictionaryMedia} */
+            const dictionaryMedia = {};
+            const dictionaryEntryMedias = getDictionaryEntryMedia(dictionaryEntry);
+            for (const dictionaryEntryMedia of dictionaryEntryMedias) {
+                const pathSplit = dictionaryEntryMedia.path.split('/');
+                const dictionaryEntryMedia2 = (
+                    Object.hasOwn(dictionaryMedia, dictionaryEntryMedia.dictionary) ?
+                    (dictionaryMedia[dictionaryEntryMedia.dictionary]) :
+                    (dictionaryMedia[dictionaryEntryMedia.dictionary] = {})
+                );
+                dictionaryEntryMedia2[dictionaryEntryMedia.path] = {value: pathSplit[pathSplit.length - 1]};
+            }
+
             commonDatas.push({
                 dictionaryEntry: dictionaryEntry,
                 resultOutputMode: 'group',
@@ -306,7 +304,7 @@ export class YomitanApi {
                 media: {
                     audio: {value: ''},
                     textFurigana: [],
-                    dictionaryMedia: dictionaryEntriesMedia,
+                    dictionaryMedia: dictionaryMedia,
                 },
                 dictionaryStylesMap: new Map(),
             });
