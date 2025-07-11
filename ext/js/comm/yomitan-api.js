@@ -187,8 +187,8 @@ export class YomitanApi {
                         if (maxEntries > 0) {
                             dictionaryEntries = dictionaryEntries.slice(0, maxEntries);
                         }
-                        const media = await this._fetchMedia(dictionaryEntries);
-                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, media);
+                        const dictionaryMedia = await this._fetchMedia(dictionaryEntries);
+                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia);
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessDocument = parseHTML('').document;
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
@@ -208,7 +208,10 @@ export class YomitanApi {
                             }
                             ankiFieldsResults.push(ankiFieldsResult);
                         }
-                        result = ankiFieldsResults;
+                        result = {
+                            fields: ankiFieldsResults,
+                            dictionaryMedia: dictionaryMedia,
+                        };
                         break;
                     }
                     default:
