@@ -465,7 +465,7 @@ export class AnkiDeckGeneratorController {
         const idleTimeout = (Number.isFinite(options.anki.downloadTimeout) && options.anki.downloadTimeout > 0 ? options.anki.downloadTimeout : null);
         const languageSummary = getLanguageSummaries().find(({iso}) => iso === options.general.language);
         const mediaOptions = addMedia ? {audio: {sources: options.audio.sources, preferredAudioIndex: null, idleTimeout: idleTimeout, languageSummary: languageSummary}} : null;
-        const requirements = addMedia ? [...this._getDictionaryEntryMedia(dictionaryEntry), {type: 'audio'}] : [];
+        const requirements = addMedia ? [...getDictionaryEntryMedia(dictionaryEntry), {type: 'audio'}] : [];
         const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(options.dictionaries);
         const cardFormat = /** @type {import('settings').AnkiCardFormat} */ ({
             deck: this._activeAnkiDeck,
@@ -515,38 +515,6 @@ export class AnkiDeckGeneratorController {
             dictionaryEntry: /** @type {import('dictionary').DictionaryEntry} */ (dictionaryEntriesTermKanji[0]),
             text: text,
         };
-    }
-
-    /**
-     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
-     * @returns {Array<object>}
-     */
-    _getDictionaryEntryMedia(dictionaryEntry) {
-        if (dictionaryEntry.type !== 'term') {
-            return [];
-        }
-        const media = [];
-        const definitions = dictionaryEntry.definitions;
-        for (const definition of definitions) {
-            const paths = this._findAllPaths(definition);
-            for (const path of paths) {
-                media.push({dictionary: definition.dictionary, path: path, type: 'dictionaryMedia'});
-            }
-        }
-        return media;
-    }
-
-    /**
-     * Extracts all values of json keys named `path` which contain a string value.
-     * Example json snippet containing a path:
-     * ...","path":"example-dictionary/svg/example-media.svg","...
-     * The path can be found in many different positions in the structure of the definition json.
-     * It is most reliable to flatten it to a string and use regex.
-     * @param {object} obj
-     * @returns {Array<string>}
-     */
-    _findAllPaths(obj) {
-        return JSON.stringify(obj).match(/(?<="path":").*?(?=")/g) ?? [];
     }
 
     /**
@@ -629,4 +597,36 @@ export class AnkiDeckGeneratorController {
         a.dispatchEvent(new MouseEvent('click'));
         setTimeout(revoke, 60000);
     }
+}
+
+/**
+ * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+ * @returns {Array<import('anki-note-builder').RequirementDictionaryMedia>}
+ */
+export function getDictionaryEntryMedia(dictionaryEntry) {
+    if (dictionaryEntry.type !== 'term') {
+        return [];
+    }
+    const media = [];
+    const definitions = dictionaryEntry.definitions;
+    for (const definition of definitions) {
+        const paths = findAllPaths(definition);
+        for (const path of paths) {
+            media.push({dictionary: definition.dictionary, path: path, type: 'dictionaryMedia'});
+        }
+    }
+    return media;
+}
+
+/**
+ * Extracts all values of json keys named `path` which contain a string value.
+ * Example json snippet containing a path:
+ * ...","path":"example-dictionary/svg/example-media.svg","...
+ * The path can be found in many different positions in the structure of the definition json.
+ * It is most reliable to flatten it to a string and use regex.
+ * @param {object} obj
+ * @returns {Array<string>}
+ */
+function findAllPaths(obj) {
+    return JSON.stringify(obj).match(/(?<="path":").*?(?=")/g) ?? [];
 }
