@@ -611,7 +611,7 @@ export function getDictionaryEntryMedia(dictionaryEntry) {
     const media = [];
     const definitions = dictionaryEntry.definitions;
     for (const definition of definitions) {
-        const paths = findAllPaths(definition);
+        const paths = [...new Set(findAllPaths(definition))];
         for (const path of paths) {
             media.push({dictionary: definition.dictionary, path: path, type: 'dictionaryMedia'});
         }
