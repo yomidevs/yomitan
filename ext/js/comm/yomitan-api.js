@@ -23,6 +23,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {parseJson, readResponseJson} from '../core/json.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
+import {createFuriganaHtml, createFuriganaPlain} from '../data/anki-note-builder.js';
 import {getDynamicTemplates} from '../data/anki-template-util.js';
 import {generateAnkiNoteMediaFileName} from '../data/anki-util.js';
 import {getLanguageSummaries} from '../language/languages.js';
@@ -376,9 +377,17 @@ export class YomitanApi {
             }
 
             let audioMediaFile = '';
+            /** @type {import('api').ParseTextLine[]} */
+            let furiganaData = [];
             if (dictionaryEntry.type === 'term') {
                 audioMediaFile = audioMediaDetails.find((x) => x.term === dictionaryEntry.headwords[0].term && x.reading === dictionaryEntry.headwords[0].reading)?.ankiFilename ?? '';
+
+                furiganaData = [[{
+                    text: dictionaryEntry.headwords[0].term,
+                    reading: dictionaryEntry.headwords[0].reading,
+                }]];
             }
+            const furiganaReadingMode = options.parsing.readingMode === 'hiragana' || options.parsing.readingMode === 'katakana' ? options.parsing.readingMode : null;
 
             commonDatas.push({
                 dictionaryEntry: dictionaryEntry,
@@ -405,7 +414,16 @@ export class YomitanApi {
                 },
                 media: {
                     audio: {value: audioMediaFile},
-                    textFurigana: [],
+                    textFurigana: [{
+                        text: text,
+                        readingMode: furiganaReadingMode,
+                        detailsHtml: {
+                            value: createFuriganaHtml(furiganaData, furiganaReadingMode),
+                        },
+                        detailsPlain: {
+                            value: createFuriganaPlain(furiganaData, furiganaReadingMode),
+                        },
+                    }],
                     dictionaryMedia: dictionaryMedia,
                 },
                 dictionaryStylesMap: this._getDictionaryStylesMapDomless(options.dictionaries, document),
