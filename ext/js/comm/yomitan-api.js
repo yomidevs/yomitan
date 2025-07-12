@@ -137,7 +137,10 @@ export class YomitanApi {
 
             try {
                 /** @type {?object} */
-                const parsedBody = body.length > 0 ? parseJson(body) : null;
+                const parsedBody = body.length > 0 ? parseJson(body) : {};
+                if (parsedBody === null) {
+                    throw new Error('Invalid request body');
+                }
 
                 let result = null;
                 let statusCode = 200;
