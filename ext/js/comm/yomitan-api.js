@@ -408,7 +408,7 @@ export class YomitanApi {
                     query: text,
                     fullQuery: text,
                     sentence: {
-                        text: text,
+                        text: '',
                         offset: 0,
                     },
                 },
