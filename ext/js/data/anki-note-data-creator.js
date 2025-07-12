@@ -17,7 +17,7 @@
  */
 
 import {getAnkiCompactGlossStyles} from '../../data/anki-compact-gloss-style.js';
-import {addScopeToCssLegacy} from '../core/utilities.js';
+import {addScopeToCss} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../dictionary/dictionary-data-util.js';
 import {distributeFurigana, distributeFuriganaInflected} from '../language/ja/japanese.js';
 
@@ -589,7 +589,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
  * @returns {string}
  */
 function addGlossaryScopeToCss(css) {
-    return addScopeToCssLegacy(css, '.yomitan-glossary');
+    return addScopeToCss(css, '.yomitan-glossary');
 }
 
 /**
@@ -602,7 +602,7 @@ function addDictionaryScopeToCss(css, dictionaryTitle) {
         .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"');
 
-    return addScopeToCssLegacy(css, `[data-dictionary="${escapedTitle}"]`);
+    return addScopeToCss(css, `[data-dictionary="${escapedTitle}"]`);
 }
 
 /**
