@@ -181,6 +181,9 @@
                         </div>
                         <div class="settings-item-description">
                             Enable support for sending local web requests to fetch data from Yomitan.
+                        </div>
+                        <div class="settings-item-description">
+                            This option may send data outside of Yomitan to local applications that request it.
                             <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                         </div>
                     </div>
@@ -1461,6 +1464,7 @@
             <div class="settings-item-left">
                 <div class="settings-item-label">Enable audio playback for terms</div>
                 <div class="settings-item-description">Show a clickable speaker icon next to search results.</div>
+                <div class="settings-item-description">This option may send term, reading, and/or language outside of Yomitan to fetch audio.</div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="audio.enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -1562,8 +1566,9 @@
                     <div class="settings-item-label">
                         Parse sentences using <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener noreferrer">MeCab</a>
                     </div>
+                    <div class="settings-item-description">Sentence words are parsed using a third-party program. Japanese only.</div>
                     <div class="settings-item-description">
-                        Sentence words are parsed using a third-party program. Japanese only.
+                        This option may send search query data outside of Yomitan for parsing.
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
@@ -1694,6 +1699,7 @@
                     <div class="settings-item-description">
                         <span>Connection status:</span>
                         <span id="anki-error-message">&hellip;</span> <a tabindex="0" id="anki-error-message-details-toggle" hidden>Details&hellip;</a>
+                        <div class="settings-item-description">This option may send limited information about the current webpage, information contained in Yomitan dictionary entries, and/or relevant user settings outside of Yomitan to Anki.</div>
                     </div>
                 </div>
                 <div class="settings-item-right">
