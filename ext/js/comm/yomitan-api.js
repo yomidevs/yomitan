@@ -183,7 +183,7 @@ export class YomitanApi {
                     case 'ankiFields': {
                         /** @type {import('yomitan-api.js').ankiFieldsInput} */
                         // @ts-expect-error - Allow this to error
-                        const {text, type, markers, maxEntries} = parsedBody;
+                        const {text, type, markers, maxEntries, includeMedia} = parsedBody;
 
                         const profileOptions = optionsFull.profiles[optionsFull.profileCurrent].options;
 
@@ -198,7 +198,7 @@ export class YomitanApi {
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessWindow = parseHTML('').window;
 
-                        const dictionaryMedia = await this._fetchDictionaryMedia(dictionaryEntries);
+                        const dictionaryMedia = includeMedia ? await this._fetchDictionaryMedia(dictionaryEntries) : [];
                         const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia, profileOptions, domlessDocument);
                         const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument, domlessWindow);
                         await ankiTemplateRenderer.prepare();
@@ -315,16 +315,18 @@ export class YomitanApi {
             /** @type {import('anki-templates.js').DictionaryMedia} */
             const dictionaryMedia = {};
             const dictionaryEntryMedias = getDictionaryEntryMedia(dictionaryEntry);
-            for (const dictionaryEntryMedia of dictionaryEntryMedias) {
-                const mediaFile = media.find((x) => x.dictionary === dictionaryEntryMedia.dictionary && x.path === dictionaryEntryMedia.path);
-                if (!mediaFile) {
-                    log.error('Failed to find media for commonDatas generation');
-                    continue;
+            if (media.length > 0) {
+                for (const dictionaryEntryMedia of dictionaryEntryMedias) {
+                    const mediaFile = media.find((x) => x.dictionary === dictionaryEntryMedia.dictionary && x.path === dictionaryEntryMedia.path);
+                    if (!mediaFile) {
+                        log.error('Failed to find media for commonDatas generation');
+                        continue;
+                    }
+                    if (!Object.hasOwn(dictionaryMedia, dictionaryEntryMedia.dictionary)) {
+                        dictionaryMedia[dictionaryEntryMedia.dictionary] = {};
+                    }
+                    dictionaryMedia[dictionaryEntryMedia.dictionary][dictionaryEntryMedia.path] = {value: mediaFile.ankiFilename};
                 }
-                if (!Object.hasOwn(dictionaryMedia, dictionaryEntryMedia.dictionary)) {
-                    dictionaryMedia[dictionaryEntryMedia.dictionary] = {};
-                }
-                dictionaryMedia[dictionaryEntryMedia.dictionary][dictionaryEntryMedia.path] = {value: mediaFile.ankiFilename};
             }
 
             commonDatas.push({

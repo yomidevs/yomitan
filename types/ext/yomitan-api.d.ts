@@ -28,6 +28,7 @@ export type ankiFieldsInput = {
     type: 'term' | 'kanji';
     markers: [string];
     maxEntries: number;
+    includeMedia?: boolean;
 };
 
 export type remoteVersionResponse = {
