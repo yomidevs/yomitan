@@ -521,70 +521,70 @@ export class AnkiNoteBuilder {
                 break;
             }
             if (data !== null) {
-                const valueHtml = this._createFuriganaHtml(data, readingMode);
-                const valuePlain = this._createFuriganaPlain(data, readingMode);
+                const valueHtml = createFuriganaHtml(data, readingMode);
+                const valuePlain = createFuriganaPlain(data, readingMode);
                 results.push({text, readingMode, detailsHtml: {value: valueHtml}, detailsPlain: {value: valuePlain}});
             }
         }
         return results;
     }
+}
 
-    /**
-     * @param {import('api').ParseTextLine[]} data
-     * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
-     * @returns {string}
-     */
-    _createFuriganaHtml(data, readingMode) {
-        let result = '';
-        for (const term of data) {
-            result += '<span class="term">';
-            for (const {text, reading} of term) {
-                if (reading.length > 0) {
-                    const reading2 = this._convertReading(reading, readingMode);
-                    result += `<ruby>${text}<rt>${reading2}</rt></ruby>`;
-                } else {
-                    result += text;
-                }
-            }
-            result += '</span>';
-        }
-        return result;
-    }
-
-    /**
-     * @param {import('api').ParseTextLine[]} data
-     * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
-     * @returns {string}
-     */
-    _createFuriganaPlain(data, readingMode) {
-        let result = '';
-        for (const term of data) {
-            for (const {text, reading} of term) {
-                if (reading.length > 0) {
-                    const reading2 = this._convertReading(reading, readingMode);
-                    result += ` ${text}[${reading2}]`;
-                } else {
-                    result += text;
-                }
+/**
+ * @param {import('api').ParseTextLine[]} data
+ * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
+ * @returns {string}
+ */
+export function createFuriganaHtml(data, readingMode) {
+    let result = '';
+    for (const term of data) {
+        result += '<span class="term">';
+        for (const {text, reading} of term) {
+            if (reading.length > 0) {
+                const reading2 = convertReading(reading, readingMode);
+                result += `<ruby>${text}<rt>${reading2}</rt></ruby>`;
+            } else {
+                result += text;
             }
         }
-        result = result.trimStart();
-        return result;
+        result += '</span>';
     }
+    return result;
+}
 
-    /**
-     * @param {string} reading
-     * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
-     * @returns {string}
-     */
-    _convertReading(reading, readingMode) {
-        switch (readingMode) {
-            case 'hiragana':
-                return convertKatakanaToHiragana(reading);
-            case 'katakana':
-                return convertHiraganaToKatakana(reading);
-            default:
-                return reading;
+/**
+ * @param {import('api').ParseTextLine[]} data
+ * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
+ * @returns {string}
+ */
+export function createFuriganaPlain(data, readingMode) {
+    let result = '';
+    for (const term of data) {
+        for (const {text, reading} of term) {
+            if (reading.length > 0) {
+                const reading2 = convertReading(reading, readingMode);
+                result += ` ${text}[${reading2}]`;
+            } else {
+                result += text;
+            }
         }
+    }
+    result = result.trimStart();
+    return result;
+}
+
+/**
+ * @param {string} reading
+ * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
+ * @returns {string}
+ */
+function convertReading(reading, readingMode) {
+    switch (readingMode) {
+        case 'hiragana':
+            return convertKatakanaToHiragana(reading);
+        case 'katakana':
+            return convertHiraganaToKatakana(reading);
+        default:
+            return reading;
     }
 }

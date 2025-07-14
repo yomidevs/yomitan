@@ -84,3 +84,45 @@ export function isNoteDataValid(note) {
 }
 
 export const INVALID_NOTE_ID = -1;
+
+
+/**
+ * @param {string} prefix
+ * @param {string} extension
+ * @param {number} timestamp
+ * @returns {string}
+ */
+export function generateAnkiNoteMediaFileName(prefix, extension, timestamp) {
+    let fileName = prefix;
+
+    fileName += `_${ankNoteDateToString(new Date(timestamp))}`;
+    fileName += extension;
+
+    fileName = replaceInvalidFileNameCharacters(fileName);
+
+    return fileName;
+}
+
+/**
+ * @param {string} fileName
+ * @returns {string}
+ */
+function replaceInvalidFileNameCharacters(fileName) {
+    // eslint-disable-next-line no-control-regex
+    return fileName.replace(/[<>:"/\\|?*\u0000-\u001F]/g, '-');
+}
+
+/**
+ * @param {Date} date
+ * @returns {string}
+ */
+function ankNoteDateToString(date) {
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth().toString().padStart(2, '0');
+    const day = date.getUTCDate().toString().padStart(2, '0');
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+    const milliseconds = date.getUTCMilliseconds().toString().padStart(3, '0');
+    return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}-${milliseconds}`;
+}

@@ -16,13 +16,20 @@
  */
 
 import {parseHTML} from '../../lib/linkedom.js';
+import {RequestBuilder} from '../background/request-builder.js';
 import {invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson, readResponseJson} from '../core/json.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
+import {createFuriganaHtml, createFuriganaPlain} from '../data/anki-note-builder.js';
 import {getDynamicTemplates} from '../data/anki-template-util.js';
+import {generateAnkiNoteMediaFileName} from '../data/anki-util.js';
+import {getLanguageSummaries} from '../language/languages.js';
+import {AudioDownloader} from '../media/audio-downloader.js';
+import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
+import {getDictionaryEntryMedia} from '../pages/settings/anki-deck-generator-controller.js';
 import {AnkiTemplateRenderer} from '../templates/anki-template-renderer.js';
 
 /** */
@@ -47,6 +54,10 @@ export class YomitanApi {
         this._setupPortPromise = null;
         /** @type {import('api').ApiMap} */
         this._apiMap = apiMap;
+        /** @type {RequestBuilder} */
+        this._requestBuilder = new RequestBuilder();
+        /** @type {AudioDownloader} */
+        this._audioDownloader = new AudioDownloader(this._requestBuilder);
     }
 
     /**
@@ -134,7 +145,10 @@ export class YomitanApi {
 
             try {
                 /** @type {?object} */
-                const parsedBody = body.length > 0 ? parseJson(body) : null;
+                const parsedBody = body.length > 0 ? parseJson(body) : {};
+                if (parsedBody === null) {
+                    throw new Error('Invalid request body');
+                }
 
                 let result = null;
                 let statusCode = 200;
@@ -177,18 +191,25 @@ export class YomitanApi {
                     case 'ankiFields': {
                         /** @type {import('yomitan-api.js').ankiFieldsInput} */
                         // @ts-expect-error - Allow this to error
-                        const {text, type, markers, maxEntries} = parsedBody;
+                        const {text, type, markers, maxEntries, includeMedia} = parsedBody;
+                        const includeAudioMedia = includeMedia && markers.includes('audio');
 
-                        const ankiTemplate = await this._getAnkiTemplate(optionsFull.profiles[optionsFull.profileCurrent].options);
+                        const profileOptions = optionsFull.profiles[optionsFull.profileCurrent].options;
+
+                        const ankiTemplate = await this._getAnkiTemplate(profileOptions);
                         let dictionaryEntries = await this._getDictionaryEntries(text, type, optionsFull.profileCurrent);
                         if (maxEntries > 0) {
                             dictionaryEntries = dictionaryEntries.slice(0, maxEntries);
                         }
-                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries);
+
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessDocument = parseHTML('').document;
                         // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
                         const domlessWindow = parseHTML('').window;
+
+                        const dictionaryMedia = includeMedia ? await this._fetchDictionaryMedia(dictionaryEntries) : [];
+                        const audioMedia = includeAudioMedia ? await this._fetchAudio(dictionaryEntries, profileOptions) : [];
+                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia, audioMedia, profileOptions, domlessDocument);
                         const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument, domlessWindow);
                         await ankiTemplateRenderer.prepare();
                         const templateRenderer = ankiTemplateRenderer.templateRenderer;
@@ -204,7 +225,11 @@ export class YomitanApi {
                             }
                             ankiFieldsResults.push(ankiFieldsResult);
                         }
-                        result = ankiFieldsResults;
+                        result = {
+                            fields: ankiFieldsResults,
+                            dictionaryMedia: dictionaryMedia,
+                            audioMedia: audioMedia,
+                        };
                         break;
                     }
                     default:
@@ -256,14 +281,114 @@ export class YomitanApi {
     }
 
     /**
+     * @param {import('dictionary.js').DictionaryEntry[]} dictionaryEntries
+     * @returns {Promise<import('yomitan-api.js').apiDictionaryMediaDetails[]>}
+     */
+    async _fetchDictionaryMedia(dictionaryEntries) {
+        const media = [];
+        let mediaCount = 0;
+        for (const dictionaryEntry of dictionaryEntries) {
+            const dictionaryEntryMedias = getDictionaryEntryMedia(dictionaryEntry);
+            const mediaRequestTargets = dictionaryEntryMedias.map((x) => { return {path: x.path, dictionary: x.dictionary}; });
+            const mediaFilesData = await this._invoke('getMedia', {
+                targets: mediaRequestTargets,
+            });
+            for (const mediaFileData of mediaFilesData) {
+                const timestamp = Date.now();
+                const ankiFilename = generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${mediaCount}`, getFileExtensionFromImageMediaType(mediaFileData.mediaType) ?? '', timestamp);
+                media.push({
+                    dictionary: mediaFileData.dictionary,
+                    path: mediaFileData.path,
+                    mediaType: mediaFileData.mediaType,
+                    width: mediaFileData.width,
+                    height: mediaFileData.height,
+                    content: mediaFileData.content,
+                    ankiFilename: ankiFilename,
+                });
+                mediaCount += 1;
+            }
+        }
+        return media;
+    }
+
+    /**
+     *
+     * @param {import('dictionary.js').DictionaryEntry[]} dictionaryEntries
+     * @param {import('settings').ProfileOptions} options
+     * @returns {Promise<import('yomitan-api.js').apiAudioMediaDetails[]>}
+     */
+    async _fetchAudio(dictionaryEntries, options) {
+        const audioDatas = [];
+        const idleTimeout = (Number.isFinite(options.anki.downloadTimeout) && options.anki.downloadTimeout > 0 ? options.anki.downloadTimeout : null);
+        const languageSummary = getLanguageSummaries().find(({iso}) => iso === options.general.language);
+        if (!languageSummary) { return []; }
+        for (const dictionaryEntry of dictionaryEntries) {
+            if (dictionaryEntry.type === 'kanji') { continue; }
+            const headword = dictionaryEntry.headwords[0]; // Only one headword is accepted for Anki card creation
+            try {
+                const audioData = await this._audioDownloader.downloadTermAudio(options.audio.sources, null, headword.term, headword.reading, idleTimeout, languageSummary);
+                const timestamp = Date.now();
+                const mediaType = audioData.contentType ?? '';
+                let extension = mediaType !== null ? getFileExtensionFromAudioMediaType(mediaType) : null;
+                if (extension === null) { extension = '.mp3'; }
+                const ankiFilename = generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp);
+                audioDatas.push({
+                    term: headword.term,
+                    reading: headword.reading,
+                    mediaType: mediaType,
+                    content: audioData.data,
+                    ankiFilename: ankiFilename,
+                });
+            } catch (e) {
+                log.log('Yomitan API failed to download audio ' + toError(e).message);
+            }
+        }
+        return audioDatas;
+    }
+
+    /**
      * @param {string} text
      * @param {import('dictionary.js').DictionaryEntry[]} dictionaryEntries
+     * @param {import('yomitan-api.js').apiDictionaryMediaDetails[]} dictionaryMediaDetails
+     * @param {import('yomitan-api.js').apiAudioMediaDetails[]} audioMediaDetails
+     * @param {import('settings').ProfileOptions} options
+     * @param {Document} document
      * @returns {Promise<import('anki-note-builder.js').CommonData[]>}
      */
-    async _createCommonDatas(text, dictionaryEntries) {
+    async _createCommonDatas(text, dictionaryEntries, dictionaryMediaDetails, audioMediaDetails, options, document) {
         /** @type {import('anki-note-builder.js').CommonData[]} */
         const commonDatas = [];
         for (const dictionaryEntry of dictionaryEntries) {
+            /** @type {import('anki-templates.js').DictionaryMedia} */
+            const dictionaryMedia = {};
+            const dictionaryEntryMedias = getDictionaryEntryMedia(dictionaryEntry);
+            if (dictionaryMediaDetails.length > 0) {
+                for (const dictionaryEntryMedia of dictionaryEntryMedias) {
+                    const mediaFile = dictionaryMediaDetails.find((x) => x.dictionary === dictionaryEntryMedia.dictionary && x.path === dictionaryEntryMedia.path);
+                    if (!mediaFile) {
+                        log.error('Failed to find media for commonDatas generation');
+                        continue;
+                    }
+                    if (!Object.hasOwn(dictionaryMedia, dictionaryEntryMedia.dictionary)) {
+                        dictionaryMedia[dictionaryEntryMedia.dictionary] = {};
+                    }
+                    dictionaryMedia[dictionaryEntryMedia.dictionary][dictionaryEntryMedia.path] = {value: mediaFile.ankiFilename};
+                }
+            }
+
+            let audioMediaFile = '';
+            /** @type {import('api').ParseTextLine[]} */
+            let furiganaData = [];
+            if (dictionaryEntry.type === 'term') {
+                audioMediaFile = audioMediaDetails.find((x) => x.term === dictionaryEntry.headwords[0].term && x.reading === dictionaryEntry.headwords[0].reading)?.ankiFilename ?? '';
+
+                furiganaData = [[{
+                    text: dictionaryEntry.headwords[0].term,
+                    reading: dictionaryEntry.headwords[0].reading,
+                }]];
+            }
+            const furiganaReadingMode = options.parsing.readingMode === 'hiragana' || options.parsing.readingMode === 'katakana' ? options.parsing.readingMode : null;
+
             commonDatas.push({
                 dictionaryEntry: dictionaryEntry,
                 resultOutputMode: 'group',
@@ -283,14 +408,67 @@ export class YomitanApi {
                     query: text,
                     fullQuery: text,
                     sentence: {
-                        text: text,
+                        text: '',
                         offset: 0,
                     },
                 },
-                dictionaryStylesMap: new Map(),
+                media: {
+                    audio: {value: audioMediaFile},
+                    textFurigana: [{
+                        text: text,
+                        readingMode: furiganaReadingMode,
+                        detailsHtml: {
+                            value: createFuriganaHtml(furiganaData, furiganaReadingMode),
+                        },
+                        detailsPlain: {
+                            value: createFuriganaPlain(furiganaData, furiganaReadingMode),
+                        },
+                    }],
+                    dictionaryMedia: dictionaryMedia,
+                },
+                dictionaryStylesMap: this._getDictionaryStylesMapDomless(options.dictionaries, document),
             });
         }
         return commonDatas;
+    }
+
+    /**
+     * @param {import('settings').DictionariesOptions} dictionaries
+     * @param {Document} domlessDocument
+     * @returns {Map<string, string>}
+     */
+    _getDictionaryStylesMapDomless(dictionaries, domlessDocument) {
+        const styleMap = new Map();
+        for (const dictionary of dictionaries) {
+            const {name, styles} = dictionary;
+            if (typeof styles === 'string') {
+                styleMap.set(name, this._sanitizeCSSDomless(styles, domlessDocument));
+            }
+        }
+        return styleMap;
+    }
+
+    /**
+     * @param {string} css
+     * @param {Document} domlessDocument
+     * @returns {string}
+     */
+    _sanitizeCSSDomless(css, domlessDocument) {
+        // Since this does not parse any CSS explicitly it should not error
+        // But there is no guarantee linkedom will not error
+        try {
+            const style = domlessDocument.createElement('style');
+            // eslint-disable-next-line no-unsanitized/property
+            style.innerHTML = css;
+            domlessDocument.appendChild(style);
+            const styleSheet = style.sheet;
+            if (styleSheet !== null) {
+                return [...styleSheet.cssRules].map((rule) => rule.cssText || '').join('\n');
+            }
+        } catch (e) {
+            log.log('Failed to sanitize css: ' + toError(e).message);
+        }
+        return '';
     }
 
     /**

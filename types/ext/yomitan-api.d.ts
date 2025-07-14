@@ -28,8 +28,27 @@ export type ankiFieldsInput = {
     type: 'term' | 'kanji';
     markers: [string];
     maxEntries: number;
+    includeMedia?: boolean;
 };
 
 export type remoteVersionResponse = {
     version: number;
+};
+
+export type apiDictionaryMediaDetails = {
+    dictionary: string;
+    path: string;
+    mediaType: string;
+    width: number;
+    height: number;
+    content: TContentType;
+    ankiFilename: string;
+};
+
+export type apiAudioMediaDetails = {
+    term: string;
+    reading: string;
+    mediaType: string;
+    content: AudioBinaryBase64;
+    ankiFilename: string;
 };
