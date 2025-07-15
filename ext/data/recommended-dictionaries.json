@@ -844,6 +844,24 @@
                 "description": "A free and open Cantonese dictionary with definitions and example sentences in Cantonese and English.",
                 "homepage": "https://github.com/MarvNC/wordshk-yomitan",
                 "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2025-07-09/Words.hk.2025-07-08.zip"
+            },
+            {
+                "name": "CC-Canto",
+                "description": "CC-Canto is an open source Cantonese dictionary project created by Pleco, intended to be used alongside the CC-CEDICT dictionary. It provides Cantonese specific words and definitions.",
+                "homepage": "https://github.com/MarvNC/cc-cedict-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-Canto.zip"
+            },
+            {
+                "name": "CC-CEDICT Canto",
+                "description": "CC-CEDICT is a continuation of the CEDICT project with the aim to provide a complete downloadable Chinese to English dictionary with pronunciation in pinyin for the Chinese characters. This version includes Cantonese readings provided by Pleco.",
+                "homepage": "https://github.com/MarvNC/cc-cedict-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.Canto.zip"
+            },
+            {
+                "name": "Cantodict",
+                "description": "CantoDict was a Cantonese-English dictionary created and maintained by Adam Sheik and public contributors.",
+                "homepage": "https://github.com/MarvNC/yomitan-dictionaries?tab=readme-ov-file#cantodict",
+                "downloadUrl": "https://github.com/MarvNC/yomichan-dictionaries/raw/master/dl/%5BCantonese%5D%20Cantodict.zip"
             }
         ]
     },
