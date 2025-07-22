@@ -1491,6 +1491,7 @@ export class Backend {
     /** */
     _attachOmniboxListener() {
         try {
+            if (!chrome.omnibox) { return; }
             chrome.omnibox.onInputEntered.addListener((text) => {
                 const newURL = 'search.html?query=' + encodeURIComponent(text);
                 void chrome.tabs.create({url: newURL});
