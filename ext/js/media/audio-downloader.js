@@ -123,17 +123,7 @@ export class AudioDownloader {
      */
     _getRequiredAudioSources(language, sources) {
         /** @type {Set<import('settings').AudioSourceType>} */
-        const requiredSources = language === 'ja' ?
-            new Set([
-                'jpod101',
-                'language-pod-101',
-                'jisho',
-            ]) :
-            new Set([
-                'lingua-libre',
-                'language-pod-101',
-                'wiktionary',
-            ]);
+        const requiredSources = getRequiredAudioSourceList(language);
 
         for (const {type} of sources) {
             requiredSources.delete(type);
@@ -636,4 +626,22 @@ export class AudioDownloader {
         });
         return await readResponseJson(response);
     }
+}
+
+/**
+ * @param {string} language
+ * @returns {Set<import('settings').AudioSourceType>}
+ */
+export function getRequiredAudioSourceList(language) {
+    return language === 'ja' ?
+        new Set([
+            'jpod101',
+            'language-pod-101',
+            'jisho',
+        ]) :
+        new Set([
+            'lingua-libre',
+            'language-pod-101',
+            'wiktionary',
+        ]);
 }

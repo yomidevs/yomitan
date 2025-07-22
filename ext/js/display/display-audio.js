@@ -19,6 +19,7 @@
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {getRequiredAudioSourceList} from '../media/audio-downloader.js';
 import {AudioSystem} from '../media/audio-system.js';
 
 export class DisplayAudio {
@@ -177,7 +178,7 @@ export class DisplayAudio {
         this._playbackVolume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume / 100)) : 1;
 
         /** @type {Set<import('settings').AudioSourceType>} */
-        const requiredAudioSources = this._getRequiredAudioSources(language);
+        const requiredAudioSources = getRequiredAudioSourceList(language);
         /** @type {Map<string, import('display-audio').AudioSource[]>} */
         const nameMap = new Map();
         this._audioSources.length = 0;
@@ -193,24 +194,6 @@ export class DisplayAudio {
         data.audioEnabled = enabled.toString();
 
         this._cache.clear();
-    }
-
-    /**
-     * @param {string} language
-     * @returns {Set<import('settings').AudioSourceType>}
-     */
-    _getRequiredAudioSources(language) {
-        return language === 'ja' ?
-            new Set([
-                'jpod101',
-                'language-pod-101',
-                'jisho',
-            ]) :
-            new Set([
-                'lingua-libre',
-                'language-pod-101',
-                'wiktionary',
-            ]);
     }
 
     /** */
