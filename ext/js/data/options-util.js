@@ -580,6 +580,7 @@ export class OptionsUtil {
             this._updateVersion66,
             this._updateVersion67,
             this._updateVersion68,
+            this._updateVersion69,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1761,6 +1762,16 @@ export class OptionsUtil {
      */
     async _updateVersion68(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v68.handlebars');
+    }
+
+    /**
+     *  - Added audio.enableDefaultAudioSources
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion69(options) {
+        for (const profile of options.profiles) {
+            profile.options.audio.enableDefaultAudioSources = true;
+        }
     }
 
     /**
