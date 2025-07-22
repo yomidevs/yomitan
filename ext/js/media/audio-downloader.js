@@ -86,11 +86,12 @@ export class AudioDownloader {
      * @param {string} reading
      * @param {?number} idleTimeout
      * @param {import('language').LanguageSummary} languageSummary
+     * @param {boolean} enableDefaultAudioSources
      * @returns {Promise<import('audio-downloader').AudioBinaryBase64>}
      */
-    async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout, languageSummary) {
+    async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout, languageSummary, enableDefaultAudioSources) {
         const errors = [];
-        const requiredAudioSources = this._getRequiredAudioSources(languageSummary.iso, sources);
+        const requiredAudioSources = enableDefaultAudioSources ? this._getRequiredAudioSources(languageSummary.iso, sources) : [];
         for (const source of [...sources, ...requiredAudioSources]) {
             let infoList = await this.getTermAudioInfoList(source, term, reading, languageSummary);
             if (typeof preferredAudioIndex === 'number') {

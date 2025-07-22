@@ -2339,7 +2339,7 @@ export class Backend {
         const {term, reading} = definitionDetails;
         if (term.length === 0 && reading.length === 0) { return null; }
 
-        const {sources, preferredAudioIndex, idleTimeout, languageSummary} = details;
+        const {sources, preferredAudioIndex, idleTimeout, languageSummary, enableDefaultAudioSources} = details;
         let data;
         let contentType;
         try {
@@ -2350,6 +2350,7 @@ export class Backend {
                 reading,
                 idleTimeout,
                 languageSummary,
+                enableDefaultAudioSources,
             ));
         } catch (e) {
             const error = this._getAudioDownloadError(e);

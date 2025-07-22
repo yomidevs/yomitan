@@ -67,6 +67,8 @@ export class DisplayAudio {
             ['custom', 'Custom URL'],
             ['custom-json', 'Custom URL (JSON)'],
         ]);
+        /** @type {?boolean} */
+        this._enableDefaultAudioSources = null;
         /** @type {(event: MouseEvent) => void} */
         this._onAudioPlayButtonClickBind = this._onAudioPlayButtonClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
@@ -160,7 +162,8 @@ export class DisplayAudio {
                 sources.push(this._getSourceData(source));
             }
         }
-        return {sources, preferredAudioIndex};
+        const enableDefaultAudioSources = this._enableDefaultAudioSources ?? false;
+        return {sources, preferredAudioIndex, enableDefaultAudioSources};
     }
 
     // Private
@@ -171,14 +174,15 @@ export class DisplayAudio {
     _onOptionsUpdated({options}) {
         const {
             general: {language},
-            audio: {enabled, autoPlay, fallbackSoundType, volume, sources},
+            audio: {enabled, autoPlay, fallbackSoundType, volume, sources, enableDefaultAudioSources},
         } = options;
         this._autoPlay = enabled && autoPlay;
         this._fallbackSoundType = fallbackSoundType;
         this._playbackVolume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume / 100)) : 1;
+        this._enableDefaultAudioSources = enableDefaultAudioSources;
 
         /** @type {Set<import('settings').AudioSourceType>} */
-        const requiredAudioSources = getRequiredAudioSourceList(language);
+        const requiredAudioSources = enableDefaultAudioSources ? getRequiredAudioSourceList(language) : new Set();
         /** @type {Map<string, import('display-audio').AudioSource[]>} */
         const nameMap = new Map();
         this._audioSources.length = 0;

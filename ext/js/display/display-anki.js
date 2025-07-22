@@ -1065,13 +1065,14 @@ export class DisplayAnki {
      */
     _getAnkiNoteMediaAudioDetails(details) {
         if (details.type !== 'term') { return null; }
-        const {sources, preferredAudioIndex} = this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading);
+        const {sources, preferredAudioIndex, enableDefaultAudioSources} = this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading);
         const languageSummary = this._display.getLanguageSummary();
         return {
             sources,
             preferredAudioIndex,
             idleTimeout: this._audioDownloadIdleTimeout,
             languageSummary,
+            enableDefaultAudioSources,
         };
     }
 
