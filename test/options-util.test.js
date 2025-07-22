@@ -342,6 +342,7 @@ function createProfileOptionsUpdatedTestData1() {
             volume: 100,
             autoPlay: false,
             fallbackSoundType: 'click',
+            enableDefaultAudioSources: true,
         },
         scanning: {
             selectText: true,
