@@ -407,15 +407,7 @@ export class DisplayAnki {
         const behavior = this._duplicateBehavior;
         if (behavior === 'prevent') {
             button.disabled = true;
-
-            const parentNode = button.parentNode;
-            const wrapper = document.createElement('div');
-            wrapper.title = 'Duplicate notes are disabled';
-
-            if (parentNode) {
-                button.parentNode.insertBefore(wrapper, button);
-                wrapper.appendChild(button);
-            }
+            button.title = 'Duplicate notes are disabled';
 
             return;
         }
