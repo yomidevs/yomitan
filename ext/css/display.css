@@ -719,7 +719,7 @@ button.action-button-collapsible[hidden] {
     display: none;
 }
 button.action-button:disabled {
-    pointer-events: none;
+    pointer-events: auto;
     cursor: default;
     -webkit-filter: grayscale(100%);
     filter: grayscale(100%);
@@ -737,7 +737,7 @@ button.action-button:focus-visible {
     background-color: var(--action-button-hover-color);
     box-shadow: none;
 }
-button.action-button:active {
+button.action-button:active:not(:disabled) {
     background-color: var(--action-button-active-color);
     box-shadow: none;
 }
