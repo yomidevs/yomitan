@@ -407,6 +407,8 @@ export class DisplayAnki {
         const behavior = this._duplicateBehavior;
         if (behavior === 'prevent') {
             button.disabled = true;
+            button.title = 'Duplicate notes are disabled';
+
             return;
         }
 
