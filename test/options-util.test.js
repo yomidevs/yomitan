@@ -313,7 +313,7 @@ function createProfileOptionsUpdatedTestData1() {
             sortFrequencyDictionaryOrder: 'descending',
             stickySearchHeader: false,
             enableYomitanApi: false,
-            yomitanApiServer: 'http://127.0.0.1:8766',
+            yomitanApiServer: 'http://127.0.0.1:19633',
         },
         audio: {
             enabled: true,
@@ -689,7 +689,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 68,
+        version: 69,
         global: {
             database: {
                 prefixWildcardsSupported: false,
