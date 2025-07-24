@@ -407,7 +407,8 @@
                                     "volume",
                                     "autoPlay",
                                     "fallbackSoundType",
-                                    "sources"
+                                    "sources",
+                                    "enableDefaultAudioSources"
                                 ],
                                 "properties": {
                                     "enabled": {
@@ -466,6 +467,10 @@
                                             }
                                         },
                                         "default": []
+                                    },
+                                    "enableDefaultAudioSources": {
+                                        "type": "boolean",
+                                        "default": true
                                     }
                                 }
                             },

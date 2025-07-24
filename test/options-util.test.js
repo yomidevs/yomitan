@@ -342,6 +342,7 @@ function createProfileOptionsUpdatedTestData1() {
             volume: 100,
             autoPlay: false,
             fallbackSoundType: 'click',
+            enableDefaultAudioSources: true,
         },
         scanning: {
             selectText: true,
@@ -689,7 +690,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 68,
+        version: 69,
         global: {
             database: {
                 prefixWildcardsSupported: false,
