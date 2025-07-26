@@ -22,13 +22,13 @@ import {isStringPartiallyChinese} from './zh/chinese.js';
  * Returns the language that the string might be by using some heuristic checks.
  * Values returned are ISO codes. `null` is returned if no language can be determined.
  * @param {string} text
- * @param {string} language
+ * @param {?string} language
  * @returns {?string}
  */
 export function getLanguageFromText(text, language) {
     const partiallyJapanese = isStringPartiallyJapanese(text);
     const partiallyChinese = isStringPartiallyChinese(text);
-    if (!['zh', 'yue'].includes(language)) {
+    if (!['zh', 'yue'].includes(language ?? '')) {
         if (partiallyJapanese) { return 'ja'; }
         if (partiallyChinese) { return 'zh'; }
     }
