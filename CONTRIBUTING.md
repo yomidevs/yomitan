@@ -78,6 +78,29 @@ Immediately you should see the "Welcome" page!
 
 Note: Yomitan may or may not update when you make and save new code changes locally. It depends on what file you've changed. Yomitan runs as collection of two programs. There is the background process called the "service worker" and there is the frontend called the "content_script". The frontend will reload on save, but to update the backend you need to click on the update icon next to the extension in `chrome://extensions/`. If you make changes to the manifest you will need to rerun `npm run build` to regenerate the manifest file.
 
+### Loading a build into Firefox browser
+
+After building, you can load the compiled extension into the Firefox browser.
+
+- Navigate to the Debugging page, type `about:debugging` into the url
+- Click on "This Firefox" on the left
+- Click on "Load Temporary Add-on" on the right
+- Navigate to the `yomitan-firefox-dev.zip` in your builds folder
+
+Immediately you should see the "Welcome" page!
+
+### Loading an unpacked build into Microsoft Edge browser
+
+After building, you can load the compiled extension into the Edge browser.
+
+- Unpack the `yomitan-edge.zip`
+- Navigate to the extension page using the "..." on the top right and clicking on "Manage extensions"
+- Turn on the toggle on the left that says "Developer Mode"
+- Click "Load unpacked" on the top right
+- Select the unpacked `yomitan-edge` folder
+
+Immediately you should see the "Welcome" page!
+
 ### Build Tools
 
 The build process can use the [7-zip](https://www.7-zip.org/) archiving tool to create the packed zip builds
