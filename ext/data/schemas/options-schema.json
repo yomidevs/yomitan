@@ -345,7 +345,7 @@
                                     },
                                     "yomitanApiServer": {
                                         "type": "string",
-                                        "default": "http://127.0.0.1:8766"
+                                        "default": "http://127.0.0.1:19633"
                                     }
                                 }
                             },

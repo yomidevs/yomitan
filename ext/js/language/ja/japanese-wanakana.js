@@ -79,7 +79,7 @@ export function convertToKana(text) {
     for (const [romaji, kana] of Object.entries(ROMAJI_TO_HIRAGANA)) {
         newText = newText.replaceAll(romaji, kana);
         // Uppercase text converts to katakana
-        newText = newText.replaceAll(romaji.toUpperCase(), convertHiraganaToKatakana(kana));
+        newText = newText.replaceAll(romaji.toUpperCase(), convertHiraganaToKatakana(kana).toUpperCase());
     }
     return fillSokuonGaps(newText);
 }
