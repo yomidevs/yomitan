@@ -174,6 +174,8 @@ describe('Japanese utility functions', () => {
             [['nnnnano', 7], {kanaString: 'んんあの', newSelectionStart: 4}], // nnnnano| -> んんあの|
             [['ny', 2], {kanaString: 'ny', newSelectionStart: 2}], // ny| -> ny|
             [['nya', 3], {kanaString: 'にゃ', newSelectionStart: 2}], // nya| -> にゃ|
+            [['tt', 2], {kanaString: 'っt', newSelectionStart: 2}], // tt| -> っt|
+            [['TT', 2], {kanaString: 'ッT', newSelectionStart: 2}], // TT| -> ッT|
         ];
 
         test.each(data)('%s -> %o', (dataValue, expected) => {
