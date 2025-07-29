@@ -1115,7 +1115,7 @@ export class DisplayGenerator {
         if (typeof language === 'string') {
             element.lang = language;
         } else {
-            const language2 = getLanguageFromText(content);
+            const language2 = getLanguageFromText(content, this._language);
             if (language2 !== null) {
                 element.lang = language2;
             }

@@ -204,7 +204,7 @@ export class StructuredContentGenerator {
             if (content.length > 0) {
                 container.appendChild(this._createTextNode(content));
                 if (language === null) {
-                    const language2 = getLanguageFromText(content);
+                    const language2 = getLanguageFromText(content, language);
                     if (language2 !== null) {
                         container.lang = language2;
                     }
