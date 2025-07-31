@@ -599,10 +599,9 @@ export class DictionaryImportController {
             {label: 'Initializing import'}, // Dictionary import is uninitialized
             {label: 'Loading dictionary'}, // Load dictionary archive and validate index
             {label: 'Loading schemas'}, // Load schemas and get archive files
-            {label: 'Validating data'}, // Load and validate dictionary data
-            {label: 'Formatting data'}, // Format dictionary data and extended data support
+            {label: 'Validating and importing data'}, // Load, validate, and import dictionary data
             {label: 'Importing media'}, // Resolve async requirements and import media
-            {label: 'Importing data', callback: this._triggerStorageChanged.bind(this)}, // Add dictionary descriptor and import data
+            {label: 'Finalizing import', callback: this._triggerStorageChanged.bind(this)}, // Add dictionary descriptor
         ];
     }
 
