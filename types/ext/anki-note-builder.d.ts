@@ -137,6 +137,7 @@ export type MinimalApi = {
 
     parseText(
         text: Api.ApiParam<'parseText', 'text'>,
+        readingOverride: Api.ApiParam<'parseText', 'readingOverride'>,
         optionsContext: Api.ApiParam<'parseText', 'optionsContext'>,
         scanLength: Api.ApiParam<'parseText', 'scanLength'>,
         useInternalParser: Api.ApiParam<'parseText', 'useInternalParser'>,

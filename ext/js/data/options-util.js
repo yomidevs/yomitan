@@ -581,6 +581,7 @@ export class OptionsUtil {
             this._updateVersion67,
             this._updateVersion68,
             this._updateVersion69,
+            this._updateVersion70,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1771,6 +1772,16 @@ export class OptionsUtil {
     async _updateVersion69(options) {
         for (const profile of options.profiles) {
             profile.options.general.yomitanApiServer = 'http://127.0.0.1:19633';
+        }
+    }
+
+    /**
+     *  - Added option to use term reading for all term occurences within parsed sentence
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion70(options) {
+        for (const profile of options.profiles) {
+            profile.options.parsing.useTermReading = false;
         }
     }
 

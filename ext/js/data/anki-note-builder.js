@@ -455,9 +455,10 @@ export class AnkiNoteBuilder {
             const textParsingOptions = mediaOptions.textParsing;
             if (typeof textParsingOptions === 'object' && textParsingOptions !== null) {
                 const {optionsContext, scanLength} = textParsingOptions;
+                /** @type {?import('api').ParseTextSegment} */
                 const readingOverride =
                     dictionaryEntryDetails.type === 'term' && dictionaryEntryDetails.reading.length > 0 ?
-                        {term: dictionaryEntryDetails.term, reading: dictionaryEntryDetails.reading} :
+                        {text: dictionaryEntryDetails.term, reading: dictionaryEntryDetails.reading} :
                         null;
                 textFuriganaPromise = this._getTextFurigana(textFuriganaDetails, optionsContext, scanLength, readingOverride);
             }
@@ -512,13 +513,13 @@ export class AnkiNoteBuilder {
      * @param {import('anki-note-builder').TextFuriganaDetails[]} entries
      * @param {import('settings').OptionsContext} optionsContext
      * @param {number} scanLength
-     * @param {{term: string, reading: string} | null} readingOverride
+     * @param {import('api').ParseTextSegment | null} readingOverride
      * @returns {Promise<import('anki-templates').TextFuriganaSegment[]>}
      */
     async _getTextFurigana(entries, optionsContext, scanLength, readingOverride) {
         const results = [];
         for (const {text, readingMode} of entries) {
-            const parseResults = await this._api.parseText(text, optionsContext, scanLength, true, false);
+            const parseResults = await this._api.parseText(text, readingOverride, optionsContext, scanLength, true, false);
             let data = null;
             for (const {source, content} of parseResults) {
                 if (source !== 'scanning-parser') { continue; }
@@ -526,8 +527,8 @@ export class AnkiNoteBuilder {
                 break;
             }
             if (data !== null) {
-                const valueHtml = createFuriganaHtml(data, readingMode, readingOverride);
-                const valuePlain = createFuriganaPlain(data, readingMode, readingOverride);
+                const valueHtml = createFuriganaHtml(data, readingMode);
+                const valuePlain = createFuriganaPlain(data, readingMode);
                 results.push({text, readingMode, detailsHtml: {value: valueHtml}, detailsPlain: {value: valuePlain}});
             }
         }
@@ -538,16 +539,15 @@ export class AnkiNoteBuilder {
 /**
  * @param {import('api').ParseTextLine[]} data
  * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
- * @param {{term: string, reading: string} | null} readingOverride
  * @returns {string}
  */
-export function createFuriganaHtml(data, readingMode, readingOverride) {
+export function createFuriganaHtml(data, readingMode) {
     let result = '';
     for (const term of data) {
         result += '<span class="term">';
         for (const {text, reading} of term) {
             if (reading.length > 0) {
-                const reading2 = getReading(text, reading, readingMode, readingOverride);
+                const reading2 = convertReading(reading, readingMode);
                 result += `<ruby>${text}<rt>${reading2}</rt></ruby>`;
             } else {
                 result += text;
@@ -561,15 +561,14 @@ export function createFuriganaHtml(data, readingMode, readingOverride) {
 /**
  * @param {import('api').ParseTextLine[]} data
  * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
- * @param {{term: string, reading: string} | null} readingOverride
  * @returns {string}
  */
-export function createFuriganaPlain(data, readingMode, readingOverride) {
+export function createFuriganaPlain(data, readingMode) {
     let result = '';
     for (const term of data) {
         for (const {text, reading} of term) {
             if (reading.length > 0) {
-                const reading2 = getReading(text, reading, readingMode, readingOverride);
+                const reading2 = convertReading(reading, readingMode);
                 result += ` ${text}[${reading2}]`;
             } else {
                 result += text;
@@ -594,16 +593,4 @@ function convertReading(reading, readingMode) {
         default:
             return reading;
     }
-}
-
-/**
- * @param {string} text
- * @param {string} reading
- * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
- * @param {{term: string, reading: string} | null} readingOverride
- * @returns {string}
- */
-function getReading(text, reading, readingMode, readingOverride) {
-    const shouldOverride = readingOverride?.term === text;
-    return convertReading(shouldOverride ? readingOverride.reading : reading, readingMode);
 }

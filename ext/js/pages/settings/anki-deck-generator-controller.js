@@ -138,7 +138,7 @@ export class AnkiDeckGeneratorController {
     async _onParse() {
         const options = await this._settingsController.getOptions();
         const optionsContext = this._settingsController.getOptionsContext();
-        const parserResult = await this._application.api.parseText(this._wordInputTextarea.value, optionsContext, options.scanning.length, !options.parsing.enableMecabParser, options.parsing.enableMecabParser);
+        const parserResult = await this._application.api.parseText(this._wordInputTextarea.value, null, optionsContext, options.scanning.length, !options.parsing.enableMecabParser, options.parsing.enableMecabParser);
         const parsedText = parserResult[0].content;
 
         const parsedParts = [];
