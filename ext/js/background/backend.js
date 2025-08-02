@@ -556,9 +556,9 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'parseText'>} */
-    async _onApiParseText({text, optionsContext, scanLength, useInternalParser, useMecabParser}) {
+    async _onApiParseText({text, readingOverride, optionsContext, scanLength, useInternalParser, useMecabParser}) {
         const [internalResults, mecabResults] = await Promise.all([
-            (useInternalParser ? this._textParseScanning(text, scanLength, optionsContext) : null),
+            (useInternalParser ? this._textParseScanning(text, readingOverride, scanLength, optionsContext) : null),
             (useMecabParser ? this._textParseMecab(text) : null),
         ]);
 
@@ -1622,11 +1622,12 @@ export class Backend {
 
     /**
      * @param {string} text
+     * @param {import('api').ParseTextSegment | null} readingOverride
      * @param {number} scanLength
      * @param {import('settings').OptionsContext} optionsContext
      * @returns {Promise<import('api').ParseTextLine[]>}
      */
-    async _textParseScanning(text, scanLength, optionsContext) {
+    async _textParseScanning(text, readingOverride, scanLength, optionsContext) {
         /** @type {import('translator').FindTermsMode} */
         const mode = 'simple';
         const options = this._getProfileOptions(optionsContext, false);
@@ -1654,9 +1655,12 @@ export class Backend {
             ) {
                 previousUngroupedSegment = null;
                 const {headwords: [{term, reading}]} = dictionaryEntries[0];
+                const finalReading = options.parsing.useTermReading && term === readingOverride?.text ?
+                    readingOverride.reading :
+                    reading;
                 const source = text.substring(i, i + originalTextLength);
                 const textSegments = [];
-                for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, source)) {
+                for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, finalReading, source)) {
                     textSegments.push({text: text2, reading: reading2});
                 }
                 results.push(textSegments);

@@ -285,6 +285,7 @@ export type ParsingOptions = {
     enableMecabParser: boolean;
     selectedParser: string | null;
     termSpacing: boolean;
+    useTermReading: boolean;
     readingMode: ParsingReadingMode;
 };
 

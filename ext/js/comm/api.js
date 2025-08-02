@@ -63,14 +63,15 @@ export class API {
 
     /**
      * @param {import('api').ApiParam<'parseText', 'text'>} text
+     * @param {import('api').ApiParam<'parseText', 'readingOverride'>} readingOverride
      * @param {import('api').ApiParam<'parseText', 'optionsContext'>} optionsContext
      * @param {import('api').ApiParam<'parseText', 'scanLength'>} scanLength
      * @param {import('api').ApiParam<'parseText', 'useInternalParser'>} useInternalParser
      * @param {import('api').ApiParam<'parseText', 'useMecabParser'>} useMecabParser
      * @returns {Promise<import('api').ApiReturn<'parseText'>>}
      */
-    parseText(text, optionsContext, scanLength, useInternalParser, useMecabParser) {
-        return this._invoke('parseText', {text, optionsContext, scanLength, useInternalParser, useMecabParser});
+    parseText(text, readingOverride, optionsContext, scanLength, useInternalParser, useMecabParser) {
+        return this._invoke('parseText', {text, readingOverride, optionsContext, scanLength, useInternalParser, useMecabParser});
     }
 
     /**

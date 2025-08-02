@@ -455,7 +455,12 @@ export class AnkiNoteBuilder {
             const textParsingOptions = mediaOptions.textParsing;
             if (typeof textParsingOptions === 'object' && textParsingOptions !== null) {
                 const {optionsContext, scanLength} = textParsingOptions;
-                textFuriganaPromise = this._getTextFurigana(textFuriganaDetails, optionsContext, scanLength);
+                /** @type {?import('api').ParseTextSegment} */
+                const readingOverride =
+                    dictionaryEntryDetails.type === 'term' && dictionaryEntryDetails.reading.length > 0 ?
+                        {text: dictionaryEntryDetails.term, reading: dictionaryEntryDetails.reading} :
+                        null;
+                textFuriganaPromise = this._getTextFurigana(textFuriganaDetails, optionsContext, scanLength, readingOverride);
             }
         }
 
@@ -508,12 +513,13 @@ export class AnkiNoteBuilder {
      * @param {import('anki-note-builder').TextFuriganaDetails[]} entries
      * @param {import('settings').OptionsContext} optionsContext
      * @param {number} scanLength
+     * @param {import('api').ParseTextSegment | null} readingOverride
      * @returns {Promise<import('anki-templates').TextFuriganaSegment[]>}
      */
-    async _getTextFurigana(entries, optionsContext, scanLength) {
+    async _getTextFurigana(entries, optionsContext, scanLength, readingOverride) {
         const results = [];
         for (const {text, readingMode} of entries) {
-            const parseResults = await this._api.parseText(text, optionsContext, scanLength, true, false);
+            const parseResults = await this._api.parseText(text, readingOverride, optionsContext, scanLength, true, false);
             let data = null;
             for (const {source, content} of parseResults) {
                 if (source !== 'scanning-parser') { continue; }
