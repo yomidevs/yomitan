@@ -1781,7 +1781,7 @@ export class OptionsUtil {
      */
     async _updateVersion70(options) {
         for (const profile of options.profiles) {
-            profile.options.parsing.useTermReading = false;
+            profile.options.parsing.useTermReading = true;
         }
     }
 

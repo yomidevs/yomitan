@@ -922,7 +922,7 @@
                                     },
                                     "useTermReading": {
                                         "type": "boolean",
-                                        "default": false
+                                        "default": true
                                     },
                                     "readingMode": {
                                         "type": "string",

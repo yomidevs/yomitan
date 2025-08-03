@@ -141,7 +141,7 @@ export class QueryParser extends EventDispatcher {
         /** @type {?import('core').TokenObject} */
         const token = {};
         this._setTextToken = token;
-        this._parseResults = await this._api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
+        this._parseResults = await this._api.parseText(text, null, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
         if (this._setTextToken !== token) { return; }
 
         this._refreshSelectedParser();

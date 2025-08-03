@@ -491,6 +491,7 @@ function createProfileOptionsUpdatedTestData1() {
             enableMecabParser: false,
             selectedParser: null,
             termSpacing: true,
+            useTermReading: true,
             readingMode: 'hiragana',
         },
         anki: {
@@ -689,7 +690,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 69,
+        version: 70,
         global: {
             database: {
                 prefixWildcardsSupported: false,
