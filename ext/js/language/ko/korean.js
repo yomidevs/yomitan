@@ -28,7 +28,7 @@ const HANGUL_JAMO_EXTENDED_A_RANGE = [0xa960, 0xa97f];
 /** @type {import('CJK-util').CodepointRange} */
 const HANGUL_JAMO_EXTENDED_B_RANGE = [0xd7b0, 0xd7ff];
 /** @type {import('CJK-util').CodepointRange} */
-const HANGUL_JAMO_HALF_WIDTH_RANGE = [0xffa0, 0xffdc];
+const HANGUL_JAMO_HALF_WIDTH_RANGE = [0xffa0, 0xffdf];
 
 /**
  * Korean character ranges, roughly ordered in order of expected frequency.
