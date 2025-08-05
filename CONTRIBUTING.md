@@ -89,6 +89,15 @@ After building, you can load the compiled extension into the Firefox browser.
 
 Immediately you should see the "Welcome" page!
 
+Note: The "Load Temporary Add-on" option is temporary and the build will need to be loaded again after browser restarts. Sometimes testing extension features between browser restarts will be necessary so here are the steps to bypass this restriction.
+
+- Download Firefox Developer or Nightly
+- Navigate to the Config page, type `about:config` into the url
+- Look up `xpinstall.signatures.required` setting on the search bar at the top
+- Toggle the value to "false"
+- Navigate to the "Extensions" page using "Manage extensions"
+- Either use drag and drop or "Install Add-on from File" to load the dev build
+
 ### Loading an unpacked build into Microsoft Edge browser
 
 After building, you can load the compiled extension into the Edge browser.
