@@ -163,7 +163,7 @@ describe('Japanese utility functions', () => {
         /** @type {[input: [string, number], expected: import('language.js').KanaIMEOutput][]} */
         const data = [
             // Note: `|` represents the text cursor (newSelectionStart) position in the following comments
-            [['KATAKANA', 8], {kanaString: 'カタカナ', newSelectionStart: 4}], // KATAKANA| -> カタカナ|
+            // hiragana
             [['hiragana', 8], {kanaString: 'ひらがな', newSelectionStart: 4}], // hiragana| -> ひらがな|
             [['n', 1], {kanaString: 'n', newSelectionStart: 1}], // n| -> n|
             [['nn', 2], {kanaString: 'ん', newSelectionStart: 1}], // nn| -> ん|
@@ -175,6 +175,17 @@ describe('Japanese utility functions', () => {
             [['nya', 3], {kanaString: 'にゃ', newSelectionStart: 2}], // nya| -> にゃ|
             [['ttttttttttsu', 12], {kanaString: 'っっっっっっっっっつ', newSelectionStart: 10}], // ttttttttttsu| -> っっっっっっっっっつ|
             [['tt', 2], {kanaString: 'っt', newSelectionStart: 2}], // tt| -> っt|
+            // Katakana
+            [['KATAKANA', 8], {kanaString: 'カタカナ', newSelectionStart: 4}], // KATAKANA| -> カタカナ|
+            [['N', 1], {kanaString: 'N', newSelectionStart: 1}], // N| -> N|
+            [['NN', 2], {kanaString: 'ン', newSelectionStart: 1}], // NN| -> ン|
+            [['NN', 1], {kanaString: 'Nン', newSelectionStart: 1}], // N|N -> N|ン
+            [['Nノ', 1], {kanaString: 'Nノ', newSelectionStart: 1}], // N|ノ -> N|ノ
+            [['NNN', 3], {kanaString: 'ンN', newSelectionStart: 2}], // NNN| -> ンN|
+            [['NNNNANO', 7], {kanaString: 'ンンアノ', newSelectionStart: 4}], // NNNNANO| -> ンンアノ|
+            [['NY', 2], {kanaString: 'NY', newSelectionStart: 2}], // NY| -> NY|
+            [['NYA', 3], {kanaString: 'ニャ', newSelectionStart: 2}], // NYA| -> ニャ|
+            [['TTTTTTTTTTSU', 12], {kanaString: 'ッッッッッッッッッツ', newSelectionStart: 10}], // TTTTTTTTTTSU| -> ッッッッッッッッッツ|
             [['TT', 2], {kanaString: 'ッT', newSelectionStart: 2}], // TT| -> ッT|
         ];
 
