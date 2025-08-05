@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CJK_COMPATIBILITY, CJK_IDEOGRAPH_RANGES, isCodePointInRange, isCodePointInRanges} from '../CJK-util.js';
+import {CJK_COMPATIBILITY, CJK_IDEOGRAPH_RANGES, CJK_PUNCTUATION_RANGE, FULLWIDTH_CHARACTER_RANGES, isCodePointInRange, isCodePointInRanges} from '../CJK-util.js';
 
 
 const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
@@ -51,17 +51,9 @@ const JAPANESE_RANGES = [
 
     [0x30fb, 0x30fc], // Katakana punctuation
     [0xff61, 0xff65], // Kana punctuation
-    [0x3000, 0x303f], // CJK punctuation
 
-    [0xff10, 0xff19], // Fullwidth numbers
-    [0xff21, 0xff3a], // Fullwidth upper case Latin letters
-    [0xff41, 0xff5a], // Fullwidth lower case Latin letters
-
-    [0xff01, 0xff0f], // Fullwidth punctuation 1
-    [0xff1a, 0xff1f], // Fullwidth punctuation 2
-    [0xff3b, 0xff3f], // Fullwidth punctuation 3
-    [0xff5b, 0xff60], // Fullwidth punctuation 4
-    [0xffe0, 0xffee], // Currency markers
+    CJK_PUNCTUATION_RANGE,
+    ...FULLWIDTH_CHARACTER_RANGES,
 ];
 
 const SMALL_KANA_SET = new Set('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ');
