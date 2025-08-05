@@ -169,11 +169,11 @@ describe('Japanese utility functions', () => {
             [['nn', 2], {kanaString: 'ん', newSelectionStart: 1}], // nn| -> ん|
             [['nn', 1], {kanaString: 'nん', newSelectionStart: 1}], // n|n -> n|ん
             [['nの', 1], {kanaString: 'nの', newSelectionStart: 1}], // n|の -> n|の
-            [['ttttttttttsu', 12], {kanaString: 'っっっっっっっっっつ', newSelectionStart: 10}], // ttttttttttsu| -> っっっっっっっっっつ|
             [['nnn', 3], {kanaString: 'んn', newSelectionStart: 2}], // nnn| -> んn|
             [['nnnnano', 7], {kanaString: 'んんあの', newSelectionStart: 4}], // nnnnano| -> んんあの|
             [['ny', 2], {kanaString: 'ny', newSelectionStart: 2}], // ny| -> ny|
             [['nya', 3], {kanaString: 'にゃ', newSelectionStart: 2}], // nya| -> にゃ|
+            [['ttttttttttsu', 12], {kanaString: 'っっっっっっっっっつ', newSelectionStart: 10}], // ttttttttttsu| -> っっっっっっっっっつ|
             [['tt', 2], {kanaString: 'っt', newSelectionStart: 2}], // tt| -> っt|
             [['TT', 2], {kanaString: 'ッT', newSelectionStart: 2}], // TT| -> ッT|
         ];
