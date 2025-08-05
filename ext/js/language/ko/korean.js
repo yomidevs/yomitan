@@ -47,7 +47,8 @@ const KOREAN_RANGES = [
     HANGUL_JAMO_HALF_WIDTH_RANGE,
 ];
 
-/** * @param {number} codePoint
+/**
+ * @param {number} codePoint
  * @returns {boolean}
  */
 export function isCodePointKorean(codePoint) {
