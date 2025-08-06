@@ -420,10 +420,10 @@ export class YomitanApi {
                         text: text,
                         readingMode: furiganaReadingMode,
                         detailsHtml: {
-                            value: createFuriganaHtml(furiganaData, furiganaReadingMode),
+                            value: createFuriganaHtml(furiganaData, furiganaReadingMode, null),
                         },
                         detailsPlain: {
-                            value: createFuriganaPlain(furiganaData, furiganaReadingMode),
+                            value: createFuriganaPlain(furiganaData, furiganaReadingMode, null),
                         },
                     }],
                     dictionaryMedia: dictionaryMedia,
