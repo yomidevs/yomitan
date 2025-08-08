@@ -170,6 +170,8 @@ export class TextScanner extends EventDispatcher {
         this._yomitanIsChangingTextSelectionNow = false;
         /** @type {boolean} */
         this._userHasNotSelectedAnythingManually = true;
+        /** @type {boolean} */
+        this._isMouseOverText = false;
     }
 
     /** @type {boolean} */
@@ -652,7 +654,7 @@ export class TextScanner extends EventDispatcher {
                 this._triggerClear('mousedown');
                 break;
             case 1: // Middle
-                if (this._preventMiddleMouse) {
+                if (this._preventMiddleMouse || this._isMouseOverText) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
@@ -1303,11 +1305,13 @@ export class TextScanner extends EventDispatcher {
             if (textSource !== null) {
                 try {
                     await this._search(textSource, searchTerms, searchKanji, inputInfo);
+                    this._isMouseOverText = true;
                 } finally {
                     textSource.cleanup();
                 }
             } else {
                 this._triggerSearchEmpty(inputInfo);
+                this._isMouseOverText = false;
             }
             safePerformance.mark('scanner:_searchAt:end');
             safePerformance.measure('scanner:_searchAt', 'scanner:_searchAt:start', 'scanner:_searchAt:end');
