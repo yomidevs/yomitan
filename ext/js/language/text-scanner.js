@@ -110,7 +110,9 @@ export class TextScanner extends EventDispatcher {
         /** @type {boolean} */
         this._layoutAwareScan = false;
         /** @type {boolean} */
-        this._preventMiddleMouse = false;
+        this._preventMiddleMouseOnPage = false;
+        /** @type {boolean} */
+        this._preventMiddleMouseOnTextHover = false;
         /** @type {boolean} */
         this._matchTypePrefix = false;
         /** @type {number} */
@@ -264,7 +266,8 @@ export class TextScanner extends EventDispatcher {
         delay,
         scanLength,
         layoutAwareScan,
-        preventMiddleMouse,
+        preventMiddleMouseOnPage,
+        preventMiddleMouseOnTextHover,
         sentenceParsingOptions,
         matchTypePrefix,
         scanWithoutMousemove,
@@ -291,8 +294,11 @@ export class TextScanner extends EventDispatcher {
         if (typeof layoutAwareScan === 'boolean') {
             this._layoutAwareScan = layoutAwareScan;
         }
-        if (typeof preventMiddleMouse === 'boolean') {
-            this._preventMiddleMouse = preventMiddleMouse;
+        if (typeof preventMiddleMouseOnPage === 'boolean') {
+            this._preventMiddleMouseOnPage = preventMiddleMouseOnPage;
+        }
+        if (typeof preventMiddleMouseOnTextHover === 'boolean') {
+            this._preventMiddleMouseOnTextHover = preventMiddleMouseOnTextHover;
         }
         if (typeof matchTypePrefix === 'boolean') {
             this._matchTypePrefix = matchTypePrefix;
@@ -654,10 +660,9 @@ export class TextScanner extends EventDispatcher {
                 this._triggerClear('mousedown');
                 break;
             case 1: // Middle
-                if (this._preventMiddleMouse || this._isMouseOverText) {
+                if (this._preventMiddleMouseOnPage || (this._preventMiddleMouseOnTextHover && this._isMouseOverText)) {
                     e.preventDefault();
                     e.stopPropagation();
-                    return false;
                 }
                 break;
         }
@@ -1304,14 +1309,14 @@ export class TextScanner extends EventDispatcher {
             });
             if (textSource !== null) {
                 try {
-                    await this._search(textSource, searchTerms, searchKanji, inputInfo);
                     this._isMouseOverText = true;
+                    await this._search(textSource, searchTerms, searchKanji, inputInfo);
                 } finally {
                     textSource.cleanup();
                 }
             } else {
-                this._triggerSearchEmpty(inputInfo);
                 this._isMouseOverText = false;
+                this._triggerSearchEmpty(inputInfo);
             }
             safePerformance.mark('scanner:_searchAt:end');
             safePerformance.measure('scanner:_searchAt', 'scanner:_searchAt:start', 'scanner:_searchAt:end');

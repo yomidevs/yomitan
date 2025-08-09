@@ -478,7 +478,8 @@ export class Display extends EventDispatcher {
                 delay: scanningOptions.delay,
                 scanLength: scanningOptions.length,
                 layoutAwareScan: scanningOptions.layoutAwareScan,
-                preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
+                preventMiddleMouseOnPage: scanningOptions.preventMiddleMouse.onSearchQuery,
+                preventMiddleMouseOnTextHover: scanningOptions.preventMiddleMouse.onTextHover,
                 matchTypePrefix: false,
                 sentenceParsingOptions,
                 scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
@@ -2085,7 +2086,8 @@ export class Display extends EventDispatcher {
             delay: scanningOptions.delay,
             scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
-            preventMiddleMouse: false,
+            preventMiddleMouseOnPage: false,
+            preventMiddleMouseOnTextHover: false,
             sentenceParsingOptions,
         });
 

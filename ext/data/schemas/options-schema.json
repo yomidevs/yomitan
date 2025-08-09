@@ -678,6 +678,7 @@
                                     "preventMiddleMouse": {
                                         "type": "object",
                                         "required": [
+                                            "onTextHover",
                                             "onWebPages",
                                             "onPopupPages",
                                             "onSearchPages",
