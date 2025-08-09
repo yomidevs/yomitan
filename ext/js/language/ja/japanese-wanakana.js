@@ -53,14 +53,17 @@ export function convertToKanaIME(text, selectionStart) {
     // `なno|` will still convert to `なの` instead of `なんお` without issue since the `no` -> `の` conversion will be found before `n` -> `ん` and `o` -> `お`.
     // `nn|` will still convert to `ん` instead of `んん` since `nn` -> `ん` will be found before `n` -> `ん`.
     // If the user pastes in a long string of `n` such as `nnnnn|` it should leave the last `n` and convert to `んんn`
-    if (text[prevSelectionStart - 1] === 'n' && text.slice(0, prevSelectionStart - 1).replaceAll('nn', '').at(-1) !== 'n') {
+    const textLowered = text.toLowerCase();
+    if (textLowered[prevSelectionStart - 1] === 'n' && textLowered.slice(0, prevSelectionStart - 1).replaceAll('nn', '').at(-1) !== 'n') {
+        const n = text.slice(prevSelectionStart - 1, prevSelectionStart);
         const beforeN = text.slice(0, prevSelectionStart - 1);
         const afterN = text.slice(prevSelectionStart);
-        kanaString = convertToKana(beforeN) + 'n' + convertToKana(afterN);
-    } else if (text.slice(prevSelectionStart - 2, prevSelectionStart) === 'ny') {
+        kanaString = convertToKana(beforeN) + n + convertToKana(afterN);
+    } else if (textLowered.slice(prevSelectionStart - 2, prevSelectionStart) === 'ny') {
+        const ny = text.slice(prevSelectionStart - 2, prevSelectionStart);
         const beforeN = text.slice(0, prevSelectionStart - 2);
         const afterN = text.slice(prevSelectionStart);
-        kanaString = convertToKana(beforeN) + 'ny' + convertToKana(afterN);
+        kanaString = convertToKana(beforeN) + ny + convertToKana(afterN);
     } else {
         kanaString = convertToKana(text);
     }
