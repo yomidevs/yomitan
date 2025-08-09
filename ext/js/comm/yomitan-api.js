@@ -328,7 +328,7 @@ export class YomitanApi {
             if (dictionaryEntry.type === 'kanji') { continue; }
             const headword = dictionaryEntry.headwords[0]; // Only one headword is accepted for Anki card creation
             try {
-                const audioData = await this._audioDownloader.downloadTermAudio(options.audio.sources, null, headword.term, headword.reading, idleTimeout, languageSummary);
+                const audioData = await this._audioDownloader.downloadTermAudio(options.audio.sources, null, headword.term, headword.reading, idleTimeout, languageSummary, options.audio.enableDefaultAudioSources);
                 const timestamp = Date.now();
                 const mediaType = audioData.contentType ?? '';
                 let extension = mediaType !== null ? getFileExtensionFromAudioMediaType(mediaType) : null;
