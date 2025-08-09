@@ -63,7 +63,7 @@ export function createAnkiNoteData(marker, {
         compactTags,
         group: (resultOutputMode === 'group'),
         merge: (resultOutputMode === 'merge'),
-        compactGlossaries: (['compact', 'compact-popup-anki'].includes(glossaryLayoutMode)),
+        compactGlossaries: (glossaryLayoutMode === 'compact-popup-anki'),
         get uniqueExpressions() { return getCachedValue(uniqueExpressions); },
         get uniqueReadings() { return getCachedValue(uniqueReadings); },
         get pitches() { return getCachedValue(pitches); },
