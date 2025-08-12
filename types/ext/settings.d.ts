@@ -238,6 +238,7 @@ export type ScanningInputOptions = {
 };
 
 export type ScanningPreventMiddleMouseOptions = {
+    onTextHover: boolean;
     onWebPages: boolean;
     onPopupPages: boolean;
     onSearchPages: boolean;
@@ -375,6 +376,7 @@ export type AccessibilityOptions = {
 };
 
 export type PreventMiddleMouseOptions = {
+    onTextHover: boolean;
     onWebPages: boolean;
     onPopupPages: boolean;
     onSearchPages: boolean;

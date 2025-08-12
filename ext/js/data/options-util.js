@@ -663,6 +663,7 @@ export class OptionsUtil {
             profileOptions.scanning.hideDelay = 0;
             profileOptions.scanning.pointerEventsEnabled = false;
             profileOptions.scanning.preventMiddleMouse = {
+                onTextHover: false,
                 onWebPages: false,
                 onPopupPages: false,
                 onSearchPages: false,

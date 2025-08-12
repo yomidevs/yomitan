@@ -363,6 +363,7 @@ function createProfileOptionsUpdatedTestData1() {
             hidePopupOnCursorExitDelay: 0,
             normalizeCssZoom: true,
             preventMiddleMouse: {
+                onTextHover: false,
                 onWebPages: false,
                 onPopupPages: false,
                 onSearchPages: false,

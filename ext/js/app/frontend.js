@@ -499,7 +499,8 @@ export class Frontend {
 
         await this._updatePopup();
 
-        const preventMiddleMouse = this._getPreventMiddleMouseValueForPageType(scanningOptions.preventMiddleMouse);
+        const preventMiddleMouseOnPage = this._getPreventMiddleMouseValueForPageType(scanningOptions.preventMiddleMouse);
+        const preventMiddleMouseOnTextHover = scanningOptions.preventMiddleMouse.onTextHover;
         this._textScanner.language = options.general.language;
         this._textScanner.setOptions({
             inputs: scanningOptions.inputs,
@@ -510,7 +511,8 @@ export class Frontend {
             scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             matchTypePrefix: scanningOptions.matchTypePrefix,
-            preventMiddleMouse,
+            preventMiddleMouseOnPage,
+            preventMiddleMouseOnTextHover,
             sentenceParsingOptions,
             scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
             scanResolution: scanningOptions.scanResolution,
