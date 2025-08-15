@@ -16,6 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {log} from './log.js';
+import {toError} from './to-error.js';
+
 
 /**
  * Converts any string into a form that can be passed into the RegExp constructor.
@@ -281,4 +284,39 @@ export function sanitizeCSS(css) {
  */
 export function addScopeToCss(css, scopeSelector) {
     return scopeSelector + ' {' + css + '\n}';
+}
+
+/**
+ * Older browser versions do not support nested css and cannot use the normal `addScopeToCss`.
+ * All major web browsers should be fine but Anki is still distributing Chromium 112 on some platforms as of Anki version 24.11.
+ * As of Anki 25.02, nesting is supported. However, many users take issue with changes around this time and refuse to update.
+ * Chromium 120+ is required for full support.
+ * @param {string} css
+ * @param {string} scopeSelector
+ * @returns {string}
+ */
+export function addScopeToCssLegacy(css, scopeSelector) {
+    try {
+        const stylesheet = new CSSStyleSheet();
+        stylesheet.replaceSync(css);
+        const newCSSRules = [];
+        for (const cssRule of stylesheet.cssRules) {
+            // ignore non-style rules
+            if (!(cssRule instanceof CSSStyleRule)) {
+                continue;
+            }
+
+            const newSelectors = [];
+            for (const selector of cssRule.selectorText.split(',')) {
+                newSelectors.push(scopeSelector + ' ' + selector);
+            }
+            const newRule = cssRule.cssText.replace(cssRule.selectorText, newSelectors.join(', '));
+            newCSSRules.push(newRule);
+        }
+        stylesheet.replaceSync(newCSSRules.join('\n'));
+        return [...stylesheet.cssRules].map((rule) => rule.cssText || '').join('\n');
+    } catch (e) {
+        log.log('addScopeToCssLegacy failed, falling back on addScopeToCss: ' + toError(e).message);
+        return addScopeToCss(css, scopeSelector);
+    }
 }

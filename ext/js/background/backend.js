@@ -206,7 +206,7 @@ export class Backend {
         ]));
 
         /** @type {YomitanApi} */
-        this._yomitanApi = new YomitanApi(this._apiMap);
+        this._yomitanApi = new YomitanApi(this._apiMap, this._offscreen);
     }
 
     /**
