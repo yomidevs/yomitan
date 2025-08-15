@@ -316,21 +316,3 @@ export class ClipboardReaderProxy {
         return await this._offscreen.sendMessagePromise({action: 'clipboardGetImageOffscreen'});
     }
 }
-
-export class DomProxy {
-    /**
-     * @param {OffscreenProxy} offscreen
-     */
-    constructor(offscreen) {
-        /** @type {OffscreenProxy} */
-        this._offscreen = offscreen;
-    }
-
-    /**
-     * @param {string} css
-     * @returns {Promise<string>}
-     */
-    async sanitizeCSSOffscreen(css) {
-        return await this._offscreen.sendMessagePromise({action: 'sanitizeCSSOffscreen', params: {css}});
-    }
-}
