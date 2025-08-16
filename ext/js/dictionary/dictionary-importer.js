@@ -164,10 +164,12 @@ export class DictionaryImporter {
                 }
             }
 
-            const filteredRequirements = requirements.filter((x) => { return !uniqueMediaPaths.has(x.source.path); });
+            const alreadyAddedRequirements = requirements.filter((x) => { return uniqueMediaPaths.has(x.source.path); });
+            const notAddedRequirements = requirements.filter((x) => { return !uniqueMediaPaths.has(x.source.path); });
             for (const requirement of requirements) { uniqueMediaPaths.add(requirement.source.path); }
 
-            let {media} = await this._resolveAsyncRequirements(filteredRequirements, fileMap);
+            await this._resolveAsyncRequirements(alreadyAddedRequirements, fileMap); // already added must also be resolved for the term dict to have correct data
+            let {media} = await this._resolveAsyncRequirements(notAddedRequirements, fileMap);
             await bulkAdd('media', media);
             mediaLength += media.length;
 
