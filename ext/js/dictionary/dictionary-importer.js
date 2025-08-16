@@ -183,60 +183,54 @@ export class DictionaryImporter {
             media = [];
         }
 
-        /** @type {import('dictionary-importer').SummaryMetaCount} */
-        let termMetaListLength = {total: 0};
-        {
-            let termMetaList = await this._readFileSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
+        let termMetaListLength = 0;
+        for (const termMetaFile of termMetaFiles) {
+            let termMetaList = await this._readFileSequence([termMetaFile], this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
 
             await bulkAdd('termMeta', termMetaList);
-            termMetaListLength = this._getMetaCounts(termMetaList);
+            termMetaListLength += this._getMetaCounts(termMetaList).total;
 
-            this._progressData.index += termMetaFiles.length - 1;
             this._progress();
 
             termMetaList = [];
         }
 
         let kanjiListLength = 0;
-        {
+        for (const kanjiFile of kanjiFiles) {
             let kanjiList = await (
                 version === 1 ?
-                this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
-                this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
+                this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
+                this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
             );
 
             await bulkAdd('kanji', kanjiList);
-            kanjiListLength = kanjiList.length;
+            kanjiListLength += kanjiList.length;
 
-            this._progressData.index += kanjiFiles.length - 1;
             this._progress();
 
             kanjiList = [];
         }
 
-        /** @type {import('dictionary-importer').SummaryMetaCount} */
-        let kanjiMetaListLength = {total: 0};
-        {
-            let kanjiMetaList = await this._readFileSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
+        let kanjiMetaListLength = 0;
+        for (const kanjiMetaFile of kanjiMetaFiles) {
+            let kanjiMetaList = await this._readFileSequence([kanjiMetaFile], this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
 
             await bulkAdd('kanjiMeta', kanjiMetaList);
-            kanjiMetaListLength = this._getMetaCounts(kanjiMetaList);
+            kanjiMetaListLength += this._getMetaCounts(kanjiMetaList).total;
 
-            this._progressData.index += kanjiMetaFiles.length - 1;
             this._progress();
 
             kanjiMetaList = [];
         }
 
         let tagListLength = 0;
-        {
-            let tagList = await this._readFileSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
+        for (const tagFile of tagFiles) {
+            let tagList = await this._readFileSequence([tagFile], this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
             this._addOldIndexTags(index, tagList, dictionaryTitle);
 
             await bulkAdd('tagMeta', tagList);
-            tagListLength = tagList.length;
+            tagListLength += tagList.length;
 
-            this._progressData.index += tagFiles.length - 1;
             this._progress();
 
             tagList = [];
@@ -248,9 +242,9 @@ export class DictionaryImporter {
         /** @type {import('dictionary-importer').SummaryCounts} */
         const counts = {
             terms: {total: termListLength},
-            termMeta: termMetaListLength,
+            termMeta: {total: termMetaListLength},
             kanji: {total: kanjiListLength},
-            kanjiMeta: kanjiMetaListLength,
+            kanjiMeta: {total: kanjiMetaListLength},
             tagMeta: {total: tagListLength},
             media: {total: mediaLength},
         };
