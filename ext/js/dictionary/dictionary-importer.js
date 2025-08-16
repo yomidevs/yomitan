@@ -133,6 +133,8 @@ export class DictionaryImporter {
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
 
         let termListLength = 0;
+        let mediaLength = 0;
+        const uniqueMediaPaths = new Set();
         /** @type {import('dictionary-importer').ImportRequirement[]} */
         const requirements = [];
         for (const termFile of termFiles) {
@@ -161,12 +163,20 @@ export class DictionaryImporter {
                 }
             }
 
+            const filteredRequirements = requirements.filter((x) => { return !uniqueMediaPaths.has(x.source.path); });
+            for (const requirement of requirements) { uniqueMediaPaths.add(requirement.source.path); }
+
+            let {media} = await this._resolveAsyncRequirements(filteredRequirements, fileMap);
+            await bulkAdd('media', media);
+            mediaLength += media.length;
+
             await bulkAdd('terms', termList);
             termListLength += termList.length;
 
             this._progress();
 
             termList = [];
+            media = [];
         }
 
         /** @type {import('dictionary-importer').SummaryMetaCount} */
@@ -226,19 +236,6 @@ export class DictionaryImporter {
             this._progress();
 
             tagList = [];
-        }
-
-        // Async requirements
-        this._progressNextStep(requirements.length);
-
-        let mediaLength = 0;
-        {
-            let {media} = await this._resolveAsyncRequirements(requirements, fileMap);
-
-            await bulkAdd('media', media);
-            mediaLength = media.length;
-
-            media = [];
         }
 
         // Add dictionary descriptor
