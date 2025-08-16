@@ -136,9 +136,9 @@ export class DictionaryImporter {
         let termListLength = 0;
         let mediaLength = 0;
         const uniqueMediaPaths = new Set();
-        /** @type {import('dictionary-importer').ImportRequirement[]} */
-        const requirements = [];
         for (const termFile of termFiles) {
+            /** @type {import('dictionary-importer').ImportRequirement[]} */
+            const requirements = [];
             let termList = await (
                 version === 1 ?
                 this._readFileSequence([termFile], this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
