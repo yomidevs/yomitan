@@ -27,6 +27,7 @@
         {"path": "test/data/vitest.options.config.json", "ignore": true},
         {"path": "test/data/vitest.json.config.json", "ignore": true},
         {"path": "benches/jsconfig.json", "ignore": true},
+        {"path": "dev/data/chrome-manifest-schema.json", "ignore": true},
 
         {
             "path": "dev/data/manifest-variants.json",

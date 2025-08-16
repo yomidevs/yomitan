@@ -26,7 +26,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {safePerformance} from '../core/safe-performance.js';
 import {toError} from '../core/to-error.js';
-import {addScopeToCssLegacy, clone, deepEqual, promiseTimeout} from '../core/utilities.js';
+import {addScopeToCss, clone, deepEqual, promiseTimeout} from '../core/utilities.js';
 import {setProfile} from '../data/profiles-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
@@ -478,7 +478,8 @@ export class Display extends EventDispatcher {
                 delay: scanningOptions.delay,
                 scanLength: scanningOptions.length,
                 layoutAwareScan: scanningOptions.layoutAwareScan,
-                preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
+                preventMiddleMouseOnPage: scanningOptions.preventMiddleMouse.onSearchQuery,
+                preventMiddleMouseOnTextHover: scanningOptions.preventMiddleMouse.onTextHover,
                 matchTypePrefix: false,
                 sentenceParsingOptions,
                 scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
@@ -1260,7 +1261,7 @@ export class Display extends EventDispatcher {
         for (const {name, enabled, styles = ''} of dictionaries) {
             if (enabled) {
                 const escapedTitle = name.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-                customCss += '\n' + addScopeToCssLegacy(styles, `[data-dictionary="${escapedTitle}"]`);
+                customCss += '\n' + addScopeToCss(styles, `[data-dictionary="${escapedTitle}"]`);
             }
         }
         this.setCustomCss(customCss);
@@ -2027,7 +2028,7 @@ export class Display extends EventDispatcher {
      * @param {import('settings').ProfileOptions} options
      */
     _updateContentTextScanner(options) {
-        if (!options.scanning.enablePopupSearch) {
+        if (!options.scanning.enablePopupSearch || (!options.scanning.enableOnSearchPage && this._pageType === 'search')) {
             if (this._contentTextScanner !== null) {
                 this._contentTextScanner.setEnabled(false);
                 this._contentTextScanner.clearSelection();
@@ -2085,7 +2086,8 @@ export class Display extends EventDispatcher {
             delay: scanningOptions.delay,
             scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
-            preventMiddleMouse: false,
+            preventMiddleMouseOnPage: false,
+            preventMiddleMouseOnTextHover: false,
             sentenceParsingOptions,
         });
 

@@ -37,6 +37,8 @@ const TextWriter = /** @type {typeof import('@zip.js/zip.js').TextWriter} */ (/*
 const Uint8ArrayReader = /** @type {typeof import('@zip.js/zip.js').Uint8ArrayReader} */ (/** @type {unknown} */ (Uint8ArrayReader0));
 const ZipReader = /** @type {typeof import('@zip.js/zip.js').ZipReader} */ (/** @type {unknown} */ (ZipReader0));
 
+const INDEX_FILE_NAME = 'index.json';
+
 export class DictionaryImporter {
     /**
      * @param {import('dictionary-importer-media-loader').GenericMediaLoader} mediaLoader
@@ -296,13 +298,32 @@ export class DictionaryImporter {
 
     /**
      * @param {import('dictionary-importer').ArchiveFileMap} fileMap
+     * @returns {?string}
+     */
+    _findRedundantDirectories(fileMap) {
+        let indexPath = '';
+        for (const file of fileMap) {
+            if (file[0].replace(/.*\//, '') === INDEX_FILE_NAME) {
+                indexPath = file[0];
+            }
+        }
+        const redundantDirectoriesRegex = new RegExp(`.*(?=${INDEX_FILE_NAME.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`);
+        const redundantDirectories = indexPath.match(redundantDirectoriesRegex);
+        return redundantDirectories ? redundantDirectories[0] : null;
+    }
+
+    /**
+     * @param {import('dictionary-importer').ArchiveFileMap} fileMap
      * @returns {Promise<import('dictionary-data').Index>}
      * @throws {Error}
      */
     async _readAndValidateIndex(fileMap) {
-        const indexFileName = 'index.json';
-        const indexFile = fileMap.get(indexFileName);
+        const indexFile = fileMap.get(INDEX_FILE_NAME);
         if (typeof indexFile === 'undefined') {
+            const redundantDirectories = this._findRedundantDirectories(fileMap);
+            if (redundantDirectories) {
+                throw new Error('Dictionary index found nested in redundant directories: "' + redundantDirectories + '" when it must be in the archive\'s root directory');
+            }
             throw new Error('No dictionary index found in archive');
         }
         const indexFile2 = /** @type {import('@zip.js/zip.js').Entry} */ (indexFile);
@@ -311,7 +332,7 @@ export class DictionaryImporter {
         const index = /** @type {unknown} */ (parseJson(indexContent));
 
         if (!ajvSchemas.dictionaryIndex(index)) {
-            throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, indexFileName);
+            throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, INDEX_FILE_NAME);
         }
 
         const validIndex = /** @type {import('dictionary-data').Index} */ (index);

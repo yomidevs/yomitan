@@ -151,6 +151,7 @@ export type GeneralOptions = {
     sortFrequencyDictionary: string | null;
     sortFrequencyDictionaryOrder: SortFrequencyDictionaryOrder;
     stickySearchHeader: boolean;
+    enableYomitanApi: boolean;
 };
 
 export type PopupWindowOptions = {
@@ -170,6 +171,7 @@ export type AudioOptions = {
     autoPlay: boolean;
     fallbackSoundType: FallbackSoundType;
     sources: AudioSourceOptions[];
+    enableDefaultAudioSources: boolean;
 };
 
 export type FallbackSoundType = 'none' | 'click' | 'bloop';
@@ -236,6 +238,7 @@ export type ScanningInputOptions = {
 };
 
 export type ScanningPreventMiddleMouseOptions = {
+    onTextHover: boolean;
     onWebPages: boolean;
     onPopupPages: boolean;
     onSearchPages: boolean;
@@ -311,13 +314,15 @@ export type AnkiScreenshotOptions = {
 };
 
 export type AnkiCardFormat = {
-    type: 'kanji' | 'term';
+    type: AnkiCardFormatType;
     name: string;
     deck: string;
     model: string;
     fields: AnkiFields;
     icon: AddNoteIcon;
 };
+
+export type AnkiCardFormatType = 'kanji' | 'term';
 
 export type AddNoteIcon = 'big-circle' | 'small-circle' | 'big-square' | 'big-diamond';
 
@@ -371,6 +376,7 @@ export type AccessibilityOptions = {
 };
 
 export type PreventMiddleMouseOptions = {
+    onTextHover: boolean;
     onWebPages: boolean;
     onPopupPages: boolean;
     onSearchPages: boolean;

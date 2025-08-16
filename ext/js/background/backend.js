@@ -20,6 +20,7 @@ import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
+import {YomitanApi} from '../comm/yomitan-api.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {fetchText} from '../core/fetch-utilities.js';
@@ -27,7 +28,7 @@ import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
 import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
-import {INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
+import {generateAnkiNoteMediaFileName, INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
@@ -179,6 +180,7 @@ export class Backend {
             ['isTabSearchPopup',             this._onApiIsTabSearchPopup.bind(this)],
             ['triggerDatabaseUpdated',       this._onApiTriggerDatabaseUpdated.bind(this)],
             ['testMecab',                    this._onApiTestMecab.bind(this)],
+            ['testYomitanApi',               this._onApiTestYomitanApi.bind(this)],
             ['isTextLookupWorthy',           this._onApiIsTextLookupWorthy.bind(this)],
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
@@ -202,6 +204,9 @@ export class Backend {
             ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
             ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)],
         ]));
+
+        /** @type {YomitanApi} */
+        this._yomitanApi = new YomitanApi(this._apiMap);
     }
 
     /**
@@ -994,6 +999,43 @@ export class Backend {
         return true;
     }
 
+    /** @type {import('api').ApiHandler<'testYomitanApi'>} */
+    async _onApiTestYomitanApi({url}) {
+        if (!this._yomitanApi.isEnabled()) {
+            throw new Error('Yomitan Api not enabled');
+        }
+
+        let permissionsOkay = false;
+        try {
+            permissionsOkay = await hasPermissions({permissions: ['nativeMessaging']});
+        } catch (e) {
+            // NOP
+        }
+        if (!permissionsOkay) {
+            throw new Error('Insufficient permissions');
+        }
+
+        const disconnect = !this._yomitanApi.isConnected();
+        try {
+            const version = await this._yomitanApi.getRemoteVersion(url);
+            if (version === null) {
+                throw new Error('Could not connect to native Yomitan API component');
+            }
+
+            const localVersion = this._yomitanApi.getLocalVersion();
+            if (version !== localVersion) {
+                throw new Error(`Yomitan API component version not supported: ${version}`);
+            }
+        } finally {
+            // Disconnect if the connection was previously disconnected
+            if (disconnect && this._yomitanApi.isEnabled()) {
+                this._yomitanApi.disconnect();
+            }
+        }
+
+        return true;
+    }
+
     /** @type {import('api').ApiHandler<'isTextLookupWorthy'>} */
     _onApiIsTextLookupWorthy({text, language}) {
         return isTextLookupWorthy(text, language);
@@ -1405,6 +1447,8 @@ export class Backend {
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
 
+        void this._yomitanApi.setEnabled(options.general.enableYomitanApi && enabled);
+
         if (options.clipboard.enableBackgroundMonitor && enabled) {
             this._clipboardMonitor.start();
         } else {
@@ -1447,6 +1491,7 @@ export class Backend {
     /** */
     _attachOmniboxListener() {
         try {
+            if (!chrome.omnibox) { return; }
             chrome.omnibox.onInputEntered.addListener((text) => {
                 const newURL = 'search.html?query=' + encodeURIComponent(text);
                 void chrome.tabs.create({url: newURL});
@@ -2295,7 +2340,7 @@ export class Backend {
         const {term, reading} = definitionDetails;
         if (term.length === 0 && reading.length === 0) { return null; }
 
-        const {sources, preferredAudioIndex, idleTimeout, languageSummary} = details;
+        const {sources, preferredAudioIndex, idleTimeout, languageSummary, enableDefaultAudioSources} = details;
         let data;
         let contentType;
         try {
@@ -2306,6 +2351,7 @@ export class Backend {
                 reading,
                 idleTimeout,
                 languageSummary,
+                enableDefaultAudioSources,
             ));
         } catch (e) {
             const error = this._getAudioDownloadError(e);
@@ -2317,7 +2363,7 @@ export class Backend {
 
         let extension = contentType !== null ? getFileExtensionFromAudioMediaType(contentType) : null;
         if (extension === null) { extension = '.mp3'; }
-        let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp);
+        let fileName = generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp);
         fileName = fileName.replace(/\]/g, '');
         return await ankiConnect.storeMediaFile(fileName, data);
     }
@@ -2338,7 +2384,7 @@ export class Backend {
             throw new Error('Unknown media type for screenshot image');
         }
 
-        const fileName = this._generateAnkiNoteMediaFileName('yomitan_browser_screenshot', extension, timestamp);
+        const fileName = generateAnkiNoteMediaFileName('yomitan_browser_screenshot', extension, timestamp);
         return await ankiConnect.storeMediaFile(fileName, data);
     }
 
@@ -2361,7 +2407,7 @@ export class Backend {
 
         const fileName = dataUrl === this._ankiClipboardImageDataUrlCache && this._ankiClipboardImageFilenameCache ?
             this._ankiClipboardImageFilenameCache :
-            this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp);
+            generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp);
 
         const storedFileName = await ankiConnect.storeMediaFile(fileName, data);
 
@@ -2411,7 +2457,7 @@ export class Backend {
             if (media !== null) {
                 const {content, mediaType} = media;
                 const extension = getFileExtensionFromImageMediaType(mediaType);
-                fileName = this._generateAnkiNoteMediaFileName(
+                fileName = generateAnkiNoteMediaFileName(
                     `yomitan_dictionary_media_${i + 1}`,
                     extension !== null ? extension : '',
                     timestamp,
@@ -2489,47 +2535,6 @@ export class Backend {
             }
         }
         return error;
-    }
-
-    /**
-     * @param {string} prefix
-     * @param {string} extension
-     * @param {number} timestamp
-     * @returns {string}
-     */
-    _generateAnkiNoteMediaFileName(prefix, extension, timestamp) {
-        let fileName = prefix;
-
-        fileName += `_${this._ankNoteDateToString(new Date(timestamp))}`;
-        fileName += extension;
-
-        fileName = this._replaceInvalidFileNameCharacters(fileName);
-
-        return fileName;
-    }
-
-    /**
-     * @param {string} fileName
-     * @returns {string}
-     */
-    _replaceInvalidFileNameCharacters(fileName) {
-        // eslint-disable-next-line no-control-regex
-        return fileName.replace(/[<>:"/\\|?*\u0000-\u001F]/g, '-');
-    }
-
-    /**
-     * @param {Date} date
-     * @returns {string}
-     */
-    _ankNoteDateToString(date) {
-        const year = date.getUTCFullYear();
-        const month = date.getUTCMonth().toString().padStart(2, '0');
-        const day = date.getUTCDate().toString().padStart(2, '0');
-        const hours = date.getUTCHours().toString().padStart(2, '0');
-        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-        const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-        const milliseconds = date.getUTCMilliseconds().toString().padStart(3, '0');
-        return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}-${milliseconds}`;
     }
 
     /**

@@ -94,6 +94,7 @@ export type AudioMediaOptions = {
     preferredAudioIndex: number | null;
     idleTimeout: number | null;
     languageSummary: Language.LanguageSummary;
+    enableDefaultAudioSources: boolean;
 };
 
 export type MediaOptions = {

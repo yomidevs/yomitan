@@ -286,24 +286,29 @@
                 "value": [
                     [
                         {
-                            "pattern": "l'",
+                            "pattern": "l('|’)",
                             "ignoreCase": true,
                             "replacement": ""
                         },
                         {
-                            "pattern": "j'",
+                            "pattern": "j('|’)",
                             "ignoreCase": true,
                             "replacement": ""
                         },
                         {
-                            "pattern": "d'",
+                            "pattern": "d('|’)",
+                            "ignoreCase": true,
+                            "replacement": ""
+                        },
+                        {
+                            "pattern": "s('|’)",
                             "ignoreCase": true,
                             "replacement": ""
                         }
                     ]
                 ]
             },
-            "description": "Separating the l', j', d' from the word."
+            "description": "Separating the l', j', d', s' from the word."
         },
         {
             "modification": {
@@ -426,6 +431,24 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
+        }
+    ],
+    "ja": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "character"
+            },
+            "description": "Scan text one character at a time."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "letter"
+            },
+            "description": "Lookup words by letter in the dictionary."
         }
     ],
     "ko": [
@@ -790,6 +813,42 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "yue": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "character"
+            },
+            "description": "Scan text one character at a time."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "letter"
+            },
+            "description": "Lookup words by letter in the dictionary."
+        }
+    ],
+    "zh": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "character"
+            },
+            "description": "Scan text one character at a time."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "letter"
+            },
+            "description": "Lookup words by letter in the dictionary."
         }
     ]
 }

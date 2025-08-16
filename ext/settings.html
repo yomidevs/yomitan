@@ -97,20 +97,11 @@
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
-                <div class="settings-item-label">Default profile</div>
-                <div class="settings-item-description">Switch the default profile that is used for scanning.</div>
+                <div class="settings-item-label">Active profile</div>
+                <div class="settings-item-description">Switch the active profile that is used for scanning.</div>
             </div>
             <div class="settings-item-right">
                 <select id="profile-active-select"></select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Editing profile</div>
-                <div class="settings-item-description">Change which profile is being modified on this page.</div>
-            </div>
-            <div class="settings-item-right">
-                <select id="profile-target-select"></select>
             </div>
         </div></div>
         <div class="settings-item settings-item-button" data-modal-action="show,profiles"><div class="settings-item-inner">
@@ -181,6 +172,41 @@
                     <input type="number" min="1" data-setting="general.maxResults">
                 </div>
             </div></div>
+            <div class="settings-item advanced-only">
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-invalid-indicator"></div>
+                        <div class="settings-item-label">
+                            Enable Yomitan API
+                        </div>
+                        <div class="settings-item-description">
+                            Enable support for sending local web requests to fetch data from Yomitan.
+                        </div>
+                        <div class="settings-item-description">
+                            This option may send data outside of Yomitan to local applications that request it.
+                            <span data-show-for-browser="firefox firefox-mobile"><a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a></span>
+                            <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                        </div>
+                    </div>
+                    <div class="settings-item-right">
+                        <label class="toggle"><input type="checkbox" class="permissions-toggle" data-permissions-setting="general.enableYomitanApi" data-required-permissions="nativeMessaging"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    </div>
+                </div>
+                <div class="settings-item-children more" hidden>
+                    <p>
+                        To activate the Yomitan API, a native messaging component must be installed.
+                        A setup guide can be found <a href="https://github.com/Kuuuube/yomitan-api/blob/master/README.md" target="_blank" rel="noopener noreferrer">here</a>.
+                    </p>
+                    <div class="margin-above flex-row-nowrap">
+                        <button type="button" id="test-yomitan-api-button">Test</button>
+                        <input id="test-yomitan-url-input" class="flex-margin-left" type="text" placeholder="http://127.0.0.1:19633" spellcheck="false" autocomplete="off" data-setting="general.yomitanApiServer">
+                        <div id="test-yomitan-api-results" class="flex-margin-left" hidden></div>
+                    </div>
+                    <p class="margin-above">
+                        <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                    </p>
+                </div>
+            </div>
         </div>
 
     <!-- Dictionaries -->
@@ -451,10 +477,10 @@
                 <label class="toggle"><input type="checkbox" data-setting="scanning.selectText"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item jpzhyue-only"><div class="settings-item-inner">
+        <div class="settings-item jpzhyueko-only"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Search text with non-Japanese, Chinese, or Cantonese characters</div>
-                <div class="settings-item-description">Only applies when language is set to Japanese, Chinese, or Cantonese.</div>
+                <div class="settings-item-label">Search text with non-Japanese, Chinese, or Korean characters</div>
+                <div class="settings-item-description">Only applies when language is set to Japanese, Chinese, Cantonese, or Korean.</div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="scanning.alphanumeric"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -1439,6 +1465,10 @@
             <div class="settings-item-left">
                 <div class="settings-item-label">Enable audio playback for terms</div>
                 <div class="settings-item-description">Show a clickable speaker icon next to search results.</div>
+                <div class="settings-item-description">
+                    This option may send term, reading, and/or language outside of Yomitan to fetch audio.
+                    <span data-show-for-browser="firefox firefox-mobile"><a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a></span>
+                </div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="audio.enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -1540,8 +1570,10 @@
                     <div class="settings-item-label">
                         Parse sentences using <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener noreferrer">MeCab</a>
                     </div>
+                    <div class="settings-item-description">Sentence words are parsed using a third-party program. Japanese only.</div>
                     <div class="settings-item-description">
-                        Sentence words are parsed using a third-party program. Japanese only.
+                        This option may send search query data outside of Yomitan for parsing.
+                        <span data-show-for-browser="firefox firefox-mobile"><a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a></span>
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
@@ -1672,6 +1704,10 @@
                     <div class="settings-item-description">
                         <span>Connection status:</span>
                         <span id="anki-error-message">&hellip;</span> <a tabindex="0" id="anki-error-message-details-toggle" hidden>Details&hellip;</a>
+                        <div class="settings-item-description">
+                            This option may send limited information about the current webpage, information contained in Yomitan dictionary entries, and/or relevant user settings outside of Yomitan to Anki.
+                            <span data-show-for-browser="firefox firefox-mobile"><a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a></span>
+                        </div>
                     </div>
                 </div>
                 <div class="settings-item-right">

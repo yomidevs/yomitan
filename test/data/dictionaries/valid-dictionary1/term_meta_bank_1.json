@@ -50,6 +50,31 @@
         "打ち込む",
         "pitch",
         {
+            "reading": "うちこむ",
+            "pitches": [
+                {"position": "HHHH"},
+                {"position": "HHHL"},
+                {"position": "HHLH"},
+                {"position": "HHLL", "devoice": 2},
+                {"position": "HLHH"},
+                {"position": "HLHL"},
+                {"position": "HLLH"},
+                {"position": "HLLL", "nasal": 3},
+                {"position": "LHHH"},
+                {"position": "LHHL"},
+                {"position": "LHLH"},
+                {"position": "LHLL", "devoice": 2, "nasal": 3},
+                {"position": "LLHH"},
+                {"position": "LLHL"},
+                {"position": "LLLH"},
+                {"position": "LLLL"}
+            ]
+        }
+    ],
+    [
+        "打ち込む",
+        "pitch",
+        {
             "reading": "ぶちこむ",
             "pitches": [
                 {"position": 0},

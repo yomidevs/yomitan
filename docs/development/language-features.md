@@ -37,6 +37,13 @@ This is just for some type safety. The first key is the ISO code. Most languages
 
 That's it! Your language should now be selectable from the dropdown, and may work perfectly fine already. If you don't already have a dictionary to test with, check out [Dictionaries](../dictionaries.md). For more advanced features, read on.
 
+## Recommended Dictionaries
+
+If you want to suggest to the user some dictionaries to download, you can make a pull request similar to:
+https://github.com/yomidevs/yomitan/pull/1951/files
+
+Please make sure you have permission to distribute these dictionaries legally.
+
 ## Language Features
 
 You should first have the repo set up locally according to the instructions in the [contributing guidelines](../../CONTRIBUTING.md).

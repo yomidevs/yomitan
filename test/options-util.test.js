@@ -312,6 +312,8 @@ function createProfileOptionsUpdatedTestData1() {
             sortFrequencyDictionary: null,
             sortFrequencyDictionaryOrder: 'descending',
             stickySearchHeader: false,
+            enableYomitanApi: false,
+            yomitanApiServer: 'http://127.0.0.1:19633',
         },
         audio: {
             enabled: true,
@@ -340,6 +342,7 @@ function createProfileOptionsUpdatedTestData1() {
             volume: 100,
             autoPlay: false,
             fallbackSoundType: 'click',
+            enableDefaultAudioSources: true,
         },
         scanning: {
             selectText: true,
@@ -360,6 +363,7 @@ function createProfileOptionsUpdatedTestData1() {
             hidePopupOnCursorExitDelay: 0,
             normalizeCssZoom: true,
             preventMiddleMouse: {
+                onTextHover: false,
                 onWebPages: false,
                 onPopupPages: false,
                 onSearchPages: false,
@@ -687,7 +691,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 64,
+        version: 70,
         global: {
             database: {
                 prefixWildcardsSupported: false,

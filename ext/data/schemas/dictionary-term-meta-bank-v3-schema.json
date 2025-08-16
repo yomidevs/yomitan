@@ -112,9 +112,18 @@
                                     "additionalProperties": false,
                                     "properties": {
                                         "position": {
-                                            "type": "integer",
-                                            "description": "Mora position of the pitch accent downstep. A value of 0 indicates that the word does not have a downstep (heiban).",
-                                            "minimum": 0
+                                            "oneOf": [
+                                                {
+                                                    "type": "integer",
+                                                    "description": "Mora position of the pitch accent downstep. A value of 0 indicates that the word does not have a downstep (heiban).",
+                                                    "minimum": 0
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "description": "Pitch level of each mora with H representing high and L representing low. For example: HHLL for a 4 mora word.",
+                                                    "pattern": "^[HL]+$"
+                                                }
+                                            ]
                                         },
                                         "nasal": {
                                             "oneOf": [

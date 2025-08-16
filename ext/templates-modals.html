@@ -302,7 +302,7 @@
         <div class="modal-body">
             <p>
                 For non-English dictionaries, please refer to the list of available
-                <a href="https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md#downloads" target="_blank"> Kaikki dictionaries</a>.
+                <a href="https://yomidevs.github.io/kaikki-to-yomitan/" target="_blank"> Kaikki dictionaries</a>.
             </p>
             <div id="recommended-term-dictionaries" hidden>
                 <h1 class="modal-title">Term Dictionaries</h1>
@@ -637,6 +637,17 @@
             <div class="settings-item">
                 <div class="settings-item-inner">
                     <div class="settings-item-left">
+                        <div class="settings-item-label">Enable Default Audio Sources</div>
+                        <div class="settings-item-description" id="default-audio-sources-settings-list"></div>
+                    </div>
+                    <div class="settings-item-right">
+                        <label class="toggle"><input type="checkbox" data-setting="audio.enableDefaultAudioSources"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-item">
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
                         <div class="settings-item-label">
                             When searching for audio, the sources are checked in order until the first
                             valid source is found. This allows for selecting a fallback source if the
@@ -810,6 +821,10 @@
                 </p>
             </div>
             <div class="input-prevention-option-list">
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onTextHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Text Hover</span>
+                </label>
                 <label class="input-prevention-option-list-item">
                     <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onWebPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                     <span>Webpages</span>
@@ -987,6 +1002,14 @@
                         <td>First definition for the term.</td>
                     </tr>
                     <tr>
+                        <td><code class="anki-field-marker">{glossary-plain}</code></td>
+                        <td>List of definitions for the term with html only used for line breaks. This may break the formatting of some dictionaries.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{glossary-plain-no-dictionary}</code></td>
+                        <td><code class="anki-field-marker">{glossary-plain}</code> except the dictionary tag is omitted.</td>
+                    </tr>
+                    <tr>
                         <td><code class="anki-field-marker">{glossary-first-brief}</code></td>
                         <td>First definition for the term in a more compact format.</td>
                     </tr>
@@ -1043,6 +1066,18 @@
                         <td><code class="anki-field-marker">{single-glossary-DICT-NAME-no-dictionary}</code></td>
                         <td>
                             See <code class="anki-field-marker">{single-glossary-DICT-NAME}</code> and <code class="anki-field-marker">{glossary-no-dictionary}</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{single-glossary-DICT-NAME-plain}</code></td>
+                        <td>
+                            See <code class="anki-field-marker">{single-glossary-DICT-NAME}</code> and <code class="anki-field-marker">{glossary-plain}</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{single-glossary-DICT-NAME-plain-no-dictionary}</code></td>
+                        <td>
+                            See <code class="anki-field-marker">{single-glossary-DICT-NAME}</code> and <code class="anki-field-marker">{glossary-plain-no-dictionary}</code>.
                         </td>
                     </tr>
                     <tr>
@@ -1150,6 +1185,14 @@
                             The average of frequency data for the current term or kanji.<br>
                             Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term or kanji usage.
                         </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{single-frequency-DICT-NAME}</code></td>
+                        <td>All frequencies from the selected dictionary put in a list.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{single-frequency-number-DICT-NAME}</code></td>
+                        <td>A single frequency number from the selected dictionary with no formatting data.</td>
                     </tr>
                     <tr>
                         <td><code class="anki-field-marker">{screenshot}</code></td>
@@ -1282,10 +1325,17 @@
             </div>
             <textarea autocomplete="off" spellcheck="false" id="generate-anki-notes-textarea" class="no-wrap margin-above" data-tab-action="indent,4"></textarea>
             <div class="generate-anki-notes-test-container margin-above">
-                <p>
-                    Active Anki deck: <code id="generate-anki-notes-active-deck"></code><br>
-                    Active Anki model: <code id="generate-anki-notes-active-model"></code>
-                </p>
+                <div id="generate-anki-notes-buttons-wrapper">
+                    <div>
+                        <div>Active Anki Flashcard Format: <select id="generate-anki-flashcard-format"></select></div>
+                        <div>Active Anki deck: <code id="generate-anki-notes-active-deck"></code></div>
+                        <div>Active Anki model: <code id="generate-anki-notes-active-model"></code></div>
+                    </div>
+                    <div>
+                        <button type="button" class="low-emphasis" id="generate-anki-notes-parse-button" title="Split text into a newline separated list of words">Parse Words</button>
+                        <button type="button" class="low-emphasis" id="generate-anki-notes-dedupe-button" title="Remove duplicate lines">Dedupe Words</button>
+                    </div>
+                </div>
                 <div class="generate-anki-notes-test-table margin-above">
                     <div class="generate-anki-notes-test-table-header">Test word</div>
                     <div></div>

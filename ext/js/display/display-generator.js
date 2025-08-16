@@ -22,7 +22,7 @@ import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKan
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji} from '../language/ja/japanese.js';
 import {getLanguageFromText} from '../language/text-utilities.js';
-import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './pronunciation-generator.js';
+import {PronunciationGenerator} from './pronunciation-generator.js';
 import {StructuredContentGenerator} from './structured-content-generator.js';
 
 export class DisplayGenerator {
@@ -38,7 +38,9 @@ export class DisplayGenerator {
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
         /** @type {StructuredContentGenerator} */
-        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
+        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document, window);
+        /** @type {PronunciationGenerator} */
+        this._pronunciationGenerator = new PronunciationGenerator(document);
         /** @type {string} */
         this._language = 'ja';
     }
@@ -797,13 +799,13 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createPronunciationPitchAccent(pitchAccent, details) {
-        const {position, nasalPositions, devoicePositions, tags} = pitchAccent;
+        const {positions, nasalPositions, devoicePositions, tags} = pitchAccent;
         const {reading, exclusiveTerms, exclusiveReadings} = details;
         const morae = getKanaMorae(reading);
 
         const node = this._instantiate('pronunciation');
 
-        node.dataset.pitchAccentDownstepPosition = `${position}`;
+        node.dataset.pitchAccentDownstepPosition = `${positions}`;
         node.dataset.pronunciationType = pitchAccent.type;
         if (nasalPositions.length > 0) { node.dataset.nasalMoraPosition = nasalPositions.join(' '); }
         if (devoicePositions.length > 0) { node.dataset.devoiceMoraPosition = devoicePositions.join(' '); }
@@ -816,15 +818,15 @@ export class DisplayGenerator {
         this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
 
         n = this._querySelector(node, '.pronunciation-downstep-notation-container');
-        n.appendChild(createPronunciationDownstepPosition(position));
+        n.appendChild(this._pronunciationGenerator.createPronunciationDownstepPosition(positions));
 
         n = this._querySelector(node, '.pronunciation-text-container');
 
         n.lang = this._language;
-        n.appendChild(createPronunciationText(morae, position, nasalPositions, devoicePositions));
+        n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, positions, nasalPositions, devoicePositions));
 
         n = this._querySelector(node, '.pronunciation-graph-container');
-        n.appendChild(createPronunciationGraph(morae, position));
+        n.appendChild(this._pronunciationGenerator.createPronunciationGraph(morae, positions));
 
         return node;
     }
@@ -1113,7 +1115,7 @@ export class DisplayGenerator {
         if (typeof language === 'string') {
             element.lang = language;
         } else {
-            const language2 = getLanguageFromText(content);
+            const language2 = getLanguageFromText(content, this._language);
             if (language2 !== null) {
                 element.lang = language2;
             }
@@ -1136,7 +1138,7 @@ export class DisplayGenerator {
             if (termPronunciation.headwordIndex !== headwordIndex) { continue; }
             for (const pronunciation of termPronunciation.pronunciations) {
                 if (pronunciation.type !== 'pitch-accent') { continue; }
-                const category = getPitchCategory(reading, pronunciation.position, isVerbOrAdjective);
+                const category = getPitchCategory(reading, pronunciation.positions, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);
                 }

@@ -110,7 +110,9 @@ export class TextScanner extends EventDispatcher {
         /** @type {boolean} */
         this._layoutAwareScan = false;
         /** @type {boolean} */
-        this._preventMiddleMouse = false;
+        this._preventMiddleMouseOnPage = false;
+        /** @type {boolean} */
+        this._preventMiddleMouseOnTextHover = false;
         /** @type {boolean} */
         this._matchTypePrefix = false;
         /** @type {number} */
@@ -170,6 +172,8 @@ export class TextScanner extends EventDispatcher {
         this._yomitanIsChangingTextSelectionNow = false;
         /** @type {boolean} */
         this._userHasNotSelectedAnythingManually = true;
+        /** @type {boolean} */
+        this._isMouseOverText = false;
     }
 
     /** @type {boolean} */
@@ -262,7 +266,8 @@ export class TextScanner extends EventDispatcher {
         delay,
         scanLength,
         layoutAwareScan,
-        preventMiddleMouse,
+        preventMiddleMouseOnPage,
+        preventMiddleMouseOnTextHover,
         sentenceParsingOptions,
         matchTypePrefix,
         scanWithoutMousemove,
@@ -289,8 +294,11 @@ export class TextScanner extends EventDispatcher {
         if (typeof layoutAwareScan === 'boolean') {
             this._layoutAwareScan = layoutAwareScan;
         }
-        if (typeof preventMiddleMouse === 'boolean') {
-            this._preventMiddleMouse = preventMiddleMouse;
+        if (typeof preventMiddleMouseOnPage === 'boolean') {
+            this._preventMiddleMouseOnPage = preventMiddleMouseOnPage;
+        }
+        if (typeof preventMiddleMouseOnTextHover === 'boolean') {
+            this._preventMiddleMouseOnTextHover = preventMiddleMouseOnTextHover;
         }
         if (typeof matchTypePrefix === 'boolean') {
             this._matchTypePrefix = matchTypePrefix;
@@ -505,7 +513,7 @@ export class TextScanner extends EventDispatcher {
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
-            } else if (showEmpty || (textSource !== null && isAltText && await this._isTextLookupWorthy(textSource.fullContent))) {
+            } else if (showEmpty || (textSource !== null && isAltText && await this._isTextLookupWorthy(textSource.content))) {
                 // Shows a "No results found" message
                 dictionaryEntries = [];
                 sentence = {text: '', offset: 0};
@@ -652,10 +660,9 @@ export class TextScanner extends EventDispatcher {
                 this._triggerClear('mousedown');
                 break;
             case 1: // Middle
-                if (this._preventMiddleMouse) {
+                if (this._preventMiddleMouseOnPage || (this._preventMiddleMouseOnTextHover && this._isMouseOverText)) {
                     e.preventDefault();
                     e.stopPropagation();
-                    return false;
                 }
                 break;
         }
@@ -1098,7 +1105,7 @@ export class TextScanner extends EventDispatcher {
 
         eventListenerInfos.push(this._getSelectionChangeCheckUserSelectionListener());
 
-        for (const [...args] of eventListenerInfos) {
+        for (const args of eventListenerInfos) {
             this._eventListeners.addEventListener(...args);
         }
     }
@@ -1302,11 +1309,13 @@ export class TextScanner extends EventDispatcher {
             });
             if (textSource !== null) {
                 try {
+                    this._isMouseOverText = true;
                     await this._search(textSource, searchTerms, searchKanji, inputInfo);
                 } finally {
                     textSource.cleanup();
                 }
             } else {
+                this._isMouseOverText = false;
                 this._triggerSearchEmpty(inputInfo);
             }
             safePerformance.mark('scanner:_searchAt:end');

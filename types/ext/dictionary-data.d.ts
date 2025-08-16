@@ -162,7 +162,7 @@ export type TermMetaFrequency = [
 export type TermMetaPitchData = {
     reading: string;
     pitches: {
-        position: number;
+        position: number | string;
         nasal?: number | number[];
         devoice?: number | number[];
         tags?: string[];

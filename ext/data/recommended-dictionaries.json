@@ -244,6 +244,32 @@
             }
         ]
     },
+    "haw": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "pukui-elbert-1986",
+                "description": "English to Hawaiian Dictionary from Pukui-Elbert in 1986",
+                "homepage": "https://github.com/bee-san/awesome-hawaiian-language",
+                "downloadUrl": "https://github.com/bee-san/awesome-hawaiian-language/releases/download/0.0.1/Pukui-Elbert-1986-Deduped-Yomitan.zip"
+            },
+            {
+                "name": "combined-dictionary",
+                "description": "English to Hawaiian Dictionary from Stephen (Kepano) Trussel",
+                "homepage": "https://github.com/bee-san/awesome-hawaiian-language",
+                "downloadUrl": "https://github.com/bee-san/awesome-hawaiian-language/releases/download/0.0.1/Combined-Hawaiian-Dictionary-2020-Mitch-Cleaned.zip"
+            },
+            {
+                "name": "hawaiian-place-names-2002",
+                "description": "Hawaiian Place Names, published 2002",
+                "homepage": "https://github.com/bee-san/awesome-hawaiian-language",
+                "downloadUrl": "https://github.com/bee-san/awesome-hawaiian-language/releases/download/0.0.1/Hawaii-place-names-2002-yomitan.zip"
+            }
+        ]
+    },
     "he": {
         "frequency": [],
         "grammar": [],
@@ -546,6 +572,12 @@
                 "description": "Russian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
                 "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ru-en.zip"
+            },
+            {
+                "name": "opr-ru-en",
+                "description": "OpenRussian is a user-contributed, libre Russian dictionary including the accents, examples, audio, related words and synonyms.",
+                "homepage": "https://github.com/ImenaOphelia/openrussian-to-yomitan",
+                "downloadUrl": "https://github.com/ImenaOphelia/openrussian-to-yomitan/releases/latest/download/opr-ru-en.zip"
             }
         ]
     },
@@ -647,6 +679,104 @@
             }
         ]
     },
+    "tok": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "toki-pona-to-chinese",
+                "description": "Toki Pona to Chinese dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-chinese.zip"
+            },
+            {
+                "name": "toki-pona-to-czech",
+                "description": "Toki Pona to Czech dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-czech.zip"
+            },
+            {
+                "name": "toki-pona-to-dutch",
+                "description": "Toki Pona to Dutch dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-dutch.zip"
+            },
+            {
+                "name": "toki-pona-to-english",
+                "description": "Toki Pona to English dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-english.zip"
+            },
+            {
+                "name": "toki-pona-to-esperanto",
+                "description": "Toki Pona to Esperanto dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-esperanto.zip"
+            },
+            {
+                "name": "toki-pona-to-french",
+                "description": "Toki Pona to French dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-french.zip"
+            },
+            {
+                "name": "toki-pona-to-german",
+                "description": "Toki Pona to German dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-german.zip"
+            },
+            {
+                "name": "toki-pona-to-indonesian",
+                "description": "Toki Pona to Indonesian dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-indonesian.zip"
+            },
+            {
+                "name": "toki-pona-to-italian",
+                "description": "Toki Pona to Italian dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-italian.zip"
+            },
+            {
+                "name": "toki-pona-to-polish",
+                "description": "Toki Pona to Polish dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-polish.zip"
+            },
+            {
+                "name": "toki-pona-to-portuguese",
+                "description": "Toki Pona to Portuguese dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-portuguese.zip"
+            },
+            {
+                "name": "toki-pona-to-russian",
+                "description": "Toki Pona to Russian dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-russian.zip"
+            },
+            {
+                "name": "toki-pona-to-slovak",
+                "description": "Toki Pona to Slovak dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-slovak.zip"
+            },
+            {
+                "name": "toki-pona-to-spanish",
+                "description": "Toki Pona to Spanish dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-spanish.zip"
+            },
+            {
+                "name": "toki-pona-to-turkish",
+                "description": "Toki Pona to Turkish dictionary",
+                "homepage": "https://github.com/bee-san/awesome-toki-pona",
+                "downloadUrl": "https://github.com/bee-san/awesome-toki-pona/releases/download/0.0.3/toki-pona-to-turkish.zip"
+            }
+        ]
+    },
     "tr": {
         "frequency": [],
         "grammar": [],
@@ -704,7 +834,7 @@
                 "name": "Words.hk 粵典 漢字",
                 "description": "A free and open Cantonese dictionary with definitions and example sentences in Cantonese and English.",
                 "homepage": "https://github.com/MarvNC/wordshk-yomitan",
-                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/Words.hk.Honzi.2024-09-16.zip"
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2025-07-09/Words.hk.Honzi.2025-07-08.zip"
             }
         ],
         "pronunciation": [],
@@ -713,7 +843,25 @@
                 "name": "Words.hk 粵典",
                 "description": "A free and open Cantonese dictionary with definitions and example sentences in Cantonese and English.",
                 "homepage": "https://github.com/MarvNC/wordshk-yomitan",
-                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/Words.hk.2024-09-16.zip"
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2025-07-09/Words.hk.2025-07-08.zip"
+            },
+            {
+                "name": "CC-Canto",
+                "description": "CC-Canto is an open source Cantonese dictionary project created by Pleco, intended to be used alongside the CC-CEDICT dictionary. It provides Cantonese specific words and definitions.",
+                "homepage": "https://github.com/MarvNC/cc-cedict-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-Canto.zip"
+            },
+            {
+                "name": "CC-CEDICT Canto",
+                "description": "CC-CEDICT is a continuation of the CEDICT project with the aim to provide a complete downloadable Chinese to English dictionary with pronunciation in pinyin for the Chinese characters. This version includes Cantonese readings provided by Pleco.",
+                "homepage": "https://github.com/MarvNC/cc-cedict-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.Canto.zip"
+            },
+            {
+                "name": "Cantodict",
+                "description": "CantoDict was a Cantonese-English dictionary created and maintained by Adam Sheik and public contributors.",
+                "homepage": "https://github.com/MarvNC/yomitan-dictionaries?tab=readme-ov-file#cantodict",
+                "downloadUrl": "https://github.com/MarvNC/yomichan-dictionaries/raw/master/dl/%5BCantonese%5D%20Cantodict.zip"
             }
         ]
     },

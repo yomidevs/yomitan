@@ -78,7 +78,7 @@ export class DisplayAnki {
         /** @type {boolean} */
         this._duplicateScopeCheckAllModels = false;
         /** @type {import('settings').AnkiDuplicateBehavior} */
-        this._duplicateBehavior = 'prevent';
+        this._duplicateBehavior = 'new';
         /** @type {import('settings').AnkiScreenshotFormat} */
         this._screenshotFormat = 'png';
         /** @type {number} */
@@ -407,6 +407,8 @@ export class DisplayAnki {
         const behavior = this._duplicateBehavior;
         if (behavior === 'prevent') {
             button.disabled = true;
+            button.title = 'Duplicate notes are disabled';
+
             return;
         }
 
@@ -952,9 +954,9 @@ export class DisplayAnki {
 
             infos = this._checkForDuplicates ?
                 await this._display.application.api.getAnkiNoteInfo(notes, this._isAdditionalInfoEnabled()) :
-                this._getAnkiNoteInfoForceValue(notes, true);
+                this._getAnkiNoteInfoForceValueIfValid(notes, true);
         } catch (e) {
-            infos = this._getAnkiNoteInfoForceValue(notes, false);
+            infos = this._getAnkiNoteInfoForceValueIfValid(notes, false);
             ankiError = toError(e);
         }
 
@@ -975,11 +977,11 @@ export class DisplayAnki {
      * @param {boolean} canAdd
      * @returns {import('anki').NoteInfoWrapper[]}
      */
-    _getAnkiNoteInfoForceValue(notes, canAdd) {
+    _getAnkiNoteInfoForceValueIfValid(notes, canAdd) {
         const results = [];
         for (const note of notes) {
             const valid = isNoteDataValid(note);
-            results.push({canAdd, valid, noteIds: null});
+            results.push({canAdd: (valid ? canAdd : valid), valid, noteIds: null});
         }
         return results;
     }
@@ -1065,13 +1067,14 @@ export class DisplayAnki {
      */
     _getAnkiNoteMediaAudioDetails(details) {
         if (details.type !== 'term') { return null; }
-        const {sources, preferredAudioIndex} = this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading);
+        const {sources, preferredAudioIndex, enableDefaultAudioSources} = this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading);
         const languageSummary = this._display.getLanguageSummary();
         return {
             sources,
             preferredAudioIndex,
             idleTimeout: this._audioDownloadIdleTimeout,
             languageSummary,
+            enableDefaultAudioSources,
         };
     }
 

@@ -38,8 +38,6 @@ export class ProfileController {
         /** @type {HTMLSelectElement} */
         this._profileActiveSelect = querySelectorNotNull(document, '#profile-active-select');
         /** @type {HTMLSelectElement} */
-        this._profileTargetSelect = querySelectorNotNull(document, '#profile-target-select');
-        /** @type {HTMLSelectElement} */
         this._profileCopySourceSelect = querySelectorNotNull(document, '#profile-copy-source-select');
         /** @type {HTMLElement} */
         this._resetProfileNameElement = querySelectorNotNull(document, '#profile-reset-name');
@@ -96,7 +94,6 @@ export class ProfileController {
         this._profileEntriesSupported = (this._profileEntryListContainer !== null);
 
         if (this._profileActiveSelect !== null) { this._profileActiveSelect.addEventListener('change', this._onProfileActiveChange.bind(this), false); }
-        if (this._profileTargetSelect !== null) { this._profileTargetSelect.addEventListener('change', this._onProfileTargetChange.bind(this), false); }
         if (this._profileAddButton !== null) { this._profileAddButton.addEventListener('click', this._onAdd.bind(this), false); }
         if (this._profileResetConfirmButton !== null) { this._profileResetConfirmButton.addEventListener('click', this._onResetConfirm.bind(this), false); }
         if (this._profileRemoveConfirmButton !== null) { this._profileRemoveConfirmButton.addEventListener('click', this._onDeleteConfirm.bind(this), false); }
@@ -150,6 +147,7 @@ export class ProfileController {
         const profileEntry = this._getProfileEntry(profileIndex);
         if (profileEntry !== null) { profileEntry.setIsDefault(true); }
 
+        this._settingsController.profileIndex = profileIndex;
         await this._settingsController.setGlobalSetting('profileCurrent', profileIndex);
     }
 
@@ -208,9 +206,6 @@ export class ProfileController {
             deleteCount: 0,
             items: [newProfile],
         }]);
-
-        // Update profile index
-        this._settingsController.profileIndex = index;
     }
 
     /**
@@ -242,7 +237,7 @@ export class ProfileController {
 
         // Get indices
         let profileCurrentNew = this._profileCurrent;
-        const settingsProfileIndex = this._settingsController.profileIndex;
+        const settingsProfileIndex = this._profileCurrent;
 
         // Construct settings modifications
         /** @type {import('settings-modifications').Modification[]} */
@@ -434,11 +429,11 @@ export class ProfileController {
 
         const settingsProfileIndex = this._settingsController.profileIndex;
 
-        // Udpate UI
+        // Update UI
         this._updateProfileSelectOptions();
+        void this.setDefaultProfile(profileCurrent);
 
         /** @type {HTMLSelectElement} */ (this._profileActiveSelect).value = `${profileCurrent}`;
-        /** @type {HTMLSelectElement} */ (this._profileTargetSelect).value = `${settingsProfileIndex}`;
 
         // Update profile conditions
         this._profileConditionsUI.cleanup();
@@ -447,7 +442,7 @@ export class ProfileController {
             void this._profileConditionsUI.prepare(settingsProfileIndex);
         }
 
-        // Udpate profile entries
+        // Update profile entries
         for (const entry of this._profileEntryList) {
             entry.cleanup();
         }
@@ -467,16 +462,6 @@ export class ProfileController {
         const value = this._tryGetValidProfileIndex(element.value);
         if (value === null) { return; }
         void this.setDefaultProfile(value);
-    }
-
-    /**
-     * @param {Event} e
-     */
-    _onProfileTargetChange(e) {
-        const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        const value = this._tryGetValidProfileIndex(element.value);
-        if (value === null) { return; }
-        this._settingsController.profileIndex = value;
     }
 
     /** */
@@ -588,7 +573,6 @@ export class ProfileController {
     _getAllProfileSelects() {
         return [
             /** @type {HTMLSelectElement} */ (this._profileActiveSelect),
-            /** @type {HTMLSelectElement} */ (this._profileTargetSelect),
             /** @type {HTMLSelectElement} */ (this._profileCopySourceSelect),
         ];
     }

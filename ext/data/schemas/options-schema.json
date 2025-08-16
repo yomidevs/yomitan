@@ -127,7 +127,9 @@
                                     "stickySearchHeader",
                                     "fontFamily",
                                     "fontSize",
-                                    "lineHeight"
+                                    "lineHeight",
+                                    "enableYomitanApi",
+                                    "yomitanApiServer"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -336,6 +338,14 @@
                                     "stickySearchHeader": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "enableYomitanApi": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "yomitanApiServer": {
+                                        "type": "string",
+                                        "default": "http://127.0.0.1:19633"
                                     }
                                 }
                             },
@@ -397,7 +407,8 @@
                                     "volume",
                                     "autoPlay",
                                     "fallbackSoundType",
-                                    "sources"
+                                    "sources",
+                                    "enableDefaultAudioSources"
                                 ],
                                 "properties": {
                                     "enabled": {
@@ -456,6 +467,10 @@
                                             }
                                         },
                                         "default": []
+                                    },
+                                    "enableDefaultAudioSources": {
+                                        "type": "boolean",
+                                        "default": true
                                     }
                                 }
                             },
@@ -668,6 +683,7 @@
                                     "preventMiddleMouse": {
                                         "type": "object",
                                         "required": [
+                                            "onTextHover",
                                             "onWebPages",
                                             "onPopupPages",
                                             "onSearchPages",
@@ -1070,7 +1086,7 @@
                                     "duplicateBehavior": {
                                         "type": "string",
                                         "enum": ["prevent", "overwrite", "new"],
-                                        "default": "prevent"
+                                        "default": "new"
                                     },
                                     "fieldTemplates": {
                                         "type": ["string", "null"],

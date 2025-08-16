@@ -39,7 +39,7 @@
         "test:unit:options": "vitest run --config test/data/vitest.options.config.json",
         "test:build": "node ./dev/bin/build.js --dryRun --all",
         "license-report:html": "license-report --output=html --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link --html.cssFile=dev/data/legal-npm.css > ext/legal-npm.html",
-        "license-report:markdown": "license-report --output=markdown --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link",
+        "license-report:markdown": "license-report --output=markdown --only=prod --fields=name --fields=licenseType --fields=link",
         "prepare": "husky"
     },
     "repository": {
@@ -117,8 +117,10 @@
         "dexie": "^4.0.10",
         "dexie-export-import": "^4.1.4",
         "hangul-js": "^0.2.6",
+        "kanji-processor": "^1.0.2",
         "parse5": "^7.2.1",
-        "yomitan-handlebars": "git+https://github.com/yomidevs/yomitan-handlebars.git#12aff5e3550954d7d3a98a5917ff7d579f3cce25"
+        "yomitan-handlebars": "git+https://github.com/yomidevs/yomitan-handlebars.git#12aff5e3550954d7d3a98a5917ff7d579f3cce25",
+        "linkedom": "^0.18.10"
     },
     "lint-staged": {
         "*.md": "prettier --write"

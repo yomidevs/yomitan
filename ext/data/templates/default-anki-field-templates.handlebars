@@ -134,6 +134,23 @@
     {{~> glossary brief=true ~}}
 {{/inline}}
 
+{{~#*inline "glossary-plain"~}}
+    {{~#scope~}}
+        {{~#each definition.definitions~}}
+            {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                {{~#unless ../noDictionaryTag~}}
+                    ({{dictionaryAlias}})<br>
+                {{~/unless~}}
+                {{#each glossary}}{{{formatGlossaryPlain ../dictionary .}}}{{#unless @last}}<br>{{/unless}}{{/each}}{{#unless @last}}<br>{{/unless}}
+            {{~/unless~}}
+        {{~/each~}}
+    {{~/scope~}}
+{{~/inline~}}
+
+{{#*inline "glossary-plain-no-dictionary"~}}
+    {{~> glossary-plain noDictionaryTag=true ~}}
+{{/inline}}
+
 {{~#*inline "glossary-first"~}}
     <div style="text-align: left;" class="yomitan-glossary">
     {{~#scope~}}
@@ -234,7 +251,7 @@
 
 {{! Pitch Accents }}
 {{#*inline "pitch-accent-item"}}
-    {{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
+    {{~pronunciation format=format reading=reading pitchPositions=positions nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
 {{/inline}}
 
 {{#*inline "pitch-accent-item-disambiguation"}}
@@ -341,17 +358,29 @@
     {{~#if (op ">" definition.frequencies.length 0)~}}
         <ul style="text-align: left;">
         {{~#each definition.frequencies~}}
-            <li>
-            {{~#if (op "!==" ../definition.type "kanji")~}}
-                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
-                    {{~furigana expression reading~}}
-                ) {{/if~}}
-            {{~/if~}}
-            {{~dictionaryAlias}}: {{frequency~}}
-            </li>
+            {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                <li>
+                {{~#if (op "!==" ../definition.type "kanji")~}}
+                    {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
+                        {{~furigana expression reading~}}
+                    ) {{/if~}}
+                {{~/if~}}
+                {{~dictionaryAlias}}: {{frequency~}}
+                </li>
+            {{~/unless~}}
         {{~/each~}}
         </ul>
     {{~/if~}}
+{{/inline}}
+
+{{#*inline "single-frequency-number"}}
+    {{~#if (op ">" definition.frequencyNumbers.length 0)~}}
+        {{~#each definition.frequencyNumbers~}}
+            {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                    {{frequency~}}
+            {{~/unless~}}
+        {{~/each~}}
+    {{/if}}
 {{/inline}}
 
 {{#*inline "frequency-harmonic-rank"}}

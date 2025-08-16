@@ -88,7 +88,7 @@ export type PitchGroup = {
 export type Pitch = {
     expressions: string[];
     reading: string;
-    position: number;
+    positions: number | string;
     nasalPositions: number[];
     devoicePositions: number[];
     tags: PitchTag[];
@@ -187,12 +187,14 @@ export type TermDictionaryEntry = {
     readonly reading: string | string[];
     readonly expressions: TermHeadword[];
     readonly glossary?: DictionaryData.TermGlossary[];
+    readonly glossaryPlain?: string[];
     readonly glossaryScopedStyles?: string;
     readonly dictScopedStyles?: string;
     readonly definitionTags?: Tag[];
     readonly termTags?: Tag[];
     readonly definitions?: TermDefinition[];
     readonly frequencies: TermFrequency[];
+    readonly frequencyNumbers: FrequencyNumber[];
     readonly frequencyHarmonic: number;
     readonly frequencyAverage: number;
     readonly pitches: TermPitchAccent[];
@@ -249,6 +251,11 @@ export type TermFrequency = {
     frequency: number | string;
 };
 
+export type FrequencyNumber = {
+    dictionary: string;
+    frequency: number;
+};
+
 export type TermPitchAccent = {
     index: number;
     expressionIndex: number;
@@ -263,7 +270,7 @@ export type TermPitchAccent = {
 };
 
 export type PitchAccent = {
-    position: number;
+    positions: number | string;
     tags: Tag[];
 };
 

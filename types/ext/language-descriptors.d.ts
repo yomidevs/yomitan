@@ -97,6 +97,9 @@ type AllTextProcessors = {
             convertHaToTaMarbuta: TextProcessor<boolean>;
         };
     };
+    bg: {
+        pre: CapitalizationPreprocessors;
+    };
     cs: {
         pre: CapitalizationPreprocessors;
     };
@@ -144,6 +147,9 @@ type AllTextProcessors = {
             convertLatinToGreek: TextProcessor<boolean>;
         };
     };
+    haw: {
+        pre: CapitalizationPreprocessors;
+    };
     he: Record<string, never>;
     hi: Record<string, never>;
     hu: {
@@ -174,8 +180,10 @@ type AllTextProcessors = {
             alphanumericWidthVariants: BidirectionalConversionPreprocessor;
             convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
             collapseEmphaticSequences: TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
+            standardizeKanji: TextProcessor<boolean>;
         };
     };
+    ka: Record<string, never>;
     ko: {
         pre: {
             disassembleHangul: TextProcessor<boolean>;
@@ -232,6 +240,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     tr: {
+        pre: CapitalizationPreprocessors;
+    };
+    tok: {
         pre: CapitalizationPreprocessors;
     };
     uk: {

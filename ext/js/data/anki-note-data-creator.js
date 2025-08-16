@@ -17,7 +17,7 @@
  */
 
 import {getAnkiCompactGlossStyles} from '../../data/anki-compact-gloss-style.js';
-import {addScopeToCssLegacy} from '../core/utilities.js';
+import {addScopeToCss} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../dictionary/dictionary-data-util.js';
 import {distributeFurigana, distributeFuriganaInflected} from '../language/ja/japanese.js';
 
@@ -63,7 +63,7 @@ export function createAnkiNoteData(marker, {
         compactTags,
         group: (resultOutputMode === 'group'),
         merge: (resultOutputMode === 'merge'),
-        compactGlossaries: (['compact', 'compact-popup-anki'].includes(glossaryLayoutMode)),
+        compactGlossaries: (glossaryLayoutMode === 'compact-popup-anki'),
         get uniqueExpressions() { return getCachedValue(uniqueExpressions); },
         get uniqueReadings() { return getCachedValue(uniqueReadings); },
         get pitches() { return getCachedValue(pitches); },
@@ -171,7 +171,7 @@ function getPublicContext(context) {
 
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
- * @returns {number[]}
+ * @returns {import('anki-templates').FrequencyNumber[]}
  */
 function getFrequencyNumbers(dictionaryEntry) {
     let previousDictionary;
@@ -183,17 +183,17 @@ function getFrequencyNumbers(dictionaryEntry) {
         previousDictionary = dictionary;
 
         if (displayValue !== null) {
-            const frequencyMatch = displayValue.match(/\d+/);
+            const frequencyMatch = displayValue.match(/^\d+/);
             if (frequencyMatch !== null) {
                 const frequencyParsed = Number.parseInt(frequencyMatch[0], 10);
                 if (frequencyParsed > 0) {
-                    frequencies.push(frequencyParsed);
+                    frequencies.push({dictionary: dictionary, frequency: frequencyParsed});
                     continue;
                 }
             }
         }
         if (frequency > 0) {
-            frequencies.push(frequency);
+            frequencies.push({dictionary: dictionary, frequency: frequency});
         }
     }
     return frequencies;
@@ -212,7 +212,7 @@ function getFrequencyHarmonic(dictionaryEntry) {
 
     let total = 0;
     for (const frequency of frequencies) {
-        total += 1 / frequency;
+        total += 1 / frequency.frequency;
     }
     return Math.floor(frequencies.length / total);
 }
@@ -230,7 +230,7 @@ function getFrequencyAverage(dictionaryEntry) {
 
     let total = 0;
     for (const frequency of frequencies) {
-        total += frequency;
+        total += frequency.frequency;
     }
     return Math.floor(total / frequencies.length);
 }
@@ -249,12 +249,12 @@ function getPitches(dictionaryEntry) {
             for (const groupedPronunciation of pronunciations) {
                 const {pronunciation} = groupedPronunciation;
                 if (pronunciation.type !== 'pitch-accent') { continue; }
-                const {position, nasalPositions, devoicePositions, tags} = pronunciation;
+                const {positions, nasalPositions, devoicePositions, tags} = pronunciation;
                 const {terms, reading, exclusiveTerms, exclusiveReadings} = groupedPronunciation;
                 pitches.push({
                     expressions: terms,
                     reading,
-                    position,
+                    positions,
                     nasalPositions,
                     devoicePositions,
                     tags: convertPitchTags(tags),
@@ -441,6 +441,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
     const termTags = createCachedValue(getTermTags.bind(null, dictionaryEntry, type));
     const expressions = createCachedValue(getTermExpressions.bind(null, dictionaryEntry));
     const frequencies = createCachedValue(getTermFrequencies.bind(null, dictionaryEntry));
+    const frequencyNumbers = createCachedValue(getFrequencyNumbers.bind(null, dictionaryEntry));
     const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry));
     const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry));
     const pitches = createCachedValue(getTermPitches.bind(null, dictionaryEntry));
@@ -483,6 +484,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
         get termTags() { return getCachedValue(termTags); },
         get definitions() { return getCachedValue(commonInfo).definitions; },
         get frequencies() { return getCachedValue(frequencies); },
+        get frequencyNumbers() { return getCachedValue(frequencyNumbers); },
         get frequencyHarmonic() { return getCachedValue(frequencyHarmonic); },
         get frequencyAverage() { return getCachedValue(frequencyAverage); },
         get pitches() { return getCachedValue(pitches); },
@@ -587,7 +589,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
  * @returns {string}
  */
 function addGlossaryScopeToCss(css) {
-    return addScopeToCssLegacy(css, '.yomitan-glossary');
+    return addScopeToCss(css, '.yomitan-glossary');
 }
 
 /**
@@ -600,7 +602,7 @@ function addDictionaryScopeToCss(css, dictionaryTitle) {
         .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"');
 
-    return addScopeToCssLegacy(css, `[data-dictionary="${escapedTitle}"]`);
+    return addScopeToCss(css, `[data-dictionary="${escapedTitle}"]`);
 }
 
 /**
@@ -662,10 +664,10 @@ function getTermPitches(dictionaryEntry) {
  */
 function getTermPitchesInner(pitches) {
     const results = [];
-    for (const {position, tags} of pitches) {
+    for (const {positions, tags} of pitches) {
         const cachedTags = createCachedValue(convertTags.bind(null, tags));
         results.push({
-            position,
+            positions,
             get tags() { return getCachedValue(cachedTags); },
         });
     }

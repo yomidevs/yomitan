@@ -70,6 +70,7 @@ export type AudioSourceShort = {
 export type AudioMediaOptions = {
     sources: Audio.AudioSourceInfo[];
     preferredAudioIndex: number | null;
+    enableDefaultAudioSources: boolean;
 };
 
 export type PlayAudioResult = {

@@ -83,7 +83,7 @@ export function createTestAnkiNoteData(dictionaryEntry, mode, styles = '') {
  * @returns {Promise<import('anki').NoteFields[]>}
  */
 export async function getTemplateRenderResults(dictionaryEntries, mode, template, expect, styles = '') {
-    const ankiTemplateRenderer = new AnkiTemplateRenderer();
+    const ankiTemplateRenderer = new AnkiTemplateRenderer(document, window);
     await ankiTemplateRenderer.prepare();
     const clozePrefix = 'cloze-prefix';
     const clozeSuffix = 'cloze-suffix';

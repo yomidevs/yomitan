@@ -195,18 +195,16 @@ h1 {
 }
 #search-settings-button {
     margin-right: 0;
+    float: right;
 }
-.search-options-left {
-    display: flex;
-    flex-flow: row wrap;
-    align-items: center;
+.search-options-right {
+    flex: 1;
 }
 .search-options {
     display: flex;
     flex-flow: row wrap;
     margin: 0.5em 0 0 0;
     align-items: center;
-    justify-content: space-between;
 }
 .search-option {
     flex: 0 1 auto;

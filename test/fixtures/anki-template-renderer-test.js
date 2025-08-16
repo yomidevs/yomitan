@@ -27,7 +27,9 @@ vi.stubGlobal('fetch', fetch);
  */
 export async function createAnkiTemplateRendererTest() {
     const test = createDomTest(void 0);
-    const ankiTemplateRenderer = new AnkiTemplateRenderer();
+    // @ts-expect-error - Document and Window are not accessible in this test and is not accessed, allow it to be undefined
+    // eslint-disable-next-line no-undefined
+    const ankiTemplateRenderer = new AnkiTemplateRenderer(undefined, undefined);
     await ankiTemplateRenderer.prepare();
     /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, ankiTemplateRenderer: AnkiTemplateRenderer}>} */
     // eslint-disable-next-line sonarjs/prefer-immediate-return

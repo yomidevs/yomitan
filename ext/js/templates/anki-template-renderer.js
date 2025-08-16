@@ -17,9 +17,10 @@
  */
 
 import {Handlebars} from '../../lib/handlebars.js';
+import {NodeFilter} from '../../lib/linkedom.js';
 import {createAnkiNoteData} from '../data/anki-note-data-creator.js';
 import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
-import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationGraphJJ, createPronunciationText} from '../display/pronunciation-generator.js';
+import {PronunciationGenerator} from '../display/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../display/structured-content-generator.js';
 import {CssStyleApplier} from '../dom/css-style-applier.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../language/ja/japanese.js';
@@ -34,8 +35,10 @@ import {TemplateRenderer} from './template-renderer.js';
 export class AnkiTemplateRenderer {
     /**
      * Creates a new instance of the class.
+     * @param {Document} document
+     * @param {Window} window
      */
-    constructor() {
+    constructor(document, window) {
         /** @type {CssStyleApplier} */
         this._structuredContentStyleApplier = new CssStyleApplier('/data/structured-content-style.json');
         /** @type {CssStyleApplier} */
@@ -54,6 +57,12 @@ export class AnkiTemplateRenderer {
         this._cleanupCallbacks = [];
         /** @type {?HTMLElement} */
         this._temporaryElement = null;
+        /** @type {Document} */
+        this._document = document;
+        /** @type {Window} */
+        this._window = window;
+        /** @type {PronunciationGenerator} */
+        this._pronunciationGenerator = new PronunciationGenerator(this._document);
     }
 
     /**
@@ -92,6 +101,7 @@ export class AnkiTemplateRenderer {
             ['concat',           this._concat.bind(this)],
             ['pitchCategories',  this._pitchCategories.bind(this)],
             ['formatGlossary',   this._formatGlossary.bind(this)],
+            ['formatGlossaryPlain', this._formatGlossaryPlain.bind(this)],
             ['hasMedia',         this._hasMedia.bind(this)],
             ['getMedia',         this._getMedia.bind(this)],
             ['pronunciation',    this._pronunciation.bind(this)],
@@ -546,8 +556,8 @@ export class AnkiTemplateRenderer {
             const {reading, wordClasses} = headwords[headwordIndex];
             const isVerbOrAdjective = isNonNounVerbOrAdjective(wordClasses);
             const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
-            for (const {position} of pitches) {
-                const category = getPitchCategory(reading, position, isVerbOrAdjective);
+            for (const {positions} of pitches) {
+                const category = getPitchCategory(reading, positions, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);
                 }
@@ -562,7 +572,7 @@ export class AnkiTemplateRenderer {
     _getTemporaryElement() {
         let element = this._temporaryElement;
         if (element === null) {
-            element = document.createElement('div');
+            element = this._document.createElement('div');
             this._temporaryElement = element;
         }
         return element;
@@ -574,6 +584,14 @@ export class AnkiTemplateRenderer {
      */
     _getStructuredContentHtml(node) {
         return this._getHtml(node, this._structuredContentStyleApplier, this._structuredContentDatasetKeyIgnorePattern);
+    }
+
+    /**
+     * @param {Element} node
+     * @returns {string}
+     */
+    _getStructuredContentText(node) {
+        return this._getText(node, this._structuredContentStyleApplier, this._structuredContentDatasetKeyIgnorePattern);
     }
 
     /**
@@ -600,13 +618,39 @@ export class AnkiTemplateRenderer {
     }
 
     /**
+     * @param {Element} node
+     * @param {CssStyleApplier} styleApplier
+     * @param {?RegExp} datasetKeyIgnorePattern
+     * @returns {string}
+     */
+    _getText(node, styleApplier, datasetKeyIgnorePattern) {
+        const container = this._getTemporaryElement();
+        container.appendChild(node);
+        this._normalizeHtml(container, styleApplier, datasetKeyIgnorePattern);
+        const result = container.innerHTML
+            .replaceAll(/<(div|li|ol|ul|br|details|summary|hr)(\s.*?>|>)/g, '\n') // tags that usually cause line breaks
+            .replaceAll(/<(span|a|ruby)(\s.*?>|>)/g, ' ') // tags that usually signify some change in content
+            .replaceAll(/<rt(\s.*?>|>)/g, '[') // ruby start
+            .replaceAll('</rt>', ']') // ruby end
+            .replaceAll(/<.*?>/gs, '') // remove all remaining tags
+            .replaceAll('<', '&lt;') // escape remaining <
+            .replaceAll('>', '&rt;') // and >
+            .replaceAll(/\n+/g, '<br>') // convert newlines into linebreaks and condense newlines
+            .replaceAll(/^(\s*<br>\s*|\s)*/g, '') // remove leading linebreaks and whitespace
+            .replaceAll('<br>', '<br>\n');
+        container.textContent = '';
+        return this._safeString(result);
+    }
+
+    /**
      * @param {Element} root
      * @param {CssStyleApplier} styleApplier
      * @param {?RegExp} datasetKeyIgnorePattern
      */
     _normalizeHtml(root, styleApplier, datasetKeyIgnorePattern) {
-        const {ELEMENT_NODE, TEXT_NODE} = Node;
-        const treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+        const TEXT_NODE = this._document.TEXT_NODE;
+        const ELEMENT_NODE = this._document.ELEMENT_NODE;
+        const treeWalker = this._document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
         /** @type {HTMLElement[]} */
         const elements = [];
         /** @type {Text[]} */
@@ -644,10 +688,10 @@ export class AnkiTemplateRenderer {
         if (parts.length <= 1) { return; }
         const {parentNode} = textNode;
         if (parentNode === null) { return; }
-        const fragment = document.createDocumentFragment();
+        const fragment = this._document.createDocumentFragment();
         for (let i = 0, ii = parts.length; i < ii; ++i) {
-            if (i > 0) { fragment.appendChild(document.createElement('br')); }
-            fragment.appendChild(document.createTextNode(parts[i]));
+            if (i > 0) { fragment.appendChild(this._document.createElement('br')); }
+            fragment.appendChild(this._document.createTextNode(parts[i]));
         }
         parentNode.replaceChild(fragment, textNode);
     }
@@ -658,7 +702,7 @@ export class AnkiTemplateRenderer {
      */
     _createStructuredContentGenerator(data) {
         const contentManager = new AnkiTemplateRendererContentManager(this._mediaProvider, data);
-        const instance = new StructuredContentGenerator(contentManager, document);
+        const instance = new StructuredContentGenerator(contentManager, this._document, this._window);
         this._cleanupCallbacks.push(() => contentManager.unloadAll());
         return instance;
     }
@@ -712,6 +756,74 @@ export class AnkiTemplateRenderer {
     }
 
     /**
+     * @type {import('template-renderer').HelperFunction<string>}
+     */
+    _formatGlossaryPlain(args, _context, options) {
+        const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
+        const data = this._getNoteDataFromOptions(options);
+        if (typeof content === 'string') { return this._safeString(content); }
+        if (!(typeof content === 'object' && content !== null)) { return ''; }
+        const structuredContentGenerator = this._createStructuredContentGenerator(data);
+        switch (content.type) {
+            case 'image': return '';
+            case 'structured-content': {
+                const glossaryStrings = this._extractGlossaryData(content, structuredContentGenerator);
+                if (glossaryStrings.length > 0) {
+                    return glossaryStrings.join('<br>\n');
+                } else {
+                    const node = structuredContentGenerator.createStructuredContent(content.content, dictionary);
+                    return node !== null ? this._getStructuredContentText(node) : '';
+                }
+            }
+            case 'text': return this._safeString(content.text);
+        }
+        return '';
+    }
+
+    /**
+     * @param {import('dictionary-data').TermGlossaryStructuredContent} content
+     * @param {StructuredContentGenerator} structuredContentGenerator
+     * @returns {string[]}
+     */
+    _extractGlossaryData(content, structuredContentGenerator) {
+        /** @type {import('structured-content.js').Content[]} */
+        const glossaryContentQueue = [];
+        const structuredContentQueue = [content.content];
+        while (structuredContentQueue.length > 0) {
+            const structuredContent = structuredContentQueue.pop();
+            if (Array.isArray(structuredContent)) {
+                structuredContentQueue.push(...structuredContent);
+            } else if (typeof structuredContent === 'object' && structuredContent.content) {
+                // @ts-expect-error - Checking if `data` exists
+                if (structuredContent.data?.content === 'glossary') {
+                    glossaryContentQueue.push(structuredContent);
+                    continue;
+                }
+                structuredContentQueue.push(structuredContent.content);
+            }
+        }
+
+        /** @type {string[]} */
+        const rawGlossaryContent = [];
+        while (glossaryContentQueue.length > 0) {
+            const structuredGloss = glossaryContentQueue.pop();
+            if (typeof structuredGloss === 'string') {
+                rawGlossaryContent.push(structuredGloss);
+            } else if (Array.isArray(structuredGloss)) {
+                glossaryContentQueue.push(...structuredGloss);
+            } else if (typeof structuredGloss === 'object' && structuredGloss.content) {
+                if (structuredGloss.tag === 'ruby') {
+                    const node = structuredContentGenerator.createStructuredContent(structuredGloss.content, '');
+                    rawGlossaryContent.push(node !== null ? this._getStructuredContentText(node) : '');
+                    continue;
+                }
+                glossaryContentQueue.push(structuredGloss.content);
+            }
+        }
+        return rawGlossaryContent;
+    }
+
+    /**
      * @type {import('template-renderer').HelperFunction<boolean>}
      */
     _hasMedia(args, _context, options) {
@@ -731,12 +843,12 @@ export class AnkiTemplateRenderer {
      * @type {import('template-renderer').HelperFunction<string>}
      */
     _pronunciation(_args, _context, options) {
-        const {format, reading, downstepPosition} = options.hash;
+        const {format, reading, pitchPositions} = options.hash;
 
         if (
             typeof reading !== 'string' ||
             reading.length === 0 ||
-            typeof downstepPosition !== 'number'
+            (typeof pitchPositions !== 'number' && typeof pitchPositions !== 'string')
         ) {
             return '';
         }
@@ -747,14 +859,14 @@ export class AnkiTemplateRenderer {
             {
                 const nasalPositions = this._getValidNumberArray(options.hash.nasalPositions);
                 const devoicePositions = this._getValidNumberArray(options.hash.devoicePositions);
-                return this._getPronunciationHtml(createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationText(morae, pitchPositions, nasalPositions, devoicePositions));
             }
             case 'graph':
-                return this._getPronunciationHtml(createPronunciationGraph(morae, downstepPosition));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraph(morae, pitchPositions));
             case 'graph-jj':
-                return this._getPronunciationHtml(createPronunciationGraphJJ(morae, downstepPosition));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraphJJ(morae, pitchPositions));
             case 'position':
-                return this._getPronunciationHtml(createPronunciationDownstepPosition(downstepPosition));
+                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationDownstepPosition(pitchPositions));
             default:
                 return '';
         }
