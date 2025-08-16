@@ -130,7 +130,8 @@ export class DictionaryImporter {
 
         // Load data
         const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
-        this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
+        // termFiles is doubled due to media importing
+        this._progressNextStep((termFiles.length * 2) + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
 
         let termListLength = 0;
         let mediaLength = 0;
@@ -169,6 +170,9 @@ export class DictionaryImporter {
             let {media} = await this._resolveAsyncRequirements(filteredRequirements, fileMap);
             await bulkAdd('media', media);
             mediaLength += media.length;
+
+            ++this._progressData.index;
+            this._progress();
 
             await bulkAdd('terms', termList);
             termListLength += termList.length;
@@ -627,8 +631,6 @@ export class DictionaryImporter {
             default:
                 return;
         }
-        ++this._progressData.index;
-        this._progress();
     }
 
     /**
