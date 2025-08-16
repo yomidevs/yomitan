@@ -599,7 +599,7 @@ export class DictionaryImportController {
             {label: 'Initializing import'}, // Dictionary import is uninitialized
             {label: 'Loading dictionary'}, // Load dictionary archive and validate index
             {label: 'Loading schemas'}, // Load schemas and get archive files
-            {label: 'Validating and importing data'}, // Load, validate, and import dictionary data
+            {label: 'Validating and importing data {fileCount}'}, // Load, validate, and import dictionary data
             {label: 'Finalizing import', callback: this._triggerStorageChanged.bind(this)}, // Add dictionary descriptor
         ];
     }
@@ -912,7 +912,7 @@ export class ImportProgressTracker {
         if (nextStep) {
             this._stepIndex++;
         }
-        const labelText = `${this.statusPrefix} - Step ${this._stepIndex + 1} of ${this.stepCount}: ${this.currentStep.label}...`;
+        const labelText = `${this.statusPrefix} - Step ${this._stepIndex + 1} of ${this.stepCount}: ${this.currentStep.label}...`.replace('{fileCount}', `(${index}/${count} files)`);
         for (const label of this._infoLabels) { label.textContent = labelText; }
 
         const percent = count > 0 ? (index / count * 100) : 0;
