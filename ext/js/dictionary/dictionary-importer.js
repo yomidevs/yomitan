@@ -177,6 +177,7 @@ export class DictionaryImporter {
             await bulkAdd('terms', termList);
             termListLength += termList.length;
 
+            ++this._progressData.index;
             this._progress();
 
             termList = [];
@@ -190,6 +191,7 @@ export class DictionaryImporter {
             await bulkAdd('termMeta', termMetaList);
             termMetaListLength += this._getMetaCounts(termMetaList).total;
 
+            ++this._progressData.index;
             this._progress();
 
             termMetaList = [];
@@ -206,6 +208,7 @@ export class DictionaryImporter {
             await bulkAdd('kanji', kanjiList);
             kanjiListLength += kanjiList.length;
 
+            ++this._progressData.index;
             this._progress();
 
             kanjiList = [];
@@ -218,6 +221,7 @@ export class DictionaryImporter {
             await bulkAdd('kanjiMeta', kanjiMetaList);
             kanjiMetaListLength += this._getMetaCounts(kanjiMetaList).total;
 
+            ++this._progressData.index;
             this._progress();
 
             kanjiMetaList = [];
@@ -231,6 +235,7 @@ export class DictionaryImporter {
             await bulkAdd('tagMeta', tagList);
             tagListLength += tagList.length;
 
+            ++this._progressData.index;
             this._progress();
 
             tagList = [];
@@ -884,9 +889,6 @@ export class DictionaryImporter {
      * @returns {Promise<TResult[]>}
      */
     async _readFileSequence(files, convertEntry, schemaName, dictionaryTitle) {
-        const progressData = this._progressData;
-        let startIndex = 0;
-
         const results = [];
         for (const file of files) {
             const content = await this._getData(file, new TextWriter());
@@ -901,16 +903,10 @@ export class DictionaryImporter {
                 }
             }
 
-            startIndex = progressData.index;
-            this._progress();
-
             const schema = ajvSchemas[schemaName];
             if (!schema(entries)) {
                 throw this._formatAjvSchemaError(schema, file.filename);
             }
-
-            progressData.index = startIndex + 1;
-            this._progress();
 
             if (Array.isArray(entries)) {
                 for (const entry of /** @type {TEntry[]} */ (entries)) {
