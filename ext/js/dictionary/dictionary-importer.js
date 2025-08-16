@@ -186,12 +186,19 @@ export class DictionaryImporter {
             media = [];
         }
 
-        let termMetaListLength = 0;
+        /** @type {Record<string, number>} */
+        const termMetaListLength = {total: 0};
         for (const termMetaFile of termMetaFiles) {
             let termMetaList = await this._readFileSequence([termMetaFile], this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
 
             await bulkAdd('termMeta', termMetaList);
-            termMetaListLength += this._getMetaCounts(termMetaList).total;
+            for (const [key, value] of Object.entries(this._getMetaCounts(termMetaList))) {
+                if (key in termMetaListLength) {
+                    termMetaListLength[key] += value;
+                } else {
+                    termMetaListLength[key] = value;
+                }
+            }
 
             ++this._progressData.index;
             this._progress();
@@ -216,12 +223,19 @@ export class DictionaryImporter {
             kanjiList = [];
         }
 
-        let kanjiMetaListLength = 0;
+        /** @type {Record<string, number>} */
+        const kanjiMetaListLength = {total: 0};
         for (const kanjiMetaFile of kanjiMetaFiles) {
             let kanjiMetaList = await this._readFileSequence([kanjiMetaFile], this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
 
             await bulkAdd('kanjiMeta', kanjiMetaList);
-            kanjiMetaListLength += this._getMetaCounts(kanjiMetaList).total;
+            for (const [key, value] of Object.entries(this._getMetaCounts(kanjiMetaList))) {
+                if (key in kanjiMetaListLength) {
+                    kanjiMetaListLength[key] += value;
+                } else {
+                    kanjiMetaListLength[key] = value;
+                }
+            }
 
             ++this._progressData.index;
             this._progress();
@@ -249,9 +263,9 @@ export class DictionaryImporter {
         /** @type {import('dictionary-importer').SummaryCounts} */
         const counts = {
             terms: {total: termListLength},
-            termMeta: {total: termMetaListLength},
+            termMeta: termMetaListLength,
             kanji: {total: kanjiListLength},
-            kanjiMeta: {total: kanjiMetaListLength},
+            kanjiMeta: kanjiMetaListLength,
             tagMeta: {total: tagListLength},
             media: {total: mediaLength},
         };

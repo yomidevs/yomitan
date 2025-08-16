@@ -86,7 +86,7 @@ export type SummaryItemCount = {
 };
 
 export type SummaryMetaCount = {
-    total: number;
+    [total: string]: number;
     [key: string]: number;
 };
 
