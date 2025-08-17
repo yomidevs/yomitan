@@ -66,6 +66,8 @@ class DictionaryEntry {
         /** @type {HTMLButtonElement} */
         this._integrityButtonWarning = querySelectorNotNull(fragment, '.dictionary-integrity-button-warning');
         /** @type {HTMLButtonElement} */
+        this._integrityButtonError = querySelectorNotNull(fragment, '.dictionary-integrity-button-error');
+        /** @type {HTMLButtonElement} */
         this._updatesAvailable = querySelectorNotNull(fragment, '.dictionary-update-available');
         /** @type {HTMLElement} */
         this._aliasNode = querySelectorNotNull(fragment, '.dictionary-alias');
@@ -84,7 +86,7 @@ class DictionaryEntry {
     prepare() {
         //
         const index = this._index;
-        const {revision, version} = this._dictionaryInfo;
+        const {revision, version, importSuccess} = this._dictionaryInfo;
 
         this._aliasNode.dataset.setting = `dictionaries[${index}].alias`;
         this._versionNode.textContent = `rev.${revision}`;
@@ -100,6 +102,10 @@ class DictionaryEntry {
         this._eventListeners.addEventListener(this._integrityButtonCheck, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButtonWarning, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._updatesAvailable, 'click', this._onUpdateButtonClick.bind(this), false);
+
+        if (importSuccess === false) {
+            this._integrityButtonError.hidden = false;
+        }
 
         this.setCounts(this._databaseCounts);
     }

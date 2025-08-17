@@ -144,120 +144,129 @@ export class DictionaryImporter {
 
         let termListLength = 0;
         let mediaLength = 0;
-        const uniqueMediaPaths = new Set();
-        for (const termFile of termFiles) {
+        /** @type {Record<string, number>} */
+        const termMetaListLength = {total: 0};
+        let kanjiListLength = 0;
+        /** @type {Record<string, number>} */
+        const kanjiMetaListLength = {total: 0};
+        let tagListLength = 0;
+
+        let importSuccess = false;
+
+        try {
+            const uniqueMediaPaths = new Set();
+            for (const termFile of termFiles) {
             /** @type {import('dictionary-importer').ImportRequirement[]} */
-            const requirements = [];
-            let termList = await (
+                const requirements = [];
+                let termList = await (
                 version === 1 ?
                 this._readFileSequence([termFile], this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
                 this._readFileSequence([termFile], this._convertTermBankEntryV3.bind(this), dataBankSchemas[0], dictionaryTitle)
-            );
+                );
 
-            // Prefix wildcard support
-            if (prefixWildcardsSupported) {
-                for (const entry of termList) {
-                    entry.expressionReverse = stringReverse(entry.expression);
-                    entry.readingReverse = stringReverse(entry.reading);
+                // Prefix wildcard support
+                if (prefixWildcardsSupported) {
+                    for (const entry of termList) {
+                        entry.expressionReverse = stringReverse(entry.expression);
+                        entry.readingReverse = stringReverse(entry.reading);
+                    }
                 }
+
+                // Extended data support
+                for (let i = 0, ii = termList.length; i < ii; ++i) {
+                    const entry = termList[i];
+                    const glossaryList = entry.glossary;
+                    for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
+                        const glossary = glossaryList[j];
+                        if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
+                        glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+                    }
+                }
+
+                const alreadyAddedRequirements = requirements.filter((x) => { return uniqueMediaPaths.has(x.source.path); });
+                const notAddedRequirements = requirements.filter((x) => { return !uniqueMediaPaths.has(x.source.path); });
+                for (const requirement of requirements) { uniqueMediaPaths.add(requirement.source.path); }
+
+                await this._resolveAsyncRequirements(alreadyAddedRequirements, fileMap); // already added must also be resolved for the term dict to have correct data
+                let {media} = await this._resolveAsyncRequirements(notAddedRequirements, fileMap);
+                await bulkAdd('media', media);
+                mediaLength += media.length;
+
+                this._progress();
+
+                await bulkAdd('terms', termList);
+                termListLength += termList.length;
+
+                this._progress();
+
+                termList = [];
+                media = [];
             }
 
-            // Extended data support
-            for (let i = 0, ii = termList.length; i < ii; ++i) {
-                const entry = termList[i];
-                const glossaryList = entry.glossary;
-                for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
-                    const glossary = glossaryList[j];
-                    if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
-                    glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+            for (const termMetaFile of termMetaFiles) {
+                let termMetaList = await this._readFileSequence([termMetaFile], this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
+
+                await bulkAdd('termMeta', termMetaList);
+                for (const [key, value] of Object.entries(this._getMetaCounts(termMetaList))) {
+                    if (key in termMetaListLength) {
+                        termMetaListLength[key] += value;
+                    } else {
+                        termMetaListLength[key] = value;
+                    }
                 }
+
+                this._progress();
+
+                termMetaList = [];
             }
 
-            const alreadyAddedRequirements = requirements.filter((x) => { return uniqueMediaPaths.has(x.source.path); });
-            const notAddedRequirements = requirements.filter((x) => { return !uniqueMediaPaths.has(x.source.path); });
-            for (const requirement of requirements) { uniqueMediaPaths.add(requirement.source.path); }
-
-            await this._resolveAsyncRequirements(alreadyAddedRequirements, fileMap); // already added must also be resolved for the term dict to have correct data
-            let {media} = await this._resolveAsyncRequirements(notAddedRequirements, fileMap);
-            await bulkAdd('media', media);
-            mediaLength += media.length;
-
-            this._progress();
-
-            await bulkAdd('terms', termList);
-            termListLength += termList.length;
-
-            this._progress();
-
-            termList = [];
-            media = [];
-        }
-
-        /** @type {Record<string, number>} */
-        const termMetaListLength = {total: 0};
-        for (const termMetaFile of termMetaFiles) {
-            let termMetaList = await this._readFileSequence([termMetaFile], this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
-
-            await bulkAdd('termMeta', termMetaList);
-            for (const [key, value] of Object.entries(this._getMetaCounts(termMetaList))) {
-                if (key in termMetaListLength) {
-                    termMetaListLength[key] += value;
-                } else {
-                    termMetaListLength[key] = value;
-                }
-            }
-
-            this._progress();
-
-            termMetaList = [];
-        }
-
-        let kanjiListLength = 0;
-        for (const kanjiFile of kanjiFiles) {
-            let kanjiList = await (
+            for (const kanjiFile of kanjiFiles) {
+                let kanjiList = await (
                 version === 1 ?
                 this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
                 this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
-            );
+                );
 
-            await bulkAdd('kanji', kanjiList);
-            kanjiListLength += kanjiList.length;
+                await bulkAdd('kanji', kanjiList);
+                kanjiListLength += kanjiList.length;
 
-            this._progress();
+                this._progress();
 
-            kanjiList = [];
-        }
-
-        /** @type {Record<string, number>} */
-        const kanjiMetaListLength = {total: 0};
-        for (const kanjiMetaFile of kanjiMetaFiles) {
-            let kanjiMetaList = await this._readFileSequence([kanjiMetaFile], this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
-
-            await bulkAdd('kanjiMeta', kanjiMetaList);
-            for (const [key, value] of Object.entries(this._getMetaCounts(kanjiMetaList))) {
-                if (key in kanjiMetaListLength) {
-                    kanjiMetaListLength[key] += value;
-                } else {
-                    kanjiMetaListLength[key] = value;
-                }
+                kanjiList = [];
             }
 
-            this._progress();
+            for (const kanjiMetaFile of kanjiMetaFiles) {
+                let kanjiMetaList = await this._readFileSequence([kanjiMetaFile], this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
 
-            kanjiMetaList = [];
-        }
+                await bulkAdd('kanjiMeta', kanjiMetaList);
+                for (const [key, value] of Object.entries(this._getMetaCounts(kanjiMetaList))) {
+                    if (key in kanjiMetaListLength) {
+                        kanjiMetaListLength[key] += value;
+                    } else {
+                        kanjiMetaListLength[key] = value;
+                    }
+                }
 
-        let tagListLength = 0;
-        for (const tagFile of tagFiles) {
-            let tagList = await this._readFileSequence([tagFile], this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
-            this._addOldIndexTags(index, tagList, dictionaryTitle);
+                this._progress();
 
-            await bulkAdd('tagMeta', tagList);
-            tagListLength += tagList.length;
+                kanjiMetaList = [];
+            }
 
-            this._progress();
+            for (const tagFile of tagFiles) {
+                let tagList = await this._readFileSequence([tagFile], this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
+                this._addOldIndexTags(index, tagList, dictionaryTitle);
 
-            tagList = [];
+                await bulkAdd('tagMeta', tagList);
+                tagListLength += tagList.length;
+
+                this._progress();
+
+                tagList = [];
+            }
+
+            importSuccess = true;
+        } catch (e) {
+            errors.push(toError(e));
         }
 
         // Add dictionary descriptor
@@ -289,7 +298,7 @@ export class DictionaryImporter {
 
         const yomitanVersion = details.yomitanVersion;
         /** @type {import('dictionary-importer').SummaryDetails} */
-        const summaryDetails = {prefixWildcardsSupported, counts, styles, yomitanVersion};
+        const summaryDetails = {prefixWildcardsSupported, counts, styles, yomitanVersion, importSuccess};
 
         const summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
@@ -409,7 +418,7 @@ export class DictionaryImporter {
      */
     _createSummary(dictionaryTitle, version, index, details) {
         const indexSequenced = index.sequenced;
-        const {prefixWildcardsSupported, counts, styles} = details;
+        const {prefixWildcardsSupported, counts, styles, importSuccess} = details;
         /** @type {import('dictionary-importer').Summary} */
         const summary = {
             title: dictionaryTitle,
@@ -420,6 +429,7 @@ export class DictionaryImporter {
             prefixWildcardsSupported,
             counts,
             styles,
+            importSuccess,
         };
 
         const {minimumYomitanVersion, author, url, description, attribution, frequencyMode, isUpdatable, sourceLanguage, targetLanguage} = index;
