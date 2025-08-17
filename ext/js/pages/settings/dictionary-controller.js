@@ -101,6 +101,7 @@ class DictionaryEntry {
         this._eventListeners.addEventListener(this._outdatedButton, 'click', this._onOutdatedButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButtonCheck, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButtonWarning, 'click', this._onIntegrityButtonClick.bind(this), false);
+        this._eventListeners.addEventListener(this._integrityButtonError, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._updatesAvailable, 'click', this._onUpdateButtonClick.bind(this), false);
 
         if (importSuccess === false) {
@@ -142,8 +143,10 @@ class DictionaryEntry {
             }
         }
 
-        this._integrityButtonWarning.hidden = !countsMismatch;
-        this._integrityButtonCheck.hidden = countsMismatch;
+        if (this._integrityButtonError.hidden) {
+            this._integrityButtonWarning.hidden = !countsMismatch;
+            this._integrityButtonCheck.hidden = countsMismatch;
+        }
     }
 
     /**
@@ -353,6 +356,7 @@ class DictionaryEntry {
             kanjiMeta: 'Kanji Meta Count',
             tagMeta: 'Tag Count',
             media: 'Media Count',
+            importSuccess: 'Import Success',
         };
 
         const dictionaryInfo = {...this._dictionaryInfo, ...this._dictionaryInfo.counts};
@@ -365,6 +369,7 @@ class DictionaryEntry {
                 if (_info && typeof _info === 'object' && 'total' in _info) {
                     return _info.total ? `${_info.total}` : false;
                 }
+                if (typeof _info === 'boolean') { return _info.toString(); }
                 return false;
             })(info);
             if (!displayText) { continue; }
