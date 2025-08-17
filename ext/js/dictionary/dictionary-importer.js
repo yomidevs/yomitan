@@ -70,6 +70,7 @@ export class DictionaryImporter {
         /** @type {Error[]} */
         const errors = [];
         const maxTransactionLength = 1000;
+        const bulkAddProgressAllowance = 1000;
 
         /**
          * @template {import('dictionary-database').ObjectStoreName} T
@@ -78,6 +79,11 @@ export class DictionaryImporter {
          */
         const bulkAdd = async (objectStoreName, entries) => {
             const ii = entries.length;
+
+            let progressIndexIncrease = bulkAddProgressAllowance / Math.ceil(ii / maxTransactionLength);
+            if (ii < maxTransactionLength) { progressIndexIncrease = bulkAddProgressAllowance; }
+            if (ii === 0) { this._progressData.index += progressIndexIncrease; }
+
             for (let i = 0; i < ii; i += maxTransactionLength) {
                 const count = Math.min(maxTransactionLength, ii - i);
 
@@ -86,6 +92,9 @@ export class DictionaryImporter {
                 } catch (e) {
                     errors.push(toError(e));
                 }
+
+                this._progressData.index += progressIndexIncrease;
+                this._progress();
             }
         };
 
@@ -131,7 +140,7 @@ export class DictionaryImporter {
         // Load data
         const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
         // termFiles is doubled due to media importing
-        this._progressNextStep((termFiles.length * 2) + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
+        this._progressNextStep((termFiles.length * 2 + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length) * bulkAddProgressAllowance);
 
         let termListLength = 0;
         let mediaLength = 0;
@@ -173,13 +182,11 @@ export class DictionaryImporter {
             await bulkAdd('media', media);
             mediaLength += media.length;
 
-            ++this._progressData.index;
             this._progress();
 
             await bulkAdd('terms', termList);
             termListLength += termList.length;
 
-            ++this._progressData.index;
             this._progress();
 
             termList = [];
@@ -200,7 +207,6 @@ export class DictionaryImporter {
                 }
             }
 
-            ++this._progressData.index;
             this._progress();
 
             termMetaList = [];
@@ -217,7 +223,6 @@ export class DictionaryImporter {
             await bulkAdd('kanji', kanjiList);
             kanjiListLength += kanjiList.length;
 
-            ++this._progressData.index;
             this._progress();
 
             kanjiList = [];
@@ -237,7 +242,6 @@ export class DictionaryImporter {
                 }
             }
 
-            ++this._progressData.index;
             this._progress();
 
             kanjiMetaList = [];
@@ -251,7 +255,6 @@ export class DictionaryImporter {
             await bulkAdd('tagMeta', tagList);
             tagListLength += tagList.length;
 
-            ++this._progressData.index;
             this._progress();
 
             tagList = [];
