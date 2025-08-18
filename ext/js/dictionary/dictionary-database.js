@@ -581,6 +581,18 @@ export class DictionaryDatabase {
         return this._db.bulkAdd(objectStoreName, items, start, count);
     }
 
+    /**
+     * @template {import('dictionary-database').ObjectStoreName} T
+     * @param {T} objectStoreName
+     * @param {import('dictionary-database').DatabaseUpdateItem[]} items
+     * @param {number} start
+     * @param {number} count
+     * @returns {Promise<void>}
+     */
+    bulkUpdate(objectStoreName, items, start, count) {
+        return this._db.bulkUpdate(objectStoreName, items, start, count);
+    }
+
     // Private
 
     /**

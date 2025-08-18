@@ -136,6 +136,37 @@ export class Database {
     }
 
     /**
+     * Update items in bulk to the object store.
+     * Items that do not exist will be added.
+     * _count_ items will be updated, starting from _start_ index of _items_ list.
+     * @param {TObjectStoreName} objectStoreName
+     * @param {import('dictionary-database.js').DatabaseUpdateItem[]} items List of items to update.
+     * @param {number} start Start index. Updated items begin at _items_[_start_].
+     * @param {number} count Count of items to update.
+     * @returns {Promise<void>}
+     */
+    bulkUpdate(objectStoreName, items, start, count) {
+        return new Promise((resolve, reject) => {
+            if (start + count > items.length) {
+                count = items.length - start;
+            }
+
+            if (count <= 0) {
+                resolve();
+                return;
+            }
+
+            const transaction = this._readWriteTransaction([objectStoreName], resolve, reject);
+            const objectStore = transaction.objectStore(objectStoreName);
+
+            for (let i = start, ii = start + count; i < ii; ++i) {
+                objectStore.put(items[i].data, items[i].primaryKey);
+            }
+            transaction.commit();
+        });
+    }
+
+    /**
      * @template [TData=unknown]
      * @template [TResult=unknown]
      * @param {IDBObjectStore|IDBIndex} objectStoreOrIndex
