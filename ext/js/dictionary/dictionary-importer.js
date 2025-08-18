@@ -163,6 +163,13 @@ export class DictionaryImporter {
             media: {total: 0},
         };
 
+        const yomitanVersion = details.yomitanVersion;
+        /** @type {import('dictionary-importer').SummaryDetails} */
+        let summaryDetails = {prefixWildcardsSupported, counts, styles: '', yomitanVersion, importSuccess};
+
+        let summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
+        await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
+
         try {
             const uniqueMediaPaths = new Set();
             for (const termFile of termFiles) {
@@ -296,12 +303,10 @@ export class DictionaryImporter {
             }
         }
 
-        const yomitanVersion = details.yomitanVersion;
-        /** @type {import('dictionary-importer').SummaryDetails} */
-        const summaryDetails = {prefixWildcardsSupported, counts, styles, yomitanVersion, importSuccess};
-
-        const summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
-        await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
+        summaryDetails = {prefixWildcardsSupported, counts, styles, yomitanVersion, importSuccess};
+        summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
+        const primaryKey = await dictionaryDatabase.findDictionaryPrimaryKey(dictionaryTitle);
+        await dictionaryDatabase.bulkUpdate('dictionaries', [{data: summary, primaryKey: primaryKey}], 0, 1);
 
         this._progress();
 
