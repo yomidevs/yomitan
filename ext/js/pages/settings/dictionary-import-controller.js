@@ -599,7 +599,8 @@ export class DictionaryImportController {
             {label: 'Initializing import'}, // Dictionary import is uninitialized
             {label: 'Loading dictionary'}, // Load dictionary archive and validate index
             {label: 'Loading schemas'}, // Load schemas and get archive files
-            {label: 'Validating and importing data'}, // Load, validate, and import dictionary data
+            {label: 'Validating data'}, // Validate dictionary data
+            {label: 'Importing data'}, // Load and import dictionary data
             {label: 'Finalizing import', callback: this._triggerStorageChanged.bind(this)}, // Add dictionary descriptor
         ];
     }

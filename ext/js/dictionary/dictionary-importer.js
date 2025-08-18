@@ -139,6 +139,15 @@ export class DictionaryImporter {
 
         // Load data
         const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
+
+        this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
+
+        for (const termFile of termFiles) { await this._validateFile(termFile, dataBankSchemas[0]); }
+        for (const termMetaFile of termMetaFiles) { await this._validateFile(termMetaFile, dataBankSchemas[1]); }
+        for (const kanjiFile of kanjiFiles) { await this._validateFile(kanjiFile, dataBankSchemas[2]); }
+        for (const kanjiMetaFile of kanjiMetaFiles) { await this._validateFile(kanjiMetaFile, dataBankSchemas[3]); }
+        for (const tagFile of tagFiles) { await this._validateFile(tagFile, dataBankSchemas[4]); }
+
         // termFiles is doubled due to media importing
         this._progressNextStep((termFiles.length * 2 + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length) * bulkAddProgressAllowance);
 
@@ -160,8 +169,8 @@ export class DictionaryImporter {
                 const requirements = [];
                 let termList = await (
                 version === 1 ?
-                this._readFileSequence([termFile], this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
-                this._readFileSequence([termFile], this._convertTermBankEntryV3.bind(this), dataBankSchemas[0], dictionaryTitle)
+                this._readFileSequence([termFile], this._convertTermBankEntryV1.bind(this), dictionaryTitle) :
+                this._readFileSequence([termFile], this._convertTermBankEntryV3.bind(this), dictionaryTitle)
                 );
 
                 // Prefix wildcard support
@@ -204,7 +213,7 @@ export class DictionaryImporter {
             }
 
             for (const termMetaFile of termMetaFiles) {
-                let termMetaList = await this._readFileSequence([termMetaFile], this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
+                let termMetaList = await this._readFileSequence([termMetaFile], this._convertTermMetaBankEntry.bind(this), dictionaryTitle);
 
                 await bulkAdd('termMeta', termMetaList);
                 for (const [key, value] of Object.entries(this._getMetaCounts(termMetaList))) {
@@ -223,8 +232,8 @@ export class DictionaryImporter {
             for (const kanjiFile of kanjiFiles) {
                 let kanjiList = await (
                 version === 1 ?
-                this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
-                this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
+                this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV1.bind(this), dictionaryTitle) :
+                this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV3.bind(this), dictionaryTitle)
                 );
 
                 await bulkAdd('kanji', kanjiList);
@@ -236,7 +245,7 @@ export class DictionaryImporter {
             }
 
             for (const kanjiMetaFile of kanjiMetaFiles) {
-                let kanjiMetaList = await this._readFileSequence([kanjiMetaFile], this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
+                let kanjiMetaList = await this._readFileSequence([kanjiMetaFile], this._convertKanjiMetaBankEntry.bind(this), dictionaryTitle);
 
                 await bulkAdd('kanjiMeta', kanjiMetaList);
                 for (const [key, value] of Object.entries(this._getMetaCounts(kanjiMetaList))) {
@@ -253,7 +262,7 @@ export class DictionaryImporter {
             }
 
             for (const tagFile of tagFiles) {
-                let tagList = await this._readFileSequence([tagFile], this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
+                let tagList = await this._readFileSequence([tagFile], this._convertTagBankEntry.bind(this), dictionaryTitle);
                 this._addOldIndexTags(index, tagList, dictionaryTitle);
 
                 await bulkAdd('tagMeta', tagList);
@@ -913,11 +922,10 @@ export class DictionaryImporter {
      * @template [TResult=unknown]
      * @param {import('@zip.js/zip.js').Entry[]} files
      * @param {(entry: TEntry, dictionaryTitle: string) => TResult} convertEntry
-     * @param {import('dictionary-importer').CompiledSchemaName} schemaName
      * @param {string} dictionaryTitle
      * @returns {Promise<TResult[]>}
      */
-    async _readFileSequence(files, convertEntry, schemaName, dictionaryTitle) {
+    async _readFileSequence(files, convertEntry, dictionaryTitle) {
         const results = [];
         for (const file of files) {
             const content = await this._getData(file, new TextWriter());
@@ -932,11 +940,6 @@ export class DictionaryImporter {
                 }
             }
 
-            const schema = ajvSchemas[schemaName];
-            if (!schema(entries)) {
-                throw this._formatAjvSchemaError(schema, file.filename);
-            }
-
             if (Array.isArray(entries)) {
                 for (const entry of /** @type {TEntry[]} */ (entries)) {
                     results.push(convertEntry(entry, dictionaryTitle));
@@ -946,6 +949,34 @@ export class DictionaryImporter {
         return results;
     }
 
+    /**
+     * @param {import('@zip.js/zip.js').Entry} file
+     * @param {import('dictionary-importer').CompiledSchemaName} schemaName
+     * @returns {Promise<boolean>}
+     */
+    async _validateFile(file, schemaName) {
+        const content = await this._getData(file, new TextWriter());
+        let entries;
+
+        try {
+            /** @type {unknown} */
+            entries = parseJson(content);
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new Error(error.message + ` in '${file.filename}'`);
+            }
+        }
+
+        const schema = ajvSchemas[schemaName];
+        if (!schema(entries)) {
+            throw this._formatAjvSchemaError(schema, file.filename);
+        }
+
+        ++this._progressData.index;
+        this._progress();
+
+        return true;
+    }
 
     /**
      * @param {import('dictionary-database').DatabaseTermMeta[]|import('dictionary-database').DatabaseKanjiMeta[]} metaList
