@@ -168,7 +168,12 @@ export class DictionaryImporter {
         let summaryDetails = {prefixWildcardsSupported, counts, styles: '', yomitanVersion, importSuccess};
 
         let summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
-        await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
+        const dictionarySummaryAdd = await dictionaryDatabase.addWithResult('dictionaries', summary);
+        /** @type {Promise<IDBValidKey>} */
+        const dictionarySummaryResult = new Promise((resolve, reject) => {
+            dictionarySummaryAdd.onerror = () => reject(void 0);
+            dictionarySummaryAdd.onsuccess = () => resolve(dictionarySummaryAdd.result);
+        });
 
         try {
             const uniqueMediaPaths = new Set();
@@ -305,8 +310,8 @@ export class DictionaryImporter {
 
         summaryDetails = {prefixWildcardsSupported, counts, styles, yomitanVersion, importSuccess};
         summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
-        const primaryKey = await dictionaryDatabase.findDictionaryPrimaryKey(dictionaryTitle);
-        await dictionaryDatabase.bulkUpdate('dictionaries', [{data: summary, primaryKey: primaryKey}], 0, 1);
+        const primaryKey = await dictionarySummaryResult;
+        await dictionaryDatabase.bulkUpdate('dictionaries', [{data: summary, primaryKey}], 0, 1);
 
         this._progress();
 

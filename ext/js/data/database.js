@@ -136,6 +136,24 @@ export class Database {
     }
 
     /**
+     * Add a single item and return a promise containing the resulting primaryKey.
+     * Holding onto the result value makes the GC not clean up until much later even if the value is not used.
+     * Only call this method if the primaryKey of the added value is required.
+     * @param {TObjectStoreName} objectStoreName
+     * @param {unknown} item Item to add.
+     * @returns {Promise<IDBRequest<IDBValidKey>>}
+     */
+    addWithResult(objectStoreName, item) {
+        return new Promise((resolve, reject) => {
+            const transaction = this._readWriteTransaction([objectStoreName], () => {}, reject);
+            const objectStore = transaction.objectStore(objectStoreName);
+            const result = objectStore.add(item);
+            transaction.commit();
+            resolve(result);
+        });
+    }
+
+    /**
      * Update items in bulk to the object store.
      * Items that do not exist will be added.
      * _count_ items will be updated, starting from _start_ index of _items_ list.

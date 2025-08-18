@@ -593,6 +593,16 @@ export class DictionaryDatabase {
     /**
      * @template {import('dictionary-database').ObjectStoreName} T
      * @param {T} objectStoreName
+     * @param {import('dictionary-database').ObjectStoreData<T>} item
+     * @returns {Promise<IDBRequest<IDBValidKey>>}
+     */
+    addWithResult(objectStoreName, item) {
+        return this._db.addWithResult(objectStoreName, item);
+    }
+
+    /**
+     * @template {import('dictionary-database').ObjectStoreName} T
+     * @param {T} objectStoreName
      * @param {import('dictionary-database').DatabaseUpdateItem[]} items
      * @param {number} start
      * @param {number} count
