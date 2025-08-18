@@ -570,6 +570,15 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {string} title
+     * @returns {Promise<IDBValidKey>}
+     */
+    async findDictionaryPrimaryKey(title) {
+        const query = IDBKeyRange.only(title);
+        return await this._db.findPrimaryKey('dictionaries', 'title', query);
+    }
+
+    /**
      * @template {import('dictionary-database').ObjectStoreName} T
      * @param {T} objectStoreName
      * @param {import('dictionary-database').ObjectStoreData<T>[]} items
