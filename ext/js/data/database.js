@@ -216,28 +216,6 @@ export class Database {
     }
 
     /**
-     * @param {TObjectStoreName} objectStoreName
-     * @param {string} indexName
-     * @param {?IDBValidKey|IDBKeyRange} query
-     * @returns {Promise<IDBValidKey>}
-     */
-    findPrimaryKey(objectStoreName, indexName, query) {
-        return new Promise((resolve, reject) => {
-            const transaction = this.transaction([objectStoreName], 'readonly');
-            const objectStore = transaction.objectStore(objectStoreName);
-            const objectStoreIndex = objectStore.index(indexName);
-            const request = objectStoreIndex.openCursor(query, 'next');
-            request.onerror = (e) => reject(/** @type {IDBRequest<?IDBCursorWithValue>} */ (e.target).error);
-            request.onsuccess = (e) => {
-                const cursor = /** @type {IDBRequest<?IDBCursorWithValue>} */ (e.target).result;
-                /** @type {unknown} */
-                const value = cursor?.primaryKey;
-                resolve(/** @type {IDBValidKey} */ (value));
-            };
-        });
-    }
-
-    /**
      * @template [TPredicateArg=unknown]
      * @template [TResult=unknown]
      * @template [TResultDefault=unknown]
