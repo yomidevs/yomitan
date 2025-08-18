@@ -140,7 +140,7 @@ export class Database {
      * Items that do not exist will be added.
      * _count_ items will be updated, starting from _start_ index of _items_ list.
      * @param {TObjectStoreName} objectStoreName
-     * @param {import('dictionary-database.js').DatabaseUpdateItem[]} items List of items to update.
+     * @param {import('dictionary-database').DatabaseUpdateItem[]} items List of items to update.
      * @param {number} start Start index. Updated items begin at _items_[_start_].
      * @param {number} count Count of items to update.
      * @returns {Promise<void>}
