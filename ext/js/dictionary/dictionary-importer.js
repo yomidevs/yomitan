@@ -151,16 +151,17 @@ export class DictionaryImporter {
         // termFiles is doubled due to media importing
         this._progressNextStep((termFiles.length * 2 + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length) * bulkAddProgressAllowance);
 
-        let termListLength = 0;
-        let mediaLength = 0;
-        /** @type {Record<string, number>} */
-        const termMetaListLength = {total: 0};
-        let kanjiListLength = 0;
-        /** @type {Record<string, number>} */
-        const kanjiMetaListLength = {total: 0};
-        let tagListLength = 0;
-
         let importSuccess = false;
+
+        /** @type {import('dictionary-importer').SummaryCounts} */
+        const counts = {
+            terms: {total: 0},
+            termMeta: {total: 0},
+            kanji: {total: 0},
+            kanjiMeta: {total: 0},
+            tagMeta: {total: 0},
+            media: {total: 0},
+        };
 
         try {
             const uniqueMediaPaths = new Set();
@@ -199,12 +200,12 @@ export class DictionaryImporter {
                 await this._resolveAsyncRequirements(alreadyAddedRequirements, fileMap); // already added must also be resolved for the term dict to have correct data
                 let {media} = await this._resolveAsyncRequirements(notAddedRequirements, fileMap);
                 await bulkAdd('media', media);
-                mediaLength += media.length;
+                counts.media.total += media.length;
 
                 this._progress();
 
                 await bulkAdd('terms', termList);
-                termListLength += termList.length;
+                counts.terms.total += termList.length;
 
                 this._progress();
 
@@ -217,10 +218,10 @@ export class DictionaryImporter {
 
                 await bulkAdd('termMeta', termMetaList);
                 for (const [key, value] of Object.entries(this._getMetaCounts(termMetaList))) {
-                    if (key in termMetaListLength) {
-                        termMetaListLength[key] += value;
+                    if (key in counts.termMeta) {
+                        counts.termMeta[key] += value;
                     } else {
-                        termMetaListLength[key] = value;
+                        counts.termMeta[key] = value;
                     }
                 }
 
@@ -237,7 +238,7 @@ export class DictionaryImporter {
                 );
 
                 await bulkAdd('kanji', kanjiList);
-                kanjiListLength += kanjiList.length;
+                counts.kanji.total += kanjiList.length;
 
                 this._progress();
 
@@ -249,10 +250,10 @@ export class DictionaryImporter {
 
                 await bulkAdd('kanjiMeta', kanjiMetaList);
                 for (const [key, value] of Object.entries(this._getMetaCounts(kanjiMetaList))) {
-                    if (key in kanjiMetaListLength) {
-                        kanjiMetaListLength[key] += value;
+                    if (key in counts.kanjiMeta) {
+                        counts.kanjiMeta[key] += value;
                     } else {
-                        kanjiMetaListLength[key] = value;
+                        counts.kanjiMeta[key] = value;
                     }
                 }
 
@@ -266,7 +267,7 @@ export class DictionaryImporter {
                 this._addOldIndexTags(index, tagList, dictionaryTitle);
 
                 await bulkAdd('tagMeta', tagList);
-                tagListLength += tagList.length;
+                counts.tagMeta.total += tagList.length;
 
                 this._progress();
 
@@ -280,16 +281,6 @@ export class DictionaryImporter {
 
         // Add dictionary descriptor
         this._progressNextStep(0);
-
-        /** @type {import('dictionary-importer').SummaryCounts} */
-        const counts = {
-            terms: {total: termListLength},
-            termMeta: termMetaListLength,
-            kanji: {total: kanjiListLength},
-            kanjiMeta: kanjiMetaListLength,
-            tagMeta: {total: tagListLength},
-            media: {total: mediaLength},
-        };
 
         const stylesFileName = 'styles.css';
         const stylesFile = fileMap.get(stylesFileName);
