@@ -303,6 +303,7 @@ export type AnkiOptions = {
     fieldTemplates: string | null;
     suspendNewCards: boolean;
     displayTagsAndFlags: AnkiDisplayTagsAndFlags;
+    targetTags: string[];
     noteGuiMode: AnkiNoteGuiMode;
     apiKey: string;
     downloadTimeout: number;
@@ -429,7 +430,7 @@ export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
 
 export type AnkiDuplicateBehavior = 'prevent' | 'overwrite' | 'new';
 
-export type AnkiDisplayTagsAndFlags = 'never' | 'always' | 'non-standard';
+export type AnkiDisplayTagsAndFlags = 'never' | 'always' | 'non-standard' | 'custom';
 
 export type AnkiNoteGuiMode = 'browse' | 'edit';
 

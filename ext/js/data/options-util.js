@@ -582,6 +582,7 @@ export class OptionsUtil {
             this._updateVersion68,
             this._updateVersion69,
             this._updateVersion70,
+            this._updateVersion71,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1783,6 +1784,16 @@ export class OptionsUtil {
     async _updateVersion70(options) {
         for (const profile of options.profiles) {
             profile.options.audio.enableDefaultAudioSources = true;
+        }
+    }
+
+    /**
+     *  - Added anki.targetTags
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion71(options) {
+        for (const profile of options.profiles) {
+            profile.options.anki.targetTags = [];
         }
     }
 
