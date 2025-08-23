@@ -57,6 +57,8 @@ export function getStandardFieldMarkers(type, language = 'ja') {
                 'search-query',
                 'popup-selection-text',
                 'sentence',
+                'sentence-furigana',
+                'sentence-furigana-plain',
                 'tags',
                 'url',
             ];
@@ -70,8 +72,6 @@ export function getStandardFieldMarkers(type, language = 'ja') {
                     'pitch-accent-graphs-jj',
                     'pitch-accent-positions',
                     'pitch-accent-categories',
-                    'sentence-furigana',
-                    'sentence-furigana-plain',
                 );
             }
             return markers;
