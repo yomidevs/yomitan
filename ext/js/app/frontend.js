@@ -516,6 +516,7 @@ export class Frontend {
             sentenceParsingOptions,
             scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
             scanResolution: scanningOptions.scanResolution,
+            pageType: this._pageType,
         });
         this._updateTextScannerEnabled();
 
