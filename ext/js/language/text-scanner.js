@@ -272,6 +272,7 @@ export class TextScanner extends EventDispatcher {
         matchTypePrefix,
         scanWithoutMousemove,
         scanResolution,
+        pageType,
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map((input) => this._convertInput(input));
@@ -301,7 +302,7 @@ export class TextScanner extends EventDispatcher {
             this._preventMiddleMouseOnTextHover = preventMiddleMouseOnTextHover;
         }
         if (typeof matchTypePrefix === 'boolean') {
-            this._matchTypePrefix = matchTypePrefix;
+            this._matchTypePrefix = pageType === 'search' ? matchTypePrefix : false;
         }
         if (typeof scanWithoutMousemove === 'boolean') {
             this._scanWithoutMousemove = scanWithoutMousemove;

@@ -2089,6 +2089,7 @@ export class Display extends EventDispatcher {
             preventMiddleMouseOnPage: false,
             preventMiddleMouseOnTextHover: false,
             sentenceParsingOptions,
+            pageType: this._pageType,
         });
 
         this._contentTextScanner.setEnabled(true);
