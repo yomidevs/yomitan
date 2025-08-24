@@ -1324,7 +1324,8 @@
         "global": {
             "type": "object",
             "required": [
-                "database"
+                "database",
+                "dataTransmissionConsentShown"
             ],
             "properties": {
                 "database": {
@@ -1338,6 +1339,10 @@
                             "default": false
                         }
                     }
+                },
+                "dataTransmissionConsentShown": {
+                    "type": "boolean",
+                    "default": false
                 }
             }
         }
