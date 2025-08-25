@@ -1979,10 +1979,17 @@
                     </div>
                 </div>
                 <div class="settings-item-right">
-                    <select data-setting="anki.displayTagsAndFlags">
+                    <select data-setting="anki.displayTagsAndFlags"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#anki-target-tags-option",
+                            "condition": {"op": "===", "value": "custom"}
+                        }'
+                    >
                         <option value="never">Never</option>
                         <option value="always">Always</option>
                         <option value="non-standard">Non-standard</option>
+                        <option value="custom">Custom</option>
                     </select>
                 </div>
             </div>
@@ -1990,7 +1997,8 @@
                 <p>
                     When coming across a word that is already in an Anki deck, two buttons can appear that show
                     the tags and flags the card has. If set to <em>Non-standard</em>, all tags that are included in the
-                    <em>Card tags</em> option will be filtered out from the list. If no tags remain after filtering,
+                    <em>Card tags</em> option will be filtered out from the list. If set to <em>Custom</em>, only tags that are included in the
+                    <em>Target tags</em> option will be shown. If no tags remain after filtering,
                     then the tags button will not be shown. If no flags are found, the flags button will not be shown.
                 </p>
                 <p>
@@ -1998,6 +2006,20 @@
                 </p>
             </div>
         </div>
+        <div class="settings-item advanced-only" id="anki-target-tags-option" hidden><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Target tags</div>
+                <div class="settings-item-description">List of space or comma separated tags.</div>
+            </div>
+            <div class="settings-item-right">
+                <input type="text" spellcheck="false" autocomplete="off" data-setting="anki.targetTags"
+                    data-transform='[
+                        {"type": "splitTags", "step": "pre"},
+                        {"type": "joinTags", "step": "post"}
+                    ]'
+                >
+            </div>
+        </div></div>
         <div class="settings-item settings-item-button" data-modal-action="show,anki-cards"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure Anki flashcards&hellip;</div>
