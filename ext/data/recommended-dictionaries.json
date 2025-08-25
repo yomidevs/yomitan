@@ -9,7 +9,7 @@
                 "name": "kty-afb-en",
                 "description": "Gulf Arabic to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-afb-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-afb-en.zip"
             }
         ]
     },
@@ -22,7 +22,7 @@
                 "name": "kty-aii-en-ipa",
                 "description": "Assyrian Neo-Aramaic IPA dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-aii-en-ipa.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-aii-en-ipa.zip"
             }
         ],
         "terms": [
@@ -30,7 +30,7 @@
                 "name": "kty-aii-en",
                 "description": "Assyrian Neo-Aramaic to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-aii-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-aii-en.zip"
             }
         ]
     },
@@ -44,7 +44,7 @@
                 "name": "kty-ang-en",
                 "description": "Old English to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ang-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ang-en.zip"
             }
         ]
     },
@@ -57,7 +57,7 @@
                 "name": "kty-ar-en-ipa",
                 "description": "Arabic IPA dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ar-en-ipa.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ar-en-ipa.zip"
             }
         ],
         "terms": [
@@ -65,7 +65,7 @@
                 "name": "kty-ar-en",
                 "description": "Arabic to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ar-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ar-en.zip"
             }
         ]
     },
@@ -78,7 +78,7 @@
                 "name": "kty-ar-en-ipa",
                 "description": "Arabic IPA dictionary created from Wiktionary data.",
                 "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ar-en-ipa.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ar-en-ipa.zip"
             }
         ],
         "terms": [
@@ -86,7 +86,7 @@
                 "name": "kty-ar-en",
                 "description": "Arabic to English dictionary created from Wiktionary data.",
                 "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ar-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ar-en.zip"
             }
         ]
     },
@@ -100,7 +100,7 @@
                 "name": "kty-cs-en",
                 "description": "Czech to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-cs-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-cs-en.zip"
             }
         ]
     },
@@ -114,7 +114,7 @@
                 "name": "kty-de-en",
                 "description": "German to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-de-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-de-en.zip"
             }
         ]
     },
@@ -128,7 +128,7 @@
                 "name": "kty-el-en",
                 "description": "Greek to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-el-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-el-en.zip"
             }
         ]
     },
@@ -142,7 +142,7 @@
                 "name": "kty-en-en",
                 "description": "English to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-en-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-en-en.zip"
             }
         ]
     },
@@ -156,7 +156,7 @@
                 "name": "kty-enm-en",
                 "description": "Middle English to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-enm-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-enm-en.zip"
             }
         ]
     },
@@ -170,7 +170,7 @@
                 "name": "kty-eo-en",
                 "description": "Esperanto to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-eo-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-eo-en.zip"
             }
         ]
     },
@@ -184,7 +184,7 @@
                 "name": "kty-es-en",
                 "description": "Spanish to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-es-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-es-en.zip"
             }
         ]
     },
@@ -198,7 +198,7 @@
                 "name": "kty-fa-en",
                 "description": "Persian  to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-fa-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-fa-en.zip"
             }
         ]
     },
@@ -212,7 +212,7 @@
                 "name": "kty-fi-en",
                 "description": "Finnish to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-fi-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-fi-en.zip"
             }
         ]
     },
@@ -226,7 +226,7 @@
                 "name": "kty-fr-en",
                 "description": "French to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-fr-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-fr-en.zip"
             }
         ]
     },
@@ -240,7 +240,7 @@
                 "name": "kty-grc-en",
                 "description": "Ancient Greek to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-grc-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-grc-en.zip"
             }
         ]
     },
@@ -280,7 +280,7 @@
                 "name": "kty-he-en",
                 "description": "Hebrew to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-he-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-he-en.zip"
             }
         ]
     },
@@ -294,7 +294,7 @@
                 "name": "kty-hi-en",
                 "description": "Hindi to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-hi-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-hi-en.zip"
             }
         ]
     },
@@ -308,7 +308,7 @@
                 "name": "kty-hu-en",
                 "description": "Hungarian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-hu-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-hu-en.zip"
             }
         ]
     },
@@ -322,7 +322,7 @@
                 "name": "kty-id-en",
                 "description": "Indonesian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-id-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-id-en.zip"
             }
         ]
     },
@@ -336,7 +336,7 @@
                 "name": "kty-it-en",
                 "description": "Italian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-it-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-it-en.zip"
             }
         ]
     },
@@ -396,7 +396,7 @@
                 "name": "kty-km-en",
                 "description": "Khmer to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-km-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-km-en.zip"
             }
         ]
     },
@@ -410,7 +410,7 @@
                 "name": "kty-kn-en",
                 "description": "Kannada to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-kn-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-kn-en.zip"
             }
         ]
     },
@@ -424,7 +424,7 @@
                 "name": "kty-ko-en",
                 "description": "Korean to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ko-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ko-en.zip"
             }
         ]
     },
@@ -438,7 +438,7 @@
                 "name": "kty-la-en",
                 "description": "Latin to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-la-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-la-en.zip"
             }
         ]
     },
@@ -452,7 +452,7 @@
                 "name": "kty-lv-en",
                 "description": "Latvian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-lv-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-lv-en.zip"
             }
         ]
     },
@@ -466,7 +466,7 @@
                 "name": "kty-mn-en",
                 "description": "Mongolian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-mn-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-mn-en.zip"
             }
         ]
     },
@@ -479,7 +479,7 @@
                 "name": "kty-mt-en-ipa",
                 "description": "Maltese IPA dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-mt-en-ipa.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-mt-en-ipa.zip"
             }
         ],
         "terms": [
@@ -487,7 +487,7 @@
                 "name": "kty-mt-en",
                 "description": "Maltese to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-mt-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-mt-en.zip"
             }
         ]
     },
@@ -501,7 +501,7 @@
                 "name": "kty-nl-en",
                 "description": "Dutch to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-nl-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-nl-en.zip"
             }
         ]
     },
@@ -515,13 +515,13 @@
                 "name": "kty-nb-en",
                 "description": "Norwegian Bokmål to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-nb-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-nb-en.zip"
             },
             {
                 "name": "kty-nn-en",
                 "description": "Norwegian Nynorsk to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-nn-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-nn-en.zip"
             }
         ]
     },
@@ -535,7 +535,7 @@
                 "name": "kty-pl-en",
                 "description": "Polish to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-pl-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-pl-en.zip"
             }
         ]
     },
@@ -549,7 +549,7 @@
                 "name": "kty-pt-en",
                 "description": "Portuguese to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-pt-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-pt-en.zip"
             }
         ]
     },
@@ -563,7 +563,7 @@
                 "name": "kty-ro-en",
                 "description": "Romanian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ro-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ro-en.zip"
             }
         ]
     },
@@ -577,7 +577,7 @@
                 "name": "kty-ru-en",
                 "description": "Russian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ru-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ru-en.zip"
             },
             {
                 "name": "opr-ru-en",
@@ -597,7 +597,7 @@
                 "name": "kty-scn-en",
                 "description": "Sicillian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-scn-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-scn-en.zip"
             }
         ]
     },
@@ -611,7 +611,7 @@
                 "name": "kty-sga-en",
                 "description": "Old Irish to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-sga-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-sga-en.zip"
             }
         ]
     },
@@ -625,7 +625,7 @@
                 "name": "kty-sh-en",
                 "description": "Serbo-Croatian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-sh-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-sh-en.zip"
             }
         ]
     },
@@ -639,7 +639,7 @@
                 "name": "kty-sq-en",
                 "description": "Albanian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-sq-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-sq-en.zip"
             }
         ]
     },
@@ -653,7 +653,7 @@
                 "name": "kty-sv-en",
                 "description": "Swedish to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-sv-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-sv-en.zip"
             }
         ]
     },
@@ -667,7 +667,7 @@
                 "name": "kty-th-en",
                 "description": "Thai to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-th-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-th-en.zip"
             }
         ]
     },
@@ -681,7 +681,7 @@
                 "name": "kty-tl-en",
                 "description": "Tagalog to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-tl-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-tl-en.zip"
             }
         ]
     },
@@ -793,7 +793,7 @@
                 "name": "kty-tr-en",
                 "description": "Turkish to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-tr-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-tr-en.zip"
             }
         ]
     },
@@ -807,7 +807,7 @@
                 "name": "kty-uk-en",
                 "description": "Ukranian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-uk-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-uk-en.zip"
             }
         ]
     },
@@ -821,7 +821,7 @@
                 "name": "kty-vi-en",
                 "description": "Vietnamese to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-vi-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-vi-en.zip"
             }
         ]
     },
@@ -894,7 +894,7 @@
                 "name": "kty-zh-en",
                 "description": "Chinese to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-zh-en.zip"
+                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-zh-en.zip"
             }
         ]
     }
