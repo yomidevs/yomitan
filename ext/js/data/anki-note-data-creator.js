@@ -171,13 +171,16 @@ function getPublicContext(context) {
 
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @param {number?} requestedHeadwordIndex
  * @returns {import('anki-templates').FrequencyNumber[]}
  */
-function getFrequencyNumbers(dictionaryEntry) {
+function getFrequencyNumbers(dictionaryEntry, requestedHeadwordIndex) {
     let previousDictionary;
     const frequencies = [];
-    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
-        if (dictionary === previousDictionary) {
+    for (const dictionaryEntryFrequency of dictionaryEntry.frequencies) {
+        const {dictionary, frequency, displayValue} = dictionaryEntryFrequency;
+        const wrongHeadwordIndex = Number.isInteger(requestedHeadwordIndex) && ('headwordIndex' in dictionaryEntryFrequency) && dictionaryEntryFrequency.headwordIndex !== requestedHeadwordIndex;
+        if (dictionary === previousDictionary || wrongHeadwordIndex) {
             continue;
         }
         previousDictionary = dictionary;
@@ -201,10 +204,11 @@ function getFrequencyNumbers(dictionaryEntry) {
 
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @param {number?} headwordIndex
  * @returns {number}
  */
-function getFrequencyHarmonic(dictionaryEntry) {
-    const frequencies = getFrequencyNumbers(dictionaryEntry);
+export function getFrequencyHarmonic(dictionaryEntry, headwordIndex) {
+    const frequencies = getFrequencyNumbers(dictionaryEntry, headwordIndex);
 
     if (frequencies.length === 0) {
         return -1;
@@ -219,10 +223,11 @@ function getFrequencyHarmonic(dictionaryEntry) {
 
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @param {number?} headwordIndex
  * @returns {number}
  */
-function getFrequencyAverage(dictionaryEntry) {
-    const frequencies = getFrequencyNumbers(dictionaryEntry);
+function getFrequencyAverage(dictionaryEntry, headwordIndex) {
+    const frequencies = getFrequencyNumbers(dictionaryEntry, headwordIndex);
 
     if (frequencies.length === 0) {
         return -1;
@@ -339,8 +344,8 @@ function getKanjiDefinition(dictionaryEntry, context) {
     const stats = createCachedValue(getKanjiStats.bind(null, dictionaryEntry));
     const tags = createCachedValue(convertTags.bind(null, dictionaryEntry.tags));
     const frequencies = createCachedValue(getKanjiFrequencies.bind(null, dictionaryEntry));
-    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry));
-    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry));
+    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry, null));
+    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry, null));
     const cloze = createCachedValue(getCloze.bind(null, dictionaryEntry, context));
 
     return {
@@ -441,9 +446,9 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
     const termTags = createCachedValue(getTermTags.bind(null, dictionaryEntry, type));
     const expressions = createCachedValue(getTermExpressions.bind(null, dictionaryEntry));
     const frequencies = createCachedValue(getTermFrequencies.bind(null, dictionaryEntry));
-    const frequencyNumbers = createCachedValue(getFrequencyNumbers.bind(null, dictionaryEntry));
-    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry));
-    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry));
+    const frequencyNumbers = createCachedValue(getFrequencyNumbers.bind(null, dictionaryEntry, null));
+    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry, null));
+    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry, null));
     const pitches = createCachedValue(getTermPitches.bind(null, dictionaryEntry));
     const phoneticTranscriptions = createCachedValue(getTermPhoneticTranscriptions.bind(null, dictionaryEntry));
     const glossary = createCachedValue(getTermGlossaryArray.bind(null, dictionaryEntry, type));
