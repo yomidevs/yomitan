@@ -890,7 +890,7 @@ select.short-height {
     margin-top: var(--modal-button-spacing);
 }
 .modal-footer-spaced {
-    justify-content: space-between;
+    justify-content: space-evenly;
 }
 .modal-body {
     flex: 1 1 auto;
