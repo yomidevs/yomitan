@@ -318,7 +318,7 @@ export class SettingsDisplayController {
         }
 
         const modal = this._modalController.getTopVisibleModal();
-        if (modal !== null) {
+        if (modal !== null && !modal.forceInteract) {
             modal.setVisible(false);
         }
     }
