@@ -1644,12 +1644,11 @@
     <div id="firefox-data-transmission-consent-modal" data-show-for-browser="firefox firefox-mobile" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
         <div class="modal-header"><div class="modal-title">Data Transmission Consent</div></div>
         <div class="modal-body">
-            <p>To comply with <a href="https://extensionworkshop.com/documentation/publish/add-on-policies/">Firefox Add-On Policies</a>, Yomitan is required to ask for your permission to enable the term audio playback setting by default.</p>
-            <p>Yomitan data is stored locally on your device. Yomitan does not sell or externally collect any user data. Some features require sending data to third party services.</p>
-            <p><b>Declining data transmission will disallow pronunciation audio playback for any terms searched.</b></p>
-            <p>Audio playback may send the term, reading, and/or language for any dictionary entry term where the Play Audio speaker button is pressed. <b>Personally identifying information is never sent.</b></p>
-            <p>Full details on Yomitan's use of data transmission are provided in the <a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Yomitan Privacy Policy</a>.</p>
-        </div>
+            <p>To comply with <a href="https://extensionworkshop.com/documentation/publish/add-on-policies/">Firefox Add-On Policies</a>, Yomitan is required to get your verification that you are comfortable with any default data transmission the extension does.</p>
+            <p>Yomitan does very little data transmission, as Yomitan data is stored locally on your device. Yomitan does not sell or externally collect any user data.</p>
+            <p><b>The only place data transmission is done by default is when the audio icon in the Yomitan popup is clicked to play the audio for a term; in this case a request will be sent to the audio provider configured in your settings.</b></p>
+            <p>This request may contain the term, reading, and/or language for the given dictionary entry term. <b>Personally identifying information is never sent.</b></p>
+            <p>Full details on Yomitan's use of data transmission are provided in the <a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Yomitan Privacy Policy</a>.</p>        </div>
         <div class="modal-footer modal-footer-spaced">
             <button type="button" class="danger low-emphasis" data-modal-action="hide" id="decline-data-transmission">Decline data transmission<br>(disable audio playback)</button>
             <button type="button" class="low-emphasis" data-modal-action="hide" id="accept-data-transmission">Agree to data transmission<br>(enable audio playback)</button>
