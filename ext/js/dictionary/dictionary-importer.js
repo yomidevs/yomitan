@@ -291,7 +291,7 @@ export class DictionaryImporter {
             errors.push(toError(e));
         }
 
-        // Add dictionary descriptor
+        // Update dictionary descriptor
         this._progressNextStep(0);
 
         const stylesFileName = 'styles.css';
