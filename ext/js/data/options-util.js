@@ -582,6 +582,7 @@ export class OptionsUtil {
             this._updateVersion68,
             this._updateVersion69,
             this._updateVersion70,
+            this._updateVersion71,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1784,6 +1785,14 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.audio.enableDefaultAudioSources = true;
         }
+    }
+
+    /**
+     *  - Always put dict glosses in a list for the `glossary` handlebar (and brief and no-dictionary)
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion71(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v71.handlebars');
     }
 
     /**
