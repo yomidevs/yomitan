@@ -28,6 +28,8 @@ export class Modal extends PanelElement {
         this._contentNode = null;
         /** @type {boolean} */
         this._canCloseOnClick = false;
+        /** @type {boolean} */
+        this.forceInteract = node.classList.contains('force-interact');
     }
 
     /** */
@@ -52,7 +54,7 @@ export class Modal extends PanelElement {
      * @param {MouseEvent} e
      */
     _onModalContainerMouseDown(e) {
-        this._canCloseOnClick = (e.currentTarget === e.target);
+        this._canCloseOnClick = (e.currentTarget === e.target) && !this.forceInteract;
     }
 
     /**
