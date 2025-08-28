@@ -213,6 +213,11 @@ export type ObjectStoreData<T extends ObjectStoreName> = (
     never
 );
 
+export type DatabaseUpdateItem = {
+    primaryKey: IDBValidKey;
+    data: ObjectStoreData<T>;
+};
+
 export type DeleteDictionaryProgressData = {
     count: number;
     processed: number;
