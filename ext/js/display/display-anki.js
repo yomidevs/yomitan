@@ -109,6 +109,8 @@ export class DisplayAnki {
         this._onViewNotesButtonContextMenuBind = this._onViewNotesButtonContextMenu.bind(this);
         /** @type {(event: import('popup-menu').MenuCloseEvent) => void} */
         this._onViewNotesButtonMenuCloseBind = this._onViewNotesButtonMenuClose.bind(this);
+        /** @type {boolean} */
+        this._forceSync = false;
     }
 
     /** */
@@ -206,6 +208,7 @@ export class DisplayAnki {
                 noteGuiMode,
                 screenshot: {format, quality},
                 downloadTimeout,
+                forceSync,
             },
             scanning: {length: scanLength},
         } = options;
@@ -227,6 +230,7 @@ export class DisplayAnki {
         this._audioDownloadIdleTimeout = (Number.isFinite(downloadTimeout) && downloadTimeout > 0 ? downloadTimeout : null);
         this._cardFormats = cardFormats;
         this._dictionaries = dictionaries;
+        this._forceSync = forceSync;
 
         void this._updateAnkiFieldTemplates(options);
     }
@@ -763,6 +767,14 @@ export class DisplayAnki {
                 this._updateSaveButtonForDuplicateBehavior(button, [noteId]);
 
                 this._updateViewNoteButton(dictionaryEntryIndex, cardFormatIndex, [noteId]);
+
+                if (this._forceSync) {
+                    try {
+                        await this._display.application.api.forceSync();
+                    } catch (e) {
+                        allErrors.push(toError(e));
+                    }
+                }
             }
         }
     }
