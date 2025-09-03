@@ -691,11 +691,12 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 71,
+        version: 72,
         global: {
             database: {
                 prefixWildcardsSupported: false,
             },
+            dataTransmissionConsentShown: false,
         },
     };
 }
