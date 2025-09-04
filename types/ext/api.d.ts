@@ -80,6 +80,11 @@ export type InjectAnkiNoteMediaDefinitionDetails = InjectAnkiNoteMediaTermDefini
 
 export type InjectAnkiNoteMediaAudioDetails = AnkiNoteBuilder.AudioMediaOptions;
 
+export type InjectAnkiNoteMediaSampleSentenceAudioDetails = {
+    details: InjectAnkiNoteMediaAudioDetails;
+    downloadAudio: boolean;
+}
+
 export type InjectAnkiNoteMediaScreenshotDetails = {
     tabId: number;
     frameId: number;
@@ -188,6 +193,7 @@ type ApiSurface = {
             timestamp: number;
             definitionDetails: InjectAnkiNoteMediaDefinitionDetails;
             audioDetails: InjectAnkiNoteMediaAudioDetails | null;
+            sampleSentenceAudioDetails: InjectAnkiNoteMediaSampleSentenceAudioDetails | null;
             screenshotDetails: InjectAnkiNoteMediaScreenshotDetails | null;
             clipboardDetails: InjectAnkiNoteMediaClipboardDetails | null;
             dictionaryMediaDetails: InjectAnkiNoteMediaDictionaryMediaDetails[];
@@ -197,6 +203,8 @@ type ApiSurface = {
             clipboardImageFileName: string | null;
             clipboardText: string | null;
             audioFileName: string | null;
+            sampleSentenceAudioFileName: string | null;
+            sampleSentenceText: string | null;
             dictionaryMedia: InjectAnkiNoteDictionaryMediaResult[];
             errors: Core.SerializedError[];
         };

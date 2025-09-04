@@ -125,13 +125,14 @@ export class API {
      * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'timestamp'>} timestamp
      * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'definitionDetails'>} definitionDetails
      * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'audioDetails'>} audioDetails
+     * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'sampleSentenceAudioDetails'>} sampleSentenceAudioDetails
      * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'screenshotDetails'>} screenshotDetails
      * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'clipboardDetails'>} clipboardDetails
      * @param {import('api').ApiParam<'injectAnkiNoteMedia', 'dictionaryMediaDetails'>} dictionaryMediaDetails
      * @returns {Promise<import('api').ApiReturn<'injectAnkiNoteMedia'>>}
      */
-    injectAnkiNoteMedia(timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
-        return this._invoke('injectAnkiNoteMedia', {timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails});
+    injectAnkiNoteMedia(timestamp, definitionDetails, audioDetails, sampleSentenceAudioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
+        return this._invoke('injectAnkiNoteMedia', {timestamp, definitionDetails, audioDetails, sampleSentenceAudioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails});
     }
 
     /**

@@ -70,7 +70,7 @@ export type GetRenderingDataDetails = {
 export type CommonData = AnkiTemplatesInternal.CreateDetails;
 
 export type RequirementGeneric = {
-    type: 'audio' | 'screenshot' | 'clipboardImage' | 'clipboardText' | 'popupSelectionText';
+    type: 'audio' | 'sampleSentenceAudio' | 'sampleSentenceText' | 'screenshot' | 'clipboardImage' | 'clipboardText' | 'popupSelectionText';
 };
 
 export type RequirementTextFurigana = {
@@ -99,6 +99,7 @@ export type AudioMediaOptions = {
 
 export type MediaOptions = {
     audio: AudioMediaOptions | null;
+    sampleSentenceAudio: AudioMediaOptions | null;
     screenshot: {
         format: Settings.AnkiScreenshotFormat;
         quality: number;
@@ -131,6 +132,7 @@ export type MinimalApi = {
         timestamp: Api.ApiParam<'injectAnkiNoteMedia', 'timestamp'>,
         definitionDetails: Api.ApiParam<'injectAnkiNoteMedia', 'definitionDetails'>,
         audioDetails: Api.ApiParam<'injectAnkiNoteMedia', 'audioDetails'>,
+        sampleSentenceAudioDetails: Api.ApiParam<'injectAnkiNoteMedia', 'sampleSentenceAudioDetails'>,
         screenshotDetails: Api.ApiParam<'injectAnkiNoteMedia', 'screenshotDetails'>,
         clipboardDetails: Api.ApiParam<'injectAnkiNoteMedia', 'clipboardDetails'>,
         dictionaryMediaDetails: Api.ApiParam<'injectAnkiNoteMedia', 'dictionaryMediaDetails'>,

@@ -830,6 +830,8 @@ export class DisplayAnki {
             const {type} = requirement;
             switch (type) {
                 case 'audio':
+                case 'sampleSentenceAudio':
+                case 'sampleSentenceText':
                 case 'clipboardImage':
                     break;
                 default:
@@ -1008,6 +1010,7 @@ export class DisplayAnki {
         const contentOrigin = this._display.getContentOrigin();
         const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntry);
         const audioDetails = this._getAnkiNoteMediaAudioDetails(details);
+        const sampleSentenceAudioDetails = this._getAnkiNoteMediaAudioDetails(details, true);
         const optionsContext = this._display.getOptionsContext();
         const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(this._dictionaries);
 
@@ -1024,6 +1027,7 @@ export class DisplayAnki {
             compactTags: this._compactTags,
             mediaOptions: {
                 audio: audioDetails,
+                sampleSentenceAudio: sampleSentenceAudioDetails,
                 screenshot: {
                     format: this._screenshotFormat,
                     quality: this._screenshotQuality,
@@ -1063,11 +1067,12 @@ export class DisplayAnki {
 
     /**
      * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} details
+     * @param {boolean} isSentence
      * @returns {?import('anki-note-builder').AudioMediaOptions}
      */
-    _getAnkiNoteMediaAudioDetails(details) {
+    _getAnkiNoteMediaAudioDetails(details, isSentence = false) {
         if (details.type !== 'term') { return null; }
-        const {sources, preferredAudioIndex, enableDefaultAudioSources} = this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading);
+        const {sources, preferredAudioIndex, enableDefaultAudioSources} = this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading, isSentence);
         const languageSummary = this._display.getLanguageSummary();
         return {
             sources,

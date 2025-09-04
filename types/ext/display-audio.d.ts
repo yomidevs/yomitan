@@ -23,6 +23,7 @@ import type * as Settings from './settings';
 export type CacheItem = {
     sourceMap: Map<number, CachedInfoList>;
     primaryCardAudio: PrimaryCardAudio | null;
+    sentenceCardAudio: PrimaryCardAudio | null;
 };
 
 export type CachedInfoList = {
@@ -77,6 +78,7 @@ export type PlayAudioResult = {
     audio: GenericAudio | null;
     source: AudioSource | null;
     subIndex: number;
+    isSentence: boolean;
     valid: boolean;
 };
 
@@ -84,12 +86,14 @@ export type TermAudio = {
     audio: GenericAudio;
     source: AudioSource;
     subIndex: number;
+    isSentence: boolean;
 };
 
 export type CreateAudioResult = {
     audio: GenericAudio | null;
     index: number;
     cacheUpdated: boolean;
+    isSentence: boolean;
 };
 
 export type GenericAudio = HTMLAudioElement | TextToSpeechAudio;

@@ -115,6 +115,44 @@ export class AudioDownloader {
         throw error;
     }
 
+    /**
+     * @param {import('audio').AudioSourceInfo[]} sources
+     * @param {?number} preferredAudioIndex
+     * @param {string} term
+     * @param {string} reading
+     * @param {?number} idleTimeout
+     * @param {import('language').LanguageSummary} languageSummary
+     * @param {boolean} downloadAudio
+     * @returns {Promise<import('audio-downloader').SampleSentence>}
+     */
+    async downloadSampleSentenceAudio(sources, preferredAudioIndex, term, reading, idleTimeout, languageSummary, downloadAudio) {
+        const errors = [];
+        for (const source of sources) {
+            let infoList = await this.getTermAudioInfoList(source, term, reading, languageSummary);
+            if (typeof preferredAudioIndex === 'number') {
+                infoList = (preferredAudioIndex >= 0 && preferredAudioIndex < infoList.length ? [infoList[preferredAudioIndex]] : []);
+            }
+            for (const info of infoList) {
+                switch (info.type) {
+                    case 'url':
+                        try {
+                            const {sentence} = info;
+                            if (typeof sentence !== 'string' || sentence.length === 0) continue;
+                            const audio = downloadAudio ? await this._downloadAudioFromUrl(info.url, source.type, idleTimeout) : null;
+                            return {audio: audio, text: sentence};
+                        } catch (e) {
+                            errors.push(e);
+                        }
+                        break;
+                }
+            }
+        }
+
+        const error = new ExtensionError('Could not download sample sentence audio');
+        error.data = {errors};
+        throw error;
+    }
+
     // Private
 
     /**
@@ -476,10 +514,11 @@ export class AudioDownloader {
 
         /** @type {import('audio-downloader').Info[]} */
         const results = [];
-        for (const {url: url2, name} of responseJson.audioSources) {
+        for (const {url: url2, name, sentence} of responseJson.audioSources) {
             /** @type {import('audio-downloader').Info1} */
             const info = {type: 'url', url: url2};
             if (typeof name === 'string') { info.name = name; }
+            if (typeof sentence === 'string') { info.sentence = sentence; }
             results.push(info);
         }
         return results;

@@ -395,6 +395,8 @@ export class AnkiNoteBuilder {
 
         // Parse requirements
         let injectAudio = false;
+        let injectSampleSentenceAudio = false;
+        let injectSampleSentenceText = false;
         let injectScreenshot = false;
         let injectClipboardImage = false;
         let injectClipboardText = false;
@@ -407,6 +409,8 @@ export class AnkiNoteBuilder {
             const {type} = requirement;
             switch (type) {
                 case 'audio': injectAudio = true; break;
+                case 'sampleSentenceAudio': injectSampleSentenceAudio = true; break;
+                case 'sampleSentenceText': injectSampleSentenceText = true; break;
                 case 'screenshot': injectScreenshot = true; break;
                 case 'clipboardImage': injectClipboardImage = true; break;
                 case 'clipboardText': injectClipboardText = true; break;
@@ -430,6 +434,8 @@ export class AnkiNoteBuilder {
         const dictionaryEntryDetails = this.getDictionaryEntryDetailsForNote(dictionaryEntry);
         /** @type {?import('api').InjectAnkiNoteMediaAudioDetails} */
         let audioDetails = null;
+        /** @type {?import('api').InjectAnkiNoteMediaSampleSentenceAudioDetails} */
+        let sampleSentenceAudioDetails = null;
         /** @type {?import('api').InjectAnkiNoteMediaScreenshotDetails} */
         let screenshotDetails = null;
         /** @type {import('api').InjectAnkiNoteMediaClipboardDetails} */
@@ -439,6 +445,16 @@ export class AnkiNoteBuilder {
             if (typeof audioOptions === 'object' && audioOptions !== null) {
                 const {sources, preferredAudioIndex, idleTimeout, languageSummary, enableDefaultAudioSources} = audioOptions;
                 audioDetails = {sources, preferredAudioIndex, idleTimeout, languageSummary, enableDefaultAudioSources};
+            }
+        }
+        if ((injectSampleSentenceAudio || injectSampleSentenceText) && dictionaryEntryDetails.type !== 'kanji') {
+            const sampleSentenceAudioOptions = mediaOptions.sampleSentenceAudio;
+            if (typeof sampleSentenceAudioOptions === 'object' && sampleSentenceAudioOptions !== null) {
+                const {sources, preferredAudioIndex, idleTimeout, languageSummary, enableDefaultAudioSources} = sampleSentenceAudioOptions;
+                sampleSentenceAudioDetails = {
+                    details: {sources, preferredAudioIndex, idleTimeout, languageSummary, enableDefaultAudioSources},
+                    downloadAudio: injectSampleSentenceAudio,
+                }
             }
         }
         if (injectScreenshot) {
@@ -465,11 +481,21 @@ export class AnkiNoteBuilder {
             timestamp,
             dictionaryEntryDetails,
             audioDetails,
+            sampleSentenceAudioDetails,
             screenshotDetails,
             clipboardDetails,
             dictionaryMediaDetails,
         );
-        const {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText, dictionaryMedia: dictionaryMediaArray, errors} = injectedMedia;
+        const {
+            audioFileName,
+            sampleSentenceAudioFileName,
+            sampleSentenceText,
+            screenshotFileName,
+            clipboardImageFileName,
+            clipboardText,
+            dictionaryMedia: dictionaryMediaArray,
+            errors
+        } = injectedMedia;
         const textFurigana = textFuriganaPromise !== null ? await textFuriganaPromise : [];
 
         // Format results
@@ -486,6 +512,8 @@ export class AnkiNoteBuilder {
         }
         const media = {
             audio: (typeof audioFileName === 'string' ? {value: audioFileName} : void 0),
+            sampleSentenceAudio: (typeof sampleSentenceAudioFileName === 'string' ? {value: sampleSentenceAudioFileName} : void 0),
+            sampleSentenceText: (typeof sampleSentenceText === 'string' ? {value: sampleSentenceText} : void 0),
             screenshot: (typeof screenshotFileName === 'string' ? {value: screenshotFileName} : void 0),
             clipboardImage: (typeof clipboardImageFileName === 'string' ? {value: clipboardImageFileName} : void 0),
             clipboardText: (typeof clipboardText === 'string' ? {value: clipboardText} : void 0),
