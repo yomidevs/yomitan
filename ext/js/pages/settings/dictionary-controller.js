@@ -66,6 +66,8 @@ class DictionaryEntry {
         /** @type {HTMLButtonElement} */
         this._integrityButtonWarning = querySelectorNotNull(fragment, '.dictionary-integrity-button-warning');
         /** @type {HTMLButtonElement} */
+        this._integrityButtonError = querySelectorNotNull(fragment, '.dictionary-integrity-button-error');
+        /** @type {HTMLButtonElement} */
         this._updatesAvailable = querySelectorNotNull(fragment, '.dictionary-update-available');
         /** @type {HTMLElement} */
         this._aliasNode = querySelectorNotNull(fragment, '.dictionary-alias');
@@ -84,7 +86,7 @@ class DictionaryEntry {
     prepare() {
         //
         const index = this._index;
-        const {revision, version} = this._dictionaryInfo;
+        const {revision, version, importSuccess} = this._dictionaryInfo;
 
         this._aliasNode.dataset.setting = `dictionaries[${index}].alias`;
         this._versionNode.textContent = `rev.${revision}`;
@@ -99,7 +101,12 @@ class DictionaryEntry {
         this._eventListeners.addEventListener(this._outdatedButton, 'click', this._onOutdatedButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButtonCheck, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButtonWarning, 'click', this._onIntegrityButtonClick.bind(this), false);
+        this._eventListeners.addEventListener(this._integrityButtonError, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._updatesAvailable, 'click', this._onUpdateButtonClick.bind(this), false);
+
+        if (importSuccess === false) {
+            this._integrityButtonError.hidden = false;
+        }
 
         this.setCounts(this._databaseCounts);
     }
@@ -136,8 +143,10 @@ class DictionaryEntry {
             }
         }
 
-        this._integrityButtonWarning.hidden = !countsMismatch;
-        this._integrityButtonCheck.hidden = countsMismatch;
+        if (this._integrityButtonError.hidden) {
+            this._integrityButtonWarning.hidden = !countsMismatch;
+            this._integrityButtonCheck.hidden = countsMismatch;
+        }
     }
 
     /**
@@ -347,6 +356,7 @@ class DictionaryEntry {
             kanjiMeta: 'Kanji Meta Count',
             tagMeta: 'Tag Count',
             media: 'Media Count',
+            importSuccess: 'Import Success',
         };
 
         const dictionaryInfo = {...this._dictionaryInfo, ...this._dictionaryInfo.counts};
@@ -359,6 +369,7 @@ class DictionaryEntry {
                 if (_info && typeof _info === 'object' && 'total' in _info) {
                     return _info.total ? `${_info.total}` : false;
                 }
+                if (typeof _info === 'boolean') { return _info.toString(); }
                 return false;
             })(info);
             if (!displayText) { continue; }

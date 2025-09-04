@@ -2442,7 +2442,8 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 .dictionary-outdated-button,
 .dictionary-update-available,
 .dictionary-integrity-button-check,
-.dictionary-integrity-button-warning {
+.dictionary-integrity-button-warning,
+.dictionary-integrity-button-error {
     --button-content-color: transparent;
     --button-border-color: transparent;
     --button-background-color: transparent;
