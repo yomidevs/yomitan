@@ -988,7 +988,7 @@ export class DisplayAudio {
      */
     _getPrimaryCardAudio(term, reading, isSentence = false) {
         const cacheEntry = this._getCacheItem(term, reading, false);
-        return typeof cacheEntry !== 'undefined' ? isSentence ? cacheEntry.sentenceCardAudio : cacheEntry.primaryCardAudio : null;
+        return typeof cacheEntry !== 'undefined' ? (isSentence ? cacheEntry.sentenceCardAudio : cacheEntry.primaryCardAudio) : null;
     }
 
     /**

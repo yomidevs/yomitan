@@ -137,7 +137,7 @@ export class AudioDownloader {
                     case 'url':
                         try {
                             const {sentence} = info;
-                            if (typeof sentence !== 'string' || sentence.length === 0) continue;
+                            if (typeof sentence !== 'string' || sentence.length === 0) { continue; }
                             const audio = downloadAudio ? await this._downloadAudioFromUrl(info.url, source.type, idleTimeout) : null;
                             return {audio: audio, text: sentence};
                         } catch (e) {

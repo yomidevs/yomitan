@@ -2391,7 +2391,7 @@ export class Backend {
      */
     async _injectAnkiNoteSampleSentenceAudio(ankiConnect, timestamp, definitionDetails, details) {
         /** @type {{sampleSentenceAudioFileName: ?string, sampleSentenceText: ?string}} */
-        let res = {sampleSentenceAudioFileName: null, sampleSentenceText: null};
+        const res = {sampleSentenceAudioFileName: null, sampleSentenceText: null};
         if (definitionDetails.type !== 'term') { return res; }
         const {term, reading} = definitionDetails;
         if (term.length === 0 && reading.length === 0) { return res; }

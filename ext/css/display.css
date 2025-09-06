@@ -2000,7 +2000,7 @@ button.footer-notification-close-button {
 .popup-menu-item-group[data-is-sentence-card-audio=true]>.popup-menu-item-audio-button~.popup-menu-item-set-primary-audio-button:active .popup-menu-item-icon,
 .popup-menu-item-group[data-is-sentence-card-audio=true]>.popup-menu-item-audio-button~.popup-menu-item-set-primary-audio-button:focus .popup-menu-item-icon {
     opacity: 1;
-    background-color:cornflowerblue;
+    background-color: #6495ed; /* cornflowerblue */
 }
 
 

@@ -83,7 +83,7 @@ export type InjectAnkiNoteMediaAudioDetails = AnkiNoteBuilder.AudioMediaOptions;
 export type InjectAnkiNoteMediaSampleSentenceAudioDetails = {
     details: InjectAnkiNoteMediaAudioDetails;
     downloadAudio: boolean;
-}
+};
 
 export type InjectAnkiNoteMediaScreenshotDetails = {
     tabId: number;

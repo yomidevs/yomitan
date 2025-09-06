@@ -454,7 +454,7 @@ export class AnkiNoteBuilder {
                 sampleSentenceAudioDetails = {
                     details: {sources, preferredAudioIndex, idleTimeout, languageSummary, enableDefaultAudioSources},
                     downloadAudio: injectSampleSentenceAudio,
-                }
+                };
             }
         }
         if (injectScreenshot) {
@@ -494,7 +494,7 @@ export class AnkiNoteBuilder {
             clipboardImageFileName,
             clipboardText,
             dictionaryMedia: dictionaryMediaArray,
-            errors
+            errors,
         } = injectedMedia;
         const textFurigana = textFuriganaPromise !== null ? await textFuriganaPromise : [];
 
