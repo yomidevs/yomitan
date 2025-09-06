@@ -29,6 +29,8 @@ export type Context = {
 
 export type Media = {
     audio?: MediaObject;
+    sampleSentenceAudio?: MediaObject;
+    sampleSentenceText?: MediaObject;
     screenshot?: MediaObject;
     clipboardImage?: MediaObject;
     clipboardText?: MediaObject;
@@ -41,6 +43,8 @@ export type MediaObject = {value: string};
 
 export type MediaSimpleType = (
     'audio' |
+    'sampleSentenceAudio' |
+    'sampleSentenceText' |
     'screenshot' |
     'clipboardImage' |
     'clipboardText' |

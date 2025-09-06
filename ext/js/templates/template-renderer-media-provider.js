@@ -98,6 +98,8 @@ export class TemplateRendererMediaProvider {
         const type = args[0];
         switch (type) {
             case 'audio': return this._getSimpleMediaData(media, 'audio');
+            case 'sampleSentenceAudio': return this._getSimpleMediaData(media, 'sampleSentenceAudio');
+            case 'sampleSentenceText': return this._getSimpleMediaData(media, 'sampleSentenceText');
             case 'screenshot': return this._getSimpleMediaData(media, 'screenshot');
             case 'clipboardImage': return this._getSimpleMediaData(media, 'clipboardImage');
             case 'clipboardText': return this._getSimpleMediaData(media, 'clipboardText');

@@ -730,12 +730,13 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'injectAnkiNoteMedia'>} */
-    async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails}) {
+    async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, sampleSentenceAudioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails}) {
         return await this._injectAnkNoteMedia(
             this._anki,
             timestamp,
             definitionDetails,
             audioDetails,
+            sampleSentenceAudioDetails,
             screenshotDetails,
             clipboardDetails,
             dictionaryMediaDetails,
@@ -2261,16 +2262,19 @@ export class Backend {
      * @param {number} timestamp
      * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
      * @param {?import('api').InjectAnkiNoteMediaAudioDetails} audioDetails
+     * @param {?import('api').InjectAnkiNoteMediaSampleSentenceAudioDetails} sampleSentenceAudioDetails
      * @param {?import('api').InjectAnkiNoteMediaScreenshotDetails} screenshotDetails
      * @param {?import('api').InjectAnkiNoteMediaClipboardDetails} clipboardDetails
      * @param {import('api').InjectAnkiNoteMediaDictionaryMediaDetails[]} dictionaryMediaDetails
      * @returns {Promise<import('api').ApiReturn<'injectAnkiNoteMedia'>>}
      */
-    async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
+    async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, sampleSentenceAudioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
         let screenshotFileName = null;
         let clipboardImageFileName = null;
         let clipboardText = null;
         let audioFileName = null;
+        let sampleSentenceAudioFileName = null;
+        let sampleSentenceText = null;
         const errors = [];
 
         try {
@@ -2305,6 +2309,14 @@ export class Backend {
             errors.push(ExtensionError.serialize(e));
         }
 
+        try {
+            if (sampleSentenceAudioDetails !== null) {
+                ({sampleSentenceAudioFileName, sampleSentenceText} = await this._injectAnkiNoteSampleSentenceAudio(ankiConnect, timestamp, definitionDetails, sampleSentenceAudioDetails));
+            }
+        } catch (e) {
+            errors.push(ExtensionError.serialize(e));
+        }
+
         /** @type {import('api').InjectAnkiNoteDictionaryMediaResult[]} */
         let dictionaryMedia;
         try {
@@ -2323,6 +2335,8 @@ export class Backend {
             clipboardImageFileName,
             clipboardText,
             audioFileName,
+            sampleSentenceAudioFileName,
+            sampleSentenceText,
             dictionaryMedia,
             errors: errors,
         };
@@ -2366,6 +2380,54 @@ export class Backend {
         let fileName = generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp);
         fileName = fileName.replace(/\]/g, '');
         return await ankiConnect.storeMediaFile(fileName, data);
+    }
+
+    /**
+     * @param {AnkiConnect} ankiConnect
+     * @param {number} timestamp
+     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
+     * @param {import('api').InjectAnkiNoteMediaSampleSentenceAudioDetails} details
+     * @returns {Promise<{sampleSentenceAudioFileName: ?string, sampleSentenceText: ?string}>}
+     */
+    async _injectAnkiNoteSampleSentenceAudio(ankiConnect, timestamp, definitionDetails, details) {
+        /** @type {{sampleSentenceAudioFileName: ?string, sampleSentenceText: ?string}} */
+        let res = {sampleSentenceAudioFileName: null, sampleSentenceText: null};
+        if (definitionDetails.type !== 'term') { return res; }
+        const {term, reading} = definitionDetails;
+        if (term.length === 0 && reading.length === 0) { return res; }
+
+        const {sources, preferredAudioIndex, idleTimeout, languageSummary} = details.details;
+        let audio;
+        let text;
+        let data;
+        let contentType;
+        try {
+            ({audio, text} = await this._audioDownloader.downloadSampleSentenceAudio(
+                sources,
+                preferredAudioIndex,
+                term,
+                reading,
+                idleTimeout,
+                languageSummary,
+                details.downloadAudio,
+            ));
+            if (typeof text === 'string') { res.sampleSentenceText = text; }
+            if (!details.downloadAudio || audio === null) { return res; }
+            ({data, contentType} = audio);
+        } catch (e) {
+            const error = this._getAudioDownloadError(e);
+            if (error !== null) { throw error; }
+            // No audio
+            log.logGenericError(e, 'log');
+            return res;
+        }
+
+        let extension = contentType !== null ? getFileExtensionFromAudioMediaType(contentType) : null;
+        if (extension === null) { extension = '.mp3'; }
+        let fileName = generateAnkiNoteMediaFileName('yomitan_sentence_audio', extension, timestamp);
+        fileName = fileName.replace(/\]/g, '');
+        res.sampleSentenceAudioFileName = await ankiConnect.storeMediaFile(fileName, data);
+        return res;
     }
 
     /**

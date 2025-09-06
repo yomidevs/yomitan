@@ -36,6 +36,16 @@
     {{~/if~}}
 {{/inline}}
 
+{{#*inline "sample-sentence-audio"}}
+    {{~#if (hasMedia "sampleSentenceAudio")~}}
+        [sound:{{getMedia "sampleSentenceAudio"}}]
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "sample-sentence-text"}}
+    {{~#if (hasMedia "sampleSentenceText")}}{{{getMedia "sampleSentenceText"}}}{{/if~}}
+{{/inline}}
+
 {{#*inline "character"}}
     {{~definition.character~}}
 {{/inline}}
