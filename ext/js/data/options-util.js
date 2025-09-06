@@ -583,6 +583,7 @@ export class OptionsUtil {
             this._updateVersion69,
             this._updateVersion70,
             this._updateVersion71,
+            this._updateVersion72,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1793,6 +1794,14 @@ export class OptionsUtil {
      */
     async _updateVersion71(options) {
         options.global.dataTransmissionConsentShown = false;
+    }
+
+    /**
+     *  - Always put dict glosses in a list for the `glossary` handlebar (and brief and no-dictionary)
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion72(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v71.handlebars');
     }
 
     /**
