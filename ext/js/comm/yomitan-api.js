@@ -236,6 +236,23 @@ export class YomitanApi {
                         };
                         break;
                     }
+                    case 'tokenize': {
+                        /** @type {import('yomitan-api.js').tokenizeInput} */
+                        // @ts-expect-error - Allow this to error
+                        const {text} = parsedBody;
+                        if (typeof text !== 'string') {
+                            throw new Error('Invalid input for tokenize');
+                        }
+                        const invokeParams = {
+                            text: text,
+                            optionsContext: {index: optionsFull.profileCurrent},
+                            scanLength: 32,
+                            useInternalParser: true,
+                            useMecabParser: false,
+                        };
+                        result = await this._invoke('parseText', invokeParams);
+                        break;
+                    }
                     default:
                         statusCode = 400;
                 }

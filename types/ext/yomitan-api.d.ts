@@ -31,6 +31,10 @@ export type ankiFieldsInput = {
     includeMedia?: boolean;
 };
 
+export type tokenizeInput = {
+    text: string;
+};
+
 export type remoteVersionResponse = {
     version: number;
 };
