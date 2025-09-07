@@ -239,14 +239,14 @@ export class YomitanApi {
                     case 'tokenize': {
                         /** @type {import('yomitan-api.js').tokenizeInput} */
                         // @ts-expect-error - Allow this to error
-                        const {text} = parsedBody;
+                        const {text, scanLength = 10} = parsedBody;
                         if (typeof text !== 'string') {
                             throw new Error('Invalid input for tokenize');
                         }
                         const invokeParams = {
                             text: text,
                             optionsContext: {index: optionsFull.profileCurrent},
-                            scanLength: 32,
+                            scanLength: scanLength,
                             useInternalParser: true,
                             useMecabParser: false,
                         };
