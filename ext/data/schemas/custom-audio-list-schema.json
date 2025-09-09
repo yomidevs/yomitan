@@ -26,6 +26,9 @@
                     },
                     "url": {
                         "type": "string"
+                    },
+                    "sentence": {
+                        "type": "string"
                     }
                 }
             }

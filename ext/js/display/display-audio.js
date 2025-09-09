@@ -144,13 +144,14 @@ export class DisplayAudio {
     /**
      * @param {string} term
      * @param {string} reading
+     * @param {boolean} isSentence
      * @returns {import('display-audio').AudioMediaOptions}
      */
-    getAnkiNoteMediaAudioDetails(term, reading) {
+    getAnkiNoteMediaAudioDetails(term, reading, isSentence = false) {
         /** @type {import('display-audio').AudioSourceShort[]} */
         const sources = [];
         let preferredAudioIndex = null;
-        const primaryCardAudio = this._getPrimaryCardAudio(term, reading);
+        const primaryCardAudio = this._getPrimaryCardAudio(term, reading, isSentence);
         if (primaryCardAudio !== null) {
             const {index, subIndex} = primaryCardAudio;
             const source = this._audioSources[index];
@@ -351,7 +352,7 @@ export class DisplayAudio {
         const headwordIndex = this._getAudioPlayButtonHeadwordIndex(button);
         const dictionaryEntryIndex = this._display.getElementDictionaryEntryIndex(button);
 
-        const {detail: {action, item, menu, shiftKey}} = e;
+        const {detail: {action, item, menu, shiftKey, ctrlKey}} = e;
         switch (action) {
             case 'playAudioFromSource':
                 if (shiftKey) {
@@ -361,7 +362,11 @@ export class DisplayAudio {
                 break;
             case 'setPrimaryAudio':
                 e.preventDefault();
-                this._setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, menu, true);
+                if (ctrlKey) {
+                    this._setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, menu, true, true);
+                } else {
+                    this._setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, menu, true);
+                }
                 break;
         }
     }
@@ -379,6 +384,7 @@ export class DisplayAudio {
             cacheEntry = {
                 sourceMap: new Map(),
                 primaryCardAudio: null,
+                sentenceCardAudio: null,
             };
             this._cache.set(key, cacheEntry);
         }
@@ -419,7 +425,7 @@ export class DisplayAudio {
 
         const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
         if (headword === null) {
-            return {audio: null, source: null, subIndex: 0, valid: false};
+            return {audio: null, source: null, subIndex: 0, isSentence: false, valid: false};
         }
 
         const buttons = this._getAudioPlayButtons(dictionaryEntryIndex, headwordIndex);
@@ -434,10 +440,11 @@ export class DisplayAudio {
             let title;
             let source = null;
             let subIndex = 0;
+            let isSentence = false;
             const info = await this._createTermAudio(term, reading, sources, audioInfoListIndex);
             const valid = (info !== null);
             if (valid) {
-                ({audio, source, subIndex} = info);
+                ({audio, source, subIndex, isSentence} = info);
                 const sourceIndex = sources.indexOf(source);
                 title = `From source ${1 + sourceIndex}: ${source.name}`;
             } else {
@@ -471,7 +478,7 @@ export class DisplayAudio {
                 }
             }
 
-            return {audio, source, subIndex, valid};
+            return {audio, source, subIndex, isSentence, valid};
         } finally {
             progressIndicatorVisible.clearOverride(overrideToken);
         }
@@ -489,9 +496,9 @@ export class DisplayAudio {
 
         try {
             const token = this._entriesToken;
-            const {valid} = await this._playAudio(dictionaryEntryIndex, headwordIndex, [source], subIndex);
+            const {valid, isSentence} = await this._playAudio(dictionaryEntryIndex, headwordIndex, [source], subIndex);
             if (valid && token === this._entriesToken) {
-                this._setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, null, false);
+                this._setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, null, false, isSentence);
             }
         } catch (e) {
             // NOP
@@ -504,8 +511,9 @@ export class DisplayAudio {
      * @param {?HTMLElement} item
      * @param {?PopupMenu} menu
      * @param {boolean} canToggleOff
+     * @param {boolean} isSentence
      */
-    _setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, menu, canToggleOff) {
+    _setPrimaryAudio(dictionaryEntryIndex, headwordIndex, item, menu, canToggleOff, isSentence = false) {
         if (item === null) { return; }
         const {source, subIndex} = this._getMenuItemSourceInfo(item);
         if (source === null || !source.downloadable) { return; }
@@ -518,16 +526,34 @@ export class DisplayAudio {
         const cacheEntry = this._getCacheItem(term, reading, true);
         if (typeof cacheEntry === 'undefined') { return; }
 
-        let {primaryCardAudio} = cacheEntry;
-        primaryCardAudio = (
-            !canToggleOff ||
-            primaryCardAudio === null ||
-            primaryCardAudio.index !== index ||
-            primaryCardAudio.subIndex !== subIndex ?
-            {index: index, subIndex} :
-            null
-        );
+        let {primaryCardAudio, sentenceCardAudio} = cacheEntry;
+        if (!isSentence) {
+            primaryCardAudio = (
+                !canToggleOff ||
+                primaryCardAudio === null ||
+                primaryCardAudio.index !== index ||
+                primaryCardAudio.subIndex !== subIndex ?
+                {index: index, subIndex} :
+                null
+            );
+            if (sentenceCardAudio !== null && sentenceCardAudio.index === index && sentenceCardAudio.subIndex === subIndex) {
+                sentenceCardAudio = null;
+            }
+        } else {
+            sentenceCardAudio = (
+                !canToggleOff ||
+                sentenceCardAudio === null ||
+                sentenceCardAudio.index !== index ||
+                sentenceCardAudio.subIndex !== subIndex ?
+                {index: index, subIndex} :
+                null
+            );
+            if (primaryCardAudio !== null && primaryCardAudio.index === index && primaryCardAudio.subIndex === subIndex) {
+                primaryCardAudio = null;
+            }
+        }
         cacheEntry.primaryCardAudio = primaryCardAudio;
+        cacheEntry.sentenceCardAudio = sentenceCardAudio;
 
         if (menu !== null) {
             this._updateMenuPrimaryCardAudio(menu.bodyNode, term, reading);
@@ -598,10 +624,10 @@ export class DisplayAudio {
                 sourceInfo.infoList = infoList;
             }
 
-            const {audio, index: subIndex, cacheUpdated: cacheUpdated2} = await this._createAudioFromInfoList(source, infoList, audioInfoListIndex);
+            const {audio, index: subIndex, cacheUpdated: cacheUpdated2, isSentence} = await this._createAudioFromInfoList(source, infoList, audioInfoListIndex);
             if (cacheUpdated || cacheUpdated2) { this._updateOpenMenu(); }
             if (audio !== null) {
-                return {audio, source, subIndex};
+                return {audio, source, subIndex, isSentence};
             }
         }
 
@@ -627,6 +653,7 @@ export class DisplayAudio {
             audio: null,
             index: -1,
             cacheUpdated: false,
+            isSentence: false,
         };
         for (let i = start; i < end; ++i) {
             const item = infoList[i];
@@ -652,6 +679,9 @@ export class DisplayAudio {
 
                 item.audio = audio;
             }
+
+            const {sentence} = item.info;
+            result.isSentence = typeof sentence === 'string' && sentence.length > 0;
 
             if (audio !== null) {
                 result.audio = audio;
@@ -953,11 +983,12 @@ export class DisplayAudio {
     /**
      * @param {string} term
      * @param {string} reading
+     * @param {boolean} isSentence
      * @returns {?import('display-audio').PrimaryCardAudio}
      */
-    _getPrimaryCardAudio(term, reading) {
+    _getPrimaryCardAudio(term, reading, isSentence = false) {
         const cacheEntry = this._getCacheItem(term, reading, false);
-        return typeof cacheEntry !== 'undefined' ? cacheEntry.primaryCardAudio : null;
+        return typeof cacheEntry !== 'undefined' ? (isSentence ? cacheEntry.sentenceCardAudio : cacheEntry.primaryCardAudio) : null;
     }
 
     /**
@@ -969,6 +1000,9 @@ export class DisplayAudio {
         const primaryCardAudio = this._getPrimaryCardAudio(term, reading);
         const primaryCardAudioIndex = (primaryCardAudio !== null ? primaryCardAudio.index : null);
         const primaryCardAudioSubIndex = (primaryCardAudio !== null ? primaryCardAudio.subIndex : null);
+        const sentenceCardAudio = this._getPrimaryCardAudio(term, reading, true);
+        const sentenceCardAudioIndex = (sentenceCardAudio !== null ? sentenceCardAudio.index : null);
+        const sentenceCardAudioSubIndex = (sentenceCardAudio !== null ? sentenceCardAudio.subIndex : null);
         const itemGroups = /** @type {NodeListOf<HTMLElement>} */ (menuBodyNode.querySelectorAll('.popup-menu-item-group'));
         for (const node of itemGroups) {
             const {index, subIndex} = node.dataset;
@@ -976,7 +1010,9 @@ export class DisplayAudio {
             const indexNumber = Number.parseInt(index, 10);
             const subIndexNumber = typeof subIndex === 'string' ? Number.parseInt(subIndex, 10) : null;
             const isPrimaryCardAudio = (indexNumber === primaryCardAudioIndex && subIndexNumber === primaryCardAudioSubIndex);
+            const isSentenceCardAudio = (indexNumber === sentenceCardAudioIndex && subIndexNumber === sentenceCardAudioSubIndex);
             node.dataset.isPrimaryCardAudio = `${isPrimaryCardAudio}`;
+            node.dataset.isSentenceCardAudio = `${isSentenceCardAudio}`;
         }
     }
 

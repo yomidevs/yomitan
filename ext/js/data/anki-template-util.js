@@ -59,6 +59,8 @@ export function getStandardFieldMarkers(type, language = 'ja') {
                 'sentence',
                 'sentence-furigana',
                 'sentence-furigana-plain',
+                'sample-sentence-audio',
+                'sample-sentence-text',
                 'tags',
                 'url',
             ];

@@ -31,6 +31,7 @@ export type Info1 = {
     type: 'url';
     url: string;
     name?: string;
+    sentence?: string;
 };
 
 export type Info2 = {
@@ -38,11 +39,17 @@ export type Info2 = {
     text: string;
     voice: string;
     name?: undefined;
+    sentence?: undefined;
 };
 
 export type AudioBinaryBase64 = {
     data: string;
     contentType: string | null;
+};
+
+export type SampleSentence = {
+    audio: AudioBinaryBase64 | null;
+    text: string | null;
 };
 
 export type CustomAudioList = {
@@ -53,6 +60,7 @@ export type CustomAudioList = {
 export type CustomAudioListSource = {
     url: string;
     name?: string;
+    sentence?: string;
 };
 
 export type WikimediaCommonsLookupResponse = {
