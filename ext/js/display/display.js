@@ -1062,15 +1062,16 @@ export class Display extends EventDispatcher {
      * @param {MouseEvent} e
      */
     _onDocumentElementClick(e) {
+        const enableBackForwardActions = this._options ? !(this._options.scanning.preventBackForward.onPopupPages) : true;
         switch (e.button) {
             case 3: // Back
-                if (this._history.hasPrevious()) {
+                if (enableBackForwardActions && this._history.hasPrevious()) {
                     e.preventDefault();
                     this._history.back();
                 }
                 break;
             case 4: // Forward
-                if (this._history.hasNext()) {
+                if (enableBackForwardActions && this._history.hasNext()) {
                     e.preventDefault();
                     this._history.forward();
                 }
