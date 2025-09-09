@@ -78,14 +78,14 @@ export class DictionaryImporter {
          * @param {import('dictionary-database').ObjectStoreData<T>[]} entries
          */
         const bulkAdd = async (objectStoreName, entries) => {
-            const ii = entries.length;
+            const entryCount = entries.length;
 
-            let progressIndexIncrease = bulkAddProgressAllowance / Math.ceil(ii / maxTransactionLength);
-            if (ii < maxTransactionLength) { progressIndexIncrease = bulkAddProgressAllowance; }
-            if (ii === 0) { this._progressData.index += progressIndexIncrease; }
+            let progressIndexIncrease = bulkAddProgressAllowance / Math.ceil(entryCount / maxTransactionLength);
+            if (entryCount < maxTransactionLength) { progressIndexIncrease = bulkAddProgressAllowance; }
+            if (entryCount === 0) { this._progressData.index += progressIndexIncrease; }
 
-            for (let i = 0; i < ii; i += maxTransactionLength) {
-                const count = Math.min(maxTransactionLength, ii - i);
+            for (let i = 0; i < entryCount; i += maxTransactionLength) {
+                const count = Math.min(maxTransactionLength, entryCount - i);
 
                 try {
                     await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
