@@ -23,6 +23,7 @@ import type * as Input from './input';
 import type * as Settings from './settings';
 import type * as TextSource from './text-source';
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
+import {PageType} from 'frontend';
 
 export type SearchResultDetail = {
     documentTitle: string;
@@ -38,10 +39,13 @@ export type Options = {
     layoutAwareScan?: boolean;
     preventMiddleMouseOnPage?: boolean;
     preventMiddleMouseOnTextHover?: boolean;
+    preventBackForwardOnPage?: boolean;
+    preventBackForwardOnTextHover?: boolean;
     matchTypePrefix?: boolean;
     sentenceParsingOptions?: SentenceParsingOptions;
     scanWithoutMousemove?: boolean;
     scanResolution?: string;
+    pageType?: PageType;
 };
 
 export type InputOptionsOuter = {

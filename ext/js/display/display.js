@@ -480,6 +480,8 @@ export class Display extends EventDispatcher {
                 layoutAwareScan: scanningOptions.layoutAwareScan,
                 preventMiddleMouseOnPage: scanningOptions.preventMiddleMouse.onSearchQuery,
                 preventMiddleMouseOnTextHover: scanningOptions.preventMiddleMouse.onTextHover,
+                preventBackForwardOnPage: scanningOptions.preventBackForward.onSearchQuery,
+                preventBackForwardOnTextHover: scanningOptions.preventBackForward.onTextHover,
                 matchTypePrefix: false,
                 sentenceParsingOptions,
                 scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
@@ -1060,15 +1062,16 @@ export class Display extends EventDispatcher {
      * @param {MouseEvent} e
      */
     _onDocumentElementClick(e) {
+        const enableBackForwardActions = this._options ? !(this._options.scanning.preventBackForward.onPopupPages) : true;
         switch (e.button) {
             case 3: // Back
-                if (this._history.hasPrevious()) {
+                if (enableBackForwardActions && this._history.hasPrevious()) {
                     e.preventDefault();
                     this._history.back();
                 }
                 break;
             case 4: // Forward
-                if (this._history.hasNext()) {
+                if (enableBackForwardActions && this._history.hasNext()) {
                     e.preventDefault();
                     this._history.forward();
                 }
@@ -2088,7 +2091,10 @@ export class Display extends EventDispatcher {
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouseOnPage: false,
             preventMiddleMouseOnTextHover: false,
+            preventBackForwardOnPage: false,
+            preventBackForwardOnTextHover: false,
             sentenceParsingOptions,
+            pageType: this._pageType,
         });
 
         this._contentTextScanner.setEnabled(true);

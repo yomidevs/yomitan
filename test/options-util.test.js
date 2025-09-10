@@ -369,6 +369,13 @@ function createProfileOptionsUpdatedTestData1() {
                 onSearchPages: false,
                 onSearchQuery: false,
             },
+            preventBackForward: {
+                onTextHover: false,
+                onWebPages: false,
+                onPopupPages: false,
+                onSearchPages: false,
+                onSearchQuery: false,
+            },
             scanWithoutMousemove: true,
             scanResolution: 'character',
             inputs: [
@@ -692,11 +699,12 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 71,
+        version: 73,
         global: {
             database: {
                 prefixWildcardsSupported: false,
             },
+            dataTransmissionConsentShown: false,
         },
     };
 }

@@ -63,6 +63,7 @@ export type Summary = {
     sourceLanguage?: string;
     targetLanguage?: string;
     frequencyMode?: 'occurrence-based' | 'rank-based';
+    importSuccess?: boolean;
 };
 
 export type SummaryDetails = {
@@ -70,6 +71,7 @@ export type SummaryDetails = {
     counts: SummaryCounts;
     styles: string;
     yomitanVersion: string;
+    importSuccess: boolean;
 };
 
 export type SummaryCounts = {
@@ -86,7 +88,7 @@ export type SummaryItemCount = {
 };
 
 export type SummaryMetaCount = {
-    total: number;
+    [total: string]: number;
     [key: string]: number;
 };
 

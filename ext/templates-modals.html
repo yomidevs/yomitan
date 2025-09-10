@@ -427,6 +427,10 @@
                         If no conditions are specified, the profile will only be used if it is selected as the default profile.
                     </p>
                     <p>
+                        When using the Flags condition, <code>clipboard</code> is the only valid input.
+                        This lets the search page apply another profile’s settings when text is copied, provided <code>Enable search page clipboard text monitoring</code> is enabled.
+                    </p>
+                    <p>
                         <a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a>
                     </p>
                 </div>
@@ -807,20 +811,22 @@
         <div class="modal-header"><div class="modal-title">Input Action Prevention</div></div>
         <div class="modal-body">
             <div>
-                Prevent middle mouse button actions on:
+                Prevent secondary mouse button actions on:
                 <a tabindex="0" class="more-toggle more-only" data-parent-distance="2">(?)</a>
             </div>
             <div class="more" hidden>
                 <p>
-                    This option is used to disable the default action of the middle mouse button in different contexts.
-                    This can be useful for preventing the scroll action that the middle mouse button is typically mapped to,
-                    which is otherwise difficult to disable inside extension pages via other means.
+                    This option is used to disable the default action of the secondary mouse buttons in different contexts.
+                    This can be useful for preventing actions that the middle button and buttons 4 and 5 are typically
+                    mapped to (scrolling and back/forward, respectively), which are otherwise difficult to disable inside
+                    extension pages via other means.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
                 </p>
             </div>
             <div class="input-prevention-option-list">
+                Middle mouse button:
                 <label class="input-prevention-option-list-item">
                     <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onTextHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                     <span>Text Hover</span>
@@ -839,6 +845,29 @@
                 </label>
                 <label class="input-prevention-option-list-item">
                     <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onSearchQuery"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Search query</span>
+                </label>
+            </div>
+            <div class="input-prevention-option-list">
+                Back/forward mouse buttons:
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventBackForward.onTextHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Text Hover</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventBackForward.onWebPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Webpages</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventBackForward.onPopupPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Popups</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventBackForward.onSearchPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Search page</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventBackForward.onSearchQuery"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                     <span>Search query</span>
                 </label>
             </div>
@@ -1637,6 +1666,21 @@
         <div class="modal-footer">
             <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
             <button type="button" class="danger" id="hotkey-list-reset" data-modal-action="hide">Reset All</button>
+        </div>
+    </div></div>
+
+    <!-- Firefox Data Transmission Consent -->
+    <div id="firefox-data-transmission-consent-modal" data-show-for-browser="firefox firefox-mobile" class="modal force-interact" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header"><div class="modal-title">Data Transmission Consent</div></div>
+        <div class="modal-body">
+            <p>To comply with <a href="https://extensionworkshop.com/documentation/publish/add-on-policies/">Firefox Add-On Policies</a>, Yomitan is required to get your verification that you are comfortable with any default data transmission the extension does.</p>
+            <p>Yomitan does very little data transmission, as Yomitan data is stored locally on your device. Yomitan does not sell or externally collect any user data.</p>
+            <p><b>The only place data transmission is done by default is when the audio icon in the Yomitan popup is clicked to play the audio for a term; in this case a request will be sent to the audio provider configured in your settings.</b></p>
+            <p>This request may contain the term, reading, and/or language for the given dictionary entry term. <b>Personally identifying information is never sent.</b></p>
+            <p>Full details on Yomitan's use of data transmission are provided in the <a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Yomitan Privacy Policy</a>.</p>        </div>
+        <div class="modal-footer modal-footer-spaced">
+            <button type="button" class="danger low-emphasis" data-modal-action="hide" id="decline-data-transmission">Decline data transmission<br>(disable audio playback)</button>
+            <button type="button" class="low-emphasis" data-modal-action="hide" id="accept-data-transmission">Agree to data transmission<br>(enable audio playback)</button>
         </div>
     </div></div>
 </template>

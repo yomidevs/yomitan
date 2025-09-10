@@ -99,6 +99,12 @@ type ApiSurface = {
         params: void;
         return: void;
     };
+    sanitizeCSSOffscreen: {
+        params: {
+            css: string;
+        };
+        return: string;
+    };
 };
 
 export type ApiMessage<TName extends ApiNames> = (

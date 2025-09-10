@@ -16,6 +16,7 @@
  */
 
 import {parseHTML} from '../../lib/linkedom.js';
+import {OffscreenProxy} from '../background/offscreen-proxy.js';
 import {RequestBuilder} from '../background/request-builder.js';
 import {invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
@@ -36,8 +37,9 @@ import {AnkiTemplateRenderer} from '../templates/anki-template-renderer.js';
 export class YomitanApi {
     /**
      * @param {import('api').ApiMap} apiMap
+     * @param {OffscreenProxy?} offscreen
      */
-    constructor(apiMap) {
+    constructor(apiMap, offscreen) {
         /** @type {?chrome.runtime.Port} */
         this._port = null;
         /** @type {EventListenerCollection} */
@@ -58,6 +60,8 @@ export class YomitanApi {
         this._requestBuilder = new RequestBuilder();
         /** @type {AudioDownloader} */
         this._audioDownloader = new AudioDownloader(this._requestBuilder);
+        /** @type {OffscreenProxy?} */
+        this._offscreen = offscreen;
     }
 
     /**
@@ -209,7 +213,7 @@ export class YomitanApi {
 
                         const dictionaryMedia = includeMedia ? await this._fetchDictionaryMedia(dictionaryEntries) : [];
                         const audioMedia = includeAudioMedia ? await this._fetchAudio(dictionaryEntries, profileOptions) : [];
-                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia, audioMedia, profileOptions, domlessDocument);
+                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia, audioMedia, profileOptions);
                         const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument, domlessWindow);
                         await ankiTemplateRenderer.prepare();
                         const templateRenderer = ankiTemplateRenderer.templateRenderer;
@@ -354,10 +358,9 @@ export class YomitanApi {
      * @param {import('yomitan-api.js').apiDictionaryMediaDetails[]} dictionaryMediaDetails
      * @param {import('yomitan-api.js').apiAudioMediaDetails[]} audioMediaDetails
      * @param {import('settings').ProfileOptions} options
-     * @param {Document} document
      * @returns {Promise<import('anki-note-builder.js').CommonData[]>}
      */
-    async _createCommonDatas(text, dictionaryEntries, dictionaryMediaDetails, audioMediaDetails, options, document) {
+    async _createCommonDatas(text, dictionaryEntries, dictionaryMediaDetails, audioMediaDetails, options) {
         /** @type {import('anki-note-builder.js').CommonData[]} */
         const commonDatas = [];
         for (const dictionaryEntry of dictionaryEntries) {
@@ -428,7 +431,7 @@ export class YomitanApi {
                     }],
                     dictionaryMedia: dictionaryMedia,
                 },
-                dictionaryStylesMap: this._getDictionaryStylesMapDomless(options.dictionaries, document),
+                dictionaryStylesMap: await this._getDictionaryStylesMapDomless(options.dictionaries),
             });
         }
         return commonDatas;
@@ -436,15 +439,14 @@ export class YomitanApi {
 
     /**
      * @param {import('settings').DictionariesOptions} dictionaries
-     * @param {Document} domlessDocument
-     * @returns {Map<string, string>}
+     * @returns {Promise<Map<string, string>>}
      */
-    _getDictionaryStylesMapDomless(dictionaries, domlessDocument) {
+    async _getDictionaryStylesMapDomless(dictionaries) {
         const styleMap = new Map();
         for (const dictionary of dictionaries) {
             const {name, styles} = dictionary;
             if (typeof styles === 'string') {
-                styleMap.set(name, this._sanitizeCSSDomless(styles, domlessDocument));
+                styleMap.set(name, await this._sanitizeCSSOffscreen(styles));
             }
         }
         return styleMap;
@@ -452,23 +454,19 @@ export class YomitanApi {
 
     /**
      * @param {string} css
-     * @param {Document} domlessDocument
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    _sanitizeCSSDomless(css, domlessDocument) {
-        // Since this does not parse any CSS explicitly it should not error
-        // But there is no guarantee linkedom will not error
+    async _sanitizeCSSOffscreen(css) {
+        if (css.length === 0) { return ''; }
         try {
-            const style = domlessDocument.createElement('style');
-            // eslint-disable-next-line no-unsanitized/property
-            style.innerHTML = css;
-            domlessDocument.appendChild(style);
-            const styleSheet = style.sheet;
-            if (styleSheet !== null) {
-                return [...styleSheet.cssRules].map((rule) => rule.cssText || '').join('\n');
+            const sanitizedCSS = this._offscreen ? await this._offscreen.sendMessagePromise({action: 'sanitizeCSSOffscreen', params: {css}}) : '';
+            if (sanitizedCSS.length === 0 && css.length > 0) {
+                throw new Error('Failed to sanitize css');
             }
+            // newlines and returns do not get converted into json well, are not required in css, and cause invalid css if not parsed for by the api consumer, just do the work for them
+            return sanitizedCSS.replaceAll(/(\r|\n)/g, ' ');
         } catch (e) {
-            log.log('Failed to sanitize css: ' + toError(e).message);
+            log.log('Failed to sanitize css: ' + css.replaceAll(/(\r|\n)/g, ' ') + ', ' + toError(e).message);
         }
         return '';
     }

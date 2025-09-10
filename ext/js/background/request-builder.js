@@ -52,7 +52,7 @@ export class RequestBuilder {
     async fetchAnonymous(url, init) {
         const id = this._getNewRuleId();
         const originUrl = this._getOriginURL(url);
-        url = encodeURI(decodeURI(url));
+        url = encodeURI(decodeURIComponent(url));
 
         this._ruleIds.add(id);
         try {

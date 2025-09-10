@@ -21,6 +21,7 @@ import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
+import {sanitizeCSS} from '../core/utilities.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {WebExtension} from '../extension/web-extension.js';
@@ -62,6 +63,7 @@ export class Offscreen {
             ['getTermFrequenciesOffscreen',    this._getTermFrequenciesHandler.bind(this)],
             ['clearDatabaseCachesOffscreen',   this._clearDatabaseCachesHandler.bind(this)],
             ['createAndRegisterPortOffscreen', this._createAndRegisterPort.bind(this)],
+            ['sanitizeCSSOffscreen',           this._sanitizeCSSOffscreen.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -196,6 +198,11 @@ export class Offscreen {
     /** @type {import('offscreen').McApiHandler<'connectToDatabaseWorker'>} */
     async _connectToDatabaseWorkerHandler(_params, ports) {
         await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
+    }
+
+    /** @type {import('offscreen').ApiHandler<'sanitizeCSSOffscreen'>} */
+    _sanitizeCSSOffscreen(params) {
+        return sanitizeCSS(params.css);
     }
 
     /**
