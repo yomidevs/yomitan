@@ -185,7 +185,8 @@ export type AudioSourceOptions = {
 
 export type ScanningOptions = {
     inputs: ScanningInput[];
-    preventMiddleMouse: ScanningPreventMiddleMouseOptions;
+    preventMiddleMouse: ScanningPreventSecondaryMouseOptions;
+    preventBackForward: ScanningPreventSecondaryMouseOptions;
     selectText: boolean;
     alphanumeric: boolean;
     autoHideResults: boolean;
@@ -238,7 +239,7 @@ export type ScanningInputOptions = {
     minimumTouchTime: number;
 };
 
-export type ScanningPreventMiddleMouseOptions = {
+export type ScanningPreventSecondaryMouseOptions = {
     onTextHover: boolean;
     onWebPages: boolean;
     onPopupPages: boolean;
@@ -376,7 +377,7 @@ export type AccessibilityOptions = {
     forceGoogleDocsHtmlRendering: boolean;
 };
 
-export type PreventMiddleMouseOptions = {
+export type PreventSecondaryMouseOptions = {
     onTextHover: boolean;
     onWebPages: boolean;
     onPopupPages: boolean;

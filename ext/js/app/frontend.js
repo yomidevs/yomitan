@@ -499,8 +499,10 @@ export class Frontend {
 
         await this._updatePopup();
 
-        const preventMiddleMouseOnPage = this._getPreventMiddleMouseValueForPageType(scanningOptions.preventMiddleMouse);
+        const preventMiddleMouseOnPage = this._getPreventSecondaryMouseValueForPageType(scanningOptions.preventMiddleMouse);
         const preventMiddleMouseOnTextHover = scanningOptions.preventMiddleMouse.onTextHover;
+        const preventBackForwardOnPage = this._getPreventSecondaryMouseValueForPageType(scanningOptions.preventBackForward);
+        const preventBackForwardOnTextHover = scanningOptions.preventBackForward.onTextHover;
         this._textScanner.language = options.general.language;
         this._textScanner.setOptions({
             inputs: scanningOptions.inputs,
@@ -513,6 +515,8 @@ export class Frontend {
             matchTypePrefix: scanningOptions.matchTypePrefix,
             preventMiddleMouseOnPage,
             preventMiddleMouseOnTextHover,
+            preventBackForwardOnPage,
+            preventBackForwardOnTextHover,
             sentenceParsingOptions,
             scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
             scanResolution: scanningOptions.scanResolution,
@@ -902,14 +906,14 @@ export class Frontend {
     }
 
     /**
-     * @param {import('settings').PreventMiddleMouseOptions} preventMiddleMouseOptions
+     * @param {import('settings').PreventSecondaryMouseOptions} preventSecondaryMouseOptions
      * @returns {boolean}
      */
-    _getPreventMiddleMouseValueForPageType(preventMiddleMouseOptions) {
+    _getPreventSecondaryMouseValueForPageType(preventSecondaryMouseOptions) {
         switch (this._pageType) {
-            case 'web': return preventMiddleMouseOptions.onWebPages;
-            case 'popup': return preventMiddleMouseOptions.onPopupPages;
-            case 'search': return preventMiddleMouseOptions.onSearchPages;
+            case 'web': return preventSecondaryMouseOptions.onWebPages;
+            case 'popup': return preventSecondaryMouseOptions.onPopupPages;
+            case 'search': return preventSecondaryMouseOptions.onSearchPages;
         }
     }
 

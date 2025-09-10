@@ -39,6 +39,8 @@ export type Options = {
     layoutAwareScan?: boolean;
     preventMiddleMouseOnPage?: boolean;
     preventMiddleMouseOnTextHover?: boolean;
+    preventBackForwardOnPage?: boolean;
+    preventBackForwardOnTextHover?: boolean;
     matchTypePrefix?: boolean;
     sentenceParsingOptions?: SentenceParsingOptions;
     scanWithoutMousemove?: boolean;

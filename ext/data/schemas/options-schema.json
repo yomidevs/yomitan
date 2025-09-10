@@ -479,6 +479,7 @@
                                 "required": [
                                     "inputs",
                                     "preventMiddleMouse",
+                                    "preventBackForward",
                                     "selectText",
                                     "alphanumeric",
                                     "autoHideResults",
@@ -681,6 +682,34 @@
                                         }
                                     },
                                     "preventMiddleMouse": {
+                                        "type": "object",
+                                        "required": [
+                                            "onTextHover",
+                                            "onWebPages",
+                                            "onPopupPages",
+                                            "onSearchPages",
+                                            "onSearchQuery"
+                                        ],
+                                        "properties": {
+                                            "onWebPages": {
+                                                "type": "boolean",
+                                                "default": false
+                                            },
+                                            "onPopupPages": {
+                                                "type": "boolean",
+                                                "default": false
+                                            },
+                                            "onSearchPages": {
+                                                "type": "boolean",
+                                                "default": false
+                                            },
+                                            "onSearchQuery": {
+                                                "type": "boolean",
+                                                "default": false
+                                            }
+                                        }
+                                    },
+                                    "preventBackForward": {
                                         "type": "object",
                                         "required": [
                                             "onTextHover",
