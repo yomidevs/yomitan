@@ -671,6 +671,13 @@ export class OptionsUtil {
                 onSearchPages: false,
                 onSearchQuery: false,
             };
+            profileOptions.scanning.preventBackForward = {
+                onTextHover: false,
+                onWebPages: false,
+                onPopupPages: false,
+                onSearchPages: false,
+                onSearchQuery: false,
+            };
 
             const {modifier, middleMouse} = profileOptions.scanning;
             delete profileOptions.scanning.modifier;

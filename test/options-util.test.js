@@ -369,6 +369,13 @@ function createProfileOptionsUpdatedTestData1() {
                 onSearchPages: false,
                 onSearchQuery: false,
             },
+            preventBackForward: {
+                onTextHover: false,
+                onWebPages: false,
+                onPopupPages: false,
+                onSearchPages: false,
+                onSearchQuery: false,
+            },
             scanWithoutMousemove: true,
             scanResolution: 'character',
             inputs: [
