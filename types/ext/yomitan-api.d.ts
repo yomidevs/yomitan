@@ -33,7 +33,7 @@ export type ankiFieldsInput = {
 
 export type tokenizeInput = {
     text: string;
-    scanLength?: number;
+    scanLength: number;
 };
 
 export type remoteVersionResponse = {
