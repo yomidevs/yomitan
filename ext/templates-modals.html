@@ -811,20 +811,22 @@
         <div class="modal-header"><div class="modal-title">Input Action Prevention</div></div>
         <div class="modal-body">
             <div>
-                Prevent middle mouse button actions on:
+                Prevent secondary mouse button actions on:
                 <a tabindex="0" class="more-toggle more-only" data-parent-distance="2">(?)</a>
             </div>
             <div class="more" hidden>
                 <p>
-                    This option is used to disable the default action of the middle mouse button in different contexts.
-                    This can be useful for preventing the scroll action that the middle mouse button is typically mapped to,
-                    which is otherwise difficult to disable inside extension pages via other means.
+                    This option is used to disable the default action of the secondary mouse buttons in different contexts.
+                    This can be useful for preventing actions that the middle button and buttons 4 and 5 are typically
+                    mapped to (scrolling and back/forward, respectively), which are otherwise difficult to disable inside
+                    extension pages via other means.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
                 </p>
             </div>
             <div class="input-prevention-option-list">
+                Middle mouse button:
                 <label class="input-prevention-option-list-item">
                     <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onTextHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                     <span>Text Hover</span>
@@ -843,6 +845,29 @@
                 </label>
                 <label class="input-prevention-option-list-item">
                     <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onSearchQuery"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Search query</span>
+                </label>
+            </div>
+            <div class="input-prevention-option-list">
+                Back/forward mouse buttons:
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventBackForward.onTextHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Text Hover</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventBackForward.onWebPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Webpages</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventBackForward.onPopupPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Popups</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventBackForward.onSearchPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Search page</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventBackForward.onSearchQuery"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                     <span>Search query</span>
                 </label>
             </div>
