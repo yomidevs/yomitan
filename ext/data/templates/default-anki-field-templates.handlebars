@@ -92,29 +92,18 @@
                 {{~/if~}}
             {{~/unless~}}
         {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
-            {{~#if (op ">" definition.definitions.length 1)~}}
-                <ol>
-                    {{~#each definition.definitions~}}
-                        {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
-                            <li data-dictionary="{{dictionary}}">
-                                {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
-                            </li>
-                            {{~#if dictScopedStyles~}}
-                                <style>{{{dictScopedStyles}}}</style>
-                            {{~/if~}}
-                        {{~/unless~}}
-                    {{~/each~}}
-                </ol>
-            {{~else~}}
+            <ol>
                 {{~#each definition.definitions~}}
                     {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
-                        {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
-                        {{~#if glossaryScopedStyles~}}
-                            <style>{{{glossaryScopedStyles}}}</style>
+                        <li data-dictionary="{{dictionary}}">
+                            {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                        </li>
+                        {{~#if dictScopedStyles~}}
+                            <style>{{{dictScopedStyles}}}</style>
                         {{~/if~}}
                     {{~/unless~}}
                 {{~/each~}}
-            {{~/if~}}
+            </ol>
         {{~else if (op "===" definition.type "kanji")~}}
             {{~#if (op ">" definition.glossary.length 1)~}}
                 <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>

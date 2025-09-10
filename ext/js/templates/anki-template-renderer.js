@@ -806,7 +806,7 @@ export class AnkiTemplateRenderer {
         /** @type {string[]} */
         const rawGlossaryContent = [];
         while (glossaryContentQueue.length > 0) {
-            const structuredGloss = glossaryContentQueue.pop();
+            const structuredGloss = glossaryContentQueue.shift();
             if (typeof structuredGloss === 'string') {
                 rawGlossaryContent.push(structuredGloss);
             } else if (Array.isArray(structuredGloss)) {
