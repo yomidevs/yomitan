@@ -976,6 +976,7 @@
                                     "fieldTemplates",
                                     "suspendNewCards",
                                     "displayTagsAndFlags",
+                                    "targetTags",
                                     "noteGuiMode",
                                     "apiKey",
                                     "downloadTimeout"
@@ -1127,8 +1128,15 @@
                                     },
                                     "displayTagsAndFlags": {
                                         "type": "string",
-                                        "enum": ["never", "always", "non-standard"],
+                                        "enum": ["never", "always", "non-standard", "custom"],
                                         "default": "never"
+                                    },
+                                    "targetTags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "default": []
                                     },
                                     "noteGuiMode": {
                                         "type": "string",

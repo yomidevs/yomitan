@@ -91,6 +91,8 @@ export class DisplayAnki {
         this._audioDownloadIdleTimeout = null;
         /** @type {string[]} */
         this._noteTags = [];
+        /** @type {string[]} */
+        this._targetTags = [];
         /** @type {import('settings').AnkiCardFormat[]} */
         this._cardFormats = [];
         /** @type {import('settings').DictionariesOptions} */
@@ -196,6 +198,7 @@ export class DisplayAnki {
             dictionaries,
             anki: {
                 tags,
+                targetTags,
                 duplicateScope,
                 duplicateScopeCheckAllModels,
                 duplicateBehavior,
@@ -224,6 +227,7 @@ export class DisplayAnki {
         this._scanLength = scanLength;
         this._noteGuiMode = noteGuiMode;
         this._noteTags = [...tags];
+        this._targetTags = [...targetTags];
         this._audioDownloadIdleTimeout = (Number.isFinite(downloadTimeout) && downloadTimeout > 0 ? downloadTimeout : null);
         this._cardFormats = cardFormats;
         this._dictionaries = dictionaries;
@@ -504,6 +508,16 @@ export class DisplayAnki {
         }
         if (this._displayTagsAndFlags === 'non-standard') {
             for (const tag of this._noteTags) {
+                displayTags.delete(tag);
+            }
+        } else if (this._displayTagsAndFlags === 'custom') {
+            const tagsToRemove = [];
+            for (const tag of displayTags) {
+                if (typeof tag === 'string' && !this._targetTags.includes(tag)) {
+                    tagsToRemove.push(tag);
+                }
+            }
+            for (const tag of tagsToRemove) {
                 displayTags.delete(tag);
             }
         }
