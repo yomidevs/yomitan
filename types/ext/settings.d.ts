@@ -309,6 +309,7 @@ export type AnkiOptions = {
     noteGuiMode: AnkiNoteGuiMode;
     apiKey: string;
     downloadTimeout: number;
+    forceSync: boolean;
 };
 
 export type AnkiScreenshotOptions = {

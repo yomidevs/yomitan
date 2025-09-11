@@ -979,7 +979,8 @@
                                     "targetTags",
                                     "noteGuiMode",
                                     "apiKey",
-                                    "downloadTimeout"
+                                    "downloadTimeout",
+                                    "forceSync"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -1151,6 +1152,10 @@
                                         "type": "number",
                                         "default": 0,
                                         "minimum": 0
+                                    },
+                                    "forceSync": {
+                                        "type": "boolean",
+                                        "default": false
                                     }
                                 }
                             },
