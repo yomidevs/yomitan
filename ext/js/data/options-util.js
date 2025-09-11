@@ -1811,6 +1811,7 @@ export class OptionsUtil {
     async _updateVersion72(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v71.handlebars');
     }
+
     /**
      *  - Added anki.targetTags
      *  @type {import('options-util').UpdateFunction}
