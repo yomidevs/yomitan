@@ -479,6 +479,7 @@
                                 "required": [
                                     "inputs",
                                     "preventMiddleMouse",
+                                    "preventBackForward",
                                     "selectText",
                                     "alphanumeric",
                                     "autoHideResults",
@@ -681,6 +682,34 @@
                                         }
                                     },
                                     "preventMiddleMouse": {
+                                        "type": "object",
+                                        "required": [
+                                            "onTextHover",
+                                            "onWebPages",
+                                            "onPopupPages",
+                                            "onSearchPages",
+                                            "onSearchQuery"
+                                        ],
+                                        "properties": {
+                                            "onWebPages": {
+                                                "type": "boolean",
+                                                "default": false
+                                            },
+                                            "onPopupPages": {
+                                                "type": "boolean",
+                                                "default": false
+                                            },
+                                            "onSearchPages": {
+                                                "type": "boolean",
+                                                "default": false
+                                            },
+                                            "onSearchQuery": {
+                                                "type": "boolean",
+                                                "default": false
+                                            }
+                                        }
+                                    },
+                                    "preventBackForward": {
                                         "type": "object",
                                         "required": [
                                             "onTextHover",
@@ -947,6 +976,7 @@
                                     "fieldTemplates",
                                     "suspendNewCards",
                                     "displayTagsAndFlags",
+                                    "targetTags",
                                     "noteGuiMode",
                                     "apiKey",
                                     "downloadTimeout"
@@ -1098,8 +1128,15 @@
                                     },
                                     "displayTagsAndFlags": {
                                         "type": "string",
-                                        "enum": ["never", "always", "non-standard"],
+                                        "enum": ["never", "always", "non-standard", "custom"],
                                         "default": "never"
+                                    },
+                                    "targetTags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "default": []
                                     },
                                     "noteGuiMode": {
                                         "type": "string",

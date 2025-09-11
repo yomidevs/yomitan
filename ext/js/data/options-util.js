@@ -584,6 +584,7 @@ export class OptionsUtil {
             this._updateVersion70,
             this._updateVersion71,
             this._updateVersion72,
+            this._updateVersion73,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -665,6 +666,13 @@ export class OptionsUtil {
             profileOptions.scanning.hideDelay = 0;
             profileOptions.scanning.pointerEventsEnabled = false;
             profileOptions.scanning.preventMiddleMouse = {
+                onTextHover: false,
+                onWebPages: false,
+                onPopupPages: false,
+                onSearchPages: false,
+                onSearchQuery: false,
+            };
+            profileOptions.scanning.preventBackForward = {
                 onTextHover: false,
                 onWebPages: false,
                 onPopupPages: false,
@@ -1802,6 +1810,16 @@ export class OptionsUtil {
      */
     async _updateVersion72(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v71.handlebars');
+    }
+
+    /**
+     *  - Added anki.targetTags
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion73(options) {
+        for (const profile of options.profiles) {
+            profile.options.anki.targetTags = [];
+        }
     }
 
     /**
