@@ -402,7 +402,7 @@ export class Frontend {
     _onSearchEmpty() {
         const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
         if (scanningOptions.autoHideResults) {
-            this._clearSelectionDelayed(scanningOptions.hideDelay, false, false);
+            void this._clearSelectionDelayed(scanningOptions.hideDelay, false, false);
         }
     }
 
@@ -467,28 +467,28 @@ export class Frontend {
         }
 
         let childPopup = this._popup?.child;
-        while (childPopup !== null && childPopup !== undefined) {
+        while (typeof childPopup !== 'undefined' && childPopup !== null) {
             try {
-                const isOver = await childPopup.isPointerOver();
+                const isOver = childPopup.isPointerOver();
                 if (isOver) {
                     return true;
                 }
                 childPopup = childPopup.child;
             } catch (e) {
-                console.warn('Error checking child popup pointer state:', e);
+                log.warn(new Error('Error checking child popup pointer state'));
             }
         }
 
         let parentPopup = this._popup?.parent;
-        while (parentPopup !== null && parentPopup !== undefined) {
+        while (typeof parentPopup !== 'undefined' && parentPopup !== null) {
             try {
-                const isOver = await parentPopup.isPointerOver();
+                const isOver = parentPopup.isPointerOver();
                 if (isOver) {
                     return true;
                 }
                 parentPopup = parentPopup.parent;
             } catch (e) {
-                console.warn('Error checking parent popup pointer state:', e);
+                log.warn(new Error('Error checking parent popup pointer state'));
             }
         }
 
@@ -504,7 +504,9 @@ export class Frontend {
         if (!this._textScanner.hasSelection()) { return; }
 
         // Add a small delay to allow mouseover events to be processed
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise((resolve) => {
+            setTimeout(resolve, 50);
+        });
 
         // Always check if pointer is over any popup before clearing
         if (await this._isPointerOverAnyPopup()) { return; }

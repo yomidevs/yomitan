@@ -300,7 +300,6 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<boolean>} Whether the pointer is over the popup
      */
     isPointerOver() {
-
         return this._invokeSafe('popupFactoryIsPointerOver', {id: this._id}, false);
     }
 

@@ -406,7 +406,6 @@ export class Popup extends EventDispatcher {
      * @returns {boolean}
      */
     isPointerOver() {
-
         return this._isPointerOverPopup;
     }
 
@@ -416,7 +415,6 @@ export class Popup extends EventDispatcher {
      * @returns {void}
      */
     _onFrameMouseOver() {
-
         this._isPointerOverPopup = true;
 
         this.trigger('mouseOver', {});
@@ -424,7 +422,6 @@ export class Popup extends EventDispatcher {
         // Clear all child popups when parent is moused over
         let currentChild = this.child;
         while (currentChild !== null) {
-
             currentChild.hide(false);
             currentChild = currentChild.child;
         }
@@ -434,16 +431,13 @@ export class Popup extends EventDispatcher {
      * @returns {void}
      */
     _onFrameMouseOut() {
-
         this._isPointerOverPopup = false;
 
         this.trigger('mouseOut', {});
 
-
         // Propagate mouseOut event up through the entire hierarchy
         let currentParent = this.parent;
         while (currentParent !== null) {
-
             currentParent.trigger('mouseOut', {});
             currentParent = currentParent.parent;
         }
@@ -492,12 +486,10 @@ export class Popup extends EventDispatcher {
 
         const useSecurePopupFrameUrl = this._useSecureFrameUrl;
 
-
         await this._setUpContainer(this._useShadowDom);
 
         /** @type {import('frame-client').SetupFrameFunction} */
         const setupFrame = (frame) => {
-
             frame.removeAttribute('src');
             frame.removeAttribute('srcdoc');
             this._observeFullscreen(true);
@@ -521,14 +513,11 @@ export class Popup extends EventDispatcher {
         await frameClient.connect(this._frame, this._targetOrigin, this._frameId, setupFrame);
         this._frameConnected = true;
 
-
         // Reattach mouse event listeners after frame injection
-
         const boundMouseOver = this._onFrameMouseOver.bind(this);
         const boundMouseOut = this._onFrameMouseOut.bind(this);
         this._frame.addEventListener('mouseover', boundMouseOver);
         this._frame.addEventListener('mouseout', boundMouseOut);
-
 
         // Configure
         /** @type {import('display').DirectApiParams<'displayConfigure'>} */
@@ -541,7 +530,6 @@ export class Popup extends EventDispatcher {
             optionsContext: this._optionsContext,
         };
         await this._invokeSafe('displayConfigure', configureParams);
-
     }
 
     /**

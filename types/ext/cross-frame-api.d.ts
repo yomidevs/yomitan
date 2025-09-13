@@ -80,7 +80,7 @@ export type CrossFrameCommunicationPortDetails = {
     otherFrameId: number;
 };
 
-export interface ApiSurface {
+export type ApiSurface = {
     displayPopupMessage1: {
         params: DisplayDirectApiFrameClientMessageAny;
         return: DisplayDirectApiReturnAny;
@@ -240,7 +240,7 @@ export interface ApiSurface {
         };
         return: boolean;
     };
-}
+};
 
 export type ApiNames = BaseApiNames<ApiSurface>;
 
