@@ -638,6 +638,9 @@ export class AnkiController {
         if (this._cardFormatIndex > ankiOptions.cardFormats.length) {
             this._cardFormatIndex = ankiOptions.cardFormats.length - 1;
         }
+        if (this._cardFormatIndex < 0) {
+            this._cardFormatIndex = 0;
+        }
 
         for (let i = 0; i < ankiOptions.cardFormats.length; ++i) {
             const cardFormat = ankiOptions.cardFormats[i];
