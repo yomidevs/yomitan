@@ -350,7 +350,7 @@ export class AnkiController {
         /** @type {HTMLSelectElement} */
         const iconSelect = querySelectorNotNull(this._ankiCardPrimary, '.anki-card-icon');
         iconSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'cardFormats', cardFormatIndex, 'icon']);
-        iconSelect.dataset.icon = this._ankiOptions?.cardFormats[cardFormatIndex].icon ?? 'big-circle';
+        iconSelect.dataset.icon = this._ankiOptions?.cardFormats[cardFormatIndex]?.icon ?? 'big-circle';
     }
 
     /**
