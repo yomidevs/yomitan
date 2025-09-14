@@ -650,6 +650,8 @@ export class AnkiController {
             }
         }
 
+        this._cardFormatDeleteButton.disabled = ankiOptions.cardFormats.length <= 1;
+
         this._setCardFormatIndex(this._cardFormatIndex, 'anki-card-term-field-menu');
     }
 
@@ -724,6 +726,7 @@ export class AnkiController {
      */
     _onCardFormatDeleteClick(e) {
         e.preventDefault();
+        if (this._ankiOptions && this._ankiOptions.cardFormats.length === 1) { return; }
         this.openDeleteCardFormatModal(this._cardFormatIndex);
     }
 
