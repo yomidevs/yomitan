@@ -80,7 +80,7 @@ export type CrossFrameCommunicationPortDetails = {
     otherFrameId: number;
 };
 
-type ApiSurface = {
+export type ApiSurface = {
     displayPopupMessage1: {
         params: DisplayDirectApiFrameClientMessageAny;
         return: DisplayDirectApiReturnAny;
@@ -233,6 +233,12 @@ type ApiSurface = {
     frameAncestryHandlerRequestFrameInfoResponse: {
         params: RequestFrameInfoResponseParams;
         return: RequestFrameInfoResponseReturn;
+    };
+    popupFactoryIsPointerOver: {
+        params: {
+            id: string;
+        };
+        return: boolean;
     };
 };
 
