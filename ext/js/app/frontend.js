@@ -424,7 +424,6 @@ export class Frontend {
      */
     _onPopupFramePointerOver() {
         this._isPointerOverPopup = true;
-        this._stopClearSelectionDelayed();
     }
 
     /**
@@ -432,9 +431,10 @@ export class Frontend {
      */
     _onPopupFramePointerOut() {
         this._isPointerOverPopup = false;
-        const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
-        if (scanningOptions.hidePopupOnCursorExit) {
-            this._clearSelectionDelayed(scanningOptions.hidePopupOnCursorExitDelay, false, false);
+        if (!this._options) { return; }
+        const {scanning: {hidePopupOnCursorExit, hidePopupOnCursorExitDelay}} = this._options;
+        if (hidePopupOnCursorExit) {
+            void this._clearSelectionDelayed(hidePopupOnCursorExitDelay, false, false);
         }
     }
 
@@ -457,18 +457,64 @@ export class Frontend {
     }
 
     /**
+     * Checks if the pointer is over any popup in the hierarchy (parent or child popups).
+     * @returns {Promise<boolean>}
+     * @private
+     */
+    async _isPointerOverAnyPopup() {
+        if (this._isPointerOverPopup) {
+            return true;
+        }
+
+        let childPopup = this._popup?.child;
+        while (childPopup !== null && childPopup !== undefined) {
+            try {
+                const isOver = await childPopup.isPointerOver();
+                if (isOver) {
+                    return true;
+                }
+                childPopup = childPopup.child;
+            } catch (e) {
+                console.warn('Error checking child popup pointer state:', e);
+            }
+        }
+
+        let parentPopup = this._popup?.parent;
+        while (parentPopup !== null && parentPopup !== undefined) {
+            try {
+                const isOver = await parentPopup.isPointerOver();
+                if (isOver) {
+                    return true;
+                }
+                parentPopup = parentPopup.parent;
+            } catch (e) {
+                console.warn('Error checking parent popup pointer state:', e);
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param {number} delay
      * @param {boolean} restart
      * @param {boolean} passive
      */
-    _clearSelectionDelayed(delay, restart, passive) {
+    async _clearSelectionDelayed(delay, restart, passive) {
         if (!this._textScanner.hasSelection()) { return; }
+
+        // Add a small delay to allow mouseover events to be processed
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Always check if pointer is over any popup before clearing
+        if (await this._isPointerOverAnyPopup()) { return; }
+
         if (delay > 0) {
             if (this._clearSelectionTimer !== null && !restart) { return; } // Already running
             this._stopClearSelectionDelayed();
-            this._clearSelectionTimer = setTimeout(() => {
+            this._clearSelectionTimer = setTimeout(async () => {
                 this._clearSelectionTimer = null;
-                if (this._isPointerOverPopup) { return; }
+                if (await this._isPointerOverAnyPopup()) { return; }
                 this._clearSelection(passive);
             }, delay);
         } else {
@@ -602,8 +648,8 @@ export class Frontend {
         this._popupEventListeners.removeAllEventListeners();
         this._popup = popup;
         if (popup !== null) {
-            this._popupEventListeners.on(popup, 'framePointerOver', this._onPopupFramePointerOver.bind(this));
-            this._popupEventListeners.on(popup, 'framePointerOut', this._onPopupFramePointerOut.bind(this));
+            this._popupEventListeners.on(popup, 'mouseOver', this._onPopupFramePointerOver.bind(this));
+            this._popupEventListeners.on(popup, 'mouseOut', this._onPopupFramePointerOut.bind(this));
         }
         this._isPointerOverPopup = false;
     }
