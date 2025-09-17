@@ -427,6 +427,13 @@ export class API {
         return this._invoke('getLanguageSummaries', void 0);
     }
 
+    /**
+     * @returns {Promise<import('api').ApiReturn<'forceSync'>>}
+     */
+    forceSync() {
+        return this._invoke('forceSync', void 0);
+    }
+
     // Utilities
 
     /**

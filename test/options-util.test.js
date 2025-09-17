@@ -543,6 +543,7 @@ function createProfileOptionsUpdatedTestData1() {
             noteGuiMode: 'browse',
             apiKey: '',
             downloadTimeout: 0,
+            forceSync: false,
         },
         sentenceParsing: {
             scanExtent: 200,
