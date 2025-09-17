@@ -1116,7 +1116,12 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'forceSync'>} */
     async _onApiForceSync() {
-        await this._anki.makeAnkiSync();
+        try {
+            await this._anki.makeAnkiSync();
+        } catch (e) {
+            log.error(e);
+            throw e;
+        }
         return void 0;
     }
 
