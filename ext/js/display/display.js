@@ -1764,11 +1764,11 @@ export class Display extends EventDispatcher {
         const popupHeight = this._contentScrollElement.clientHeight;
         const contentBottom = this._contentScrollElement.scrollHeight - popupHeight;
         const overlap = 10;
-        const scrollAmount = Math.min(this._windowScroll.y + ((popupHeight - overlap) * direction), contentBottom);
-        const target = Math.max(0, scrollAmount);
+        const scrollAmount = ((popupHeight - overlap) * direction);
+        const target = Math.min(this._windowScroll.y + scrollAmount, contentBottom);
 
         this._windowScroll.stop();
-        this._windowScroll.toY(target);
+        this._windowScroll.toY(Math.max(0, target));
     }
 
     /**
