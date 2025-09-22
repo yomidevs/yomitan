@@ -356,6 +356,10 @@ export class Display extends EventDispatcher {
         }
 
         document.addEventListener('wheel', this._onWheel.bind(this), {passive: false});
+        if (this._contentScrollElement !== null) {
+            this._contentScrollElement.addEventListener('touchstart', this._onTouchStart.bind(this), {passive: true});
+            this._contentScrollElement.addEventListener('touchmove', this._onTouchMove.bind(this), {passive: false});
+        }
         if (this._closeButton !== null) {
             this._closeButton.addEventListener('click', this._onCloseButtonClick.bind(this), false);
         }
@@ -1001,6 +1005,46 @@ export class Display extends EventDispatcher {
     }
 
     /**
+     * @param {TouchEvent} e
+     */
+    _onTouchStart(e) {
+        if (!this._options?.scanning.paginatedScrolling || e.touches.length !== 1) {
+            return;
+        }
+
+        const start = e.touches[0].clientY;
+        /**
+         * @param {TouchEvent} endEvent
+         */
+        const onTouchEnd = (endEvent) => {
+            this._contentScrollElement.removeEventListener('touchend', onTouchEnd);
+
+            const end = endEvent.changedTouches[0].clientY;
+            const delta = start - end;
+            const swipeThreshold = 50;
+
+            if (delta > swipeThreshold) {
+                this._scrollPaginated(1);
+            } else if (delta < -swipeThreshold) {
+                this._scrollPaginated(-1);
+            }
+        };
+
+        this._contentScrollElement.addEventListener('touchend', onTouchEnd, {passive: true});
+    }
+
+    /**
+     * @param {TouchEvent} e
+     */
+    _onTouchMove = (e) => {
+        if (!this._options?.scanning.paginatedScrolling || !e.cancelable) {
+            return;
+        }
+
+        e.preventDefault();
+    };
+
+    /**
      * @param {WheelEvent} e
      */
     _onWheel(e) {
@@ -1011,6 +1055,9 @@ export class Display extends EventDispatcher {
             }
         } else if (e.shiftKey) {
             this._onHistoryWheel(e);
+        } else if (this._options?.scanning.paginatedScrolling) {
+            this._scrollPaginated(e.deltaY > 0 ? 1 : -1);
+            e.preventDefault();
         }
     }
 
@@ -1707,6 +1754,21 @@ export class Display extends EventDispatcher {
 
         this._focusEntry(index, focusDefinitionIndex, smooth);
         return true;
+    }
+
+    /**
+     *
+     * @param {number} direction
+     */
+    _scrollPaginated(direction) {
+        const popupHeight = this._contentScrollElement.clientHeight;
+        const contentBottom = this._contentScrollElement.scrollHeight - popupHeight;
+        const overlap = 10;
+        const scrollAmount = Math.min(this._windowScroll.y + ((popupHeight - overlap) * direction), contentBottom);
+        const target = Math.max(0, scrollAmount);
+
+        this._windowScroll.stop();
+        this._windowScroll.toY(target);
     }
 
     /**

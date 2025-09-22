@@ -496,6 +496,7 @@
                                     "matchTypePrefix",
                                     "hidePopupOnCursorExit",
                                     "hidePopupOnCursorExitDelay",
+                                    "paginatedScrolling",
                                     "normalizeCssZoom",
                                     "scanWithoutMousemove",
                                     "scanResolution"
@@ -805,6 +806,10 @@
                                         "type": "number",
                                         "minimum": 0,
                                         "default": 0
+                                    },
+                                    "paginatedScrolling": {
+                                        "type": "boolean",
+                                        "default": false
                                     },
                                     "normalizeCssZoom": {
                                         "type": "boolean",

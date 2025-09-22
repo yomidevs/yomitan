@@ -203,6 +203,7 @@ export type ScanningOptions = {
     matchTypePrefix: boolean;
     hidePopupOnCursorExit: boolean;
     hidePopupOnCursorExitDelay: number;
+    paginatedScrolling: boolean;
     normalizeCssZoom: boolean;
     scanWithoutMousemove: boolean;
     scanResolution: string;
