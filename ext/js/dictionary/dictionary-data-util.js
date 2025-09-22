@@ -333,7 +333,7 @@ export function isNonNounVerbOrAdjective(wordClasses) {
             case 'vs':
                 isVerbOrAdjective = true;
                 isSuruVerb = true;
-                // Falls through
+		break;
             case 'n':
                 isNoun = true;
                 break;
