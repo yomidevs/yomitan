@@ -2672,7 +2672,9 @@ export class Backend {
             for (const {pattern, ignoreCase, replacement} of group) {
                 let patternRegExp;
                 try {
-                    patternRegExp = new RegExp(pattern, ignoreCase ? 'gi' : 'g');
+                    patternRegExp = ignoreCase ?
+                        new RegExp(pattern.replace("'", "['’]"), 'gi') :
+                        new RegExp(pattern, 'g');
                 } catch (e) {
                     // Invalid pattern
                     continue;
