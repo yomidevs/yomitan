@@ -29,6 +29,7 @@ import {arabicTransforms} from './ar/arabic-transforms.js';
 import {normalizeRadicalCharacters} from './CJK-util.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
+import {removeDoubleAcuteAccents} from './el/modern-greek-processors.js';
 import {englishTransforms} from './en/english-transforms.js';
 import {esperantoTransforms} from './eo/esperanto-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
@@ -152,7 +153,10 @@ const languageDescriptors = [
         iso639_3: 'ell',
         name: 'Greek',
         exampleText: 'διαβάζω',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeDoubleAcuteAccents,
+        },
     },
     {
         iso: 'en',
