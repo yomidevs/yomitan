@@ -22,6 +22,7 @@ import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
 import {getDynamicTemplates} from '../../data/anki-template-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {getLanguageSummaries} from '../../language/languages.js';
+import {getRequiredAudioSources} from '../../media/audio-downloader.js';
 import {TemplateRendererProxy} from '../../templates/template-renderer-proxy.js';
 
 export class AnkiDeckGeneratorController {
@@ -496,7 +497,8 @@ export class AnkiDeckGeneratorController {
         const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
         const idleTimeout = (Number.isFinite(options.anki.downloadTimeout) && options.anki.downloadTimeout > 0 ? options.anki.downloadTimeout : null);
         const languageSummary = getLanguageSummaries().find(({iso}) => iso === options.general.language);
-        const mediaOptions = addMedia ? {audio: {sources: options.audio.sources, preferredAudioIndex: null, idleTimeout: idleTimeout, languageSummary: languageSummary}} : null;
+        const requiredAudioSources = options.audio.enableDefaultAudioSources ? getRequiredAudioSources(options.general.language, options.audio.sources) : [];
+        const mediaOptions = addMedia ? {audio: {sources: [...options.audio.sources, ...requiredAudioSources], preferredAudioIndex: null, idleTimeout: idleTimeout, languageSummary: languageSummary}} : null;
         const requirements = addMedia ? [...getDictionaryEntryMedia(dictionaryEntry), {type: 'audio'}] : [];
         const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(options.dictionaries);
         const cardFormat = /** @type {import('settings').AnkiCardFormat} */ ({

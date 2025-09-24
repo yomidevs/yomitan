@@ -91,7 +91,7 @@ export class AudioDownloader {
      */
     async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout, languageSummary, enableDefaultAudioSources) {
         const errors = [];
-        const requiredAudioSources = enableDefaultAudioSources ? this._getRequiredAudioSources(languageSummary.iso, sources) : [];
+        const requiredAudioSources = enableDefaultAudioSources ? getRequiredAudioSources(languageSummary.iso, sources) : [];
         for (const source of [...sources, ...requiredAudioSources]) {
             let infoList = await this.getTermAudioInfoList(source, term, reading, languageSummary);
             if (typeof preferredAudioIndex === 'number') {
@@ -116,22 +116,6 @@ export class AudioDownloader {
     }
 
     // Private
-
-    /**
-     * @param {string} language
-     * @param {import('audio').AudioSourceInfo[]} sources
-     * @returns {import('audio').AudioSourceInfo[]}
-     */
-    _getRequiredAudioSources(language, sources) {
-        /** @type {Set<import('settings').AudioSourceType>} */
-        const requiredSources = getRequiredAudioSourceList(language);
-
-        for (const {type} of sources) {
-            requiredSources.delete(type);
-        }
-
-        return [...requiredSources].map((type) => ({type, url: '', voice: ''}));
-    }
 
     /**
      * @param {string} url
@@ -645,4 +629,20 @@ export function getRequiredAudioSourceList(language) {
             'language-pod-101',
             'wiktionary',
         ]);
+}
+
+/**
+ * @param {string} language
+ * @param {import('audio').AudioSourceInfo[]} sources
+ * @returns {import('audio').AudioSourceInfo[]}
+ */
+export function getRequiredAudioSources(language, sources) {
+    /** @type {Set<import('settings').AudioSourceType>} */
+    const requiredSources = getRequiredAudioSourceList(language);
+
+    for (const {type} of sources) {
+        requiredSources.delete(type);
+    }
+
+    return [...requiredSources].map((type) => ({type, url: '', voice: ''}));
 }
