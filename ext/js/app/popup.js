@@ -99,6 +99,8 @@ export class Popup extends EventDispatcher {
         this._useShadowDom = true;
         /** @type {string} */
         this._customOuterCss = '';
+        /** @type {boolean} */
+        this._hidePopupOnCursorExit = false;
 
         /** @type {?number} */
         this._frameSizeContentScale = null;
@@ -419,11 +421,13 @@ export class Popup extends EventDispatcher {
 
         this.trigger('mouseOver', {});
 
-        // Clear all child popups when parent is moused over
-        let currentChild = this.child;
-        while (currentChild !== null) {
-            currentChild.hide(false);
-            currentChild = currentChild.child;
+        if (this._hidePopupOnCursorExit) {
+            // Clear all child popups when parent is moused over
+            let currentChild = this.child;
+            while (currentChild !== null) {
+                currentChild.hide(false);
+                currentChild = currentChild.child;
+            }
         }
     }
 
@@ -1049,7 +1053,7 @@ export class Popup extends EventDispatcher {
     async _setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
         const options = await this._application.api.optionsGet(optionsContext);
-        const {general} = options;
+        const {general, scanning} = options;
         this._themeController.theme = general.popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;
         this._themeController.siteOverride = checkPopupPreviewURL(optionsContext.url);
@@ -1070,6 +1074,7 @@ export class Popup extends EventDispatcher {
         this._useSecureFrameUrl = general.useSecurePopupFrameUrl;
         this._useShadowDom = general.usePopupShadowDom;
         this._customOuterCss = general.customPopupOuterCss;
+        this._hidePopupOnCursorExit = scanning.hidePopupOnCursorExit;
         void this.updateTheme();
     }
 
