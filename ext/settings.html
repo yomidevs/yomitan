@@ -678,15 +678,57 @@
                 </div></div>
             </div>
         </div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Paginate scrolling in popup</div>
-                <div class="settings-item-description">Scroll by popup's current height</div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Reduced motion scrolling</div>
+                    <div class="settings-item-description">Scrolls by a configurable height (similar to pagination), reducing animations. Useful on e-readers and e-ink screens.</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox"
+                        data-setting="scanning.reducedMotionScrolling"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#reduced-motion-scrolling-options",
+                            "condition": {"op": "===", "value": true}
+                        }'
+                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
             </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="scanning.paginatedScrolling"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            <div class="settings-item-children settings-item-children-group" id="reduced-motion-scrolling-options" hidden>
+                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Scale</div>
+                        <div class="settings-item-description">Percentage of the popup's height scrolled per step.</div>
+                    </div>
+                    <div class="settings-item-right">
+                        <select data-setting="scanning.reducedMotionScrollingScale"
+                            data-transform='[
+                                {"type": "toNumber", "step": "pre", "constraints": {"min": 0.4}},
+                                {"type": "toString", "step": "post"}
+                            ]'
+                        >
+                            <option value="0.4">40%</option>
+                            <option value="0.5">50%</option>
+                            <option value="0.6">60%</option>
+                            <option value="0.7">70%</option>
+                            <option value="0.8">80%</option>
+                            <option value="0.9">90%</option>
+                            <option value="1">100%</option>
+                        </select>
+                    </div>
+                </div></div>
+                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Swipe Threshold <span class="light">(in pixels)</span></div>
+                        <div class="settings-item-description">Minimum distance on touch devices for a swipe to be recognized as scrolling. Lower values can feel more responsive but increase the chance for misinputs.</div>
+                    </div>
+                    <div class="settings-item-right">
+                        <input type="number" data-setting="scanning.reducedMotionScrollingSwipeThreshold" min="0">
+                    </div>
+                </div></div>
             </div>
-        </div></div>
+        </div>
         <div class="settings-item advanced-only"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Search terms when clicking text from the results list</div>
