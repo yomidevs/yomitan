@@ -407,6 +407,17 @@ export class AnkiConnect {
         return false;
     }
 
+    /**
+     * Makes Anki sync.
+     * @returns {Promise<?unknown>}
+     */
+    async makeAnkiSync() {
+        if (!this._enabled) { return null; }
+        const version = await this._checkVersion();
+        const result = await this._invoke('sync', {version});
+        return result === null;
+    }
+
     // Private
 
     /**

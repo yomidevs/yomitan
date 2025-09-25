@@ -400,6 +400,10 @@ type ApiSurface = {
         params: void;
         return: void;
     };
+    forceSync: {
+        params: void;
+        return: void;
+    };
 };
 
 type ApiExtraArgs = [sender: chrome.runtime.MessageSender];

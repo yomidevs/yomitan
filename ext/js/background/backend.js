@@ -187,6 +187,7 @@ export class Backend {
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
             ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)],
             ['heartbeat',                    this._onApiHeartbeat.bind(this)],
+            ['forceSync',                    this._onApiForceSync.bind(this)],
         ]);
 
         /** @type {import('api').PmApiMap} */
@@ -1110,6 +1111,17 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'heartbeat'>} */
     _onApiHeartbeat() {
+        return void 0;
+    }
+
+    /** @type {import('api').ApiHandler<'forceSync'>} */
+    async _onApiForceSync() {
+        try {
+            await this._anki.makeAnkiSync();
+        } catch (e) {
+            log.error(e);
+            throw e;
+        }
         return void 0;
     }
 
