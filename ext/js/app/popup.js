@@ -99,6 +99,8 @@ export class Popup extends EventDispatcher {
         this._useShadowDom = true;
         /** @type {string} */
         this._customOuterCss = '';
+        /** @type {boolean} */
+        this._hidePopupOnCursorExit = false;
 
         /** @type {?number} */
         this._frameSizeContentScale = null;
@@ -111,6 +113,8 @@ export class Popup extends EventDispatcher {
         this._frame.style.height = '0';
         /** @type {boolean} */
         this._frameConnected = false;
+        /** @type {boolean} */
+        this._isPointerOverPopup = false;
 
         /** @type {HTMLElement} */
         this._container = this._frame;
@@ -385,8 +389,7 @@ export class Popup extends EventDispatcher {
      * @returns {Promise<import('popup').ValidSize>} The size and whether or not it is valid.
      */
     async getFrameSize() {
-        const {width, height} = this._getFrameBoundingClientRect();
-        return {width, height, valid: true};
+        return {width: this._frame.offsetWidth, height: this._frame.offsetHeight, valid: true};
     }
 
     /**
@@ -400,20 +403,48 @@ export class Popup extends EventDispatcher {
         return true;
     }
 
+    /**
+     * Returns whether the pointer is currently over this popup.
+     * @returns {boolean}
+     */
+    isPointerOver() {
+        return this._isPointerOverPopup;
+    }
+
     // Private functions
 
     /**
      * @returns {void}
      */
     _onFrameMouseOver() {
-        this.trigger('framePointerOver', {});
+        this._isPointerOverPopup = true;
+
+        this.trigger('mouseOver', {});
+
+        if (this._hidePopupOnCursorExit) {
+            // Clear all child popups when parent is moused over
+            let currentChild = this.child;
+            while (currentChild !== null) {
+                currentChild.hide(false);
+                currentChild = currentChild.child;
+            }
+        }
     }
 
     /**
      * @returns {void}
      */
     _onFrameMouseOut() {
-        this.trigger('framePointerOut', {});
+        this._isPointerOverPopup = false;
+
+        this.trigger('mouseOut', {});
+
+        // Propagate mouseOut event up through the entire hierarchy
+        let currentParent = this.parent;
+        while (currentParent !== null) {
+            currentParent.trigger('mouseOut', {});
+            currentParent = currentParent.parent;
+        }
     }
 
     /**
@@ -485,6 +516,12 @@ export class Popup extends EventDispatcher {
         this._frameClient = frameClient;
         await frameClient.connect(this._frame, this._targetOrigin, this._frameId, setupFrame);
         this._frameConnected = true;
+
+        // Reattach mouse event listeners after frame injection
+        const boundMouseOver = this._onFrameMouseOver.bind(this);
+        const boundMouseOut = this._onFrameMouseOut.bind(this);
+        this._frame.addEventListener('mouseover', boundMouseOver);
+        this._frame.addEventListener('mouseout', boundMouseOut);
 
         // Configure
         /** @type {import('display').DirectApiParams<'displayConfigure'>} */
@@ -1016,7 +1053,7 @@ export class Popup extends EventDispatcher {
     async _setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
         const options = await this._application.api.optionsGet(optionsContext);
-        const {general} = options;
+        const {general, scanning} = options;
         this._themeController.theme = general.popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;
         this._themeController.siteOverride = checkPopupPreviewURL(optionsContext.url);
@@ -1037,6 +1074,7 @@ export class Popup extends EventDispatcher {
         this._useSecureFrameUrl = general.useSecurePopupFrameUrl;
         this._useShadowDom = general.usePopupShadowDom;
         this._customOuterCss = general.customPopupOuterCss;
+        this._hidePopupOnCursorExit = scanning.hidePopupOnCursorExit;
         void this.updateTheme();
     }
 

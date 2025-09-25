@@ -263,6 +263,13 @@ export class PopupWindow extends EventDispatcher {
         return false;
     }
 
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async isPointerOver() {
+        return false;
+    }
+
     // Private
 
     /**
