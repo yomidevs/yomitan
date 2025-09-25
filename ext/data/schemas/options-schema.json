@@ -496,6 +496,9 @@
                                     "matchTypePrefix",
                                     "hidePopupOnCursorExit",
                                     "hidePopupOnCursorExitDelay",
+                                    "reducedMotionScrolling",
+                                    "reducedMotionScrollingScale",
+                                    "reducedMotionScrollingSwipeThreshold",
                                     "normalizeCssZoom",
                                     "scanWithoutMousemove",
                                     "scanResolution"
@@ -805,6 +808,19 @@
                                         "type": "number",
                                         "minimum": 0,
                                         "default": 0
+                                    },
+                                    "reducedMotionScrolling": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "reducedMotionScrollingScale": {
+                                        "type": "number",
+                                        "default": 1
+                                    },
+                                    "reducedMotionScrollingSwipeThreshold": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "default": 40
                                     },
                                     "normalizeCssZoom": {
                                         "type": "boolean",

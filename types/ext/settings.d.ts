@@ -203,6 +203,9 @@ export type ScanningOptions = {
     matchTypePrefix: boolean;
     hidePopupOnCursorExit: boolean;
     hidePopupOnCursorExitDelay: number;
+    reducedMotionScrolling: boolean;
+    reducedMotionScrollingScale: number;
+    reducedMotionScrollingSwipeThreshold: number;
     normalizeCssZoom: boolean;
     scanWithoutMousemove: boolean;
     scanResolution: string;
