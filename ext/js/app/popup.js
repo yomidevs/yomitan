@@ -70,6 +70,8 @@ export class Popup extends EventDispatcher {
         this._contentScale = 1;
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+        /** @type {?import('core').Timeout} */
+        this._hidePopupTimer = null;
 
         /** @type {number} */
         this._initialWidth = 400;
@@ -101,6 +103,8 @@ export class Popup extends EventDispatcher {
         this._customOuterCss = '';
         /** @type {boolean} */
         this._hidePopupOnCursorExit = false;
+        /** @type {number} */
+        this._hidePopupOnCursorExitDelay = 0;
 
         /** @type {?number} */
         this._frameSizeContentScale = null;
@@ -236,12 +240,42 @@ export class Popup extends EventDispatcher {
             return;
         }
 
+        this.stophideDelayed();
+
         this._setVisible(false);
         if (this._child !== null) {
             this._child.hide(false);
         }
         if (changeFocus) {
             this._focusParent();
+        }
+    }
+
+    /**
+     * @param {number} delay
+     */
+    hideDelayed(delay) {
+        if (this.isPointerOverSelfOrChildren()) { return; }
+
+        if (delay > 0) {
+            this.stophideDelayed();
+            this._hidePopupTimer = setTimeout(() => {
+                this._hidePopupTimer = null;
+                if (this.isPointerOverSelfOrChildren()) { return; }
+                this.hide(false);
+            }, delay);
+        } else {
+            this.hide(false);
+        }
+    }
+
+    /**
+     * @returns {void}
+     */
+    stophideDelayed() {
+        if (this._hidePopupTimer !== null) {
+            clearTimeout(this._hidePopupTimer);
+            this._hidePopupTimer = null;
         }
     }
 
@@ -411,6 +445,22 @@ export class Popup extends EventDispatcher {
         return this._isPointerOverPopup;
     }
 
+    /**
+     * Returns whether the pointer is currently over this popup or any children.
+     * @returns {boolean}
+     */
+    isPointerOverSelfOrChildren() {
+        if (this.isPointerOver()) { return true; }
+
+        let currentChild = this.child;
+        while (currentChild !== null) {
+            if (currentChild.isPointerOver()) { return true; }
+            currentChild = currentChild.child;
+        }
+
+        return false;
+    }
+
     // Private functions
 
     /**
@@ -419,15 +469,12 @@ export class Popup extends EventDispatcher {
     _onFrameMouseOver() {
         this._isPointerOverPopup = true;
 
+        this.stophideDelayed();
         this.trigger('mouseOver', {});
 
-        if (this._hidePopupOnCursorExit) {
-            // Clear all child popups when parent is moused over
-            let currentChild = this.child;
-            while (currentChild !== null) {
-                currentChild.hide(false);
-                currentChild = currentChild.child;
-            }
+        // Clear all child popups when parent is moused over
+        if (this._hidePopupOnCursorExit && this.child !== null) {
+            this.child.hideDelayed(this._hidePopupOnCursorExitDelay);
         }
     }
 
@@ -451,6 +498,9 @@ export class Popup extends EventDispatcher {
      * @returns {Promise<boolean>}
      */
     _inject() {
+        // If there's already a timer running on the same popup, reset it
+        this.stophideDelayed();
+
         let injectPromise = this._injectPromise;
         if (injectPromise === null) {
             injectPromise = this._injectInnerWrapper();
@@ -1075,6 +1125,7 @@ export class Popup extends EventDispatcher {
         this._useShadowDom = general.usePopupShadowDom;
         this._customOuterCss = general.customPopupOuterCss;
         this._hidePopupOnCursorExit = scanning.hidePopupOnCursorExit;
+        this._hidePopupOnCursorExitDelay = scanning.hidePopupOnCursorExitDelay;
         void this.updateTheme();
     }
 
