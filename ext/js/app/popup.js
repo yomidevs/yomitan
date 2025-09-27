@@ -338,6 +338,9 @@ export class Popup extends EventDispatcher {
             await this._setOptionsContextIfDifferent(optionsContext);
         }
 
+        // If there's already a timer running on the same popup from a previous lookup, reset it
+        this.stopHideDelayed();
+
         await this._show(sourceRects, writingMode);
 
         if (displayDetails !== null) {
@@ -498,9 +501,6 @@ export class Popup extends EventDispatcher {
      * @returns {Promise<boolean>}
      */
     _inject() {
-        // If there's already a timer running on the same popup from a previous lookup, reset it
-        this.stopHideDelayed();
-
         let injectPromise = this._injectPromise;
         if (injectPromise === null) {
             injectPromise = this._injectInnerWrapper();
