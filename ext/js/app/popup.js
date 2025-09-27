@@ -240,7 +240,7 @@ export class Popup extends EventDispatcher {
             return;
         }
 
-        this.stophideDelayed();
+        this.stopHideDelayed();
 
         this._setVisible(false);
         if (this._child !== null) {
@@ -258,7 +258,7 @@ export class Popup extends EventDispatcher {
         if (this.isPointerOverSelfOrChildren()) { return; }
 
         if (delay > 0) {
-            this.stophideDelayed();
+            this.stopHideDelayed();
             this._hidePopupTimer = setTimeout(() => {
                 this._hidePopupTimer = null;
                 if (this.isPointerOverSelfOrChildren()) { return; }
@@ -272,7 +272,7 @@ export class Popup extends EventDispatcher {
     /**
      * @returns {void}
      */
-    stophideDelayed() {
+    stopHideDelayed() {
         if (this._hidePopupTimer !== null) {
             clearTimeout(this._hidePopupTimer);
             this._hidePopupTimer = null;
@@ -469,7 +469,7 @@ export class Popup extends EventDispatcher {
     _onFrameMouseOver() {
         this._isPointerOverPopup = true;
 
-        this.stophideDelayed();
+        this.stopHideDelayed();
         this.trigger('mouseOver', {});
 
         // Clear all child popups when parent is moused over
@@ -498,8 +498,8 @@ export class Popup extends EventDispatcher {
      * @returns {Promise<boolean>}
      */
     _inject() {
-        // If there's already a timer running on the same popup, reset it
-        this.stophideDelayed();
+        // If there's already a timer running on the same popup from a previous lookup, reset it
+        this.stopHideDelayed();
 
         let injectPromise = this._injectPromise;
         if (injectPromise === null) {
