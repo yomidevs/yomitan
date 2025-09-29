@@ -21,9 +21,11 @@ import {removeDoubleAcuteAccentsImpl} from '../../ext/js/language/el/modern-gree
 const testCases = [
     ['πρόσωπό', 'πρόσωπο'],
     ['ναΰδριό', 'ναΰδριο'],
+    ['ό,τί', 'ό,τι'],
     // Does nothing with less than two acute accents
     ['παιδί', 'παιδί'],
     ['το', 'το'],
+    ['ΕΛ.ΑΣ', 'ΕΛ.ΑΣ'],
 ];
 
 describe('diacritics normalization', () => {
