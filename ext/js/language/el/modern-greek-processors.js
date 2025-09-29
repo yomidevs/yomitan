@@ -32,18 +32,11 @@ export const removeDoubleAcuteAccents = {
  * @returns {string}
  */
 export function removeDoubleAcuteAccentsImpl(word) {
-    const ACUTE_ACCENT = '\u0301'; // Combining acute accent
-    const decomposed = word.normalize('NFD');
+    const ACUTE_ACCENT = '\u0301';
+    const decomposed = [...word.normalize('NFD')];
 
-    // Remove every acute after the first
-    let acuteAccents = 0;
-    const updated = [...decomposed].filter((char) => {
-        if (char === ACUTE_ACCENT) {
-            acuteAccents += 1;
-            return acuteAccents === 1;
-        }
-        return true;
-    });
+    const firstIndex = decomposed.indexOf(ACUTE_ACCENT);
+    const updated = decomposed.filter((char, index) => char !== ACUTE_ACCENT || index === firstIndex);
 
     return updated.join('').normalize('NFC');
 }
