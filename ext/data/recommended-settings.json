@@ -121,6 +121,14 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.length",
+                "value": 24
+            },
+            "description": "Increase the default scanning length from 16 to 24 characters."
         }
     ],
     "en": [
