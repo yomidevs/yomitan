@@ -112,7 +112,9 @@ type AllTextProcessors = {
         };
     };
     el: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & {
+            removeDoubleAcuteAccents: TextProcessor<boolean>;
+        };
     };
     en: {
         pre: CapitalizationPreprocessors;
