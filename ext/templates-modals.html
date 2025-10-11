@@ -679,9 +679,10 @@
         </div>
         <div class="modal-body">
             <p>
-                A custom URL can be used to play audio from any URL.
+                A custom URL can be used to play audio from any URL.<br>
                 The replacement tags <code data-select-on-click="">{term}</code> and <code data-select-on-click="">{reading}</code>
                 can be used to specify which term and reading is being looked up.<br>
+                <code data-select-on-click="">{language}</code> is also available for sources that require an iso language string.<br>
             </p>
             <p>
                 Example:<br>
@@ -701,6 +702,11 @@
             <p>
                 A custom URL to a JSON file which lists one or more audio URLs for a given term.
                 The format of the JSON file is described in <a href="/data/schemas/custom-audio-list-schema.json" target="_blank" rel="noopener noreferrer">this schema file</a>.
+            </p>
+            <p>
+                The replacement tags <code data-select-on-click="">{term}</code> and <code data-select-on-click="">{reading}</code>
+                can be used to specify which term and reading is being looked up.<br>
+                <code data-select-on-click="">{language}</code> is also available for sources that require an iso language string.<br>
             </p>
             <p>
                 Example:<br>
