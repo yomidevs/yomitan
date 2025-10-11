@@ -471,10 +471,10 @@ class AudioSourceEntry {
                 break;
         }
 
-        /** @type {?HTMLElement} */
+        /** @type {?HTMLButtonElement} */
         const helpNode = menu.bodyNode.querySelector('.popup-menu-item[data-menu-action=help]');
         if (helpNode !== null) {
-            helpNode.hidden = !hasHelp;
+            helpNode.disabled = !hasHelp;
         }
     }
 
