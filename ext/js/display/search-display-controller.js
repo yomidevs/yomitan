@@ -176,6 +176,10 @@ export class SearchDisplayController {
         if (!isInputField && (!isModifierKey || isCtrlBackspace) && isAllowedKey && !isSpaceKey) {
             this._queryInput.focus({preventScroll: true});
         }
+
+        if (e.ctrlKey && e.key === 'u') {
+            this._onClear(e);
+        }
     }
 
     /** */
