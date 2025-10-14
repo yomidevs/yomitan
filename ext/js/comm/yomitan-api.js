@@ -213,7 +213,7 @@ export class YomitanApi {
 
                         const dictionaryMedia = includeMedia ? await this._fetchDictionaryMedia(dictionaryEntries) : [];
                         const audioMedia = includeAudioMedia ? await this._fetchAudio(dictionaryEntries, profileOptions) : [];
-                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia, audioMedia, profileOptions);
+                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia, audioMedia, profileOptions, domlessDocument);
                         const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument, domlessWindow);
                         await ankiTemplateRenderer.prepare();
                         const templateRenderer = ankiTemplateRenderer.templateRenderer;
@@ -378,9 +378,10 @@ export class YomitanApi {
      * @param {import('yomitan-api.js').apiDictionaryMediaDetails[]} dictionaryMediaDetails
      * @param {import('yomitan-api.js').apiAudioMediaDetails[]} audioMediaDetails
      * @param {import('settings').ProfileOptions} options
+     * @param {Document} domlessDocument
      * @returns {Promise<import('anki-note-builder.js').CommonData[]>}
      */
-    async _createCommonDatas(text, dictionaryEntries, dictionaryMediaDetails, audioMediaDetails, options) {
+    async _createCommonDatas(text, dictionaryEntries, dictionaryMediaDetails, audioMediaDetails, options, domlessDocument) {
         /** @type {import('anki-note-builder.js').CommonData[]} */
         const commonDatas = [];
         for (const dictionaryEntry of dictionaryEntries) {
@@ -451,7 +452,7 @@ export class YomitanApi {
                     }],
                     dictionaryMedia: dictionaryMedia,
                 },
-                dictionaryStylesMap: await this._getDictionaryStylesMapDomless(options.dictionaries),
+                dictionaryStylesMap: await this._getDictionaryStylesMapDomless(options.dictionaries, domlessDocument),
             });
         }
         return commonDatas;
@@ -459,14 +460,15 @@ export class YomitanApi {
 
     /**
      * @param {import('settings').DictionariesOptions} dictionaries
+     * @param {Document} domlessDocument
      * @returns {Promise<Map<string, string>>}
      */
-    async _getDictionaryStylesMapDomless(dictionaries) {
+    async _getDictionaryStylesMapDomless(dictionaries, domlessDocument) {
         const styleMap = new Map();
         for (const dictionary of dictionaries) {
             const {name, styles} = dictionary;
             if (typeof styles === 'string') {
-                styleMap.set(name, await this._sanitizeCSSOffscreen(styles));
+                styleMap.set(name, await this._sanitizeCSSOffscreen(styles, domlessDocument));
             }
         }
         return styleMap;
@@ -474,20 +476,40 @@ export class YomitanApi {
 
     /**
      * @param {string} css
+     * @param {Document} domlessDocument
      * @returns {Promise<string>}
      */
-    async _sanitizeCSSOffscreen(css) {
+    async _sanitizeCSSOffscreen(css, domlessDocument) {
         if (css.length === 0) { return ''; }
         try {
+            if (!this._offscreen) {
+                throw new Error('Offscreen page not available');
+            }
             const sanitizedCSS = this._offscreen ? await this._offscreen.sendMessagePromise({action: 'sanitizeCSSOffscreen', params: {css}}) : '';
             if (sanitizedCSS.length === 0 && css.length > 0) {
-                throw new Error('Failed to sanitize css');
+                throw new Error('CSS parsing failed');
             }
             // newlines and returns do not get converted into json well, are not required in css, and cause invalid css if not parsed for by the api consumer, just do the work for them
             return sanitizedCSS.replaceAll(/(\r|\n)/g, ' ');
         } catch (e) {
-            log.log('Failed to sanitize css: ' + css.replaceAll(/(\r|\n)/g, ' ') + ', ' + toError(e).message);
+            log.log('Offscreen CSS sanitizer failed: ' + toError(e).message);
         }
+
+        try {
+            const style = domlessDocument.createElement('style');
+            // eslint-disable-next-line no-unsanitized/property
+            style.innerHTML = css;
+            domlessDocument.appendChild(style);
+            const styleSheet = style.sheet;
+            if (!styleSheet) {
+                throw new Error('CSS parsing failed');
+            }
+            return [...styleSheet.cssRules].map((rule) => rule.cssText || '').join('\n');
+        } catch (e) {
+            log.log('CSSOM CSS sanitizer failed: ' + toError(e).message);
+        }
+
+        log.log('Failed to sanitize CSS: ' + css.replaceAll(/(\r|\n)/g, ' '));
         return '';
     }
 
