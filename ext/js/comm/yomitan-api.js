@@ -468,7 +468,9 @@ export class YomitanApi {
         for (const dictionary of options.dictionaries) {
             const {name, styles} = dictionary;
             if (typeof styles === 'string') {
-                styleMap.set(name, await this._sanitizeCSSOffscreen(options, styles, domlessDocument));
+                // newlines and returns do not get converted into json well, are not required in css, and cause invalid css if not parsed for by the api consumer, just do the work for them
+                const sanitizedCSS = (await this._sanitizeCSSOffscreen(options, styles, domlessDocument)).replaceAll(/(\r|\n)/g, ' ');
+                styleMap.set(name, sanitizedCSS);
             }
         }
         return styleMap;
@@ -490,8 +492,7 @@ export class YomitanApi {
             if (sanitizedCSS.length === 0 && css.length > 0) {
                 throw new Error('CSS parsing failed');
             }
-            // newlines and returns do not get converted into json well, are not required in css, and cause invalid css if not parsed for by the api consumer, just do the work for them
-            return sanitizedCSS.replaceAll(/(\r|\n)/g, ' ');
+            return sanitizedCSS;
         } catch (e) {
             log.log('Offscreen CSS sanitizer failed: ' + toError(e).message);
         }
