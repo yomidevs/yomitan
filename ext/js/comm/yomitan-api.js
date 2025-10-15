@@ -512,7 +512,7 @@ export class YomitanApi {
         }
 
         if (options.general.yomitanApiAllowCssSanitizationBypass) {
-            log.log('Failed to sanitize CSS. Sanitization bypass is enabled, passing through CSS without sanitization.');
+            log.log('Failed to sanitize CSS. Sanitization bypass is enabled, passing through CSS without sanitization: ' + css.replaceAll(/(\r|\n)/g, ' '));
             return css;
         }
 
