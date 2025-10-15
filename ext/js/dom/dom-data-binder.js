@@ -25,16 +25,16 @@ import {SelectorObserver} from './selector-observer.js';
  */
 export class DOMDataBinder {
     /**
-     * @param {string} selector
+     * @param {string[]} selectors
      * @param {import('dom-data-binder').CreateElementMetadataCallback<T>} createElementMetadata
      * @param {import('dom-data-binder').CompareElementMetadataCallback<T>} compareElementMetadata
      * @param {import('dom-data-binder').GetValuesCallback<T>} getValues
      * @param {import('dom-data-binder').SetValuesCallback<T>} setValues
      * @param {import('dom-data-binder').OnErrorCallback<T>|null} [onError]
      */
-    constructor(selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null) {
-        /** @type {string} */
-        this._selector = selector;
+    constructor(selectors, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null) {
+        /** @type {string[]} */
+        this._selectors = selectors;
         /** @type {import('dom-data-binder').CreateElementMetadataCallback<T>} */
         this._createElementMetadata = createElementMetadata;
         /** @type {import('dom-data-binder').CompareElementMetadataCallback<T>} */
@@ -49,27 +49,31 @@ export class DOMDataBinder {
         this._updateTasks = new TaskAccumulator(this._onBulkUpdate.bind(this));
         /** @type {TaskAccumulator<import('dom-data-binder').ElementObserver<T>, import('dom-data-binder').AssignTaskValue>} */
         this._assignTasks = new TaskAccumulator(this._onBulkAssign.bind(this));
-        /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */
-        this._selectorObserver = new SelectorObserver({
+        /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>[]} */
+        this._selectorObservers = selectors.map((selector) => new SelectorObserver({
             selector,
             ignoreSelector: null,
             onAdded: this._createObserver.bind(this),
             onRemoved: this._removeObserver.bind(this),
             onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
             isStale: this._isObserverStale.bind(this),
-        });
+        }));
     }
 
     /**
      * @param {Element} element
      */
     observe(element) {
-        this._selectorObserver.observe(element, true);
+        for (const selectorObserver of this._selectorObservers) {
+            selectorObserver.observe(element, true);
+        }
     }
 
     /** */
     disconnect() {
-        this._selectorObserver.disconnect();
+        for (const selectorObserver of this._selectorObservers) {
+            selectorObserver.disconnect();
+        }
     }
 
     /** */
@@ -98,8 +102,10 @@ export class DOMDataBinder {
         }
         if (all) {
             targets.length = 0;
-            for (const observer of this._selectorObserver.datas()) {
-                targets.push([observer, null]);
+            for (const selectorObserver of this._selectorObservers) {
+                for (const observer of selectorObserver.datas()) {
+                    targets.push([observer, null]);
+                }
             }
         }
 
