@@ -452,34 +452,35 @@ export class YomitanApi {
                     }],
                     dictionaryMedia: dictionaryMedia,
                 },
-                dictionaryStylesMap: await this._getDictionaryStylesMapDomless(options.dictionaries, domlessDocument),
+                dictionaryStylesMap: await this._getDictionaryStylesMapDomless(options, domlessDocument),
             });
         }
         return commonDatas;
     }
 
     /**
-     * @param {import('settings').DictionariesOptions} dictionaries
+     * @param {import('settings').ProfileOptions} options
      * @param {Document} domlessDocument
      * @returns {Promise<Map<string, string>>}
      */
-    async _getDictionaryStylesMapDomless(dictionaries, domlessDocument) {
+    async _getDictionaryStylesMapDomless(options, domlessDocument) {
         const styleMap = new Map();
-        for (const dictionary of dictionaries) {
+        for (const dictionary of options.dictionaries) {
             const {name, styles} = dictionary;
             if (typeof styles === 'string') {
-                styleMap.set(name, await this._sanitizeCSSOffscreen(styles, domlessDocument));
+                styleMap.set(name, await this._sanitizeCSSOffscreen(options, styles, domlessDocument));
             }
         }
         return styleMap;
     }
 
     /**
+     * @param {import('settings').ProfileOptions} options
      * @param {string} css
      * @param {Document} domlessDocument
      * @returns {Promise<string>}
      */
-    async _sanitizeCSSOffscreen(css, domlessDocument) {
+    async _sanitizeCSSOffscreen(options, css, domlessDocument) {
         if (css.length === 0) { return ''; }
         try {
             if (!this._offscreen) {
@@ -507,6 +508,11 @@ export class YomitanApi {
             return [...styleSheet.cssRules].map((rule) => rule.cssText || '').join('\n');
         } catch (e) {
             log.log('CSSOM CSS sanitizer failed: ' + toError(e).message);
+        }
+
+        if (options.general.yomitanApiAllowCssSanitizationBypass) {
+            log.log('Failed to sanitize CSS. Sanitization bypass is enabled, passing through CSS without sanitization.');
+            return css;
         }
 
         log.log('Failed to sanitize CSS: ' + css.replaceAll(/(\r|\n)/g, ' '));
