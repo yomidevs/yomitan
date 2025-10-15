@@ -188,7 +188,13 @@
                         </div>
                     </div>
                     <div class="settings-item-right">
-                        <label class="toggle"><input type="checkbox" class="permissions-toggle" data-permissions-setting="general.enableYomitanApi" data-required-permissions="nativeMessaging"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                        <label class="toggle"><input type="checkbox" class="permissions-toggle" data-permissions-setting="general.enableYomitanApi" data-required-permissions="nativeMessaging"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#yomitan-api-additional-options",
+                            "condition": {"op": "===", "value": true}
+                        }'
+                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
                     </div>
                 </div>
                 <div class="settings-item-children more" hidden>
@@ -204,6 +210,37 @@
                     <p class="margin-above">
                         <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
                     </p>
+                </div>
+                <div class="settings-item-children settings-item-children-group" id="yomitan-api-additional-options" hidden>
+                    <div class="settings-item">
+                        <div class="settings-item-inner settings-item-inner-wrappable">
+                            <div class="settings-item-left">
+                                <div class="settings-item-label">
+                                    Allow bypassing css sanitization
+                                </div>
+                                <div class="settings-item-description">
+                                    <p class="warning-text">
+                                        This can potentially allow dictionaries to output malicious or malformed CSS. Only enable this option if you trust the authors of your dictionaries.
+                                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                                    </p>
+                                </div>
+                                <div class="settings-item-description more" hidden>
+                                    <p>
+                                        Enabling this option will allow CSS that cannot be sanitized to pass through the sanitizer. This ONLY applies to the Yomitan API, it will not make any other areas of Yomitan potentially vulnerable.
+                                    </p>
+                                    <p>
+                                        Some browsers do not support the offscreen page necessary for complex CSS sanitization in the Yomitan API on the backend. Yomitan will attempt to fall back on basic sanitization but this will fail for dictionaries making use of complex CSS.
+                                    </p>
+                                    <p class="margin-above">
+                                        <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="settings-item-right">
+                                <label class="toggle"><input type="checkbox" data-setting="general.yomitanApiAllowCssSanitizationBypass"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
