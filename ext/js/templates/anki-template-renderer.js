@@ -790,7 +790,7 @@ export class AnkiTemplateRenderer {
         const glossaryContentQueue = [];
         const structuredContentQueue = [content.content];
         while (structuredContentQueue.length > 0) {
-            const structuredContent = structuredContentQueue.pop();
+            const structuredContent = structuredContentQueue.shift();
             if (Array.isArray(structuredContent)) {
                 structuredContentQueue.push(...structuredContent);
             } else if (typeof structuredContent === 'object' && structuredContent.content) {
