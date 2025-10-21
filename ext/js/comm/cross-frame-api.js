@@ -69,6 +69,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
         if (this._port === null) { throw new Error('Invalid state'); }
         this._eventListeners.addListener(this._port.onDisconnect, this._onDisconnect.bind(this));
         this._eventListeners.addListener(this._port.onMessage, this._onMessage.bind(this));
+        this._eventListeners.addEventListener(window, 'pageshow', this._onPageShow.bind(this));
     }
 
     /**
@@ -122,6 +123,16 @@ export class CrossFrameAPIPort extends EventDispatcher {
     }
 
     // Private
+
+    /**
+     * @param {PageTransitionEvent} e
+     */
+    _onPageShow(e) {
+        // Page restored from BFCache
+        if (e.persisted) {
+            this._onDisconnect();
+        }
+    }
 
     /** */
     _onDisconnect() {
