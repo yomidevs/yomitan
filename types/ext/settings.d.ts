@@ -153,6 +153,7 @@ export type GeneralOptions = {
     sortFrequencyDictionaryOrder: SortFrequencyDictionaryOrder;
     stickySearchHeader: boolean;
     enableYomitanApi: boolean;
+    yomitanApiAllowCssSanitizationBypass: boolean;
 };
 
 export type PopupWindowOptions = {

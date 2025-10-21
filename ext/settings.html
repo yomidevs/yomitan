@@ -188,7 +188,13 @@
                         </div>
                     </div>
                     <div class="settings-item-right">
-                        <label class="toggle"><input type="checkbox" class="permissions-toggle" data-permissions-setting="general.enableYomitanApi" data-required-permissions="nativeMessaging"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                        <label class="toggle"><input type="checkbox" class="permissions-toggle" data-permissions-setting="general.enableYomitanApi" data-required-permissions="nativeMessaging"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#yomitan-api-additional-options",
+                            "condition": {"op": "===", "value": true}
+                        }'
+                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
                     </div>
                 </div>
                 <div class="settings-item-children more" hidden>
@@ -204,6 +210,51 @@
                     <p class="margin-above">
                         <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
                     </p>
+                </div>
+                <div class="settings-item-children settings-item-children-group" id="yomitan-api-additional-options" hidden>
+                    <div class="settings-item">
+                        <div class="settings-item-inner settings-item-inner-wrappable">
+                            <div class="settings-item-left">
+                                <div class="settings-item-label">
+                                    Allow bypassing css sanitization
+                                </div>
+                                <div class="settings-item-description">
+                                    <p class="warning-text">
+                                        Only enable this option if you trust the authors of your dictionaries or will perform sanitization outside of Yomitan.
+                                        Malicious dictionaries can send malformed CSS to allow Javascript execution if injected into a webview or browser.
+                                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                                    </p>
+                                </div>
+                                <div class="settings-item-description more" hidden>
+                                    <p>
+                                        A malicious dictionary which contains malicious CSS may try to execute Javascript.
+                                        For example, if the output of the Yomitan API is used in Anki, then the resulting Anki card may execute unintended Javascript.
+                                        The risk in this case is similar to downloading a malicious Anki deck.
+                                        Namely, in both cases, you are relying purely on Anki's sandbox to protect your machine and information from the malicious code.
+                                        If the Anki sandbox works, card contents could be leaked (a minor confidential issue).
+                                        If the sandbox fails, there is much more to worry about (actions being taken on your machine such as stealing credentials and sensitive information, or ransomware taking over your computer).
+                                    </p>
+                                    <p>
+                                        If you choose to disable the CSS sanitization, we recommend thinking end-to-end about where the Yomitan API output is used, and whether that destination is resilient to potentially malicious Javascript code being included, otherwise you are potentially risking the data and integrity of your system.
+                                    </p>
+                                    <p>
+                                        Sanitization bypass will allow CSS that cannot be sanitized to pass through the sanitizer unchanged.
+                                        This ONLY applies to the Yomitan API, it will not make any other areas of Yomitan potentially vulnerable.
+                                    </p>
+                                    <p>
+                                        This can be required to retrieve CSS on some browsers which do not support the offscreen page necessary for full CSS sanitization in the Yomitan API on the backend.
+                                        Yomitan will attempt to fall back on basic sanitization but this will fail for dictionaries making use of complex CSS.
+                                    </p>
+                                    <p class="margin-above">
+                                        <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="settings-item-right">
+                                <label class="toggle"><input type="checkbox" data-setting="general.yomitanApiAllowCssSanitizationBypass"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
