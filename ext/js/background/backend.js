@@ -639,8 +639,10 @@ export class Backend {
         const notesNoDuplicatesAllowed = strippedNotes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
 
         // If only older AnkiConnect available, use `canAddNotes`.
-        const withDuplicatesAllowed = await this._anki.canAddNotes(strippedNotes);
-        const noDuplicatesAllowed = await this._anki.canAddNotes(notesNoDuplicatesAllowed);
+        const [withDuplicatesAllowed, noDuplicatesAllowed] = await Promise.all([
+             this._anki.canAddNotes(strippedNotes),
+             this._anki.canAddNotes(notesNoDuplicatesAllowed)
+        ]);
 
         /** @type {{ note: import('anki').Note, isDuplicate: boolean }[]} */
         const canAddArray = [];
