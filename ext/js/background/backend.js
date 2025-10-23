@@ -640,15 +640,12 @@ export class Backend {
 
         // If only older AnkiConnect available, use `canAddNotes`.
         const [withDuplicatesAllowed, noDuplicatesAllowed] = await Promise.all([
-             this._anki.canAddNotes(strippedNotes),
-             this._anki.canAddNotes(notesNoDuplicatesAllowed)
+            this._anki.canAddNotes(strippedNotes),
+            this._anki.canAddNotes(notesNoDuplicatesAllowed),
         ]);
 
         /** @type {{ note: import('anki').Note, isDuplicate: boolean }[]} */
         const canAddArray = [];
-
-        /** @type {import('anki').Note[]} */
-        const cannotAddArray = [];
 
         for (let i = 0; i < withDuplicatesAllowed.length; i++) {
             if (withDuplicatesAllowed[i] === noDuplicatesAllowed[i]) {
@@ -658,17 +655,15 @@ export class Backend {
             }
         }
 
-        return {canAddArray, cannotAddArray};
+        return canAddArray;
     }
 
     /** @type {import('api').ApiHandler<'getAnkiNoteInfo'>} */
     async _onApiGetAnkiNoteInfo({notes, fetchAdditionalInfo}) {
-        const {canAddArray, cannotAddArray} = await this.partitionAddibleNotes(notes);
+        const canAddArray = await this.partitionAddibleNotes(notes);
 
         /** @type {import('anki').NoteInfoWrapper[]} */
-        const results = cannotAddArray
-            .filter((note) => isNoteDataValid(note))
-            .map(() => ({canAdd: false, valid: false, noteIds: null}));
+        const results = [];
 
         /** @type {import('anki').Note[]} */
         const duplicateNotes = [];
