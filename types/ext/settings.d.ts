@@ -152,6 +152,7 @@ export type GeneralOptions = {
     sortFrequencyDictionary: string | null;
     sortFrequencyDictionaryOrder: SortFrequencyDictionaryOrder;
     stickySearchHeader: boolean;
+    enableSearchSuggestions: boolean;
     enableYomitanApi: boolean;
     yomitanApiAllowCssSanitizationBypass: boolean;
 };
