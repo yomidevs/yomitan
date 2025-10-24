@@ -975,9 +975,13 @@ export class DisplayAnki {
         let infos;
         let ankiError = null;
         try {
-            infos = this._checkForDuplicates ?
-                await this._display.application.api.getAnkiNoteInfo(notes, this._isAdditionalInfoEnabled()) :
-                this._getAnkiNoteInfoForceValueIfValid(notes, true);
+            if (this._checkForDuplicates) {
+                infos = await this._display.application.api.getAnkiNoteInfo(notes, this._isAdditionalInfoEnabled());
+            } else {
+                const isAnkiConnected = await this._display.application.api.isAnkiConnected();
+                infos = this._getAnkiNoteInfoForceValueIfValid(notes, isAnkiConnected);
+                ankiError = isAnkiConnected ? null : new Error('Anki not connected');
+            }
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValueIfValid(notes, false);
             ankiError = (e instanceof ExtensionError && e.message.includes('Anki connection failure')) ?
