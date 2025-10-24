@@ -83,6 +83,9 @@ export class CollapsibleDictionaryController {
         for (let i = 0, ii = dictionaries.length; i < ii; ++i) {
             const {name} = dictionaries[i];
             const dictionaryInfo = this._dictionaryInfoMap.get(name);
+            if (!dictionaryInfo?.counts?.terms?.total && !dictionaryInfo?.counts?.kanji?.total) {
+                continue;
+            }
             if (typeof dictionaryInfo === 'undefined') { continue; }
 
             const select = this._addSelect(fragment, name, `rev.${dictionaryInfo.revision}`);
