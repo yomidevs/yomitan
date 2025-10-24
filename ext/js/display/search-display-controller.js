@@ -302,7 +302,7 @@ export class SearchDisplayController {
     }
 
     /**
-     * @param {MouseEvent} e
+     * @param {Event} e
      */
     _onClear(e) {
         e.preventDefault();
