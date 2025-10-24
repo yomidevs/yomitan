@@ -679,7 +679,10 @@ export class Backend {
             }
         }
 
-        const duplicateNoteIds = await this._anki.findNoteIds(duplicateNotes);
+        const duplicateNoteIds =
+            duplicateNotes.length > 0 ?
+                await this._anki.findNoteIds(duplicateNotes) :
+                [];
 
         for (let i = 0; i < canAddArray.length; ++i) {
             const {note, isDuplicate} = canAddArray[i];
