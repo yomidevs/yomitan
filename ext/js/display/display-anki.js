@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
@@ -974,16 +975,18 @@ export class DisplayAnki {
         let infos;
         let ankiError = null;
         try {
-            if (!await this._display.application.api.isAnkiConnected()) {
-                throw new Error('Anki not connected');
+            if (this._checkForDuplicates) {
+                infos = await this._display.application.api.getAnkiNoteInfo(notes, this._isAdditionalInfoEnabled());
+            } else {
+                const isAnkiConnected = await this._display.application.api.isAnkiConnected();
+                infos = this._getAnkiNoteInfoForceValueIfValid(notes, isAnkiConnected);
+                ankiError = isAnkiConnected ? null : new Error('Anki not connected');
             }
-
-            infos = this._checkForDuplicates ?
-                await this._display.application.api.getAnkiNoteInfo(notes, this._isAdditionalInfoEnabled()) :
-                this._getAnkiNoteInfoForceValueIfValid(notes, true);
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValueIfValid(notes, false);
-            ankiError = toError(e);
+            ankiError = (e instanceof ExtensionError && e.message.includes('Anki connection failure')) ?
+                new Error('Anki not connected') :
+                toError(e);
         }
 
         /** @type {import('display-anki').DictionaryEntryDetails[]} */
