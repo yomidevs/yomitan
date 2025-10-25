@@ -174,7 +174,7 @@ export class AnkiConnect {
      * @returns {Promise<import('anki').CanAddNotesDetail[]>}
      */
     async canAddNotesWithErrorDetail(notes) {
-        if (!this._enabled) { return notes.map(() => ({ canAdd: false, error: null })); }
+        if (!this._enabled) { return notes.map(() => ({canAdd: false, error: null})); }
         await this._checkVersion();
         const result = await this._invoke('canAddNotesWithErrorDetail', {notes});
         return this._normalizeCanAddNotesWithErrorDetailArray(result, notes.length);

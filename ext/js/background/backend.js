@@ -672,7 +672,11 @@ export class Backend {
         const notesNoDuplicatesAllowed = strippedNotes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
 
         try {
-            return await this._findDuplicates(notes, notesNoDuplicatesAllowed);
+            const useFallback = this._environment.getInfo().platform.os === 'android';
+
+            return useFallback ?
+                await this._findDuplicatesFallback(notes, notesNoDuplicatesAllowed, strippedNotes) :
+                await this._findDuplicates(notes, notesNoDuplicatesAllowed);
         } catch (e) {
             // User has older anki-connect that does not support canAddNotesWithErrorDetail
             if (e instanceof ExtensionError && e.message.includes('Anki error: unsupported action')) {
