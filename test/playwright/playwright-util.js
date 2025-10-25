@@ -139,6 +139,7 @@ function getResponseBody(action) {
         case 'modelNames': return ['Mock Model'];
         case 'modelFieldNames': return [...getMockModelFields().keys()];
         case 'canAddNotes': return [true, true];
+        case 'canAddNotesWithErrorDetail': return [{canAdd: true}, {canAdd: true}];
         case 'storeMediaFile': return 'mock_audio.mp3';
         case 'addNote': return 102312488912;
         case 'multi': return [];
