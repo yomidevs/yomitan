@@ -42,6 +42,8 @@ export function getStandardFieldMarkers(type, language = 'ja') {
                 'frequency-harmonic-occurrence',
                 'frequency-average-rank',
                 'frequency-average-occurrence',
+                'furigana',
+                'furigana-plain',
                 'glossary',
                 'glossary-brief',
                 'glossary-no-dictionary',
@@ -65,8 +67,6 @@ export function getStandardFieldMarkers(type, language = 'ja') {
             if (language === 'ja') {
                 markers.push(
                     'cloze-body-kana',
-                    'furigana',
-                    'furigana-plain',
                     'pitch-accents',
                     'pitch-accent-graphs',
                     'pitch-accent-graphs-jj',
