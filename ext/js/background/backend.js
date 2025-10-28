@@ -627,6 +627,39 @@ export class Backend {
 
     /**
      * @param {import('anki').Note[]} notes
+     * @param {import('anki').Note[]} notesStrippedNoDuplicates
+     * @returns {Promise<{ note: import('anki').Note, isDuplicate: boolean }[]>}
+     */
+    async _findDuplicates(notes, notesStrippedNoDuplicates) {
+        const canAddNotesWithErrors = await this._anki.canAddNotesWithErrorDetail(notesStrippedNoDuplicates);
+        return canAddNotesWithErrors.map((item, i) => ({
+            note: notes[i],
+            isDuplicate: item.error === null ?
+                false :
+                item.error.includes('cannot create note because it is a duplicate'),
+        }));
+    }
+
+    /**
+     * @param {import('anki').Note[]} notes
+     * @param {import('anki').Note[]} notesStrippedNoDuplicates
+     * @param {import('anki').Note[]} notesStrippedDuplicates
+     * @returns {Promise<{ note: import('anki').Note, isDuplicate: boolean }[]>}
+     */
+    async _findDuplicatesFallback(notes, notesStrippedNoDuplicates, notesStrippedDuplicates) {
+        const [withDuplicatesAllowed, noDuplicatesAllowed] = await Promise.all([
+            this._anki.canAddNotes(notesStrippedDuplicates),
+            this._anki.canAddNotes(notesStrippedNoDuplicates),
+        ]);
+
+        return withDuplicatesAllowed.map((item, i) => ({
+            note: notes[i],
+            isDuplicate: item !== noDuplicatesAllowed[i],
+        }));
+    }
+
+    /**
+     * @param {import('anki').Note[]} notes
      * @returns {Promise<import('backend').CanAddResults>}
      */
     async partitionAddibleNotes(notes) {
@@ -638,24 +671,16 @@ export class Backend {
         // to check which notes are duplicates.
         const notesNoDuplicatesAllowed = strippedNotes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
 
-        // If only older AnkiConnect available, use `canAddNotes`.
-        const [withDuplicatesAllowed, noDuplicatesAllowed] = await Promise.all([
-            this._anki.canAddNotes(strippedNotes),
-            this._anki.canAddNotes(notesNoDuplicatesAllowed),
-        ]);
-
-        /** @type {{ note: import('anki').Note, isDuplicate: boolean }[]} */
-        const canAddArray = [];
-
-        for (let i = 0; i < withDuplicatesAllowed.length; i++) {
-            if (withDuplicatesAllowed[i] === noDuplicatesAllowed[i]) {
-                canAddArray.push({note: notes[i], isDuplicate: false});
-            } else {
-                canAddArray.push({note: notes[i], isDuplicate: true});
+        try {
+            return await this._findDuplicates(notes, notesNoDuplicatesAllowed);
+        } catch (e) {
+            // User has older anki-connect that does not support canAddNotesWithErrorDetail
+            if (e instanceof ExtensionError && e.message.includes('Anki error: unsupported action')) {
+                return await this._findDuplicatesFallback(notes, notesNoDuplicatesAllowed, strippedNotes);
             }
-        }
 
-        return canAddArray;
+            throw e;
+        }
     }
 
     /** @type {import('api').ApiHandler<'getAnkiNoteInfo'>} */

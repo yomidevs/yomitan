@@ -170,6 +170,17 @@ export class AnkiConnect {
     }
 
     /**
+     * @param {import('anki').Note[]} notes
+     * @returns {Promise<import('anki').CanAddNotesDetail[]>}
+     */
+    async canAddNotesWithErrorDetail(notes) {
+        if (!this._enabled) { return notes.map(() => ({canAdd: false, error: null})); }
+        await this._checkVersion();
+        const result = await this._invoke('canAddNotesWithErrorDetail', {notes});
+        return this._normalizeCanAddNotesWithErrorDetailArray(result, notes.length);
+    }
+
+    /**
      * @param {import('anki').NoteId[]} noteIds
      * @returns {Promise<(?import('anki').NoteInfo)[]>}
      */
@@ -721,6 +732,42 @@ export class AnkiConnect {
                 flags: typeof flags === 'number' ? flags : 0,
                 cardState: typeof queue === 'number' ? queue : 0,
             };
+            result2.push(item2);
+        }
+        return result2;
+    }
+
+    /**
+     * @param {unknown} result
+     * @param {number} expectedCount
+     * @returns {import('anki').CanAddNotesDetail[]}
+     * @throws {Error}
+     */
+    _normalizeCanAddNotesWithErrorDetailArray(result, expectedCount) {
+        if (!Array.isArray(result)) {
+            throw this._createUnexpectedResultError('array', result, '');
+        }
+        if (expectedCount !== result.length) {
+            throw this._createError(`Unexpected result array size: expected ${expectedCount}, received ${result.length}`, result);
+        }
+        /** @type {import('anki').CanAddNotesDetail[]} */
+        const result2 = [];
+        for (let i = 0; i < expectedCount; ++i) {
+            const item = /** @type {unknown} */ (result[i]);
+            if (item === null || typeof item !== 'object') {
+                throw this._createError(`Unexpected result type at index ${i}: expected object, received ${this._getTypeName(item)}`, result);
+            }
+
+            const {canAdd, error} = /** @type {{[key: string]: unknown}} */ (item);
+            if (typeof canAdd !== 'boolean') {
+                throw this._createError(`Unexpected result type at index ${i}, field canAdd: expected boolean, received ${this._getTypeName(canAdd)}`, result);
+            }
+
+            const item2 = {
+                canAdd: canAdd,
+                error: typeof error === 'string' ? error : null,
+            };
+
             result2.push(item2);
         }
         return result2;

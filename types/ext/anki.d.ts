@@ -83,3 +83,8 @@ export type MessageBody = {
     version: number;
     key?: string;
 };
+
+export type CanAddNotesDetail = {
+    canAdd: boolean;
+    error: string | null;
+};
