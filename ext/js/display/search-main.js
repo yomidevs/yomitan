@@ -28,6 +28,7 @@ import {Display} from './display.js';
 import {SearchActionPopupController} from './search-action-popup-controller.js';
 import {SearchDisplayController} from './search-display-controller.js';
 import {SearchPersistentStateController} from './search-persistent-state-controller.js';
+import {SearchSuggestionController} from './search-suggestion-controller.js';
 
 await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController('#search-textbox');
@@ -51,7 +52,9 @@ await Application.main(true, async (application) => {
     const displayAnki = new DisplayAnki(display, displayAudio);
     displayAnki.prepare();
 
-    const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
+    const searchSuggestionController = new SearchSuggestionController(searchPersistentStateController, display);
+
+    const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController, searchSuggestionController);
     await searchDisplayController.prepare();
 
     const modalController = new ModalController([]);
