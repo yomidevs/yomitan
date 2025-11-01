@@ -71,7 +71,7 @@ jobs:
         if: github.event_name == 'pull_request'
 
       - name: "[PR] Upload master-screenshots-outcome"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: master-screenshots-outcome-${{ matrix.shardIndex }}
           path: master-screenshots-outcome
@@ -90,7 +90,7 @@ jobs:
         run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} -u 2>&1 | tee ./playwright-output
         if: github.event_name == 'push'
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: playwright-screenshots-${{ matrix.shardIndex }}
           path: test/playwright/__screenshots__/
@@ -98,13 +98,13 @@ jobs:
 
       - name: Upload blob report to GitHub Actions Artifacts
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: blob-report-${{ matrix.shardIndex }}
           path: blob-report
           retention-days: 1
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: playwright-output-${{ matrix.shardIndex }}
           path: playwright-output
@@ -134,12 +134,12 @@ jobs:
       - name: Merge into JSON Report
         run: npx playwright merge-reports --reporter json ./all-blob-reports > playwright-results.json
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: playwright-report
           path: playwright-report/
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: playwright-results-json
           path: playwright-results.json
@@ -152,7 +152,7 @@ jobs:
           pattern: playwright-screenshots-*
           merge-multiple: true
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: playwright-screenshots
           path: test/playwright/__screenshots__/
@@ -176,7 +176,7 @@ jobs:
         if: github.event_name == 'pull_request'
 
       - name: '[PR] Upload master-screenshots-outcome'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: master-screenshots-outcome
           path: master-screenshots-outcome
@@ -193,7 +193,7 @@ jobs:
       - name: Merge playwright output files
         run: cat playwright-outputs/* > playwright-output
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: playwright-output
           path: playwright-output
