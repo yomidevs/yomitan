@@ -122,7 +122,7 @@ jobs:
 
       ### playwright-report
       - name: Download blob reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: all-blob-reports
           pattern: blob-report-*
@@ -146,7 +146,7 @@ jobs:
 
       ### playwright-screenshots
       - name: Download & merge screenshots from GitHub Actions Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: test/playwright/__screenshots__
           pattern: playwright-screenshots-*
@@ -159,7 +159,7 @@ jobs:
 
       ### [PR] master-screenshots-outcome
       - name: '[PR] Download master-screenshots-outcome files'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: master-screenshots-outcomes
           pattern: master-screenshots-outcome-*
@@ -184,7 +184,7 @@ jobs:
 
       ### playwright-output
       - name: Download playwright-output files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: playwright-outputs
           pattern: playwright-output-*
