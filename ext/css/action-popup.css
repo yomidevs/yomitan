@@ -23,13 +23,13 @@
     --font-size: calc(1px * var(--font-size-no-units));
     --line-height-no-units: 20;
     --line-height: calc(var(--line-height-no-units) / var(--font-size-no-units));
-    --background-color: #f8f9fa;
-    --text-color: #333333;
+    --background-color: #e8d60c;
+    --text-color: #16ed3a;
 }
 
 :root[data-theme=dark] {
-    --background-color: #1e1e1e;
-    --text-color: #cccccc;
+    --background-color: #eb17c4;
+    --text-color: #e9810a;
 }
 
 /* Initilization */
