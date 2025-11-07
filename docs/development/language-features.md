@@ -219,7 +219,7 @@ Now, only dictionary entries marked with the same "n" condition will be eligible
 
 <img align="right" src="../../img/deinflection-example-chain.png">
 
-Now consider the word `dogs'`, as in the `the dogs' bones`. This is the possessive of a plural noun. We can add a rule for the possessive:
+Now consider the word `dogs'`, as in `the dogs' bones`. This is the possessive of a plural noun. We can add a rule for the possessive:
 
 ```js
 {
