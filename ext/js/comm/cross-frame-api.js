@@ -70,6 +70,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
         this._eventListeners.addListener(this._port.onDisconnect, this._onDisconnect.bind(this));
         this._eventListeners.addListener(this._port.onMessage, this._onMessage.bind(this));
         this._eventListeners.addEventListener(window, 'pageshow', this._onPageShow.bind(this));
+        this._eventListeners.addEventListener(document, 'resume', this._onResume.bind(this));
     }
 
     /**
@@ -125,11 +126,21 @@ export class CrossFrameAPIPort extends EventDispatcher {
     // Private
 
     /**
+     * @param {Event} e
+     */
+    _onResume(e) {
+        // Page Resumed after being frozen
+        log.log('Yomitan cross frame reset. Resuming after page frozen.', e);
+        this._onDisconnect();
+    }
+
+    /**
      * @param {PageTransitionEvent} e
      */
     _onPageShow(e) {
         // Page restored from BFCache
         if (e.persisted) {
+            log.log('Yomitan cross frame reset. Page restored from BFCache.', e);
             this._onDisconnect();
         }
     }
