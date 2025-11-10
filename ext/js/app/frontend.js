@@ -560,7 +560,6 @@ export class Frontend {
             delay: scanningOptions.delay,
             scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
-            matchTypePrefix: scanningOptions.matchTypePrefix,
             preventMiddleMouseOnPage,
             preventMiddleMouseOnTextHover,
             preventBackForwardOnPage,
@@ -568,7 +567,6 @@ export class Frontend {
             sentenceParsingOptions,
             scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
             scanResolution: scanningOptions.scanResolution,
-            pageType: this._pageType,
         });
         this._updateTextScannerEnabled();
 

@@ -117,8 +117,6 @@ export class TextScanner extends EventDispatcher {
         this._preventBackForwardOnPage = false;
         /** @type {boolean} */
         this._preventBackForwardOnTextHover = false;
-        /** @type {boolean} */
-        this._matchTypePrefix = false;
         /** @type {number} */
         this._sentenceScanExtent = 0;
         /** @type {boolean} */
@@ -275,10 +273,8 @@ export class TextScanner extends EventDispatcher {
         preventBackForwardOnPage,
         preventBackForwardOnTextHover,
         sentenceParsingOptions,
-        matchTypePrefix,
         scanWithoutMousemove,
         scanResolution,
-        pageType,
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map((input) => this._convertInput(input));
@@ -312,9 +308,6 @@ export class TextScanner extends EventDispatcher {
         }
         if (typeof preventBackForwardOnTextHover === 'boolean') {
             this._preventBackForwardOnTextHover = preventBackForwardOnTextHover;
-        }
-        if (typeof matchTypePrefix === 'boolean') {
-            this._matchTypePrefix = pageType === 'search' ? matchTypePrefix : false;
         }
         if (typeof scanWithoutMousemove === 'boolean') {
             this._scanWithoutMousemove = scanWithoutMousemove;
@@ -1268,7 +1261,6 @@ export class TextScanner extends EventDispatcher {
 
         /** @type {import('api').FindTermsDetails} */
         const details = {};
-        if (this._matchTypePrefix) { details.matchType = 'prefix'; }
         const {dictionaryEntries, originalTextLength} = await this._api.termsFind(searchText, details, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
