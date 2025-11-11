@@ -781,27 +781,39 @@ export class AnkiTemplateRenderer {
     }
 
     /**
+     * @param {import('structured-content.js').Content[]} content
+     * @returns {import('structured-content.js').Content[]}
+     */
+    _extractGlossaryStructuredContentRecursive(content) {
+        /** @type {import('structured-content.js').Content[]} */
+        const extractedContent = [];
+        while (content.length > 0) {
+            const structuredContent = content.shift();
+            if (Array.isArray(structuredContent)) {
+                extractedContent.push(...this._extractGlossaryStructuredContentRecursive(structuredContent));
+            } else if (typeof structuredContent === 'object' && structuredContent) {
+                // @ts-expect-error - Checking if `data` exists
+                if (structuredContent.data?.content === 'glossary') {
+                    extractedContent.push(structuredContent);
+                    continue;
+                }
+                if (structuredContent.content) {
+                    extractedContent.push(...this._extractGlossaryStructuredContentRecursive([structuredContent.content]));
+                }
+            }
+        }
+
+        return extractedContent;
+    }
+
+    /**
      * @param {import('dictionary-data').TermGlossaryStructuredContent} content
      * @param {StructuredContentGenerator} structuredContentGenerator
      * @returns {string[]}
      */
     _extractGlossaryData(content, structuredContentGenerator) {
         /** @type {import('structured-content.js').Content[]} */
-        const glossaryContentQueue = [];
-        const structuredContentQueue = [content.content];
-        while (structuredContentQueue.length > 0) {
-            const structuredContent = structuredContentQueue.shift();
-            if (Array.isArray(structuredContent)) {
-                structuredContentQueue.push(...structuredContent);
-            } else if (typeof structuredContent === 'object' && structuredContent.content) {
-                // @ts-expect-error - Checking if `data` exists
-                if (structuredContent.data?.content === 'glossary') {
-                    glossaryContentQueue.push(structuredContent);
-                    continue;
-                }
-                structuredContentQueue.push(structuredContent.content);
-            }
-        }
+        const glossaryContentQueue = this._extractGlossaryStructuredContentRecursive([content.content]);
 
         /** @type {string[]} */
         const rawGlossaryContent = [];
