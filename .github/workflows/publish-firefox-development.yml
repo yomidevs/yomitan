@@ -29,7 +29,7 @@ jobs:
       - name: Sign Firefox xpi for offline distribution
         id: ffSignXpi
         continue-on-error: true
-        uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@b5c3dd6962ca3114057a5e9a31f5381d8ebd9b8f # signing_test branch
+        uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@0953ef0b8a488a791f17c14fa5b800b131632d34
         with:
           approvalTimeoutMs: 1200000
           validationTimeoutMs: 3600000
