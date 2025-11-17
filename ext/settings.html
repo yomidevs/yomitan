@@ -32,16 +32,16 @@
             <a href="#appearance"       class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="palette"></span></span><span class="outline-item-label">Appearance</span></a>
             <a href="#result-display"   class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="monitor"></span></span><span class="outline-item-label">Result Display</span></a>
             <a href="#popup-size"       class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup-size"></span></span><span class="outline-item-label">Position &amp; Size</span></a>
-            <a href="#window"           class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="window"></span></span><span class="outline-item-label">Search Window</span></a>
             <a href="#audio"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="speaker"></span></span><span class="outline-item-label">Audio</span></a>
             <a href="#text-parsing"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="text-parsing"></span></span><span class="outline-item-label">Text Parsing</span></a>
-            <a href="#translation"      class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">Translation</span></a>
             <a href="#anki"             class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="note-card"></span></span><span class="outline-item-label">Anki</span></a>
             <a href="#clipboard"        class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="clipboard"></span></span><span class="outline-item-label">Clipboard</span></a>
             <a href="#shortcuts"        class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="keyboard"></span></span><span class="outline-item-label">Shortcuts</span></a>
             <a href="#backup"           class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="backup"></span></span><span class="outline-item-label">Backup</span></a>
             <a href="#accessibility"    class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="accessibility"></span></span><span class="outline-item-label">Accessibility</span></a>
             <a href="#security"         class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="lock"></span></span><span class="outline-item-label">Security</span></a>
+            <a href="#window"           class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="window"></span></span><span class="outline-item-label">Search Window</span></a>
+            <a href="#translation"      class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">Translation</span></a>
         </div>
         <div class="sidebar-bottom">
             <label class="button outline-item"><span class="outline-item-left">
@@ -1401,166 +1401,6 @@
         </div></div>
     </div>
 
-    <!-- Search Window -->
-    <div class="heading-container advanced-only">
-        <div class="heading-container-icon"><span class="icon" data-icon="window"></span></div>
-        <div class="heading-container-left"><h2 id="window"><a href="#window">Search Window</a></h2></div>
-        <div class="heading-container-right"><a tabindex="0" class="heading-link-light" id="test-window-open-link">Open&hellip;</a></div>
-    </div>
-    <div class="settings-group advanced-only">
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Sticky search header</div>
-                    <div class="settings-item-description">Search header stays on the page when scrolling down.</div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="general.stickySearchHeader"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-        </div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Use a native browser window instead of an embedded popup
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="general.usePopupWindow"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    Instead of showing definitions in a popup embedded into the webpage,
-                    a native browser window containing the popup content will be opened instead.
-                    This window will be shared across all tabs.
-                </p>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Size</div>
-                <div class="settings-item-description">Control the size of the window, in pixels.</div>
-            </div>
-            <div class="settings-item-right">
-                <div class="settings-item-group">
-                    <div class="settings-item-group-item">
-                        <div class="settings-item-group-item-label">Width</div>
-                        <input type="number" class="short-width short-height" min="0" step="1" data-setting="popupWindow.width">
-                    </div>
-                    <div class="settings-item-group-item">
-                        <div class="settings-item-group-item-label">Height</div>
-                        <input type="number" class="short-width short-height" min="0" step="1" data-setting="popupWindow.height">
-                    </div>
-                </div>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Left position</div>
-                <div class="settings-item-description">Control the left position of the window, in pixels.</div>
-            </div>
-            <div class="settings-item-right">
-                <div class="settings-item-group">
-                    <div class="settings-item-group-item" id="popup-window-left-container" hidden>
-                        <div class="settings-item-group-item-label">x</div>
-                        <input type="number" class="short-width short-height" step="1" data-setting="popupWindow.left">
-                    </div>
-                    <div class="settings-item-group-item">
-                        <div class="settings-item-group-item-label">Mode</div>
-                        <select class="short-width short-height" data-setting="popupWindow.useLeft"
-                            data-transform='[
-                                {
-                                    "step": "pre",
-                                    "type": "toBoolean"
-                                },
-                                {
-                                    "type": "setVisibility",
-                                    "selector": "#popup-window-left-container",
-                                    "condition": {"op": "===", "value": true}
-                                },
-                                {
-                                    "step": "post",
-                                    "type": "toString"
-                                }
-                            ]'
-                        >
-                            <option value="false">Auto</option>
-                            <option value="true">Manual</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Top position</div>
-                <div class="settings-item-description">Control the top position of the window, in pixels.</div>
-            </div>
-            <div class="settings-item-right">
-                <div class="settings-item-group">
-                    <div class="settings-item-group-item" id="popup-window-top-container" hidden>
-                        <div class="settings-item-group-item-label">y</div>
-                        <input type="number" class="short-width short-height" step="1" data-setting="popupWindow.top">
-                    </div>
-                    <div class="settings-item-group-item">
-                        <div class="settings-item-group-item-label">Mode</div>
-                        <select class="short-width short-height" data-setting="popupWindow.useTop"
-                            data-transform='[
-                                {
-                                    "step": "pre",
-                                    "type": "toBoolean"
-                                },
-                                {
-                                    "type": "setVisibility",
-                                    "selector": "#popup-window-top-container",
-                                    "condition": {"op": "===", "value": true}
-                                },
-                                {
-                                    "step": "post",
-                                    "type": "toString"
-                                }
-                            ]'
-                        >
-                            <option value="false">Auto</option>
-                            <option value="true">Manual</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Window style</div>
-                <div class="settings-item-description">Change the appearance of the window.</div>
-            </div>
-            <div class="settings-item-right">
-                <div class="settings-item-group">
-                    <div class="settings-item-group-item">
-                        <div class="settings-item-group-item-label">Type</div>
-                        <select class="short-width short-height" data-setting="popupWindow.windowType">
-                            <option value="normal">Normal</option>
-                            <option value="popup">Popup</option>
-                        </select>
-                    </div>
-                    <div class="settings-item-group-item">
-                        <div class="settings-item-group-item-label">State</div>
-                        <select class="short-width short-height" data-setting="popupWindow.windowState">
-                            <option value="normal">Normal</option>
-                            <option value="maximized">Maximized</option>
-                            <option value="fullscreen">Fullscreen</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div></div>
-    </div>
-
     <!-- Audio -->
     <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="speaker"></span></div>
@@ -1746,36 +1586,6 @@
                         <option value="none">None</option>
                     </select>
                 </div>
-            </div>
-        </div></div>
-    </div>
-
-    <!-- Translation -->
-    <div class="advanced-only">
-        <div class="heading-container">
-            <div class="heading-container-icon"><span class="icon" data-icon="translation"></span></div>
-            <div class="heading-container-left"><h2 id="translation"><a href="#translation">Translation</a></h2></div>
-        </div>
-    </div>
-    <div class="settings-group advanced-only">
-        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Dictionary search resolution</div>
-                <div class="settings-item-description" lang="en"><p>"A dog"&#x3000;&rarr;&#x3000;search for "A dog","A do", "A d", "A"</p> or <p>"A dog"&#x3000;&rarr;&#x3000;"A dog", "A"</p></div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.searchResolution">
-                    <option value="letter">Letter</option>
-                    <option value="word">Word</option>
-                </select>
-            </div>
-        </div></div>
-        <div class="settings-item settings-item-button" data-modal-action="show,translation-text-replacement-patterns"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Configure custom text replacement patterns&hellip;</div>
-            </div>
-            <div class="settings-item-right open-panel-button-container">
-                <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
     </div>
@@ -2471,6 +2281,196 @@
                 </p>
             </div>
         </div>
+    </div>
+
+    <!-- Search Window -->
+    <div class="heading-container advanced-only">
+        <div class="heading-container-icon"><span class="icon" data-icon="window"></span></div>
+        <div class="heading-container-left"><h2 id="window"><a href="#window">Search Window</a></h2></div>
+        <div class="heading-container-right"><a tabindex="0" class="heading-link-light" id="test-window-open-link">Open&hellip;</a></div>
+    </div>
+    <div class="settings-group advanced-only">
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Sticky search header</div>
+                    <div class="settings-item-description">Search header stays on the page when scrolling down.</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.stickySearchHeader"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Use a native browser window instead of an embedded popup
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.usePopupWindow"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Instead of showing definitions in a popup embedded into the webpage,
+                    a native browser window containing the popup content will be opened instead.
+                    This window will be shared across all tabs.
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Size</div>
+                <div class="settings-item-description">Control the size of the window, in pixels.</div>
+            </div>
+            <div class="settings-item-right">
+                <div class="settings-item-group">
+                    <div class="settings-item-group-item">
+                        <div class="settings-item-group-item-label">Width</div>
+                        <input type="number" class="short-width short-height" min="0" step="1" data-setting="popupWindow.width">
+                    </div>
+                    <div class="settings-item-group-item">
+                        <div class="settings-item-group-item-label">Height</div>
+                        <input type="number" class="short-width short-height" min="0" step="1" data-setting="popupWindow.height">
+                    </div>
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Left position</div>
+                <div class="settings-item-description">Control the left position of the window, in pixels.</div>
+            </div>
+            <div class="settings-item-right">
+                <div class="settings-item-group">
+                    <div class="settings-item-group-item" id="popup-window-left-container" hidden>
+                        <div class="settings-item-group-item-label">x</div>
+                        <input type="number" class="short-width short-height" step="1" data-setting="popupWindow.left">
+                    </div>
+                    <div class="settings-item-group-item">
+                        <div class="settings-item-group-item-label">Mode</div>
+                        <select class="short-width short-height" data-setting="popupWindow.useLeft"
+                            data-transform='[
+                                {
+                                    "step": "pre",
+                                    "type": "toBoolean"
+                                },
+                                {
+                                    "type": "setVisibility",
+                                    "selector": "#popup-window-left-container",
+                                    "condition": {"op": "===", "value": true}
+                                },
+                                {
+                                    "step": "post",
+                                    "type": "toString"
+                                }
+                            ]'
+                        >
+                            <option value="false">Auto</option>
+                            <option value="true">Manual</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Top position</div>
+                <div class="settings-item-description">Control the top position of the window, in pixels.</div>
+            </div>
+            <div class="settings-item-right">
+                <div class="settings-item-group">
+                    <div class="settings-item-group-item" id="popup-window-top-container" hidden>
+                        <div class="settings-item-group-item-label">y</div>
+                        <input type="number" class="short-width short-height" step="1" data-setting="popupWindow.top">
+                    </div>
+                    <div class="settings-item-group-item">
+                        <div class="settings-item-group-item-label">Mode</div>
+                        <select class="short-width short-height" data-setting="popupWindow.useTop"
+                            data-transform='[
+                                {
+                                    "step": "pre",
+                                    "type": "toBoolean"
+                                },
+                                {
+                                    "type": "setVisibility",
+                                    "selector": "#popup-window-top-container",
+                                    "condition": {"op": "===", "value": true}
+                                },
+                                {
+                                    "step": "post",
+                                    "type": "toString"
+                                }
+                            ]'
+                        >
+                            <option value="false">Auto</option>
+                            <option value="true">Manual</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Window style</div>
+                <div class="settings-item-description">Change the appearance of the window.</div>
+            </div>
+            <div class="settings-item-right">
+                <div class="settings-item-group">
+                    <div class="settings-item-group-item">
+                        <div class="settings-item-group-item-label">Type</div>
+                        <select class="short-width short-height" data-setting="popupWindow.windowType">
+                            <option value="normal">Normal</option>
+                            <option value="popup">Popup</option>
+                        </select>
+                    </div>
+                    <div class="settings-item-group-item">
+                        <div class="settings-item-group-item-label">State</div>
+                        <select class="short-width short-height" data-setting="popupWindow.windowState">
+                            <option value="normal">Normal</option>
+                            <option value="maximized">Maximized</option>
+                            <option value="fullscreen">Fullscreen</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+    </div>
+
+    <!-- Translation -->
+    <div class="advanced-only">
+        <div class="heading-container">
+            <div class="heading-container-icon"><span class="icon" data-icon="translation"></span></div>
+            <div class="heading-container-left"><h2 id="translation"><a href="#translation">Translation</a></h2></div>
+        </div>
+    </div>
+    <div class="settings-group advanced-only">
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Dictionary search resolution</div>
+                <div class="settings-item-description" lang="en"><p>"A dog"&#x3000;&rarr;&#x3000;search for "A dog","A do", "A d", "A"</p> or <p>"A dog"&#x3000;&rarr;&#x3000;"A dog", "A"</p></div>
+            </div>
+            <div class="settings-item-right">
+                <select data-setting="translation.searchResolution">
+                    <option value="letter">Letter</option>
+                    <option value="word">Word</option>
+                </select>
+            </div>
+        </div></div>
+        <div class="settings-item settings-item-button" data-modal-action="show,translation-text-replacement-patterns"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Configure custom text replacement patterns&hellip;</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
     </div>
 
     <div class="footer-padding"></div>
