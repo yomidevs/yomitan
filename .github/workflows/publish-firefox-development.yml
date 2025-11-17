@@ -23,16 +23,19 @@ jobs:
       - uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # pin@v1.12
         with:
           tag: ${{ github.ref_name }}
+          zipBall: true
           fileName: "*"
 
       - name: Sign Firefox xpi for offline distribution
         id: ffSignXpi
         continue-on-error: true
-        uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@6c31e947111a95f05682fc98c6340367cce49cdc # pin@v1.0.8
+        uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@0953ef0b8a488a791f17c14fa5b800b131632d34
         with:
-          timeoutMs: 1200000
+          approvalTimeoutMs: 1200000
+          validationTimeoutMs: 3600000
           extensionId: ${{ secrets.FF_OFFLINE_EXT_ID }}
           zipFilePath: yomitan-firefox-dev.zip
+          sourcesZipFilePath: yomitan-${{ github.ref_name }}.zip
           xpiFilePath: yomitan-firefox-dev.xpi
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}
