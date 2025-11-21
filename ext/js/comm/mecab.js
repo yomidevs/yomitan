@@ -209,12 +209,34 @@ export class Mecab {
             /** @type {import('mecab').ParseFragment[][]} */
             const lines = [];
             for (const rawLine of rawLines) {
+                /** @type {import('mecab').ParseFragment[]} */
                 const line = [];
-                for (let {expression: term, reading, source} of rawLine) {
+
+                for (let {expression: term, reading, source, pos, pos2} of rawLine) {
                     if (typeof term !== 'string') { term = ''; }
                     if (typeof reading !== 'string') { reading = ''; }
                     if (typeof source !== 'string') { source = ''; }
-                    line.push({term, reading, source});
+                    // Fix: Explicitly handle pos and pos2 typing
+                    const tokenPos = typeof pos === 'string' ? pos : '';
+                    const tokenPos2 = typeof pos2 === 'string' ? pos2 : '';
+
+                    if (line.length > 0) {
+                        const last_token = line[line.length - 1];
+                        // Check if current token should be merged with previous
+                        const shouldMerge = (
+                            // 助動詞 or 動詞-接尾 (but not after 記号)
+                            ((tokenPos === '助動詞' || (tokenPos === '動詞' && tokenPos2 === '接尾')) && last_token.pos !== '記号') ||
+                            // て/で particle after verb
+                            (tokenPos === '助詞' && tokenPos2 === '接続助詞' && (term === 'て' || term === 'で') && last_token.pos === '動詞')
+                        );
+                        if (shouldMerge) {
+                            line.pop();
+                            term = last_token.term + term;
+                            reading = last_token.reading + reading;
+                            source = last_token.source + source;
+                        }
+                    }
+                    line.push({term, reading, source, pos: tokenPos, pos2: tokenPos2});
                 }
                 lines.push(line);
             }
