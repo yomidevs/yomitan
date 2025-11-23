@@ -225,7 +225,7 @@ export class Mecab {
                         // Check if current token should be merged with previous
                         const shouldMerge = (
                             // 助動詞 or 動詞-接尾 (but not after 記号)
-                            ((tokenPos === '助動詞' || (tokenPos === '動詞' && tokenPos2 === '接尾')) && last_token.pos !== '記号') ||
+                            ((tokenPos === '助動詞' || (tokenPos === '動詞' && tokenPos2 === '接尾')) && last_token.pos === '動詞') ||
                             // て/で particle after verb
                             (tokenPos === '助詞' && tokenPos2 === '接続助詞' && (term === 'て' || term === 'で') && last_token.pos === '動詞')
                         );
