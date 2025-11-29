@@ -1701,9 +1701,29 @@ export class Backend {
                 previousUngroupedSegment = null;
                 const {headwords: [{term, reading}]} = dictionaryEntries[0];
                 const source = text.substring(i, i + originalTextLength);
+                /** @type {import('api').ParseTextSegment[]} */
                 const textSegments = [];
                 for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, source)) {
                     textSegments.push({text: text2, reading: reading2});
+                }
+                if (textSegments.length > 0) {
+                    const token = textSegments.map((s) => s.text).join('');
+                    const trimmedHeadwords = [];
+                    for (const dictionaryEntry of dictionaryEntries) {
+                        const validHeadwords = [];
+                        for (const headword of dictionaryEntry.headwords) {
+                            const validSources = [];
+                            for (const src of headword.sources) {
+                                if (src.originalText !== token) { continue; }
+                                if (!src.isPrimary) { continue; }
+                                if (src.matchType !== 'exact') { continue; }
+                                validSources.push(src);
+                            }
+                            if (validSources.length > 0) { validHeadwords.push({term: headword.term, reading: headword.reading, sources: validSources}); }
+                        }
+                        if (validHeadwords.length > 0) { trimmedHeadwords.push(validHeadwords); }
+                    }
+                    textSegments[0].headwords = trimmedHeadwords;
                 }
                 results.push(textSegments);
                 i += originalTextLength;

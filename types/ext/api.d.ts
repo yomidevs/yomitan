@@ -61,6 +61,11 @@ export type ParseTextResultItem = {
 export type ParseTextSegment = {
     text: string;
     reading: string;
+    headwords?: {
+        term: string;
+        reading: string;
+        sources: Dictionary.TermSource[];
+    }[][];
 };
 
 export type ParseTextLine = ParseTextSegment[];
