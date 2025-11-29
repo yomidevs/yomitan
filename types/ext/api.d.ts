@@ -141,7 +141,7 @@ type ApiSurface = {
     };
     parseText: {
         params: {
-            text: string;
+            text: string | string[];
             optionsContext: Settings.OptionsContext;
             scanLength: number;
             useInternalParser: boolean;

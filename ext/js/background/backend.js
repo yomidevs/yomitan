@@ -558,31 +558,40 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'parseText'>} */
     async _onApiParseText({text, optionsContext, scanLength, useInternalParser, useMecabParser}) {
-        const [internalResults, mecabResults] = await Promise.all([
-            (useInternalParser ? this._textParseScanning(text, scanLength, optionsContext) : null),
-            (useMecabParser ? this._textParseMecab(text) : null),
-        ]);
-
         /** @type {import('api').ParseTextResultItem[]} */
         const results = [];
+
+        const [internalResults, mecabResults] = await Promise.all([
+            useInternalParser ?
+                (Array.isArray(text) ?
+                    Promise.all(text.map((t) => this._textParseScanning(t, scanLength, optionsContext))) :
+                    Promise.all([this._textParseScanning(text, scanLength, optionsContext)])) :
+                null,
+            useMecabParser ?
+                (Array.isArray(text) ?
+                    Promise.all(text.map((t) => this._textParseMecab(t))) :
+                    Promise.all([this._textParseMecab(text)])) :
+                null,
+        ]);
 
         if (internalResults !== null) {
             results.push({
                 id: 'scan',
                 source: 'scanning-parser',
                 dictionary: null,
-                content: internalResults,
+                content: internalResults.flat(),
             });
         }
-
         if (mecabResults !== null) {
-            for (const [dictionary, content] of mecabResults) {
-                results.push({
-                    id: `mecab-${dictionary}`,
-                    source: 'mecab',
-                    dictionary,
-                    content,
-                });
+            for (const mecabResult of mecabResults) {
+                for (const [dictionary, content] of mecabResult) {
+                    results.push({
+                        id: `mecab-${dictionary}`,
+                        source: 'mecab',
+                        dictionary,
+                        content,
+                    });
+                }
             }
         }
 
