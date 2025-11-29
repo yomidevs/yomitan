@@ -34,6 +34,7 @@ import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
+import {CacheMap} from '../general/cache-map.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
 import {getLanguageSummaries, isTextLookupWorthy} from '../language/languages.js';
@@ -208,6 +209,8 @@ export class Backend {
 
         /** @type {YomitanApi} */
         this._yomitanApi = new YomitanApi(this._apiMap, this._offscreen);
+        /** @type {CacheMap<string, {originalTextLength: number, textSegments: import('api').ParseTextSegment[]}>} */
+        this._textParseCache = new CacheMap(10000, 3600000); // 1 hour idle time, ~32MB per 1000 entries for Japanese
     }
 
     /**
@@ -1505,6 +1508,8 @@ export class Backend {
 
         void this._accessibilityController.update(this._getOptionsFull(false));
 
+        this._textParseCache.clear();
+
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
     }
 
@@ -1686,45 +1691,54 @@ export class Backend {
         let i = 0;
         const ii = text.length;
         while (i < ii) {
-            const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
-                mode,
-                text.substring(i, i + scanLength),
-                findTermsOptions,
-            );
             const codePoint = /** @type {number} */ (text.codePointAt(i));
             const character = String.fromCodePoint(codePoint);
-            if (
-                dictionaryEntries.length > 0 &&
-                originalTextLength > 0 &&
-                (originalTextLength !== character.length || isCodePointJapanese(codePoint))
-            ) {
-                previousUngroupedSegment = null;
-                const {headwords: [{term, reading}]} = dictionaryEntries[0];
-                const source = text.substring(i, i + originalTextLength);
+            const substring = text.substring(i, i + scanLength);
+            const cacheKey = `${optionsContext.index}:${substring}`;
+            let cached = this._textParseCache.get(cacheKey);
+            if (typeof cached === 'undefined') {
+                const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
+                    mode,
+                    substring,
+                    findTermsOptions,
+                );
                 /** @type {import('api').ParseTextSegment[]} */
                 const textSegments = [];
-                for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, source)) {
-                    textSegments.push({text: text2, reading: reading2});
-                }
-                if (textSegments.length > 0) {
-                    const token = textSegments.map((s) => s.text).join('');
-                    const trimmedHeadwords = [];
-                    for (const dictionaryEntry of dictionaryEntries) {
-                        const validHeadwords = [];
-                        for (const headword of dictionaryEntry.headwords) {
-                            const validSources = [];
-                            for (const src of headword.sources) {
-                                if (src.originalText !== token) { continue; }
-                                if (!src.isPrimary) { continue; }
-                                if (src.matchType !== 'exact') { continue; }
-                                validSources.push(src);
-                            }
-                            if (validSources.length > 0) { validHeadwords.push({term: headword.term, reading: headword.reading, sources: validSources}); }
-                        }
-                        if (validHeadwords.length > 0) { trimmedHeadwords.push(validHeadwords); }
+                if (dictionaryEntries.length > 0 &&
+                originalTextLength > 0 &&
+                (originalTextLength !== character.length || isCodePointJapanese(codePoint))
+                ) {
+                    const {headwords: [{term, reading}]} = dictionaryEntries[0];
+                    const source = substring.substring(0, originalTextLength);
+                    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, source)) {
+                        textSegments.push({text: text2, reading: reading2});
                     }
-                    textSegments[0].headwords = trimmedHeadwords;
+                    if (textSegments.length > 0) {
+                        const token = textSegments.map((s) => s.text).join('');
+                        const trimmedHeadwords = [];
+                        for (const dictionaryEntry of dictionaryEntries) {
+                            const validHeadwords = [];
+                            for (const headword of dictionaryEntry.headwords) {
+                                const validSources = [];
+                                for (const src of headword.sources) {
+                                    if (src.originalText !== token) { continue; }
+                                    if (!src.isPrimary) { continue; }
+                                    if (src.matchType !== 'exact') { continue; }
+                                    validSources.push(src);
+                                }
+                                if (validSources.length > 0) { validHeadwords.push({term: headword.term, reading: headword.reading, sources: validSources}); }
+                            }
+                            if (validHeadwords.length > 0) { trimmedHeadwords.push(validHeadwords); }
+                        }
+                        textSegments[0].headwords = trimmedHeadwords;
+                    }
                 }
+                cached = {originalTextLength, textSegments};
+                if (typeof optionsContext.index === 'undefined') { this._textParseCache.set(cacheKey, cached); }
+            }
+            const {originalTextLength, textSegments} = cached;
+            if (textSegments.length > 0) {
+                previousUngroupedSegment = null;
                 results.push(textSegments);
                 i += originalTextLength;
             } else {
