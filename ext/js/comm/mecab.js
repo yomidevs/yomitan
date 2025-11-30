@@ -222,13 +222,22 @@ export class Mecab {
 
                     if (line.length > 0) {
                         const last_token = line[line.length - 1];
-                        // Check if current token should be merged with previous
-                        const shouldMerge = (
-                            // 助動詞 or 動詞-接尾 (but not after 記号)
-                            ((tokenPos === '助動詞' || (tokenPos === '動詞' && tokenPos2 === '接尾')) && last_token.pos === '動詞') ||
-                            // て/で particle after verb
-                            (tokenPos === '助詞' && tokenPos2 === '接続助詞' && (term === 'て' || term === 'で') && last_token.pos === '動詞')
-                        );
+
+                        const isAuxVerb = tokenPos === '助動詞' || tokenPos === 'aux-verb' || tokenPos === 'aux';
+
+                        const isVerbSuffix = (tokenPos === '動詞' && tokenPos2 === '接尾') ||
+                                           (tokenPos === 'verb' && tokenPos2 === 'suffix') ||
+                                           (tokenPos === 'suffix');
+                        const isTeDeParticle = (tokenPos === '助詞' || tokenPos === 'particle') &&
+                        (tokenPos2 === '接続助詞' || tokenPos2 === 'conjunctive') &&
+                                             (term === 'て' || term === 'で');
+
+                        // Mecab returns "aux-verb" but the mecab.py bridge returns "aux" because it cuts after the '-'
+                        const lastIsVerbLike = last_token.pos === '動詞' || last_token.pos === 'verb' ||
+                                             last_token.pos === '助動詞' || last_token.pos === 'aux-verb' || last_token.pos === 'aux';
+
+                        const shouldMerge = lastIsVerbLike && (isAuxVerb || isVerbSuffix || isTeDeParticle);
+
                         if (shouldMerge) {
                             line.pop();
                             term = last_token.term + term;
