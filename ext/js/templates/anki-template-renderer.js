@@ -807,6 +807,32 @@ export class AnkiTemplateRenderer {
     }
 
     /**
+     * @param {import('structured-content.js').Content[]} content
+     * @param {StructuredContentGenerator} structuredContentGenerator
+     * @returns {string[]}
+     */
+    _convertGlossaryStructuredContentRecursive(content, structuredContentGenerator) {
+        /** @type {string[]} */
+        const rawGlossaryContent = [];
+        while (content.length > 0) {
+            const structuredGloss = content.shift();
+            if (typeof structuredGloss === 'string') {
+                rawGlossaryContent.push(structuredGloss);
+            } else if (Array.isArray(structuredGloss)) {
+                rawGlossaryContent.push(...this._convertGlossaryStructuredContentRecursive(structuredGloss, structuredContentGenerator));
+            } else if (typeof structuredGloss === 'object' && structuredGloss.content) {
+                if (structuredGloss.tag === 'ruby') {
+                    const node = structuredContentGenerator.createStructuredContent(structuredGloss.content, '');
+                    rawGlossaryContent.push(node !== null ? this._getStructuredContentText(node) : '');
+                    continue;
+                }
+                rawGlossaryContent.push(...this._convertGlossaryStructuredContentRecursive([structuredGloss.content], structuredContentGenerator));
+            }
+        }
+        return rawGlossaryContent;
+    }
+
+    /**
      * @param {import('dictionary-data').TermGlossaryStructuredContent} content
      * @param {StructuredContentGenerator} structuredContentGenerator
      * @returns {string[]}
@@ -816,23 +842,7 @@ export class AnkiTemplateRenderer {
         const glossaryContentQueue = this._extractGlossaryStructuredContentRecursive([content.content]);
 
         /** @type {string[]} */
-        const rawGlossaryContent = [];
-        while (glossaryContentQueue.length > 0) {
-            const structuredGloss = glossaryContentQueue.shift();
-            if (typeof structuredGloss === 'string') {
-                rawGlossaryContent.push(structuredGloss);
-            } else if (Array.isArray(structuredGloss)) {
-                glossaryContentQueue.push(...structuredGloss);
-            } else if (typeof structuredGloss === 'object' && structuredGloss.content) {
-                if (structuredGloss.tag === 'ruby') {
-                    const node = structuredContentGenerator.createStructuredContent(structuredGloss.content, '');
-                    rawGlossaryContent.push(node !== null ? this._getStructuredContentText(node) : '');
-                    continue;
-                }
-                glossaryContentQueue.push(structuredGloss.content);
-            }
-        }
-        return rawGlossaryContent;
+        return this._convertGlossaryStructuredContentRecursive(glossaryContentQueue, structuredContentGenerator);
     }
 
     /**
