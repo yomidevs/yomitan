@@ -27,6 +27,7 @@ export type ParseResultTermRaw = {
     source?: string;
     pos?: string;
     pos2?: string;
+    inflection_type?: string;
 };
 
 /** The resulting data from an invocation of `parseText`. */

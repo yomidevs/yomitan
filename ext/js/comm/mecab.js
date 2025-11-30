@@ -212,29 +212,35 @@ export class Mecab {
                 /** @type {import('mecab').ParseFragment[]} */
                 const line = [];
 
-                for (let {expression: term, reading, source, pos, pos2} of rawLine) {
+                for (let {expression: term, reading, source, pos, pos2, inflection_type} of rawLine) {
                     if (typeof term !== 'string') { term = ''; }
                     if (typeof reading !== 'string') { reading = ''; }
                     if (typeof source !== 'string') { source = ''; }
-                    // Fix: Explicitly handle pos and pos2 typing
                     const tokenPos = typeof pos === 'string' ? pos : '';
                     const tokenPos2 = typeof pos2 === 'string' ? pos2 : '';
+                    const conjugationType = typeof inflection_type === 'string' ? inflection_type : '';
 
                     if (line.length > 0) {
                         const last_token = line[line.length - 1];
 
-                        const isAuxVerb = tokenPos === '助動詞' || tokenPos === 'aux-verb' || tokenPos === 'aux';
+                        // for unidic-mecab-translate
+                        const isCopulaByType = conjugationType === 'aux|da' || conjugationType === 'aux|desu';
+                        // for ipadic
+                        const isCopulaByTerm = (tokenPos === '助動詞' || tokenPos === 'aux-verb' || tokenPos === 'aux') &&
+                                             (term === 'だ' || term === 'です' || term === 'で' || term === 'じゃ');
+                        const isCopula = isCopulaByType || isCopulaByTerm;
 
-                        const isVerbSuffix = (tokenPos === '動詞' && tokenPos2 === '接尾') ||
+                        const isAuxVerb = (tokenPos === '助動詞' || tokenPos === 'aux-verb' || tokenPos === 'aux') && !isCopula;
+
+                        const isVerbSuffix = (tokenPos === '動詞' && (tokenPos2 === '接尾')) ||
                                            (tokenPos === 'verb' && tokenPos2 === 'suffix') ||
                                            (tokenPos === 'suffix');
                         const isTeDeParticle = (tokenPos === '助詞' || tokenPos === 'particle') &&
-                        (tokenPos2 === '接続助詞' || tokenPos2 === 'conjunctive') &&
+                                             (tokenPos2 === '接続助詞' || tokenPos2 === 'conjunctive') &&
                                              (term === 'て' || term === 'で');
 
-                        // Mecab returns "aux-verb" but the mecab.py bridge returns "aux" because it cuts after the '-'
                         const lastIsVerbLike = last_token.pos === '動詞' || last_token.pos === 'verb' ||
-                                             last_token.pos === '助動詞' || last_token.pos === 'aux-verb' || last_token.pos === 'aux';
+                            last_token.pos === '助動詞' || last_token.pos === 'aux-verb' || last_token.pos === 'aux';
 
                         const shouldMerge = lastIsVerbLike && (isAuxVerb || isVerbSuffix || isTeDeParticle);
 
