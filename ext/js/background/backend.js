@@ -1734,7 +1734,7 @@ export class Backend {
                     }
                 }
                 cached = {originalTextLength, textSegments};
-                if (typeof optionsContext.index === 'undefined') { this._textParseCache.set(cacheKey, cached); }
+                if (typeof optionsContext.index !== 'undefined') { this._textParseCache.set(cacheKey, cached); }
             }
             const {originalTextLength, textSegments} = cached;
             if (textSegments.length > 0) {
