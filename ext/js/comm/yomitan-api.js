@@ -239,7 +239,7 @@ export class YomitanApi {
                     case 'tokenize': {
                         /** @type {import('yomitan-api.js').tokenizeInput} */
                         // @ts-expect-error - Allow this to error
-                        const {text, scanLength} = parsedBody;
+                        const {text, scanLength, parser} = parsedBody;
                         if (typeof text !== 'string') {
                             throw new Error('Invalid input for tokenize, expected "text" to be a string but got ' + typeof text);
                         }
@@ -250,8 +250,8 @@ export class YomitanApi {
                             text: text,
                             optionsContext: {index: optionsFull.profileCurrent},
                             scanLength: scanLength,
-                            useInternalParser: true,
-                            useMecabParser: false,
+                            useInternalParser: parser !== 'mecab',
+                            useMecabParser: parser === 'mecab',
                         };
                         result = await this._invoke('parseText', invokeParams);
                         break;

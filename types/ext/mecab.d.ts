@@ -25,6 +25,11 @@ export type ParseResultTermRaw = {
     expression?: string;
     reading?: string;
     source?: string;
+    pos1?: string;
+    pos2?: string;
+    pos3?: string;
+    pos4?: string;
+    inflection_type?: string;
 };
 
 /** The resulting data from an invocation of `parseText`. */
@@ -43,4 +48,8 @@ export type ParseFragment = {
     reading: string;
     /** The source text. */
     source: string;
+    /** The part of speech (major category). */
+    pos: string;
+    /** The part of speech (minor category). */
+    pos2: string;
 };

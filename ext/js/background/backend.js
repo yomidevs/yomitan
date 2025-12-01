@@ -1740,7 +1740,6 @@ export class Backend {
                     }
                     result.push(termParts);
                 }
-                result.push([{text: '\n', reading: ''}]);
             }
             results.push([name, result]);
         }
