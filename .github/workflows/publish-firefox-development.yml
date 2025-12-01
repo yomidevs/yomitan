@@ -62,7 +62,7 @@ jobs:
 
       # update updates.json so that all people who have the dev version installed get the new update
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: metadata
 
