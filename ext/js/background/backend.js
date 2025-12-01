@@ -578,12 +578,14 @@ export class Backend {
         ]);
 
         if (internalResults !== null) {
-            results.push({
-                id: 'scan',
-                source: 'scanning-parser',
-                dictionary: null,
-                content: internalResults.flat(),
-            });
+            for (const internalResult of internalResults) {
+                results.push({
+                    id: 'scan',
+                    source: 'scanning-parser',
+                    dictionary: null,
+                    content: internalResult,
+                });
+            }
         }
         if (mecabResults !== null) {
             for (const mecabResult of mecabResults) {
