@@ -206,52 +206,72 @@ export class Mecab {
         /** @type {import('mecab').ParseResult[]} */
         const results = [];
         for (const [name, rawLines] of Object.entries(rawResults)) {
+            // Define helper functions based on dictionary type
+            let isNoun, isCopula, isAuxVerb, isVerbSuffix, isTeDeParticle, isVerb, isVerbNonIndependent, isNounSuffix, isCounter, isNumeral;
+
+            if (name === 'unidic-mecab-translate') {
+                // Helper functions for unidic-mecab-translate
+                isNoun = (tok) => tok.pos1 === 'noun';
+                isCopula = (tok) => tok.inflection_type === 'aux|da' || tok.inflection_type === 'aux|desu';
+                isAuxVerb = (tok) => (tok.pos1 === 'aux' || tok.pos1 === 'aux-verb') && !isCopula(tok);
+                isVerbSuffix = (tok) => tok.pos1 === 'suffix';
+                isTeDeParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && (tok.term === 'て' || tok.term === 'で');
+                isVerb = (tok) => tok.pos1 === 'verb' || (tok.pos1 === 'aux' || tok.pos1 === 'aux-verb');
+                isVerbNonIndependent = (tok) => isVerb(tok) && tok.pos2 === 'nonindependent?';
+                isNounSuffix = (tok) => tok.pos1 === 'suffix' && tok.pos2 === 'substantive';
+                isCounter = (tok) => tok.pos1 === 'noun' && tok.pos2 === 'common' && tok.pos3 === 'counter?';
+                isNumeral = (tok) => tok.pos1 === 'noun' && tok.pos2 === 'numeral';
+            } else {
+                // Helper functions for ipadic and other dictionaries
+                isNoun = (tok) => tok.pos1 === '名詞';
+                isCopula = (tok) => tok.pos1 === '助動詞' && (tok.term === 'だ' || tok.term === 'です' || tok.term === 'で' || tok.term === 'じゃ');
+                isAuxVerb = (tok) => tok.pos1 === '助動詞' && !isCopula(tok);
+                // 待ってるじゃないです : てる is 動詞,非自立,*,*,一段,基本形,てる,テル,テル
+                // やられる : れる is 動詞,接尾,*,*,一段,基本形,れる,レル,レル
+                isVerbSuffix = (tok) => tok.pos1 === '動詞' && (tok.pos2 === '非自立' || tok.pos2 === '接尾');
+                isTeDeParticle = (tok) => tok.pos1 === '助詞' && tok.pos2 === '接続助詞' && (tok.term === 'て' || tok.term === 'で');
+                isVerb = (tok) => tok.pos1 === '動詞' || tok.pos1 === '助動詞';
+                isVerbNonIndependent = (_) => true;
+                isNounSuffix = (tok) => tok.pos1 === '動詞' && tok.pos2 === '接尾';
+                isCounter = (tok) => tok.pos1 === '名詞' && tok.pos2 === '接尾' && tok.pos3 === '助数詞';
+                isNumeral = (tok) => tok.pos1 === '名詞' && tok.pos2 === '数';
+            }
+
             /** @type {import('mecab').ParseFragment[][]} */
             const lines = [];
             for (const rawLine of rawLines) {
                 /** @type {import('mecab').ParseFragment[]} */
                 const line = [];
 
-                for (let {expression: term, reading, source, pos, pos2, inflection_type} of rawLine) {
+                for (let {expression: term, reading, source, pos1, pos2, pos3, pos4, inflection_type} of rawLine) {
                     if (typeof term !== 'string') { term = ''; }
                     if (typeof reading !== 'string') { reading = ''; }
                     if (typeof source !== 'string') { source = ''; }
-                    const tokenPos = typeof pos === 'string' ? pos : '';
-                    const tokenPos2 = typeof pos2 === 'string' ? pos2 : '';
-                    const conjugationType = typeof inflection_type === 'string' ? inflection_type : '';
+                    if (typeof pos1 !== 'string') { pos1 = ''; }
+                    if (typeof pos2 !== 'string') { pos2 = ''; }
+                    if (typeof pos3 !== 'string') { pos3 = ''; }
+                    if (typeof pos4 !== 'string') { pos4 = ''; }
+                    if (typeof inflection_type !== 'string') { inflection_type = ''; }
+
+                    // Create token object early for helper functions
+                    const token = {term, reading, source, pos1, pos2, pos3, pos4, inflection_type};
 
                     if (line.length > 0) {
                         const last_token = line[line.length - 1];
 
-                        // for unidic-mecab-translate
-                        const isCopulaByType = conjugationType === 'aux|da' || conjugationType === 'aux|desu';
-                        // for ipadic
-                        const isCopulaByTerm = (tokenPos === '助動詞' || tokenPos === 'aux-verb' || tokenPos === 'aux') &&
-                                             (term === 'だ' || term === 'です' || term === 'で' || term === 'じゃ');
-                        const isCopula = isCopulaByType || isCopulaByTerm;
-
-                        const isAuxVerb = (tokenPos === '助動詞' || tokenPos === 'aux-verb' || tokenPos === 'aux') && !isCopula;
-
-                        const isVerbSuffix = (tokenPos === '動詞' && (tokenPos2 === '接尾')) ||
-                                           (tokenPos === 'verb' && tokenPos2 === 'suffix') ||
-                                           (tokenPos === 'suffix');
-                        const isTeDeParticle = (tokenPos === '助詞' || tokenPos === 'particle') &&
-                                             (tokenPos2 === '接続助詞' || tokenPos2 === 'conjunctive') &&
-                                             (term === 'て' || term === 'で');
-
-                        const lastIsVerbLike = last_token.pos === '動詞' || last_token.pos === 'verb' ||
-                            last_token.pos === '助動詞' || last_token.pos === 'aux-verb' || last_token.pos === 'aux';
-
-                        const shouldMerge = lastIsVerbLike && (isAuxVerb || isVerbSuffix || isTeDeParticle);
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                        const shouldMerge = (isVerb(last_token) && (isAuxVerb(token) || (isVerbSuffix(token) && isVerbNonIndependent(last_token)) || isTeDeParticle(token))) ||
+                        (isNoun(last_token) && isNounSuffix(token)) ||
+                        (isCounter(token) && isNumeral(last_token));
 
                         if (shouldMerge) {
                             line.pop();
-                            term = last_token.term + term;
-                            reading = last_token.reading + reading;
-                            source = last_token.source + source;
+                            token.term = last_token.term + token.term;
+                            token.reading = last_token.reading + token.reading;
+                            token.source = last_token.source + token.source;
                         }
                     }
-                    line.push({term, reading, source, pos: tokenPos, pos2: tokenPos2});
+                    line.push(token);
                 }
                 lines.push(line);
             }
