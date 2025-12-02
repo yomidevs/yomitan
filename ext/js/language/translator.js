@@ -853,26 +853,14 @@ export class Translator {
      * @returns {import('translation-internal').TermDictionaryEntry[]}
      */
     _groupDictionaryEntriesByHeadword(language, dictionaryEntries, tagAggregator, primaryReading) {
-        /** @type {Map<string, import('translation-internal').TermDictionaryEntry[]>} */
-        const groups = new Map();
         const readingNormalizer = this._readingNormalizers.get(language);
-        for (const dictionaryEntry of dictionaryEntries) {
+        /** @type {(entry: import('translation-internal').TermDictionaryEntry) => string} */
+        const createGroupingKey = (dictionaryEntry) => {
             const {inflectionRuleChainCandidates, headwords: [{term, reading}]} = dictionaryEntry;
             const normalizedReading = typeof readingNormalizer === 'undefined' ? reading : readingNormalizer(reading);
-            const key = this._createMapKey([term, normalizedReading, ...inflectionRuleChainCandidates]);
-            let groupDictionaryEntries = groups.get(key);
-            if (typeof groupDictionaryEntries === 'undefined') {
-                groupDictionaryEntries = [];
-                groups.set(key, groupDictionaryEntries);
-            }
-            groupDictionaryEntries.push(dictionaryEntry);
-        }
-
-        const newDictionaryEntries = [];
-        for (const groupDictionaryEntries of groups.values()) {
-            newDictionaryEntries.push(this._createGroupedDictionaryEntry(language, groupDictionaryEntries, false, tagAggregator, primaryReading));
-        }
-        return newDictionaryEntries;
+            return this._createMapKey([term, normalizedReading, ...inflectionRuleChainCandidates]);
+        };
+        return this._groupDictionaryEntries(language, dictionaryEntries, tagAggregator, primaryReading, createGroupingKey);
     }
 
     /**
@@ -883,11 +871,27 @@ export class Translator {
      * @returns {import('translation-internal').TermDictionaryEntry[]}
      */
     _groupDictionaryEntriesByTerm(language, dictionaryEntries, tagAggregator, primaryReading) {
+        /** @type {(entry: import('translation-internal').TermDictionaryEntry) => string} */
+        const createGroupingKey = (dictionaryEntry) => {
+            const {inflectionRuleChainCandidates, headwords: [{term}]} = dictionaryEntry;
+            return this._createMapKey([term, ...inflectionRuleChainCandidates]);
+        };
+        return this._groupDictionaryEntries(language, dictionaryEntries, tagAggregator, primaryReading, createGroupingKey);
+    }
+
+    /**
+     * @param {string} language
+     * @param {Iterable<import('translation-internal').TermDictionaryEntry>} dictionaryEntries
+     * @param {TranslatorTagAggregator} tagAggregator
+     * @param {string} primaryReading
+     * @param {(entry: import('translation-internal').TermDictionaryEntry) => string} createGroupingKey
+     * @returns {import('translation-internal').TermDictionaryEntry[]}
+     */
+    _groupDictionaryEntries(language, dictionaryEntries, tagAggregator, primaryReading, createGroupingKey) {
         /** @type {Map<string, import('translation-internal').TermDictionaryEntry[]>} */
         const groups = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
-            const {inflectionRuleChainCandidates, headwords: [{term}]} = dictionaryEntry;
-            const key = this._createMapKey([term, ...inflectionRuleChainCandidates]);
+            const key = createGroupingKey(dictionaryEntry);
             let groupDictionaryEntries = groups.get(key);
             if (typeof groupDictionaryEntries === 'undefined') {
                 groupDictionaryEntries = [];
