@@ -55,6 +55,7 @@ export type ParseTextResultItem = {
     id: string;
     source: 'scanning-parser' | 'mecab';
     dictionary: null | string;
+    index: number;
     content: ParseTextLine[];
 };
 
