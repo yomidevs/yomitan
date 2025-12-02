@@ -26,8 +26,9 @@ export class CacheMap {
     /**
      * Creates a new CacheMap.
      * @param {number} maxSize The maximum number of entries able to be stored in the cache.
+     * @param {number} [maxIdleTime=0] The maximum idle time (ms) before the cache is automatically cleared.
      */
-    constructor(maxSize) {
+    constructor(maxSize, maxIdleTime = 0) {
         if (!(
             Number.isFinite(maxSize) &&
             maxSize >= 0 &&
@@ -35,9 +36,20 @@ export class CacheMap {
         )) {
             throw new Error('Invalid maxCount');
         }
+        if (!(
+            Number.isFinite(maxIdleTime) &&
+            maxIdleTime >= 0 &&
+            Math.floor(maxIdleTime) === maxIdleTime
+        )) {
+            throw new Error('Invalid maxIdleTime');
+        }
 
         /** @type {number} */
         this._maxSize = maxSize;
+        /** @type {number} */
+        this._maxIdleTime = maxIdleTime;
+        /** @type {?import('core').Timeout} */
+        this._idleTimeout = null;
         /** @type {Map<K, import('cache-map').Node<K, V>>} */
         this._map = new Map();
         /** @type {import('cache-map').Node<K, V>} */
@@ -116,6 +128,16 @@ export class CacheMap {
     clear() {
         this._map.clear();
         this._resetEndNodes();
+        this.clearIdleTimeout();
+    }
+
+    /**
+     * Clears the idle timeout.
+     */
+    clearIdleTimeout() {
+        if (this._idleTimeout === null) { return; }
+        clearTimeout(this._idleTimeout);
+        this._idleTimeout = null;
     }
 
     // Private
@@ -142,6 +164,7 @@ export class CacheMap {
      * @param {import('cache-map').Node<K, V>} previous
      */
     _addNode(node, previous) {
+        this._resetIdleTimeout();
         const next = previous.next;
         node.next = next;
         node.previous = previous;
@@ -163,5 +186,14 @@ export class CacheMap {
     _resetEndNodes() {
         this._listFirst.next = this._listLast;
         this._listLast.previous = this._listFirst;
+    }
+
+    /**
+     * @returns {void}
+     */
+    _resetIdleTimeout() {
+        if (this._maxIdleTime <= 0) { return; }
+        this.clearIdleTimeout();
+        this._idleTimeout = setTimeout(() => this.clear(), this._maxIdleTime);
     }
 }

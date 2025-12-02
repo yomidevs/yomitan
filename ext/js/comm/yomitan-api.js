@@ -240,8 +240,8 @@ export class YomitanApi {
                         /** @type {import('yomitan-api.js').tokenizeInput} */
                         // @ts-expect-error - Allow this to error
                         const {text, scanLength} = parsedBody;
-                        if (typeof text !== 'string') {
-                            throw new Error('Invalid input for tokenize, expected "text" to be a string but got ' + typeof text);
+                        if (typeof text !== 'string' && !Array.isArray(text)) {
+                            throw new Error('Invalid input for tokenize, expected "text" to be a string or a string array but got ' + typeof text);
                         }
                         if (typeof scanLength !== 'number') {
                             throw new Error('Invalid input for tokenize, expected "scanLength" to be a number but got ' + typeof scanLength);

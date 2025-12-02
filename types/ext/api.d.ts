@@ -55,12 +55,18 @@ export type ParseTextResultItem = {
     id: string;
     source: 'scanning-parser' | 'mecab';
     dictionary: null | string;
+    index: number;
     content: ParseTextLine[];
 };
 
 export type ParseTextSegment = {
     text: string;
     reading: string;
+    headwords?: {
+        term: string;
+        reading: string;
+        sources: Dictionary.TermSource[];
+    }[][];
 };
 
 export type ParseTextLine = ParseTextSegment[];
@@ -141,7 +147,7 @@ type ApiSurface = {
     };
     parseText: {
         params: {
-            text: string;
+            text: string | string[];
             optionsContext: Settings.OptionsContext;
             scanLength: number;
             useInternalParser: boolean;
