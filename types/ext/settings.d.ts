@@ -391,7 +391,7 @@ export type PreventSecondaryMouseOptions = {
     onSearchQuery: boolean;
 };
 
-export type ResultOutputMode = 'group' | 'merge' | 'split';
+export type ResultOutputMode = 'group' | 'merge' | 'split' | 'term';
 
 export type PopupDisplayMode = 'default' | 'full-width';
 
