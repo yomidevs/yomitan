@@ -19,11 +19,11 @@
 import {safePerformance} from '../core/safe-performance.js';
 import {applyTextReplacement} from '../general/regex-util.js';
 import {isCodePointJapanese} from './ja/japanese.js';
+import {isCodePointKorean} from './ko/korean.js';
 import {LanguageTransformer} from './language-transformer.js';
 import {getAllLanguageReadingNormalizers, getAllLanguageTextProcessors} from './languages.js';
 import {MultiLanguageTransformer} from './multi-language-transformer.js';
 import {isCodePointChinese} from './zh/chinese.js';
-import {isCodePointKorean} from './ko/korean.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
@@ -86,6 +86,9 @@ export class Translator {
         switch (mode) {
             case 'group':
                 dictionaryEntries = this._groupDictionaryEntriesByHeadword(language, dictionaryEntries, tagAggregator, primaryReading);
+                break;
+            case 'term':
+                dictionaryEntries = this._groupDictionaryEntriesByTerm(language, dictionaryEntries, tagAggregator, primaryReading);
                 break;
             case 'merge':
                 dictionaryEntries = await this._getRelatedDictionaryEntries(dictionaryEntries, options, tagAggregator);
@@ -857,6 +860,34 @@ export class Translator {
             const {inflectionRuleChainCandidates, headwords: [{term, reading}]} = dictionaryEntry;
             const normalizedReading = typeof readingNormalizer === 'undefined' ? reading : readingNormalizer(reading);
             const key = this._createMapKey([term, normalizedReading, ...inflectionRuleChainCandidates]);
+            let groupDictionaryEntries = groups.get(key);
+            if (typeof groupDictionaryEntries === 'undefined') {
+                groupDictionaryEntries = [];
+                groups.set(key, groupDictionaryEntries);
+            }
+            groupDictionaryEntries.push(dictionaryEntry);
+        }
+
+        const newDictionaryEntries = [];
+        for (const groupDictionaryEntries of groups.values()) {
+            newDictionaryEntries.push(this._createGroupedDictionaryEntry(language, groupDictionaryEntries, false, tagAggregator, primaryReading));
+        }
+        return newDictionaryEntries;
+    }
+
+    /**
+     * @param {string} language
+     * @param {Iterable<import('translation-internal').TermDictionaryEntry>} dictionaryEntries
+     * @param {TranslatorTagAggregator} tagAggregator
+     * @param {string} primaryReading
+     * @returns {import('translation-internal').TermDictionaryEntry[]}
+     */
+    _groupDictionaryEntriesByTerm(language, dictionaryEntries, tagAggregator, primaryReading) {
+        /** @type {Map<string, import('translation-internal').TermDictionaryEntry[]>} */
+        const groups = new Map();
+        for (const dictionaryEntry of dictionaryEntries) {
+            const {inflectionRuleChainCandidates, headwords: [{term}]} = dictionaryEntry;
+            const key = this._createMapKey([term, ...inflectionRuleChainCandidates]);
             let groupDictionaryEntries = groups.get(key);
             if (typeof groupDictionaryEntries === 'undefined') {
                 groupDictionaryEntries = [];

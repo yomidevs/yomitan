@@ -430,6 +430,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
     let type = 'term';
     switch (resultOutputMode) {
         case 'group': type = 'termGrouped'; break;
+        case 'term': type = 'termGrouped'; break;
         case 'merge': type = 'termMerged'; break;
     }
 
