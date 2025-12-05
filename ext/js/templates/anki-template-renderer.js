@@ -800,6 +800,8 @@ export class AnkiTemplateRenderer {
                 if (structuredContent.content) {
                     extractedContent.push(...this._extractGlossaryStructuredContentRecursive([structuredContent.content]));
                 }
+            } else if (typeof structuredContent === 'string') {
+                extractedContent.push(structuredContent);
             }
         }
 
