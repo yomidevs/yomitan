@@ -207,7 +207,7 @@ export class Mecab {
         const results = [];
         for (const [name, rawLines] of Object.entries(rawResults)) {
             // Define helper functions based on dictionary type
-            let isNoun, isCopula, isAuxVerb, isVerbSuffix, isTeDeParticle, isVerb, isVerbNonIndependent, isNounSuffix, isCounter, isNumeral;
+            let isNoun, isCopula, isAuxVerb, isVerbSuffix, isTeDeParticle, isTaDaParticle, isVerb, isVerbNonIndependent, isNounSuffix, isCounter, isNumeral;
 
             if (name === 'unidic-mecab-translate') {
                 // Helper functions for unidic-mecab-translate
@@ -216,6 +216,7 @@ export class Mecab {
                 isAuxVerb = (tok) => (tok.pos1 === 'aux' || tok.pos1 === 'aux-verb') && !isCopula(tok);
                 isVerbSuffix = (tok) => tok.pos1 === 'suffix';
                 isTeDeParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && (tok.term === 'て' || tok.term === 'で');
+                isTaDaParticle = (tok) => isAuxVerb(tok) && (tok.term === 'た' || tok.term === 'だ');
                 isVerb = (tok) => tok.pos1 === 'verb' || (tok.pos1 === 'aux' || tok.pos1 === 'aux-verb');
                 isVerbNonIndependent = (tok) => isVerb(tok) && tok.pos2 === 'nonindependent?';
                 isNounSuffix = (tok) => tok.pos1 === 'suffix' && tok.pos2 === 'substantive';
@@ -230,6 +231,7 @@ export class Mecab {
                 // やられる : れる is 動詞,接尾,*,*,一段,基本形,れる,レル,レル
                 isVerbSuffix = (tok) => tok.pos1 === '動詞' && (tok.pos2 === '非自立' || tok.pos2 === '接尾');
                 isTeDeParticle = (tok) => tok.pos1 === '助詞' && tok.pos2 === '接続助詞' && (tok.term === 'て' || tok.term === 'で');
+                isTaDaParticle = (tok) => isAuxVerb(tok) && (tok.term === 'た' || tok.term === 'だ');
                 isVerb = (tok) => tok.pos1 === '動詞' || tok.pos1 === '助動詞';
                 isVerbNonIndependent = (_) => true;
                 isNounSuffix = (tok) => tok.pos1 === '動詞' && tok.pos2 === '接尾';
@@ -260,9 +262,11 @@ export class Mecab {
                         const last_token = line[line.length - 1];
 
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                        const shouldMerge = (isVerb(last_token) && (isAuxVerb(token) || (isVerbSuffix(token) && isVerbNonIndependent(last_token)) || isTeDeParticle(token))) ||
+                        const shouldMerge = (isVerb(last_token) && (isAuxVerb(token) || (isVerbSuffix(token) && isVerbNonIndependent(last_token)))) ||
                         (isNoun(last_token) && isNounSuffix(token)) ||
-                        (isCounter(token) && isNumeral(last_token));
+                        (isCounter(token) && isNumeral(last_token)) ||
+                        isTeDeParticle(token) ||
+                        isTaDaParticle(token); // Allowing more than verbs because it can be adj too, なかった
 
                         if (shouldMerge) {
                             line.pop();
