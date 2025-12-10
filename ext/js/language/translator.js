@@ -1816,8 +1816,17 @@ export class Translator {
         const definitionEntries = [];
         /** @type {Map<string, import('dictionary').TermHeadword>} */
         const headwords = new Map();
+        /** @type {Map<number, number>} */
+        const headwordDictionaryIndices = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
             const headwordIndexMap = this._addTermHeadwords(language, headwords, dictionaryEntry.headwords, tagAggregator);
+            // Track minimum dictionary index for each headword
+            for (const headwordIndex of headwordIndexMap) {
+                const existing = headwordDictionaryIndices.get(headwordIndex);
+                if (typeof existing === 'undefined' || dictionaryEntry.dictionaryIndex < existing) {
+                    headwordDictionaryIndices.set(headwordIndex, dictionaryEntry.dictionaryIndex);
+                }
+            }
             definitionEntries.push({index: definitionEntries.length, dictionaryEntry, headwordIndexMap});
         }
 
@@ -1868,19 +1877,9 @@ export class Translator {
 
         const headwordsArray = [...headwords.values()];
 
-        let sourceTermExactMatchCount = 0;
-        let matchPrimaryReading = false;
-        for (const {sources, reading} of headwordsArray) {
-            if (primaryReading.length > 0 && reading === primaryReading) {
-                matchPrimaryReading = true;
-            }
-            for (const source of sources) {
-                if (source.isPrimary && source.matchSource === 'term') {
-                    ++sourceTermExactMatchCount;
-                    break;
-                }
-            }
-        }
+        this._sortHeadwords(headwordsArray, headwordDictionaryIndices, definitions);
+
+        const {sourceTermExactMatchCount, matchPrimaryReading} = this._getHeadwordMatchCounts(headwordsArray, primaryReading);
 
         return this._createTermDictionaryEntry(
             isPrimary,
@@ -1895,6 +1894,64 @@ export class Translator {
             headwordsArray,
             definitions,
         );
+    }
+
+    /**
+     * @param {import('dictionary').TermHeadword[]} headwordsArray
+     * @param {Map<number, number>} headwordDictionaryIndices
+     * @param {import('dictionary').TermDefinition[]} definitions
+     */
+    _sortHeadwords(headwordsArray, headwordDictionaryIndices, definitions) {
+        // Sort headwords: primary sources first, then by dictionary index
+        headwordsArray.sort((a, b) => {
+            const aHasPrimary = a.sources.some((s) => s.isPrimary);
+            const bHasPrimary = b.sources.some((s) => s.isPrimary);
+            if (aHasPrimary !== bHasPrimary) { return aHasPrimary ? -1 : 1; }
+            const aDictIndex = headwordDictionaryIndices.get(a.index) ?? Number.MAX_SAFE_INTEGER;
+            const bDictIndex = headwordDictionaryIndices.get(b.index) ?? Number.MAX_SAFE_INTEGER;
+            return aDictIndex - bDictIndex;
+        });
+
+        // Update headword indices after sorting
+        /** @type {Map<number, number>} */
+        const headwordIndexMap = new Map();
+        for (let i = 0; i < headwordsArray.length; i++) {
+            headwordIndexMap.set(headwordsArray[i].index, i);
+            headwordsArray[i].index = i;
+        }
+
+        // Remap definition headword indices
+        for (const definition of definitions) {
+            for (let i = 0; i < definition.headwordIndices.length; i++) {
+                const oldIndex = definition.headwordIndices[i];
+                const newIndex = headwordIndexMap.get(oldIndex);
+                if (typeof newIndex === 'number') {
+                    definition.headwordIndices[i] = newIndex;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param {import('dictionary').TermHeadword[]} headwordsArray
+     * @param {string} primaryReading
+     * @returns {{sourceTermExactMatchCount: number, matchPrimaryReading: boolean}}
+     */
+    _getHeadwordMatchCounts(headwordsArray, primaryReading) {
+        let sourceTermExactMatchCount = 0;
+        let matchPrimaryReading = false;
+        for (const {sources, reading} of headwordsArray) {
+            if (primaryReading.length > 0 && reading === primaryReading) {
+                matchPrimaryReading = true;
+            }
+            for (const source of sources) {
+                if (source.isPrimary && source.matchSource === 'term') {
+                    ++sourceTermExactMatchCount;
+                    break;
+                }
+            }
+        }
+        return {sourceTermExactMatchCount, matchPrimaryReading};
     }
 
     // Data collection addition functions

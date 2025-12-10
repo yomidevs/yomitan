@@ -65,7 +65,7 @@ export type FindTermsOptions = {
      */
     deinflect: boolean;
     /**
-     * The reading which will be sorted to the top of the results.
+     * The reading which will be sorted to the top of the results, if provided as a query parameter.
      */
     primaryReading: string;
     /**
