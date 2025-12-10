@@ -1,0 +1,36 @@
+{{<<<<<<<}}
+{{~#*inline "glossary-plain"~}}
+    {{~#scope~}}
+        {{~#each definition.definitions~}}
+            {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                {{~#unless ../noDictionaryTag~}}
+                    ({{dictionaryAlias}})<br>
+                {{~/unless~}}
+                {{#each glossary}}{{{formatGlossaryPlain ../dictionary .}}}{{#unless @last}}<br>{{/unless}}{{/each}}{{#unless @last}}<br>{{/unless}}
+            {{~/unless~}}
+        {{~/each~}}
+    {{~/scope~}}
+{{~/inline~}}
+{{=======}}
+{{~#*inline "glossary-plain"~}}
+    {{~#scope~}}
+        {{~#if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#each definition.definitions~}}
+                {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                    {{~#unless ../noDictionaryTag~}}
+                        ({{dictionaryAlias}})<br>
+                    {{~/unless~}}
+                    {{#each glossary}}{{{formatGlossaryPlain ../dictionary .}}}{{#unless @last}}<br>{{/unless}}{{/each}}{{#unless @last}}<br>{{/unless}}
+                {{~/unless~}}
+            {{~/each~}}
+        {{~else~}}
+            {{~#unless (op "&&" selectedDictionary (op "!=" selectedDictionary definition.dictionary))~}}
+                {{~#unless noDictionaryTag~}}
+                    ({{definition.dictionaryAlias}})<br>
+                {{~/unless~}}
+                {{#each definition.glossary}}{{{formatGlossaryPlain ../definition.dictionary .}}}{{/each}}
+            {{~/unless~}}
+        {{~/if~}}
+    {{~/scope~}}
+{{~/inline~}}
+{{>>>>>>>}}
