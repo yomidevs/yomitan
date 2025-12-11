@@ -207,15 +207,18 @@ export class Mecab {
         const results = [];
         for (const [name, rawLines] of Object.entries(rawResults)) {
             // Define helper functions based on dictionary type
-            let isNoun, isCopula, isAuxVerb, isVerbSuffix, isTeDeParticle, isTaDaParticle, isVerb, isVerbNonIndependent, isNounSuffix, isCounter, isNumeral;
+            let ignoreReading, isNoun, isCopula, isAuxVerb, isContinuativeForm, isVerbSuffix, isBaParticle, isTeDeParticle, isTaDaParticle, isVerb, isVerbNonIndependent, isNounSuffix, isCounter, isNumeral;
 
             if (name === 'unidic-mecab-translate') {
                 // Helper functions for unidic-mecab-translate
+                ignoreReading = (tok) => tok.pos1 === 'symbol' && tok.pos2 === 'character';
                 isNoun = (tok) => tok.pos1 === 'noun';
                 isCopula = (tok) => tok.inflection_type === 'aux|da' || tok.inflection_type === 'aux|desu';
                 isAuxVerb = (tok) => (tok.pos1 === 'aux' || tok.pos1 === 'aux-verb') && !isCopula(tok);
+                isContinuativeForm = (tok) => (tok.inflection_form === 'continuative' || tok.inflection_form === 'continuative|nasal');
                 isVerbSuffix = (tok) => tok.pos1 === 'suffix';
-                isTeDeParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && (tok.term === 'て' || tok.term === 'で');
+                isBaParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && (tok.term === 'ば');
+                isTeDeParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && (tok.lemma === 'て');
                 isTaDaParticle = (tok) => isAuxVerb(tok) && (tok.term === 'た' || tok.term === 'だ');
                 isVerb = (tok) => tok.pos1 === 'verb' || (tok.pos1 === 'aux' || tok.pos1 === 'aux-verb');
                 isVerbNonIndependent = (tok) => isVerb(tok) && tok.pos2 === 'nonindependent?';
@@ -224,13 +227,16 @@ export class Mecab {
                 isNumeral = (tok) => tok.pos1 === 'noun' && tok.pos2 === 'numeral';
             } else {
                 // Helper functions for ipadic and other dictionaries
+                ignoreReading = (_) => false;
                 isNoun = (tok) => tok.pos1 === '名詞';
-                isCopula = (tok) => tok.pos1 === '助動詞' && (tok.term === 'だ' || tok.term === 'です' || tok.term === 'で' || tok.term === 'じゃ');
+                isCopula = (tok) => tok.inflection_type === '特殊|だ' || tok.inflection_type === '特殊|デス';
                 isAuxVerb = (tok) => tok.pos1 === '助動詞' && !isCopula(tok);
+                isContinuativeForm = (tok) => (tok.inflection_form === '連用デ接続' || tok.inflection_form === '連用タ接続' || tok.inflection_form === '連用形') && (tok.reading !== 'ない');
                 // 待ってるじゃないです : てる is 動詞,非自立,*,*,一段,基本形,てる,テル,テル
                 // やられる : れる is 動詞,接尾,*,*,一段,基本形,れる,レル,レル
                 isVerbSuffix = (tok) => tok.pos1 === '動詞' && (tok.pos2 === '非自立' || tok.pos2 === '接尾');
-                isTeDeParticle = (tok) => tok.pos1 === '助詞' && tok.pos2 === '接続助詞' && (tok.term === 'て' || tok.term === 'で');
+                isBaParticle = (tok) => tok.pos1 === '助詞' && tok.pos2 === '接続助詞' && (tok.term === 'ば');
+                isTeDeParticle = (tok) => tok.pos1 === '助詞' && tok.pos2 === '接続助詞' && (tok.term === 'て' || tok.term === 'で' || tok.term === 'ちゃ'); // cha doesn't have a lemma in ipadic
                 isTaDaParticle = (tok) => isAuxVerb(tok) && (tok.term === 'た' || tok.term === 'だ');
                 isVerb = (tok) => tok.pos1 === '動詞' || tok.pos1 === '助動詞';
                 isVerbNonIndependent = (_) => true;
@@ -241,41 +247,50 @@ export class Mecab {
 
             /** @type {import('mecab').ParseFragment[][]} */
             const lines = [];
+            let last_standalone_token;
+
             for (const rawLine of rawLines) {
                 /** @type {import('mecab').ParseFragment[]} */
                 const line = [];
 
-                for (let {expression: term, reading, source, pos1, pos2, pos3, pos4, inflection_type} of rawLine) {
+                for (let {expression: term, reading, source, pos1, pos2, pos3, pos4, inflection_type, inflection_form, lemma} of rawLine) {
                     if (typeof term !== 'string') { term = ''; }
-                    if (typeof reading !== 'string') { reading = ''; }
+                    if ((typeof reading !== 'string')) { reading = ''; }
                     if (typeof source !== 'string') { source = ''; }
                     if (typeof pos1 !== 'string') { pos1 = ''; }
                     if (typeof pos2 !== 'string') { pos2 = ''; }
                     if (typeof pos3 !== 'string') { pos3 = ''; }
                     if (typeof pos4 !== 'string') { pos4 = ''; }
                     if (typeof inflection_type !== 'string') { inflection_type = ''; }
+                    if (typeof lemma !== 'string') { lemma = ''; }
 
-                    // Create token object early for helper functions
-                    const token = {term, reading, source, pos1, pos2, pos3, pos4, inflection_type};
+                    let token = {term, reading, source, pos1, pos2, pos3, pos4, inflection_type, inflection_form, lemma};
 
+                    if (ignoreReading(token)) {
+                        token.reading = '';
+                    }
+
+                    let result_token = token;
+                    let should_merge;
                     if (line.length > 0) {
-                        const last_token = line[line.length - 1];
-
+                        const last_result_token = line[line.length - 1];
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                        const shouldMerge = (isVerb(last_token) && (isAuxVerb(token) || (isVerbSuffix(token) && isVerbNonIndependent(last_token)))) ||
-                        (isNoun(last_token) && isNounSuffix(token)) ||
-                        (isCounter(token) && isNumeral(last_token)) ||
-                        isTeDeParticle(token) ||
+                        should_merge = (isVerb(last_standalone_token) && (isAuxVerb(token) || isContinuativeForm(last_standalone_token) || (isVerbSuffix(token) && isVerbNonIndependent(last_standalone_token)))) ||
+                        (isNoun(last_standalone_token) && isNounSuffix(token)) ||
+                        (isCounter(token) && isNumeral(last_standalone_token)) ||
+                        isBaParticle(token) ||
+                        (isTeDeParticle(token) && isContinuativeForm(last_standalone_token)) ||
                         isTaDaParticle(token); // Allowing more than verbs because it can be adj too, なかった
-
-                        if (shouldMerge) {
+                        if (should_merge) {
                             line.pop();
-                            token.term = last_token.term + token.term;
-                            token.reading = last_token.reading + token.reading;
-                            token.source = last_token.source + token.source;
+                            last_result_token.term = last_result_token.term + token.term;
+                            last_result_token.reading = last_result_token.reading + token.reading;
+                            last_result_token.source = last_result_token.source + token.source;
+                            result_token = last_result_token;
                         }
                     }
-                    line.push(token);
+                    last_standalone_token = token;
+                    line.push(result_token);
                 }
                 lines.push(line);
             }
