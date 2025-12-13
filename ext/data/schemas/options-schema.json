@@ -779,7 +779,7 @@
                                     "popupNestingMaxDepth": {
                                         "type": "integer",
                                         "minimum": 0,
-                                        "default": 0
+                                        "default": 10
                                     },
                                     "enablePopupSearch": {
                                         "type": "boolean",
