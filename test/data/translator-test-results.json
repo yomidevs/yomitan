@@ -7123,7 +7123,7 @@
     "dictionaryEntries": []
   },
   {
-    "name": "Search using different modes",
+    "name": "Search using different modes - simple",
     "originalTextLength": 4,
     "dictionaryEntries": [
       {
@@ -7809,7 +7809,7 @@
     ]
   },
   {
-    "name": "Search using different modes",
+    "name": "Search using different modes - group",
     "originalTextLength": 4,
     "dictionaryEntries": [
       {
@@ -9247,7 +9247,7 @@
     ]
   },
   {
-    "name": "Search using different modes",
+    "name": "Search using different modes - merge",
     "originalTextLength": 4,
     "dictionaryEntries": [
       {
@@ -10612,6 +10612,1357 @@
           {
             "index": 6,
             "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 27,
+            "displayValue": "twenty-seven",
+            "displayValueParsed": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Search using different modes - term",
+    "originalTextLength": 4,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 10,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryAlias": "",
+        "sourceTermExactMatchCount": 2,
+        "matchPrimaryReading": false,
+        "maxOriginalTextLength": 4,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "打ち込む",
+            "reading": "うちこむ",
+            "sources": [
+              {
+                "originalText": "打ち込む",
+                "transformedText": "打ち込む",
+                "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [
+              {
+                "name": "E1",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 1"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "E2",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 2"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "P",
+                "category": "popular",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "popular term"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "wordClasses": [
+              "v5"
+            ]
+          },
+          {
+            "index": 1,
+            "term": "打ち込む",
+            "reading": "ぶちこむ",
+            "sources": [
+              {
+                "originalText": "打ち込む",
+                "transformedText": "打ち込む",
+                "deinflectedText": "打ち込む",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [
+              {
+                "name": "E1",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 1"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "E2",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 2"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "P",
+                "category": "popular",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "popular term"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "wordClasses": [
+              "v5"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 7,
+            "score": 10,
+            "frequencyOrder": 0,
+            "sequences": [
+              4
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "uchikomu definition 1",
+              "uchikomu definition 2"
+            ]
+          },
+          {
+            "index": 2,
+            "headwordIndices": [
+              1
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 9,
+            "score": 10,
+            "frequencyOrder": 0,
+            "sequences": [
+              4
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "buchikomu definition 1",
+              "buchikomu definition 2"
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 8,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              4
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "uchikomu definition 3",
+              "uchikomu definition 4"
+            ]
+          },
+          {
+            "index": 3,
+            "headwordIndices": [
+              1
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 10,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              4
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "buchikomu definition 3",
+              "buchikomu definition 4"
+            ]
+          }
+        ],
+        "pronunciations": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": 0,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": "HHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HHLL",
+                "nasalPositions": [],
+                "devoicePositions": [
+                  2
+                ],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "HLLL",
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LHLL",
+                "nasalPositions": [
+                  3
+                ],
+                "devoicePositions": [
+                  2
+                ],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLHL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": "LLLL",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "pronunciations": [
+              {
+                "type": "pitch-accent",
+                "positions": 0,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              },
+              {
+                "type": "pitch-accent",
+                "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": []
+              }
+            ]
+          }
+        ],
+        "frequencies": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 12,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "eighteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 8,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 24,
+            "displayValue": "twenty-four (24)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 10,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 30,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 1,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 3,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 7,
+            "displayValue": "seven",
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 13,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 7,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "nineteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 9,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 25,
+            "displayValue": "twenty-five (25)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 11,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 31,
+            "displayValue": "thirty-one",
+            "displayValueParsed": false
+          }
+        ]
+      },
+      {
+        "type": "term",
+        "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": [
+              {
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to 連用形, the part of the verb after conjugating with -ます and dropping ます."
+              }
+            ]
+          }
+        ],
+        "score": 10,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryAlias": "",
+        "sourceTermExactMatchCount": 2,
+        "matchPrimaryReading": false,
+        "maxOriginalTextLength": 2,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "打つ",
+            "reading": "うつ",
+            "sources": [
+              {
+                "originalText": "打ち",
+                "transformedText": "打ち",
+                "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [
+              {
+                "name": "E1",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 1"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "E2",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 2"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "P",
+                "category": "popular",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "popular term"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "wordClasses": [
+              "v5"
+            ]
+          },
+          {
+            "index": 1,
+            "term": "打つ",
+            "reading": "ぶつ",
+            "sources": [
+              {
+                "originalText": "打ち",
+                "transformedText": "打ち",
+                "deinflectedText": "打つ",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [
+              {
+                "name": "E1",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 1"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "E2",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 2"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "P",
+                "category": "popular",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "popular term"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "wordClasses": [
+              "v5"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 3,
+            "score": 10,
+            "frequencyOrder": 0,
+            "sequences": [
+              3
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "utsu definition 1",
+              "utsu definition 2"
+            ]
+          },
+          {
+            "index": 2,
+            "headwordIndices": [
+              1
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 5,
+            "score": 10,
+            "frequencyOrder": 0,
+            "sequences": [
+              3
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "butsu definition 1",
+              "butsu definition 2"
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 4,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              3
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "utsu definition 3",
+              "utsu definition 4"
+            ]
+          },
+          {
+            "index": 3,
+            "headwordIndices": [
+              1
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 6,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              3
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "butsu definition 3",
+              "butsu definition 4"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 10,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "sixteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 8,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 22,
+            "displayValue": "twenty-two (22)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 10,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 28,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 1,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 2,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 6,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 5,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 11,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 7,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "seventeen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 9,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 23,
+            "displayValue": "twenty-three (23)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 11,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 29,
+            "displayValue": "twenty-nine",
+            "displayValueParsed": false
+          }
+        ]
+      },
+      {
+        "type": "term",
+        "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryAlias": "",
+        "sourceTermExactMatchCount": 2,
+        "matchPrimaryReading": false,
+        "maxOriginalTextLength": 1,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "打",
+            "reading": "だ",
+            "sources": [
+              {
+                "originalText": "打",
+                "transformedText": "打",
+                "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [
+              {
+                "name": "E1",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 1"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "wordClasses": [
+              "n"
+            ]
+          },
+          {
+            "index": 1,
+            "term": "打",
+            "reading": "ダース",
+            "sources": [
+              {
+                "originalText": "打",
+                "transformedText": "打",
+                "deinflectedText": "打",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [
+              {
+                "name": "E1",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 1"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 1,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              1
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "da definition 1",
+              "da definition 2"
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndices": [
+              1
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 2,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              2
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "abbr",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "abbreviation"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "daasu definition 1",
+              "daasu definition 2"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 8,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 10,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 12,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 1,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 3,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 7,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 9,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 9,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fifteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 11,
+            "headwordIndex": 1,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "hasReading": true,
+            "frequency": 21,
+            "displayValue": "twenty-one (21)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 13,
+            "headwordIndex": 1,
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryAlias": "termsDictAlias",

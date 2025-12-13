@@ -68,7 +68,7 @@ export type SequenceQuery = {
     dictionary: string;
 };
 
-export type FindTermsMode = 'simple' | 'group' | 'merge' | 'split';
+export type FindTermsMode = 'simple' | 'group' | 'merge' | 'split' | 'term';
 
 export type TermReadingItem = {
     term: string;
