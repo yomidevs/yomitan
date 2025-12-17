@@ -207,7 +207,7 @@ export class Mecab {
         const results = [];
         for (const [name, rawLines] of Object.entries(rawResults)) {
             // Define helper functions based on dictionary type
-            let ignoreReading, isNoun, isCopula, isAuxVerb, isContinuativeForm, isVerbSuffix, isBaParticle, isTeDeParticle, isTaDaParticle, isVerb, isVerbNonIndependent, isNounSuffix, isCounter, isNumeral;
+            let ignoreReading, isNoun, isProperNoun, isCopula, isAuxVerb, isContinuativeForm, isVerbSuffix, isTatteParticle, isBaParticle, isTeDeParticle, isTaDaParticle, isVerb, isVerbNonIndependent, isNounSuffix, isCounter, isNumeral;
 
             if (name === 'unidic-mecab-translate') {
                 // Helper functions for unidic-mecab-translate
@@ -215,34 +215,44 @@ export class Mecab {
                 isNoun = (tok) => tok.pos1 === 'noun';
                 isCopula = (tok) => tok.inflection_type === 'aux|da' || tok.inflection_type === 'aux|desu';
                 isAuxVerb = (tok) => (tok.pos1 === 'aux' || tok.pos1 === 'aux-verb') && !isCopula(tok);
-                isContinuativeForm = (tok) => (tok.inflection_form === 'continuative' || tok.inflection_form === 'continuative|nasal');
+                isContinuativeForm = (tok) => (tok.inflection_form.startsWith('continuative'));
                 isVerbSuffix = (tok) => tok.pos1 === 'suffix';
+                isTatteParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && (tok.lemma === 'たって');
                 isBaParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && (tok.term === 'ば');
-                isTeDeParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && (tok.lemma === 'て');
+                isTeDeParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && tok.lemma === 'て';
                 isTaDaParticle = (tok) => isAuxVerb(tok) && (tok.term === 'た' || tok.term === 'だ');
                 isVerb = (tok) => tok.pos1 === 'verb' || (tok.pos1 === 'aux' || tok.pos1 === 'aux-verb');
                 isVerbNonIndependent = (tok) => isVerb(tok) && tok.pos2 === 'nonindependent?';
+                isProperNoun = (tok) => tok.pos1 === 'noun' && tok.pos2 === 'proper';
                 isNounSuffix = (tok) => tok.pos1 === 'suffix' && tok.pos2 === 'substantive';
                 isCounter = (tok) => tok.pos1 === 'noun' && tok.pos2 === 'common' && tok.pos3 === 'counter?';
                 isNumeral = (tok) => tok.pos1 === 'noun' && tok.pos2 === 'numeral';
             } else {
                 // Helper functions for ipadic and other dictionaries
-                ignoreReading = (_) => false;
+                ignoreReading = (tok) => tok.pos1 === '記号' && tok.pos2 === '文字';
                 isNoun = (tok) => tok.pos1 === '名詞';
-                isCopula = (tok) => tok.inflection_type === '特殊|だ' || tok.inflection_type === '特殊|デス';
+                const isCopulaIpadic = (tok) => tok.inflection_type === '特殊|だ' || tok.inflection_type === '特殊|デス';
+                const isCopulaUnidic = (tok) => tok.inflection_type === '助動詞-ダ' || tok.inflection_type === '助動詞-デス';
+                isCopula = (tok) => isCopulaIpadic(tok) || isCopulaUnidic(tok);
                 isAuxVerb = (tok) => tok.pos1 === '助動詞' && !isCopula(tok);
-                isContinuativeForm = (tok) => (tok.inflection_form === '連用デ接続' || tok.inflection_form === '連用タ接続' || tok.inflection_form === '連用形') && (tok.reading !== 'ない');
+                isContinuativeForm = (tok) => (tok.inflection_form === '連用デ接続' || tok.inflection_form === '連用タ接続' || tok.inflection_form.startsWith('連用形')) && (tok.reading !== 'ない');
                 // 待ってるじゃないです : てる is 動詞,非自立,*,*,一段,基本形,てる,テル,テル
                 // やられる : れる is 動詞,接尾,*,*,一段,基本形,れる,レル,レル
-                isVerbSuffix = (tok) => tok.pos1 === '動詞' && (tok.pos2 === '非自立' || tok.pos2 === '接尾');
+                const isVerbSuffixIpadic = (tok) => tok.pos1 === '動詞' && (tok.pos2 === '非自立' || tok.pos2 === '接尾');
+                const isVerbSuffixUnidic = (tok) => tok.pos1 === '接尾辞' && (tok.pos2 === '形容詞的');
+                isVerbSuffix = (tok) => isVerbSuffixUnidic(tok) || isVerbSuffixIpadic(tok);
+                isTatteParticle = (tok) => tok.pos1 === '助詞' && tok.pos2 === '接続助詞' && (tok.lemma === 'たって');
                 isBaParticle = (tok) => tok.pos1 === '助詞' && tok.pos2 === '接続助詞' && (tok.term === 'ば');
                 isTeDeParticle = (tok) => tok.pos1 === '助詞' && tok.pos2 === '接続助詞' && (tok.term === 'て' || tok.term === 'で' || tok.term === 'ちゃ'); // cha doesn't have a lemma in ipadic
                 isTaDaParticle = (tok) => isAuxVerb(tok) && (tok.term === 'た' || tok.term === 'だ');
                 isVerb = (tok) => tok.pos1 === '動詞' || tok.pos1 === '助動詞';
                 isVerbNonIndependent = (_) => true;
-                isNounSuffix = (tok) => tok.pos1 === '動詞' && tok.pos2 === '接尾';
-                isCounter = (tok) => tok.pos1 === '名詞' && tok.pos2 === '接尾' && tok.pos3 === '助数詞';
-                isNumeral = (tok) => tok.pos1 === '名詞' && tok.pos2 === '数';
+                isProperNoun = (tok) => tok.pos1 === '名詞' && tok.pos2 === '固有名詞';
+                const isNounSuffixIpadic = (tok) => tok.pos1 === '動詞' && tok.pos2 === '接尾';
+                const isNounSuffixUnidic = (tok) => tok.pos1 === '接尾辞' && tok.pos2 === '名詞的';
+                isNounSuffix = (tok) => isNounSuffixIpadic(tok) || isNounSuffixUnidic(tok);
+                isCounter = (tok) => tok.pos1 === '名詞' && tok.pos3.startsWith('助数詞');
+                isNumeral = (tok) => tok.pos1 === '名詞' && tok.pos2.startsWith('数');
             }
 
             /** @type {import('mecab').ParseFragment[][]} */
@@ -264,7 +274,7 @@ export class Mecab {
                     if (typeof inflection_type !== 'string') { inflection_type = ''; }
                     if (typeof lemma !== 'string') { lemma = ''; }
 
-                    let token = {term, reading, source, pos1, pos2, pos3, pos4, inflection_type, inflection_form, lemma};
+                    const token = {term, reading, source, pos1, pos2, pos3, pos4, inflection_type, inflection_form, lemma};
 
                     if (ignoreReading(token)) {
                         token.reading = '';
@@ -275,10 +285,10 @@ export class Mecab {
                     if (line.length > 0) {
                         const last_result_token = line[line.length - 1];
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                        should_merge = (isVerb(last_standalone_token) && (isAuxVerb(token) || isContinuativeForm(last_standalone_token) || (isVerbSuffix(token) && isVerbNonIndependent(last_standalone_token)))) ||
-                        (isNoun(last_standalone_token) && isNounSuffix(token)) ||
+                        should_merge = (isVerb(last_standalone_token) && (isAuxVerb(token) || (isContinuativeForm(last_standalone_token) && isVerbSuffix(token)) || (isVerbSuffix(token) && isVerbNonIndependent(last_standalone_token)))) ||
+                        (isNoun(last_standalone_token) && !isProperNoun(last_standalone_token) && isNounSuffix(token)) ||
                         (isCounter(token) && isNumeral(last_standalone_token)) ||
-                        isBaParticle(token) ||
+                        isBaParticle(token) || isTatteParticle(token) ||
                         (isTeDeParticle(token) && isContinuativeForm(last_standalone_token)) ||
                         isTaDaParticle(token); // Allowing more than verbs because it can be adj too, なかった
                         if (should_merge) {
