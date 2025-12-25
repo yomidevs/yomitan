@@ -80,11 +80,15 @@ export class WebExtension extends EventDispatcher {
      * @returns {Promise<unknown>}
      */
     sendMessagePromise(message) {
+        // eslint-disable-next-line no-console
+        console.debug(`Sending message: ${JSON.stringify(message)}`);
         return new Promise((resolve, reject) => {
             try {
                 this.sendMessage(message, (response) => {
                     const error = this.getLastError();
                     if (error !== null) {
+                        // eslint-disable-next-line no-console
+                        console.error(`Error sending message: ${JSON.stringify(message)}`, error);
                         reject(error);
                     } else {
                         resolve(response);

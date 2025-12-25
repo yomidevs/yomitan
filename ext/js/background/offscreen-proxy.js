@@ -77,14 +77,14 @@ export class OffscreenProxy {
             return;
         }
 
-        this._creatingOffscreen = chrome.offscreen.createDocument({
-            url: 'offscreen.html',
-            reasons: [
-                /** @type {chrome.offscreen.Reason} */ ('CLIPBOARD'),
-            ],
-            justification: 'Access to the clipboard',
-        });
-        await this._creatingOffscreen;
+        // this._creatingOffscreen = chrome.offscreen.createDocument({
+        //     url: 'offscreen.html',
+        //     reasons: [
+        //         /** @type {chrome.offscreen.Reason} */ ('CLIPBOARD'),
+        //     ],
+        //     justification: 'Access to the clipboard',
+        // });
+        // await this._creatingOffscreen;
         this._creatingOffscreen = null;
     }
 
@@ -92,23 +92,24 @@ export class OffscreenProxy {
      * @returns {Promise<boolean>}
      */
     async _hasOffscreenDocument() {
-        const offscreenUrl = chrome.runtime.getURL('offscreen.html');
-        if (!chrome.runtime.getContexts) { // Chrome version below 116
-            // Clients: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/clients
-            // @ts-expect-error - Types not set up for service workers yet
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const matchedClients = await clients.matchAll();
-            // @ts-expect-error - Types not set up for service workers yet
-            return await matchedClients.some((client) => client.url === offscreenUrl);
-        }
+        // const offscreenUrl = chrome.runtime.getURL('offscreen.html');
+        // if (!chrome.runtime.getContexts) { // Chrome version below 116
+        //     // Clients: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/clients
+        //     // @ts-expect-error - Types not set up for service workers yet
+        //     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        //     const matchedClients = await clients.matchAll();
+        //     // @ts-expect-error - Types not set up for service workers yet
+        //     return await matchedClients.some((client) => client.url === offscreenUrl);
+        // }
 
-        const contexts = await chrome.runtime.getContexts({
-            contextTypes: [
-                /** @type {chrome.runtime.ContextType} */ ('OFFSCREEN_DOCUMENT'),
-            ],
-            documentUrls: [offscreenUrl],
-        });
-        return contexts.length > 0;
+        // const contexts = await chrome.runtime.getContexts({
+        //     contextTypes: [
+        //         /** @type {chrome.runtime.ContextType} */ ('OFFSCREEN_DOCUMENT'),
+        //     ],
+        //     documentUrls: [offscreenUrl],
+        // });
+        // return contexts.length > 0;
+        return false;
     }
 
     /**

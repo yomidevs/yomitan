@@ -1766,12 +1766,13 @@ export class Backend {
      */
     _getBrowserIconTitle() {
         const manifest = /** @type {chrome.runtime.ManifestV3} */ (chrome.runtime.getManifest());
-        const action = manifest.action;
-        if (typeof action === 'undefined') { throw new Error('Failed to find action'); }
-        const defaultTitle = action.default_title;
-        if (typeof defaultTitle === 'undefined') { throw new Error('Failed to find default_title'); }
+        return manifest.title || 'Yomidict';
+        // const action = manifest.action;
+        // if (typeof action === 'undefined') { throw new Error('Failed to find action'); }
+        // const defaultTitle = action.default_title;
+        // if (typeof defaultTitle === 'undefined') { throw new Error('Failed to find default_title'); }
 
-        return defaultTitle;
+        // return defaultTitle;
     }
 
     /**
@@ -2688,12 +2689,22 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _openWelcomeGuidePageOnce() {
-        const result = await chrome.storage.session.get(['openedWelcomePage']);
-        if (!result.openedWelcomePage) {
-            await Promise.all([
-                this._openWelcomeGuidePage(),
-                chrome.storage.session.set({openedWelcomePage: true}),
-            ]);
+        try {
+            const result = await chrome.storage.session.get(['openedWelcomePage']);
+            if (!result.openedWelcomePage) {
+                await Promise.all([
+                    this._openWelcomeGuidePage(),
+                    chrome.storage.session.set({openedWelcomePage: true}),
+                ]);
+            }
+        } catch (e) {
+            const result = localStorage.getItem('openedWelcomePage');
+            if (result !== 'true') {
+                await Promise.all([
+                    this._openWelcomeGuidePage(),
+                    localStorage.setItem('openedWelcomePage', 'true'),
+                ]);
+            }
         }
     }
 

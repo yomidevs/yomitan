@@ -54,10 +54,20 @@ async function setupGenericSettingsController(genericSettingController) {
 /** */
 async function checkNeedsCustomTemplatesWarning() {
     const key = 'needsCustomTemplatesWarning';
-    const result = await chrome.storage.session.get({[key]: false});
-    if (!result[key]) { return; }
-    document.documentElement.dataset.warnCustomTemplates = 'true';
-    await chrome.storage.session.remove([key]);
+
+    try {
+        const result = await chrome.storage.session.get({[key]: false});
+        if (!result[key]) { return; }
+        document.documentElement.dataset.warnCustomTemplates = 'true';
+        await chrome.storage.session.remove([key]);
+    } catch (error) {
+        // use local storage if session storage is not available
+        const result = localStorage.getItem(key);
+        if (result !== null && result !== 'false') {
+            document.documentElement.dataset.warnCustomTemplates = 'true';
+            localStorage.removeItem(key);
+        }
+    }
 }
 
 await Application.main(true, async (application) => {

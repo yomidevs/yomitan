@@ -52,6 +52,39 @@ if (checkChromeNotAvailable()) {
 }
 
 /**
+ * Sleeps for the specified number of milliseconds.
+ * @param {number} ms The number of milliseconds to sleep.
+ * @returns {Promise<void>} A promise that resolves after the specified time.
+ */
+async function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+
+/**
+ * Retries a promise-returning function up to `retries` times with `delayMs` ms delay between attempts.
+ * @param {() => Promise<any>} fn
+ * @param {number} retries
+ * @param {number} delayMs
+ * @returns {Promise<any>}
+ */
+async function retryWithDelay(fn, retries, delayMs) {
+    let lastError;
+    for (let i = 0; i < retries; ++i) {
+        try {
+            return await fn();
+        } catch (e) {
+            lastError = e;
+            if (i < retries - 1) {
+                await sleep(delayMs);
+            }
+        }
+    }
+    throw lastError;
+}
+
+/**
  * @param {WebExtension} webExtension
  */
 async function waitForBackendReady(webExtension) {
@@ -62,7 +95,11 @@ async function waitForBackendReady(webExtension) {
     const onMessage = ({action, params}, _sender, callback) => invokeApiMapHandler(apiMap, action, params, [], callback);
     chrome.runtime.onMessage.addListener(onMessage);
     try {
-        await webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
+        await retryWithDelay(
+            () => webExtension.sendMessagePromise({action: 'requestBackendReadySignal'}),
+            10,
+            500,
+        );
         await promise;
     } finally {
         chrome.runtime.onMessage.removeListener(onMessage);

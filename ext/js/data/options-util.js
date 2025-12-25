@@ -1146,11 +1146,19 @@ export class OptionsUtil {
                 customTemplates = true;
             }
         }
-
-        if (customTemplates && isObjectNotArray(chrome.storage)) {
-            void chrome.storage.session.set({needsCustomTemplatesWarning: true});
-            await this._createTab(chrome.runtime.getURL('/welcome.html'));
-            void chrome.storage.session.set({openedWelcomePage: true});
+        try {
+            if (customTemplates && isObjectNotArray(chrome.storage)) {
+                void chrome.storage.session.set({needsCustomTemplatesWarning: true});
+                await this._createTab(chrome.runtime.getURL('/welcome.html'));
+                void chrome.storage.session.set({openedWelcomePage: true});
+            }
+        } catch (error) {
+            // use window.localStorage as a fallback
+            if (customTemplates) {
+                window.localStorage.setItem('needsCustomTemplatesWarning', 'true');
+                window.open(chrome.runtime.getURL('/welcome.html'), '_blank');
+                window.localStorage.setItem('openedWelcomePage', 'true');
+            }
         }
     }
 

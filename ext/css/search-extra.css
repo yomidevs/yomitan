@@ -1,0 +1,18 @@
+.top-body {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.top-body .top-body-item {
+    width: 100%;
+    max-width: 700px;
+    padding: 10px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.hidden {
+    display: none !important;
+}
