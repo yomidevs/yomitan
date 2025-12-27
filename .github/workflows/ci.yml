@@ -40,7 +40,7 @@ jobs:
             test: test:unit:options
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/setup
 
       - name: Run ${{ matrix.name }} tests
@@ -50,7 +50,7 @@ jobs:
     name: Test Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/setup
 
       - name: Build Legal
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'merge_group'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/setup
 
       - name: Run Benchmarks
