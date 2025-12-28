@@ -787,8 +787,8 @@ export class AnkiTemplateRenderer {
     _extractGlossaryStructuredContentRecursive(content) {
         /** @type {import('structured-content.js').Content[]} */
         const extractedContent = [];
-        while (content.length > 0) {
-            const structuredContent = content.shift();
+        for (let i = 0; i < content.length; i++) {
+            const structuredContent = content[i];
             if (Array.isArray(structuredContent)) {
                 extractedContent.push(...this._extractGlossaryStructuredContentRecursive(structuredContent));
             } else if (typeof structuredContent === 'object' && structuredContent) {
