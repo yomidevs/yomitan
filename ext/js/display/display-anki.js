@@ -642,17 +642,18 @@ export class DisplayAnki {
         const button = this._saveButtonFind(dictionaryEntryIndex, cardFormatIndex);
         if (button === null || button.disabled) { return; }
 
+        /** @type {Error[]} */
+        const allErrors = [];
+
         button.disabled = true;
         setTimeout(() => {
-            if (this._duplicateBehavior !== 'prevent') {
+            if (this._duplicateBehavior !== 'prevent' || allErrors.length > 0) {
                 button.disabled = false;
             }
         }, 2500);
 
         this._hideErrorNotification(true);
 
-        /** @type {Error[]} */
-        const allErrors = [];
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
         try {
