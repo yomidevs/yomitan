@@ -642,6 +642,13 @@ export class DisplayAnki {
         const button = this._saveButtonFind(dictionaryEntryIndex, cardFormatIndex);
         if (button === null || button.disabled) { return; }
 
+        button.disabled = true;
+        setTimeout(() => {
+            if (this._duplicateBehavior !== 'prevent') {
+                button.disabled = false;
+            }
+        }, 2500);
+
         this._hideErrorNotification(true);
 
         /** @type {Error[]} */
