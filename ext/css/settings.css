@@ -70,7 +70,7 @@
     --content-dimmer-color: rgba(0, 0, 0, 0.1);
     --advanced-color: #6640be;
     --advanced-color-lighter: hsl(258, 50%, 75%);
-    --advanced-color-transparent25: rgba(102, 64, 190, 0.5);
+    --advanced-color-transparent50: rgba(102, 64, 190, 0.5);
 
     --modal-padding-horizontal: 1em;
     --modal-padding-vertical: 0.625em;
@@ -763,7 +763,7 @@ select.short-height {
 .advanced-toggle {
     --accent-color: var(--advanced-color);
     --accent-color-lighter: var(--advanced-color-lighter);
-    --accent-color-transparent25: var(--advanced-color-transparent25);
+    --accent-color-transparent25: var(--advanced-color-transparent50);
 }
 
 /* Debug settings */
