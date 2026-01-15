@@ -456,6 +456,7 @@ a.heading-link-light {
     cursor: pointer;
     transition: background-color var(--animation-duration) ease-in-out;
     box-sizing: border-box;
+    position: relative;
 }
 .outline-item,
 .outline-item:hover {
@@ -760,6 +761,14 @@ select.short-height {
     height: 100%;
     width: 0.25em;
 }
+.outline-item.advanced-only::after {
+    content: '';
+    background-color: var(--advanced-color-lighter);
+    position: absolute;
+    left: 0;
+    height: 100%;
+    width: 0.25em;
+}
 .advanced-toggle {
     --accent-color: var(--advanced-color);
     --accent-color-lighter: var(--advanced-color-lighter);
@@ -774,6 +783,14 @@ select.short-height {
     position: absolute;
     right: 0;
     top: 0;
+    height: 100%;
+    width: 0.25em;
+}
+.outline-item.debug-only::after {
+    content: '';
+    background-color: var(--danger-color-lighter);
+    position: absolute;
+    left: 0;
     height: 100%;
     width: 0.25em;
 }
