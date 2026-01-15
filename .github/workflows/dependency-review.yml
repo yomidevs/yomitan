@@ -22,6 +22,6 @@ jobs:
           egress-policy: audit
 
       - name: 'Checkout Repository'
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: 'Dependency Review'
         uses: actions/dependency-review-action@56339e523c0409420f6c2c9a2f4292bbb3c07dd3 # v4.8.0
