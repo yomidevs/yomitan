@@ -391,8 +391,6 @@ export class DisplayAnki {
      * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
      */
     async _quickDupeCheck(dictionaryEntries) {
-        // let s = safePerformance.now();
-        // const start = safePerformance.now();
         const len = dictionaryEntries.length;
         const empty = /** @type {import('dictionary').DictionaryEntry} */ ({});
         const context = this._noteContext;
@@ -423,14 +421,8 @@ export class DisplayAnki {
                     dictionaryStylesMap: new Map()},
             ));
         }
-        // let e = safePerformance.now();
-        // console.log(`Skeleton Note Templates Creation Time ${e - s} ms`);
-        // console.log("skeletonNoteTemplates:");
-        // console.log(skeletonNoteTemplates);
-        // NEED TOKEN OR RACE CONDITION PREVENTER
         const notesToCheck = [];
         const noteTargets = [];
-        // s = safePerformance.now();
         for (let i = 0, ii = len; i < ii; ++i) {
             const {type} = dictionaryEntries[i];
             for (const [cardFormatIndex, cardFormat] of this._cardFormats.entries()) {
@@ -446,13 +438,7 @@ export class DisplayAnki {
                 noteTargets.push({index: i, cardFormatIndex, cardFormat});
             }
         }
-        // console.log("notesToCheck:");
-        // e = performance.now();
-        // console.log(`NotesToCheck Time ${e - s} ms`);
-        // console.log(notesToCheck.map(note => note.note));
         const infos = await this._display.application.api.getAnkiNoteInfo(notesToCheck.map((note) => note.note), this._isAdditionalInfoEnabled());
-        // console.log("infos from quickDupeCheck:");
-        // console.log(infos);
         /** @type {import('display-anki').DictionaryEntryDetails[]} */
         const results = new Array(dictionaryEntries.length).fill(null).map(() => ({noteMap: new Map()}));
         const ankiError = null;
@@ -462,14 +448,9 @@ export class DisplayAnki {
             const {cardFormatIndex, cardFormat, index} = noteTargets[i];
             results[index].noteMap.set(cardFormatIndex, {cardFormat, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
         }
-        // s = safePerformance.now();
         this._displayWhetherDupeOrNotAndLoading(results);
         // eslint-disable-next-line no-underscore-dangle
         this._display._hotkeyHelpController.setupNode(document.documentElement);
-        // e = safePerformance.now();
-        // console.log(`Update Save Buttons Time ${e - s} ms`);
-        // const end = performance.now();
-        // console.log(`QUICK DUPE CHECK FINISHED Execution time: ${end - start} ms`);
     }
 
     /**
@@ -497,7 +478,6 @@ export class DisplayAnki {
                     text.textContent = ' NOT A DUPLICATE ';
                     container.appendChild(text);
                 }
-
                 if (displayTagsAndFlags !== 'never' && Array.isArray(noteInfos)) {
                     this._setupTagsIndicator(entryIndex, cardFormatIndex, noteInfos);
                     this._setupFlagsIndicator(entryIndex, cardFormatIndex, noteInfos);
