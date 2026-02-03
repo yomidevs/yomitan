@@ -70,7 +70,7 @@
     --content-dimmer-color: rgba(0, 0, 0, 0.1);
     --advanced-color: #6640be;
     --advanced-color-lighter: hsl(258, 50%, 75%);
-    --advanced-color-transparent25: rgba(102, 64, 190, 0.5);
+    --advanced-color-transparent50: rgba(102, 64, 190, 0.5);
 
     --modal-padding-horizontal: 1em;
     --modal-padding-vertical: 0.625em;
@@ -456,6 +456,7 @@ a.heading-link-light {
     cursor: pointer;
     transition: background-color var(--animation-duration) ease-in-out;
     box-sizing: border-box;
+    position: relative;
 }
 .outline-item,
 .outline-item:hover {
@@ -760,10 +761,18 @@ select.short-height {
     height: 100%;
     width: 0.25em;
 }
+.outline-item.advanced-only::after {
+    content: '';
+    background-color: var(--advanced-color-lighter);
+    position: absolute;
+    left: 0;
+    height: 100%;
+    width: 0.25em;
+}
 .advanced-toggle {
     --accent-color: var(--advanced-color);
     --accent-color-lighter: var(--advanced-color-lighter);
-    --accent-color-transparent25: var(--advanced-color-transparent25);
+    --accent-color-transparent25: var(--advanced-color-transparent50);
 }
 
 /* Debug settings */
@@ -774,6 +783,14 @@ select.short-height {
     position: absolute;
     right: 0;
     top: 0;
+    height: 100%;
+    width: 0.25em;
+}
+.outline-item.debug-only::after {
+    content: '';
+    background-color: var(--danger-color-lighter);
+    position: absolute;
+    left: 0;
     height: 100%;
     width: 0.25em;
 }

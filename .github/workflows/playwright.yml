@@ -18,7 +18,7 @@ jobs:
       - name: Remove all fonts
         run: rm -rf /usr/share/fonts
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install CJK fonts
         uses: awalsh128/cache-apt-pkgs-action@2c09a5e66da6c8016428a2172bd76e5e4f14bb17 # v1.5.3
@@ -44,7 +44,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Grab latest dictionaries from dictionaries branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: yomidevs/yomitan # so that this works on forks
           ref: dictionaries
@@ -71,7 +71,7 @@ jobs:
         if: github.event_name == 'pull_request'
 
       - name: "[PR] Upload master-screenshots-outcome"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: master-screenshots-outcome-${{ matrix.shardIndex }}
           path: master-screenshots-outcome
@@ -90,7 +90,7 @@ jobs:
         run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} -u 2>&1 | tee ./playwright-output
         if: github.event_name == 'push'
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: playwright-screenshots-${{ matrix.shardIndex }}
           path: test/playwright/__screenshots__/
@@ -98,13 +98,13 @@ jobs:
 
       - name: Upload blob report to GitHub Actions Artifacts
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: blob-report-${{ matrix.shardIndex }}
           path: blob-report
           retention-days: 1
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: playwright-output-${{ matrix.shardIndex }}
           path: playwright-output
@@ -117,12 +117,12 @@ jobs:
     if: ${{ !cancelled() }}
     needs: [playwright-tests]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
 
       ### playwright-report
       - name: Download blob reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: all-blob-reports
           pattern: blob-report-*
@@ -134,32 +134,32 @@ jobs:
       - name: Merge into JSON Report
         run: npx playwright merge-reports --reporter json ./all-blob-reports > playwright-results.json
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: playwright-report
           path: playwright-report/
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: playwright-results-json
           path: playwright-results.json
 
       ### playwright-screenshots
       - name: Download & merge screenshots from GitHub Actions Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: test/playwright/__screenshots__
           pattern: playwright-screenshots-*
           merge-multiple: true
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: playwright-screenshots
           path: test/playwright/__screenshots__/
 
       ### [PR] master-screenshots-outcome
       - name: '[PR] Download master-screenshots-outcome files'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: master-screenshots-outcomes
           pattern: master-screenshots-outcome-*
@@ -176,7 +176,7 @@ jobs:
         if: github.event_name == 'pull_request'
 
       - name: '[PR] Upload master-screenshots-outcome'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: master-screenshots-outcome
           path: master-screenshots-outcome
@@ -184,7 +184,7 @@ jobs:
 
       ### playwright-output
       - name: Download playwright-output files
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: playwright-outputs
           pattern: playwright-output-*
@@ -193,7 +193,7 @@ jobs:
       - name: Merge playwright output files
         run: cat playwright-outputs/* > playwright-output
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: playwright-output
           path: playwright-output
