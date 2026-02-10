@@ -92,7 +92,6 @@ The second item in the array of the tag bank schema determines the tag category,
 - partOfSpeech
 - search
 - pronunciation-dictionary
-- search
 
 You can view the tag colors [here](https://github.com/yomidevs/yomitan/blob/48f1d012ad5045319d4e492dfbefa39da92817b2/ext/css/display.css#L136-L149).
 
