@@ -185,7 +185,7 @@ jobs:
 
       - name: '[PR] Calculate if any shard failed to download master screenshots'
         run: |
-          if [ -d "master-screenshots-outcomes" ] && grep -q "failure" master-screenshots-outcomes/* 2>/dev/null; then
+          if [ -d "master-screenshots-outcomes" ] && [ "$(ls -A master-screenshots-outcomes)" ] && grep -q "failure" master-screenshots-outcomes/* 2>/dev/null; then
             echo "failure" > master-screenshots-outcome
           else
             echo "success" > master-screenshots-outcome
