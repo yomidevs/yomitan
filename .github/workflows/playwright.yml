@@ -128,18 +128,32 @@ jobs:
           pattern: blob-report-*
           merge-multiple: true
 
+      - name: Check if blob reports exist
+        id: check-blob-reports
+        run: |
+          if [ -d "all-blob-reports" ] && [ "$(ls -A all-blob-reports)" ]; then
+            echo "has-reports=true" >> $GITHUB_OUTPUT
+          else
+            echo "has-reports=false" >> $GITHUB_OUTPUT
+            mkdir -p all-blob-reports
+          fi
+
       - name: Merge into HTML Report
+        if: steps.check-blob-reports.outputs.has-reports == 'true'
         run: npx playwright merge-reports --reporter html ./all-blob-reports
 
       - name: Merge into JSON Report
+        if: steps.check-blob-reports.outputs.has-reports == 'true'
         run: npx playwright merge-reports --reporter json ./all-blob-reports > playwright-results.json
 
       - uses: actions/upload-artifact@v6
+        if: steps.check-blob-reports.outputs.has-reports == 'true'
         with:
           name: playwright-report
           path: playwright-report/
 
       - uses: actions/upload-artifact@v6
+        if: steps.check-blob-reports.outputs.has-reports == 'true'
         with:
           name: playwright-results-json
           path: playwright-results.json
@@ -151,6 +165,9 @@ jobs:
           path: test/playwright/__screenshots__
           pattern: playwright-screenshots-*
           merge-multiple: true
+
+      - name: Ensure screenshots directory exists
+        run: mkdir -p test/playwright/__screenshots__
 
       - uses: actions/upload-artifact@v6
         with:
@@ -168,7 +185,7 @@ jobs:
 
       - name: '[PR] Calculate if any shard failed to download master screenshots'
         run: |
-          if grep -q "failure" master-screenshots-outcomes/*; then
+          if [ -d "master-screenshots-outcomes" ] && grep -q "failure" master-screenshots-outcomes/* 2>/dev/null; then
             echo "failure" > master-screenshots-outcome
           else
             echo "success" > master-screenshots-outcome
@@ -191,7 +208,12 @@ jobs:
           merge-multiple: true
 
       - name: Merge playwright output files
-        run: cat playwright-outputs/* > playwright-output
+        run: |
+          if [ -d "playwright-outputs" ] && [ "$(ls -A playwright-outputs)" ]; then
+            cat playwright-outputs/* > playwright-output
+          else
+            touch playwright-output
+          fi
 
       - uses: actions/upload-artifact@v6
         with:
