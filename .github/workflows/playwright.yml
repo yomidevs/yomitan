@@ -132,9 +132,9 @@ jobs:
         id: check-blob-reports
         run: |
           if [ -d "all-blob-reports" ] && [ "$(ls -A all-blob-reports)" ]; then
-            echo "has-reports=true" >> $GITHUB_OUTPUT
+            echo "has-reports=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has-reports=false" >> $GITHUB_OUTPUT
+            echo "has-reports=false" >> "$GITHUB_OUTPUT"
             mkdir -p all-blob-reports
           fi
 
