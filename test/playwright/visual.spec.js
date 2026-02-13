@@ -23,8 +23,17 @@ import {expect, root, test} from './playwright-util.js';
 
 test.beforeEach(async ({context}) => {
     // Wait for the on-install welcome.html tab to load, which becomes the foreground tab
-    const welcome = await context.waitForEvent('page');
-    await welcome.close(); // Close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
+    // Use a promise race to avoid hanging if the welcome page doesn't appear
+    try {
+        const welcome = await Promise.race([
+            context.waitForEvent('page'),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+        ]);
+        await welcome.close(); // Close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
+    } catch (e) {
+        // If welcome page doesn't appear or already appeared, that's okay
+        console.log('Welcome page handling:', e.message);
+    }
 });
 
 test('welcome', async ({page, extensionId}) => {
@@ -34,6 +43,7 @@ test('welcome', async ({page, extensionId}) => {
     await expect(page.getByText('Welcome to Yomitan!')).toBeVisible();
 
     // Take a screenshot of the welcome page
+    await page.bringToFront();
     await expect.soft(page).toHaveScreenshot('welcome-page.png');
 });
 test.describe('settings', () => {
@@ -48,6 +58,7 @@ test.describe('settings', () => {
         const storage_locator = page.locator('.storage-use-finite >> xpath=..');
 
         // Take a simple screenshot of the settings page
+        await page.bringToFront();
         await expect.soft(page).toHaveScreenshot('settings-fresh.png', {mask: [storage_locator]});
 
         // Load in jmdict_english.zip
@@ -56,6 +67,7 @@ test.describe('settings', () => {
         await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 
         // Take a screenshot of the settings page with jmdict loaded
+        await page.bringToFront();
         await expect.soft(page).toHaveScreenshot('settings-jmdict-loaded.png', {mask: [storage_locator]});
     });
     test('remote load and delete of jmdict_swedish', async ({page, extensionId}) => {
@@ -99,6 +111,7 @@ test.describe('settings', () => {
         const storage_locator = page.locator('.storage-use-finite >> xpath=..');
 
         // Take a full page screenshot of the settings page with advanced settings enabled
+        await page.bringToFront();
         await expect.soft(page).toHaveScreenshot('settings-fresh-full-advanced.png', {
             fullPage: true,
             mask: [storage_locator],
