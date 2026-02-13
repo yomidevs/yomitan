@@ -115,6 +115,13 @@ const languageDescriptors = [
         languageTransforms: arabicTransforms,
     },
     {
+        iso: 'be',
+        iso639_3: 'bel',
+        name: 'Belarusian',
+        exampleText: 'чытаць',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'bg',
         iso639_3: 'bul',
         name: 'Bulgarian',
