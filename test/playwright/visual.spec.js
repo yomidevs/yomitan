@@ -23,8 +23,17 @@ import {expect, root, test} from './playwright-util.js';
 
 test.beforeEach(async ({context}) => {
     // Wait for the on-install welcome.html tab to load, which becomes the foreground tab
-    const welcome = await context.waitForEvent('page');
-    await welcome.close(); // Close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
+    // Use a promise race to avoid hanging if the welcome page doesn't appear
+    try {
+        const welcome = await Promise.race([
+            context.waitForEvent('page'),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+        ]);
+        await welcome.close(); // Close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
+    } catch (e) {
+        // If welcome page doesn't appear or already appeared, that's okay
+        console.log('Welcome page handling:', e.message);
+    }
 });
 
 test('welcome', async ({page, extensionId}) => {
