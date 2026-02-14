@@ -294,6 +294,10 @@ export type TermHeadword = {
      */
     index: number;
     /**
+     * The current index of this headword in the parent {@link TermDictionaryEntry.headwords} array.
+     */
+    headwordIndex: number;
+    /**
      * The text for the term.
      */
     term: string;
@@ -324,7 +328,7 @@ export type TermDefinition = {
      */
     index: number;
     /**
-     * A list of headwords that this definition corresponds to.
+     * A list of {@link TermHeadword.headwordIndex} values which this definition corresponds to.
      */
     headwordIndices: number[];
     /**
@@ -381,7 +385,7 @@ export type TermPronunciation = {
      */
     index: number;
     /**
-     * Which headword this pronunciation corresponds to.
+     * Which {@link TermHeadword.headwordIndex} this pronunciation corresponds to.
      */
     headwordIndex: number;
     /**
@@ -459,7 +463,7 @@ export type TermFrequency = {
      */
     index: number;
     /**
-     * Which headword this frequency corresponds to.
+     * Which {@link TermHeadword.headwordIndex} this frequency corresponds to.
      */
     headwordIndex: number;
     /**
@@ -478,6 +482,10 @@ export type TermFrequency = {
      * Whether or not the frequency had an explicit reading specified.
      */
     hasReading: boolean;
+    /**
+     * How the frequency number should be interpreted for this dictionary.
+     */
+    frequencyMode: DictionaryData.FrequencyMode | null;
     /**
      * The frequency for the term, as a number of occurrences or an overall rank.
      */

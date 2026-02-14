@@ -514,7 +514,7 @@ export class AnkiNoteBuilder {
     async _getTextFurigana(entries, optionsContext, scanLength, readingOverride) {
         const results = [];
         for (const {text, readingMode} of entries) {
-            const parseResults = await this._api.parseText(text, optionsContext, scanLength, true, false);
+            const parseResults = await this._api.parseText(text, optionsContext, scanLength, true, false, false);
             let data = null;
             for (const {source, content} of parseResults) {
                 if (source !== 'scanning-parser') { continue; }

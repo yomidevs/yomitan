@@ -66,6 +66,7 @@ export type ParseTextSegment = {
         term: string;
         reading: string;
         sources: Dictionary.TermSource[];
+        frequencies: Dictionary.TermFrequency[];
     }[][];
 };
 
@@ -152,6 +153,7 @@ type ApiSurface = {
             scanLength: number;
             useInternalParser: boolean;
             useMecabParser: boolean;
+            useAllFrequencyDictionaries?: boolean;
         };
         return: ParseTextResultItem[];
     };
