@@ -473,6 +473,7 @@ export class Display extends EventDispatcher {
             readingMode: options.parsing.readingMode,
             useInternalParser: options.parsing.enableScanningParser,
             useMecabParser: options.parsing.enableMecabParser,
+            useAllFrequencyDictionaries: options.parsing.useAllFrequencyDictionaries,
             language: options.general.language,
             scanning: {
                 inputs: scanningOptions.inputs,

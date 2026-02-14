@@ -252,6 +252,7 @@ export class YomitanApi {
                             scanLength: scanLength,
                             useInternalParser: true,
                             useMecabParser: false,
+                            useAllFrequencyDictionaries: true,
                         };
                         result = await this._invoke('parseText', invokeParams);
                         break;

@@ -131,6 +131,7 @@ export type QueryParserOptions = {
     readingMode: Settings.ParsingReadingMode;
     useInternalParser: boolean;
     useMecabParser: boolean;
+    useAllFrequencyDictionaries: boolean;
     language: string;
     scanning: TextScannerTypes.Options;
 };

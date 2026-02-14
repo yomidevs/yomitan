@@ -560,15 +560,15 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'parseText'>} */
-    async _onApiParseText({text, optionsContext, scanLength, useInternalParser, useMecabParser}) {
+    async _onApiParseText({text, optionsContext, scanLength, useInternalParser, useMecabParser, useAllFrequencyDictionaries}) {
         /** @type {import('api').ParseTextResultItem[]} */
         const results = [];
 
         const [internalResults, mecabResults] = await Promise.all([
             useInternalParser ?
                 (Array.isArray(text) ?
-                    Promise.all(text.map((t) => this._textParseScanning(t, scanLength, optionsContext))) :
-                    Promise.all([this._textParseScanning(text, scanLength, optionsContext)])) :
+                    Promise.all(text.map((t) => this._textParseScanning(t, scanLength, optionsContext, useAllFrequencyDictionaries))) :
+                    Promise.all([this._textParseScanning(text, scanLength, optionsContext, useAllFrequencyDictionaries)])) :
                 null,
             useMecabParser ?
                 (Array.isArray(text) ?
@@ -1679,9 +1679,10 @@ export class Backend {
      * @param {string} text
      * @param {number} scanLength
      * @param {import('settings').OptionsContext} optionsContext
+     * @param {import('api').ApiParam<'parseText', 'useAllFrequencyDictionaries'>} useAllFrequencyDictionaries
      * @returns {Promise<import('api').ParseTextLine[]>}
      */
-    async _textParseScanning(text, scanLength, optionsContext) {
+    async _textParseScanning(text, scanLength, optionsContext, useAllFrequencyDictionaries) {
         /** @type {import('translator').FindTermsMode} */
         const mode = 'simple';
         const options = this._getProfileOptions(optionsContext, false);
@@ -1689,6 +1690,7 @@ export class Backend {
         /** @type {import('api').FindTermsDetails} */
         const details = {matchType: 'exact', deinflect: true};
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
+        if (useAllFrequencyDictionaries) { findTermsOptions.useAllFrequencyDictionaries = true; }
         /** @type {import('api').ParseTextLine[]} */
         const results = [];
         let previousUngroupedSegment = null;
@@ -1730,7 +1732,7 @@ export class Backend {
                                     if (src.matchType !== 'exact') { continue; }
                                     validSources.push(src);
                                 }
-                                if (validSources.length > 0) { validHeadwords.push({term: headword.term, reading: headword.reading, sources: validSources}); }
+                                if (validSources.length > 0) { validHeadwords.push({term: headword.term, reading: headword.reading, sources: validSources, frequencies: dictionaryEntry.frequencies.filter((f) => f.headwordIndex === headword.headwordIndex)}); }
                             }
                             if (validHeadwords.length > 0) { trimmedHeadwords.push(validHeadwords); }
                         }
@@ -2707,6 +2709,7 @@ export class Backend {
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
             language,
+            useAllFrequencyDictionaries: false,
         };
     }
 

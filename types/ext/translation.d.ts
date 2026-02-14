@@ -105,6 +105,10 @@ export type FindTermsOptions = {
      * ISO-639 code of the language.
      */
     language: string;
+    /**
+     * Whether to force using using all frequency dictionaries, even in 'simple' FindTermsMode mode.
+     */
+    useAllFrequencyDictionaries: boolean;
 };
 
 /**

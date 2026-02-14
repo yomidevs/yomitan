@@ -67,10 +67,11 @@ export class API {
      * @param {import('api').ApiParam<'parseText', 'scanLength'>} scanLength
      * @param {import('api').ApiParam<'parseText', 'useInternalParser'>} useInternalParser
      * @param {import('api').ApiParam<'parseText', 'useMecabParser'>} useMecabParser
+     * @param {import('api').ApiParam<'parseText', 'useAllFrequencyDictionaries'>} useAllFrequencyDictionaries
      * @returns {Promise<import('api').ApiReturn<'parseText'>>}
      */
-    parseText(text, optionsContext, scanLength, useInternalParser, useMecabParser) {
-        return this._invoke('parseText', {text, optionsContext, scanLength, useInternalParser, useMecabParser});
+    parseText(text, optionsContext, scanLength, useInternalParser, useMecabParser, useAllFrequencyDictionaries) {
+        return this._invoke('parseText', {text, optionsContext, scanLength, useInternalParser, useMecabParser, useAllFrequencyDictionaries});
     }
 
     /**
