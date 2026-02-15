@@ -125,6 +125,7 @@
                                     "sortFrequencyDictionary",
                                     "sortFrequencyDictionaryOrder",
                                     "stickySearchHeader",
+                                    "enableSearchSuggestions",
                                     "fontFamily",
                                     "fontSize",
                                     "lineHeight",
@@ -337,6 +338,10 @@
                                         "default": "descending"
                                     },
                                     "stickySearchHeader": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "enableSearchSuggestions": {
                                         "type": "boolean",
                                         "default": false
                                     },
