@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextProcessorOptions} from '../text-processors.js';
-
 const optionalDiacritics = [
     '\u0618', // Small Fatha
     '\u0619', // Small Damma
@@ -38,72 +36,51 @@ const optionalDiacritics = [
 
 const diacriticsRegex = new RegExp(`[${optionalDiacritics.join('')}]`, 'g');
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const removeArabicScriptDiacritics = {
     name: 'Remove diacritics',
     description: 'وَلَدَ → ولد',
-    options: basicTextProcessorOptions,
-    process: (text, setting) => {
-        return setting ? text.replace(diacriticsRegex, '') : text;
-    },
+    process: (text) => [text, text.replace(diacriticsRegex, '')],
 };
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const removeTatweel = {
     name: 'Remove tatweel characters',
     description: 'لـكن → لكن',
-    options: basicTextProcessorOptions,
-    process: (text, setting) => {
-        return setting ? text.replaceAll('ـ', '') : text;
-    },
+    process: (text) => [text, text.replaceAll('ـ', '')],
 };
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const normalizeUnicode = {
     name: 'Normalize unicode',
     description: 'ﻴ → ي',
-    options: basicTextProcessorOptions,
-    process: (text, setting) => {
-        return setting ? text.normalize('NFKC') : text;
-    },
+    process: (text) => [text, text.normalize('NFKC')],
 };
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const addHamzaTop = {
     name: 'Add Hamza to top of Alif',
     description: 'اكبر → أكبر',
-    options: basicTextProcessorOptions,
-    process: (text, setting) => {
-        return setting ? text.replace('ا', 'أ') : text;
-    },
+    process: (text) => [text, text.replace('ا', 'أ')],
 };
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const addHamzaBottom = {
     name: 'Add Hamza to bottom of Alif',
     description: 'اسلام → إسلام',
-    options: basicTextProcessorOptions,
-    process: (text, setting) => {
-        return setting ? text.replace('ا', 'إ') : text;
-    },
+    process: (text) => [text, text.replace('ا', 'إ')],
 };
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const convertAlifMaqsuraToYaa = {
     name: 'Convert Alif Maqsura to Yaa',
     description: 'فى → في',
-    options: basicTextProcessorOptions,
-    process: (text, setting) => {
-        return setting ? text.replace(/ى$/, 'ي') : text;
-    },
+    process: (text) => [text, text.replace(/ى$/, 'ي')],
 };
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const convertHaToTaMarbuta = {
     name: 'Convert final Ha to Ta Marbuta',
     description: 'لغه → لغة',
-    options: basicTextProcessorOptions,
-    process: (text, setting) => {
-        return setting ? text.replace(/ه$/, 'ة') : text;
-    },
+    process: (text) => [text, text.replace(/ه$/, 'ة')],
 };

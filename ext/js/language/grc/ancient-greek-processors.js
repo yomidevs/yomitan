@@ -15,16 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextProcessorOptions, removeAlphabeticDiacritics} from '../text-processors.js';
-
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const convertLatinToGreek = {
     name: 'Convert latin characters to greek',
     description: 'a → α, A → Α, b → β, B → Β, etc.',
-    options: basicTextProcessorOptions,
-    process: (str, setting) => {
-        return setting ? latinToGreek(str) : str;
-    },
+    process: (str) => [str, latinToGreek(str)],
 };
 
 /**
@@ -32,7 +27,7 @@ export const convertLatinToGreek = {
  * @returns {string}
  */
 export function latinToGreek(latin) {
-    latin = removeAlphabeticDiacritics.process(latin, true);
+    latin = latin.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
     const singleMap = {
         a: 'α',

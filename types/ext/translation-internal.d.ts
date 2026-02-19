@@ -72,8 +72,8 @@ export type DictionaryEntryGroup = {
 export type TextProcessorMap = Map<
     string,
     {
-        textPreprocessors: Language.TextProcessorWithId<unknown>[];
-        textPostprocessors: Language.TextProcessorWithId<unknown>[];
+        textPreprocessors: Language.TextProcessorWithId[];
+        textPostprocessors: Language.TextProcessorWithId[];
     }
 >;
 
@@ -82,4 +82,4 @@ export type ReadingNormalizerMap = Map<
     Language.ReadingNormalizer
 >;
 
-export type TextCache = Map<string, Map<string, Map<unknown, string>>>;
+export type TextCache = Map<string, Map<string, string[]>>;

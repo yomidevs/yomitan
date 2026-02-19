@@ -15,31 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextProcessorOptions} from '../text-processors.js';
-
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const removeRussianDiacritics = {
     name: 'Remove diacritics',
     description: 'A\u0301 → A, a\u0301 → a',
-    options: basicTextProcessorOptions,
-    process: (str, setting) => {
-        return setting ? str.replace(/\u0301/g, '') : str;
-    },
+    process: (str) => [str, str.replace(/\u0301/g, '')],
 };
 
-/** @type {import('language').BidirectionalConversionPreprocessor} */
+/** @type {import('language').TextProcessor} */
 export const yoToE = {
     name: 'Convert "ё" to "е"',
     description: 'ё → е, Ё → Е and vice versa',
-    options: ['off', 'direct', 'inverse'],
-    process: (str, setting) => {
-        switch (setting) {
-            case 'off':
-                return str;
-            case 'direct':
-                return str.replace(/ё/g, 'е').replace(/Ё/g, 'Е');
-            case 'inverse':
-                return str.replace(/е/g, 'ё').replace(/Е/g, 'Ё');
-        }
-    },
+    process: (str) => [
+        str,
+        str.replace(/ё/g, 'е').replace(/Ё/g, 'Е'),
+        str.replace(/е/g, 'ё').replace(/Е/g, 'Ё'),
+    ],
 };

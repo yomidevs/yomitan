@@ -15,16 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextProcessorOptions} from '../text-processors.js';
-
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const removeDoubleAcuteAccents = {
     name: 'Remove double acute accents',
     description: 'πρόσωπό → πρόσωπο',
-    options: basicTextProcessorOptions,
-    process: (str, setting) => {
-        return setting ? removeDoubleAcuteAccentsImpl(str) : str;
-    },
+    process: (str) => [str, removeDoubleAcuteAccentsImpl(str)],
 };
 
 /**

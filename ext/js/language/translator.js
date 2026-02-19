@@ -556,7 +556,7 @@ export class Translator {
 
     /**
      * @param {string} text
-     * @param {import('language').TextProcessorWithId<unknown>[]} textProcessors
+     * @param {import('language').TextProcessorWithId[]} textProcessors
      * @param {(import('translation').FindTermsTextReplacement[] | null)[]} textReplacements
      * @param {import('translation-internal').TextCache} textCache
      * @returns {import('translation-internal').VariantAndTextProcessorRuleChainCandidatesMap}
@@ -571,12 +571,11 @@ export class Translator {
             if (textReplacement === null) { continue; }
             variantsMap.set(this._applyTextReplacements(text, textReplacement), [['Text Replacement' + ' ' + id]]);
         }
-        for (const {id, textProcessor: {process, options}} of textProcessors) {
+        for (const {id, textProcessor: {process}} of textProcessors) {
             /** @type {import('translation-internal').VariantAndTextProcessorRuleChainCandidatesMap} */
             const newVariantsMap = new Map();
-            for (const [variant, currentPreprocessorRuleChainCandidates] of variantsMap) {
-                for (const option of options) {
-                    const processed = this._getProcessedText(textCache, variant, id, option, process);
+            outer: for (const [variant, currentPreprocessorRuleChainCandidates] of variantsMap) {
+                for (const processed of this._getProcessedTexts(textCache, variant, id, process)) {
                     const existingCandidates = newVariantsMap.get(processed);
 
                     // Ignore if applying the textProcessor doesn't change the source
@@ -591,6 +590,8 @@ export class Translator {
                     } else {
                         newVariantsMap.set(processed, [...existingCandidates, ...currentPreprocessorRuleChainCandidates.map((candidate) => [...candidate, id])]);
                     }
+
+                    if (newVariantsMap.size >= 1024) { break outer; }
                 }
             }
             variantsMap = newVariantsMap;
@@ -602,30 +603,22 @@ export class Translator {
      * @param {import('translation-internal').TextCache} textCache
      * @param {string} text
      * @param {string} id
-     * @param {unknown} setting
      * @param {import('language').TextProcessorFunction} process
-     * @returns {string}
+     * @returns {string[]}
      */
-    _getProcessedText(textCache, text, id, setting, process) {
+    _getProcessedTexts(textCache, text, id, process) {
         let level1 = textCache.get(text);
         if (!level1) {
             level1 = new Map();
             textCache.set(text, level1);
         }
 
-        let level2 = level1.get(id);
-        if (!level2) {
-            level2 = new Map();
-            level1.set(id, level2);
+        let results = level1.get(id);
+        if (typeof results === 'undefined') {
+            results = process(text);
+            level1.set(id, results);
         }
-
-        if (!level2.has(setting)) {
-            text = process(text, setting);
-            level2.set(setting, text);
-        } else {
-            text = level2.get(setting) || '';
-        }
-        return text;
+        return results;
     }
 
     /**
