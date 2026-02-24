@@ -575,7 +575,7 @@ export class Translator {
         for (const {id, textProcessor: {process}} of textProcessors) {
             /** @type {import('translation-internal').VariantAndTextProcessorRuleChainCandidatesMap} */
             const newVariantsMap = new Map();
-            outer: for (const [variant, currentPreprocessorRuleChainCandidates] of variantsMap) {
+            for (const [variant, currentPreprocessorRuleChainCandidates] of variantsMap) {
                 for (const processed of this._getProcessedTexts(textCache, variant, id, process)) {
                     const existingCandidates = newVariantsMap.get(processed);
 
