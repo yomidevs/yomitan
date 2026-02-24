@@ -23,6 +23,7 @@ import {isCodePointKorean} from './ko/korean.js';
 import {LanguageTransformer} from './language-transformer.js';
 import {getAllLanguageReadingNormalizers, getAllLanguageTextProcessors} from './languages.js';
 import {MultiLanguageTransformer} from './multi-language-transformer.js';
+import {MAX_PROCESS_VARIANTS} from './text-processors.js';
 import {isCodePointChinese} from './zh/chinese.js';
 
 /**
@@ -616,6 +617,11 @@ export class Translator {
         let results = level1.get(id);
         if (typeof results === 'undefined') {
             results = process(text);
+            if (results.length > MAX_PROCESS_VARIANTS) {
+                // eslint-disable-next-line no-console
+                console.warn(`Text processor "${id}" produced ${results.length} variants for input "${text}"; truncating to ${MAX_PROCESS_VARIANTS}`);
+                results = results.slice(0, MAX_PROCESS_VARIANTS);
+            }
             level1.set(id, results);
         }
         return results;

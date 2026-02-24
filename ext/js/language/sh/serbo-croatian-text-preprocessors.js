@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {MAX_PROCESS_VARIANTS} from '../text-processors.js';
 /**
  * Generates all variants of a string where unaccented letters that have
  * common diacritic counterparts are substituted: c→č/ć, z→ž, s→š, dj→đ.
@@ -25,6 +26,7 @@ function generateDiacriticVariants(str) {
     str = str.normalize('NFC');
     /** @type {string[]} */
     let variants = [''];
+    let warned = false;
 
     for (let i = 0; i < str.length; i++) {
         const ch = str[i];
@@ -35,22 +37,29 @@ function generateDiacriticVariants(str) {
             const đ = ch === 'D' ? 'Đ' : 'đ';
             variants = variants.flatMap((v) => [v + base, v + đ]);
             i++;
-            continue;
+        } else {
+            /** @type {string[]} */
+            let choices;
+            switch (ch) {
+                case 'c': choices = ['c', 'č', 'ć']; break;
+                case 'C': choices = ['C', 'Č', 'Ć']; break;
+                case 'z': choices = ['z', 'ž']; break;
+                case 'Z': choices = ['Z', 'Ž']; break;
+                case 's': choices = ['s', 'š']; break;
+                case 'S': choices = ['S', 'Š']; break;
+                default: choices = [ch]; break;
+            }
+            variants = variants.flatMap((v) => choices.map((c) => v + c));
         }
 
-        /** @type {string[]} */
-        let choices;
-        switch (ch) {
-            case 'c': choices = ['c', 'č', 'ć']; break;
-            case 'C': choices = ['C', 'Č', 'Ć']; break;
-            case 'z': choices = ['z', 'ž']; break;
-            case 'Z': choices = ['Z', 'Ž']; break;
-            case 's': choices = ['s', 'š']; break;
-            case 'S': choices = ['S', 'Š']; break;
-            default: choices = [ch]; break;
+        if (variants.length > MAX_PROCESS_VARIANTS) {
+            if (!warned) {
+                // eslint-disable-next-line no-console
+                console.warn(`addSerboCroatianDiacritics: input "${str}" produces too many variants; truncating to ${MAX_PROCESS_VARIANTS}`);
+                warned = true;
+            }
+            variants = variants.slice(0, MAX_PROCESS_VARIANTS);
         }
-
-        variants = variants.flatMap((v) => choices.map((c) => v + c));
     }
     return variants;
 }

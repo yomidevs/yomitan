@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+export const MAX_PROCESS_VARIANTS = 4096;
+
 /** @type {import('language').TextProcessor} */
 export const decapitalize = {
     name: 'Decapitalize text',
