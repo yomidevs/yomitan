@@ -16,6 +16,7 @@
  */
 
 import {MAX_PROCESS_VARIANTS} from '../text-processors.js';
+
 /**
  * Generates all variants of a string where unaccented letters that have
  * common diacritic counterparts are substituted: c→č/ć, z→ž, s→š, dj→đ.
