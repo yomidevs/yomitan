@@ -591,8 +591,6 @@ export class Translator {
                     } else {
                         newVariantsMap.set(processed, [...existingCandidates, ...currentPreprocessorRuleChainCandidates.map((candidate) => [...candidate, id])]);
                     }
-
-                    if (newVariantsMap.size >= 1024) { break outer; }
                 }
             }
             variantsMap = newVariantsMap;
