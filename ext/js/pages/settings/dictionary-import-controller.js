@@ -19,11 +19,20 @@
 import {ExtensionError} from '../../core/extension-error.js';
 import {readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
+import {safePerformance} from '../../core/safe-performance.js';
 import {toError} from '../../core/to-error.js';
 import {getKebabCase} from '../../data/anki-template-util.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryController} from './dictionary-controller.js';
+
+/**
+ * @param {number} valueMs
+ * @returns {string}
+ */
+function formatDurationMs(valueMs) {
+    return `${valueMs.toFixed(1)}ms`;
+}
 
 export class DictionaryImportController {
     /**
@@ -461,10 +470,13 @@ export class DictionaryImportController {
     async *_generateFilesFromUrls(urls, onProgress) {
         for (const url of urls) {
             onProgress({nextStep: true, index: 0, count: 0});
+            const trimmedUrl = url.trim();
+            const downloadStartTime = safePerformance.now();
+            log.log(`[ImportTiming] download started: ${trimmedUrl}`);
 
             try {
                 const xhr = new XMLHttpRequest();
-                xhr.open('GET', url.trim(), true);
+                xhr.open('GET', trimmedUrl, true);
                 xhr.responseType = 'blob';
 
                 xhr.onprogress = (event) => {
@@ -480,23 +492,27 @@ export class DictionaryImportController {
                             if (xhr.response instanceof Blob) {
                                 resolve(new File([xhr.response], 'fileFromURL'));
                             } else {
-                                reject(new Error(`Failed to fetch blob from ${url}`));
+                                reject(new Error(`Failed to fetch blob from ${trimmedUrl}`));
                             }
                         } else {
-                            reject(new Error(`Failed to fetch the URL: ${url}`));
+                            reject(new Error(`Failed to fetch the URL: ${trimmedUrl}`));
                         }
                     };
 
                     xhr.onerror = () => {
-                        reject(new Error(`Error fetching URL: ${url}`));
+                        reject(new Error(`Error fetching URL: ${trimmedUrl}`));
                     };
                 });
 
                 xhr.send();
 
                 const file = await blobPromise;
+                const downloadEndTime = safePerformance.now();
+                log.log(`[ImportTiming] download completed in ${formatDurationMs(downloadEndTime - downloadStartTime)}: ${trimmedUrl}`);
                 yield file;
             } catch (error) {
+                const downloadEndTime = safePerformance.now();
+                log.log(`[ImportTiming] download failed after ${formatDurationMs(downloadEndTime - downloadStartTime)}: ${trimmedUrl}`);
                 log.error(error);
             }
         }
@@ -547,6 +563,7 @@ export class DictionaryImportController {
 
         /** @type {Error[]} */
         let errors = [];
+        const importStartTime = safePerformance.now();
         try {
             this._setModifying(true);
             this._hideErrors();
@@ -582,6 +599,7 @@ export class DictionaryImportController {
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
                 importProgressTracker.onNextDictionary();
                 if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
+                const dictionaryLoopStartTime = safePerformance.now();
                 const file = (await dictionaries.next()).value;
                 if (!file || !(file instanceof File)) {
                     errors.push(new Error(`Failed to read file ${i + 1} of ${importProgressTracker.dictionaryCount}.`));
@@ -596,10 +614,15 @@ export class DictionaryImportController {
                         onProgress,
                     ) ?? []),
                 ];
+                const dictionaryLoopEndTime = safePerformance.now();
+                log.log(`[ImportTiming] dictionary ${i + 1}/${importProgressTracker.dictionaryCount} total ${formatDurationMs(dictionaryLoopEndTime - dictionaryLoopStartTime)}`);
             }
         } catch (error) {
             errors.push(toError(error));
         } finally {
+            importProgressTracker.onImportComplete(errors.length);
+            const importEndTime = safePerformance.now();
+            log.log(`[ImportTiming] import session complete in ${formatDurationMs(importEndTime - importStartTime)} (errors=${errors.length})`);
             this._showErrors(errors);
             prevention.end();
             for (const progress of [...progressContainers, ...recommendedProgressContainers]) { progress.hidden = true; }
@@ -687,34 +710,60 @@ export class DictionaryImportController {
      * @returns {Promise<Error[] | undefined>}
      */
     async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, onProgress) {
+        const dictionaryTitle = file.name || 'unknown-dictionary';
+        const importStartTime = safePerformance.now();
+        log.log(`[ImportTiming] [${dictionaryTitle}] starting import`);
+
+        const readStartTime = safePerformance.now();
         const archiveContent = await this._readFile(file);
+        const readEndTime = safePerformance.now();
+        log.log(`[ImportTiming] [${dictionaryTitle}] read archive ${formatDurationMs(readEndTime - readStartTime)}`);
+
         let importDetailsWithSeed = importDetails;
         try {
+            const seedExportStartTime = safePerformance.now();
             importDetailsWithSeed = {
                 ...importDetails,
                 existingDatabaseContentBase64: await this._settingsController.application.api.exportDictionaryDatabase(),
             };
+            const seedExportEndTime = safePerformance.now();
+            log.log(`[ImportTiming] [${dictionaryTitle}] export existing fallback DB ${formatDurationMs(seedExportEndTime - seedExportStartTime)}`);
         } catch (e) {
             log.warn(e);
         }
+
+        const workerImportStartTime = safePerformance.now();
         const importResult = /** @type {import('dictionary-importer').ImportResult & {fallbackDatabaseContentBase64?: string}} */ (
             await new DictionaryWorker().importDictionary(archiveContent, importDetailsWithSeed, onProgress)
         );
+        const workerImportEndTime = safePerformance.now();
+        log.log(`[ImportTiming] [${dictionaryTitle}] worker importDictionary ${formatDurationMs(workerImportEndTime - workerImportStartTime)}`);
+
         const {result, errors, fallbackDatabaseContentBase64} = importResult;
         if (!result) {
             return errors;
         }
 
         if (typeof fallbackDatabaseContentBase64 === 'string') {
+            const fallbackImportStartTime = safePerformance.now();
             await this._settingsController.application.api.importDictionaryDatabase(fallbackDatabaseContentBase64);
+            const fallbackImportEndTime = safePerformance.now();
+            log.log(`[ImportTiming] [${dictionaryTitle}] import fallback DB snapshot ${formatDurationMs(fallbackImportEndTime - fallbackImportStartTime)}`);
         }
 
+        const addSettingsStartTime = safePerformance.now();
         const errors2 = await this._addDictionarySettings(result, profilesDictionarySettings);
+        const addSettingsEndTime = safePerformance.now();
+        log.log(`[ImportTiming] [${dictionaryTitle}] add dictionary settings ${formatDurationMs(addSettingsEndTime - addSettingsStartTime)}`);
 
+        const triggerDatabaseUpdatedStartTime = safePerformance.now();
         await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+        const triggerDatabaseUpdatedEndTime = safePerformance.now();
+        log.log(`[ImportTiming] [${dictionaryTitle}] triggerDatabaseUpdated ${formatDurationMs(triggerDatabaseUpdatedEndTime - triggerDatabaseUpdatedStartTime)}`);
 
         // Only runs if updating a dictionary
         if (profilesDictionarySettings !== null) {
+            const profileUpdateStartTime = safePerformance.now();
             const options = await this._settingsController.getOptionsFull();
             const {profiles} = options;
 
@@ -729,7 +778,12 @@ export class DictionaryImportController {
                 }
             }
             await this._settingsController.setAllSettings(options);
+            const profileUpdateEndTime = safePerformance.now();
+            log.log(`[ImportTiming] [${dictionaryTitle}] update profile dictionary references ${formatDurationMs(profileUpdateEndTime - profileUpdateStartTime)}`);
         }
+
+        const importEndTime = safePerformance.now();
+        log.log(`[ImportTiming] [${dictionaryTitle}] total import path ${formatDurationMs(importEndTime - importStartTime)} (errors=${errors.length + errors2.length})`);
 
         if (errors.length > 0) {
             errors.push(new Error(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`));
@@ -944,6 +998,14 @@ export class ImportProgressTracker {
         this._stepIndex = 0;
         /** @type {number} */
         this._dictionaryIndex = 0;
+        /** @type {number} */
+        this._importStartTime = safePerformance.now();
+        /** @type {number} */
+        this._dictionaryStartTime = this._importStartTime;
+        /** @type {number} */
+        this._stepStartTime = this._importStartTime;
+        /** @type {number} */
+        this._stepChangeCount = 0;
 
         const progressSelector = '.dictionary-import-progress';
         /** @type {NodeListOf<HTMLElement>} */
@@ -979,6 +1041,7 @@ export class ImportProgressTracker {
     /** @type {import('dictionary-worker').ImportProgressCallback} */
     onProgress(data) {
         const {nextStep, index, count} = data;
+        const previousStepIndex = this._stepIndex;
         if (nextStep && this._steps.length > 0) {
             this._stepIndex = Math.min(this._stepIndex + 1, this._steps.length - 1);
         }
@@ -996,16 +1059,48 @@ export class ImportProgressTracker {
         if (currentStep && typeof currentStep.callback === 'function') {
             currentStep.callback();
         }
+
+        if (nextStep && this._steps.length > 0 && this._stepIndex !== previousStepIndex) {
+            const now = safePerformance.now();
+            const completedStep = this._steps[previousStepIndex];
+            const completedLabel = completedStep?.label ?? `Step ${previousStepIndex + 1}`;
+            const stepDuration = now - this._stepStartTime;
+            log.log(`[ImportTiming] ${this.statusPrefix} completed "${completedLabel}" in ${formatDurationMs(stepDuration)}`);
+            this._stepStartTime = now;
+            this._stepChangeCount += 1;
+        }
     }
 
     /** */
     onNextDictionary() {
+        const now = safePerformance.now();
+        if (this._dictionaryIndex > 0) {
+            const previousDictionaryDuration = now - this._dictionaryStartTime;
+            log.log(`[ImportTiming] dictionary ${this._dictionaryIndex}/${this._dictionaryCount} total progress phase time ${formatDurationMs(previousDictionaryDuration)}`);
+        }
         this._dictionaryIndex += 1;
         this._stepIndex = 0;
+        this._dictionaryStartTime = now;
+        this._stepStartTime = now;
+        log.log(`[ImportTiming] dictionary ${this._dictionaryIndex}/${this._dictionaryCount} started`);
         this.onProgress({
             nextStep: true,
             index: 0,
             count: 0,
         });
+    }
+
+    /**
+     * @param {number} errorCount
+     */
+    onImportComplete(errorCount) {
+        const now = safePerformance.now();
+        const currentStepLabel = this.currentStep?.label ?? `Step ${this._stepIndex + 1}`;
+        const currentStepDuration = now - this._stepStartTime;
+        const currentDictionaryDuration = now - this._dictionaryStartTime;
+        const totalDuration = now - this._importStartTime;
+        log.log(`[ImportTiming] ${this.statusPrefix} current step "${currentStepLabel}" open for ${formatDurationMs(currentStepDuration)}`);
+        log.log(`[ImportTiming] dictionary ${this._dictionaryIndex}/${this._dictionaryCount} total progress phase time ${formatDurationMs(currentDictionaryDuration)}`);
+        log.log(`[ImportTiming] all dictionaries progress phases complete in ${formatDurationMs(totalDuration)} (step-transitions=${this._stepChangeCount}, errors=${errorCount})`);
     }
 }
