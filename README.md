@@ -2,9 +2,7 @@
 
 # Manabitan
 
-[![Get Manabitan for Chrome](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&style=for-the-badge&logoColor=lightblue&color=lightblue&label=get%20manabitan%20for%20chrome%20(stable)>)](https://github.com/ManabiIO/manabitan/releases/latest)
-[![Get Manabitan for Firefox](<https://img.shields.io/amo/v/yomitan?logo=Firefox&style=for-the-badge&color=orange&label=get%20manabitan%20for%20firefox%20(stable)>)](https://github.com/ManabiIO/manabitan/releases/latest)
-[![Get Manabitan for Edge](https://img.shields.io/badge/dynamic/json?logo=puzzle&label=get%20manabitan%20for%20edge&style=for-the-badge&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fidelnfbbmikgfiejhgmddlbkfgiifnnn)](https://github.com/ManabiIO/manabitan/releases/latest)
+[Download for Chrome, Firefox, Edge](https://github.com/ManabiIO/manabitan/releases/latest)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ManabiIO/manabitan/badge?style=for-the-badge)](https://securityscorecards.dev/viewer/?uri=github.com/ManabiIO/manabitan)
 
 [![Manabi Discord](https://dcbadge.limes.pink/api/server/gvxzS93C3w?style=for-the-badge)](https://discord.gg/gvxzS93C3w)
