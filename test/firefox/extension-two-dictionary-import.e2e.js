@@ -121,8 +121,17 @@ async function importDictionaryFromUrl(driver, dictionaryUrl) {
     await clickWithScroll(driver, '.settings-item[data-modal-action="show,dictionaries"]');
     await clickWithScroll(driver, '#dictionary-import-button');
     await driver.wait(until.elementLocated(By.css('#dictionary-import-url-text')), 30_000);
-    await (await driver.findElement(By.css('#dictionary-import-url-text'))).clear();
-    await (await driver.findElement(By.css('#dictionary-import-url-text'))).sendKeys(dictionaryUrl);
+    // Headless Firefox can fail to scroll textareas for sendKeys; set value directly.
+    await driver.executeScript(`
+        const value = arguments[0];
+        const element = document.querySelector('#dictionary-import-url-text');
+        if (!(element instanceof HTMLTextAreaElement)) {
+            throw new Error('URL textarea not found');
+        }
+        element.value = String(value);
+        element.dispatchEvent(new Event('input', {bubbles: true}));
+        element.dispatchEvent(new Event('change', {bubbles: true}));
+    `, dictionaryUrl);
     await clickWithScroll(driver, '#dictionary-import-url-button');
 }
 
