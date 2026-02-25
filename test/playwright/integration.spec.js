@@ -32,7 +32,7 @@ import {
 
 const execFile = promisify(execFileCallback);
 const testDictionaryTitle = 'valid-dictionary1';
-/** @type {Promise<string> | null} */
+/** @type {Promise<string>|null} */
 let testDictionaryDatabaseBase64Promise = null;
 
 /**
@@ -344,7 +344,11 @@ test('anki add', async ({context, page, extensionId}) => {
     }
     await page.locator('#anki-cards-modal > div > div.modal-footer > button:nth-child(2)').click();
     await writeToClipboardFromPage(page, '読むの例文');
+<<<<<<< HEAD
     const expectedAddNoteBody = /** @type {{params: {note: unknown}}} */ (getExpectedAddNoteBody());
+=======
+    const expectedAddNoteBody = /** @type {{params: {note: Record<string, unknown>}}} */ (getExpectedAddNoteBody());
+>>>>>>> 050a4985 (Update playwright integration test expectations)
     await invokeRuntimeApi(page, 'addAnkiNote', {note: expectedAddNoteBody.params.note});
     const addNoteReqBody = await addNotePromiseDetails.promise;
     expect(addNoteReqBody).toMatchObject(getExpectedAddNoteBody());
