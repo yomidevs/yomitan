@@ -984,6 +984,11 @@ export class DictionaryImporter {
                     continue;
                 }
 
+                // Reject trailing non-whitespace after closing ] (space, tab, LF, CR)
+                if (depth === 0 && hasTopLevelArray && ch !== 0x20 && ch !== 0x09 && ch !== 0x0A && ch !== 0x0D) {
+                    throw new Error(`Dictionary has invalid data in '${file.filename}'`);
+                }
+
                 switch (ch) {
                     case 0x22: // "
                         inString = true;
