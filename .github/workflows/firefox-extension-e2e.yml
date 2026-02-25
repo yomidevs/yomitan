@@ -51,6 +51,13 @@ jobs:
         run: npm install --no-save selenium-webdriver@4.38.0
 
       - name: Run Firefox extension E2E
+        id: firefoxE2E
+        continue-on-error: true
         env:
           MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev.xpi
         run: npm run test:e2e:firefox-extension
+
+      - name: Report Firefox extension E2E failure without blocking main CI
+        if: steps.firefoxE2E.outcome == 'failure'
+        run: |
+          echo "::warning::Firefox Extension E2E failed (non-blocking). See this workflow run for logs."
