@@ -131,13 +131,14 @@ export class DictionaryImporter {
         // Load data
         const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
 
-        this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
+        const validationFileCount = termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length;
+        this._progressNextStep(validationFileCount * bulkAddProgressAllowance);
 
-        for (const termFile of termFiles) { await this._validateFile(termFile, dataBankSchemas[0]); }
-        for (const termMetaFile of termMetaFiles) { await this._validateFile(termMetaFile, dataBankSchemas[1]); }
-        for (const kanjiFile of kanjiFiles) { await this._validateFile(kanjiFile, dataBankSchemas[2]); }
-        for (const kanjiMetaFile of kanjiMetaFiles) { await this._validateFile(kanjiMetaFile, dataBankSchemas[3]); }
-        for (const tagFile of tagFiles) { await this._validateFile(tagFile, dataBankSchemas[4]); }
+        for (const termFile of termFiles) { await this._validateFile(termFile, dataBankSchemas[0], maxTransactionLength, bulkAddProgressAllowance); }
+        for (const termMetaFile of termMetaFiles) { await this._validateFile(termMetaFile, dataBankSchemas[1], maxTransactionLength, bulkAddProgressAllowance); }
+        for (const kanjiFile of kanjiFiles) { await this._validateFile(kanjiFile, dataBankSchemas[2], maxTransactionLength, bulkAddProgressAllowance); }
+        for (const kanjiMetaFile of kanjiMetaFiles) { await this._validateFile(kanjiMetaFile, dataBankSchemas[3], maxTransactionLength, bulkAddProgressAllowance); }
+        for (const tagFile of tagFiles) { await this._validateFile(tagFile, dataBankSchemas[4], maxTransactionLength, bulkAddProgressAllowance); }
 
         // termFiles is doubled due to media importing
         this._progressNextStep((termFiles.length * 2 + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length) * bulkAddProgressAllowance);
@@ -200,11 +201,9 @@ export class DictionaryImporter {
                     counts.terms.total += batch.length;
                 };
                 await (version === 1 ?
-                    this._readFileSequenceStreaming(termFile, this._convertTermBankEntryV1.bind(this), dictionaryTitle, onTermBatch, maxTransactionLength) :
-                    this._readFileSequenceStreaming(termFile, this._convertTermBankEntryV3.bind(this), dictionaryTitle, onTermBatch, maxTransactionLength)
+                    this._readFileSequenceStreaming(termFile, this._convertTermBankEntryV1.bind(this), dictionaryTitle, onTermBatch, maxTransactionLength, 2 * bulkAddProgressAllowance) :
+                    this._readFileSequenceStreaming(termFile, this._convertTermBankEntryV3.bind(this), dictionaryTitle, onTermBatch, maxTransactionLength, 2 * bulkAddProgressAllowance)
                 );
-                this._progressData.index += 2 * bulkAddProgressAllowance;
-                this._progress();
             }
 
             for (const termMetaFile of termMetaFiles) {
@@ -219,9 +218,7 @@ export class DictionaryImporter {
                         }
                     }
                 };
-                await this._readFileSequenceStreaming(termMetaFile, this._convertTermMetaBankEntry.bind(this), dictionaryTitle, onTermMetaBatch, maxTransactionLength);
-                this._progressData.index += bulkAddProgressAllowance;
-                this._progress();
+                await this._readFileSequenceStreaming(termMetaFile, this._convertTermMetaBankEntry.bind(this), dictionaryTitle, onTermMetaBatch, maxTransactionLength, bulkAddProgressAllowance);
             }
 
             for (const kanjiFile of kanjiFiles) {
@@ -231,11 +228,9 @@ export class DictionaryImporter {
                     counts.kanji.total += batch.length;
                 };
                 await (version === 1 ?
-                    this._readFileSequenceStreaming(kanjiFile, this._convertKanjiBankEntryV1.bind(this), dictionaryTitle, onKanjiBatch, maxTransactionLength) :
-                    this._readFileSequenceStreaming(kanjiFile, this._convertKanjiBankEntryV3.bind(this), dictionaryTitle, onKanjiBatch, maxTransactionLength)
+                    this._readFileSequenceStreaming(kanjiFile, this._convertKanjiBankEntryV1.bind(this), dictionaryTitle, onKanjiBatch, maxTransactionLength, bulkAddProgressAllowance) :
+                    this._readFileSequenceStreaming(kanjiFile, this._convertKanjiBankEntryV3.bind(this), dictionaryTitle, onKanjiBatch, maxTransactionLength, bulkAddProgressAllowance)
                 );
-                this._progressData.index += bulkAddProgressAllowance;
-                this._progress();
             }
 
             for (const kanjiMetaFile of kanjiMetaFiles) {
@@ -250,9 +245,7 @@ export class DictionaryImporter {
                         }
                     }
                 };
-                await this._readFileSequenceStreaming(kanjiMetaFile, this._convertKanjiMetaBankEntry.bind(this), dictionaryTitle, onKanjiMetaBatch, maxTransactionLength);
-                this._progressData.index += bulkAddProgressAllowance;
-                this._progress();
+                await this._readFileSequenceStreaming(kanjiMetaFile, this._convertKanjiMetaBankEntry.bind(this), dictionaryTitle, onKanjiMetaBatch, maxTransactionLength, bulkAddProgressAllowance);
             }
 
             for (const tagFile of tagFiles) {
@@ -262,9 +255,7 @@ export class DictionaryImporter {
                     await bulkAdd('tagMeta', batch);
                     counts.tagMeta.total += batch.length;
                 };
-                await this._readFileSequenceStreaming(tagFile, this._convertTagBankEntry.bind(this), dictionaryTitle, onTagBatch, maxTransactionLength);
-                this._progressData.index += bulkAddProgressAllowance;
-                this._progress();
+                await this._readFileSequenceStreaming(tagFile, this._convertTagBankEntry.bind(this), dictionaryTitle, onTagBatch, maxTransactionLength, bulkAddProgressAllowance);
             }
 
             importSuccess = true;
@@ -940,9 +931,10 @@ export class DictionaryImporter {
      * in memory.
      * @param {import('@zip.js/zip.js').Entry} file
      * @param {(entry: unknown) => void | Promise<void>} onEntry
+     * @param {((fraction: number) => void) | null} [onProgress]
      * @returns {Promise<void>}
      */
-    async _forEachStreamedEntry(file, onEntry) {
+    async _forEachStreamedEntry(file, onEntry, onProgress = null) {
         if (typeof file.getData === 'undefined') {
             throw new Error(`Cannot read ${file.filename}`);
         }
@@ -950,7 +942,16 @@ export class DictionaryImporter {
         const {readable, writable} = new TransformStream();
         const dataPromise = file.getData(writable);
 
-        const textStream = readable.pipeThrough(new TextDecoderStream());
+        const totalBytes = file.uncompressedSize;
+        let bytesRead = 0;
+        const countingStream = new TransformStream({
+            transform(/** @type {Uint8Array} */ chunk, /** @type {TransformStreamDefaultController} */ controller) {
+                bytesRead += chunk.byteLength;
+                controller.enqueue(chunk);
+            },
+        });
+
+        const textStream = readable.pipeThrough(countingStream).pipeThrough(new TextDecoderStream());
         const reader = textStream.getReader();
 
         // Bracket-depth scanner state
@@ -1033,6 +1034,10 @@ export class DictionaryImporter {
                 accumulated += text.substring(entryStart);
                 entryStart = 0;
             }
+
+            if (onProgress !== null && totalBytes > 0) {
+                onProgress(bytesRead / totalBytes);
+            }
         }
 
         if (!hasTopLevelArray || depth !== 0) {
@@ -1052,39 +1057,75 @@ export class DictionaryImporter {
      * @param {string} dictionaryTitle
      * @param {(batch: TResult[]) => Promise<void>} onBatch
      * @param {number} batchSize
+     * @param {number} progressBudget
      * @returns {Promise<void>}
      */
-    async _readFileSequenceStreaming(file, convertEntry, dictionaryTitle, onBatch, batchSize) {
+    async _readFileSequenceStreaming(file, convertEntry, dictionaryTitle, onBatch, batchSize, progressBudget) {
         /** @type {TResult[]} */
         let batch = [];
+        let progressAdded = 0;
         await this._forEachStreamedEntry(file, async (entry) => {
             batch.push(convertEntry(/** @type {TEntry} */ (entry), dictionaryTitle));
             if (batch.length >= batchSize) {
                 await onBatch(batch);
                 batch = [];
             }
+        }, (fraction) => {
+            const target = Math.floor(fraction * progressBudget);
+            const increment = target - progressAdded;
+            if (increment > 0) {
+                this._progressData.index += increment;
+                progressAdded += increment;
+                this._progress();
+            }
         });
         if (batch.length > 0) {
             await onBatch(batch);
+        }
+        const remaining = progressBudget - progressAdded;
+        if (remaining > 0) {
+            this._progressData.index += remaining;
+            this._progress();
         }
     }
 
     /**
      * @param {import('@zip.js/zip.js').Entry} file
      * @param {import('dictionary-importer').CompiledSchemaName} schemaName
+     * @param {number} batchSize
+     * @param {number} progressBudget
      * @returns {Promise<boolean>}
      */
-    async _validateFile(file, schemaName) {
+    async _validateFile(file, schemaName, batchSize, progressBudget) {
         const schema = ajvSchemas[schemaName];
+        /** @type {unknown[]} */
+        let batch = [];
+        let progressAdded = 0;
         await this._forEachStreamedEntry(file, (entry) => {
-            if (!schema([entry])) {
-                throw this._formatAjvSchemaError(schema, file.filename);
+            batch.push(entry);
+            if (batch.length >= batchSize) {
+                if (!schema(batch)) {
+                    throw this._formatAjvSchemaError(schema, file.filename);
+                }
+                batch = [];
+            }
+        }, (fraction) => {
+            const target = Math.floor(fraction * progressBudget);
+            const increment = target - progressAdded;
+            if (increment > 0) {
+                this._progressData.index += increment;
+                progressAdded += increment;
+                this._progress();
             }
         });
-
-        ++this._progressData.index;
-        this._progress();
-
+        if (batch.length > 0 && !schema(batch)) {
+            throw this._formatAjvSchemaError(schema, file.filename);
+        }
+        const remaining = progressBudget - progressAdded;
+        if (remaining > 0) {
+            this._progressData.index += remaining;
+            this._progress();
+        }
         return true;
     }
 
