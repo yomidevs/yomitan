@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Yomitan Settings</title>
+    <title>Manabitan Settings</title>
     <link rel="icon" type="image/png" href="/images/icon16.png" sizes="16x16">
     <link rel="icon" type="image/png" href="/images/icon19.png" sizes="19x19">
     <link rel="icon" type="image/png" href="/images/icon32.png" sizes="32x32">
@@ -62,7 +62,7 @@
                     }'
                 ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </span><span class="outline-item-label">Debug</span></label>
-            <a href="/info.html" class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="question-mark"></span></span><span class="outline-item-label">About Yomitan</span></a>
+            <a href="/info.html" class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="question-mark"></span></span><span class="outline-item-label">About Manabitan</span></a>
         </div>
     </div></div>
 </div>
@@ -70,7 +70,7 @@
 
     <span tabindex="-1" id="content-scroll-focus"></span>
 
-    <h1>Yomitan Settings</h1>
+    <h1>Manabitan Settings</h1>
 
     <!-- Notifications -->
     <div class="settings-group settings-group-top-margin page-loading-stalled-notification">
@@ -81,7 +81,7 @@
                         This page is taking longer than expected to load.
                     </p>
                     <p data-show-for-browser="safari">
-                        Due to a bug in Safari, it may be necessary to click the <img src="/images/yomitan-icon.svg" class="inline-icon" alt=""> <em>Yomitan</em>
+                        Due to a bug in Safari, it may be necessary to click the <img src="/images/yomitan-icon.svg" class="inline-icon" alt=""> <em>Manabitan</em>
                         button in the browser bar to fully load the page
                     </p>
                 </div>
@@ -122,7 +122,7 @@
         <div class="settings-group">
             <div class="settings-item"><div class="settings-item-inner">
                 <div class="settings-item-left">
-                    <div class="settings-item-label">Enable Yomitan</div>
+                    <div class="settings-item-label">Enable Manabitan</div>
                 </div>
                 <div class="settings-item-right">
                     <label class="toggle"><input type="checkbox" data-setting="general.enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -157,7 +157,7 @@
             </div></div>
             <div class="settings-item advanced-only"><div class="settings-item-inner">
                 <div class="settings-item-left">
-                    <div class="settings-item-label">Show "Lookup in Yomitan" in right-click menu</div>
+                    <div class="settings-item-label">Show "Lookup in Manabitan" in right-click menu</div>
                 </div>
                 <div class="settings-item-right">
                     <label class="toggle"><input type="checkbox" data-setting="general.enableContextMenuScanSelected"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -177,13 +177,13 @@
                     <div class="settings-item-left">
                         <div class="settings-item-invalid-indicator"></div>
                         <div class="settings-item-label">
-                            Enable Yomitan API
+                            Enable Manabitan API
                         </div>
                         <div class="settings-item-description">
-                            Enable support for sending local web requests to fetch data from Yomitan.
+                            Enable support for sending local web requests to fetch data from Manabitan.
                         </div>
                         <div class="settings-item-description">
-                            This option may send data outside of Yomitan to local applications that request it<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
+                            This option may send data outside of Manabitan to local applications that request it<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
                             <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                         </div>
                     </div>
@@ -199,7 +199,7 @@
                 </div>
                 <div class="settings-item-children more" hidden>
                     <p>
-                        To activate the Yomitan API, a native messaging component must be installed.
+                        To activate the Manabitan API, a native messaging component must be installed.
                         A setup guide can be found <a href="https://github.com/yomidevs/yomitan-api/blob/master/README.md" target="_blank" rel="noopener noreferrer">here</a>.
                     </p>
                     <div class="margin-above flex-row-nowrap">
@@ -220,7 +220,7 @@
                                 </div>
                                 <div class="settings-item-description">
                                     <p class="warning-text">
-                                        Only enable this option if you trust the authors of your dictionaries or will perform sanitization outside of Yomitan.
+                                        Only enable this option if you trust the authors of your dictionaries or will perform sanitization outside of Manabitan.
                                         Malicious dictionaries can send malformed CSS to allow Javascript execution if injected into a webview or browser.
                                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                                     </p>
@@ -228,22 +228,22 @@
                                 <div class="settings-item-description more" hidden>
                                     <p>
                                         A malicious dictionary which contains malicious CSS may try to execute Javascript.
-                                        For example, if the output of the Yomitan API is used in Anki, then the resulting Anki card may execute unintended Javascript.
+                                        For example, if the output of the Manabitan API is used in Anki, then the resulting Anki card may execute unintended Javascript.
                                         The risk in this case is similar to downloading a malicious Anki deck.
                                         Namely, in both cases, you are relying purely on Anki's sandbox to protect your machine and information from the malicious code.
                                         If the Anki sandbox works, card contents could be leaked (a minor confidential issue).
                                         If the sandbox fails, there is much more to worry about (actions being taken on your machine such as stealing credentials and sensitive information, or ransomware taking over your computer).
                                     </p>
                                     <p>
-                                        If you choose to disable the CSS sanitization, we recommend thinking end-to-end about where the Yomitan API output is used, and whether that destination is resilient to potentially malicious Javascript code being included, otherwise you are potentially risking the data and integrity of your system.
+                                        If you choose to disable the CSS sanitization, we recommend thinking end-to-end about where the Manabitan API output is used, and whether that destination is resilient to potentially malicious Javascript code being included, otherwise you are potentially risking the data and integrity of your system.
                                     </p>
                                     <p>
                                         Sanitization bypass will allow CSS that cannot be sanitized to pass through the sanitizer unchanged.
-                                        This ONLY applies to the Yomitan API, it will not make any other areas of Yomitan potentially vulnerable.
+                                        This ONLY applies to the Manabitan API, it will not make any other areas of Manabitan potentially vulnerable.
                                     </p>
                                     <p>
-                                        This can be required to retrieve CSS on some browsers which do not support the offscreen page necessary for full CSS sanitization in the Yomitan API on the backend.
-                                        Yomitan will attempt to fall back on basic sanitization but this will fail for dictionaries making use of complex CSS.
+                                        This can be required to retrieve CSS on some browsers which do not support the offscreen page necessary for full CSS sanitization in the Manabitan API on the backend.
+                                        Manabitan will attempt to fall back on basic sanitization but this will fail for dictionaries making use of complex CSS.
                                     </p>
                                     <p class="margin-above">
                                         <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -294,10 +294,10 @@
                     <div class="settings-item-label">Storage</div>
                     <div class="settings-item-description">
                         <span class="storage-use-invalid">
-                            Yomitan is using an indeterminate amount of storage.
+                            Manabitan is using an indeterminate amount of storage.
                         </span>
                         <span class="storage-use-finite" hidden>
-                            Yomitan is using approximately <span class="storage-usage">?</span> of <span class="storage-quota">?</span>.
+                            Manabitan is using approximately <span class="storage-usage">?</span> of <span class="storage-quota">?</span>.
                             <div class="storage-exhaustion-alert warning-text margin-above">
                                 <div>
                                     <strong>Your system is running low on storage space.</strong><br>
@@ -306,7 +306,7 @@
                             </div>
                         </span>
                         <span class="storage-use-infinite" hidden>
-                            Yomitan is permitted unlimited storage.
+                            Manabitan is permitted unlimited storage.
                         </span>
                     </div>
                 </div>
@@ -398,7 +398,7 @@
             <div class="settings-item-children more" hidden>
                 <p>
                     Web browsers will sometimes clear stored data if the device is running low on storage space.
-                    This can result in the imported dictionaries being deleted unexpectedly, causing Yomitan to stop functioning.
+                    This can result in the imported dictionaries being deleted unexpectedly, causing Manabitan to stop functioning.
                     Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.
                 </p>
                 <p data-show-for-browser="firefox firefox-mobile" class="storage-use-invalid" hidden>
@@ -413,7 +413,7 @@
                     It may not be possible to enable Persistent Storage on Firefox for Android.
                 </p>
                 <p data-show-for-browser="chrome edge">
-                    Chromium-based browsers should not need to enable this setting since the Yomitan extension has
+                    Chromium-based browsers should not need to enable this setting since the Manabitan extension has
                     the <code>unlimitedStorage</code> permission, which should prevent data deletion.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
                 </p>
                 <p>
@@ -832,7 +832,7 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Theme</div>
-                <div class="settings-item-description">Adjust the style of Yomitan.</div>
+                <div class="settings-item-description">Adjust the style of Manabitan.</div>
             </div>
             <div class="settings-item-right">
                 <div class="settings-item-group">
@@ -891,7 +891,7 @@
                 <div class="settings-item-left">
                     <div class="settings-item-label">Font family</div>
                     <div class="settings-item-description">
-                        Change the font family used in Yomitan.
+                        Change the font family used in Manabitan.
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
@@ -1577,7 +1577,7 @@
                 <div class="settings-item-label">Enable audio playback for terms</div>
                 <div class="settings-item-description">Show a clickable speaker icon next to search results.</div>
                 <div class="settings-item-description">
-                    This option may send term, reading, and/or language outside of Yomitan to fetch audio<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
+                    This option may send term, reading, and/or language outside of Manabitan to fetch audio<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
                 </div>
             </div>
             <div class="settings-item-right">
@@ -1598,7 +1598,7 @@
                 <div class="settings-item-left">
                     <div class="settings-item-label">Audio fallback sound</div>
                     <div class="settings-item-description">
-                        The sound to play when Yomitan fails to fetch audio.
+                        The sound to play when Manabitan fails to fetch audio.
                     </div>
                 </div>
                 <div class="settings-item-right">
@@ -1638,7 +1638,7 @@
         </div>
         <div class="heading-description more" hidden>
             <p>
-                Yomitan is able to scan the sentence surrounding a term and parse individual words
+                Manabitan is able to scan the sentence surrounding a term and parse individual words
                 of the query on the <a href="/search.html" target="_blank" rel="noopener">search page</a>.
                 This information can also be added to Anki cards to provide additional context.
             </p>
@@ -1651,9 +1651,9 @@
         <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
-                    <div class="settings-item-label">Parse sentences using Yomitan's internal parser</div>
+                    <div class="settings-item-label">Parse sentences using Manabitan's internal parser</div>
                     <div class="settings-item-description">
-                        Sentence words are parsed using Yomitan's dictionaries.
+                        Sentence words are parsed using Manabitan's dictionaries.
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
@@ -1663,7 +1663,7 @@
             </div>
             <div class="settings-item-children more" hidden>
                 <p>
-                    Yomitan's internal parser is a simple algorithm which can parse sentences using the installed dictionaries.
+                    Manabitan's internal parser is a simple algorithm which can parse sentences using the installed dictionaries.
                     It works by repeatedly detecting the longest term at the start of the sentence and advancing until no text remains.
                     This provides decent results for the general case, but since grammatical structure is not taken into account,
                     it can sometimes yield incorrect segmentation.
@@ -1682,7 +1682,7 @@
                     </div>
                     <div class="settings-item-description">Sentence words are parsed using a third-party program. Japanese only.</div>
                     <div class="settings-item-description">
-                        This option may send search query data outside of Yomitan for parsing<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
+                        This option may send search query data outside of Manabitan for parsing<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
@@ -1693,10 +1693,10 @@
             <div class="settings-item-children more" hidden>
                 <p>
                     MeCab is a third-party program which uses its own dictionaries and parsing algorithm to decompose sentences into individual words.
-                    MeCab may provide more accurate parsing results than Yomitan's internal parser.
+                    MeCab may provide more accurate parsing results than Manabitan's internal parser.
                 </p>
                 <p>
-                    In order for Yomitan to use it, both MeCab and a native messaging component must be installed.
+                    In order for Manabitan to use it, both MeCab and a native messaging component must be installed.
                     A setup guide can be found <a href="https://github.com/yomidevs/yomitan-mecab-installer/blob/master/README.md" target="_blank" rel="noopener noreferrer">here</a>.
                 </p>
                 <div class="margin-above flex-row-nowrap">
@@ -1794,11 +1794,11 @@
         </div>
         <div class="heading-description more" hidden>
             <p>
-                Yomitan supports automatic flashcard creation for <a href="https://apps.ankiweb.net/" target="_blank" rel="noopener noreferrer">Anki</a>,
+                Manabitan supports automatic flashcard creation for <a href="https://apps.ankiweb.net/" target="_blank" rel="noopener noreferrer">Anki</a>,
                 a free application designed to assist in remembering information.
                 This feature requires installation of the <a href="https://foosoft.net/projects/anki-connect/" target="_blank" rel="noopener noreferrer">AnkiConnect</a> plugin.
                 <br>
-                See the <a href="https://yomitan.wiki/anki/" target="_blank" rel="noopener noreferrer">Yomitan wiki</a> for a setup guide.
+                See the <a href="https://yomitan.wiki/anki/" target="_blank" rel="noopener noreferrer">Manabitan wiki</a> for a setup guide.
             </p>
             <p>
                 <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -1814,7 +1814,7 @@
                         <span>Connection status:</span>
                         <span id="anki-error-message">&hellip;</span> <a tabindex="0" id="anki-error-message-details-toggle" hidden>Details&hellip;</a>
                         <div class="settings-item-description">
-                            This option may send limited information about the current webpage, information contained in Yomitan dictionary entries, and/or relevant user settings outside of Yomitan to Anki<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
+                            This option may send limited information about the current webpage, information contained in Manabitan dictionary entries, and/or relevant user settings outside of Manabitan to Anki<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
                         </div>
                     </div>
                 </div>
@@ -1836,7 +1836,7 @@
             <div class="settings-item-children" data-show-for-os="mac">
                 <p class="warning-text">
                     <strong>Notice for macOS users:</strong>
-                    If Yomitan has issues connecting to AnkiConnect, it may be necessary to adjust some system settings.
+                    If Manabitan has issues connecting to AnkiConnect, it may be necessary to adjust some system settings.
                     See <a href="https://foosoft.net/projects/anki-connect/#notes-for-mac-os-x-users" target="_blank" rel="noopener noreferrer">this link</a> for details.
                 </p>
             </div>
@@ -2178,11 +2178,11 @@
         </div>
         <div class="heading-description more" hidden>
             <p>
-                Yomitan can watch the system clipboard and automatically search on the search page when text is copied.
-                This can be useful for using Yomitan to scan text from external applications.
+                Manabitan can watch the system clipboard and automatically search on the search page when text is copied.
+                This can be useful for using Manabitan to scan text from external applications.
             </p>
             <p>
-                This feature requires Yomitan to have clipboard reading permissions, and when this option is enabled,
+                This feature requires Manabitan to have clipboard reading permissions, and when this option is enabled,
                 the clipboard will be frequently checked for new text.
             </p>
             <p>
@@ -2255,12 +2255,12 @@
             <div class="settings-item-left">
                 <div class="settings-item-label">
                     <p>
-                        Yomitan has two categories of keyboard shortcuts:
+                        Manabitan has two categories of keyboard shortcuts:
                     </p>
                     <ul>
                         <li>
                             <strong>Standard</strong> keyboard shortcuts are controlled by the extension, and can be added, removed,
-                            and configured to work on webpages that Yomitan functions on.
+                            and configured to work on webpages that Manabitan functions on.
                         </li>
                         <li>
                             <strong>Native</strong> keyboard shortcuts are controlled by the web browser, and function globally
@@ -2297,7 +2297,7 @@
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">
-                    Yomitan can import and export settings files which can be
+                    Manabitan can import and export settings files which can be
                     used to restore settings, share settings across devices,
                     and to help to debug problems. These files will only
                     contain settings and will not contain dictionaries.
@@ -2394,9 +2394,9 @@
                     Google Docs now uses
                     <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas" target="_blank" rel="noopener noreferrer">canvas-based</a>
                     rendering to display content<sup><a href="https://workspaceupdates.googleblog.com/2021/05/Google-Docs-Canvas-Based-Rendering-Update.html" target="_blank" rel="noopener noreferrer">[2]</a></sup>
-                    which prevents Yomitan from being able to scan text using the standard methods.
+                    which prevents Manabitan from being able to scan text using the standard methods.
                     Enabling this option will force Google Docs webpages to expose some additional text
-                    information which should allow Yomitan to still work.
+                    information which should allow Manabitan to still work.
                 </p>
                 <p class="warning-text">
                     If any profile has this setting enabled, compatibility mode will be activated;
@@ -2421,7 +2421,7 @@
     <div class="settings-group">
         <a href="/permissions.html" rel="noopener" class="settings-item settings-item-button"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Configure Yomitan Permissions</div>
+                <div class="settings-item-label">Configure Manabitan Permissions</div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -2444,7 +2444,7 @@
                     On <a href="https://caniuse.com/shadowdomv1" target="_blank" rel="noopener noreferrer">supported browsers</a>,
                     a popup's <code>iframe</code> element will be embeded inside of a container with a closed <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM" target="_blank" rel="noopener noreferrer">shadow DOM</a>.
                     This container prevents scripts running on the underlying web page from being able to discover the <code>iframe</code>,
-                    which helps avoid situations where the web page might try to modify or use the Yomitan popup for an unintended purpose.
+                    which helps avoid situations where the web page might try to modify or use the Manabitan popup for an unintended purpose.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -2469,7 +2469,7 @@
                     directly changing the location of the <code>iframe</code>'s internal document, rather than using
                     the <code>iframe</code>'s <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-src" target="_blank" rel="noopener noreferrer"><code>src</code></a>
                     attribute. This results in the extension URL not being exposed to the underling web page, and thus making it harder
-                    to detect the presence of Yomitan.
+                    to detect the presence of Manabitan.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>

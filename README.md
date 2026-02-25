@@ -13,11 +13,11 @@
 
 > Documentation currently lives on the legacy Yomitan wiki. Manabitan is feature-compatible, so the Yomitan wiki guides still apply.
 
-:wave: **Manabitan is the successor to Yomitan** ([legacy migration guide](https://yomitan.wiki/yomichan-migration/)). We continue Yomitan's feature set with compatible behavior while extending ongoing maintenance and development.
+:wave: **Manabitan is a fast Yomitan.** It forks Yomitan to provide the same functionality with much faster imports and lookups. It also deduplicates and compresses Yomitan entries to reduce storage use.
 
-## What is Manabitan?
+## Why the name change Manabitan?
 
-Manabitan is a browser extension fork of Yomitan that helps you read and learn languages with popup dictionary lookup and study tooling.
+Manabitan changes core Yomitan database technology to deliver major performance gains. Because of that, merging this directly upstream and migrating every existing Yomitan setup at once would be risky. This project prioritizes shipping and stabilizing the new technology first, then addressing broad migration paths. It is built by the developer of [Manabi Reader](https://reader.manabi.io/), who previously pioneered similar Yomitan performance optimizations now prototyped for the upcoming Manabi Reader update.
 
 📢 **New contributors [welcome](#contributing)!**
 
@@ -101,6 +101,8 @@ Some contributions we always appreciate:
 Information on how to setup and build the codebase can be found [here](./CONTRIBUTING.md#setup).
 
 If you want to add or improve support for a language, read the documentation on [language features](./docs/development/language-features.md).
+
+Feel free to join us on the [Manabi Discord](https://discord.gg/gvxzS93C3w).
 
 Feel free to join us on the [Manabitan Discord](https://discord.gg/YkQrXW6TXF).
 
