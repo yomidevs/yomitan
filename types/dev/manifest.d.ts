@@ -21,6 +21,8 @@
  */
 export type ManifestOverrides = {
     author?: chrome.runtime.Manifest['author'] | string;
+    cross_origin_opener_policy?: {value: string};
+    cross_origin_embedder_policy?: {value: string};
 };
 
 export type Manifest = Omit<chrome.runtime.Manifest, keyof ManifestOverrides> & ManifestOverrides;
