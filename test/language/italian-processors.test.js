@@ -22,6 +22,7 @@ const testCases = [
     ['dell\'Italia', 'Italia'],
     ['nell\'Italia', 'Italia'],
     ['c\'erano', 'erano'],
+    ['c’erano', 'erano'],
 ];
 
 describe('removing apostrophed words', () => {

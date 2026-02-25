@@ -31,5 +31,5 @@ export const removeApostrophedWords = {
  * @returns {string}
  */
 export function removeApostrophedWordsImpl(word) {
-    return word.replace(/(l|dell|all|dall|nell|sull|coll|un|quest|quell|c|n)'/g, '');
+    return word.replace(/(l|dell|all|dall|nell|sull|coll|un|quest|quell|c|n)['’]/g, '');
 }
