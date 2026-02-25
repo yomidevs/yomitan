@@ -984,13 +984,16 @@ export class DictionaryImporter {
                     continue;
                 }
 
-                // Reject trailing non-whitespace after closing ] (space, tab, LF, CR)
-                if (depth === 0 && hasTopLevelArray && ch !== 0x20 && ch !== 0x09 && ch !== 0x0A && ch !== 0x0D) {
+                // At depth 0, only whitespace and the opening [ are valid
+                if (depth === 0 && ch !== 0x20 && ch !== 0x09 && ch !== 0x0A && ch !== 0x0D && (hasTopLevelArray || ch !== 0x5B)) {
                     throw new Error(`Dictionary has invalid data in '${file.filename}'`);
                 }
 
                 switch (ch) {
                     case 0x22: // "
+                        if (depth === 1) {
+                            throw new Error(`Dictionary has invalid data in '${file.filename}'`);
+                        }
                         inString = true;
                         break;
                     case 0x5B: // [
@@ -1030,6 +1033,12 @@ export class DictionaryImporter {
                             throw new Error(`Dictionary has invalid data in '${file.filename}'`);
                         }
                         depth--;
+                        break;
+                    default:
+                        // At depth 1, only whitespace and commas are valid between entries
+                        if (depth === 1 && ch !== 0x2C && ch !== 0x20 && ch !== 0x09 && ch !== 0x0A && ch !== 0x0D) {
+                            throw new Error(`Dictionary has invalid data in '${file.filename}'`);
+                        }
                         break;
                 }
             }

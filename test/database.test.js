@@ -158,6 +158,12 @@ describe('Database', () => {
             {name: 'invalid-dictionary4'},
             {name: 'invalid-dictionary5'},
             {name: 'invalid-dictionary6'},
+            {name: 'invalid-dictionary7'},
+            {name: 'invalid-dictionary8'},
+            {name: 'invalid-dictionary9'},
+            {name: 'invalid-dictionary10'},
+            {name: 'invalid-dictionary11'},
+            {name: 'invalid-dictionary12'},
         ];
         describe.each(invalidDictionaries)('Invalid dictionary: $name', ({name}) => {
             test('Has invalid data', async ({expect}) => {
