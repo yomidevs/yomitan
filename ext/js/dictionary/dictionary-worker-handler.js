@@ -94,13 +94,17 @@ export class DictionaryWorkerHandler {
                 details !== null &&
                 !Array.isArray(details) &&
                 typeof Reflect.get(details, 'existingDatabaseContentBase64') === 'string'
-            ) ? /** @type {string} */ (Reflect.get(details, 'existingDatabaseContentBase64')) : null;
+            ) ?
+                /** @type {string} */ (Reflect.get(details, 'existingDatabaseContentBase64')) :
+                null;
             if (existingDatabaseContentBase64 !== null) {
                 await dictionaryDatabase.importDatabase(base64ToArrayBuffer(existingDatabaseContentBase64));
             }
             const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
             const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
-            const fallbackDatabaseContent = dictionaryDatabase.usesFallbackStorage() ? await dictionaryDatabase.exportDatabase() : null;
+            const fallbackDatabaseContent = dictionaryDatabase.usesFallbackStorage() ?
+                await dictionaryDatabase.exportDatabase() :
+                null;
             return {
                 result,
                 errors: errors.map((error) => ExtensionError.serialize(error)),
