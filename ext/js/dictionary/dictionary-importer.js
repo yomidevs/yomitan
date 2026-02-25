@@ -236,33 +236,30 @@ export class DictionaryImporter {
             try {
                 const useMediaPipeline = !(this._skipMediaImport && this._structuredContentImportFastPath);
                 const uniqueMediaPaths = useMediaPipeline ? new Set() : null;
-                let nextTermFilePromise =
-                    termFiles.length > 0 ?
-                        this._readTermBankFile(
-                            termFiles[0],
-                            version,
-                            dictionaryTitle,
-                            prefixWildcardsSupported,
-                            useMediaPipeline,
-                            enableTermEntryContentDedup,
-                        ) :
-                        null;
                 for (let termFileIndex = 0; termFileIndex < termFiles.length; ++termFileIndex) {
                     const termFile = termFiles[termFileIndex];
                     const tTermFile = Date.now();
-                    const termReadResult = nextTermFilePromise !== null ? await nextTermFilePromise : {termList: [], requirements: null};
-                    const nextTermFile = termFileIndex + 1 < termFiles.length ? termFiles[termFileIndex + 1] : null;
-                    nextTermFilePromise =
-                        nextTermFile !== null ?
-                            this._readTermBankFile(
-                                nextTermFile,
-                                version,
-                                dictionaryTitle,
-                                prefixWildcardsSupported,
-                            useMediaPipeline,
+                    let termReadResult;
+                    if (useMediaPipeline) {
+                        termReadResult = await this._readTermBankFile(
+                            termFile,
+                            version,
+                            dictionaryTitle,
+                            prefixWildcardsSupported,
+                            true,
                             enableTermEntryContentDedup,
-                        ) :
-                            null;
+                        );
+                    } else {
+                        const readCurrent = this._readTermBankFile(
+                            termFile,
+                            version,
+                            dictionaryTitle,
+                            prefixWildcardsSupported,
+                            false,
+                            enableTermEntryContentDedup,
+                        );
+                        termReadResult = await readCurrent;
+                    }
 
                     let termList = termReadResult.termList;
                     const requirements = termReadResult.requirements;
@@ -292,6 +289,9 @@ export class DictionaryImporter {
                         media = [];
                     }
 
+                    if (useMediaPipeline) {
+                        this._prepareTermImportSerialization(termList, enableTermEntryContentDedup);
+                    }
                     const tTermsWriteStart = Date.now();
                     await bulkAdd('terms', termList);
                     const tTermsWriteEnd = Date.now();
@@ -1268,7 +1268,9 @@ export class DictionaryImporter {
                 }
             }
 
-            this._prepareTermEntrySerialization(entry, enableTermEntryContentDedup);
+            if (requirements === null) {
+                this._prepareTermEntrySerialization(entry, enableTermEntryContentDedup);
+            }
             result[i] = entry;
         }
         return {termList: result, requirements};
