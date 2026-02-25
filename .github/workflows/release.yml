@@ -1,7 +1,7 @@
 name: release
 on:
   release:
-    types: [released]
+    types: [published, released]
 permissions: {}
 jobs:
   build:
