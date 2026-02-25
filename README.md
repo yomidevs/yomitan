@@ -57,13 +57,9 @@ Manabitan provides powerful features not available in other browser-based dictio
 
 ## Installation
 
-Install from the latest release page:
+Install from the latest GitHub release page:
 
-### [Download for Chrome, Firefox, Edge](https://github.com/ManabiIO/manabitan/releases/latest)
-
-For Firefox dev builds with automatic updates:
-
-### [Install Firefox Dev Build (.xpi)](https://github.com/ManabiIO/manabitan/releases/latest/download/manabitan-firefox-dev.xpi)
+- [Download for Chrome, Firefox, Edge](https://github.com/ManabiIO/manabitan/releases/latest)
 
 ## Contributing
 

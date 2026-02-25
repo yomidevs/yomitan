@@ -53,6 +53,14 @@ export type DatabaseTermEntry = {
     rules: string;
     score: number;
     glossary: DictionaryData.TermGlossary[];
+    /** Pre-serialized glossary JSON for import fast-path. */
+    glossaryJson?: string;
+    /** Pre-serialized dedupe payload JSON for import fast-path. */
+    termEntryContentJson?: string;
+    /** Precomputed dedupe payload hash for import fast-path. */
+    termEntryContentHash?: string;
+    /** Pre-encoded dedupe payload bytes for import fast-path. */
+    termEntryContentBytes?: Uint8Array;
     sequence?: number;
     termTags?: string;
     dictionary: string;

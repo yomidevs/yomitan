@@ -24,6 +24,14 @@ import {log} from '../core/log.js';
 import {safePerformance} from '../core/safe-performance.js';
 import {stringReverse} from '../core/utilities.js';
 import {deleteOpfsDatabaseFiles, didLastOpenUseFallbackStorage, getSqlite3, importOpfsDatabase, openOpfsDatabase} from './sqlite-wasm.js';
+import {
+    compressTermContentZstd,
+    decompressTermContentZstd,
+    initializeTermContentZstd,
+    logTermContentZstdError,
+    resolveTermContentZstdDictName,
+} from './zstd-term-content.js';
+import {TermContentOpfsStore} from './term-content-opfs-store.js';
 
 /**
  * @typedef {object} InsertStatement
@@ -47,12 +55,22 @@ export class DictionaryDatabase {
         this._bulkImportTransactionOpen = false;
         /** @type {Map<string, number>} */
         this._termEntryContentIdByKey = new Map();
+        /** @type {Map<string, number>} */
+        this._termEntryContentIdByHash = new Map();
+        /** @type {boolean} */
+        this._termEntryContentHasExistingRows = true;
         /** @type {boolean} */
         this._enableTermEntryContentDedup = true;
         /** @type {Map<string, import('@sqlite.org/sqlite-wasm').PreparedStatement>} */
         this._statementCache = new Map();
         /** @type {Map<number, {definitionTags: string|null, termTags: string|undefined, rules: string, glossary: import('dictionary-data').TermGlossary[]}>} */
         this._termEntryContentCache = new Map();
+        /** @type {TextEncoder} */
+        this._textEncoder = new TextEncoder();
+        /** @type {TextDecoder} */
+        this._textDecoder = new TextDecoder();
+        /** @type {boolean} */
+        this._termContentZstdInitialized = false;
         /** @type {Map<string, boolean>} */
         this._termExactPresenceCache = new Map();
         /** @type {Map<string, boolean>} */
@@ -61,6 +79,10 @@ export class DictionaryDatabase {
         this._directTermIndexByDictionary = new Map();
         /** @type {boolean} */
         this._enableSqliteSecondaryIndexes = false;
+        /** @type {number} */
+        this._termContentCompressionMinBytes = 1048576;
+        /** @type {TermContentOpfsStore} */
+        this._termContentStore = new TermContentOpfsStore();
 
         /**
          * @type {Worker?}
@@ -90,6 +112,8 @@ export class DictionaryDatabase {
         try {
             this._isOpening = true;
             await this._openConnection();
+            await initializeTermContentZstd();
+            this._termContentZstdInitialized = true;
             await this._deleteLegacyIndexedDb();
 
             // keep existing draw worker split behaviour.
@@ -127,6 +151,7 @@ export class DictionaryDatabase {
         }
         this._clearCachedStatements();
         this._termEntryContentCache.clear();
+        this._termEntryContentIdByHash.clear();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -160,10 +185,13 @@ export class DictionaryDatabase {
     startBulkImport() {
         const db = this._requireDb();
         if (this._bulkImportDepth === 0) {
+            this._applyImportPragmas();
+            this._termEntryContentHasExistingRows = this._asNumber(db.selectValue('SELECT 1 FROM termEntryContent LIMIT 1'), 0) === 1;
             for (const dropIndexSql of this._createDropIndexesSql()) {
                 db.exec(dropIndexSql);
             }
             this._termEntryContentIdByKey.clear();
+            this._termEntryContentIdByHash.clear();
             this._termEntryContentCache.clear();
             this._termExactPresenceCache.clear();
             this._termPrefixNegativeCache.clear();
@@ -196,10 +224,12 @@ export class DictionaryDatabase {
                 }
             }
             this._termEntryContentIdByKey.clear();
+            this._termEntryContentIdByHash.clear();
             this._termEntryContentCache.clear();
             this._termExactPresenceCache.clear();
             this._termPrefixNegativeCache.clear();
             this._directTermIndexByDictionary.clear();
+            this._applyRuntimePragmas();
         }
     }
 
@@ -225,11 +255,13 @@ export class DictionaryDatabase {
                 } catch (_) { /* NOP */ }
                 this._bulkImportTransactionOpen = false;
             }
+            this._applyRuntimePragmas();
             this._clearCachedStatements();
             this._db.close();
             this._db = null;
             this._usesFallbackStorage = false;
         }
+        await this._termContentStore.reset();
 
         if (this._worker !== null) {
             this._worker.terminate();
@@ -245,6 +277,7 @@ export class DictionaryDatabase {
 
         await this.prepare();
         this._termEntryContentCache.clear();
+        this._termEntryContentIdByHash.clear();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -286,6 +319,7 @@ export class DictionaryDatabase {
         this._sqlite3 = sqlite3;
         await this._openConnection();
         this._termEntryContentCache.clear();
+        this._termEntryContentIdByHash.clear();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -348,7 +382,9 @@ export class DictionaryDatabase {
         }
 
         onProgress(progressData);
+        this._pruneOrphanTermEntryContent();
         this._termEntryContentCache.clear();
+        this._termEntryContentIdByHash.clear();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -380,6 +416,7 @@ export class DictionaryDatabase {
         }
         this._statementCache.clear();
         this._termEntryContentCache.clear();
+        this._termEntryContentIdByHash.clear();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -1238,6 +1275,7 @@ export class DictionaryDatabase {
         if (count <= 0) { return; }
         if (objectStoreName === 'terms') {
             this._termEntryContentCache.clear();
+            this._termEntryContentIdByHash.clear();
             this._termExactPresenceCache.clear();
             this._termPrefixNegativeCache.clear();
             this._directTermIndexByDictionary.clear();
@@ -1247,20 +1285,14 @@ export class DictionaryDatabase {
             await this._bulkAddTerms(/** @type {import('dictionary-database').ObjectStoreData<'terms'>[]} */ (items), start, count);
             return;
         }
-
-        const statement = this._getInsertStatement(objectStoreName);
-        const stmt = this._getCachedStatement(statement.sql);
+        const descriptor = this._getBulkInsertDescriptor(objectStoreName);
         const useLocalTransaction = !this._bulkImportTransactionOpen;
 
         if (useLocalTransaction) {
             db.exec('BEGIN IMMEDIATE');
         }
         try {
-            for (let i = start, ii = start + count; i < ii; ++i) {
-                stmt.reset(true);
-                stmt.bind(statement.bind(items[i]));
-                stmt.step();
-            }
+            await this._bulkInsertWithDescriptor(descriptor, items, start, count);
             if (useLocalTransaction) {
                 db.exec('COMMIT');
             }
@@ -1269,6 +1301,122 @@ export class DictionaryDatabase {
                 try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
             }
             throw e;
+        }
+    }
+
+    /**
+     * @param {{table: string, columnsSql: string, rowPlaceholderSql: string, batchSize: number, bindRow: (item: unknown) => import('@sqlite.org/sqlite-wasm').Bindable[]}} descriptor
+     * @param {unknown[]} items
+     * @param {number} start
+     * @param {number} count
+     * @returns {Promise<void>}
+     */
+    async _bulkInsertWithDescriptor(descriptor, items, start, count) {
+        const {table, columnsSql, rowPlaceholderSql, batchSize, bindRow} = descriptor;
+        for (let i = start, ii = start + count; i < ii; i += batchSize) {
+            const chunkCount = Math.min(batchSize, ii - i);
+            /** @type {string[]} */
+            const valueRows = [];
+            /** @type {import('@sqlite.org/sqlite-wasm').Bindable[]} */
+            const bind = [];
+            for (let j = 0; j < chunkCount; ++j) {
+                valueRows.push(rowPlaceholderSql);
+                const rowBind = bindRow(items[i + j]);
+                for (const value of rowBind) {
+                    bind.push(value);
+                }
+            }
+            const sql = `INSERT INTO ${table}(${columnsSql}) VALUES ${valueRows.join(',')}`;
+            const stmt = this._getCachedStatement(sql);
+            stmt.reset(true);
+            stmt.bind(bind);
+            stmt.step();
+        }
+    }
+
+    /**
+     * @param {import('dictionary-database').ObjectStoreName} objectStoreName
+     * @returns {{table: string, columnsSql: string, rowPlaceholderSql: string, batchSize: number, bindRow: (item: unknown) => import('@sqlite.org/sqlite-wasm').Bindable[]}}
+     * @throws {Error}
+     */
+    _getBulkInsertDescriptor(objectStoreName) {
+        switch (objectStoreName) {
+            case 'dictionaries':
+                return {
+                    table: 'dictionaries',
+                    columnsSql: 'title, version, summaryJson',
+                    rowPlaceholderSql: '(?, ?, ?)',
+                    batchSize: 256,
+                    bindRow: (item) => {
+                        const summary = /** @type {import('dictionary-importer').Summary} */ (item);
+                        return [summary.title, summary.version, JSON.stringify(summary)];
+                    },
+                };
+            case 'termMeta':
+                return {
+                    table: 'termMeta',
+                    columnsSql: 'dictionary, expression, mode, dataJson',
+                    rowPlaceholderSql: '(?, ?, ?, ?)',
+                    batchSize: 2048,
+                    bindRow: (item) => {
+                        const row = /** @type {import('dictionary-database').DatabaseTermMeta} */ (item);
+                        return [row.dictionary, row.expression, row.mode, JSON.stringify(row.data)];
+                    },
+                };
+            case 'kanji':
+                return {
+                    table: 'kanji',
+                    columnsSql: 'dictionary, character, onyomi, kunyomi, tags, meaningsJson, statsJson',
+                    rowPlaceholderSql: '(?, ?, ?, ?, ?, ?, ?)',
+                    batchSize: 1024,
+                    bindRow: (item) => {
+                        const row = /** @type {import('dictionary-database').DatabaseKanjiEntry} */ (item);
+                        return [
+                            row.dictionary,
+                            row.character,
+                            row.onyomi,
+                            row.kunyomi,
+                            row.tags,
+                            JSON.stringify(row.meanings),
+                            typeof row.stats !== 'undefined' ? JSON.stringify(row.stats) : null,
+                        ];
+                    },
+                };
+            case 'kanjiMeta':
+                return {
+                    table: 'kanjiMeta',
+                    columnsSql: 'dictionary, character, mode, dataJson',
+                    rowPlaceholderSql: '(?, ?, ?, ?)',
+                    batchSize: 2048,
+                    bindRow: (item) => {
+                        const row = /** @type {import('dictionary-database').DatabaseKanjiMeta} */ (item);
+                        return [row.dictionary, row.character, row.mode, JSON.stringify(row.data)];
+                    },
+                };
+            case 'tagMeta':
+                return {
+                    table: 'tagMeta',
+                    columnsSql: 'dictionary, name, category, ord, notes, score',
+                    rowPlaceholderSql: '(?, ?, ?, ?, ?, ?)',
+                    batchSize: 2048,
+                    bindRow: (item) => {
+                        const row = /** @type {import('dictionary-database').Tag} */ (item);
+                        return [row.dictionary, row.name, row.category, row.order, row.notes, row.score];
+                    },
+                };
+            case 'media':
+                return {
+                    table: 'media',
+                    columnsSql: 'dictionary, path, mediaType, width, height, content',
+                    rowPlaceholderSql: '(?, ?, ?, ?, ?, ?)',
+                    batchSize: 8,
+                    bindRow: (item) => {
+                        const row = /** @type {import('dictionary-database').MediaDataArrayBufferContent} */ (item);
+                        return [row.dictionary, row.path, row.mediaType, row.width, row.height, row.content];
+                    },
+                };
+            default:
+                throw new Error(`Unsupported object store: ${objectStoreName}`);
         }
     }
 
@@ -1348,26 +1496,27 @@ export class DictionaryDatabase {
             await this._bulkAddTermsWithoutContentDedup(items, start, count);
             return;
         }
+        if (!this._termContentZstdInitialized) {
+            await initializeTermContentZstd();
+            this._termContentZstdInitialized = true;
+        }
         const db = this._requireDb();
         const insertContentStmt = this._getCachedStatement(`
-            INSERT INTO termEntryContent(contentHash, rules, definitionTags, termTags, glossaryJson)
-            VALUES($contentHash, $rules, $definitionTags, $termTags, $glossaryJson)
-        `);
-        const selectContentStmt = this._getCachedStatement(`
-            SELECT id, rules, definitionTags, termTags, glossaryJson
-            FROM termEntryContent
-            WHERE contentHash = $contentHash
-        `);
-        const insertTermStmt = this._getCachedStatement(`
-            INSERT INTO terms(
-                dictionary, expression, reading, expressionReverse, readingReverse,
-                entryContentId, definitionTags, termTags, rules, score, glossaryJson, sequence
-            ) VALUES(
-                $dictionary, $expression, $reading, $expressionReverse, $readingReverse,
-                $entryContentId, $definitionTags, $termTags, $rules, $score, $glossaryJson, $sequence
-            )
+            INSERT INTO termEntryContent(contentHash, contentZstd, contentDictName, rules, definitionTags, termTags, glossaryJson, contentOffset, contentLength)
+            VALUES($contentHash, NULL, $contentDictName, '', '', '', '[]', $contentOffset, $contentLength)
         `);
         const useLocalTransaction = !this._bulkImportTransactionOpen;
+        /** @type {{values: import('@sqlite.org/sqlite-wasm').Bindable[], contentKey: string|null}[]} */
+        const termRows = [];
+        /** @type {{contentKey: string, contentHash: string, contentBytes: Uint8Array, contentDictName: string|null}[]} */
+        const pendingContentRows = [];
+        /** @type {Set<string>} */
+        const pendingContentKeys = new Set();
+        const batchSize = 1024;
+        const canUseFastContentInsert = !this._termEntryContentHasExistingRows;
+        if (!canUseFastContentInsert) {
+            this._loadTermEntryContentHashIndex();
+        }
 
         if (useLocalTransaction) {
             db.exec('BEGIN IMMEDIATE');
@@ -1378,34 +1527,105 @@ export class DictionaryDatabase {
                 const rules = row.rules;
                 const definitionTags = row.definitionTags ?? row.tags ?? '';
                 const termTags = row.termTags ?? '';
-                const glossaryJson = JSON.stringify(row.glossary);
-                const contentHash = this._hashEntryContent(rules, definitionTags, termTags, glossaryJson);
-                const contentId = this._resolveOrCreateTermEntryContentId(
-                    selectContentStmt,
-                    insertContentStmt,
-                    contentHash,
-                    rules,
-                    definitionTags,
-                    termTags,
-                    glossaryJson,
-                );
-
-                insertTermStmt.reset(true);
-                insertTermStmt.bind({
-                    $dictionary: row.dictionary,
-                    $expression: row.expression,
-                    $reading: row.reading,
-                    $expressionReverse: row.expressionReverse ?? null,
-                    $readingReverse: row.readingReverse ?? null,
-                    $entryContentId: contentId,
-                    $definitionTags: '',
-                    $termTags: '',
-                    $rules: '',
-                    $score: row.score,
-                    $glossaryJson: '[]',
-                    $sequence: typeof row.sequence === 'number' ? row.sequence : null,
-                });
-                insertTermStmt.step();
+                const contentJson = row.termEntryContentJson ?? null;
+                const contentHash = row.termEntryContentHash ?? (contentJson !== null ? this._hashEntryContent(contentJson) : this._hashEntryContent(this._serializeTermEntryContent(rules, definitionTags, termTags, row.glossary)));
+                const contentBytes = row.termEntryContentBytes instanceof Uint8Array ?
+                    row.termEntryContentBytes :
+                    this._textEncoder.encode(contentJson !== null ? contentJson : this._serializeTermEntryContent(rules, definitionTags, termTags, row.glossary));
+                const cachedContentId = this._termEntryContentIdByKey.get(contentHash);
+                let contentId = typeof cachedContentId === 'number' ? cachedContentId : null;
+                if (contentId === null && canUseFastContentInsert) {
+                    if (!pendingContentKeys.has(contentHash)) {
+                        const contentDictName = resolveTermContentZstdDictName(row.dictionary);
+                        let contentZstd = contentBytes;
+                        let effectiveDictName = 'raw';
+                        if (contentBytes.byteLength >= this._termContentCompressionMinBytes) {
+                            const compressed = compressTermContentZstd(contentBytes, contentDictName);
+                            if (compressed.byteLength < contentBytes.byteLength) {
+                                contentZstd = compressed;
+                                effectiveDictName = contentDictName ?? '';
+                            }
+                        }
+                        pendingContentRows.push({
+                            contentKey: contentHash,
+                            contentHash,
+                            contentBytes: contentZstd,
+                            contentDictName: effectiveDictName,
+                        });
+                        pendingContentKeys.add(contentHash);
+                    }
+                    termRows.push({
+                        values: [
+                            row.dictionary,
+                            row.expression,
+                            row.reading,
+                            row.expressionReverse ?? null,
+                            row.readingReverse ?? null,
+                            0,
+                            '',
+                            '',
+                            '',
+                            row.score,
+                            '[]',
+                            typeof row.sequence === 'number' ? row.sequence : null,
+                        ],
+                        contentKey: contentHash,
+                    });
+                } else {
+                    if (contentId === null) {
+                        const contentDictName = resolveTermContentZstdDictName(row.dictionary);
+                        let contentZstd = contentBytes;
+                        let effectiveDictName = 'raw';
+                        if (contentBytes.byteLength >= this._termContentCompressionMinBytes) {
+                            const compressed = compressTermContentZstd(contentBytes, contentDictName);
+                            if (compressed.byteLength < contentBytes.byteLength) {
+                                contentZstd = compressed;
+                                effectiveDictName = contentDictName ?? '';
+                            }
+                        }
+                        contentId = await this._resolveOrCreateTermEntryContentId(
+                            insertContentStmt,
+                            contentHash,
+                            contentZstd,
+                            effectiveDictName,
+                            contentHash,
+                        );
+                    }
+                    termRows.push({
+                        values: [
+                            row.dictionary,
+                            row.expression,
+                            row.reading,
+                            row.expressionReverse ?? null,
+                            row.readingReverse ?? null,
+                            contentId,
+                            '',
+                            '',
+                            '',
+                            row.score,
+                            '[]',
+                            typeof row.sequence === 'number' ? row.sequence : null,
+                        ],
+                        contentKey: null,
+                    });
+                }
+                if (termRows.length >= batchSize) {
+                    if (pendingContentRows.length > 0) {
+                        await this._insertTermEntryContentBatch(pendingContentRows);
+                        pendingContentRows.length = 0;
+                        pendingContentKeys.clear();
+                    }
+                    this._insertResolvedTermRowsWithContentKeys(termRows);
+                    termRows.length = 0;
+                }
+            }
+            if (pendingContentRows.length > 0) {
+                await this._insertTermEntryContentBatch(pendingContentRows);
+                pendingContentRows.length = 0;
+                pendingContentKeys.clear();
+            }
+            if (termRows.length > 0) {
+                this._insertResolvedTermRowsWithContentKeys(termRows);
             }
             if (useLocalTransaction) {
                 db.exec('COMMIT');
@@ -1419,6 +1639,99 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {import('@sqlite.org/sqlite-wasm').Bindable[][]} rows
+     * @param {number} count
+     */
+    _insertResolvedTermRows(rows, count) {
+        /** @type {string[]} */
+        const valueRows = [];
+        /** @type {import('@sqlite.org/sqlite-wasm').Bindable[]} */
+        const bind = [];
+        for (let i = 0; i < count; ++i) {
+            valueRows.push('(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            const row = rows[i];
+            for (const value of row) {
+                bind.push(value);
+            }
+        }
+        const sql = `
+            INSERT INTO terms(
+                dictionary, expression, reading, expressionReverse, readingReverse,
+                entryContentId, definitionTags, termTags, rules, score, glossaryJson, sequence
+            ) VALUES ${valueRows.join(',')}
+        `;
+        const stmt = this._getCachedStatement(sql);
+        stmt.reset(true);
+        stmt.bind(bind);
+        stmt.step();
+    }
+
+    /**
+     * @param {{values: import('@sqlite.org/sqlite-wasm').Bindable[], contentKey: string|null}[]} rows
+     * @throws {Error}
+     */
+    _insertResolvedTermRowsWithContentKeys(rows) {
+        /** @type {import('@sqlite.org/sqlite-wasm').Bindable[][]} */
+        const resolved = [];
+        for (const row of rows) {
+            /** @type {import('@sqlite.org/sqlite-wasm').Bindable[]} */
+            const values = [];
+            for (const value of row.values) {
+                values.push(value);
+            }
+            const {contentKey} = row;
+            if (contentKey !== null) {
+                const contentId = this._termEntryContentIdByKey.get(contentKey);
+                if (typeof contentId !== 'number') {
+                    throw new Error('Failed to resolve term entry content id for batched insert');
+                }
+                values[5] = contentId;
+            }
+            resolved.push(values);
+        }
+        this._insertResolvedTermRows(resolved, resolved.length);
+    }
+
+    /**
+     * @param {{contentKey: string, contentHash: string, contentBytes: Uint8Array, contentDictName: string|null}[]} rows
+     * @throws {Error}
+     */
+    async _insertTermEntryContentBatch(rows) {
+        if (rows.length === 0) { return; }
+        const spans = await this._termContentStore.appendBatch(rows.map((row) => row.contentBytes));
+        /** @type {string[]} */
+        const valueRows = [];
+        /** @type {import('@sqlite.org/sqlite-wasm').Bindable[]} */
+        const bind = [];
+        for (let i = 0, ii = rows.length; i < ii; ++i) {
+            const row = rows[i];
+            const span = spans[i];
+            valueRows.push('(?, NULL, ?, \'\', \'\', \'\', \'[]\', ?, ?)');
+            bind.push(row.contentHash, row.contentDictName, span.offset, span.length);
+        }
+        const sql = `
+            INSERT INTO termEntryContent(contentHash, contentZstd, contentDictName, rules, definitionTags, termTags, glossaryJson, contentOffset, contentLength)
+            VALUES ${valueRows.join(',')}
+        `;
+        const stmt = this._getCachedStatement(sql);
+        stmt.reset(true);
+        stmt.bind(bind);
+        stmt.step();
+
+        const db = this._requireDb();
+        const lastInsertRowId = this._asNumber(db.selectValue('SELECT last_insert_rowid()'), -1);
+        if (lastInsertRowId <= 0) {
+            throw new Error('Failed to insert batched term entry content');
+        }
+        const firstId = lastInsertRowId - rows.length + 1;
+        for (let i = 0, ii = rows.length; i < ii; ++i) {
+            const id = firstId + i;
+            this._termEntryContentIdByHash.set(rows[i].contentHash, id);
+            this._termEntryContentIdByKey.set(rows[i].contentKey, id);
+        }
+    }
+
+    /**
      * @param {import('dictionary-database').ObjectStoreData<'terms'>[]} items
      * @param {number} start
      * @param {number} count
@@ -1427,7 +1740,7 @@ export class DictionaryDatabase {
     async _bulkAddTermsWithoutContentDedup(items, start, count) {
         const db = this._requireDb();
         const useLocalTransaction = !this._bulkImportTransactionOpen;
-        const batchSize = 256;
+        const batchSize = 1024;
 
         if (useLocalTransaction) {
             db.exec('BEGIN IMMEDIATE');
@@ -1454,7 +1767,7 @@ export class DictionaryDatabase {
                         row.termTags ?? null,
                         row.rules,
                         row.score,
-                        JSON.stringify(row.glossary),
+                        row.glossaryJson ?? JSON.stringify(row.glossary),
                         typeof row.sequence === 'number' ? row.sequence : null,
                     );
                 }
@@ -1481,49 +1794,32 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {import('@sqlite.org/sqlite-wasm').PreparedStatement} selectContentStmt
      * @param {import('@sqlite.org/sqlite-wasm').PreparedStatement} insertContentStmt
      * @param {string} contentHash
-     * @param {string} rules
-     * @param {string} definitionTags
-     * @param {string} termTags
-     * @param {string} glossaryJson
-     * @returns {number}
+     * @param {Uint8Array} contentZstd
+     * @param {string|null} contentDictName
+     * @param {string} contentKey
+     * @returns {Promise<number>}
      * @throws {Error}
      */
-    _resolveOrCreateTermEntryContentId(selectContentStmt, insertContentStmt, contentHash, rules, definitionTags, termTags, glossaryJson) {
-        const contentKey = `${rules}\u001f${definitionTags}\u001f${termTags}\u001f${glossaryJson}`;
+    async _resolveOrCreateTermEntryContentId(insertContentStmt, contentHash, contentZstd, contentDictName, contentKey) {
         const cachedId = this._termEntryContentIdByKey.get(contentKey);
         if (typeof cachedId === 'number') {
             return cachedId;
         }
-
-        selectContentStmt.reset(true);
-        selectContentStmt.bind({$contentHash: contentHash});
-        while (selectContentStmt.step()) {
-            const rowUnknown = /** @type {unknown} */ (selectContentStmt.get({}));
-            const row = /** @type {import('core').SafeAny} */ (rowUnknown);
-            if (
-                this._asString(row.rules) === rules &&
-                this._asString(row.definitionTags) === definitionTags &&
-                this._asString(row.termTags) === termTags &&
-                this._asString(row.glossaryJson) === glossaryJson
-            ) {
-                const id = this._asNumber(row.id, -1);
-                if (id > 0) {
-                    this._termEntryContentIdByKey.set(contentKey, id);
-                    return id;
-                }
-            }
+        const cachedHashId = this._termEntryContentIdByHash.get(contentHash);
+        if (typeof cachedHashId === 'number') {
+            this._termEntryContentIdByKey.set(contentKey, cachedHashId);
+            return cachedHashId;
         }
 
         insertContentStmt.reset(true);
+        const [span] = await this._termContentStore.appendBatch([contentZstd]);
         insertContentStmt.bind({
             $contentHash: contentHash,
-            $rules: rules,
-            $definitionTags: definitionTags,
-            $termTags: termTags,
-            $glossaryJson: glossaryJson,
+            $contentDictName: contentDictName,
+            $contentOffset: span.offset,
+            $contentLength: span.length,
         });
         insertContentStmt.step();
 
@@ -1532,8 +1828,39 @@ export class DictionaryDatabase {
         if (id <= 0) {
             throw new Error('Failed to insert term entry content');
         }
+        this._termEntryContentIdByHash.set(contentHash, id);
         this._termEntryContentIdByKey.set(contentKey, id);
         return id;
+    }
+
+    /** */
+    _loadTermEntryContentHashIndex() {
+        if (this._termEntryContentIdByHash.size > 0) { return; }
+        const stmt = this._getCachedStatement('SELECT id, contentHash FROM termEntryContent');
+        stmt.reset(true);
+        while (stmt.step()) {
+            const row = /** @type {import('core').SafeAny[]} */ (stmt.get([]));
+            const id = this._asNumber(row[0], -1);
+            if (id <= 0) { continue; }
+            const contentHash = this._asString(row[1]);
+            if (contentHash.length === 0) { continue; }
+            if (!this._termEntryContentIdByHash.has(contentHash)) {
+                this._termEntryContentIdByHash.set(contentHash, id);
+            }
+        }
+    }
+
+    /** */
+    _pruneOrphanTermEntryContent() {
+        const db = this._requireDb();
+        db.exec(`
+            DELETE FROM termEntryContent
+            WHERE id NOT IN (
+                SELECT DISTINCT entryContentId
+                FROM terms
+                WHERE entryContentId IS NOT NULL
+            )
+        `);
     }
 
     // Parent-Worker API
@@ -1572,18 +1899,15 @@ export class DictionaryDatabase {
         this._sqlite3 = await getSqlite3();
         this._db = await openOpfsDatabase();
         this._usesFallbackStorage = didLastOpenUseFallbackStorage();
+        await this._termContentStore.prepare();
 
-        const db = this._requireDb();
-        db.exec('PRAGMA journal_mode = MEMORY');
-        db.exec('PRAGMA synchronous = OFF');
-        db.exec('PRAGMA temp_store = MEMORY');
-        db.exec('PRAGMA foreign_keys = OFF');
+        this._applyRuntimePragmas();
 
-        this._initializeSchema();
+        await this._initializeSchema();
     }
 
     /** */
-    _initializeSchema() {
+    async _initializeSchema() {
         const db = this._requireDb();
         db.exec(`
             CREATE TABLE IF NOT EXISTS dictionaries (
@@ -1596,6 +1920,10 @@ export class DictionaryDatabase {
             CREATE TABLE IF NOT EXISTS termEntryContent (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 contentHash TEXT NOT NULL,
+                contentZstd BLOB,
+                contentOffset INTEGER,
+                contentLength INTEGER,
+                contentDictName TEXT,
                 rules TEXT NOT NULL,
                 definitionTags TEXT NOT NULL,
                 termTags TEXT NOT NULL,
@@ -1665,7 +1993,7 @@ export class DictionaryDatabase {
                 content BLOB NOT NULL
             );
         `);
-        this._migrateTermsContentSchema();
+        await this._migrateTermsContentSchema();
         if (!this._enableSqliteSecondaryIndexes) {
             for (const dropIndexSql of this._createDropIndexesSql()) {
                 db.exec(dropIndexSql);
@@ -1742,8 +2070,26 @@ export class DictionaryDatabase {
     }
 
     /** */
-    _migrateTermsContentSchema() {
+    async _migrateTermsContentSchema() {
         const db = this._requireDb();
+        const contentTableInfo = db.selectObjects('PRAGMA table_info(termEntryContent)');
+        const hasContentZstd = contentTableInfo.some((row) => this._asString(row.name) === 'contentZstd');
+        const hasContentOffset = contentTableInfo.some((row) => this._asString(row.name) === 'contentOffset');
+        const hasContentLength = contentTableInfo.some((row) => this._asString(row.name) === 'contentLength');
+        const hasContentDictName = contentTableInfo.some((row) => this._asString(row.name) === 'contentDictName');
+        if (!hasContentZstd) {
+            db.exec('ALTER TABLE termEntryContent ADD COLUMN contentZstd BLOB');
+        }
+        if (!hasContentDictName) {
+            db.exec('ALTER TABLE termEntryContent ADD COLUMN contentDictName TEXT');
+        }
+        if (!hasContentOffset) {
+            db.exec('ALTER TABLE termEntryContent ADD COLUMN contentOffset INTEGER');
+        }
+        if (!hasContentLength) {
+            db.exec('ALTER TABLE termEntryContent ADD COLUMN contentLength INTEGER');
+        }
+
         const tableInfo = db.selectObjects('PRAGMA table_info(terms)');
         const hasEntryContentId = tableInfo.some((row) => this._asString(row.name) === 'entryContentId');
         if (!hasEntryContentId) {
@@ -1770,7 +2116,12 @@ export class DictionaryDatabase {
             const definitionTags = this._asString(row.definitionTags);
             const termTags = this._asString(row.termTags);
             const glossaryJson = this._asString(row.glossaryJson);
-            const contentHash = this._hashEntryContent(rules, definitionTags, termTags, glossaryJson);
+            const contentHash = this._hashEntryContent(this._serializeTermEntryContent(
+                rules,
+                definitionTags,
+                termTags,
+                this._safeParseJson(glossaryJson, []),
+            ));
             db.exec({
                 sql: 'UPDATE termEntryContent SET contentHash = $contentHash WHERE id = $id',
                 bind: {$contentHash: contentHash, $id: id},
@@ -1791,6 +2142,41 @@ export class DictionaryDatabase {
             )
             WHERE entryContentId IS NULL
         `);
+
+        const externalizeRows = db.selectObjects(`
+            SELECT id, contentZstd
+            FROM termEntryContent
+            WHERE
+                contentZstd IS NOT NULL AND
+                length(contentZstd) > 0 AND
+                (contentOffset IS NULL OR contentOffset < 0 OR contentLength IS NULL OR contentLength <= 0)
+        `);
+        if (externalizeRows.length > 0) {
+            const chunks = [];
+            for (const row of externalizeRows) {
+                const contentZstd = this._toUint8Array(row.contentZstd);
+                if (contentZstd === null || contentZstd.byteLength <= 0) { continue; }
+                chunks.push(contentZstd);
+            }
+            if (chunks.length > 0) {
+                const spans = await this._termContentStore.appendBatch(chunks);
+                let spanIndex = 0;
+                for (const row of externalizeRows) {
+                    const id = this._asNumber(row.id, -1);
+                    const contentZstd = this._toUint8Array(row.contentZstd);
+                    if (id <= 0 || contentZstd === null || contentZstd.byteLength <= 0) { continue; }
+                    const span = spans[spanIndex++];
+                    db.exec({
+                        sql: `
+                            UPDATE termEntryContent
+                            SET contentOffset = $contentOffset, contentLength = $contentLength, contentZstd = NULL
+                            WHERE id = $id
+                        `,
+                        bind: {$contentOffset: span.offset, $contentLength: span.length, $id: id},
+                    });
+                }
+            }
+        }
     }
 
     /**
@@ -1965,10 +2351,10 @@ export class DictionaryDatabase {
         return `
             SELECT
                 t.*,
-                c.rules AS c_rules,
-                c.definitionTags AS c_definitionTags,
-                c.termTags AS c_termTags,
-                c.glossaryJson AS c_glossaryJson
+                c.contentZstd AS c_contentZstd,
+                c.contentOffset AS c_contentOffset,
+                c.contentLength AS c_contentLength,
+                c.contentDictName AS c_contentDictName
             FROM terms t
             LEFT JOIN termEntryContent c ON c.id = t.entryContentId
             WHERE ${whereClause}
@@ -1980,6 +2366,7 @@ export class DictionaryDatabase {
      * @returns {Promise<Map<number, import('dictionary-database').DatabaseTermEntryWithId>>}
      */
     async _fetchTermRowsByIds(ids) {
+        await this._termContentStore.ensureLoadedForRead();
         /** @type {Map<number, import('dictionary-database').DatabaseTermEntryWithId>} */
         const rowsById = new Map();
         const idArray = [...ids].filter((id) => id > 0);
@@ -2020,11 +2407,39 @@ export class DictionaryDatabase {
                 rules = cached.rules;
                 glossary = cached.glossary;
             } else {
-                definitionTags = this._asNullableString(row.c_definitionTags ?? row.definitionTags) ?? null;
-                termTags = this._asNullableString(row.c_termTags ?? row.termTags);
-                rules = this._asString(row.c_rules ?? row.rules);
-                const glossaryJson = this._asString(row.c_glossaryJson ?? row.glossaryJson);
-                glossary = this._safeParseJson(glossaryJson, []);
+                const contentOffset = this._asNumber(row.c_contentOffset, -1);
+                const contentLength = this._asNumber(row.c_contentLength, -1);
+                const contentDictName = this._asNullableString(row.c_contentDictName) ?? '';
+                let contentBytes = (contentOffset >= 0 && contentLength > 0) ? this._termContentStore.readSlice(contentOffset, contentLength) : null;
+                if (contentBytes === null) {
+                    // Transitional migration support only.
+                    contentBytes = this._toUint8Array(row.c_contentZstd);
+                }
+                if (contentBytes !== null && contentBytes.length > 0) {
+                    try {
+                        const contentJson = (contentDictName === 'raw') ?
+                            this._textDecoder.decode(contentBytes) :
+                            this._textDecoder.decode(decompressTermContentZstd(contentBytes, contentDictName.length > 0 ? contentDictName : null));
+                        const content = /** @type {{rules?: string, definitionTags?: string, termTags?: string, glossary?: import('dictionary-data').TermGlossary[]}} */ (
+                            this._safeParseJson(contentJson, {})
+                        );
+                        definitionTags = this._asNullableString(content.definitionTags) ?? null;
+                        termTags = this._asNullableString(content.termTags);
+                        rules = this._asString(content.rules);
+                        glossary = Array.isArray(content.glossary) ? content.glossary : [];
+                    } catch (e) {
+                        logTermContentZstdError(e);
+                        definitionTags = null;
+                        termTags = '';
+                        rules = '';
+                        glossary = [];
+                    }
+                } else {
+                    definitionTags = null;
+                    termTags = '';
+                    rules = '';
+                    glossary = [];
+                }
                 this._termEntryContentCache.set(entryContentId, {definitionTags, termTags, rules, glossary});
             }
         } else {
@@ -2177,6 +2592,37 @@ export class DictionaryDatabase {
 
     /**
      * @param {unknown} value
+     * @returns {Uint8Array|null}
+     */
+    _toUint8Array(value) {
+        if (value instanceof Uint8Array) {
+            return value;
+        }
+        if (value instanceof ArrayBuffer) {
+            return new Uint8Array(value);
+        }
+        return null;
+    }
+
+    /**
+     * @param {Uint8Array} a
+     * @param {Uint8Array} b
+     * @returns {boolean}
+     */
+    _areUint8ArraysEqual(a, b) {
+        if (a.byteLength !== b.byteLength) {
+            return false;
+        }
+        for (let i = 0, ii = a.byteLength; i < ii; ++i) {
+            if (a[i] !== b[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param {unknown} value
      * @param {number} defaultValue
      * @returns {number}
      */
@@ -2241,44 +2687,57 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {string} value
-     * @param {bigint} seed
-     * @returns {bigint}
-     */
-    _hashString64(value, seed) {
-        let hash = seed ^ 0xcbf29ce484222325n ^ BigInt(value.length);
-        for (let i = 0, ii = value.length; i < ii; ++i) {
-            hash ^= BigInt(value.codePointAt(i) ?? 0);
-            hash = (hash * 0x100000001b3n) & 0xffffffffffffffffn;
-        }
-        hash ^= hash >> 33n;
-        hash = (hash * 0xff51afd7ed558ccdn) & 0xffffffffffffffffn;
-        hash ^= hash >> 33n;
-        hash = (hash * 0xc4ceb9fe1a85ec53n) & 0xffffffffffffffffn;
-        hash ^= hash >> 33n;
-        return hash & 0xffffffffffffffffn;
-    }
-
-    /**
      * @param {string} rules
      * @param {string} definitionTags
      * @param {string} termTags
-     * @param {string} glossaryJson
+     * @param {import('dictionary-data').TermGlossary[]} glossary
      * @returns {string}
      */
-    _hashEntryContent(rules, definitionTags, termTags, glossaryJson) {
-        const seed = 0x9e3779b97f4a7c15n;
-        let hash = this._hashString64(rules, seed ^ 0xa24baed4963ee407n);
-        hash ^= this._hashString64(definitionTags, seed ^ 0x9fb21c651e98df25n) + 0x9e3779b97f4a7c15n + ((hash << 6n) & 0xffffffffffffffffn) + (hash >> 2n);
-        hash &= 0xffffffffffffffffn;
-        hash ^= this._hashString64(termTags, seed ^ 0x243f6a8885a308d3n) + 0x9e3779b97f4a7c15n + ((hash << 6n) & 0xffffffffffffffffn) + (hash >> 2n);
-        hash &= 0xffffffffffffffffn;
-        hash ^= this._hashString64(glossaryJson, seed ^ 0xb7e151628aed2a6bn) + 0x9e3779b97f4a7c15n + ((hash << 6n) & 0xffffffffffffffffn) + (hash >> 2n);
-        hash &= 0xffffffffffffffffn;
-        if (hash === 0n) {
-            hash = 1n;
+    _serializeTermEntryContent(rules, definitionTags, termTags, glossary) {
+        return JSON.stringify({rules, definitionTags, termTags, glossary});
+    }
+
+    /**
+     * @param {string} contentJson
+     * @returns {string}
+     */
+    _hashEntryContent(contentJson) {
+        let h1 = 0x811c9dc5;
+        let h2 = 0x9e3779b9;
+        for (let i = 0, ii = contentJson.length; i < ii; ++i) {
+            const code = contentJson.charCodeAt(i);
+            h1 = Math.imul((h1 ^ code) >>> 0, 0x01000193);
+            h2 = Math.imul((h2 ^ code) >>> 0, 0x85ebca6b);
+            h2 = (h2 ^ (h2 >>> 13)) >>> 0;
         }
-        return hash.toString(16).padStart(16, '0');
+        if ((h1 | h2) === 0) {
+            h1 = 1;
+        }
+        return `${(h1 >>> 0).toString(16).padStart(8, '0')}${(h2 >>> 0).toString(16).padStart(8, '0')}`;
+    }
+
+    /** */
+    _applyRuntimePragmas() {
+        const db = this._requireDb();
+        db.exec('PRAGMA journal_mode = WAL');
+        db.exec('PRAGMA synchronous = NORMAL');
+        db.exec('PRAGMA temp_store = MEMORY');
+        db.exec('PRAGMA foreign_keys = OFF');
+        db.exec('PRAGMA wal_autocheckpoint = 1000');
+        db.exec('PRAGMA cache_size = -16384');
+        db.exec('PRAGMA locking_mode = NORMAL');
+    }
+
+    /** */
+    _applyImportPragmas() {
+        const db = this._requireDb();
+        db.exec('PRAGMA journal_mode = WAL');
+        db.exec('PRAGMA synchronous = NORMAL');
+        db.exec('PRAGMA temp_store = MEMORY');
+        db.exec('PRAGMA foreign_keys = OFF');
+        db.exec('PRAGMA cache_size = -65536');
+        db.exec('PRAGMA wal_autocheckpoint = 0');
+        db.exec('PRAGMA locking_mode = EXCLUSIVE');
     }
 
     /**

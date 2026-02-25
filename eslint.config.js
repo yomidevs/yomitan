@@ -47,10 +47,13 @@ header.rules.header.meta.schema = false;
 const manabitanHeaderFiles = [
     'ext/js/dictionary/sqlite-wasm.js',
     'dev/bin/run-playwright.js',
+    'dev/lib/zstd-wasm.js',
+    'ext/js/dictionary/zstd-term-content.js',
+    'ext/js/dictionary/term-content-opfs-store.js',
 ];
 
 const upstreamCopyrightPattern = ' \\* Copyright \\(C\\) (20(23|24)-)?2025  Yomitan Authors(\n \\* Copyright \\(C\\) (20(16|17|18|19|20|21)-)?2022  Yomichan Authors)?\n \\*\n \\* This program is free software: you can redistribute it and/or modify\n \\* it under the terms of the GNU General Public License as published by\n \\* the Free Software Foundation, either version 3 of the License, or\n \\* \\(at your option\\) any later version\\.\n \\*\n \\* This program is distributed in the hope that it will be useful,\n \\* but WITHOUT ANY WARRANTY; without even the implied warranty of\n \\* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE\\.  See the\n \\* GNU General Public License for more details\\.\n \\*\n \\* You should have received a copy of the GNU General Public License\n \\* along with this program\\.  If not, see <https://www\\.gnu\\.org/licenses/>\\.\n ';
-const manabitanCopyrightPattern = ' \\* Copyright \\(C\\) 2026  Manabitan authors\n \\*\n \\* This program is free software: you can redistribute it and/or modify\n \\* it under the terms of the GNU General Public License as published by\n \\* the Free Software Foundation, either version 3 of the License, or\n \\* \\(at your option\\) any later version\\.\n \\*\n \\* This program is distributed in the hope that it will be useful,\n \\* but WITHOUT ANY WARRANTY; without even the implied warranty of\n \\* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE\\.  See the\n \\* GNU General Public License for more details\\.\n \\*\n \\* You should have received a copy of the GNU General Public License\n \\* along with this program\\.  If not, see <https://www\\.gnu\\.org/licenses/>\\.\n ';
+const manabitanCopyrightPattern = ' \\* Copyright \\(C\\) 2026 {1,2}Manabitan authors\n \\*\n \\* This program is free software: you can redistribute it and/or modify\n \\* it under the terms of the GNU General Public License as published by\n \\* the Free Software Foundation, either version 3 of the License, or\n \\* \\(at your option\\) any later version\\.\n \\*\n \\* This program is distributed in the hope that it will be useful,\n \\* but WITHOUT ANY WARRANTY; without even the implied warranty of\n \\* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE\\.  See the\n \\* GNU General Public License for more details\\.\n \\*\n \\* You should have received a copy of the GNU General Public License\n \\* along with this program\\.  If not, see <https://www\\.gnu\\.org/licenses/>\\.\n ';
 
 /**
  * @param {string[]} scriptPaths

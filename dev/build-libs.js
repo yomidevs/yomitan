@@ -55,6 +55,31 @@ async function copySqliteWasm(out) {
     }
 }
 
+/**
+ * @param {string} out
+ */
+async function copyZstdAssets(out) {
+    const zstdEntryPath = require.resolve('@bokuweb/zstd-wasm');
+    const zstdPkgPath = path.resolve(path.dirname(zstdEntryPath), '..', '..');
+    const zstdWasmPath = path.join(zstdPkgPath, 'dist/esm/zstd.wasm');
+    fs.copyFileSync(zstdWasmPath, path.join(out, 'zstd.wasm'));
+
+    const zstdDictOutPath = path.join(out, 'zstd-dicts');
+    fs.mkdirSync(zstdDictOutPath, {recursive: true});
+    const jmdictDictPath = path.join(
+        dirname,
+        '..',
+        '..',
+        'ManabiDictionaries',
+        'Sources',
+        'YomitanDictionaries',
+        'Resources',
+        'ZstdDicts',
+        'jmdict.zdict',
+    );
+    fs.copyFileSync(jmdictDictPath, path.join(zstdDictOutPath, 'jmdict.zdict'));
+}
+
 
 /**
  * @param {string} scriptPath
@@ -111,4 +136,5 @@ export async function buildLibs() {
 
     await copyWasm(path.join(extDir, 'lib'));
     await copySqliteWasm(path.join(extDir, 'lib'));
+    await copyZstdAssets(path.join(extDir, 'lib'));
 }
