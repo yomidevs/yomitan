@@ -29,8 +29,19 @@ jobs:
           zipBall: true
           fileName: "*"
 
+      - name: Check Firefox signing configuration
+        id: signingConfig
+        run: |
+          if [[ -n "${{ secrets.FF_JWT_ISSUER }}" && -n "${{ secrets.FF_JWT_SECRET }}" && -n "${{ secrets.FF_OFFLINE_EXT_ID }}" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Firefox signing secrets are not configured; skipping signing and metadata update."
+          fi
+
       - name: Sign Firefox xpi for offline distribution
         id: ffSignXpi
+        if: steps.signingConfig.outputs.enabled == 'true'
         continue-on-error: true
         uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@0953ef0b8a488a791f17c14fa5b800b131632d34
         with:
@@ -45,12 +56,14 @@ jobs:
 
       - name: Abort on sign error
         if: |
+          steps.signingConfig.outputs.enabled == 'true' &&
           steps.ffSignXpi.outcome == 'failure' &&
           steps.ffSignXpi.outputs.sameVersionAlreadyUploadedError != 'true'
         run: exit 1
 
       - name: Generate hashes
         id: hash
+        if: steps.ffSignXpi.outcome == 'success'
         run: |
           echo "hashes=$(sha256sum manabitan-firefox-dev.xpi | base64 -w0)" >> "$GITHUB_OUTPUT"
 
@@ -70,17 +83,21 @@ jobs:
 
       - uses: actions/checkout@v6
         id: checkoutMetadata
+        if: steps.ffSignXpi.outcome == 'success'
         continue-on-error: true
         with:
           ref: metadata
 
       - name: Initialize metadata branch
-        if: steps.checkoutMetadata.outcome != 'success'
+        if: |
+          steps.ffSignXpi.outcome == 'success' &&
+          steps.checkoutMetadata.outcome != 'success'
         run: |
           git checkout --orphan metadata
           git rm -rf . || true
 
       - name: Recreate updates.json
+        if: steps.ffSignXpi.outcome == 'success'
         run: |
           cat > updates.json << EOF
           {
@@ -98,6 +115,7 @@ jobs:
           EOF
 
       - name: Commit files
+        if: steps.ffSignXpi.outcome == 'success'
         continue-on-error: true
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -106,12 +124,14 @@ jobs:
           git commit -m "${{ inputs.tag }}"
 
       - name: Push changes
+        if: steps.ffSignXpi.outcome == 'success'
         uses: ad-m/github-push-action@d91a481090679876dfc4178fef17f286781251df # pin@master
         with:
           branch: metadata
 
   provenance:
     needs: [build]
+    if: needs.build.outputs.hashes != ''
     permissions:
       actions: read # To read the workflow path.
       id-token: write # To sign the provenance.
