@@ -3081,6 +3081,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -3330,6 +3338,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -3483,6 +3499,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -3692,7 +3732,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -4301,6 +4341,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -4550,6 +4598,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -4703,6 +4759,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -4912,7 +4992,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -9893,6 +9973,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -10142,6 +10230,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -10295,6 +10391,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -10504,7 +10624,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -10685,6 +10805,14 @@
                   "expression": "打ち込む",
                   "reading": "うちこむ",
                   "pitches": [
+                    {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
                     {
                       "positions": "HHHH",
                       "tags": []
@@ -10935,6 +11063,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -11088,6 +11224,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -11297,7 +11457,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -13820,6 +13980,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -14107,6 +14275,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -14242,6 +14418,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -14451,7 +14651,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -16466,6 +16666,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -17017,6 +17225,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -17188,6 +17404,34 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -17459,7 +17703,7 @@
             ]
           }
         ],
-        "pitchCount": 20,
+        "pitchCount": 22,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -18882,6 +19126,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -19450,6 +19702,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -19621,6 +19881,34 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -19892,7 +20180,7 @@
             ]
           }
         ],
-        "pitchCount": 20,
+        "pitchCount": 22,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -21272,6 +21560,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -21521,6 +21817,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -21674,6 +21978,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -21883,7 +22211,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -22534,6 +22862,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -22783,6 +23119,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -22936,6 +23280,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -23145,7 +23513,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -25723,6 +26091,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -25972,6 +26348,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -26125,6 +26509,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -26334,7 +26742,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -26943,6 +27351,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -27192,6 +27608,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -27345,6 +27769,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -27554,7 +28002,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -30111,6 +30559,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -30360,6 +30816,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -30513,6 +30977,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -30722,7 +31210,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -31331,6 +31819,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -31580,6 +32076,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -31733,6 +32237,30 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -31942,7 +32470,7 @@
             ]
           }
         ],
-        "pitchCount": 18,
+        "pitchCount": 20,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",
@@ -35004,6 +35532,14 @@
                   "reading": "うちこむ",
                   "pitches": [
                     {
+                      "positions": "HHHHH",
+                      "tags": []
+                    },
+                    {
+                      "positions": "HHHHL",
+                      "tags": []
+                    },
+                    {
                       "positions": "HHHH",
                       "tags": []
                     },
@@ -35555,6 +36091,14 @@
               "reading": "うちこむ",
               "pitches": [
                 {
+                  "positions": "HHHHH",
+                  "tags": []
+                },
+                {
+                  "positions": "HHHHL",
+                  "tags": []
+                },
+                {
                   "positions": "HHHH",
                   "tags": []
                 },
@@ -35726,6 +36270,34 @@
                 ],
                 "reading": "うちこむ",
                 "positions": 3,
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHH",
+                "nasalPositions": [],
+                "devoicePositions": [],
+                "tags": [],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": [
+                  "うちこむ"
+                ]
+              },
+              {
+                "expressions": [
+                  "打ち込む"
+                ],
+                "reading": "うちこむ",
+                "positions": "HHHHL",
                 "nasalPositions": [],
                 "devoicePositions": [],
                 "tags": [],
@@ -35997,7 +36569,7 @@
             ]
           }
         ],
-        "pitchCount": 20,
+        "pitchCount": 22,
         "phoneticTranscriptions": [
           {
             "dictionary": "Test Dictionary 2",

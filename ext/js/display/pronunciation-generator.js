@@ -330,7 +330,11 @@ export class PronunciationGenerator {
      * @returns {string}
      */
     _pitchValueToPattJJ(numberOfMora, pitchValue) {
-        if (typeof pitchValue === 'string') { return pitchValue + pitchValue[pitchValue.length - 1]; }
+        if (typeof pitchValue === 'string') {
+            // the suffix may be set in the dictionary explicitly by appending an extra value
+            const pitchValueExtended = pitchValue + pitchValue[pitchValue.length - 1];
+            return pitchValueExtended.slice(0, numberOfMora + 1);
+        }
         if (numberOfMora >= 1) {
             if (pitchValue === 0) {
                 // Heiban

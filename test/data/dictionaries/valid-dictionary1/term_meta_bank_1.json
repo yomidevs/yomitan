@@ -52,6 +52,8 @@
         {
             "reading": "うちこむ",
             "pitches": [
+                {"position": "HHHHH"},
+                {"position": "HHHHL"},
                 {"position": "HHHH"},
                 {"position": "HHHL"},
                 {"position": "HHLH"},

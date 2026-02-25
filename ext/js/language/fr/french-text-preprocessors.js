@@ -16,19 +16,13 @@
  */
 
 
-/** @type {import('language').BidirectionalConversionPreprocessor} */
+/** @type {import('language').TextProcessor} */
 export const apostropheVariants = {
     name: 'Search for apostrophe variants',
-    description: '\' → ’ and vice versa',
-    options: ['off', 'direct', 'inverse'],
-    process: (str, setting) => {
-        switch (setting) {
-            case 'off':
-                return str;
-            case 'direct':
-                return str.replace(/'/g, '’');
-            case 'inverse':
-                return str.replace(/’/g, '\'');
-        }
-    },
+    description: '\' → \u2019 and vice versa',
+    process: (str) => [
+        str,
+        str.replace(/'/g, '\u2019'),
+        str.replace(/\u2019/g, '\''),
+    ],
 };

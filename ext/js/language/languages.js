@@ -47,20 +47,20 @@ export function getAllLanguageReadingNormalizers() {
 export function getAllLanguageTextProcessors() {
     const results = [];
     for (const {iso, textPreprocessors = {}, textPostprocessors = {}} of languageDescriptorMap.values()) {
-        /** @type {import('language').TextProcessorWithId<unknown>[]} */
+        /** @type {import('language').TextProcessorWithId[]} */
         const textPreprocessorsArray = [];
         for (const [id, textPreprocessor] of Object.entries(textPreprocessors)) {
             textPreprocessorsArray.push({
                 id,
-                textProcessor: /** @type {import('language').TextProcessor<unknown>} */ (textPreprocessor),
+                textProcessor: /** @type {import('language').TextProcessor} */ (textPreprocessor),
             });
         }
-        /** @type {import('language').TextProcessorWithId<unknown>[]} */
+        /** @type {import('language').TextProcessorWithId[]} */
         const textPostprocessorsArray = [];
         for (const [id, textPostprocessor] of Object.entries(textPostprocessors)) {
             textPostprocessorsArray.push({
                 id,
-                textProcessor: /** @type {import('language').TextProcessor<unknown>} */ (textPostprocessor),
+                textProcessor: /** @type {import('language').TextProcessor} */ (textPostprocessor),
             });
         }
         results.push({iso, textPreprocessors: textPreprocessorsArray, textPostprocessors: textPostprocessorsArray});

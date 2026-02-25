@@ -15,9 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {TextProcessor, ReadingNormalizer, BidirectionalConversionPreprocessor} from './language';
+import type {TextProcessor, ReadingNormalizer} from './language';
 import type {LanguageTransformDescriptor} from './language-transformer';
-import type {SafeAny} from './core';
 
 export type IsTextLookupWorthyFunction = (text: string) => boolean;
 
@@ -44,7 +43,7 @@ type LanguageDescriptor<
 };
 
 type TextProcessorDescriptor = {
-    [key: string]: TextProcessor<SafeAny>;
+    [key: string]: TextProcessor;
 };
 
 type LanguageDescriptorObjectMap = {
@@ -58,12 +57,12 @@ type LanguageDescriptorObjectMap = {
 export type LanguageDescriptorAny = LanguageDescriptorObjectMap[keyof LanguageDescriptorObjectMap];
 
 type CapitalizationPreprocessors = {
-    capitalizeFirstLetter: TextProcessor<boolean>;
-    decapitalize: TextProcessor<boolean>;
+    capitalizeFirstLetter: TextProcessor;
+    decapitalize: TextProcessor;
 };
 
 type AlphabeticDiacriticsProcessor = {
-    removeAlphabeticDiacritics: TextProcessor<boolean>;
+    removeAlphabeticDiacritics: TextProcessor;
 };
 
 /**
@@ -73,29 +72,32 @@ type AlphabeticDiacriticsProcessor = {
 type AllTextProcessors = {
     aii: {
         pre: {
-            removeSyriacScriptDiacritics: TextProcessor<boolean>;
+            removeSyriacScriptDiacritics: TextProcessor;
         };
     };
     ar: {
         pre: {
-            removeArabicScriptDiacritics: TextProcessor<boolean>;
-            removeTatweel: TextProcessor<boolean>;
-            normalizeUnicode: TextProcessor<boolean>;
-            addHamzaTop: TextProcessor<boolean>;
-            addHamzaBottom: TextProcessor<boolean>;
-            convertAlifMaqsuraToYaa: TextProcessor<boolean>;
+            removeArabicScriptDiacritics: TextProcessor;
+            removeTatweel: TextProcessor;
+            normalizeUnicode: TextProcessor;
+            addHamzaTop: TextProcessor;
+            addHamzaBottom: TextProcessor;
+            convertAlifMaqsuraToYaa: TextProcessor;
         };
     };
     arz: {
         pre: {
-            removeArabicScriptDiacritics: TextProcessor<boolean>;
-            removeTatweel: TextProcessor<boolean>;
-            normalizeUnicode: TextProcessor<boolean>;
-            addHamzaTop: TextProcessor<boolean>;
-            addHamzaBottom: TextProcessor<boolean>;
-            convertAlifMaqsuraToYaa: TextProcessor<boolean>;
-            convertHaToTaMarbuta: TextProcessor<boolean>;
+            removeArabicScriptDiacritics: TextProcessor;
+            removeTatweel: TextProcessor;
+            normalizeUnicode: TextProcessor;
+            addHamzaTop: TextProcessor;
+            addHamzaBottom: TextProcessor;
+            convertAlifMaqsuraToYaa: TextProcessor;
+            convertHaToTaMarbuta: TextProcessor;
         };
+    };
+    be: {
+        pre: CapitalizationPreprocessors;
     };
     bg: {
         pre: CapitalizationPreprocessors;
@@ -108,12 +110,12 @@ type AllTextProcessors = {
     };
     de: {
         pre: CapitalizationPreprocessors & {
-            eszettPreprocessor: BidirectionalConversionPreprocessor;
+            eszettPreprocessor: TextProcessor;
         };
     };
     el: {
         pre: CapitalizationPreprocessors & {
-            removeDoubleAcuteAccents: TextProcessor<boolean>;
+            removeDoubleAcuteAccents: TextProcessor;
         };
     };
     en: {
@@ -130,7 +132,7 @@ type AllTextProcessors = {
     };
     fa: {
         pre: {
-            removeArabicScriptDiacritics: TextProcessor<boolean>;
+            removeArabicScriptDiacritics: TextProcessor;
         };
     };
     fi: {
@@ -138,7 +140,7 @@ type AllTextProcessors = {
     };
     fr: {
         pre: CapitalizationPreprocessors & {
-            apostropheVariants: BidirectionalConversionPreprocessor;
+            apostropheVariants: TextProcessor;
         };
     };
     ga: {
@@ -146,7 +148,7 @@ type AllTextProcessors = {
     };
     grc: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor & {
-            convertLatinToGreek: TextProcessor<boolean>;
+            convertLatinToGreek: TextProcessor;
         };
     };
     haw: {
@@ -165,7 +167,7 @@ type AllTextProcessors = {
     };
     la: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor & {
-            processDiphtongs: BidirectionalConversionPreprocessor;
+            processDiphtongs: TextProcessor;
         };
     };
     lo: Record<string, never>;
@@ -174,24 +176,24 @@ type AllTextProcessors = {
     };
     ja: {
         pre: {
-            convertHalfWidthCharacters: TextProcessor<boolean>;
-            alphabeticToHiragana: TextProcessor<boolean>;
-            normalizeCombiningCharacters: TextProcessor<boolean>;
-            normalizeCJKCompatibilityCharacters: TextProcessor<boolean>;
-            normalizeRadicalCharacters: TextProcessor<boolean>;
-            alphanumericWidthVariants: BidirectionalConversionPreprocessor;
-            convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
-            collapseEmphaticSequences: TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
-            standardizeKanji: TextProcessor<boolean>;
+            convertHalfWidthCharacters: TextProcessor;
+            alphabeticToHiragana: TextProcessor;
+            normalizeCombiningCharacters: TextProcessor;
+            normalizeCJKCompatibilityCharacters: TextProcessor;
+            normalizeRadicalCharacters: TextProcessor;
+            alphanumericWidthVariants: TextProcessor;
+            convertHiraganaToKatakana: TextProcessor;
+            collapseEmphaticSequences: TextProcessor;
+            standardizeKanji: TextProcessor;
         };
     };
     ka: Record<string, never>;
     ko: {
         pre: {
-            disassembleHangul: TextProcessor<boolean>;
+            disassembleHangul: TextProcessor;
         };
         post: {
-            reassembleHangul: TextProcessor<boolean>;
+            reassembleHangul: TextProcessor;
         };
     };
     km: Record<string, never>;
@@ -219,8 +221,8 @@ type AllTextProcessors = {
     };
     ru: {
         pre: CapitalizationPreprocessors & {
-            yoToE: BidirectionalConversionPreprocessor;
-            removeRussianDiacritics: TextProcessor<boolean>;
+            yoToE: TextProcessor;
+            removeRussianDiacritics: TextProcessor;
         };
     };
     sga: {
@@ -228,7 +230,8 @@ type AllTextProcessors = {
     };
     sh: {
         pre: CapitalizationPreprocessors & {
-            removeSerboCroatianAccentMarks: TextProcessor<boolean>;
+            removeSerboCroatianAccentMarks: TextProcessor;
+            addSerboCroatianDiacritics: TextProcessor;
         };
     };
     sq: {
@@ -252,7 +255,7 @@ type AllTextProcessors = {
     };
     vi: {
         pre: CapitalizationPreprocessors & {
-            normalizeDiacritics: TextProcessor<'old' | 'new' | 'off'>;
+            normalizeDiacritics: TextProcessor;
         };
     };
     cy: {
@@ -260,22 +263,22 @@ type AllTextProcessors = {
     };
     yi: {
         pre: {
-            combineYiddishLigatures: TextProcessor<boolean>;
-            removeYiddishDiacritics: TextProcessor<boolean>;
+            combineYiddishLigatures: TextProcessor;
+            removeYiddishDiacritics: TextProcessor;
         };
         post: {
-            convertFinalLetters: TextProcessor<boolean>;
-            convertYiddishLigatures: BidirectionalConversionPreprocessor;
+            convertFinalLetters: TextProcessor;
+            convertYiddishLigatures: TextProcessor;
         };
     };
     yue: {
         pre: {
-            normalizeRadicalCharacters: TextProcessor<boolean>;
+            normalizeRadicalCharacters: TextProcessor;
         };
     };
     zh: {
         pre: {
-            normalizeRadicalCharacters: TextProcessor<boolean>;
+            normalizeRadicalCharacters: TextProcessor;
         };
     };
 };
