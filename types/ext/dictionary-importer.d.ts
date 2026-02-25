@@ -41,6 +41,14 @@ export type ImportResult = {
 export type ImportDetails = {
     prefixWildcardsSupported: boolean;
     yomitanVersion: string;
+    skipSchemaValidation?: boolean;
+    enableBulkImportIndexOptimization?: boolean;
+    disableProgressEvents?: boolean;
+    enableTermEntryContentDedup?: boolean;
+    skipImageMetadata?: boolean;
+    skipMediaImport?: boolean;
+    mediaResolutionConcurrency?: number;
+    debugImportLogging?: boolean;
 };
 
 export type Summary = {

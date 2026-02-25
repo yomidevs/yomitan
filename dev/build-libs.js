@@ -40,6 +40,21 @@ async function copyWasm(out) {
     fs.copyFileSync(wasmPath, path.join(out, 'resvg.wasm'));
 }
 
+/**
+ * @param {string} out
+ */
+async function copySqliteWasm(out) {
+    const sqliteWasmPath = path.dirname(require.resolve('@sqlite.org/sqlite-wasm/package.json'));
+    const sqliteDistPath = path.join(sqliteWasmPath, 'dist');
+    const sqliteOutPath = path.join(out, 'sqlite');
+    fs.mkdirSync(sqliteOutPath, {recursive: true});
+    for (const fileName of fs.readdirSync(sqliteDistPath)) {
+        const source = path.join(sqliteDistPath, fileName);
+        const destination = path.join(sqliteOutPath, fileName);
+        fs.copyFileSync(source, destination);
+    }
+}
+
 
 /**
  * @param {string} scriptPath
@@ -95,4 +110,5 @@ export async function buildLibs() {
     fs.writeFileSync(path.join(extDir, 'lib/validate-schemas.js'), patchedModuleCode);
 
     await copyWasm(path.join(extDir, 'lib'));
+    await copySqliteWasm(path.join(extDir, 'lib'));
 }

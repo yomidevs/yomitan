@@ -23,6 +23,14 @@ import {defineConfig, devices} from '@playwright/test';
  */
 import 'dotenv/config';
 
+const nodeMajorVersion = Number.parseInt(process.versions.node.split('.')[0], 10);
+if (!Number.isFinite(nodeMajorVersion) || nodeMajorVersion < 18 || nodeMajorVersion > 22) {
+    throw new Error(
+        `Playwright tests require Node.js 18-22. Detected ${process.version}. ` +
+        'Use a supported Node version for deterministic Playwright execution.',
+    );
+}
+
 /**
  * @see https://playwright.dev/docs/test-configuration
  */

@@ -16,13 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Dexie} from '../../../lib/dexie.js';
 import {ThemeController} from '../../app/theme-controller.js';
 import {parseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {isObjectNotArray} from '../../core/object-utilities.js';
 import {toError} from '../../core/to-error.js';
-import {arrayBufferUtf8Decode} from '../../data/array-buffer-util.js';
+import {arrayBufferToBase64, arrayBufferUtf8Decode, base64ToArrayBuffer} from '../../data/array-buffer-util.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {getAllPermissions} from '../../data/permissions-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -590,17 +589,10 @@ export class BackupController {
      * @returns {Promise<Blob>}
      */
     async _exportDatabase(databaseName) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const DexieConstructor = /** @type {import('dexie').DexieConstructor} */ (/** @type {unknown} */ (Dexie));
-        const db = new DexieConstructor(databaseName);
-        await db.open();
-        /** @type {unknown} */
-        // @ts-expect-error - The export function is declared as an extension which has no type information.
-        const blob = await db.export({
-            progressCallback: this._databaseExportProgressCallback.bind(this),
-        });
-        db.close();
-        return /** @type {Blob} */ (blob);
+        void databaseName;
+        const base64 = await this._settingsController.application.api.exportDictionaryDatabase();
+        this._databaseExportProgressCallback({totalRows: 1, completedRows: 1, done: true});
+        return new Blob([base64ToArrayBuffer(base64)], {type: 'application/octet-stream'});
     }
 
     /** */
@@ -621,9 +613,8 @@ export class BackupController {
             /** @type {import('core').TokenObject} */
             const token = {};
             this._settingsExportDatabaseToken = token;
-            const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
-            const data = await this._exportDatabase(this._dictionariesDatabaseName);
-            const blob = new Blob([data], {type: 'application/json'});
+            const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.sqlite3`;
+            const blob = await this._exportDatabase(this._dictionariesDatabaseName);
             this._saveBlob(blob, fileName);
         } catch (error) {
             log.log(error);
@@ -662,11 +653,11 @@ export class BackupController {
      * @param {File} file
      */
     async _importDatabase(_databaseName, file) {
-        await this._settingsController.application.api.purgeDatabase();
-        await Dexie.import(file, {
-            progressCallback: this._databaseImportProgressCallback.bind(this),
-        });
-        void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+        void _databaseName;
+        const content = await this._readFileArrayBuffer(file);
+        this._databaseImportProgressCallback({totalRows: 1, completedRows: 0, done: false});
+        await this._settingsController.application.api.importDictionaryDatabase(arrayBufferToBase64(content));
+        this._databaseImportProgressCallback({totalRows: 1, completedRows: 1, done: true});
         this._settingsController.application.triggerStorageChanged();
     }
 

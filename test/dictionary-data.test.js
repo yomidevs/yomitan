@@ -18,7 +18,7 @@
 import {readFileSync} from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {describe} from 'vitest';
+import {afterAll, beforeAll, describe, vi} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {createTranslatorTest} from './fixtures/translator-test.js';
 import {createTestAnkiNoteData, getTemplateRenderResults} from './utilities/anki.js';
@@ -30,9 +30,21 @@ setupStubs();
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
+const consoleLog = console.log;
 
 describe('Dictionary data', () => {
-    console.log('test');
+    beforeAll(() => {
+        vi.spyOn(console, 'log').mockImplementation((...args) => {
+            if (typeof args[0] === 'string' && args[0].startsWith('addScopeToCssLegacy failed, falling back on addScopeToCss:')) {
+                return;
+            }
+            consoleLog(...args);
+        });
+    });
+    afterAll(() => {
+        vi.restoreAllMocks();
+    });
+
     const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
     /** @type {import('test/translator').TranslatorTestInputs} */
     const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));

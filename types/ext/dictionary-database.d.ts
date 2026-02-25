@@ -213,8 +213,8 @@ export type ObjectStoreData<T extends ObjectStoreName> = (
     never
 );
 
-export type DatabaseUpdateItem = {
-    primaryKey: IDBValidKey;
+export type DatabaseUpdateItem<T extends ObjectStoreName = ObjectStoreName> = {
+    primaryKey: number;
     data: ObjectStoreData<T>;
 };
 
@@ -270,7 +270,7 @@ export type FindMultiBulkData<TItem = unknown> = {
     indexIndex: number;
 };
 
-export type CreateQuery<TItem = unknown> = (item: TItem) => (IDBValidKey | IDBKeyRange | null);
+export type CreateQuery<TItem = unknown> = (item: TItem) => (string | number | null);
 
 export type FindPredicate<TItem = unknown, TRow = unknown> = (row: TRow, item: TItem) => boolean;
 

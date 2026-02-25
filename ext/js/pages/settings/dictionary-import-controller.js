@@ -554,9 +554,25 @@ export class DictionaryImportController {
             for (const progress of [...progressContainers, ...recommendedProgressContainers]) { progress.hidden = false; }
 
             const optionsFull = await this._settingsController.getOptionsFull();
+            const {
+                skipSchemaValidation,
+                enableBulkImportIndexOptimization,
+                disableProgressEvents,
+                enableTermEntryContentDedup,
+                skipImageMetadata,
+                skipMediaImport,
+                mediaResolutionConcurrency,
+            } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
                 yomitanVersion: chrome.runtime.getManifest().version,
+                skipSchemaValidation,
+                enableBulkImportIndexOptimization,
+                disableProgressEvents,
+                enableTermEntryContentDedup,
+                skipImageMetadata,
+                skipMediaImport,
+                mediaResolutionConcurrency,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -615,6 +631,35 @@ export class DictionaryImportController {
     }
 
     /**
+     * @returns {{skipSchemaValidation: boolean, enableBulkImportIndexOptimization: boolean, disableProgressEvents: boolean, enableTermEntryContentDedup: boolean, skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number}}
+     */
+    _getImportPerformanceFlags() {
+        const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
+        if (typeof flags !== 'object' || flags === null || Array.isArray(flags)) {
+            return {
+                skipSchemaValidation: true,
+                enableBulkImportIndexOptimization: true,
+                disableProgressEvents: true,
+                enableTermEntryContentDedup: false,
+                skipImageMetadata: false,
+                skipMediaImport: false,
+                mediaResolutionConcurrency: 8,
+            };
+        }
+        const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
+        const mediaResolutionConcurrency = Number.isFinite(flagsRecord.mediaResolutionConcurrency) ? Math.trunc(/** @type {number} */ (flagsRecord.mediaResolutionConcurrency)) : 8;
+        return {
+            skipSchemaValidation: flagsRecord.skipSchemaValidation !== false,
+            enableBulkImportIndexOptimization: flagsRecord.enableBulkImportIndexOptimization !== false,
+            disableProgressEvents: flagsRecord.disableProgressEvents !== false,
+            enableTermEntryContentDedup: flagsRecord.enableTermEntryContentDedup === true,
+            skipImageMetadata: flagsRecord.skipImageMetadata === true,
+            skipMediaImport: flagsRecord.skipMediaImport === true,
+            mediaResolutionConcurrency: Math.max(1, Math.min(32, mediaResolutionConcurrency)),
+        };
+    }
+
+    /**
      * @template T
      * @param {T[]} arr
      * @yields {Promise<T>}
@@ -635,9 +680,13 @@ export class DictionaryImportController {
      */
     async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
-        const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
+        const {result, errors, fallbackDatabaseContentBase64} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
         if (!result) {
             return errors;
+        }
+
+        if (typeof fallbackDatabaseContentBase64 === 'string') {
+            await this._settingsController.application.api.importDictionaryDatabase(fallbackDatabaseContentBase64);
         }
 
         const errors2 = await this._addDictionarySettings(result, profilesDictionarySettings);

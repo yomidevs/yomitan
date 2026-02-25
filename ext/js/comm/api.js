@@ -256,6 +256,21 @@ export class API {
     }
 
     /**
+     * @returns {Promise<import('api').ApiReturn<'exportDictionaryDatabase'>>}
+     */
+    exportDictionaryDatabase() {
+        return this._invoke('exportDictionaryDatabase', void 0);
+    }
+
+    /**
+     * @param {import('api').ApiParam<'importDictionaryDatabase', 'content'>} content
+     * @returns {Promise<import('api').ApiReturn<'importDictionaryDatabase'>>}
+     */
+    importDictionaryDatabase(content) {
+        return this._invoke('importDictionaryDatabase', {content});
+    }
+
+    /**
      * @param {import('api').ApiParam<'getMedia', 'targets'>} targets
      * @returns {Promise<import('api').ApiReturn<'getMedia'>>}
      */

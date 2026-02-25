@@ -49,6 +49,16 @@ type ApiSurface = {
         };
         return: DictionaryDatabase.Media<string>[];
     };
+    databaseExportOffscreen: {
+        params: void;
+        return: string;
+    };
+    databaseImportOffscreen: {
+        params: {
+            content: string;
+        };
+        return: void;
+    };
     translatorPrepareOffscreen: {
         params: void;
         return: void;

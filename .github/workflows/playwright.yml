@@ -27,6 +27,8 @@ jobs:
           execute_install_scripts: true
 
       - uses: ./.github/actions/setup
+        with:
+          node-version: '22'
 
       - name: Build
         run: npm run build
@@ -81,13 +83,13 @@ jobs:
       - name: "[PR] Run tests & compare against master"
         id: playwright
         run: |
-          npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} 2>&1 | tee ./playwright-output || true
+          npm run -s test:playwright -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} 2>&1 | tee ./playwright-output || true
         continue-on-error: true
         if: github.event_name == 'pull_request' && steps.master-screenshots.outcome != 'failure'
 
       - name: "[Push] Run tests & save screenshots"
         id: playwright-master
-        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} -u 2>&1 | tee ./playwright-output
+        run: npm run -s test:playwright -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} -u 2>&1 | tee ./playwright-output
         if: github.event_name == 'push'
 
       - uses: actions/upload-artifact@v6
@@ -119,6 +121,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
+        with:
+          node-version: '22'
 
       ### playwright-report
       - name: Download blob reports from GitHub Actions Artifacts

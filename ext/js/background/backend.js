@@ -29,7 +29,7 @@ import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
 import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
 import {generateAnkiNoteMediaFileName, INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
-import {arrayBufferToBase64} from '../data/array-buffer-util.js';
+import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
@@ -171,6 +171,8 @@ export class Backend {
             ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)],
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
+            ['exportDictionaryDatabase',     this._onApiExportDictionaryDatabase.bind(this)],
+            ['importDictionaryDatabase',     this._onApiImportDictionaryDatabase.bind(this)],
             ['getMedia',                     this._onApiGetMedia.bind(this)],
             ['logGenericErrorBackend',       this._onApiLogGenericErrorBackend.bind(this)],
             ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
@@ -931,6 +933,18 @@ export class Backend {
     async _onApiPurgeDatabase() {
         await this._dictionaryDatabase.purge();
         this._triggerDatabaseUpdated('dictionary', 'purge');
+    }
+
+    /** @type {import('api').ApiHandler<'exportDictionaryDatabase'>} */
+    async _onApiExportDictionaryDatabase() {
+        const content = await this._dictionaryDatabase.exportDatabase();
+        return arrayBufferToBase64(content);
+    }
+
+    /** @type {import('api').ApiHandler<'importDictionaryDatabase'>} */
+    async _onApiImportDictionaryDatabase({content}) {
+        await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
+        this._triggerDatabaseUpdated('dictionary', 'import');
     }
 
     /** @type {import('api').ApiHandler<'getMedia'>} */

@@ -16,16 +16,28 @@
  */
 
 import {test as base, chromium} from '@playwright/test';
+import fs from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
+import {ManifestUtil} from '../../dev/manifest-util.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const root = path.join(dirname, '..', '..');
 
+const manifestPath = path.join(root, 'ext', 'manifest.json');
+
 export const test = base.extend({
     // eslint-disable-next-line no-empty-pattern
     context: async ({}, /** @type {(r: import('playwright').BrowserContext) => Promise<void>} */ use) => {
+        let createdManifest = false;
+        if (!fs.existsSync(manifestPath)) {
+            const manifestUtil = new ManifestUtil();
+            const variant = manifestUtil.getManifest('chrome-playwright');
+            fs.writeFileSync(manifestPath, ManifestUtil.createManifestString(variant).replace('$YOMITAN_VERSION', '0.0.0.0'));
+            createdManifest = true;
+        }
+
         const pathToExtension = path.join(root, 'ext');
         const context = await chromium.launchPersistentContext('', {
             // Disabled: headless: false,
@@ -35,13 +47,19 @@ export const test = base.extend({
                 `--load-extension=${pathToExtension}`,
             ],
         });
-        await use(context);
-        await context.close();
+        try {
+            await use(context);
+        } finally {
+            await context.close();
+            if (createdManifest) {
+                fs.unlinkSync(manifestPath);
+            }
+        }
     },
     extensionId: async ({context}, use) => {
         let [background] = context.serviceWorkers();
         if (!background) {
-            background = await context.waitForEvent('serviceworker');
+            background = await context.waitForEvent('serviceworker', {timeout: 15_000});
         }
 
         const extensionId = background.url().split('/')[2];

@@ -20,6 +20,9 @@ import fs from 'fs';
 import {test} from 'vitest';
 import {builtinEnvironments} from 'vitest/environments';
 
+const nativeInt8Array = Int8Array;
+const nativeUint8Array = Uint8Array;
+
 /**
  * @param {import('jsdom').DOMWindow} window
  */
@@ -47,6 +50,8 @@ export async function setupDomTest(htmlFilePath) {
     const html = typeof htmlFilePath === 'string' ? fs.readFileSync(htmlFilePath, {encoding: 'utf8'}) : '<!DOCTYPE html>';
     const env = builtinEnvironments.jsdom;
     const environment = await env.setup(global, {jsdom: {html}});
+    global.Int8Array = nativeInt8Array;
+    global.Uint8Array = nativeUint8Array;
     const window = /** @type {import('jsdom').DOMWindow} */ (/** @type {unknown} */ (global.window));
     prepareWindow(window);
     return {
@@ -66,6 +71,8 @@ export function createDomTest(htmlFilePath) {
         window: async ({}, use) => {
             const env = builtinEnvironments.jsdom;
             const environment = await env.setup(global, {jsdom: {html}});
+            global.Int8Array = nativeInt8Array;
+            global.Uint8Array = nativeUint8Array;
             const window = /** @type {import('jsdom').DOMWindow} */ (/** @type {unknown} */ (global.window));
             prepareWindow(window);
             try {

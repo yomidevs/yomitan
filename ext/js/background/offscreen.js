@@ -22,7 +22,7 @@ import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {sanitizeCSS} from '../core/utilities.js';
-import {arrayBufferToBase64} from '../data/array-buffer-util.js';
+import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {WebExtension} from '../extension/web-extension.js';
 import {Translator} from '../language/translator.js';
@@ -57,6 +57,8 @@ export class Offscreen {
             ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
             ['databasePurgeOffscreen',         this._purgeDatabaseHandler.bind(this)],
             ['databaseGetMediaOffscreen',      this._getMediaHandler.bind(this)],
+            ['databaseExportOffscreen',        this._exportDatabaseHandler.bind(this)],
+            ['databaseImportOffscreen',        this._importDatabaseHandler.bind(this)],
             ['translatorPrepareOffscreen',     this._prepareTranslatorHandler.bind(this)],
             ['findKanjiOffscreen',             this._findKanjiHandler.bind(this)],
             ['findTermsOffscreen',             this._findTermsHandler.bind(this)],
@@ -126,6 +128,16 @@ export class Offscreen {
     async _getMediaHandler({targets}) {
         const media = await this._dictionaryDatabase.getMedia(targets);
         return media.map((m) => ({...m, content: arrayBufferToBase64(m.content)}));
+    }
+
+    /** @type {import('offscreen').ApiHandler<'databaseExportOffscreen'>} */
+    async _exportDatabaseHandler() {
+        return arrayBufferToBase64(await this._dictionaryDatabase.exportDatabase());
+    }
+
+    /** @type {import('offscreen').ApiHandler<'databaseImportOffscreen'>} */
+    async _importDatabaseHandler({content}) {
+        await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
     }
 
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */

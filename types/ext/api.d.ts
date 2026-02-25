@@ -293,6 +293,16 @@ type ApiSurface = {
         params: void;
         return: void;
     };
+    exportDictionaryDatabase: {
+        params: void;
+        return: string;
+    };
+    importDictionaryDatabase: {
+        params: {
+            content: string;
+        };
+        return: void;
+    };
     getMedia: {
         params: {
             targets: GetMediaDetailsTarget[];

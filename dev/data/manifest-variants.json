@@ -1,7 +1,7 @@
 {
     "manifest": {
         "manifest_version": 3,
-        "name": "Yomitan Popup Dictionary",
+        "name": "Manabitan Popup Dictionary",
         "version": "$YOMITAN_VERSION",
         "description": "Popup dictionary for language learning",
         "author": {
@@ -26,12 +26,18 @@
                 "64": "images/icon64.png",
                 "128": "images/icon128.png"
             },
-            "default_title": "Yomitan",
+            "default_title": "Manabitan",
             "default_popup": "action-popup.html"
         },
         "background": {
             "service_worker": "sw.js",
             "type": "module"
+        },
+        "cross_origin_opener_policy": {
+            "value": "same-origin"
+        },
+        "cross_origin_embedder_policy": {
+            "value": "require-corp"
         },
         "omnibox": {
             "keyword": "yomi"
@@ -106,7 +112,8 @@
                     "popup.html",
                     "template-renderer.html",
                     "js/*",
-                    "lib/resvg.wasm"
+                    "lib/resvg.wasm",
+                    "lib/sqlite/*"
                 ],
                 "matches": [
                     "<all_urls>"
@@ -127,7 +134,7 @@
         {
             "name": "chrome",
             "inherit": "base",
-            "fileName": "yomitan-chrome.zip",
+            "fileName": "manabitan-chrome.zip",
             "excludeFiles": [
                 "background.html"
             ]
@@ -135,7 +142,7 @@
         {
             "name": "chrome-dev",
             "inherit": "chrome",
-            "fileName": "yomitan-chrome-dev.zip",
+            "fileName": "manabitan-chrome-dev.zip",
             "modifications": [
                 {
                     "action": "replace",
@@ -160,7 +167,7 @@
         {
             "name": "chrome-playwright",
             "inherit": "chrome-dev",
-            "fileName": "yomitan-chrome-playwright.zip",
+            "fileName": "manabitan-chrome-playwright.zip",
             "modifications": [
                 {
                     "action": "remove",
@@ -183,7 +190,7 @@
         {
             "name": "firefox",
             "inherit": "base",
-            "fileName": "yomitan-firefox.zip",
+            "fileName": "manabitan-firefox.zip",
             "modifications": [
                 {
                     "action": "set",
@@ -204,6 +211,18 @@
                     "path": [
                         "background",
                         "type"
+                    ]
+                },
+                {
+                    "action": "delete",
+                    "path": [
+                        "cross_origin_opener_policy"
+                    ]
+                },
+                {
+                    "action": "delete",
+                    "path": [
+                        "cross_origin_embedder_policy"
                     ]
                 },
                 {
@@ -277,7 +296,7 @@
         {
             "name": "firefox-dev",
             "inherit": "firefox",
-            "fileName": "yomitan-firefox-dev.zip",
+            "fileName": "manabitan-firefox-dev.zip",
             "modifications": [
                 {
                     "action": "replace",
@@ -326,7 +345,7 @@
         {
             "name": "firefox-android",
             "inherit": "firefox",
-            "fileName": "yomitan-firefox-android"
+            "fileName": "manabitan-firefox-android"
         },
         {
             "name": "safari",
@@ -351,6 +370,18 @@
                         "permissions"
                     ],
                     "item": "offscreen"
+                },
+                {
+                    "action": "delete",
+                    "path": [
+                        "cross_origin_opener_policy"
+                    ]
+                },
+                {
+                    "action": "delete",
+                    "path": [
+                        "cross_origin_embedder_policy"
+                    ]
                 },
                 {
                     "action": "delete",
@@ -384,7 +415,7 @@
         {
             "name": "edge",
             "inherit": "base",
-            "fileName": "yomitan-edge.zip",
+            "fileName": "manabitan-edge.zip",
             "excludeFiles": [
                 "background.html"
             ]

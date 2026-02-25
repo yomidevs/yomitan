@@ -1,9 +1,21 @@
 name: Setup
 description: Setup the workspace for the CI
+inputs:
+  node-version:
+    description: "Optional Node.js version override"
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
     - name: Setup node
+      if: ${{ inputs.node-version != '' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Setup node from package.json
+      if: ${{ inputs.node-version == '' }}
       uses: actions/setup-node@v4
       with:
         node-version-file: "package.json"

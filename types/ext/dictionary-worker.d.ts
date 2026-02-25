@@ -61,11 +61,13 @@ export type MessageData<TResponseRaw = unknown> = MessageCompleteData<TResponseR
 export type MessageCompleteResultSerialized = {
     result: DictionaryImporter.Summary | null;
     errors: Core.SerializedError[];
+    fallbackDatabaseContentBase64: string | null;
 };
 
 export type MessageCompleteResult = {
     result: DictionaryImporter.Summary | null;
     errors: Error[];
+    fallbackDatabaseContentBase64: string | null;
 };
 
 export type ImportProgressCallback = (details: DictionaryImporter.ProgressData) => void;

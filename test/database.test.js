@@ -25,6 +25,7 @@ import {createDictionaryArchiveData, getDictionaryArchiveIndex} from '../dev/dic
 import {parseJson} from '../dev/json.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
+import {chrome, fetch} from './mocks/common.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
 import {setupStubs} from './utilities/database.js';
 
@@ -32,6 +33,8 @@ const dirname = pathDirname(fileURLToPath(import.meta.url));
 
 setupStubs();
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
+vi.stubGlobal('fetch', fetch);
+vi.stubGlobal('chrome', chrome);
 
 /**
  * @param {string} dictionary
@@ -177,6 +180,75 @@ describe('Database', () => {
         const testDataFilePath = join(dirname, 'data/database-test-cases.json');
         /** @type {import('test/database').DatabaseTestData} */
         const testData = parseJson(readFileSync(testDataFilePath, {encoding: 'utf8'}));
+        test('Deduplicates shared term entry content', async ({expect}) => {
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            /** @type {import('dictionary-database').DatabaseTermEntry[]} */
+            const entries = [
+                {
+                    dictionary: 'dedupe-dict',
+                    expression: '語1',
+                    reading: 'ご1',
+                    definitionTags: 'n',
+                    termTags: '',
+                    rules: '',
+                    score: 1,
+                    glossary: ['shared definition'],
+                    sequence: 1,
+                },
+                {
+                    dictionary: 'dedupe-dict',
+                    expression: '語2',
+                    reading: 'ご2',
+                    definitionTags: 'n',
+                    termTags: '',
+                    rules: '',
+                    score: 2,
+                    glossary: ['shared definition'],
+                    sequence: 2,
+                },
+                {
+                    dictionary: 'dedupe-dict',
+                    expression: '語3',
+                    reading: 'ご3',
+                    definitionTags: 'n',
+                    termTags: '',
+                    rules: '',
+                    score: 3,
+                    glossary: ['different definition'],
+                    sequence: 3,
+                },
+            ];
+
+            await dictionaryDatabase.bulkAdd('terms', entries, 0, entries.length);
+
+            // eslint-disable-next-line no-underscore-dangle
+            const db = dictionaryDatabase._requireDb();
+            const termsCount = db.selectValue('SELECT COUNT(*) FROM terms');
+            const termEntryContentCount = db.selectValue('SELECT COUNT(*) FROM termEntryContent');
+            const reusedContentCount = db.selectValue(`
+                SELECT COUNT(*)
+                FROM (
+                    SELECT entryContentId
+                    FROM terms
+                    GROUP BY entryContentId
+                    HAVING COUNT(*) > 1
+                )
+            `);
+
+            expect.soft(termsCount).toStrictEqual(3);
+            expect.soft(termEntryContentCount).toStrictEqual(2);
+            expect.soft(reusedContentCount).toStrictEqual(1);
+
+            const titles = new Map([['dedupe-dict', {alias: 'dedupe-dict', allowSecondarySearches: false}]]);
+            const results = await dictionaryDatabase.findTermsExactBulk([{term: '語2', reading: 'ご2'}], titles);
+            expect.soft(results.length).toStrictEqual(1);
+            expect.soft(results[0].definitions).toStrictEqual(['shared definition']);
+
+            await dictionaryDatabase.close();
+        });
+
         test('Import data and test', async ({expect}) => {
             const fakeImportDate = testData.expectedSummary.importDate;
 

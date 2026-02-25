@@ -18,7 +18,7 @@
 
 import {ExtensionError} from '../core/extension-error.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
-import {base64ToArrayBuffer} from '../data/array-buffer-util.js';
+import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
 
 /**
  * This class is responsible for creating and communicating with an offscreen document.
@@ -204,6 +204,22 @@ export class DictionaryDatabaseProxy {
     async getMedia(targets) {
         const serializedMedia = /** @type {import('dictionary-database').Media<string>[]} */ (await this._offscreen.sendMessagePromise({action: 'databaseGetMediaOffscreen', params: {targets}}));
         return serializedMedia.map((m) => ({...m, content: base64ToArrayBuffer(m.content)}));
+    }
+
+    /**
+     * @returns {Promise<ArrayBuffer>}
+     */
+    async exportDatabase() {
+        const content = await this._offscreen.sendMessagePromise({action: 'databaseExportOffscreen'});
+        return base64ToArrayBuffer(content);
+    }
+
+    /**
+     * @param {ArrayBuffer} content
+     * @returns {Promise<void>}
+     */
+    async importDatabase(content) {
+        await this._offscreen.sendMessagePromise({action: 'databaseImportOffscreen', params: {content: arrayBufferToBase64(content)}});
     }
 
     /**

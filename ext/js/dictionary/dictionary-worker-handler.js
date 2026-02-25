@@ -17,6 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
+import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from './dictionary-database.js';
 import {DictionaryImporter} from './dictionary-importer.js';
 import {DictionaryWorkerMediaLoader} from './dictionary-worker-media-loader.js';
@@ -90,9 +91,11 @@ export class DictionaryWorkerHandler {
         try {
             const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
             const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
+            const fallbackDatabaseContent = dictionaryDatabase.usesFallbackStorage() ? await dictionaryDatabase.exportDatabase() : null;
             return {
                 result,
                 errors: errors.map((error) => ExtensionError.serialize(error)),
+                fallbackDatabaseContentBase64: fallbackDatabaseContent === null ? null : arrayBufferToBase64(fallbackDatabaseContent),
             };
         } finally {
             void dictionaryDatabase.close();
