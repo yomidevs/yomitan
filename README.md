@@ -143,6 +143,7 @@ This section documents how to build an exact copy of the distributed extension p
    ```
 
 This executes:
+
 - `npm run build:libs`
 - `npm run license-report:html`
 - `npm run-script build -- --all --version <version>`
@@ -150,6 +151,7 @@ This executes:
 ### Build outputs
 
 The generated browser packages are written to the `builds/` directory, including:
+
 - `manabitan-chrome.zip`
 - `manabitan-firefox.zip`
 - `manabitan-firefox-dev.zip`
