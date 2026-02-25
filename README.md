@@ -1,25 +1,33 @@
-# Yomitan
+![Manabitan icon](ext/images/icon128.png)
 
-[![Get Yomitan for Chrome](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&style=for-the-badge&logoColor=lightblue&color=lightblue&label=get%20yomitan%20for%20chrome%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
-[![Get Yomitan for Firefox](<https://img.shields.io/amo/v/yomitan?logo=Firefox&style=for-the-badge&color=orange&label=get%20yomitan%20for%20firefox%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
-[![Get Yomitan for Edge](https://img.shields.io/badge/dynamic/json?logo=puzzle&label=get%20yomitan%20for%20edge&style=for-the-badge&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fidelnfbbmikgfiejhgmddlbkfgiifnnn)](https://microsoftedge.microsoft.com/addons/detail/yomitan/idelnfbbmikgfiejhgmddlbkfgiifnnn)
+# Manabitan
+
+[![Get Manabitan for Chrome](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&style=for-the-badge&logoColor=lightblue&color=lightblue&label=get%20manabitan%20for%20chrome%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
+[![Get Manabitan for Firefox](<https://img.shields.io/amo/v/yomitan?logo=Firefox&style=for-the-badge&color=orange&label=get%20manabitan%20for%20firefox%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
+[![Get Manabitan for Edge](https://img.shields.io/badge/dynamic/json?logo=puzzle&label=get%20manabitan%20for%20edge&style=for-the-badge&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fidelnfbbmikgfiejhgmddlbkfgiifnnn)](https://microsoftedge.microsoft.com/addons/detail/yomitan/idelnfbbmikgfiejhgmddlbkfgiifnnn)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/yomidevs/yomitan/badge?style=for-the-badge)](https://securityscorecards.dev/viewer/?uri=github.com/yomidevs/yomitan)
 
 [![Discord](https://dcbadge.limes.pink/api/server/YkQrXW6TXF?style=for-the-badge)](https://discord.gg/YkQrXW6TXF)
 
 # Visit [yomitan.wiki](https://yomitan.wiki) to learn more!
 
-:wave: **Yomitan is [the successor](https://foosoft.net/posts/passing-the-torch-to-yomitan/) to Yomichan** ([migration guide](https://yomitan.wiki/yomichan-migration/)) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26, 2023. We have made a number of foundational changes to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
+> Documentation currently lives on the legacy Yomitan wiki. Manabitan is feature-compatible, so the Yomitan wiki guides still apply.
+
+:wave: **Manabitan is the successor to Yomitan** ([legacy migration guide](https://yomitan.wiki/yomichan-migration/)). We continue Yomitan's feature set with compatible behavior while extending ongoing maintenance and development.
+
+## What is Manabitan?
+
+Manabitan is a browser extension fork of Yomitan that helps you read and learn languages with popup dictionary lookup and study tooling.
 
 📢 **New contributors [welcome](#contributing)!**
 
-📢 **Interested in adding a new language to Yomitan? See [here](./docs/development/language-features.md) for thorough documentation!**
+📢 **Interested in adding a new language to Manabitan? See [here](./docs/development/language-features.md) for thorough documentation!**
 
-## What is Yomitan?
+## Features
 
-Yomitan turns your web browser into a tool for building language literacy by helping you **read** texts that would otherwise be too difficult to tackle in [a variety of supported languages](https://yomitan.wiki/supported-languages/).
+Manabitan turns your web browser into a tool for building language literacy by helping you **read** texts that would otherwise be too difficult to tackle in [a variety of supported languages](https://yomitan.wiki/supported-languages/).
 
-Yomitan provides powerful features not available in other browser-based dictionaries:
+Manabitan provides powerful features not available in other browser-based dictionaries:
 
 - 💬 Interactive popup definition window for displaying search results.
 - 🔊 Built-in native pronunciation audio with the ability to add your own [custom audio sources](https://yomitan.wiki/advanced/#default-audio-sources).
@@ -36,12 +44,12 @@ Yomitan provides powerful features not available in other browser-based dictiona
 
 ## Documentation/How To
 
-**Please visit the [Yomitan Wiki](https://yomitan.wiki) for the most up-to-date usage documentation.**
+**Please visit the [Yomitan Wiki](https://yomitan.wiki) for the most up-to-date usage documentation (legacy docs, feature-compatible with Manabitan).**
 
 ### Developer Documentation
 
 - Dictionaries
-  - 🛠️ [Making Yomitan Dictionaries](./docs/making-yomitan-dictionaries.md)
+  - 🛠️ [Making Manabitan Dictionaries](./docs/making-yomitan-dictionaries.md)
 - Anki Integration
   - 🔧 [Anki handlebar templates](./docs/templates.md)
 - Advanced Features
@@ -50,7 +58,7 @@ Yomitan provides powerful features not available in other browser-based dictiona
 
 ## Installation
 
-Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially introduced into the _testing_ version, and after some time spent ensuring that they are relatively bug free, they will be promoted to the _stable_ version. If you are technically savvy and don't mind [submitting issues](https://github.com/yomidevs/yomitan/issues/new/choose) on GitHub, try the _testing_ version; otherwise, the _stable_ version will be your best bet. Check [contributing](#contributing) for more information on how to help.
+Manabitan comes in two flavors: _stable_ and _testing_. New changes are initially introduced into the _testing_ version, and after some time spent ensuring that they are relatively bug free, they will be promoted to the _stable_ version. If you are technically savvy and don't mind [submitting issues](https://github.com/ManabiIO/manabitan/issues/new/choose) on GitHub, try the _testing_ version; otherwise, the _stable_ version will be your best bet. Check [contributing](#contributing) for more information on how to help.
 
 - **Google Chrome**
 
@@ -60,7 +68,7 @@ Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially 
 - **Mozilla Firefox**
 
   - [stable](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
-  - [testing](https://github.com/yomidevs/yomitan/releases) ※
+  - [testing](https://github.com/ManabiIO/manabitan/releases) ※
 
 - **Microsoft Edge**
   - [stable](https://microsoftedge.microsoft.com/addons/detail/yomitan/idelnfbbmikgfiejhgmddlbkfgiifnnn)
@@ -70,17 +78,17 @@ Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially 
 
 ## Contributing
 
-🚀 **Dip your toes into contributing by looking at issues with the label [good first issue](https://github.com/yomidevs/yomitan/issues?q=is%3Aissue+is%3Aopen+label%3A%22gоοd+fіrst+іssսe%22).**
+🚀 **Dip your toes into contributing by looking at issues with the label [good first issue](https://github.com/ManabiIO/manabitan/issues?q=is%3Aissue+is%3Aopen+label%3A%22gоοd+fіrst+іssսe%22).**
 
-Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/yomidevs/yomitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md).
+Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/ManabiIO/manabitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md).
 
 Here are some ways anyone can help:
 
-- Try using the Yomitan dev build. Not only do you get cutting edge features, but you can help uncover bugs and give feedback to developers early on.
-- Document any UI/UX friction in GitHub Issues. We're looking to make Yomitan more accessible to non-technical users.
+- Try using the Manabitan dev build. Not only do you get cutting edge features, but you can help uncover bugs and give feedback to developers early on.
+- Document any UI/UX friction in GitHub Issues. We're looking to make Manabitan more accessible to non-technical users.
 - All the issues in `area/bug` older than 2 months need help reproducing. If anything interests you, please try to reproduce it and report your results. We can't easily tell if these issues are one-off, have since been resolved, or are no longer relevant.
 
-> The current active maintainers of Yomitan spend a lot of their time debugging and triaging issues. When someone files a bug report, we need to assess the frequency and severity of the bug. It is extremely helpful if we get multiple reports of people who experience a bug or people who can contribute additional detail to an existing bug report.
+> The current active maintainers of Manabitan spend a lot of their time debugging and triaging issues. When someone files a bug report, we need to assess the frequency and severity of the bug. It is extremely helpful if we get multiple reports of people who experience a bug or people who can contribute additional detail to an existing bug report.
 
 If you're looking to code, please let us know what you plan on working on before submitting a Pull Request. This gives the core maintainers an opportunity to provide feedback early on before you dive too deep. You can do this by opening a GitHub Issue with the proposal.
 
@@ -94,9 +102,9 @@ Information on how to setup and build the codebase can be found [here](./CONTRIB
 
 If you want to add or improve support for a language, read the documentation on [language features](./docs/development/language-features.md).
 
-Feel free to join us on the [Yomitan Discord](https://discord.gg/YkQrXW6TXF).
+Feel free to join us on the [Manabitan Discord](https://discord.gg/YkQrXW6TXF).
 
-## Building Yomitan
+## Building Manabitan
 
 1. Install [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/).
 
@@ -112,7 +120,7 @@ For more information, see [Contributing](./CONTRIBUTING.md#setup).
 
 ## Third-Party Libraries
 
-Yomitan uses several third-party libraries to function.
+Manabitan uses several third-party libraries to function.
 
 <!-- The following table is generated using the command `npm run license-report:markdown`. -->
 
