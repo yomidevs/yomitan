@@ -165,6 +165,7 @@ export class DictionaryImporter {
             };
         }
         dictionaryDatabase.setTermEntryContentDedupEnabled(enableTermEntryContentDedup);
+        dictionaryDatabase.setImportDebugLogging(this._debugImportLogging);
 
         this._disableProgressEvents = !!details.disableProgressEvents;
 
@@ -396,6 +397,7 @@ export class DictionaryImporter {
 
             return {result: summary, errors};
         } finally {
+            dictionaryDatabase.setImportDebugLogging(false);
             if (enableBulkImportIndexOptimization) {
                 this._progressNextStep(20);
                 this._progressData.index = 0;

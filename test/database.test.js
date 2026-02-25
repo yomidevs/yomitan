@@ -226,19 +226,23 @@ describe('Database', () => {
             // eslint-disable-next-line no-underscore-dangle
             const db = dictionaryDatabase._requireDb();
             const termsCount = db.selectValue('SELECT COUNT(*) FROM terms');
-            const termEntryContentCount = db.selectValue('SELECT COUNT(*) FROM termEntryContent');
+            const termsWithExternalContentCount = db.selectValue(`
+                SELECT COUNT(*)
+                FROM terms
+                WHERE entryContentOffset IS NOT NULL AND entryContentLength IS NOT NULL
+            `);
             const reusedContentCount = db.selectValue(`
                 SELECT COUNT(*)
                 FROM (
-                    SELECT entryContentId
+                    SELECT entryContentOffset, entryContentLength, entryContentDictName
                     FROM terms
-                    GROUP BY entryContentId
+                    GROUP BY entryContentOffset, entryContentLength, entryContentDictName
                     HAVING COUNT(*) > 1
                 )
             `);
 
             expect.soft(termsCount).toStrictEqual(3);
-            expect.soft(termEntryContentCount).toStrictEqual(2);
+            expect.soft(termsWithExternalContentCount).toStrictEqual(3);
             expect.soft(reusedContentCount).toStrictEqual(1);
 
             const titles = new Map([['dedupe-dict', {alias: 'dedupe-dict', allowSecondarySearches: false}]]);

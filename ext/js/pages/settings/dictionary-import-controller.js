@@ -563,6 +563,7 @@ export class DictionaryImportController {
                 skipMediaImport,
                 mediaResolutionConcurrency,
                 structuredContentImportFastPath,
+                debugImportLogging,
             } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
@@ -575,6 +576,7 @@ export class DictionaryImportController {
                 skipMediaImport,
                 mediaResolutionConcurrency,
                 structuredContentImportFastPath,
+                debugImportLogging,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -633,7 +635,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipSchemaValidation: boolean, enableBulkImportIndexOptimization: boolean, disableProgressEvents: boolean, enableTermEntryContentDedup: boolean, skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, structuredContentImportFastPath: boolean}}
+     * @returns {{skipSchemaValidation: boolean, enableBulkImportIndexOptimization: boolean, disableProgressEvents: boolean, enableTermEntryContentDedup: boolean, skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, structuredContentImportFastPath: boolean, debugImportLogging: boolean}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -647,6 +649,7 @@ export class DictionaryImportController {
                 skipMediaImport: false,
                 mediaResolutionConcurrency: 8,
                 structuredContentImportFastPath: true,
+                debugImportLogging: false,
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
@@ -660,6 +663,7 @@ export class DictionaryImportController {
             skipMediaImport: flagsRecord.skipMediaImport === true,
             mediaResolutionConcurrency: Math.max(1, Math.min(32, mediaResolutionConcurrency)),
             structuredContentImportFastPath: flagsRecord.structuredContentImportFastPath === true,
+            debugImportLogging: flagsRecord.debugImportLogging === true,
         };
     }
 
