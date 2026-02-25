@@ -25,6 +25,7 @@ import {createDictionaryArchiveData, getDictionaryArchiveIndex} from '../dev/dic
 import {parseJson} from '../dev/json.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
+import {DictionaryWorkerHandler} from '../ext/js/dictionary/dictionary-worker-handler.js';
 import {chrome, fetch} from './mocks/common.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
 import {setupStubs} from './utilities/database.js';
@@ -180,6 +181,45 @@ describe('Database', () => {
         const testDataFilePath = join(dirname, 'data/database-test-cases.json');
         /** @type {import('test/database').DatabaseTestData} */
         const testData = parseJson(readFileSync(testDataFilePath, {encoding: 'utf8'}));
+        test('Seeds existing database content for sequential fallback worker imports', async ({expect}) => {
+            const dictionaryWorkerHandler = new DictionaryWorkerHandler();
+            /** @type {Record<string, unknown>} */
+            const fakeDatabase = {
+                usesFallbackStorage: () => true,
+                exportDatabase: async () => new ArrayBuffer(8),
+                importDatabase: async () => {},
+                close: async () => {},
+            };
+            const getPreparedDictionaryDatabaseSpy = vi.spyOn(dictionaryWorkerHandler, '_getPreparedDictionaryDatabase').mockResolvedValue(
+                /** @type {import('dictionary-database').DictionaryDatabase} */ (/** @type {unknown} */ (fakeDatabase)),
+            );
+            const importDictionarySpy = vi.spyOn(DictionaryImporter.prototype, 'importDictionary').mockResolvedValue({
+                result: /** @type {import('dictionary-importer').Summary} */ ({title: 'mock', revision: 'mock', sequenced: true, version: 3, importDate: 0, prefixWildcardsSupported: false, styles: ''}),
+                errors: [],
+            });
+            const importDatabaseSpy = vi.spyOn(fakeDatabase, 'importDatabase');
+
+            const importDictionaryInternal = /** @type {(params: import('dictionary-worker-handler').ImportDictionaryMessageParams, onProgress: (...args: unknown[]) => void) => Promise<import('dictionary-worker').MessageCompleteResultSerialized>} */ (
+                Reflect.get(dictionaryWorkerHandler, '_importDictionary').bind(dictionaryWorkerHandler)
+            );
+            /** @type {import('dictionary-importer').ImportDetails} */
+            const importDetails = {
+                prefixWildcardsSupported: false,
+                yomitanVersion: '0.0.0.0',
+            };
+
+            await importDictionaryInternal({details: importDetails, archiveContent: new ArrayBuffer(0)}, () => {});
+            expect.soft(importDatabaseSpy).toHaveBeenCalledTimes(0);
+
+            await importDictionaryInternal({
+                details: {...importDetails, existingDatabaseContentBase64: 'AQID'},
+                archiveContent: new ArrayBuffer(0),
+            }, () => {});
+            expect.soft(importDatabaseSpy).toHaveBeenCalledTimes(1);
+
+            getPreparedDictionaryDatabaseSpy.mockRestore();
+            importDictionarySpy.mockRestore();
+        });
         test('Deduplicates shared term entry content', async ({expect}) => {
             const dictionaryDatabase = new DictionaryDatabase();
             await dictionaryDatabase.prepare();
