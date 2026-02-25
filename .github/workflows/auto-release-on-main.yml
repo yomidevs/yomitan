@@ -33,9 +33,12 @@ jobs:
         id: meta
         shell: bash
         run: |
-          # Keep Chrome-compatible 4-part integer version while staying unique per CI run attempt.
+          # Keep a Chrome-compatible 4-part integer version while making the
+          # last two parts fixed-width (no leading zeroes) for stable release ordering.
+          # n is monotonic per workflow run + attempt.
           n=$(( ${{ github.event.workflow_run.run_number }} * 100 + ${{ github.event.workflow_run.run_attempt }} ))
-          version="1.0.$(( n / 65535 )).$(( n % 65535 ))"
+          slot=50000
+          version="1.0.$(( 10000 + n / slot )).$(( 10000 + n % slot ))"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "tag=$version" >> "$GITHUB_OUTPUT"
 
