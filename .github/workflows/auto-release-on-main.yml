@@ -46,6 +46,7 @@ jobs:
         run: npm run-script build -- --all --version "${{ steps.meta.outputs.version }}"
 
       - name: Create GitHub release with extension artifacts
+        id: release
         uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # pin@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
@@ -53,3 +54,11 @@ jobs:
           generate_release_notes: true
           prerelease: false
           files: builds/*
+
+      - name: Dispatch publish-firefox-development
+        uses: aurelien-baudet/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7 # pin@v2
+        with:
+          workflow: publish-firefox-development
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: false
+          inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}", "tag": "${{ steps.meta.outputs.tag }}" }'
