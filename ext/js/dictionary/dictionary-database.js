@@ -1566,8 +1566,8 @@ export class DictionaryDatabase {
         const pendingContentRows = [];
         /** @type {Map<string, number>} */
         const pendingContentRowIndexByHash = new Map();
-        const termBatchSize = 10000;
-        const contentBatchSize = 4096;
+        const termBatchSize = 25000;
+        const contentBatchSize = 8192;
 
         if (useLocalTransaction) {
             db.exec('BEGIN IMMEDIATE');
@@ -1908,7 +1908,7 @@ export class DictionaryDatabase {
      */
     async _bulkAddTermsWithoutContentDedup(items, start, count) {
         const useLocalTransaction = !this._bulkImportTransactionOpen;
-        const batchSize = 10000;
+        const batchSize = 25000;
 
         if (useLocalTransaction) {
             this._requireDb().exec('BEGIN IMMEDIATE');

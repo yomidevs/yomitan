@@ -52,7 +52,7 @@ export class TermRecordOpfsStore {
         /** @type {Uint8Array[]} */
         this._pendingWriteChunks = [];
         /** @type {number} */
-        this._flushThresholdBytes = 8 * 1024 * 1024;
+        this._flushThresholdBytes = 16 * 1024 * 1024;
         /** @type {boolean} */
         this._importSessionActive = false;
         /** @type {Map<number, TermRecord>} */
@@ -177,17 +177,14 @@ export class TermRecordOpfsStore {
 
     /**
      * @param {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} records
-     * @returns {Promise<number[]>}
+     * @returns {Promise<void>}
      */
     async appendBatch(records) {
-        if (records.length === 0) { return []; }
+        if (records.length === 0) { return; }
         /** @type {TermRecord[]} */
         const mappedRecords = [];
-        /** @type {number[]} */
-        const ids = [];
         for (const row of records) {
             const id = this._nextId++;
-            ids.push(id);
             const record = {
                 id,
                 dictionary: row.dictionary,
@@ -211,7 +208,6 @@ export class TermRecordOpfsStore {
             this._indexDirty = true;
         }
         await this._appendEncodedChunk(await this._encodeRecords(mappedRecords));
-        return ids;
     }
 
     /**

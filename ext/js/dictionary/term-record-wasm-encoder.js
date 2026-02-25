@@ -65,54 +65,50 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     /** @type {Uint8Array[]} */
     const stringChunks = [];
     let stringsTotal = 0;
+    /** @type {Map<string, {off: number, len: number}>} */
+    const encodedStringCache = new Map();
+
+    /**
+     * @param {string} value
+     * @returns {{off: number, len: number}}
+     */
+    const internString = (value) => {
+        const cached = encodedStringCache.get(value);
+        if (typeof cached !== 'undefined') {
+            return cached;
+        }
+        const bytes = textEncoder.encode(value);
+        const out = {off: stringsTotal, len: bytes.byteLength};
+        stringsTotal += bytes.byteLength;
+        stringChunks.push(bytes);
+        encodedStringCache.set(value, out);
+        return out;
+    };
 
     let metaOffset = 0;
     for (const record of records) {
-        const dictionaryBytes = textEncoder.encode(record.dictionary);
-        const expressionBytes = textEncoder.encode(record.expression);
-        const readingBytes = textEncoder.encode(record.reading);
-        const expressionReverseBytes = record.expressionReverse !== null ? textEncoder.encode(record.expressionReverse) : null;
-        const readingReverseBytes = record.readingReverse !== null ? textEncoder.encode(record.readingReverse) : null;
-        const dictNameBytes = textEncoder.encode(record.entryContentDictName);
-
-        const dictionaryOff = stringsTotal;
-        stringChunks.push(dictionaryBytes);
-        stringsTotal += dictionaryBytes.byteLength;
-        const expressionOff = stringsTotal;
-        stringChunks.push(expressionBytes);
-        stringsTotal += expressionBytes.byteLength;
-        const readingOff = stringsTotal;
-        stringChunks.push(readingBytes);
-        stringsTotal += readingBytes.byteLength;
-        const expressionReverseOff = expressionReverseBytes !== null ? stringsTotal : U32_NULL;
-        if (expressionReverseBytes !== null) {
-            stringChunks.push(expressionReverseBytes);
-            stringsTotal += expressionReverseBytes.byteLength;
-        }
-        const readingReverseOff = readingReverseBytes !== null ? stringsTotal : U32_NULL;
-        if (readingReverseBytes !== null) {
-            stringChunks.push(readingReverseBytes);
-            stringsTotal += readingReverseBytes.byteLength;
-        }
-        const dictNameOff = stringsTotal;
-        stringChunks.push(dictNameBytes);
-        stringsTotal += dictNameBytes.byteLength;
+        const dictionary = internString(record.dictionary);
+        const expression = internString(record.expression);
+        const reading = internString(record.reading);
+        const expressionReverse = record.expressionReverse !== null ? internString(record.expressionReverse) : null;
+        const readingReverse = record.readingReverse !== null ? internString(record.readingReverse) : null;
+        const dictName = internString(record.entryContentDictName);
 
         metasView.setUint32(metaOffset + 0, record.id, true);
-        metasView.setUint32(metaOffset + 4, dictionaryOff, true);
-        metasView.setUint32(metaOffset + 8, dictionaryBytes.byteLength, true);
-        metasView.setUint32(metaOffset + 12, expressionOff, true);
-        metasView.setUint32(metaOffset + 16, expressionBytes.byteLength, true);
-        metasView.setUint32(metaOffset + 20, readingOff, true);
-        metasView.setUint32(metaOffset + 24, readingBytes.byteLength, true);
-        metasView.setUint32(metaOffset + 28, expressionReverseOff, true);
-        metasView.setUint32(metaOffset + 32, expressionReverseBytes === null ? U32_NULL : expressionReverseBytes.byteLength, true);
-        metasView.setUint32(metaOffset + 36, readingReverseOff, true);
-        metasView.setUint32(metaOffset + 40, readingReverseBytes === null ? U32_NULL : readingReverseBytes.byteLength, true);
+        metasView.setUint32(metaOffset + 4, dictionary.off, true);
+        metasView.setUint32(metaOffset + 8, dictionary.len, true);
+        metasView.setUint32(metaOffset + 12, expression.off, true);
+        metasView.setUint32(metaOffset + 16, expression.len, true);
+        metasView.setUint32(metaOffset + 20, reading.off, true);
+        metasView.setUint32(metaOffset + 24, reading.len, true);
+        metasView.setUint32(metaOffset + 28, expressionReverse?.off ?? U32_NULL, true);
+        metasView.setUint32(metaOffset + 32, expressionReverse?.len ?? U32_NULL, true);
+        metasView.setUint32(metaOffset + 36, readingReverse?.off ?? U32_NULL, true);
+        metasView.setUint32(metaOffset + 40, readingReverse?.len ?? U32_NULL, true);
         metasView.setInt32(metaOffset + 44, record.entryContentOffset, true);
         metasView.setInt32(metaOffset + 48, record.entryContentLength, true);
-        metasView.setUint32(metaOffset + 52, dictNameOff, true);
-        metasView.setUint32(metaOffset + 56, dictNameBytes.byteLength, true);
+        metasView.setUint32(metaOffset + 52, dictName.off, true);
+        metasView.setUint32(metaOffset + 56, dictName.len, true);
         metasView.setInt32(metaOffset + 60, record.score, true);
         metasView.setInt32(metaOffset + 64, record.sequence ?? -1, true);
         metaOffset += META_BYTES;
