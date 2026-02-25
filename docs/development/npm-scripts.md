@@ -95,6 +95,21 @@ Scripts can be executed by running `npm run <name>`.
 - `test:unit:options`
   Runs unit tests related to the extension's options and their upgrade process.
 
+- `test:playwright`
+  Runs Playwright tests.
+
+- `test:playwright:integration`
+  Runs Playwright integration tests in Chromium.
+
+- `test:e2e:firefox-extension`
+  Runs Firefox extension end-to-end validation for dictionary imports (installs the extension, imports two dictionaries, and verifies both remain installed).
+  Prerequisites:
+
+  - Firefox installed
+  - geckodriver on `PATH`
+  - Node.js 22
+  - a built Firefox `.xpi` at `builds/manabitan-firefox-dev.xpi` (or set `MANABITAN_FIREFOX_XPI` to override)
+
 - `test:build`
   Performs a dry run of the build process without generating any files.
 
