@@ -83,6 +83,25 @@ async function waitForText(driver, selector, text, timeoutMs) {
 }
 
 /**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string} selector
+ * @returns {Promise<void>}
+ */
+async function clickWithScroll(driver, selector) {
+    // Selenium's JS-only API surfaces `any` for located elements.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const element = await driver.findElement(By.css(selector));
+    await driver.executeScript(`
+        const element = arguments[0];
+        if (!(element instanceof HTMLElement)) {
+            throw new Error('Expected an HTMLElement');
+        }
+        element.scrollIntoView({block: 'center', inline: 'nearest'});
+        element.click();
+    `, element);
+}
+
+/**
  * @param {string} title
  * @param {string} outputPath
  * @returns {Promise<void>}
@@ -99,12 +118,12 @@ async function buildDictionaryZip(title, outputPath) {
  * @returns {Promise<void>}
  */
 async function importDictionaryFromUrl(driver, dictionaryUrl) {
-    await (await driver.findElement(By.css('.settings-item[data-modal-action="show,dictionaries"]'))).click();
-    await (await driver.findElement(By.css('#dictionary-import-button'))).click();
+    await clickWithScroll(driver, '.settings-item[data-modal-action="show,dictionaries"]');
+    await clickWithScroll(driver, '#dictionary-import-button');
     await driver.wait(until.elementLocated(By.css('#dictionary-import-url-text')), 30_000);
     await (await driver.findElement(By.css('#dictionary-import-url-text'))).clear();
     await (await driver.findElement(By.css('#dictionary-import-url-text'))).sendKeys(dictionaryUrl);
-    await (await driver.findElement(By.css('#dictionary-import-url-button'))).click();
+    await clickWithScroll(driver, '#dictionary-import-url-button');
 }
 
 /**
