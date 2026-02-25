@@ -999,7 +999,7 @@ export class DictionaryImporter {
                         break;
                     case 0x7B: // {
                         if (depth <= 1) {
-                            throw new Error(`Expected array in '${file.filename}'`);
+                            throw new Error(`Dictionary has invalid data in '${file.filename}'`);
                         }
                         depth++;
                         break;
@@ -1022,7 +1022,7 @@ export class DictionaryImporter {
                         break;
                     case 0x7D: // }
                         if (depth <= 1) {
-                            throw new Error(`Unexpected } in '${file.filename}'`);
+                            throw new Error(`Dictionary has invalid data in '${file.filename}'`);
                         }
                         depth--;
                         break;
@@ -1041,7 +1041,7 @@ export class DictionaryImporter {
         }
 
         if (!hasTopLevelArray || depth !== 0) {
-            throw new Error(`Expected array in '${file.filename}'`);
+            throw new Error(`Dictionary has invalid data in '${file.filename}'`);
         }
 
         await dataPromise;
