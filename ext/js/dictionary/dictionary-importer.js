@@ -223,17 +223,17 @@ export class DictionaryImporter {
         let summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         const dictionarySummaryPrimaryKey = await dictionaryDatabase.addWithResult('dictionaries', summary);
         if (enableBulkImportIndexOptimization) {
-            dictionaryDatabase.startBulkImport();
+            await dictionaryDatabase.startBulkImport();
         }
 
         try {
             try {
                 const useMediaPipeline = !(this._skipMediaImport && this._structuredContentImportFastPath);
-                const uniqueMediaPaths = useMediaPipeline ? new Set() : null;
+                const uniqueMediaPaths = new Set();
                 for (const termFile of termFiles) {
                     const tTermFile = Date.now();
-                    /** @type {import('dictionary-importer').ImportRequirement[]|null} */
-                    const requirements = useMediaPipeline ? [] : null;
+                    /** @type {import('dictionary-importer').ImportRequirement[]} */
+                    const requirements = [];
                     let termList = await (
                         version === 1 ?
                             this._readFileSequence([termFile], this._convertTermBankEntryV1.bind(this), dictionaryTitle) :
@@ -402,7 +402,7 @@ export class DictionaryImporter {
                 this._progressNextStep(20);
                 this._progressData.index = 0;
                 this._progress();
-                dictionaryDatabase.finishBulkImport((checkpointIndex, total) => {
+                await dictionaryDatabase.finishBulkImport((checkpointIndex, total) => {
                     this._progressData.index = Math.max(1, Math.floor((checkpointIndex / total) * this._progressData.count));
                     this._progress();
                     this._logImport(`bulk finalization ${checkpointIndex}/${total}`);

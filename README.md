@@ -59,7 +59,7 @@ Manabitan provides powerful features not available in other browser-based dictio
 
 Install from the latest GitHub release page:
 
-- [Download for Chrome, Firefox, Edge](https://github.com/ManabiIO/manabitan/releases/latest)
+### [Download for Chrome, Firefox, Edge](https://github.com/ManabiIO/manabitan/releases/latest)
 
 ## Contributing
 

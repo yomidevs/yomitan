@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 
 import {initWasm, Resvg} from '../../lib/resvg-wasm.js';
@@ -171,6 +172,8 @@ export class DictionaryDatabase {
         if (this._db === null) {
             throw new Error('Database is not open');
         }
+        await this._termContentStore.endImportSession();
+        await this._termRecordStore.endImportSession();
         if (this._bulkImportTransactionOpen) {
             try {
                 this._db.exec('ROLLBACK');
@@ -212,9 +215,11 @@ export class DictionaryDatabase {
     }
 
     /** */
-    startBulkImport() {
+    async startBulkImport() {
         const db = this._requireDb();
         if (this._bulkImportDepth === 0) {
+            await this._termContentStore.beginImportSession();
+            await this._termRecordStore.beginImportSession();
             this._applyImportPragmas();
             this._deferTermsVirtualTableSync = true;
             this._termsVirtualTableDirty = false;
@@ -245,37 +250,48 @@ export class DictionaryDatabase {
         --this._bulkImportDepth;
         if (this._bulkImportDepth === 0) {
             const db = this._requireDb();
-            if (this._bulkImportTransactionOpen) {
-                db.exec('COMMIT');
-                this._bulkImportTransactionOpen = false;
-            }
-            if (this._termsVirtualTableDirty) {
-                db.exec('BEGIN IMMEDIATE');
-                try {
-                    await this._syncTermsVirtualTableFromRecordStore();
+            try {
+                if (this._bulkImportTransactionOpen) {
                     db.exec('COMMIT');
-                    this._termsVirtualTableDirty = false;
-                } catch (e) {
+                    this._bulkImportTransactionOpen = false;
+                }
+                await this._termContentStore.endImportSession();
+                await this._termRecordStore.endImportSession();
+                if (this._termsVirtualTableDirty) {
+                    db.exec('BEGIN IMMEDIATE');
+                    try {
+                        await this._syncTermsVirtualTableFromRecordStore();
+                        db.exec('COMMIT');
+                        this._termsVirtualTableDirty = false;
+                    } catch (e) {
+                        try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+                        throw e;
+                    }
+                }
+                const createIndexStatements = this._createIndexesSql();
+                for (let i = 0; i < createIndexStatements.length; ++i) {
+                    db.exec(createIndexStatements[i]);
+                    if (typeof onCheckpoint === 'function') {
+                        onCheckpoint(i + 1, createIndexStatements.length);
+                    }
+                }
+                this._termEntryContentIdByKey.clear();
+                this._termEntryContentIdByHash.clear();
+                this._termEntryContentMetaByHash.clear();
+                this._termEntryContentCache.clear();
+                this._termExactPresenceCache.clear();
+                this._termPrefixNegativeCache.clear();
+                this._directTermIndexByDictionary.clear();
+                this._deferTermsVirtualTableSync = false;
+                this._applyRuntimePragmas();
+            } finally {
+                if (this._bulkImportTransactionOpen) {
                     try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
-                    throw e;
+                    this._bulkImportTransactionOpen = false;
                 }
+                await this._termContentStore.endImportSession();
+                await this._termRecordStore.endImportSession();
             }
-            const createIndexStatements = this._createIndexesSql();
-            for (let i = 0; i < createIndexStatements.length; ++i) {
-                db.exec(createIndexStatements[i]);
-                if (typeof onCheckpoint === 'function') {
-                    onCheckpoint(i + 1, createIndexStatements.length);
-                }
-            }
-            this._termEntryContentIdByKey.clear();
-            this._termEntryContentIdByHash.clear();
-            this._termEntryContentMetaByHash.clear();
-            this._termEntryContentCache.clear();
-            this._termExactPresenceCache.clear();
-            this._termPrefixNegativeCache.clear();
-            this._directTermIndexByDictionary.clear();
-            this._deferTermsVirtualTableSync = false;
-            this._applyRuntimePragmas();
         }
     }
 
@@ -1550,7 +1566,7 @@ export class DictionaryDatabase {
         const pendingContentRows = [];
         /** @type {Map<string, number>} */
         const pendingContentRowIndexByHash = new Map();
-        const termBatchSize = 2048;
+        const termBatchSize = 10000;
         const contentBatchSize = 4096;
 
         if (useLocalTransaction) {
@@ -1892,7 +1908,7 @@ export class DictionaryDatabase {
      */
     async _bulkAddTermsWithoutContentDedup(items, start, count) {
         const useLocalTransaction = !this._bulkImportTransactionOpen;
-        const batchSize = 1024;
+        const batchSize = 10000;
 
         if (useLocalTransaction) {
             this._requireDb().exec('BEGIN IMMEDIATE');

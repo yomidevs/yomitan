@@ -21,12 +21,22 @@ export class TermContentOpfsStore {
     constructor() {
         /** @type {FileSystemFileHandle|null} */
         this._fileHandle = null;
+        /** @type {FileSystemWritableFileStream|null} */
+        this._writable = null;
         /** @type {Uint8Array[]} */
         this._chunks = [];
         /** @type {number[]} */
         this._chunkOffsets = [];
         /** @type {number} */
         this._length = 0;
+        /** @type {number} */
+        this._pendingWriteBytes = 0;
+        /** @type {Uint8Array[]} */
+        this._pendingWriteChunks = [];
+        /** @type {number} */
+        this._flushThresholdBytes = 8 * 1024 * 1024;
+        /** @type {boolean} */
+        this._importSessionActive = false;
         /** @type {boolean} */
         this._loadedForRead = false;
     }
@@ -35,6 +45,7 @@ export class TermContentOpfsStore {
      * @returns {Promise<void>}
      */
     async prepare() {
+        await this._closeWritable();
         if (typeof navigator === 'undefined' || !('storage' in navigator) || !('getDirectory' in navigator.storage)) {
             return;
         }
@@ -45,16 +56,52 @@ export class TermContentOpfsStore {
         this._chunks = [];
         this._chunkOffsets = [];
         this._loadedForRead = false;
+        this._pendingWriteBytes = 0;
+        this._pendingWriteChunks = [];
+        this._importSessionActive = false;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async beginImportSession() {
+        if (this._importSessionActive) {
+            return;
+        }
+        this._importSessionActive = true;
+        this._pendingWriteBytes = 0;
+        this._pendingWriteChunks = [];
+        if (this._fileHandle === null) {
+            return;
+        }
+        this._writable = await this._fileHandle.createWritable({keepExistingData: true});
+        await this._writable.seek(this._length);
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async endImportSession() {
+        if (!this._importSessionActive && this._writable === null) {
+            return;
+        }
+        this._importSessionActive = false;
+        await this._flushPendingWrites();
+        await this._closeWritable();
     }
 
     /**
      * @returns {Promise<void>}
      */
     async reset() {
+        await this._closeWritable();
         if (this._fileHandle === null) {
             this._chunks = [];
             this._chunkOffsets = [];
             this._length = 0;
+            this._pendingWriteBytes = 0;
+            this._pendingWriteChunks = [];
+            this._importSessionActive = false;
             return;
         }
         const writable = await this._fileHandle.createWritable();
@@ -64,6 +111,9 @@ export class TermContentOpfsStore {
         this._chunkOffsets = [];
         this._length = 0;
         this._loadedForRead = true;
+        this._pendingWriteBytes = 0;
+        this._pendingWriteChunks = [];
+        this._importSessionActive = false;
     }
 
     /**
@@ -79,15 +129,16 @@ export class TermContentOpfsStore {
             const length = chunk.byteLength;
             spans.push({offset: nextOffset, length});
             if (length > 0) {
-                this._chunkOffsets.push(nextOffset);
-                this._chunks.push(chunk);
+                if (!this._importSessionActive || this._loadedForRead || this._fileHandle === null) {
+                    this._chunkOffsets.push(nextOffset);
+                    this._chunks.push(chunk);
+                }
                 nextOffset += length;
             }
         }
         this._length = nextOffset;
 
         if (this._fileHandle !== null) {
-            const writable = await this._fileHandle.createWritable({keepExistingData: true});
             let totalBytes = 0;
             for (const chunk of chunks) {
                 totalBytes += chunk.byteLength;
@@ -100,10 +151,15 @@ export class TermContentOpfsStore {
                     merged.set(chunk, mergeOffset);
                     mergeOffset += chunk.byteLength;
                 }
-                await writable.seek(spans[0].offset);
-                await writable.write(merged);
+                this._pendingWriteChunks.push(merged);
+                this._pendingWriteBytes += merged.byteLength;
+                if (!this._importSessionActive || this._pendingWriteBytes >= this._flushThresholdBytes) {
+                    await this._flushPendingWrites();
+                    if (!this._importSessionActive) {
+                        await this._closeWritable();
+                    }
+                }
             }
-            await writable.close();
         }
         return spans;
     }
@@ -112,6 +168,8 @@ export class TermContentOpfsStore {
      * @returns {Promise<void>}
      */
     async ensureLoadedForRead() {
+        await this._flushPendingWrites();
+        await this._closeWritable();
         if (this._loadedForRead) { return; }
         if (this._fileHandle === null) {
             // Non-OPFS environments rely on in-memory chunks only.
@@ -129,6 +187,46 @@ export class TermContentOpfsStore {
         this._chunkOffsets = bytes.byteLength > 0 ? [0] : [];
         this._length = bytes.byteLength;
         this._loadedForRead = true;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _flushPendingWrites() {
+        if (this._pendingWriteBytes <= 0 || this._pendingWriteChunks.length === 0 || this._fileHandle === null) {
+            return;
+        }
+        if (this._writable === null) {
+            this._writable = await this._fileHandle.createWritable({keepExistingData: true});
+            const seekOffset = this._length - this._pendingWriteBytes;
+            await this._writable.seek(Math.max(0, seekOffset));
+        }
+        let merged = this._pendingWriteChunks[0];
+        if (this._pendingWriteChunks.length > 1) {
+            merged = new Uint8Array(this._pendingWriteBytes);
+            let cursor = 0;
+            for (const chunk of this._pendingWriteChunks) {
+                merged.set(chunk, cursor);
+                cursor += chunk.byteLength;
+            }
+        }
+        await this._writable.write(merged);
+        this._pendingWriteBytes = 0;
+        this._pendingWriteChunks = [];
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _closeWritable() {
+        if (this._writable === null) {
+            return;
+        }
+        try {
+            await this._writable.close();
+        } finally {
+            this._writable = null;
+        }
     }
 
     /**
