@@ -19,6 +19,8 @@ import sqlite3InitModule from '../../lib/sqlite/index.mjs';
 
 export const DICTIONARY_DB_FILE = '/dict.sqlite3';
 
+const DICTIONARY_DB_FILE_ALT = 'dict.sqlite3';
+
 const FALLBACK_IMPORT_DB_FILE = '/dict-import.sqlite3';
 /** @type {Uint8Array|null} */
 let fallbackImportedContent = null;
@@ -32,6 +34,35 @@ let lastOpenUsedFallbackStorage = false;
 
 /** @type {Promise<import('@sqlite.org/sqlite-wasm').Sqlite3Static>|null} */
 let sqlite3Promise = null;
+
+/**
+ * @returns {string[]}
+ */
+function getDatabasePaths() {
+    return [DICTIONARY_DB_FILE, DICTIONARY_DB_FILE_ALT];
+}
+
+/**
+ * @param {SqliteOpfsApi|undefined} opfs
+ * @returns {Promise<void>}
+ */
+async function deleteOpfsDatabaseFilesInternal(opfs) {
+    if (typeof opfs?.unlink !== 'function') {
+        return;
+    }
+    /** @type {string[]} */
+    const targets = [];
+    for (const dbPath of getDatabasePaths()) {
+        targets.push(dbPath, `${dbPath}-wal`, `${dbPath}-shm`);
+    }
+    for (const target of targets) {
+        try {
+            await opfs.unlink(target, false, false);
+        } catch (_) {
+            // NOP - continue best-effort cleanup.
+        }
+    }
+}
 
 /**
  * @returns {Promise<import('@sqlite.org/sqlite-wasm').Sqlite3Static>}
@@ -60,10 +91,32 @@ export async function openOpfsDatabase() {
     const sqlite3 = await getSqlite3();
     const OpfsDb = sqlite3.oo1.OpfsDb;
     if (typeof OpfsDb === 'function') {
-        try {
-            return new OpfsDb(DICTIONARY_DB_FILE);
-        } catch (_) {
-            // Fall back for runtimes where OPFS exists but cannot be opened.
+        /**
+         * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
+         */
+        const tryOpen = () => {
+            for (const dbPath of getDatabasePaths()) {
+                for (const flags of ['cw', 'c']) {
+                    try {
+                        return new OpfsDb(dbPath, flags);
+                    } catch (_) {
+                        // Try the next path/flag combination.
+                    }
+                }
+            }
+            return null;
+        };
+
+        const opened = tryOpen();
+        if (opened !== null) {
+            return opened;
+        }
+
+        const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
+        await deleteOpfsDatabaseFilesInternal(opfs);
+        const openedAfterCleanup = tryOpen();
+        if (openedAfterCleanup !== null) {
+            return openedAfterCleanup;
         }
     }
 
@@ -94,20 +147,7 @@ export async function deleteOpfsDatabaseFiles() {
         fallbackImportedContent = null;
         return true;
     }
-
-    const targets = [
-        DICTIONARY_DB_FILE,
-        `${DICTIONARY_DB_FILE}-wal`,
-        `${DICTIONARY_DB_FILE}-shm`,
-    ];
-
-    for (const target of targets) {
-        try {
-            await opfs.unlink(target, false, false);
-        } catch (_) {
-            // NOP - continue best-effort cleanup.
-        }
-    }
+    await deleteOpfsDatabaseFilesInternal(opfs);
 
     return true;
 }
@@ -123,9 +163,14 @@ export async function importOpfsDatabase(content) {
         fallbackImportedContent = Uint8Array.from(new Uint8Array(content));
         return;
     }
-    try {
-        await opfs.importDb(DICTIONARY_DB_FILE, new Uint8Array(content));
-    } catch (_) {
-        fallbackImportedContent = Uint8Array.from(new Uint8Array(content));
+    const bytes = new Uint8Array(content);
+    for (const dbPath of getDatabasePaths()) {
+        try {
+            await opfs.importDb(dbPath, bytes);
+            return;
+        } catch (_) {
+            // Try alternate path variant.
+        }
     }
+    fallbackImportedContent = Uint8Array.from(bytes);
 }
