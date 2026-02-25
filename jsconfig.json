@@ -23,7 +23,6 @@
             "jszip",
             "parse5",
             "zip.js",
-            "dexie",
             "ajv"
         ],
         "lib": [
