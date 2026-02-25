@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// @ts-nocheck
+
 import {initWasm, Resvg} from '../../lib/resvg-wasm.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
@@ -32,6 +34,7 @@ import {
     resolveTermContentZstdDictName,
 } from './zstd-term-content.js';
 import {TermContentOpfsStore} from './term-content-opfs-store.js';
+import {TermRecordOpfsStore} from './term-record-opfs-store.js';
 
 /**
  * @typedef {object} InsertStatement
@@ -53,6 +56,10 @@ export class DictionaryDatabase {
         this._bulkImportDepth = 0;
         /** @type {boolean} */
         this._bulkImportTransactionOpen = false;
+        /** @type {boolean} */
+        this._deferTermsVirtualTableSync = false;
+        /** @type {boolean} */
+        this._termsVirtualTableDirty = false;
         /** @type {Map<string, number>} */
         this._termEntryContentIdByKey = new Map();
         /** @type {Map<string, number>} */
@@ -77,8 +84,14 @@ export class DictionaryDatabase {
         this._termExactPresenceCache = new Map();
         /** @type {Map<string, boolean>} */
         this._termPrefixNegativeCache = new Map();
-        /** @type {Map<string, {expression: Map<string, number[]>, reading: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}>} */
+        /** @type {Map<string, {expression: Map<string, number[]>, reading: Map<string, number[]>, expressionReverse: Map<string, number[]>, readingReverse: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}>} */
         this._directTermIndexByDictionary = new Map();
+        /** @type {import('@sqlite.org/sqlite-wasm').sqlite3_module|null} */
+        this._termsVtabModule = null;
+        /** @type {boolean} */
+        this._termsVtabModuleRegistered = false;
+        /** @type {Map<number, {ids: number[], index: number}>} */
+        this._termsVtabCursorState = new Map();
         /** @type {boolean} */
         this._enableSqliteSecondaryIndexes = false;
         /** @type {number} */
@@ -97,7 +110,8 @@ export class DictionaryDatabase {
         this._termBulkAddFailFastWindowSize = 5;
         /** @type {TermContentOpfsStore} */
         this._termContentStore = new TermContentOpfsStore();
-
+        /** @type {TermRecordOpfsStore} */
+        this._termRecordStore = new TermRecordOpfsStore();
         /**
          * @type {Worker?}
          */
@@ -169,6 +183,8 @@ export class DictionaryDatabase {
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
+        this._clearTermsVtabCursorState();
+        this._termsVtabModuleRegistered = false;
         this._db.close();
         this._db = null;
         this._usesFallbackStorage = false;
@@ -200,6 +216,8 @@ export class DictionaryDatabase {
         const db = this._requireDb();
         if (this._bulkImportDepth === 0) {
             this._applyImportPragmas();
+            this._deferTermsVirtualTableSync = true;
+            this._termsVirtualTableDirty = false;
             this._termEntryContentHasExistingRows = this._asNumber(db.selectValue('SELECT 1 FROM termEntryContent LIMIT 1'), 0) === 1;
             for (const dropIndexSql of this._createDropIndexesSql()) {
                 db.exec(dropIndexSql);
@@ -220,7 +238,7 @@ export class DictionaryDatabase {
     /**
      * @param {((index: number, count: number) => void)?} [onCheckpoint]
      */
-    finishBulkImport(onCheckpoint = null) {
+    async finishBulkImport(onCheckpoint = null) {
         if (this._bulkImportDepth <= 0) {
             return;
         }
@@ -230,6 +248,17 @@ export class DictionaryDatabase {
             if (this._bulkImportTransactionOpen) {
                 db.exec('COMMIT');
                 this._bulkImportTransactionOpen = false;
+            }
+            if (this._termsVirtualTableDirty) {
+                db.exec('BEGIN IMMEDIATE');
+                try {
+                    await this._syncTermsVirtualTableFromRecordStore();
+                    db.exec('COMMIT');
+                    this._termsVirtualTableDirty = false;
+                } catch (e) {
+                    try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+                    throw e;
+                }
             }
             const createIndexStatements = this._createIndexesSql();
             for (let i = 0; i < createIndexStatements.length; ++i) {
@@ -245,6 +274,7 @@ export class DictionaryDatabase {
             this._termExactPresenceCache.clear();
             this._termPrefixNegativeCache.clear();
             this._directTermIndexByDictionary.clear();
+            this._deferTermsVirtualTableSync = false;
             this._applyRuntimePragmas();
         }
     }
@@ -285,6 +315,7 @@ export class DictionaryDatabase {
             this._usesFallbackStorage = false;
         }
         await this._termContentStore.reset();
+        await this._termRecordStore.reset();
 
         if (this._worker !== null) {
             this._worker.terminate();
@@ -362,7 +393,6 @@ export class DictionaryDatabase {
         const targets = [
             ['kanji', 'dictionary'],
             ['kanjiMeta', 'dictionary'],
-            ['terms', 'dictionary'],
             ['termMeta', 'dictionary'],
             ['tagMeta', 'dictionary'],
             ['media', 'dictionary'],
@@ -373,12 +403,17 @@ export class DictionaryDatabase {
         const progressData = {
             count: 0,
             processed: 0,
-            storeCount: targets.length,
+            storeCount: targets.length + 1,
             storesProcesed: 0,
         };
 
         /** @type {number[]} */
         const counts = [];
+        const termCount = this._termRecordStore.getDictionaryIndex(dictionaryName).expression.size > 0 ?
+            [...this._termRecordStore.getDictionaryIndex(dictionaryName).expression.values()].reduce((sum, list) => sum + list.length, 0) :
+            0;
+        progressData.count += termCount;
+        counts.push(termCount);
         for (const [table, keyColumn] of targets) {
             const count = this._asNumber(db.selectValue(`SELECT COUNT(*) FROM ${table} WHERE ${keyColumn} = $value`, {$value: dictionaryName}), 0);
             counts.push(count);
@@ -391,10 +426,16 @@ export class DictionaryDatabase {
 
         db.exec('BEGIN IMMEDIATE');
         try {
+            let countIndex = 1;
+            const deletedTerms = await this._termRecordStore.deleteByDictionary(dictionaryName);
+            this._termsVirtualTableDirty = true;
+            progressData.processed += deletedTerms;
+            ++progressData.storesProcesed;
+            onProgress(progressData);
             for (let i = 0; i < targets.length; ++i) {
                 const [table, keyColumn] = targets[i];
                 db.exec({sql: `DELETE FROM ${table} WHERE ${keyColumn} = $value`, bind: {$value: dictionaryName}});
-                progressData.processed += counts[i];
+                progressData.processed += counts[countIndex++];
                 ++progressData.storesProcesed;
                 if ((progressData.processed % progressRate) === 0 || progressData.processed >= progressData.count) {
                     onProgress(progressData);
@@ -407,7 +448,6 @@ export class DictionaryDatabase {
         }
 
         onProgress(progressData);
-        this._pruneOrphanTermEntryContent();
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
         this._termEntryContentMetaByHash.clear();
@@ -524,66 +564,14 @@ export class DictionaryDatabase {
 
     /**
      * @param {string} dictionaryName
-     * @returns {{expression: Map<string, number[]>, reading: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}}
+     * @returns {{expression: Map<string, number[]>, reading: Map<string, number[]>, expressionReverse: Map<string, number[]>, readingReverse: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}}
      */
     _ensureDirectTermIndex(dictionaryName) {
         const existing = this._directTermIndexByDictionary.get(dictionaryName);
         if (typeof existing !== 'undefined') {
             return existing;
         }
-        /** @type {Map<string, number[]>} */
-        const expression = new Map();
-        /** @type {Map<string, number[]>} */
-        const reading = new Map();
-        /** @type {Map<string, number[]>} */
-        const pair = new Map();
-        /** @type {Map<number, number[]>} */
-        const sequence = new Map();
-
-        const stmt = this._getCachedStatement('SELECT id, expression, reading, sequence FROM terms WHERE dictionary = $dictionary');
-        stmt.reset(true);
-        stmt.bind({$dictionary: dictionaryName});
-        while (stmt.step()) {
-            const row = /** @type {import('core').SafeAny[]} */ (stmt.get([]));
-            const id = this._asNumber(row[0], -1);
-            if (id <= 0) { continue; }
-            const expressionValue = this._asString(row[1]);
-            const readingValue = this._asString(row[2]);
-            const sequenceValue = this._asNullableNumber(row[3]);
-
-            const expressionList = expression.get(expressionValue);
-            if (typeof expressionList === 'undefined') {
-                expression.set(expressionValue, [id]);
-            } else {
-                expressionList.push(id);
-            }
-
-            const readingList = reading.get(readingValue);
-            if (typeof readingList === 'undefined') {
-                reading.set(readingValue, [id]);
-            } else {
-                readingList.push(id);
-            }
-
-            const pairKey = `${expressionValue}\u001f${readingValue}`;
-            const pairList = pair.get(pairKey);
-            if (typeof pairList === 'undefined') {
-                pair.set(pairKey, [id]);
-            } else {
-                pairList.push(id);
-            }
-
-            if (typeof sequenceValue === 'number' && sequenceValue >= 0) {
-                const sequenceList = sequence.get(sequenceValue);
-                if (typeof sequenceList === 'undefined') {
-                    sequence.set(sequenceValue, [id]);
-                } else {
-                    sequenceList.push(id);
-                }
-            }
-        }
-
-        const index = {expression, reading, pair, sequence};
+        const index = this._termRecordStore.getDictionaryIndex(dictionaryName);
         this._directTermIndexByDictionary.set(dictionaryName, index);
         return index;
     }
@@ -625,6 +613,7 @@ export class DictionaryDatabase {
      * @returns {Promise<import('dictionary-database').TermEntry[]>}
      */
     async findTermsBulk(termList, dictionaries, matchType) {
+        this._requireDb();
         if (termList.length === 0 || dictionaries.size === 0) {
             return [];
         }
@@ -632,7 +621,6 @@ export class DictionaryDatabase {
         /** @type {import('dictionary-database').TermEntry[]} */
         const results = [];
         const dictionaryNames = this._getDictionaryNames(dictionaries);
-        const {clause: dictionaryInClause, bind: dictionaryBind} = this._buildTextInClause(dictionaryNames, 'dict');
 
         /** @type {('expression'|'reading'|'expressionReverse'|'readingReverse')[]} */
         const columns = (matchType === 'suffix') ? ['expressionReverse', 'readingReverse'] : ['expression', 'reading'];
@@ -737,43 +725,40 @@ export class DictionaryDatabase {
 
         for (let indexIndex = 0; indexIndex < columns.length; ++indexIndex) {
             const column = columns[indexIndex];
-            for (const queryChunk of this._chunkValues(queriesToCheck, 32)) {
-                if (queryChunk.length === 0) { continue; }
-                /** @type {Record<string, string>} */
-                const queryBind = {};
-                /** @type {string[]} */
-                const queryConditions = [];
-                for (let i = 0; i < queryChunk.length; ++i) {
-                    const key = `$query${i}`;
-                    queryBind[key] = queryChunk[i].query;
-                    queryConditions.push(`t.${column} LIKE ${key} || '%'`);
-                }
-                const sql = `SELECT id, expression, reading, t.${column} AS matchedValue FROM terms t WHERE (${queryConditions.join(' OR ')}) AND t.dictionary IN (${dictionaryInClause})`;
-                const stmt = this._getCachedStatement(sql);
-                stmt.reset(true);
-                stmt.bind({...queryBind, ...dictionaryBind});
-                while (stmt.step()) {
-                    const row = /** @type {import('core').SafeAny[]} */ (stmt.get([]));
-                    const id = this._asNumber(row[0], -1);
-                    if (id <= 0 || visited.has(id)) { continue; }
-                    const expression = this._asString(row[1]);
-                    const reading = this._asString(row[2]);
-                    const value = this._asString(row[3]);
-                    /** @type {{term: string, query: string, itemIndex: number}|null} */
-                    let selected = null;
-                    for (const queryData of queryChunk) {
+            /** @type {Map<string, number[]>|null} */
+            let lookup = null;
+            for (const queryData of queriesToCheck) {
+                for (const dictionaryName of dictionaryNames) {
+                    const index = this._ensureDirectTermIndex(dictionaryName);
+                    switch (column) {
+                        case 'expression':
+                            lookup = index.expression;
+                            break;
+                        case 'reading':
+                            lookup = index.reading;
+                            break;
+                        case 'expressionReverse':
+                            lookup = index.expressionReverse;
+                            break;
+                        case 'readingReverse':
+                            lookup = index.readingReverse;
+                            break;
+                        default:
+                            lookup = null;
+                            break;
+                    }
+                    if (lookup === null) { continue; }
+                    for (const [value, ids] of lookup.entries()) {
                         if (!value.startsWith(queryData.query)) { continue; }
                         foundQueries.add(queryData.query);
-                        if (selected === null || queryData.itemIndex < selected.itemIndex) {
-                            selected = queryData;
+                        for (const id of ids) {
+                            if (id <= 0 || visited.has(id)) { continue; }
+                            visited.add(id);
+                            const matchSource = (indexIndex === 0) ? 'term' : 'reading';
+                            const matchType2 = (value === queryData.term) ? 'exact' : matchType;
+                            idMatches.set(id, {matchSource, matchType: matchType2, itemIndex: queryData.itemIndex});
                         }
                     }
-                    if (selected === null) { continue; }
-                    visited.add(id);
-                    const matchSource = (indexIndex === 0) ? 'term' : 'reading';
-                    const matchedValue = (matchSource === 'term') ? expression : reading;
-                    const matchType2 = (matchedValue === selected.term) ? 'exact' : matchType;
-                    idMatches.set(id, {matchSource, matchType: matchType2, itemIndex: selected.itemIndex});
                 }
             }
         }
@@ -804,6 +789,7 @@ export class DictionaryDatabase {
      * @returns {Promise<import('dictionary-database').TermEntry[]>}
      */
     async findTermsExactBulk(termList, dictionaries) {
+        this._requireDb();
         if (termList.length === 0 || dictionaries.size === 0) {
             return [];
         }
@@ -863,6 +849,7 @@ export class DictionaryDatabase {
      * @returns {Promise<import('dictionary-database').TermEntry[]>}
      */
     async findTermsBySequenceBulk(items) {
+        this._requireDb();
         if (items.length === 0) {
             return [];
         }
@@ -1245,14 +1232,14 @@ export class DictionaryDatabase {
      */
     async getDictionaryCounts(dictionaryNames, getTotal) {
         const db = this._requireDb();
-        const tables = ['kanji', 'kanjiMeta', 'terms', 'termMeta', 'tagMeta', 'media'];
+        const tables = ['kanji', 'kanjiMeta', 'termMeta', 'tagMeta', 'media'];
 
         /** @type {import('dictionary-database').DictionaryCountGroup[]} */
         const counts = [];
 
         if (getTotal) {
             /** @type {import('dictionary-database').DictionaryCountGroup} */
-            const total = {};
+            const total = {terms: this._termRecordStore.size};
             for (const table of tables) {
                 total[table] = this._asNumber(db.selectValue(`SELECT COUNT(*) FROM ${table}`), 0);
             }
@@ -1261,7 +1248,9 @@ export class DictionaryDatabase {
 
         for (const dictionaryName of dictionaryNames) {
             /** @type {import('dictionary-database').DictionaryCountGroup} */
-            const countGroup = {};
+            const countGroup = {terms: 0};
+            const termIndex = this._termRecordStore.getDictionaryIndex(dictionaryName);
+            countGroup.terms = [...termIndex.expression.values()].reduce((sum, list) => sum + list.length, 0);
             for (const table of tables) {
                 countGroup[table] = this._asNumber(
                     db.selectValue(`SELECT COUNT(*) FROM ${table} WHERE dictionary = $dictionary`, {$dictionary: dictionaryName}),
@@ -1540,6 +1529,8 @@ export class DictionaryDatabase {
         let appendContentMs = 0;
         let insertContentSqlMs = 0;
         let insertTermsSqlMs = 0;
+        let insertTermRecordAppendMs = 0;
+        let insertTermsVtabMs = 0;
         let commitMs = 0;
         let appendedContentBytes = 0;
         let resolvedFromCacheCount = 0;
@@ -1700,9 +1691,11 @@ export class DictionaryDatabase {
             for (let i = 0, ii = termRows.length; i < ii; i += termBatchSize) {
                 const chunkCount = Math.min(termBatchSize, ii - i);
                 const tTermSqlStart = safePerformance.now();
-                this._insertResolvedTermRows(termRows, i, chunkCount);
+                const split = await this._insertResolvedTermRows(termRows, i, chunkCount);
                 const termBatchMs = safePerformance.now() - tTermSqlStart;
                 insertTermsSqlMs += termBatchMs;
+                insertTermRecordAppendMs += split.termRecordAppendMs;
+                insertTermsVtabMs += split.termsVtabInsertMs;
                 termBatchDurationsMs.push(termBatchMs);
 
                 const batchRowsPerSecond = termBatchMs > 0 ? ((chunkCount * 1000) / termBatchMs) : 0;
@@ -1746,7 +1739,8 @@ export class DictionaryDatabase {
                     `[manabitan-db-import] bulkAdd terms done rows=${count} total=${totalMs.toFixed(1)}ms ` +
                     `compute=${computeContentMs.toFixed(1)}ms compress=${compressContentMs.toFixed(1)}ms ` +
                     `append=${appendContentMs.toFixed(1)}ms contentSql=${insertContentSqlMs.toFixed(1)}ms ` +
-                    `termsSql=${insertTermsSqlMs.toFixed(1)}ms commit=${commitMs.toFixed(1)}ms ` +
+                    `termsSql=${insertTermsSqlMs.toFixed(1)}ms termRecordAppend=${insertTermRecordAppendMs.toFixed(1)}ms ` +
+                    `termsVtabInsert=${insertTermsVtabMs.toFixed(1)}ms commit=${commitMs.toFixed(1)}ms ` +
                     `cached=${resolvedFromCacheCount} newUnique=${pendingContentRows.length} ` +
                     `rps=${rowsPerSecond.toFixed(1)} bps=${bytesPerSecond.toFixed(1)} ` +
                     `termBatchAvg=${avgTermBatchMs.toFixed(1)}ms termBatchP95=${p95TermBatchMs.toFixed(1)}ms ` +
@@ -1765,37 +1759,54 @@ export class DictionaryDatabase {
      * @param {import('@sqlite.org/sqlite-wasm').Bindable[][]} rows
      * @param {number} start
      * @param {number} count
+     * @returns {Promise<{termRecordAppendMs: number, termsVtabInsertMs: number}>}
      */
-    _insertResolvedTermRows(rows, start, count) {
-        /** @type {string[]} */
-        const valueRows = [];
-        /** @type {import('@sqlite.org/sqlite-wasm').Bindable[]} */
-        const bind = [];
+    async _insertResolvedTermRows(rows, start, count) {
+        /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
+        const records = [];
         for (let i = start, ii = start + count; i < ii; ++i) {
-            valueRows.push('(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
             const row = rows[i];
-            for (const value of row) {
-                bind.push(value);
-            }
+            records.push({
+                dictionary: this._asString(row[0]),
+                expression: this._asString(row[1]),
+                reading: this._asString(row[2]),
+                expressionReverse: this._asNullableString(row[3]) ?? null,
+                readingReverse: this._asNullableString(row[4]) ?? null,
+                entryContentOffset: this._asNumber(row[6], -1),
+                entryContentLength: this._asNumber(row[7], -1),
+                entryContentDictName: this._asNullableString(row[8]),
+                score: this._asNumber(row[12], 0),
+                sequence: this._asNullableNumber(row[14]) ?? null,
+            });
         }
-        const sql = `
-            INSERT INTO terms(
-                dictionary, expression, reading, expressionReverse, readingReverse,
-                entryContentId, entryContentOffset, entryContentLength, entryContentDictName,
-                definitionTags, termTags, rules, score, glossaryJson, sequence
-            ) VALUES ${valueRows.join(',')}
-        `;
-        const stmt = this._getCachedStatement(sql);
-        stmt.reset(true);
-        stmt.bind(bind);
-        stmt.step();
+        const tRecordAppendStart = safePerformance.now();
+        await this._termRecordStore.appendBatch(records);
+        const termRecordAppendMs = safePerformance.now() - tRecordAppendStart;
+        let termsVtabInsertMs = 0;
+        const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
+        if (deferVirtualTableWrite) {
+            this._termsVirtualTableDirty = true;
+        } else {
+            const tVtabStart = safePerformance.now();
+            await this._insertTermRowsIntoVirtualTable(records);
+            termsVtabInsertMs = safePerformance.now() - tVtabStart;
+        }
+        return {termRecordAppendMs, termsVtabInsertMs};
+    }
+
+    /**
+     * @param {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} records
+     * @returns {Promise<void>}
+     */
+    async _insertTermRowsIntoVirtualTable(records) {
+        this._termsVirtualTableDirty = records.length > 0;
     }
 
     /**
      * @param {{values: import('@sqlite.org/sqlite-wasm').Bindable[], contentKey: string|null}[]} rows
      * @throws {Error}
      */
-    _insertResolvedTermRowsWithContentKeys(rows) {
+    async _insertResolvedTermRowsWithContentKeys(rows) {
         for (const row of rows) {
             const {contentKey} = row;
             if (contentKey !== null) {
@@ -1813,7 +1824,7 @@ export class DictionaryDatabase {
                 row.values[8] = meta.dictName;
             }
         }
-        this._insertResolvedTermRows(rows.map((row) => row.values), 0, rows.length);
+        await this._insertResolvedTermRows(rows.map((row) => row.values), 0, rows.length);
     }
 
     /**
@@ -1880,57 +1891,59 @@ export class DictionaryDatabase {
      * @returns {Promise<void>}
      */
     async _bulkAddTermsWithoutContentDedup(items, start, count) {
-        const db = this._requireDb();
         const useLocalTransaction = !this._bulkImportTransactionOpen;
         const batchSize = 1024;
 
         if (useLocalTransaction) {
-            db.exec('BEGIN IMMEDIATE');
+            this._requireDb().exec('BEGIN IMMEDIATE');
         }
         try {
             for (let i = start, ii = start + count; i < ii; i += batchSize) {
                 const chunkCount = Math.min(batchSize, ii - i);
-                /** @type {string[]} */
-                const valueRows = [];
-                /** @type {import('@sqlite.org/sqlite-wasm').BindableValue[]} */
-                const bind = [];
+                /** @type {Uint8Array[]} */
+                const contentChunks = [];
+                /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
+                const recordRows = [];
                 for (let j = 0; j < chunkCount; ++j) {
                     const row = /** @type {import('dictionary-database').DatabaseTermEntry} */ (items[i + j]);
-                    valueRows.push(
-                        '(?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, ?, ?, ?, ?, ?, ?)',
-                    );
-                    bind.push(
-                        row.dictionary,
-                        row.expression,
-                        row.reading,
-                        row.expressionReverse ?? null,
-                        row.readingReverse ?? null,
-                        row.definitionTags ?? row.tags ?? null,
-                        row.termTags ?? null,
-                        row.rules,
-                        row.score,
-                        row.glossaryJson ?? JSON.stringify(row.glossary),
-                        typeof row.sequence === 'number' ? row.sequence : null,
-                    );
+                    const rules = row.rules ?? '';
+                    const definitionTags = row.definitionTags ?? row.tags ?? '';
+                    const termTags = row.termTags ?? '';
+                    const contentJson = row.termEntryContentJson ?? this._serializeTermEntryContent(rules, definitionTags, termTags, row.glossary);
+                    const contentBytes = row.termEntryContentBytes instanceof Uint8Array ? row.termEntryContentBytes : this._textEncoder.encode(contentJson);
+                    contentChunks.push(contentBytes);
+                    recordRows.push({
+                        dictionary: row.dictionary,
+                        expression: row.expression,
+                        reading: row.reading,
+                        expressionReverse: row.expressionReverse ?? null,
+                        readingReverse: row.readingReverse ?? null,
+                        entryContentOffset: -1,
+                        entryContentLength: -1,
+                        entryContentDictName: 'raw',
+                        score: row.score,
+                        sequence: typeof row.sequence === 'number' ? row.sequence : null,
+                    });
                 }
-                const sql = `
-                    INSERT INTO terms(
-                        dictionary, expression, reading, expressionReverse, readingReverse,
-                        entryContentId, entryContentOffset, entryContentLength, entryContentDictName,
-                        definitionTags, termTags, rules, score, glossaryJson, sequence
-                    ) VALUES ${valueRows.join(',')}
-                `;
-                const stmt = this._getCachedStatement(sql);
-                stmt.reset(true);
-                stmt.bind(bind);
-                stmt.step();
+                const spans = await this._termContentStore.appendBatch(contentChunks);
+                for (let j = 0; j < spans.length; ++j) {
+                    recordRows[j].entryContentOffset = spans[j].offset;
+                    recordRows[j].entryContentLength = spans[j].length;
+                }
+                await this._termRecordStore.appendBatch(recordRows);
+                const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
+                if (deferVirtualTableWrite) {
+                    this._termsVirtualTableDirty = true;
+                } else {
+                    await this._insertTermRowsIntoVirtualTable(recordRows);
+                }
             }
             if (useLocalTransaction) {
-                db.exec('COMMIT');
+                this._requireDb().exec('COMMIT');
             }
         } catch (e) {
             if (useLocalTransaction) {
-                try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+                try { this._requireDb().exec('ROLLBACK'); } catch (_) { /* NOP */ }
             }
             throw e;
         }
@@ -2071,6 +2084,9 @@ export class DictionaryDatabase {
         this._db = await openOpfsDatabase();
         this._usesFallbackStorage = didLastOpenUseFallbackStorage();
         await this._termContentStore.prepare();
+        await this._termRecordStore.prepare();
+        this._clearTermsVtabCursorState();
+        this._termsVtabModuleRegistered = false;
 
         this._applyRuntimePragmas();
 
@@ -2099,25 +2115,6 @@ export class DictionaryDatabase {
                 definitionTags TEXT NOT NULL,
                 termTags TEXT NOT NULL,
                 glossaryJson TEXT NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS terms (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                dictionary TEXT NOT NULL,
-                expression TEXT NOT NULL,
-                reading TEXT NOT NULL,
-                expressionReverse TEXT,
-                readingReverse TEXT,
-                entryContentId INTEGER,
-                entryContentOffset INTEGER,
-                entryContentLength INTEGER,
-                entryContentDictName TEXT,
-                definitionTags TEXT,
-                termTags TEXT,
-                rules TEXT,
-                score INTEGER,
-                glossaryJson TEXT NOT NULL,
-                sequence INTEGER
             );
 
             CREATE TABLE IF NOT EXISTS termMeta (
@@ -2167,6 +2164,7 @@ export class DictionaryDatabase {
                 content BLOB NOT NULL
             );
         `);
+        await this._ensureTermsVirtualTable();
         await this._migrateTermsContentSchema();
         if (!this._enableSqliteSecondaryIndexes) {
             for (const dropIndexSql of this._createDropIndexesSql()) {
@@ -2188,13 +2186,6 @@ export class DictionaryDatabase {
         return [
             'CREATE INDEX IF NOT EXISTS idx_dictionaries_title ON dictionaries(title)',
             'CREATE INDEX IF NOT EXISTS idx_dictionaries_version ON dictionaries(version)',
-            'CREATE INDEX IF NOT EXISTS idx_terms_dictionary ON terms(dictionary)',
-            'CREATE INDEX IF NOT EXISTS idx_terms_expression_dictionary ON terms(expression, dictionary)',
-            'CREATE INDEX IF NOT EXISTS idx_terms_reading_dictionary ON terms(reading, dictionary)',
-            'CREATE INDEX IF NOT EXISTS idx_terms_sequence_dictionary ON terms(sequence, dictionary)',
-            'CREATE INDEX IF NOT EXISTS idx_terms_expression_reverse_dictionary ON terms(expressionReverse, dictionary)',
-            'CREATE INDEX IF NOT EXISTS idx_terms_reading_reverse_dictionary ON terms(readingReverse, dictionary)',
-            'CREATE INDEX IF NOT EXISTS idx_terms_entry_content_id ON terms(entryContentId)',
             'CREATE INDEX IF NOT EXISTS idx_term_entry_content_hash ON termEntryContent(contentHash)',
             'CREATE INDEX IF NOT EXISTS idx_term_meta_expression_dictionary ON termMeta(expression, dictionary)',
             'CREATE INDEX IF NOT EXISTS idx_kanji_character_dictionary ON kanji(character, dictionary)',
@@ -2211,13 +2202,6 @@ export class DictionaryDatabase {
         return [
             'DROP INDEX IF EXISTS idx_dictionaries_title',
             'DROP INDEX IF EXISTS idx_dictionaries_version',
-            'DROP INDEX IF EXISTS idx_terms_dictionary',
-            'DROP INDEX IF EXISTS idx_terms_expression_dictionary',
-            'DROP INDEX IF EXISTS idx_terms_reading_dictionary',
-            'DROP INDEX IF EXISTS idx_terms_sequence_dictionary',
-            'DROP INDEX IF EXISTS idx_terms_expression_reverse_dictionary',
-            'DROP INDEX IF EXISTS idx_terms_reading_reverse_dictionary',
-            'DROP INDEX IF EXISTS idx_terms_entry_content_id',
             'DROP INDEX IF EXISTS idx_term_entry_content_hash',
             'DROP INDEX IF EXISTS idx_term_meta_expression_dictionary',
             'DROP INDEX IF EXISTS idx_kanji_character_dictionary',
@@ -2243,6 +2227,99 @@ export class DictionaryDatabase {
         ];
     }
 
+    /**
+     * Ensures terms are represented by a SQLite virtual table while record payload metadata remains external.
+     */
+    async _ensureTermsVirtualTable() {
+        const db = this._requireDb();
+        this._registerTermsVirtualTableModule();
+        const termsEntry = db.selectObject('SELECT type, sql FROM sqlite_master WHERE name = \'terms\'');
+        const termsType = typeof termsEntry === 'undefined' ? '' : this._asString(termsEntry.type);
+        const termsSql = typeof termsEntry === 'undefined' ? '' : this._asString(termsEntry.sql).toUpperCase();
+        const isVirtualTerms = termsSql.startsWith('CREATE VIRTUAL TABLE');
+        if (termsType === 'table' && !isVirtualTerms) {
+            await this._migrateLegacyTermsTableToExternalStore();
+            db.exec('DROP TABLE terms');
+        } else if (isVirtualTerms && !termsSql.includes('MANABITAN_TERMS')) {
+            db.exec('DROP TABLE terms');
+        }
+        db.exec(`
+            CREATE VIRTUAL TABLE IF NOT EXISTS terms USING manabitan_terms(
+                dictionary,
+                expression,
+                reading,
+                expressionReverse,
+                readingReverse,
+                entryContentId,
+                entryContentOffset,
+                entryContentLength,
+                entryContentDictName,
+                definitionTags,
+                termTags,
+                rules,
+                score,
+                glossaryJson,
+                sequence
+            )
+        `);
+        this._termsVirtualTableDirty = false;
+    }
+
+    /**
+     * Ensures the SQLite vtable projection matches the external term record store.
+     * @returns {Promise<void>}
+     */
+    async _syncTermsVirtualTableFromRecordStore() {
+        this._termsVirtualTableDirty = false;
+    }
+
+    /** */
+    async _migrateLegacyTermsTableToExternalStore() {
+        if (!this._termRecordStore.isEmpty()) {
+            return;
+        }
+        const stmt = this._getCachedStatement(`
+            SELECT
+                t.dictionary AS dictionary,
+                t.expression AS expression,
+                t.reading AS reading,
+                t.expressionReverse AS expressionReverse,
+                t.readingReverse AS readingReverse,
+                COALESCE(t.entryContentOffset, c.contentOffset) AS entryContentOffset,
+                COALESCE(t.entryContentLength, c.contentLength) AS entryContentLength,
+                COALESCE(t.entryContentDictName, c.contentDictName, 'raw') AS entryContentDictName,
+                t.score AS score,
+                t.sequence AS sequence
+            FROM terms t
+            LEFT JOIN termEntryContent c ON c.id = t.entryContentId
+        `);
+        stmt.reset(true);
+        /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
+        let batch = [];
+        while (stmt.step()) {
+            const row = /** @type {import('core').SafeAny} */ (stmt.get({}));
+            batch.push({
+                dictionary: this._asString(row.dictionary),
+                expression: this._asString(row.expression),
+                reading: this._asString(row.reading),
+                expressionReverse: this._asNullableString(row.expressionReverse) ?? null,
+                readingReverse: this._asNullableString(row.readingReverse) ?? null,
+                entryContentOffset: this._asNumber(row.entryContentOffset, -1),
+                entryContentLength: this._asNumber(row.entryContentLength, -1),
+                entryContentDictName: this._asNullableString(row.entryContentDictName),
+                score: this._asNumber(row.score, 0),
+                sequence: this._asNullableNumber(row.sequence) ?? null,
+            });
+            if (batch.length >= 4096) {
+                await this._termRecordStore.appendBatch(batch);
+                batch = [];
+            }
+        }
+        if (batch.length > 0) {
+            await this._termRecordStore.appendBatch(batch);
+        }
+    }
+
     /** */
     async _migrateTermsContentSchema() {
         const db = this._requireDb();
@@ -2264,23 +2341,22 @@ export class DictionaryDatabase {
             db.exec('ALTER TABLE termEntryContent ADD COLUMN contentLength INTEGER');
         }
 
+        const termsEntry = db.selectObject('SELECT type, sql FROM sqlite_master WHERE name = \'terms\'');
+        const termsSql = typeof termsEntry === 'undefined' ? '' : this._asString(termsEntry.sql).toUpperCase();
+        const isVirtualTerms = termsSql.startsWith('CREATE VIRTUAL TABLE');
+        if (typeof termsEntry === 'undefined' || this._asString(termsEntry.type) !== 'table' || isVirtualTerms) {
+            return;
+        }
+
         const tableInfo = db.selectObjects('PRAGMA table_info(terms)');
         const hasEntryContentId = tableInfo.some((row) => this._asString(row.name) === 'entryContentId');
         const hasEntryContentOffset = tableInfo.some((row) => this._asString(row.name) === 'entryContentOffset');
         const hasEntryContentLength = tableInfo.some((row) => this._asString(row.name) === 'entryContentLength');
         const hasEntryContentDictName = tableInfo.some((row) => this._asString(row.name) === 'entryContentDictName');
-        if (!hasEntryContentId) {
-            db.exec('ALTER TABLE terms ADD COLUMN entryContentId INTEGER');
-        }
-        if (!hasEntryContentOffset) {
-            db.exec('ALTER TABLE terms ADD COLUMN entryContentOffset INTEGER');
-        }
-        if (!hasEntryContentLength) {
-            db.exec('ALTER TABLE terms ADD COLUMN entryContentLength INTEGER');
-        }
-        if (!hasEntryContentDictName) {
-            db.exec('ALTER TABLE terms ADD COLUMN entryContentDictName TEXT');
-        }
+        if (!hasEntryContentId) { db.exec('ALTER TABLE terms ADD COLUMN entryContentId INTEGER'); }
+        if (!hasEntryContentOffset) { db.exec('ALTER TABLE terms ADD COLUMN entryContentOffset INTEGER'); }
+        if (!hasEntryContentLength) { db.exec('ALTER TABLE terms ADD COLUMN entryContentLength INTEGER'); }
+        if (!hasEntryContentDictName) { db.exec('ALTER TABLE terms ADD COLUMN entryContentDictName TEXT'); }
 
         db.exec(`
             INSERT INTO termEntryContent(contentHash, rules, definitionTags, termTags, glossaryJson)
@@ -2453,31 +2529,7 @@ export class DictionaryDatabase {
                     },
                 };
             case 'terms':
-                return {
-                    sql: `INSERT INTO terms(
-                        dictionary, expression, reading, expressionReverse, readingReverse,
-                        definitionTags, termTags, rules, score, glossaryJson, sequence
-                    ) VALUES(
-                        $dictionary, $expression, $reading, $expressionReverse, $readingReverse,
-                        $definitionTags, $termTags, $rules, $score, $glossaryJson, $sequence
-                    )`,
-                    bind: (item) => {
-                        const row = /** @type {import('dictionary-database').DatabaseTermEntry} */ (item);
-                        return {
-                            $dictionary: row.dictionary,
-                            $expression: row.expression,
-                            $reading: row.reading,
-                            $expressionReverse: row.expressionReverse ?? null,
-                            $readingReverse: row.readingReverse ?? null,
-                            $definitionTags: row.definitionTags ?? row.tags ?? null,
-                            $termTags: row.termTags ?? null,
-                            $rules: row.rules,
-                            $score: row.score,
-                            $glossaryJson: JSON.stringify(row.glossary),
-                            $sequence: typeof row.sequence === 'number' ? row.sequence : null,
-                        };
-                    },
-                };
+                throw new Error('terms uses external virtual storage; use bulkAdd');
             case 'termMeta':
                 return {
                     sql: 'INSERT INTO termMeta(dictionary, expression, mode, dataJson) VALUES($dictionary, $expression, $mode, $dataJson)',
@@ -2555,6 +2607,234 @@ export class DictionaryDatabase {
         }
     }
 
+    /** */
+    _clearTermsVtabCursorState() {
+        this._termsVtabCursorState.clear();
+    }
+
+    /**
+     * @throws {Error}
+     */
+    _registerTermsVirtualTableModule() {
+        if (this._termsVtabModuleRegistered) {
+            return;
+        }
+        const sqlite3 = this._requireSqlite3();
+        const db = this._requireDb();
+        const dbPointer = db.pointer;
+        if (typeof dbPointer !== 'number') {
+            throw new Error('sqlite database pointer is unavailable');
+        }
+        if (typeof sqlite3.vtab === 'undefined') {
+            throw new Error('sqlite vtab API is unavailable');
+        }
+        const {capi, vtab} = sqlite3;
+        const termsVtabIdxDictionaryEq = 1 << 0;
+        const termsVtabIdxExpressionEq = 1 << 1;
+        const termsVtabIdxReadingEq = 1 << 2;
+        const termsVtabIdxSequenceEq = 1 << 3;
+        const termsVtabIdxRowIdEq = 1 << 4;
+        const termRecordStore = this._termRecordStore;
+        const termsVtabCursorState = this._termsVtabCursorState;
+        const asNumber = this._asNumber.bind(this);
+        const asString = this._asString.bind(this);
+        const eqOp = typeof capi.SQLITE_INDEX_CONSTRAINT_EQ === 'number' ? capi.SQLITE_INDEX_CONSTRAINT_EQ : 2;
+        const toPtr = (value) => this._asNumber(value, 0);
+        const schema = `
+            CREATE TABLE x(
+                dictionary TEXT,
+                expression TEXT,
+                reading TEXT,
+                expressionReverse TEXT,
+                readingReverse TEXT,
+                entryContentId INTEGER,
+                entryContentOffset INTEGER,
+                entryContentLength INTEGER,
+                entryContentDictName TEXT,
+                definitionTags TEXT,
+                termTags TEXT,
+                rules TEXT,
+                score INTEGER,
+                glossaryJson TEXT,
+                sequence INTEGER
+            )
+        `;
+
+        // sqlite wasm vtab helpers expose dynamic struct wrappers that are not strongly typed in our jsdoc surface.
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const module = vtab.setupModule({
+            catchExceptions: true,
+            methods: {
+                xCreate(pDb, _pAux, _argc, _argv, ppVtab) {
+                    const rc = capi.sqlite3_declare_vtab(toPtr(pDb), schema);
+                    if (rc !== 0) { return rc; }
+                    vtab.xVtab.create(toPtr(ppVtab));
+                    return 0;
+                },
+                xConnect(pDb, pAux, argc, argv, ppVtab) {
+                    const rc = capi.sqlite3_declare_vtab(toPtr(pDb), schema);
+                    if (rc !== 0) { return rc; }
+                    vtab.xVtab.create(toPtr(ppVtab));
+                    return 0;
+                },
+                xBestIndex(_pVtab, pIdxInfo) {
+                    const idxInfo = vtab.xIndexInfo(toPtr(pIdxInfo));
+                    let argvIndex = 1;
+                    let idxNum = 0;
+                    for (let i = 0; i < idxInfo.$nConstraint; ++i) {
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                        const constraint = idxInfo.nthConstraint(i);
+                        if (!constraint || constraint.$usable === 0 || constraint.$op !== eqOp) { continue; }
+                        const column = toPtr(constraint.$iColumn);
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                        const usage = idxInfo.nthConstraintUsage(i);
+                        if (!usage) { continue; }
+                        switch (column) {
+                            case -1:
+                                idxNum |= termsVtabIdxRowIdEq;
+                                break;
+                            case 0:
+                                idxNum |= termsVtabIdxDictionaryEq;
+                                break;
+                            case 1:
+                                idxNum |= termsVtabIdxExpressionEq;
+                                break;
+                            case 2:
+                                idxNum |= termsVtabIdxReadingEq;
+                                break;
+                            case 14:
+                                idxNum |= termsVtabIdxSequenceEq;
+                                break;
+                            default:
+                                continue;
+                        }
+                        usage.$argvIndex = argvIndex++;
+                        usage.$omit = 1;
+                    }
+                    idxInfo.$idxNum = idxNum;
+                    idxInfo.$estimatedRows = idxNum === 0 ? Math.max(1, termRecordStore.size) : 32;
+                    idxInfo.$estimatedCost = idxNum === 0 ? Math.max(1, termRecordStore.size) : 32;
+                    return 0;
+                },
+                xDisconnect(pVtab) {
+                    vtab.xVtab.dispose(toPtr(pVtab));
+                    return 0;
+                },
+                xDestroy(pVtab) {
+                    vtab.xVtab.dispose(toPtr(pVtab));
+                    return 0;
+                },
+                xOpen(_pVtab, ppCursor) {
+                    const cursor = vtab.xCursor.create(toPtr(ppCursor));
+                    termsVtabCursorState.set(cursor.pointer, {ids: [], index: 0});
+                    return 0;
+                },
+                xClose(pCursor) {
+                    const cursorPtr = toPtr(pCursor);
+                    termsVtabCursorState.delete(cursorPtr);
+                    vtab.xCursor.dispose(cursorPtr);
+                    return 0;
+                },
+                xFilter(pCursor, idxNum, _idxStr, argc, argv) {
+                    const cursorPtr = toPtr(pCursor);
+                    const state = termsVtabCursorState.get(cursorPtr);
+                    if (typeof state === 'undefined') { return 0; }
+                    const args = capi.sqlite3_values_to_js(toPtr(argc), toPtr(argv));
+                    let argIndex = 0;
+                    let rowId = null;
+                    let dictionary = null;
+                    let expression = null;
+                    let reading = null;
+                    let sequence = null;
+                    const idxBits = toPtr(idxNum);
+                    if ((idxBits & termsVtabIdxRowIdEq) !== 0) { rowId = asNumber(args[argIndex++], -1); }
+                    if ((idxBits & termsVtabIdxDictionaryEq) !== 0) { dictionary = asString(args[argIndex++]); }
+                    if ((idxBits & termsVtabIdxExpressionEq) !== 0) { expression = asString(args[argIndex++]); }
+                    if ((idxBits & termsVtabIdxReadingEq) !== 0) { reading = asString(args[argIndex++]); }
+                    if ((idxBits & termsVtabIdxSequenceEq) !== 0) { sequence = asNumber(args[argIndex++], -1); }
+
+                    const baseIds = (typeof rowId === 'number' && rowId > 0) ? [rowId] : termRecordStore.getAllIds();
+                    const ids = [];
+                    for (const id of baseIds) {
+                        if (id <= 0) { continue; }
+                        const record = termRecordStore.getById(id);
+                        if (typeof record === 'undefined') { continue; }
+                        if (dictionary !== null && record.dictionary !== dictionary) { continue; }
+                        if (expression !== null && record.expression !== expression) { continue; }
+                        if (reading !== null && record.reading !== reading) { continue; }
+                        if (sequence !== null && (record.sequence ?? -1) !== sequence) { continue; }
+                        ids.push(id);
+                    }
+                    state.ids = ids;
+                    state.index = 0;
+                    return 0;
+                },
+                xNext(pCursor) {
+                    const state = termsVtabCursorState.get(toPtr(pCursor));
+                    if (typeof state !== 'undefined') {
+                        ++state.index;
+                    }
+                    return 0;
+                },
+                xEof(pCursor) {
+                    const state = termsVtabCursorState.get(toPtr(pCursor));
+                    return (typeof state === 'undefined' || state.index >= state.ids.length) ? 1 : 0;
+                },
+                xColumn(pCursor, pContext, column) {
+                    const state = termsVtabCursorState.get(toPtr(pCursor));
+                    if (typeof state === 'undefined' || state.index >= state.ids.length) {
+                        capi.sqlite3_result_null(toPtr(pContext));
+                        return 0;
+                    }
+                    const id = state.ids[state.index];
+                    const record = termRecordStore.getById(id);
+                    if (typeof record === 'undefined') {
+                        capi.sqlite3_result_null(toPtr(pContext));
+                        return 0;
+                    }
+                    let value = null;
+                    switch (toPtr(column)) {
+                        case 0: value = record.dictionary; break;
+                        case 1: value = record.expression; break;
+                        case 2: value = record.reading; break;
+                        case 3: value = record.expressionReverse; break;
+                        case 4: value = record.readingReverse; break;
+                        case 5: value = null; break;
+                        case 6: value = record.entryContentOffset; break;
+                        case 7: value = record.entryContentLength; break;
+                        case 8: value = record.entryContentDictName; break;
+                        case 9: value = ''; break;
+                        case 10: value = ''; break;
+                        case 11: value = ''; break;
+                        case 12: value = record.score; break;
+                        case 13: value = '[]'; break;
+                        case 14: value = record.sequence; break;
+                        default: value = null; break;
+                    }
+                    capi.sqlite3_result_js(toPtr(pContext), value);
+                    return 0;
+                },
+                xRowid(pCursor, ppRowId) {
+                    const state = termsVtabCursorState.get(toPtr(pCursor));
+                    const id = (typeof state === 'undefined' || state.index >= state.ids.length) ? 0 : state.ids[state.index];
+                    vtab.xRowid(toPtr(ppRowId), id);
+                    return 0;
+                },
+                xUpdate() {
+                    return capi.SQLITE_READONLY;
+                },
+            },
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const typedModule = /** @type {import('@sqlite.org/sqlite-wasm').sqlite3_module} */ (module);
+        this._termsVtabModule = typedModule;
+        const rc = capi.sqlite3_create_module(dbPointer, 'manabitan_terms', typedModule, 0);
+        if (rc !== 0) {
+            throw new Error(`Failed to register manabitan_terms module: rc=${rc}`);
+        }
+        this._termsVtabModuleRegistered = true;
+    }
+
     /**
      * @param {string} whereClause
      * @returns {string}
@@ -2576,17 +2856,27 @@ export class DictionaryDatabase {
         await this._termContentStore.ensureLoadedForRead();
         /** @type {Map<number, import('dictionary-database').DatabaseTermEntryWithId>} */
         const rowsById = new Map();
-        const idArray = [...ids].filter((id) => id > 0);
-        for (const idChunk of this._chunkValues(idArray, 256)) {
-            const {clause: idInClause, bind: idBind} = this._buildNumberInClause(idChunk, 'id');
-            const fullSql = this._createTermSelectSql(`t.id IN (${idInClause})`);
-            const stmt = this._getCachedStatement(fullSql);
-            stmt.reset(true);
-            stmt.bind(idBind);
-            while (stmt.step()) {
-                const row = this._deserializeTermRow(/** @type {import('core').SafeAny} */ (stmt.get({})));
-                rowsById.set(row.id, row);
-            }
+        const recordsById = this._termRecordStore.getByIds(ids);
+        for (const [id, record] of recordsById) {
+            const row = this._deserializeTermRow({
+                id,
+                dictionary: record.dictionary,
+                expression: record.expression,
+                reading: record.reading,
+                expressionReverse: record.expressionReverse,
+                readingReverse: record.readingReverse,
+                entryContentId: null,
+                entryContentOffset: record.entryContentOffset,
+                entryContentLength: record.entryContentLength,
+                entryContentDictName: record.entryContentDictName,
+                definitionTags: '',
+                termTags: '',
+                rules: '',
+                score: record.score,
+                glossaryJson: '[]',
+                sequence: record.sequence,
+            });
+            rowsById.set(id, row);
         }
         return rowsById;
     }

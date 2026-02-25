@@ -688,7 +688,10 @@ export class DictionaryImportController {
      */
     async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
-        const {result, errors, fallbackDatabaseContentBase64} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
+        const importResult = /** @type {import('dictionary-importer').ImportResult & {fallbackDatabaseContentBase64?: string}} */ (
+            await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress)
+        );
+        const {result, errors, fallbackDatabaseContentBase64} = importResult;
         if (!result) {
             return errors;
         }
