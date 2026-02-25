@@ -26,6 +26,8 @@ import {
 } from '../../lib/zip.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
+import {log} from '../core/log.js';
+import {safePerformance} from '../core/safe-performance.js';
 import {toError} from '../core/to-error.js';
 import {stringReverse} from '../core/utilities.js';
 import {getFileExtensionFromImageMediaType, getImageMediaTypeFromFileName} from '../media/media-util.js';
@@ -66,6 +68,8 @@ export class DictionaryImporter {
         if (!dictionaryDatabase.isPrepared()) {
             throw new Error('Database is not ready');
         }
+
+        const importStartTime = safePerformance.now();
 
         /** @type {Error[]} */
         const errors = [];
@@ -204,7 +208,8 @@ export class DictionaryImporter {
             }
 
             for (const termMetaFile of termMetaFiles) {
-                await this._readFileSequenceStreaming(termMetaFile, this._convertTermMetaBankEntry.bind(this), dictionaryTitle, async (batch) => {
+                /** @type {(batch: import('dictionary-database').DatabaseTermMeta[]) => Promise<void>} */
+                const onTermMetaBatch = async (batch) => {
                     await bulkAdd('termMeta', batch);
                     for (const [key, value] of Object.entries(this._getMetaCounts(batch))) {
                         if (key in counts.termMeta) {
@@ -213,28 +218,29 @@ export class DictionaryImporter {
                             counts.termMeta[key] = value;
                         }
                     }
-                }, maxTransactionLength);
+                };
+                await this._readFileSequenceStreaming(termMetaFile, this._convertTermMetaBankEntry.bind(this), dictionaryTitle, onTermMetaBatch, maxTransactionLength);
                 this._progressData.index += bulkAddProgressAllowance;
                 this._progress();
             }
 
             for (const kanjiFile of kanjiFiles) {
+                /** @type {(batch: import('dictionary-database').DatabaseKanjiEntry[]) => Promise<void>} */
+                const onKanjiBatch = async (batch) => {
+                    await bulkAdd('kanji', batch);
+                    counts.kanji.total += batch.length;
+                };
                 await (version === 1 ?
-                    this._readFileSequenceStreaming(kanjiFile, this._convertKanjiBankEntryV1.bind(this), dictionaryTitle, async (batch) => {
-                        await bulkAdd('kanji', batch);
-                        counts.kanji.total += batch.length;
-                    }, maxTransactionLength) :
-                    this._readFileSequenceStreaming(kanjiFile, this._convertKanjiBankEntryV3.bind(this), dictionaryTitle, async (batch) => {
-                        await bulkAdd('kanji', batch);
-                        counts.kanji.total += batch.length;
-                    }, maxTransactionLength)
+                    this._readFileSequenceStreaming(kanjiFile, this._convertKanjiBankEntryV1.bind(this), dictionaryTitle, onKanjiBatch, maxTransactionLength) :
+                    this._readFileSequenceStreaming(kanjiFile, this._convertKanjiBankEntryV3.bind(this), dictionaryTitle, onKanjiBatch, maxTransactionLength)
                 );
                 this._progressData.index += bulkAddProgressAllowance;
                 this._progress();
             }
 
             for (const kanjiMetaFile of kanjiMetaFiles) {
-                await this._readFileSequenceStreaming(kanjiMetaFile, this._convertKanjiMetaBankEntry.bind(this), dictionaryTitle, async (batch) => {
+                /** @type {(batch: import('dictionary-database').DatabaseKanjiMeta[]) => Promise<void>} */
+                const onKanjiMetaBatch = async (batch) => {
                     await bulkAdd('kanjiMeta', batch);
                     for (const [key, value] of Object.entries(this._getMetaCounts(batch))) {
                         if (key in counts.kanjiMeta) {
@@ -243,17 +249,20 @@ export class DictionaryImporter {
                             counts.kanjiMeta[key] = value;
                         }
                     }
-                }, maxTransactionLength);
+                };
+                await this._readFileSequenceStreaming(kanjiMetaFile, this._convertKanjiMetaBankEntry.bind(this), dictionaryTitle, onKanjiMetaBatch, maxTransactionLength);
                 this._progressData.index += bulkAddProgressAllowance;
                 this._progress();
             }
 
             for (const tagFile of tagFiles) {
-                await this._readFileSequenceStreaming(tagFile, this._convertTagBankEntry.bind(this), dictionaryTitle, async (batch) => {
+                /** @type {(batch: import('dictionary-database').Tag[]) => Promise<void>} */
+                const onTagBatch = async (batch) => {
                     this._addOldIndexTags(index, batch, dictionaryTitle);
                     await bulkAdd('tagMeta', batch);
                     counts.tagMeta.total += batch.length;
-                }, maxTransactionLength);
+                };
+                await this._readFileSequenceStreaming(tagFile, this._convertTagBankEntry.bind(this), dictionaryTitle, onTagBatch, maxTransactionLength);
                 this._progressData.index += bulkAddProgressAllowance;
                 this._progress();
             }
@@ -286,6 +295,8 @@ export class DictionaryImporter {
         await dictionaryDatabase.bulkUpdate('dictionaries', [{data: summary, primaryKey}], 0, 1);
 
         this._progress();
+
+        log.log(`Dictionary import took ${((safePerformance.now() - importStartTime) / 1000).toFixed(2)}s`);
 
         return {result: summary, errors};
     }
@@ -923,20 +934,15 @@ export class DictionaryImporter {
     }
 
     /**
-     * Reads a single file from the archive using streaming decompression and a
-     * bracket-depth JSON scanner. Each top-level array element is extracted,
-     * parsed with native JSON.parse, converted, and flushed in batches so that
-     * the full decompressed string and parsed array are never held in memory.
-     * @template [TEntry=unknown]
-     * @template [TResult=unknown]
+     * Streams a file from the archive using streaming decompression and a
+     * bracket-depth JSON scanner, calling onEntry for each parsed top-level
+     * array element. Never holds the full decompressed string or parsed array
+     * in memory.
      * @param {import('@zip.js/zip.js').Entry} file
-     * @param {(entry: TEntry, title: string) => TResult} convertEntry
-     * @param {string} dictionaryTitle
-     * @param {(batch: TResult[]) => Promise<void>} onBatch
-     * @param {number} batchSize
+     * @param {(entry: unknown) => void | Promise<void>} onEntry
      * @returns {Promise<void>}
      */
-    async _readFileSequenceStreaming(file, convertEntry, dictionaryTitle, onBatch, batchSize) {
+    async _forEachStreamedEntry(file, onEntry) {
         if (typeof file.getData === 'undefined') {
             throw new Error(`Cannot read ${file.filename}`);
         }
@@ -953,9 +959,7 @@ export class DictionaryImporter {
         let escape = false;
         let entryStart = -1;
         let accumulated = '';
-
-        /** @type {TResult[]} */
-        let batch = [];
+        let hasTopLevelArray = false;
 
         for (;;) {
             const {done, value} = await reader.read();
@@ -986,7 +990,12 @@ export class DictionaryImporter {
                     case 0x5B: // [
                     case 0x7B: // {
                         depth++;
-                        if (depth === 2) {
+                        if (depth === 1) {
+                            if (ch !== 0x5B) {
+                                throw new Error(`Expected array in '${file.filename}'`);
+                            }
+                            hasTopLevelArray = true;
+                        } else if (depth === 2) {
                             entryStart = i;
                             accumulated = '';
                         }
@@ -996,21 +1005,17 @@ export class DictionaryImporter {
                         depth--;
                         if (depth === 1) {
                             accumulated += text.substring(entryStart, i + 1);
+                            let parsed;
                             try {
-                                const parsed = /** @type {TEntry} */ (parseJson(accumulated));
-                                batch.push(convertEntry(parsed, dictionaryTitle));
+                                parsed = parseJson(accumulated);
                             } catch (error) {
                                 if (error instanceof Error) {
                                     throw new Error(error.message + ` in '${file.filename}'`);
                                 }
                                 throw error;
                             }
+                            await onEntry(parsed);
                             entryStart = -1;
-
-                            if (batch.length >= batchSize) {
-                                await onBatch(batch);
-                                batch = [];
-                            }
                         }
                         break;
                 }
@@ -1023,11 +1028,38 @@ export class DictionaryImporter {
             }
         }
 
-        if (batch.length > 0) {
-            await onBatch(batch);
+        if (!hasTopLevelArray) {
+            throw new Error(`Expected array in '${file.filename}'`);
         }
 
         await dataPromise;
+    }
+
+    /**
+     * Reads a single file from the archive using streaming decompression,
+     * converting and flushing entries in batches.
+     * @template [TEntry=unknown]
+     * @template [TResult=unknown]
+     * @param {import('@zip.js/zip.js').Entry} file
+     * @param {(entry: TEntry, title: string) => TResult} convertEntry
+     * @param {string} dictionaryTitle
+     * @param {(batch: TResult[]) => Promise<void>} onBatch
+     * @param {number} batchSize
+     * @returns {Promise<void>}
+     */
+    async _readFileSequenceStreaming(file, convertEntry, dictionaryTitle, onBatch, batchSize) {
+        /** @type {TResult[]} */
+        let batch = [];
+        await this._forEachStreamedEntry(file, async (entry) => {
+            batch.push(convertEntry(/** @type {TEntry} */ (entry), dictionaryTitle));
+            if (batch.length >= batchSize) {
+                await onBatch(batch);
+                batch = [];
+            }
+        });
+        if (batch.length > 0) {
+            await onBatch(batch);
+        }
     }
 
     /**
@@ -1036,22 +1068,12 @@ export class DictionaryImporter {
      * @returns {Promise<boolean>}
      */
     async _validateFile(file, schemaName) {
-        const content = await this._getData(file, new TextWriter());
-        let entries;
-
-        try {
-            /** @type {unknown} */
-            entries = parseJson(content);
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(error.message + ` in '${file.filename}'`);
-            }
-        }
-
         const schema = ajvSchemas[schemaName];
-        if (!schema(entries)) {
-            throw this._formatAjvSchemaError(schema, file.filename);
-        }
+        await this._forEachStreamedEntry(file, (entry) => {
+            if (!schema([entry])) {
+                throw this._formatAjvSchemaError(schema, file.filename);
+            }
+        });
 
         ++this._progressData.index;
         this._progress();
