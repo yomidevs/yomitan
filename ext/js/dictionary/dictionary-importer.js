@@ -78,23 +78,10 @@ export class DictionaryImporter {
          * @param {import('dictionary-database').ObjectStoreData<T>[]} entries
          */
         const bulkAdd = async (objectStoreName, entries) => {
-            const entryCount = entries.length;
-
-            let progressIndexIncrease = bulkAddProgressAllowance / Math.ceil(entryCount / maxTransactionLength);
-            if (entryCount < maxTransactionLength) { progressIndexIncrease = bulkAddProgressAllowance; }
-            if (entryCount === 0) { this._progressData.index += progressIndexIncrease; }
-
-            for (let i = 0; i < entryCount; i += maxTransactionLength) {
-                const count = Math.min(maxTransactionLength, entryCount - i);
-
-                try {
-                    await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
-                } catch (e) {
-                    errors.push(toError(e));
-                }
-
-                this._progressData.index += progressIndexIncrease;
-                this._progress();
+            try {
+                await dictionaryDatabase.bulkAdd(objectStoreName, entries, 0, entries.length);
+            } catch (e) {
+                errors.push(toError(e));
             }
         };
 
@@ -178,112 +165,97 @@ export class DictionaryImporter {
         try {
             const uniqueMediaPaths = new Set();
             for (const termFile of termFiles) {
-            /** @type {import('dictionary-importer').ImportRequirement[]} */
-                const requirements = [];
-                let termList = await (
-                version === 1 ?
-                this._readFileSequence([termFile], this._convertTermBankEntryV1.bind(this), dictionaryTitle) :
-                this._readFileSequence([termFile], this._convertTermBankEntryV3.bind(this), dictionaryTitle)
+                /** @type {(batch: import('dictionary-database').DatabaseTermEntry[]) => Promise<void>} */
+                const onTermBatch = async (batch) => {
+                    /** @type {import('dictionary-importer').ImportRequirement[]} */
+                    const requirements = [];
+
+                    for (const entry of batch) {
+                        if (prefixWildcardsSupported) {
+                            entry.expressionReverse = stringReverse(entry.expression);
+                            entry.readingReverse = stringReverse(entry.reading);
+                        }
+                        const glossaryList = entry.glossary;
+                        for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
+                            const glossary = glossaryList[j];
+                            if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
+                            glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+                        }
+                    }
+
+                    const alreadyAddedRequirements = requirements.filter((x) => { return uniqueMediaPaths.has(x.source.path); });
+                    const notAddedRequirements = requirements.filter((x) => { return !uniqueMediaPaths.has(x.source.path); });
+                    for (const requirement of requirements) { uniqueMediaPaths.add(requirement.source.path); }
+
+                    await this._resolveAsyncRequirements(alreadyAddedRequirements, fileMap);
+                    const {media} = await this._resolveAsyncRequirements(notAddedRequirements, fileMap);
+                    await bulkAdd('media', media);
+                    counts.media.total += media.length;
+
+                    await bulkAdd('terms', batch);
+                    counts.terms.total += batch.length;
+                };
+                await (version === 1 ?
+                    this._readFileSequenceStreaming(termFile, this._convertTermBankEntryV1.bind(this), dictionaryTitle, onTermBatch, maxTransactionLength) :
+                    this._readFileSequenceStreaming(termFile, this._convertTermBankEntryV3.bind(this), dictionaryTitle, onTermBatch, maxTransactionLength)
                 );
-
-                // Prefix wildcard support
-                if (prefixWildcardsSupported) {
-                    for (const entry of termList) {
-                        entry.expressionReverse = stringReverse(entry.expression);
-                        entry.readingReverse = stringReverse(entry.reading);
-                    }
-                }
-
-                // Extended data support
-                for (let i = 0, ii = termList.length; i < ii; ++i) {
-                    const entry = termList[i];
-                    const glossaryList = entry.glossary;
-                    for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
-                        const glossary = glossaryList[j];
-                        if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
-                        glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
-                    }
-                }
-
-                const alreadyAddedRequirements = requirements.filter((x) => { return uniqueMediaPaths.has(x.source.path); });
-                const notAddedRequirements = requirements.filter((x) => { return !uniqueMediaPaths.has(x.source.path); });
-                for (const requirement of requirements) { uniqueMediaPaths.add(requirement.source.path); }
-
-                await this._resolveAsyncRequirements(alreadyAddedRequirements, fileMap); // already added must also be resolved for the term dict to have correct data
-                let {media} = await this._resolveAsyncRequirements(notAddedRequirements, fileMap);
-                await bulkAdd('media', media);
-                counts.media.total += media.length;
-
+                this._progressData.index += 2 * bulkAddProgressAllowance;
                 this._progress();
-
-                await bulkAdd('terms', termList);
-                counts.terms.total += termList.length;
-
-                this._progress();
-
-                termList = [];
-                media = [];
             }
 
             for (const termMetaFile of termMetaFiles) {
-                let termMetaList = await this._readFileSequence([termMetaFile], this._convertTermMetaBankEntry.bind(this), dictionaryTitle);
-
-                await bulkAdd('termMeta', termMetaList);
-                for (const [key, value] of Object.entries(this._getMetaCounts(termMetaList))) {
-                    if (key in counts.termMeta) {
-                        counts.termMeta[key] += value;
-                    } else {
-                        counts.termMeta[key] = value;
+                await this._readFileSequenceStreaming(termMetaFile, this._convertTermMetaBankEntry.bind(this), dictionaryTitle, async (batch) => {
+                    await bulkAdd('termMeta', batch);
+                    for (const [key, value] of Object.entries(this._getMetaCounts(batch))) {
+                        if (key in counts.termMeta) {
+                            counts.termMeta[key] += value;
+                        } else {
+                            counts.termMeta[key] = value;
+                        }
                     }
-                }
-
+                }, maxTransactionLength);
+                this._progressData.index += bulkAddProgressAllowance;
                 this._progress();
-
-                termMetaList = [];
             }
 
             for (const kanjiFile of kanjiFiles) {
-                let kanjiList = await (
-                version === 1 ?
-                this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV1.bind(this), dictionaryTitle) :
-                this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV3.bind(this), dictionaryTitle)
+                await (version === 1 ?
+                    this._readFileSequenceStreaming(kanjiFile, this._convertKanjiBankEntryV1.bind(this), dictionaryTitle, async (batch) => {
+                        await bulkAdd('kanji', batch);
+                        counts.kanji.total += batch.length;
+                    }, maxTransactionLength) :
+                    this._readFileSequenceStreaming(kanjiFile, this._convertKanjiBankEntryV3.bind(this), dictionaryTitle, async (batch) => {
+                        await bulkAdd('kanji', batch);
+                        counts.kanji.total += batch.length;
+                    }, maxTransactionLength)
                 );
-
-                await bulkAdd('kanji', kanjiList);
-                counts.kanji.total += kanjiList.length;
-
+                this._progressData.index += bulkAddProgressAllowance;
                 this._progress();
-
-                kanjiList = [];
             }
 
             for (const kanjiMetaFile of kanjiMetaFiles) {
-                let kanjiMetaList = await this._readFileSequence([kanjiMetaFile], this._convertKanjiMetaBankEntry.bind(this), dictionaryTitle);
-
-                await bulkAdd('kanjiMeta', kanjiMetaList);
-                for (const [key, value] of Object.entries(this._getMetaCounts(kanjiMetaList))) {
-                    if (key in counts.kanjiMeta) {
-                        counts.kanjiMeta[key] += value;
-                    } else {
-                        counts.kanjiMeta[key] = value;
+                await this._readFileSequenceStreaming(kanjiMetaFile, this._convertKanjiMetaBankEntry.bind(this), dictionaryTitle, async (batch) => {
+                    await bulkAdd('kanjiMeta', batch);
+                    for (const [key, value] of Object.entries(this._getMetaCounts(batch))) {
+                        if (key in counts.kanjiMeta) {
+                            counts.kanjiMeta[key] += value;
+                        } else {
+                            counts.kanjiMeta[key] = value;
+                        }
                     }
-                }
-
+                }, maxTransactionLength);
+                this._progressData.index += bulkAddProgressAllowance;
                 this._progress();
-
-                kanjiMetaList = [];
             }
 
             for (const tagFile of tagFiles) {
-                let tagList = await this._readFileSequence([tagFile], this._convertTagBankEntry.bind(this), dictionaryTitle);
-                this._addOldIndexTags(index, tagList, dictionaryTitle);
-
-                await bulkAdd('tagMeta', tagList);
-                counts.tagMeta.total += tagList.length;
-
+                await this._readFileSequenceStreaming(tagFile, this._convertTagBankEntry.bind(this), dictionaryTitle, async (batch) => {
+                    this._addOldIndexTags(index, batch, dictionaryTitle);
+                    await bulkAdd('tagMeta', batch);
+                    counts.tagMeta.total += batch.length;
+                }, maxTransactionLength);
+                this._progressData.index += bulkAddProgressAllowance;
                 this._progress();
-
-                tagList = [];
             }
 
             importSuccess = true;
@@ -948,6 +920,114 @@ export class DictionaryImporter {
             }
         }
         return results;
+    }
+
+    /**
+     * Reads a single file from the archive using streaming decompression and a
+     * bracket-depth JSON scanner. Each top-level array element is extracted,
+     * parsed with native JSON.parse, converted, and flushed in batches so that
+     * the full decompressed string and parsed array are never held in memory.
+     * @template [TEntry=unknown]
+     * @template [TResult=unknown]
+     * @param {import('@zip.js/zip.js').Entry} file
+     * @param {(entry: TEntry, title: string) => TResult} convertEntry
+     * @param {string} dictionaryTitle
+     * @param {(batch: TResult[]) => Promise<void>} onBatch
+     * @param {number} batchSize
+     * @returns {Promise<void>}
+     */
+    async _readFileSequenceStreaming(file, convertEntry, dictionaryTitle, onBatch, batchSize) {
+        if (typeof file.getData === 'undefined') {
+            throw new Error(`Cannot read ${file.filename}`);
+        }
+
+        const {readable, writable} = new TransformStream();
+        const dataPromise = file.getData(writable);
+
+        const textStream = readable.pipeThrough(new TextDecoderStream());
+        const reader = textStream.getReader();
+
+        // Bracket-depth scanner state
+        let depth = 0;
+        let inString = false;
+        let escape = false;
+        let entryStart = -1;
+        let accumulated = '';
+
+        /** @type {TResult[]} */
+        let batch = [];
+
+        for (;;) {
+            const {done, value} = await reader.read();
+            if (done) { break; }
+
+            const text = /** @type {string} */ (value);
+            for (let i = 0, ii = text.length; i < ii; i++) {
+                const ch = text.charCodeAt(i);
+
+                if (escape) {
+                    escape = false;
+                    continue;
+                }
+
+                if (inString) {
+                    if (ch === 0x5C) { // backslash
+                        escape = true;
+                    } else if (ch === 0x22) { // double quote
+                        inString = false;
+                    }
+                    continue;
+                }
+
+                switch (ch) {
+                    case 0x22: // "
+                        inString = true;
+                        break;
+                    case 0x5B: // [
+                    case 0x7B: // {
+                        depth++;
+                        if (depth === 2) {
+                            entryStart = i;
+                            accumulated = '';
+                        }
+                        break;
+                    case 0x5D: // ]
+                    case 0x7D: // }
+                        depth--;
+                        if (depth === 1) {
+                            accumulated += text.substring(entryStart, i + 1);
+                            try {
+                                const parsed = /** @type {TEntry} */ (parseJson(accumulated));
+                                batch.push(convertEntry(parsed, dictionaryTitle));
+                            } catch (error) {
+                                if (error instanceof Error) {
+                                    throw new Error(error.message + ` in '${file.filename}'`);
+                                }
+                                throw error;
+                            }
+                            entryStart = -1;
+
+                            if (batch.length >= batchSize) {
+                                await onBatch(batch);
+                                batch = [];
+                            }
+                        }
+                        break;
+                }
+            }
+
+            // Accumulate remaining text if mid-entry at chunk boundary
+            if (entryStart >= 0) {
+                accumulated += text.substring(entryStart);
+                entryStart = 0;
+            }
+        }
+
+        if (batch.length > 0) {
+            await onBatch(batch);
+        }
+
+        await dataPromise;
     }
 
     /**
