@@ -66,17 +66,10 @@ async function copyZstdAssets(out) {
 
     const zstdDictOutPath = path.join(out, 'zstd-dicts');
     fs.mkdirSync(zstdDictOutPath, {recursive: true});
-    const jmdictDictPath = path.join(
-        dirname,
-        '..',
-        '..',
-        'ManabiDictionaries',
-        'Sources',
-        'YomitanDictionaries',
-        'Resources',
-        'ZstdDicts',
-        'jmdict.zdict',
-    );
+    const jmdictDictPath = path.join(dirname, 'data', 'zstd-dicts', 'jmdict.zdict');
+    if (!fs.existsSync(jmdictDictPath)) {
+        throw new Error(`Missing vendored zstd dictionary asset: ${jmdictDictPath}`);
+    }
     fs.copyFileSync(jmdictDictPath, path.join(zstdDictOutPath, 'jmdict.zdict'));
 }
 
