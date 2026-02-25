@@ -2294,6 +2294,16 @@ export class DictionaryDatabase {
         if (!this._termRecordStore.isEmpty()) {
             return;
         }
+        const db = this._requireDb();
+        const termsTableInfo = db.selectObjects('PRAGMA table_info(terms)');
+        const termsColumns = new Set(termsTableInfo.map((row) => this._asString(row.name)));
+        const hasEntryContentOffset = termsColumns.has('entryContentOffset');
+        const hasEntryContentLength = termsColumns.has('entryContentLength');
+        const hasEntryContentDictName = termsColumns.has('entryContentDictName');
+        const hasEntryContentId = termsColumns.has('entryContentId');
+        const entryContentOffsetExpr = hasEntryContentOffset ? 't.entryContentOffset' : (hasEntryContentId ? 'c.contentOffset' : '-1');
+        const entryContentLengthExpr = hasEntryContentLength ? 't.entryContentLength' : (hasEntryContentId ? 'c.contentLength' : '-1');
+        const entryContentDictNameExpr = hasEntryContentDictName ? 't.entryContentDictName' : (hasEntryContentId ? 'c.contentDictName' : '\'raw\'');
         const stmt = this._getCachedStatement(`
             SELECT
                 t.dictionary AS dictionary,
@@ -2301,13 +2311,13 @@ export class DictionaryDatabase {
                 t.reading AS reading,
                 t.expressionReverse AS expressionReverse,
                 t.readingReverse AS readingReverse,
-                COALESCE(t.entryContentOffset, c.contentOffset) AS entryContentOffset,
-                COALESCE(t.entryContentLength, c.contentLength) AS entryContentLength,
-                COALESCE(t.entryContentDictName, c.contentDictName, 'raw') AS entryContentDictName,
+                ${entryContentOffsetExpr} AS entryContentOffset,
+                ${entryContentLengthExpr} AS entryContentLength,
+                COALESCE(${entryContentDictNameExpr}, 'raw') AS entryContentDictName,
                 t.score AS score,
                 t.sequence AS sequence
             FROM terms t
-            LEFT JOIN termEntryContent c ON c.id = t.entryContentId
+            ${hasEntryContentId ? 'LEFT JOIN termEntryContent c ON c.id = t.entryContentId' : ''}
         `);
         stmt.reset(true);
         /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */

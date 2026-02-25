@@ -17,6 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
+import {toError} from '../core/to-error.js';
 import {DictionaryImporterMediaLoader} from './dictionary-importer-media-loader.js';
 
 export class DictionaryWorker {
@@ -74,6 +75,42 @@ export class DictionaryWorker {
     _invoke(action, params, transfer, onProgress, formatResult) {
         return new Promise((resolve, reject) => {
             const worker = new Worker('/js/dictionary/dictionary-worker-main.js', {type: 'module'});
+            /** @type {import('dictionary-worker').InvokeDetails<TResponseRaw, TResponse> | null} */
+            let detailsRef = null;
+            /**
+             * @param {Error} error
+             */
+            const fail = (error) => {
+                const details = detailsRef;
+                if (details === null || details.complete) { return; }
+                const {worker: worker2, reject: reject2, onMessage} = details;
+                if (worker2 === null || reject2 === null || onMessage === null) { return; }
+                details.complete = true;
+                details.worker = null;
+                details.resolve = null;
+                details.reject = null;
+                details.onMessage = null;
+                details.onProgress = null;
+                details.formatResult = null;
+                worker2.removeEventListener('message', onMessage);
+                worker2.removeEventListener('error', onError);
+                worker2.removeEventListener('messageerror', onMessageError);
+                worker2.terminate();
+                reject2(error);
+            };
+            /**
+             * @param {ErrorEvent} event
+             */
+            const onError = (event) => {
+                const detail = event.message ? `: ${event.message}` : '';
+                fail(new Error(`Dictionary worker failed${detail}`));
+            };
+            /**
+             * @param {MessageEvent} _event
+             */
+            const onMessageError = (_event) => {
+                fail(new Error('Dictionary worker message deserialization failed'));
+            };
             /** @type {import('dictionary-worker').InvokeDetails<TResponseRaw, TResponse>} */
             const details = {
                 complete: false,
@@ -88,8 +125,15 @@ export class DictionaryWorker {
             /** @type {(event: MessageEvent<import('dictionary-worker').MessageData<TResponseRaw>>) => void} */
             const onMessage = /** @type {(details: import('dictionary-worker').InvokeDetails<TResponseRaw, TResponse>, event: MessageEvent<import('dictionary-worker').MessageData<TResponseRaw>>) => void} */ (this._onMessage).bind(this, details);
             details.onMessage = onMessage;
+            detailsRef = details;
             worker.addEventListener('message', onMessage);
-            worker.postMessage({action, params}, transfer);
+            worker.addEventListener('error', onError);
+            worker.addEventListener('messageerror', onMessageError);
+            try {
+                worker.postMessage({action, params}, transfer);
+            } catch (e) {
+                fail(toError(e));
+            }
         });
     }
 

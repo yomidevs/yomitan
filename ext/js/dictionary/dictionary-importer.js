@@ -21,6 +21,7 @@ import {
     BlobWriter as BlobWriter0,
     TextWriter as TextWriter0,
     Uint8ArrayReader as Uint8ArrayReader0,
+    Uint8ArrayWriter as Uint8ArrayWriter0,
     ZipReader as ZipReader0,
     configure,
 } from '../../lib/zip.js';
@@ -30,11 +31,13 @@ import {toError} from '../core/to-error.js';
 import {stringReverse} from '../core/utilities.js';
 import {getFileExtensionFromImageMediaType, getImageMediaTypeFromFileName} from '../media/media-util.js';
 import {compareRevisions} from './dictionary-data-util.js';
+import {parseTermBankWithWasm} from './term-bank-wasm-parser.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 const BlobWriter = /** @type {typeof import('@zip.js/zip.js').BlobWriter} */ (/** @type {unknown} */ (BlobWriter0));
 const TextWriter = /** @type {typeof import('@zip.js/zip.js').TextWriter} */ (/** @type {unknown} */ (TextWriter0));
 const Uint8ArrayReader = /** @type {typeof import('@zip.js/zip.js').Uint8ArrayReader} */ (/** @type {unknown} */ (Uint8ArrayReader0));
+const Uint8ArrayWriter = /** @type {typeof import('@zip.js/zip.js').Uint8ArrayWriter} */ (/** @type {unknown} */ (Uint8ArrayWriter0));
 const ZipReader = /** @type {typeof import('@zip.js/zip.js').ZipReader} */ (/** @type {unknown} */ (ZipReader0));
 
 const INDEX_FILE_NAME = 'index.json';
@@ -1025,7 +1028,7 @@ export class DictionaryImporter {
      * @param {boolean} enableTermEntryContentDedup
      */
     _prepareTermEntrySerialization(entry, enableTermEntryContentDedup) {
-        const glossaryJson = JSON.stringify(entry.glossary);
+        const glossaryJson = (typeof entry.glossaryJson === 'string') ? entry.glossaryJson : JSON.stringify(entry.glossary);
         if (!enableTermEntryContentDedup) {
             entry.glossaryJson = glossaryJson;
         }
@@ -1220,6 +1223,13 @@ export class DictionaryImporter {
         useMediaPipeline,
         enableTermEntryContentDedup,
     ) {
+        if (!useMediaPipeline && this._structuredContentImportFastPath) {
+            try {
+                return await this._readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, enableTermEntryContentDedup);
+            } catch (e) {
+                this._logImport(`term file ${termFile.filename}: wasm parse fallback (${/** @type {Error} */ (toError(e)).message})`);
+            }
+        }
         const content = await this._getData(termFile, new TextWriter());
         let entries = /** @type {unknown} */ ([]);
         try {
@@ -1262,6 +1272,54 @@ export class DictionaryImporter {
             result[i] = entry;
         }
         return {termList: result, requirements};
+    }
+
+    /**
+     * @param {import('@zip.js/zip.js').Entry} termFile
+     * @param {import('dictionary-data').IndexVersion} version
+     * @param {string} dictionaryTitle
+     * @param {boolean} prefixWildcardsSupported
+     * @param {boolean} enableTermEntryContentDedup
+     * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: null}>}
+     */
+    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, enableTermEntryContentDedup) {
+        const bytes = await this._getData(termFile, new Uint8ArrayWriter());
+        const parsedRows = await parseTermBankWithWasm(bytes, version);
+        /** @type {import('dictionary-database').DatabaseTermEntry[]} */
+        const termList = [];
+        termList.length = parsedRows.length;
+        for (let i = 0, ii = parsedRows.length; i < ii; ++i) {
+            const row = parsedRows[i];
+            const expression = row.expression;
+            const reading = row.reading.length > 0 ? row.reading : expression;
+            /** @type {import('dictionary-database').DatabaseTermEntry} */
+            const entry = {
+                expression,
+                reading,
+                definitionTags: row.definitionTags,
+                rules: row.rules,
+                score: row.score,
+                glossary: [],
+                glossaryJson: row.glossaryJson,
+                termTags: row.termTags,
+                dictionary: dictionaryTitle,
+            };
+            if (typeof row.sequence === 'number') {
+                entry.sequence = row.sequence;
+            }
+            if (prefixWildcardsSupported) {
+                entry.expressionReverse = stringReverse(entry.expression);
+                entry.readingReverse = stringReverse(entry.reading);
+            }
+            if (enableTermEntryContentDedup && typeof row.termEntryContentHash === 'string' && row.termEntryContentBytes instanceof Uint8Array) {
+                entry.termEntryContentHash = row.termEntryContentHash;
+                entry.termEntryContentBytes = row.termEntryContentBytes;
+            } else {
+                this._prepareTermEntrySerialization(entry, enableTermEntryContentDedup);
+            }
+            termList[i] = entry;
+        }
+        return {termList, requirements: null};
     }
 
     /**
