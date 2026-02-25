@@ -85,7 +85,7 @@ jobs:
           cat > updates.json << EOF
           {
               "addons": {
-                  "{2d13e145-294e-4ead-9bce-b4644b203a00}": {
+                  "{accbebce-862b-48a9-bb9a-1da9ad1f8702}": {
                       "updates": [
                           {
                               "version": "${{ inputs.tag }}",
