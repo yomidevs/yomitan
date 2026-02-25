@@ -36,6 +36,7 @@ export type ProgressData = {
 export type ImportResult = {
     result: Summary | null;
     errors: Error[];
+    fallbackDatabaseContentBase64?: string | null;
 };
 
 export type ImportDetails = {

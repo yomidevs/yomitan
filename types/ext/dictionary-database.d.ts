@@ -276,9 +276,14 @@ export type FindPredicate<TItem = unknown, TRow = unknown> = (row: TRow, item: T
 
 export type CreateResult<TItem = unknown, TRow = unknown, TResult = unknown> = (row: TRow, data: FindMultiBulkData<TItem>) => TResult;
 
-export type DictionarySet = {
-    has(value: string): boolean;
-};
+export type DictionarySet =
+    Set<string> |
+    Map<string, unknown> |
+    {
+        has(value: string): boolean;
+        readonly size: number;
+        [Symbol.iterator](): Iterator<string>;
+    };
 
 /** API for communicating with its own worker */
 

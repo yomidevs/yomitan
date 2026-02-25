@@ -1244,7 +1244,7 @@ export class DictionaryDatabase {
         }
 
         if (objectStoreName === 'terms') {
-            await this._bulkAddTerms(items, start, count);
+            await this._bulkAddTerms(/** @type {import('dictionary-database').ObjectStoreData<'terms'>[]} */ (items), start, count);
             return;
         }
 
@@ -1437,7 +1437,7 @@ export class DictionaryDatabase {
                 const chunkCount = Math.min(batchSize, ii - i);
                 /** @type {string[]} */
                 const valueRows = [];
-                /** @type {import('@sqlite.org/sqlite-wasm').Bindable[]} */
+                /** @type {import('@sqlite.org/sqlite-wasm').BindableValue[]} */
                 const bind = [];
                 for (let j = 0; j < chunkCount; ++j) {
                     const row = /** @type {import('dictionary-database').DatabaseTermEntry} */ (items[i + j]);
@@ -1481,8 +1481,8 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {import('@sqlite.org/sqlite-wasm').Statement} selectContentStmt
-     * @param {import('@sqlite.org/sqlite-wasm').Statement} insertContentStmt
+     * @param {import('@sqlite.org/sqlite-wasm').PreparedStatement} selectContentStmt
+     * @param {import('@sqlite.org/sqlite-wasm').PreparedStatement} insertContentStmt
      * @param {string} contentHash
      * @param {string} rules
      * @param {string} definitionTags
