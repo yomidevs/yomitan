@@ -217,9 +217,26 @@ async function waitForImportWithPhaseScreenshots(driver, report, dictionaryName,
     let previousLabel = '';
     let previousLabelStart = importStartTime;
     const deadline = importStartTime + timeoutMs;
+    let sawVisibleProgress = false;
 
     while (safePerformance.now() < deadline) {
         const now = safePerformance.now();
+        // Selenium executeScript return value is untyped (`any`).
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const progressVisible = await driver.executeScript(`
+            const selectors = [
+                '#recommended-dictionaries-modal .dictionary-import-progress',
+                '#dictionaries-modal .dictionary-import-progress'
+            ];
+            return selectors.some((selector) => {
+                const node = document.querySelector(selector);
+                return node instanceof HTMLElement && !node.hidden;
+            });
+        `);
+        if (progressVisible) {
+            sawVisibleProgress = true;
+        }
+
         const currentLabel = await getImportProgressLabel(driver);
         if (currentLabel.length > 0 && currentLabel !== previousLabel) {
             if (previousLabel.length > 0) {
@@ -236,8 +253,7 @@ async function waitForImportWithPhaseScreenshots(driver, report, dictionaryName,
             previousLabelStart = now;
         }
 
-        const countsText = await getDictionaryCountsText(driver);
-        if (countsText === expectedCounts) {
+        if (sawVisibleProgress && !progressVisible) {
             if (previousLabel.length > 0) {
                 await addReportPhase(
                     report,
@@ -248,11 +264,15 @@ async function waitForImportWithPhaseScreenshots(driver, report, dictionaryName,
                     now,
                 );
             }
+            const countsText = await getDictionaryCountsText(driver);
+            if (countsText !== expectedCounts) {
+                fail(`Progress completed for ${dictionaryName} but counts were ${countsText} (expected ${expectedCounts})`);
+            }
             await addReportPhase(
                 report,
                 driver,
                 `${dictionaryName}: total import`,
-                `Dictionary counts reached ${expectedCounts}`,
+                `Progress bar completed and dictionary counts reached ${expectedCounts}`,
                 importStartTime,
                 now,
             );
@@ -263,7 +283,7 @@ async function waitForImportWithPhaseScreenshots(driver, report, dictionaryName,
     }
 
     const countsText = await getDictionaryCountsText(driver);
-    fail(`Timed out waiting for ${dictionaryName} import completion. Last dictionary counts: ${countsText}`);
+    fail(`Timed out waiting for ${dictionaryName} import completion. Progress seen=${String(sawVisibleProgress)}. Last dictionary counts: ${countsText}`);
 }
 
 /**
@@ -406,8 +426,8 @@ async function main() {
         const tempDir = await mkdtemp(path.join(os.tmpdir(), 'manabitan-firefox-e2e-'));
         const dict1Path = path.join(tempDir, 'integration-dictionary-1.zip');
         const dict2Path = path.join(tempDir, 'integration-dictionary-2.zip');
-        await buildDictionaryZip('JMdict', dict1Path);
-        await buildDictionaryZip('KANJIDIC', dict2Path);
+        await buildDictionaryZip('Jitendex', dict1Path);
+        await buildDictionaryZip('JMdict', dict2Path);
         const dict1Buffer = await readFile(dict1Path);
         const dict2Buffer = await readFile(dict2Path);
 
@@ -455,20 +475,19 @@ async function main() {
             ja: {
                 terms: [
                     {
-                        name: 'JMdict',
-                        description: 'Test JMdict entry',
+                        name: 'Jitendex',
+                        description: 'Test Jitendex entry',
                         homepage: '',
                         downloadUrl: dict1Url,
                     },
-                ],
-                kanji: [
                     {
-                        name: 'KANJIDIC',
-                        description: 'Test KANJIDIC entry',
+                        name: 'JMdict',
+                        description: 'Test JMdict entry',
                         homepage: '',
                         downloadUrl: dict2Url,
                     },
                 ],
+                kanji: [],
                 frequency: [],
                 grammar: [],
                 pronunciation: [],
@@ -477,19 +496,19 @@ async function main() {
         const mockInstallStart = safePerformance.now();
         await installRecommendedDictionariesMock(driver, mockRecommendedDictionaries);
         const mockInstallEnd = safePerformance.now();
-        await addReportPhase(report, driver, 'Install mocked recommended dictionary feed', 'recommended-dictionaries.json overridden to use local JMdict and KANJIDIC test archives', mockInstallStart, mockInstallEnd);
+        await addReportPhase(report, driver, 'Install mocked recommended dictionary feed', 'recommended-dictionaries.json overridden to use local Jitendex and JMdict test archives', mockInstallStart, mockInstallEnd);
+
+        const jitendexClickStart = safePerformance.now();
+        await installRecommendedDictionary(driver, 'Jitendex');
+        const jitendexClickEnd = safePerformance.now();
+        await addReportPhase(report, driver, 'Click Jitendex download', 'Triggered recommended Jitendex import', jitendexClickStart, jitendexClickEnd);
+        await waitForImportWithPhaseScreenshots(driver, report, 'Jitendex', '1 installed, 1 enabled', 300_000);
 
         const jmdictClickStart = safePerformance.now();
         await installRecommendedDictionary(driver, 'JMdict');
         const jmdictClickEnd = safePerformance.now();
         await addReportPhase(report, driver, 'Click JMdict download', 'Triggered recommended JMdict import', jmdictClickStart, jmdictClickEnd);
-        await waitForImportWithPhaseScreenshots(driver, report, 'JMdict', '1 installed, 1 enabled', 300_000);
-
-        const kanjidicClickStart = safePerformance.now();
-        await installRecommendedDictionary(driver, 'KANJIDIC');
-        const kanjidicClickEnd = safePerformance.now();
-        await addReportPhase(report, driver, 'Click KANJIDIC download', 'Triggered recommended KANJIDIC import', kanjidicClickStart, kanjidicClickEnd);
-        await waitForImportWithPhaseScreenshots(driver, report, 'KANJIDIC', '2 installed, 2 enabled', 300_000);
+        await waitForImportWithPhaseScreenshots(driver, report, 'JMdict', '2 installed, 2 enabled', 300_000);
 
         const verifyStart = safePerformance.now();
         await clickWithScroll(driver, '.settings-item[data-modal-action="show,dictionaries"]');
@@ -502,15 +521,18 @@ async function main() {
                     .map((node) => (node.textContent || '').trim())
                     .filter((title) => title.length > 0);
             `);
-            return Array.isArray(dictionaryTitles) &&
-            dictionaryTitles.includes('JMdict') &&
-            dictionaryTitles.includes('KANJIDIC');
-        }, 60_000, 'Expected installed dictionary list to contain JMdict and KANJIDIC');
+            return (
+                Array.isArray(dictionaryTitles) &&
+                dictionaryTitles.includes('Jitendex') &&
+                dictionaryTitles.includes('JMdict') &&
+                !dictionaryTitles.includes('KANJIDIC')
+            );
+        }, 60_000, 'Expected installed dictionary list to contain Jitendex and JMdict');
         const verifyEnd = safePerformance.now();
-        await addReportPhase(report, driver, 'Verify installed dictionaries list', 'Opened dictionaries modal and confirmed JMdict + KANJIDIC are listed', verifyStart, verifyEnd);
+        await addReportPhase(report, driver, 'Verify installed dictionaries list', 'Opened dictionaries modal and confirmed Jitendex + JMdict are listed', verifyStart, verifyEnd);
 
         report.status = 'success';
-        console.log('[firefox-e2e] PASS: Recommended dictionary imports installed JMdict and KANJIDIC.');
+        console.log('[firefox-e2e] PASS: Recommended dictionary imports installed Jitendex and JMdict.');
     } catch (e) {
         report.status = 'failure';
         report.failureReason = errorMessage(e);
