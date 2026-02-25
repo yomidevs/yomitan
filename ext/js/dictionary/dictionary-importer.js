@@ -988,20 +988,21 @@ export class DictionaryImporter {
                         inString = true;
                         break;
                     case 0x5B: // [
-                    case 0x7B: // {
                         depth++;
                         if (depth === 1) {
-                            if (ch !== 0x5B) {
-                                throw new Error(`Expected array in '${file.filename}'`);
-                            }
                             hasTopLevelArray = true;
                         } else if (depth === 2) {
                             entryStart = i;
                             accumulated = '';
                         }
                         break;
+                    case 0x7B: // {
+                        if (depth <= 1) {
+                            throw new Error(`Expected array in '${file.filename}'`);
+                        }
+                        depth++;
+                        break;
                     case 0x5D: // ]
-                    case 0x7D: // }
                         depth--;
                         if (depth === 1) {
                             accumulated += text.substring(entryStart, i + 1);
@@ -1018,6 +1019,12 @@ export class DictionaryImporter {
                             entryStart = -1;
                         }
                         break;
+                    case 0x7D: // }
+                        if (depth <= 1) {
+                            throw new Error(`Unexpected } in '${file.filename}'`);
+                        }
+                        depth--;
+                        break;
                 }
             }
 
@@ -1028,7 +1035,7 @@ export class DictionaryImporter {
             }
         }
 
-        if (!hasTopLevelArray) {
+        if (!hasTopLevelArray || depth !== 0) {
             throw new Error(`Expected array in '${file.filename}'`);
         }
 
