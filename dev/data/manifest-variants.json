@@ -151,7 +151,7 @@
                     ],
                     "pattern": "^.*$",
                     "patternFlags": "",
-                    "replacement": "$& (development build)"
+                    "replacement": "$& (dev)"
                 },
                 {
                     "action": "replace",
@@ -305,7 +305,7 @@
                     ],
                     "pattern": "^.*$",
                     "patternFlags": "",
-                    "replacement": "$& (development build)"
+                    "replacement": "$& (dev)"
                 },
                 {
                     "action": "replace",
