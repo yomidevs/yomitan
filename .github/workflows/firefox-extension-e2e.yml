@@ -1,0 +1,53 @@
+name: Firefox Extension E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - ext/**
+      - test/firefox/**
+      - dev/**
+      - package.json
+      - package-lock.json
+      - .github/workflows/firefox-extension-e2e.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  firefox-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Restore dependencies
+        id: restore-dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: firefox-e2e-js-depend-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.restore-dependencies.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Build third-party libraries
+        run: npm run build:libs
+
+      - name: Build Firefox dev package
+        run: |
+          npm run build -- --target firefox-dev
+          cp builds/manabitan-firefox-dev.zip builds/manabitan-firefox-dev.xpi
+
+      - name: Run Firefox extension E2E
+        env:
+          MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev.xpi
+        run: npm run test:e2e:firefox-extension

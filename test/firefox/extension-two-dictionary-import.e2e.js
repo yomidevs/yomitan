@@ -15,11 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {mkdtemp, writeFile} from 'node:fs/promises';
+import {access, mkdtemp, writeFile} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {Builder, Browser, By, until} from 'selenium-webdriver';
+import * as firefox from 'selenium-webdriver/firefox.js';
 import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -94,8 +95,18 @@ async function buildDictionaryZip(title, outputPath) {
  */
 async function main() {
     const xpiPath = process.env.MANABITAN_FIREFOX_XPI ?? path.join(root, 'builds', 'manabitan-firefox-dev.xpi');
+    try {
+        await access(xpiPath);
+    } catch (_) {
+        fail(`Extension XPI not found at: ${xpiPath}`);
+    }
+    const firefoxOptions = new firefox.Options();
+    firefoxOptions.addArguments('-headless');
     const driver = /** @type {import('selenium-webdriver').ThenableWebDriver} */ (
-        new Builder().forBrowser(Browser.FIREFOX).build()
+        new Builder()
+            .forBrowser(Browser.FIREFOX)
+            .setFirefoxOptions(firefoxOptions)
+            .build()
     );
     try {
         const tempDir = await mkdtemp(path.join(os.tmpdir(), 'manabitan-firefox-e2e-'));
