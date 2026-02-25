@@ -183,7 +183,13 @@ describe('Database', () => {
         const testData = parseJson(readFileSync(testDataFilePath, {encoding: 'utf8'}));
         test('Seeds existing database content for sequential fallback worker imports', async ({expect}) => {
             const dictionaryWorkerHandler = new DictionaryWorkerHandler();
-            /** @type {Record<string, unknown>} */
+            /**
+             * @type {{
+             *   usesFallbackStorage: () => boolean,
+             *   exportDatabase: () => Promise<ArrayBuffer>,
+             *   importDatabase: (content: ArrayBuffer) => Promise<void>,
+             *   close: () => Promise<void>
+              }} */
             const fakeDatabase = {
                 usesFallbackStorage: () => true,
                 exportDatabase: async () => new ArrayBuffer(8),
@@ -191,7 +197,7 @@ describe('Database', () => {
                 close: async () => {},
             };
             const getPreparedDictionaryDatabaseSpy = vi.spyOn(dictionaryWorkerHandler, '_getPreparedDictionaryDatabase').mockResolvedValue(
-                /** @type {import('dictionary-database').DictionaryDatabase} */ (/** @type {unknown} */ (fakeDatabase)),
+                /** @type {any} */ (fakeDatabase),
             );
             const importDictionarySpy = vi.spyOn(DictionaryImporter.prototype, 'importDictionary').mockResolvedValue({
                 result: /** @type {import('dictionary-importer').Summary} */ ({title: 'mock', revision: 'mock', sequenced: true, version: 3, importDate: 0, prefixWildcardsSupported: false, styles: ''}),

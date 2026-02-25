@@ -15,7 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {access, mkdtemp, writeFile} from 'node:fs/promises';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
+import {access, mkdtemp, readFile, writeFile} from 'node:fs/promises';
+import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -79,27 +83,6 @@ async function waitForText(driver, selector, text, timeoutMs) {
 }
 
 /**
- * @param {import('selenium-webdriver').ThenableWebDriver} driver
- * @param {string} filePath
- * @returns {Promise<void>}
- */
-async function uploadDictionaryFile(driver, filePath) {
-    await driver.executeScript(`
-        const input = document.querySelector('#dictionary-import-file-input');
-        if (!(input instanceof HTMLInputElement)) { throw new Error('Dictionary file input not found'); }
-        input.hidden = false;
-        input.style.display = 'block';
-        input.style.opacity = '1';
-    `);
-    await (await driver.findElement(By.css('#dictionary-import-file-input'))).sendKeys(filePath);
-    await driver.executeScript(`
-        const input = document.querySelector('#dictionary-import-file-input');
-        if (!(input instanceof HTMLInputElement)) { throw new Error('Dictionary file input not found after upload'); }
-        input.dispatchEvent(new Event('change', {bubbles: true}));
-    `);
-}
-
-/**
  * @param {string} title
  * @param {string} outputPath
  * @returns {Promise<void>}
@@ -108,6 +91,20 @@ async function buildDictionaryZip(title, outputPath) {
     const dictionaryDir = path.join(root, 'test', 'data', 'dictionaries', 'valid-dictionary1');
     const data = await createDictionaryArchiveData(dictionaryDir, title);
     await writeFile(outputPath, Buffer.from(data));
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string} dictionaryUrl
+ * @returns {Promise<void>}
+ */
+async function importDictionaryFromUrl(driver, dictionaryUrl) {
+    await (await driver.findElement(By.css('.settings-item[data-modal-action="show,dictionaries"]'))).click();
+    await (await driver.findElement(By.css('#dictionary-import-button'))).click();
+    await driver.wait(until.elementLocated(By.css('#dictionary-import-url-text')), 30_000);
+    await (await driver.findElement(By.css('#dictionary-import-url-text'))).clear();
+    await (await driver.findElement(By.css('#dictionary-import-url-text'))).sendKeys(dictionaryUrl);
+    await (await driver.findElement(By.css('#dictionary-import-url-button'))).click();
 }
 
 /**
@@ -121,20 +118,55 @@ async function main() {
     } catch (_) {
         fail(`Extension XPI not found at: ${xpiPath}`);
     }
+    // Selenium's JS-only API surfaces `any` here.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const firefoxOptions = new firefox.Options();
     firefoxOptions.addArguments('-headless');
+    // Selenium's JS-only API surfaces `any` here.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const driver = /** @type {import('selenium-webdriver').ThenableWebDriver} */ (
         new Builder()
             .forBrowser(Browser.FIREFOX)
             .setFirefoxOptions(firefoxOptions)
             .build()
     );
+    /** @type {http.Server|undefined} */
+    let server;
     try {
         const tempDir = await mkdtemp(path.join(os.tmpdir(), 'manabitan-firefox-e2e-'));
         const dict1Path = path.join(tempDir, 'integration-dictionary-1.zip');
         const dict2Path = path.join(tempDir, 'integration-dictionary-2.zip');
         await buildDictionaryZip('IntegrationDictionary1', dict1Path);
         await buildDictionaryZip('IntegrationDictionary2', dict2Path);
+        const dict1Buffer = await readFile(dict1Path);
+        const dict2Buffer = await readFile(dict2Path);
+
+        server = http.createServer((req, res) => {
+            const url = String(req.url ?? '/');
+            if (url === '/integration-dictionary-1.zip') {
+                res.writeHead(200, {'Content-Type': 'application/zip'});
+                res.end(dict1Buffer);
+                return;
+            }
+            if (url === '/integration-dictionary-2.zip') {
+                res.writeHead(200, {'Content-Type': 'application/zip'});
+                res.end(dict2Buffer);
+                return;
+            }
+            res.writeHead(404, {'Content-Type': 'text/plain'});
+            res.end('not found');
+        });
+        await new Promise((resolve) => {
+            server.listen(0, '127.0.0.1', () => {
+                resolve(void 0);
+            });
+        });
+        const address = server.address();
+        if (!(address && typeof address === 'object' && typeof address.port === 'number')) {
+            fail('Failed to start local dictionary HTTP server');
+        }
+        const dict1Url = `http://127.0.0.1:${address.port}/integration-dictionary-1.zip`;
+        const dict2Url = `http://127.0.0.1:${address.port}/integration-dictionary-2.zip`;
 
         await driver.installAddon(xpiPath, true);
 
@@ -142,16 +174,23 @@ async function main() {
         await driver.get(`${extensionBaseUrl}/settings.html`);
         await driver.wait(until.elementLocated(By.css('#dictionary-import-file-input')), 30_000);
 
-        await uploadDictionaryFile(driver, dict1Path);
+        await importDictionaryFromUrl(driver, dict1Url);
         await waitForText(driver, '#dictionaries', 'Dictionaries (1 installed, 1 enabled)', 120_000);
 
-        await uploadDictionaryFile(driver, dict2Path);
+        await importDictionaryFromUrl(driver, dict2Url);
         await waitForText(driver, '#dictionaries', 'Dictionaries (2 installed, 2 enabled)', 120_000);
 
         console.log('[firefox-e2e] PASS: Two sequential dictionary imports are preserved.');
     } catch (e) {
         fail(errorMessage(e));
     } finally {
+        if (typeof server !== 'undefined') {
+            await new Promise((resolve) => {
+                server.close(() => {
+                    resolve(void 0);
+                });
+            });
+        }
         await driver.quit();
     }
 }

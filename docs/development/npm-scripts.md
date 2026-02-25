@@ -108,6 +108,7 @@ Scripts can be executed by running `npm run <name>`.
   - Firefox installed
   - geckodriver on `PATH`
   - Node.js 22
+  - `selenium-webdriver` installed (`npm install --no-save selenium-webdriver@4.38.0`)
   - a built Firefox `.xpi` at `builds/manabitan-firefox-dev.xpi` (or set `MANABITAN_FIREFOX_XPI` to override)
 
 - `test:build`

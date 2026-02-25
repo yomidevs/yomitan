@@ -47,6 +47,9 @@ jobs:
           npm run build -- --target firefox-dev
           cp builds/manabitan-firefox-dev.zip builds/manabitan-firefox-dev.xpi
 
+      - name: Install Selenium driver dependency
+        run: npm install --no-save selenium-webdriver@4.38.0
+
       - name: Run Firefox extension E2E
         env:
           MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev.xpi

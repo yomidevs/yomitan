@@ -110,7 +110,6 @@
         "prettier": "^3.4.2",
         "stylelint": "^16.12.0",
         "stylelint-config-recommended": "^14.0.1",
-        "selenium-webdriver": "^4.38.0",
         "ts-json-schema-generator": "^2.3.0",
         "typescript": "^5.7.2",
         "typescript-eslint": "^8.18.2",
