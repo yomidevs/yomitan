@@ -42,6 +42,7 @@ export type ImportResult = {
 export type ImportDetails = {
     prefixWildcardsSupported: boolean;
     yomitanVersion: string;
+    existingDatabaseContentBase64?: string;
     skipSchemaValidation?: boolean;
     enableBulkImportIndexOptimization?: boolean;
     disableProgressEvents?: boolean;

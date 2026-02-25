@@ -17,7 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {arrayBufferToBase64} from '../data/array-buffer-util.js';
+import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from './dictionary-database.js';
 import {DictionaryImporter} from './dictionary-importer.js';
 import {DictionaryWorkerMediaLoader} from './dictionary-worker-media-loader.js';
@@ -89,6 +89,15 @@ export class DictionaryWorkerHandler {
     async _importDictionary({details, archiveContent}, onProgress) {
         const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
         try {
+            const existingDatabaseContentBase64 = (
+                typeof details === 'object' &&
+                details !== null &&
+                !Array.isArray(details) &&
+                typeof Reflect.get(details, 'existingDatabaseContentBase64') === 'string'
+            ) ? /** @type {string} */ (Reflect.get(details, 'existingDatabaseContentBase64')) : null;
+            if (existingDatabaseContentBase64 !== null) {
+                await dictionaryDatabase.importDatabase(base64ToArrayBuffer(existingDatabaseContentBase64));
+            }
             const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
             const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
             const fallbackDatabaseContent = dictionaryDatabase.usesFallbackStorage() ? await dictionaryDatabase.exportDatabase() : null;
