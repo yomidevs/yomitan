@@ -72,19 +72,6 @@ async function waitForExtensionBaseUrl(driver) {
 /**
  * @param {import('selenium-webdriver').ThenableWebDriver} driver
  * @param {string} selector
- * @param {string} text
- * @param {number} timeoutMs
- * @returns {Promise<void>}
- */
-async function waitForText(driver, selector, text, timeoutMs) {
-    await driver.wait(async () => {
-        return String(await (await driver.findElement(By.css(selector))).getText()) === text;
-    }, timeoutMs, `Expected ${selector} text to become: ${text}`);
-}
-
-/**
- * @param {import('selenium-webdriver').ThenableWebDriver} driver
- * @param {string} selector
  * @returns {Promise<void>}
  */
 async function clickWithScroll(driver, selector) {
@@ -102,6 +89,20 @@ async function clickWithScroll(driver, selector) {
 }
 
 /**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string} expectedText
+ * @param {number} timeoutMs
+ * @returns {Promise<void>}
+ */
+async function waitForDictionaryCounts(driver, expectedText, timeoutMs) {
+    await driver.wait(async () => {
+        const installCount = String(await (await driver.findElement(By.css('#dictionary-install-count'))).getText());
+        const enabledCount = String(await (await driver.findElement(By.css('#dictionary-enabled-count'))).getText());
+        return `${installCount} installed, ${enabledCount} enabled` === expectedText;
+    }, timeoutMs, `Expected dictionary counts to become: ${expectedText}`);
+}
+
+/**
  * @param {string} title
  * @param {string} outputPath
  * @returns {Promise<void>}
@@ -114,25 +115,60 @@ async function buildDictionaryZip(title, outputPath) {
 
 /**
  * @param {import('selenium-webdriver').ThenableWebDriver} driver
- * @param {string} dictionaryUrl
+ * @param {string} dictionaryName
  * @returns {Promise<void>}
  */
-async function importDictionaryFromUrl(driver, dictionaryUrl) {
-    await clickWithScroll(driver, '.settings-item[data-modal-action="show,dictionaries"]');
-    await clickWithScroll(driver, '#dictionary-import-button');
-    await driver.wait(until.elementLocated(By.css('#dictionary-import-url-text')), 30_000);
-    // Headless Firefox can fail to scroll textareas for sendKeys; set value directly.
+async function installRecommendedDictionary(driver, dictionaryName) {
+    await clickWithScroll(driver, '.settings-item[data-modal-action="show,recommended-dictionaries"]');
+    await driver.wait(until.elementLocated(By.css('#recommended-dictionaries-modal')), 30_000);
+    await driver.wait(async () => {
+        // Selenium's executeScript return value is untyped (`any`).
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const names = await driver.executeScript(`
+            return Array.from(document.querySelectorAll('#recommended-dictionaries-modal .settings-item-label'))
+                .map((node) => (node.textContent || '').trim());
+        `);
+        return Array.isArray(names) && names.includes(dictionaryName);
+    }, 30_000, `Expected recommended dictionary to render: ${dictionaryName}`);
     await driver.executeScript(`
-        const value = arguments[0];
-        const element = document.querySelector('#dictionary-import-url-text');
-        if (!(element instanceof HTMLTextAreaElement)) {
-            throw new Error('URL textarea not found');
+        const dictionaryName = arguments[0];
+        const items = Array.from(document.querySelectorAll('#recommended-dictionaries-modal .settings-item'));
+        const item = items.find((currentItem) => {
+            const labelNode = currentItem.querySelector('.settings-item-label');
+            return (labelNode && (labelNode.textContent || '').trim() === dictionaryName);
+        });
+        if (!(item instanceof HTMLElement)) {
+            throw new Error(\`Recommended dictionary not found: \${dictionaryName}\`);
         }
-        element.value = String(value);
-        element.dispatchEvent(new Event('input', {bubbles: true}));
-        element.dispatchEvent(new Event('change', {bubbles: true}));
-    `, dictionaryUrl);
-    await clickWithScroll(driver, '#dictionary-import-url-button');
+        const button = item.querySelector('button[data-action="import-recommended-dictionary"]');
+        if (!(button instanceof HTMLButtonElement)) {
+            throw new Error(\`Recommended dictionary button not found: \${dictionaryName}\`);
+        }
+        button.scrollIntoView({block: 'center', inline: 'nearest'});
+        button.click();
+    `, dictionaryName);
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {Record<string, unknown>} recommendedDictionaries
+ * @returns {Promise<void>}
+ */
+async function installRecommendedDictionariesMock(driver, recommendedDictionaries) {
+    await driver.executeScript(`
+        const data = arguments[0];
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = async (input, init) => {
+            const url = String(typeof input === 'string' ? input : input?.url || '');
+            if (url.includes('recommended-dictionaries.json')) {
+                return new Response(JSON.stringify(data), {
+                    status: 200,
+                    headers: {'Content-Type': 'application/json'},
+                });
+            }
+            return originalFetch(input, init);
+        };
+    `, recommendedDictionaries);
 }
 
 /**
@@ -164,8 +200,8 @@ async function main() {
         const tempDir = await mkdtemp(path.join(os.tmpdir(), 'manabitan-firefox-e2e-'));
         const dict1Path = path.join(tempDir, 'integration-dictionary-1.zip');
         const dict2Path = path.join(tempDir, 'integration-dictionary-2.zip');
-        await buildDictionaryZip('IntegrationDictionary1', dict1Path);
-        await buildDictionaryZip('IntegrationDictionary2', dict2Path);
+        await buildDictionaryZip('JMdict', dict1Path);
+        await buildDictionaryZip('KANJIDIC', dict2Path);
         const dict1Buffer = await readFile(dict1Path);
         const dict2Buffer = await readFile(dict2Path);
 
@@ -201,14 +237,53 @@ async function main() {
         const extensionBaseUrl = await waitForExtensionBaseUrl(driver);
         await driver.get(`${extensionBaseUrl}/settings.html`);
         await driver.wait(until.elementLocated(By.css('#dictionary-import-file-input')), 30_000);
+        const mockRecommendedDictionaries = {
+            ja: {
+                terms: [
+                    {
+                        name: 'JMdict',
+                        description: 'Test JMdict entry',
+                        homepage: '',
+                        downloadUrl: dict1Url,
+                    },
+                ],
+                kanji: [
+                    {
+                        name: 'KANJIDIC',
+                        description: 'Test KANJIDIC entry',
+                        homepage: '',
+                        downloadUrl: dict2Url,
+                    },
+                ],
+                frequency: [],
+                grammar: [],
+                pronunciation: [],
+            },
+        };
+        await installRecommendedDictionariesMock(driver, mockRecommendedDictionaries);
 
-        await importDictionaryFromUrl(driver, dict1Url);
-        await waitForText(driver, '#dictionaries', 'Dictionaries (1 installed, 1 enabled)', 300_000);
+        await installRecommendedDictionary(driver, 'JMdict');
+        await waitForDictionaryCounts(driver, '1 installed, 1 enabled', 300_000);
 
-        await importDictionaryFromUrl(driver, dict2Url);
-        await waitForText(driver, '#dictionaries', 'Dictionaries (2 installed, 2 enabled)', 300_000);
+        await installRecommendedDictionary(driver, 'KANJIDIC');
+        await waitForDictionaryCounts(driver, '2 installed, 2 enabled', 300_000);
 
-        console.log('[firefox-e2e] PASS: Two sequential dictionary imports are preserved.');
+        await clickWithScroll(driver, '.settings-item[data-modal-action="show,dictionaries"]');
+        await driver.wait(until.elementLocated(By.css('#dictionaries-modal')), 30_000);
+        await driver.wait(async () => {
+            // Selenium's executeScript return value is untyped (`any`).
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const dictionaryTitles = await driver.executeScript(`
+                return Array.from(document.querySelectorAll('#dictionary-list .dictionary-title'))
+                    .map((node) => (node.textContent || '').trim())
+                    .filter((title) => title.length > 0);
+            `);
+            return Array.isArray(dictionaryTitles) &&
+            dictionaryTitles.includes('JMdict') &&
+            dictionaryTitles.includes('KANJIDIC');
+        }, 60_000, 'Expected installed dictionary list to contain JMdict and KANJIDIC');
+
+        console.log('[firefox-e2e] PASS: Recommended dictionary imports installed JMdict and KANJIDIC.');
     } catch (e) {
         fail(errorMessage(e));
     } finally {
