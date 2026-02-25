@@ -332,7 +332,7 @@
                         "gecko",
                         "update_url"
                     ],
-                    "value": "https://raw.githubusercontent.com/yomidevs/yomitan/metadata/updates.json"
+                    "value": "https://raw.githubusercontent.com/ManabiIO/manabitan/metadata/updates.json"
                 }
             ],
             "excludeFiles": [
