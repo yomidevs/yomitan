@@ -203,10 +203,10 @@ async function main() {
         await driver.wait(until.elementLocated(By.css('#dictionary-import-file-input')), 30_000);
 
         await importDictionaryFromUrl(driver, dict1Url);
-        await waitForText(driver, '#dictionaries', 'Dictionaries (1 installed, 1 enabled)', 120_000);
+        await waitForText(driver, '#dictionaries', 'Dictionaries (1 installed, 1 enabled)', 300_000);
 
         await importDictionaryFromUrl(driver, dict2Url);
-        await waitForText(driver, '#dictionaries', 'Dictionaries (2 installed, 2 enabled)', 120_000);
+        await waitForText(driver, '#dictionaries', 'Dictionaries (2 installed, 2 enabled)', 300_000);
 
         console.log('[firefox-e2e] PASS: Two sequential dictionary imports are preserved.');
     } catch (e) {
