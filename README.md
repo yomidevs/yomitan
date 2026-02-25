@@ -107,6 +107,58 @@ Feel free to join us on the [Manabi Discord](https://discord.gg/gvxzS93C3w) or t
 
 For more information, see [Contributing](./CONTRIBUTING.md#setup).
 
+## Reproducible Source Build
+
+This section documents how to build an exact copy of the distributed extension packages from source.
+
+### Environment requirements
+
+- Operating system: Linux or macOS (CI uses Ubuntu).
+- Node.js: `>=22.0.0` (from `package.json` `engines.node`).
+- npm: bundled with your Node.js installation.
+
+### Tool installation
+
+1. Install Node.js 22+ from [nodejs.org](https://nodejs.org/).
+2. Verify tool versions:
+   - `node --version`
+   - `npm --version`
+
+### Exact rebuild steps
+
+1. Clone and checkout the exact source revision you want to reproduce:
+
+   ```bash
+   git clone https://github.com/ManabiIO/manabitan.git
+   cd manabitan
+   git checkout <tag-or-commit>
+   ```
+
+2. Install dependencies exactly as locked:
+
+   ```bash
+   npm ci
+   ```
+
+3. Run the full release source build script (all required technical steps):
+
+   ```bash
+   npm run build:source-release -- --version <version>
+   ```
+
+This executes:
+- `npm run build:libs`
+- `npm run license-report:html`
+- `npm run-script build -- --all --version <version>`
+
+### Build outputs
+
+The generated browser packages are written to the `builds/` directory, including:
+- `manabitan-chrome.zip`
+- `manabitan-firefox.zip`
+- `manabitan-firefox-dev.zip`
+- `manabitan-edge.zip`
+
 ## Third-Party Libraries
 
 Manabitan uses several third-party libraries to function.
