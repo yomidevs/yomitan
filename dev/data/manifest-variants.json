@@ -271,7 +271,12 @@
                     "value": {
                         "gecko": {
                             "id": "{6b733b82-9261-47ee-a595-2dda294a4d08}",
-                            "strict_min_version": "115.0"
+                            "strict_min_version": "115.0",
+                            "data_collection_permissions": {
+                                "required": [
+                                    "none"
+                                ]
+                            }
                         },
                         "gecko_android": {
                             "strict_min_version": "115.0"
