@@ -79,6 +79,27 @@ async function waitForText(driver, selector, text, timeoutMs) {
 }
 
 /**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string} filePath
+ * @returns {Promise<void>}
+ */
+async function uploadDictionaryFile(driver, filePath) {
+    await driver.executeScript(`
+        const input = document.querySelector('#dictionary-import-file-input');
+        if (!(input instanceof HTMLInputElement)) { throw new Error('Dictionary file input not found'); }
+        input.hidden = false;
+        input.style.display = 'block';
+        input.style.opacity = '1';
+    `);
+    await (await driver.findElement(By.css('#dictionary-import-file-input'))).sendKeys(filePath);
+    await driver.executeScript(`
+        const input = document.querySelector('#dictionary-import-file-input');
+        if (!(input instanceof HTMLInputElement)) { throw new Error('Dictionary file input not found after upload'); }
+        input.dispatchEvent(new Event('change', {bubbles: true}));
+    `);
+}
+
+/**
  * @param {string} title
  * @param {string} outputPath
  * @returns {Promise<void>}
@@ -121,10 +142,10 @@ async function main() {
         await driver.get(`${extensionBaseUrl}/settings.html`);
         await driver.wait(until.elementLocated(By.css('#dictionary-import-file-input')), 30_000);
 
-        await (await driver.findElement(By.css('#dictionary-import-file-input'))).sendKeys(dict1Path);
+        await uploadDictionaryFile(driver, dict1Path);
         await waitForText(driver, '#dictionaries', 'Dictionaries (1 installed, 1 enabled)', 120_000);
 
-        await (await driver.findElement(By.css('#dictionary-import-file-input'))).sendKeys(dict2Path);
+        await uploadDictionaryFile(driver, dict2Path);
         await waitForText(driver, '#dictionaries', 'Dictionaries (2 installed, 2 enabled)', 120_000);
 
         console.log('[firefox-e2e] PASS: Two sequential dictionary imports are preserved.');
