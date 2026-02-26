@@ -961,6 +961,7 @@ export class DictionaryImporter {
         let entryStart = -1;
         let accumulated = '';
         let hasTopLevelArray = false;
+        let needsComma = false;
 
         for (;;) {
             const {done, value} = await reader.read();
@@ -1001,6 +1002,9 @@ export class DictionaryImporter {
                         if (depth === 1) {
                             hasTopLevelArray = true;
                         } else if (depth === 2) {
+                            if (needsComma) {
+                                throw new Error(`Dictionary has invalid data in '${file.filename}'`);
+                            }
                             entryStart = i;
                             accumulated = '';
                         }
@@ -1026,6 +1030,7 @@ export class DictionaryImporter {
                             }
                             await onEntry(parsed);
                             entryStart = -1;
+                            needsComma = true;
                         }
                         break;
                     case 0x7D: // }
@@ -1035,9 +1040,16 @@ export class DictionaryImporter {
                         depth--;
                         break;
                     default:
-                        // At depth 1, only whitespace and commas are valid between entries
-                        if (depth === 1 && ch !== 0x2C && ch !== 0x20 && ch !== 0x09 && ch !== 0x0A && ch !== 0x0D) {
-                            throw new Error(`Dictionary has invalid data in '${file.filename}'`);
+                        // At depth 1, only whitespace (0x20 space, 0x09 tab, 0x0A LF, 0x0D CR) and commas are valid between entries
+                        if (depth === 1) {
+                            if (ch === 0x2C) {
+                                if (!needsComma) {
+                                    throw new Error(`Dictionary has invalid data in '${file.filename}'`);
+                                }
+                                needsComma = false;
+                            } else if (ch !== 0x20 && ch !== 0x09 && ch !== 0x0A && ch !== 0x0D) {
+                                throw new Error(`Dictionary has invalid data in '${file.filename}'`);
+                            }
                         }
                         break;
                 }
