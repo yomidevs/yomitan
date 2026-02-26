@@ -811,6 +811,7 @@ async function main() {
             fail(`Extension package not found at: ${xpiPath}`);
         }
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- selenium-webdriver/firefox.js types can be error-typed in CI type-aware linting.
     const firefoxOptions = new firefox.Options();
     const headlessEnv = (process.env.MANABITAN_FIREFOX_HEADLESS ?? '1').trim().toLowerCase();
     const headless = !(headlessEnv === '0' || headlessEnv === 'false' || headlessEnv === 'no');
@@ -825,6 +826,7 @@ async function main() {
     } catch (_) {
         // Use default Firefox binary when Developer Edition is unavailable.
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Builder chain can be error-typed in CI type-aware linting.
     const driver = /** @type {import('selenium-webdriver').ThenableWebDriver} */ (
         new Builder()
             .forBrowser(Browser.FIREFOX)
