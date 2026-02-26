@@ -135,7 +135,7 @@ function renderReportHtml(report) {
   <div class="failure-banner">
     <div class="failure-banner-title">FAILED</div>
     <div class="failure-banner-reason">${escapeHtml(report.failureReason || 'Unknown failure')}</div>
-  </div>`
+  </div>`;
     }
     const rows = report.phases.map((phase, index) => {
         const imageUrl = `data:${phase.screenshotMimeType};base64,${phase.screenshotBase64}`;
