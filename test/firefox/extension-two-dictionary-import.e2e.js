@@ -129,11 +129,14 @@ async function addReportPhase(report, driver, name, details, startMs, endMs) {
  */
 function renderReportHtml(report) {
     const isFailure = report.status === 'failure';
-    const failureBanner = isFailure ? `
+    let failureBanner = '';
+    if (isFailure) {
+        failureBanner = `
   <div class="failure-banner">
     <div class="failure-banner-title">FAILED</div>
     <div class="failure-banner-reason">${escapeHtml(report.failureReason || 'Unknown failure')}</div>
-  </div>` : '';
+  </div>`
+    }
     const rows = report.phases.map((phase, index) => {
         const imageUrl = `data:${phase.screenshotMimeType};base64,${phase.screenshotBase64}`;
         return `

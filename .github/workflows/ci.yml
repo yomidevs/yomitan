@@ -66,6 +66,33 @@ jobs:
           schema: ./dev/data/chrome-manifest-schema.json
           fixSchemas: true
 
+  test-firefox-extension-e2e:
+    name: Full Extension E2E (Firefox)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup
+
+      - name: Build Firefox dev package
+        run: npm run build -- --target firefox-dev
+
+      - name: Install Selenium driver dependency
+        run: npm install --no-save selenium-webdriver@4.38.0
+
+      - name: Run Firefox extension E2E
+        env:
+          MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev.zip
+        run: npm run test:e2e:firefox-extension
+
+      - name: Upload Firefox extension E2E report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-extension-e2e-report
+          path: builds/firefox-e2e-import-report.html
+          if-no-files-found: ignore
+
   bench:
     name: Benchmarks
     runs-on: ubuntu-latest
