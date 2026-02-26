@@ -43,6 +43,27 @@ function getDatabasePaths() {
 }
 
 /**
+ * @param {import('@sqlite.org/sqlite-wasm').Sqlite3Static} sqlite3
+ * @returns {string[]}
+ */
+function getWasmfsDatabasePaths(sqlite3) {
+    const getOpfsDir = sqlite3?.capi?.sqlite3_wasmfs_opfs_dir;
+    if (typeof getOpfsDir !== 'function') {
+        return [];
+    }
+    let opfsDir = '';
+    try {
+        opfsDir = String(getOpfsDir() ?? '');
+    } catch (_) {
+        return [];
+    }
+    if (!/^\/[^/]+$/.test(opfsDir)) {
+        return [];
+    }
+    return [`${opfsDir}/dict.sqlite3`];
+}
+
+/**
  * @param {SqliteOpfsApi|undefined} opfs
  * @returns {Promise<void>}
  */
@@ -89,6 +110,47 @@ export async function getSqlite3() {
 export async function openOpfsDatabase() {
     lastOpenUsedFallbackStorage = false;
     const sqlite3 = await getSqlite3();
+    if (Reflect.get(globalThis, 'manabitanForceSqliteFallback') === true) {
+        lastOpenUsedFallbackStorage = true;
+        if (fallbackImportedContent !== null) {
+            sqlite3.capi.sqlite3_js_posix_create_file(FALLBACK_IMPORT_DB_FILE, fallbackImportedContent);
+            fallbackImportedContent = null;
+            return new sqlite3.oo1.DB(FALLBACK_IMPORT_DB_FILE, 'c');
+        }
+        return new sqlite3.oo1.DB(':memory:', 'c');
+    }
+    /**
+     * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
+     */
+    const tryOpenWasmfsPersistent = () => {
+        const wasmfsPaths = getWasmfsDatabasePaths(sqlite3);
+        for (const dbPath of wasmfsPaths) {
+            for (const flags of ['cw', 'c']) {
+                try {
+                    return new sqlite3.oo1.DB(dbPath, flags);
+                } catch (_) {
+                    // Try the next wasmfs path/flag combination.
+                }
+            }
+        }
+        return null;
+    };
+    /**
+     * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
+     */
+    const tryOpenViaUri = () => {
+        for (const dbPath of getDatabasePaths()) {
+            const uri = `file:${dbPath}?vfs=opfs`;
+            for (const flags of ['cw', 'c']) {
+                try {
+                    return new sqlite3.oo1.DB(uri, flags);
+                } catch (_) {
+                    // Try the next URI/flag combination.
+                }
+            }
+        }
+        return null;
+    };
     const OpfsDb = sqlite3.oo1.OpfsDb;
     if (typeof OpfsDb === 'function') {
         /**
@@ -118,6 +180,16 @@ export async function openOpfsDatabase() {
         if (openedAfterCleanup !== null) {
             return openedAfterCleanup;
         }
+    }
+
+    const openedViaUri = tryOpenViaUri();
+    if (openedViaUri !== null) {
+        return openedViaUri;
+    }
+
+    const openedViaWasmfsPersistentPath = tryOpenWasmfsPersistent();
+    if (openedViaWasmfsPersistentPath !== null) {
+        return openedViaWasmfsPersistentPath;
     }
 
     lastOpenUsedFallbackStorage = true;

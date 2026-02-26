@@ -214,18 +214,6 @@
                     ]
                 },
                 {
-                    "action": "delete",
-                    "path": [
-                        "cross_origin_opener_policy"
-                    ]
-                },
-                {
-                    "action": "delete",
-                    "path": [
-                        "cross_origin_embedder_policy"
-                    ]
-                },
-                {
                     "action": "set",
                     "path": [
                         "background",

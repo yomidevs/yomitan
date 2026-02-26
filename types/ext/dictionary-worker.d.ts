@@ -25,6 +25,8 @@ export type InvokeDetails<TResponseRaw = unknown, TResponse = unknown> = {
     resolve: ((result: TResponse) => void) | null;
     reject: ((reason?: Core.RejectionReason) => void) | null;
     onMessage: ((event: MessageEvent<MessageData<TResponseRaw>>) => void) | null;
+    onError: ((event: ErrorEvent) => void) | null;
+    onMessageError: ((event: MessageEvent) => void) | null;
     onProgress: ((...args: unknown[]) => void) | null;
     formatResult: ((result: TResponseRaw) => TResponse) | null;
 };

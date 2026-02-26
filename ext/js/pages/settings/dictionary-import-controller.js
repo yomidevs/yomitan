@@ -17,7 +17,7 @@
  */
 
 import {ExtensionError} from '../../core/extension-error.js';
-import {readResponseJson} from '../../core/json.js';
+import {parseJson, readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {safePerformance} from '../../core/safe-performance.js';
 import {toError} from '../../core/to-error.js';
@@ -475,6 +475,20 @@ export class DictionaryImportController {
             log.log(`[ImportTiming] download started: ${trimmedUrl}`);
 
             try {
+                if (trimmedUrl.startsWith('manabitan-e2e-dict:')) {
+                    const inlineArchiveBase64 = this._getInlineArchiveBase64ForUrl(trimmedUrl);
+                    if (typeof inlineArchiveBase64 !== 'string') {
+                        throw new Error(`Missing inline archive for ${trimmedUrl}`);
+                    }
+                    const tokenName = trimmedUrl.slice('manabitan-e2e-dict:'.length).trim();
+                    const safeName = tokenName.length > 0 ? tokenName.replaceAll(/[^a-zA-Z0-9._-]/g, '-') : 'fileFromURL';
+                    const file = new File([this._base64ToUint8Array(inlineArchiveBase64)], `${safeName}.zip`, {type: 'application/zip'});
+                    const downloadEndTime = safePerformance.now();
+                    log.log(`[ImportTiming] download completed in ${formatDurationMs(downloadEndTime - downloadStartTime)}: ${trimmedUrl} (inline archive)`);
+                    yield file;
+                    continue;
+                }
+
                 const xhr = new XMLHttpRequest();
                 xhr.open('GET', trimmedUrl, true);
                 xhr.responseType = 'blob';
@@ -513,9 +527,45 @@ export class DictionaryImportController {
             } catch (error) {
                 const downloadEndTime = safePerformance.now();
                 log.log(`[ImportTiming] download failed after ${formatDurationMs(downloadEndTime - downloadStartTime)}: ${trimmedUrl}`);
+                if (trimmedUrl.startsWith('manabitan-e2e-dict:')) {
+                    throw error;
+                }
                 log.error(error);
             }
         }
+    }
+
+    /**
+     * @param {string} url
+     * @returns {string|null}
+     */
+    _getInlineArchiveBase64ForUrl(url) {
+        if (!url.startsWith('manabitan-e2e-dict:')) { return null; }
+        const source = globalThis.localStorage?.getItem('manabitanE2eArchiveMap') || '';
+        if (source.length === 0) { return null; }
+        /** @type {unknown} */
+        let value;
+        try {
+            value = parseJson(source);
+        } catch (_error) {
+            return null;
+        }
+        if (!(value && typeof value === 'object' && !Array.isArray(value))) { return null; }
+        const content = /** @type {unknown} */ (Reflect.get(value, url));
+        return (typeof content === 'string' && content.length > 0) ? content : null;
+    }
+
+    /**
+     * @param {string} base64
+     * @returns {Uint8Array}
+     */
+    _base64ToUint8Array(base64) {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; ++i) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes;
     }
 
     /** */
@@ -563,6 +613,8 @@ export class DictionaryImportController {
 
         /** @type {Error[]} */
         let errors = [];
+        const useImportSession = this._getUseImportSession();
+        const dictionaryWorker = new DictionaryWorker({reuseWorker: useImportSession});
         const importStartTime = safePerformance.now();
         try {
             this._setModifying(true);
@@ -600,9 +652,17 @@ export class DictionaryImportController {
                 importProgressTracker.onNextDictionary();
                 if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
                 const dictionaryLoopStartTime = safePerformance.now();
-                const file = (await dictionaries.next()).value;
-                if (!file || !(file instanceof File)) {
-                    errors.push(new Error(`Failed to read file ${i + 1} of ${importProgressTracker.dictionaryCount}.`));
+                const nextDictionary = await dictionaries.next();
+                const fileValue = nextDictionary.done ? null : nextDictionary.value;
+                /** @type {File} */
+                let file;
+                if (fileValue instanceof File) {
+                    file = fileValue;
+                } else if (fileValue && typeof fileValue === 'object') {
+                    const blobPart = /** @type {BlobPart} */ (fileValue);
+                    file = new File([blobPart], 'fileFromURL.zip', {type: 'application/zip'});
+                } else {
+                    errors.push(new Error(`Failed to read file ${i + 1} of ${importProgressTracker.dictionaryCount} (value-type=${typeof fileValue}, value=${String(fileValue)}).`));
                     continue;
                 }
                 errors = [
@@ -611,6 +671,10 @@ export class DictionaryImportController {
                         file,
                         profilesDictionarySettings,
                         importDetails,
+                        dictionaryWorker,
+                        useImportSession,
+                        (!useImportSession || i === 0),
+                        (useImportSession && i === importProgressTracker.dictionaryCount - 1),
                         onProgress,
                     ) ?? []),
                 ];
@@ -630,6 +694,7 @@ export class DictionaryImportController {
             this._setModifying(false);
             this._triggerStorageChanged();
             if (onImportDone) { onImportDone(); }
+            dictionaryWorker.destroy();
         }
     }
 
@@ -691,6 +756,13 @@ export class DictionaryImportController {
     }
 
     /**
+     * @returns {boolean}
+     */
+    _getUseImportSession() {
+        return Reflect.get(globalThis, 'manabitanImportUseSession') !== false;
+    }
+
+    /**
      * @template T
      * @param {T[]} arr
      * @yields {Promise<T>}
@@ -706,10 +778,14 @@ export class DictionaryImportController {
      * @param {File} file
      * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      * @param {import('dictionary-importer').ImportDetails} importDetails
+     * @param {DictionaryWorker} dictionaryWorker
+     * @param {boolean} useImportSession
+     * @param {boolean} includeExistingDatabaseSeed
+     * @param {boolean} finalizeImportSession
      * @param {import('dictionary-worker').ImportProgressCallback} onProgress
      * @returns {Promise<Error[] | undefined>}
      */
-    async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, onProgress) {
+    async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, dictionaryWorker, useImportSession, includeExistingDatabaseSeed, finalizeImportSession, onProgress) {
         const dictionaryTitle = file.name || 'unknown-dictionary';
         const importStartTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] starting import`);
@@ -720,27 +796,45 @@ export class DictionaryImportController {
         log.log(`[ImportTiming] [${dictionaryTitle}] read archive ${formatDurationMs(readEndTime - readStartTime)}`);
 
         let importDetailsWithSeed = importDetails;
-        try {
-            const seedExportStartTime = safePerformance.now();
-            importDetailsWithSeed = {
-                ...importDetails,
-                existingDatabaseContentBase64: await this._settingsController.application.api.exportDictionaryDatabase(),
-            };
-            const seedExportEndTime = safePerformance.now();
-            log.log(`[ImportTiming] [${dictionaryTitle}] export existing fallback DB ${formatDurationMs(seedExportEndTime - seedExportStartTime)}`);
-        } catch (e) {
-            log.warn(e);
+        if (includeExistingDatabaseSeed) {
+            try {
+                const seedExportStartTime = safePerformance.now();
+                importDetailsWithSeed = {
+                    ...importDetails,
+                    existingDatabaseContentBase64: await this._settingsController.application.api.exportDictionaryDatabase(),
+                };
+                const seedExportEndTime = safePerformance.now();
+                log.log(`[ImportTiming] [${dictionaryTitle}] export existing fallback DB ${formatDurationMs(seedExportEndTime - seedExportStartTime)}`);
+            } catch (e) {
+                log.warn(e);
+            }
         }
 
         const workerImportStartTime = safePerformance.now();
         const importResult = /** @type {import('dictionary-importer').ImportResult & {fallbackDatabaseContentBase64?: string}} */ (
-            await new DictionaryWorker().importDictionary(archiveContent, importDetailsWithSeed, onProgress)
+            await dictionaryWorker.importDictionary(
+                archiveContent,
+                {
+                    ...importDetailsWithSeed,
+                    ...(Reflect.get(globalThis, 'manabitanForceSqliteFallback') === true ? {forceMemoryOnly: true} : {}),
+                    ...(useImportSession ? {useImportSession: true, finalizeImportSession} : {}),
+                },
+                onProgress,
+            )
         );
         const workerImportEndTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] worker importDictionary ${formatDurationMs(workerImportEndTime - workerImportStartTime)}`);
 
         const {result, errors, fallbackDatabaseContentBase64} = importResult;
         if (!result) {
+            Reflect.set(globalThis, '__manabitanLastImportDebug', {
+                dictionaryTitle,
+                hasResult: false,
+                resultTitle: null,
+                errorCount: Array.isArray(errors) ? errors.length : -1,
+                addSettingsErrorCount: null,
+                fallbackDatabaseContentBase64Length: typeof fallbackDatabaseContentBase64 === 'string' ? fallbackDatabaseContentBase64.length : null,
+            });
             return errors;
         }
 
@@ -755,6 +849,14 @@ export class DictionaryImportController {
         const errors2 = await this._addDictionarySettings(result, profilesDictionarySettings);
         const addSettingsEndTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] add dictionary settings ${formatDurationMs(addSettingsEndTime - addSettingsStartTime)}`);
+        Reflect.set(globalThis, '__manabitanLastImportDebug', {
+            dictionaryTitle,
+            hasResult: true,
+            resultTitle: result.title || null,
+            errorCount: Array.isArray(errors) ? errors.length : -1,
+            addSettingsErrorCount: errors2.length,
+            fallbackDatabaseContentBase64Length: typeof fallbackDatabaseContentBase64 === 'string' ? fallbackDatabaseContentBase64.length : null,
+        });
 
         const triggerDatabaseUpdatedStartTime = safePerformance.now();
         await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');

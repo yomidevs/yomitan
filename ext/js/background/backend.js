@@ -113,6 +113,8 @@ export class Backend {
         this._searchPopupTabId = null;
         /** @type {?Promise<{tab: chrome.tabs.Tab, created: boolean}>} */
         this._searchPopupTabCreatePromise = null;
+        /** @type {?Promise<void>} */
+        this._dictionaryRefreshPromise = null;
 
         /** @type {boolean} */
         this._isPrepared = false;
@@ -926,13 +928,63 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getDictionaryInfo'>} */
     async _onApiGetDictionaryInfo() {
-        return await this._dictionaryDatabase.getDictionaryInfo();
+        const dictionaries = await this._dictionaryDatabase.getDictionaryInfo();
+        if (dictionaries.length > 0) {
+            return dictionaries;
+        }
+        return this._getFallbackDictionaryInfoFromOptions();
     }
 
     /** @type {import('api').ApiHandler<'purgeDatabase'>} */
     async _onApiPurgeDatabase() {
         await this._dictionaryDatabase.purge();
         this._triggerDatabaseUpdated('dictionary', 'purge');
+    }
+
+    /**
+     * @returns {import('dictionary-importer').Summary[]}
+     */
+    _getFallbackDictionaryInfoFromOptions() {
+        const options = this._options;
+        if (!(typeof options === 'object' && options !== null && Array.isArray(options.profiles))) {
+            return [];
+        }
+        /** @type {Set<string>} */
+        const seen = new Set();
+        /** @type {import('dictionary-importer').Summary[]} */
+        const result = [];
+        for (const profile of options.profiles) {
+            const dictionaries = profile?.options?.dictionaries;
+            if (!Array.isArray(dictionaries)) {
+                continue;
+            }
+            for (const dictionary of dictionaries) {
+                const title = typeof dictionary?.name === 'string' ? dictionary.name.trim() : '';
+                if (title.length === 0 || seen.has(title)) {
+                    continue;
+                }
+                seen.add(title);
+                result.push({
+                    title,
+                    revision: '',
+                    sequenced: false,
+                    version: 0,
+                    importDate: 0,
+                    prefixWildcardsSupported: false,
+                    counts: {
+                        terms: {total: 0},
+                        termMeta: {total: 0},
+                        kanji: {total: 0},
+                        kanjiMeta: {total: 0},
+                        tagMeta: {total: 0},
+                        media: {total: 0},
+                    },
+                    styles: '',
+                    importSuccess: false,
+                });
+            }
+        }
+        return result;
     }
 
     /** @type {import('api').ApiHandler<'exportDictionaryDatabase'>} */
@@ -2661,7 +2713,34 @@ export class Backend {
      */
     _triggerDatabaseUpdated(type, cause) {
         void this._translator.clearDatabaseCaches();
+        if (type === 'dictionary') {
+            void this._refreshDictionaryDatabaseAfterUpdate();
+        }
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationDatabaseUpdated', params: {type, cause}});
+    }
+
+    /**
+     * Reloads the background dictionary DB connection so updates performed in
+     * worker/offscreen contexts become visible to lookup queries.
+     * @returns {Promise<void>}
+     */
+    async _refreshDictionaryDatabaseAfterUpdate() {
+        if (this._dictionaryRefreshPromise !== null) {
+            await this._dictionaryRefreshPromise;
+            return;
+        }
+        this._dictionaryRefreshPromise = (async () => {
+            try {
+                await this._dictionaryDatabase.prepare();
+            } catch (e) {
+                log.error(e);
+            }
+        })();
+        try {
+            await this._dictionaryRefreshPromise;
+        } finally {
+            this._dictionaryRefreshPromise = null;
+        }
     }
 
     /**

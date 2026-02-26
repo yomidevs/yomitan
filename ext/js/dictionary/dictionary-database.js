@@ -362,7 +362,24 @@ export class DictionaryDatabase {
         const db = this._requireDb();
         const sqlite3 = this._requireSqlite3();
 
-        db.exec('PRAGMA wal_checkpoint(TRUNCATE)');
+        // Release cached prepared statements before serialization to reduce wasm heap pressure.
+        this._clearCachedStatements();
+        try {
+            db.exec('PRAGMA shrink_memory');
+        } catch (_) {
+            // Not all sqlite builds expose shrink_memory; ignore when unavailable.
+        }
+        try {
+            db.exec('PRAGMA wal_checkpoint(TRUNCATE)');
+        } catch (_) {
+            // In-memory/non-WAL databases may reject checkpoint pragmas.
+        }
+        const exportBinaryImage = /** @type {unknown} */ (Reflect.get(db, 'exportBinaryImage'));
+        if (typeof exportBinaryImage === 'function') {
+            const raw = /** @type {() => Uint8Array|ArrayBuffer} */ (exportBinaryImage).call(db);
+            const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
+            return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+        }
         const dbPointer = db.pointer;
         if (typeof dbPointer !== 'number') {
             throw new Error('sqlite database pointer is unavailable');

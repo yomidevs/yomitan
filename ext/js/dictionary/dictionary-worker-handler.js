@@ -26,6 +26,8 @@ export class DictionaryWorkerHandler {
     constructor() {
         /** @type {DictionaryWorkerMediaLoader} */
         this._mediaLoader = new DictionaryWorkerMediaLoader();
+        /** @type {DictionaryDatabase|null} */
+        this._importSessionDictionaryDatabase = null;
     }
 
     /** */
@@ -87,7 +89,35 @@ export class DictionaryWorkerHandler {
      * @returns {Promise<import('dictionary-worker').MessageCompleteResultSerialized>}
      */
     async _importDictionary({details, archiveContent}, onProgress) {
-        const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
+        Reflect.set(
+            globalThis,
+            'manabitanForceSqliteFallback',
+            (
+                typeof details === 'object' &&
+                details !== null &&
+                !Array.isArray(details) &&
+                Reflect.get(details, 'forceMemoryOnly') === true
+            ),
+        );
+        const useImportSession = (
+            typeof details === 'object' &&
+            details !== null &&
+            !Array.isArray(details) &&
+            Reflect.get(details, 'useImportSession') === true
+        );
+        const finalizeImportSession = (
+            typeof details === 'object' &&
+            details !== null &&
+            !Array.isArray(details) &&
+            Reflect.get(details, 'finalizeImportSession') === true
+        );
+        const createdImportSessionDatabase = useImportSession && this._importSessionDictionaryDatabase === null;
+        const dictionaryDatabase = useImportSession ?
+            (this._importSessionDictionaryDatabase ?? await this._getPreparedDictionaryDatabase()) :
+            await this._getPreparedDictionaryDatabase();
+        if (createdImportSessionDatabase) {
+            this._importSessionDictionaryDatabase = dictionaryDatabase;
+        }
         try {
             const existingDatabaseContentBase64 = (
                 typeof details === 'object' &&
@@ -97,21 +127,32 @@ export class DictionaryWorkerHandler {
             ) ?
                 /** @type {string} */ (Reflect.get(details, 'existingDatabaseContentBase64')) :
                 null;
-            if (existingDatabaseContentBase64 !== null) {
+            if (existingDatabaseContentBase64 !== null && (!useImportSession || createdImportSessionDatabase)) {
                 await dictionaryDatabase.importDatabase(base64ToArrayBuffer(existingDatabaseContentBase64));
             }
             const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
             const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
-            const fallbackDatabaseContent = dictionaryDatabase.usesFallbackStorage() ?
-                await dictionaryDatabase.exportDatabase() :
-                null;
+            const shouldExportFallbackSnapshot = (!useImportSession || finalizeImportSession);
+            let fallbackDatabaseContent = null;
+            if (shouldExportFallbackSnapshot) {
+                try {
+                    fallbackDatabaseContent = await dictionaryDatabase.exportDatabase();
+                } catch (_) {
+                    // Keep the import result usable even if fallback snapshot export fails.
+                }
+            }
             return {
                 result,
                 errors: errors.map((error) => ExtensionError.serialize(error)),
                 fallbackDatabaseContentBase64: fallbackDatabaseContent === null ? null : arrayBufferToBase64(fallbackDatabaseContent),
             };
         } finally {
-            void dictionaryDatabase.close();
+            if (useImportSession && finalizeImportSession && this._importSessionDictionaryDatabase !== null) {
+                void this._importSessionDictionaryDatabase.close();
+                this._importSessionDictionaryDatabase = null;
+            } else if (!useImportSession) {
+                void dictionaryDatabase.close();
+            }
         }
     }
 

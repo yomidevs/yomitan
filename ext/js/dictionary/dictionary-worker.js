@@ -21,9 +21,16 @@ import {toError} from '../core/to-error.js';
 import {DictionaryImporterMediaLoader} from './dictionary-importer-media-loader.js';
 
 export class DictionaryWorker {
-    constructor() {
+    /**
+     * @param {{reuseWorker?: boolean}} [options]
+     */
+    constructor(options = {}) {
         /** @type {DictionaryImporterMediaLoader} */
         this._dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
+        /** @type {boolean} */
+        this._reuseWorker = options.reuseWorker === true;
+        /** @type {Worker|null} */
+        this._worker = null;
     }
 
     /**
@@ -60,6 +67,14 @@ export class DictionaryWorker {
         return this._invoke('getDictionaryCounts', {dictionaryNames, getTotal}, [], null, null);
     }
 
+    /** */
+    destroy() {
+        if (this._worker !== null) {
+            this._worker.terminate();
+            this._worker = null;
+        }
+    }
+
     // Private
 
     /**
@@ -74,7 +89,10 @@ export class DictionaryWorker {
      */
     _invoke(action, params, transfer, onProgress, formatResult) {
         return new Promise((resolve, reject) => {
-            const worker = new Worker('/js/dictionary/dictionary-worker-main.js', {type: 'module'});
+            const worker = this._worker ?? new Worker('/js/dictionary/dictionary-worker-main.js', {type: 'module'});
+            if (this._reuseWorker && this._worker === null) {
+                this._worker = worker;
+            }
             /** @type {import('dictionary-worker').InvokeDetails<TResponseRaw, TResponse> | null} */
             let detailsRef = null;
             /**
@@ -83,19 +101,24 @@ export class DictionaryWorker {
             const fail = (error) => {
                 const details = detailsRef;
                 if (details === null || details.complete) { return; }
-                const {worker: worker2, reject: reject2, onMessage} = details;
+                const {worker: worker2, reject: reject2, onMessage, onError: onError2, onMessageError: onMessageError2} = details;
                 if (worker2 === null || reject2 === null || onMessage === null) { return; }
                 details.complete = true;
                 details.worker = null;
                 details.resolve = null;
                 details.reject = null;
                 details.onMessage = null;
+                details.onError = null;
+                details.onMessageError = null;
                 details.onProgress = null;
                 details.formatResult = null;
                 worker2.removeEventListener('message', onMessage);
-                worker2.removeEventListener('error', onError);
-                worker2.removeEventListener('messageerror', onMessageError);
+                if (onError2 !== null) { worker2.removeEventListener('error', onError2); }
+                if (onMessageError2 !== null) { worker2.removeEventListener('messageerror', onMessageError2); }
                 worker2.terminate();
+                if (this._worker === worker2) {
+                    this._worker = null;
+                }
                 reject2(error);
             };
             /**
@@ -118,6 +141,8 @@ export class DictionaryWorker {
                 resolve,
                 reject,
                 onMessage: null,
+                onError: null,
+                onMessageError: null,
                 onProgress,
                 formatResult,
             };
@@ -125,6 +150,8 @@ export class DictionaryWorker {
             /** @type {(event: MessageEvent<import('dictionary-worker').MessageData<TResponseRaw>>) => void} */
             const onMessage = /** @type {(details: import('dictionary-worker').InvokeDetails<TResponseRaw, TResponse>, event: MessageEvent<import('dictionary-worker').MessageData<TResponseRaw>>) => void} */ (this._onMessage).bind(this, details);
             details.onMessage = onMessage;
+            details.onError = onError;
+            details.onMessageError = onMessageError;
             detailsRef = details;
             worker.addEventListener('message', onMessage);
             worker.addEventListener('error', onError);
@@ -149,17 +176,24 @@ export class DictionaryWorker {
         switch (action) {
             case 'complete':
                 {
-                    const {worker, resolve, reject, onMessage, formatResult} = details;
+                    const {worker, resolve, reject, onMessage, onError, onMessageError, formatResult} = details;
                     if (worker === null || onMessage === null || resolve === null || reject === null) { return; }
                     details.complete = true;
                     details.worker = null;
                     details.resolve = null;
                     details.reject = null;
                     details.onMessage = null;
+                    details.onError = null;
+                    details.onMessageError = null;
                     details.onProgress = null;
                     details.formatResult = null;
                     worker.removeEventListener('message', onMessage);
-                    worker.terminate();
+                    if (this._reuseWorker) {
+                        if (onError !== null) { worker.removeEventListener('error', onError); }
+                        if (onMessageError !== null) { worker.removeEventListener('messageerror', onMessageError); }
+                    } else {
+                        worker.terminate();
+                    }
                     this._onMessageComplete(params, resolve, reject, formatResult);
                 }
                 break;

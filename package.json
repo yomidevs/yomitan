@@ -33,7 +33,7 @@
         "test:md:write": "prettier . --write",
         "test:ts:main": "npx tsc --noEmit --project jsconfig.json",
         "test:ts:dev": "npx tsc --noEmit --project dev/jsconfig.json",
-        "test:ts:test": "npx tsc --noEmit --project test/jsconfig.json",
+        "test:ts:test": "npx tsc --noEmit --project test/jsconfig.typecheck.json",
         "test:ts:bench": "npx tsc --noEmit --project benches/jsconfig.json",
         "test:unit": "vitest run",
         "test:unit:write": "vitest run --config test/data/vitest.write.config.json",

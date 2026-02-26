@@ -1,0 +1,9 @@
+{
+    "extends": "./jsconfig.json",
+    "exclude": [
+        "firefox/**/*.js",
+        "../node_modules",
+        "../dev/lib",
+        "../ext/lib"
+    ]
+}
