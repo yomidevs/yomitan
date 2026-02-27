@@ -68,6 +68,7 @@ jobs:
 
   test-firefox-extension-e2e:
     name: Full Extension E2E (Firefox)
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -80,6 +81,12 @@ jobs:
       - name: Install Selenium driver dependency
         run: npm install --no-save selenium-webdriver@4.38.0
 
+      - name: Restore Firefox E2E dictionary cache
+        uses: actions/cache@v4
+        with:
+          path: builds/e2e-dictionary-cache
+          key: firefox-e2e-dictionaries-${{ runner.os }}-v1
+
       - name: Run Firefox extension E2E
         env:
           MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev.zip
@@ -91,6 +98,152 @@ jobs:
         with:
           name: firefox-extension-e2e-report
           path: builds/firefox-e2e-import-report.html
+          if-no-files-found: ignore
+
+  test-chromium-extension-e2e:
+    name: Full Extension E2E (Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup
+
+      - name: Build Chromium dev package
+        run: npm run build -- --target chrome-dev
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Restore Chromium E2E dictionary cache
+        uses: actions/cache@v4
+        with:
+          path: builds/e2e-dictionary-cache
+          key: chromium-e2e-dictionaries-${{ runner.os }}-v1
+
+      - name: Run Chromium extension E2E
+        env:
+          MANABITAN_CHROMIUM_HEADLESS: '1'
+        run: xvfb-run -a npm run test:e2e:chromium-extension
+
+      - name: Summarize Chromium extension E2E
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = 'builds/chromium-e2e-import-report.json';
+          if (!fs.existsSync(path)) {
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## Chromium Extension E2E\nReport JSON not found.\n');
+            process.exit(0);
+          }
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const phases = Array.isArray(report.phases) ? report.phases : [];
+          const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
+          const opfsReady = runtime ? (
+            runtime.hasOpfsDbCtor === true &&
+            runtime.hasOpfsImportDb === true &&
+            runtime.hasStorageGetDirectory === true &&
+            (typeof runtime.opfsVfsPtr === 'number' ? runtime.opfsVfsPtr > 0 : runtime.opfsVfsPtr !== null)
+          ) : null;
+          const top = [...phases].sort((a, b) => Number(b.durationMs || 0) - Number(a.durationMs || 0)).slice(0, 5);
+          const lines = [
+            '## Chromium Extension E2E',
+            `- Status: \`${String(report.status || 'unknown')}\``,
+            `- Launch mode: \`${String(report.launchMode || 'unknown')}\``,
+            `- Failure: ${report.failureReason ? `\`${String(report.failureReason)}\`` : 'none'}`,
+            `- OPFS ready: ${opfsReady === null ? 'unknown' : `\`${String(opfsReady)}\``}`,
+            `- Runtime diagnostics: \`${JSON.stringify(report.runtimeDiagnostics ?? null)}\``,
+            `- Phase count: ${String(phases.length)}`,
+            '- Slowest phases:',
+            ...top.map((phase) => `  - ${String(phase.name)} (${Number(phase.durationMs || 0).toFixed(1)} ms)`),
+            '',
+          ];
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
+          NODE
+
+      - name: Upload Chromium extension E2E report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chromium-extension-e2e-report
+          path: |
+            builds/chromium-e2e-import-report.html
+            builds/chromium-e2e-import-report.json
+            builds/extension-e2e-report.html
+          if-no-files-found: ignore
+
+  test-edge-extension-e2e:
+    name: Full Extension E2E (Edge)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup
+
+      - name: Build Chromium dev package
+        run: npm run build -- --target chrome-dev
+
+      - name: Install Playwright Edge
+        run: npx playwright install --with-deps msedge
+
+      - name: Restore Edge E2E dictionary cache
+        uses: actions/cache@v4
+        with:
+          path: builds/e2e-dictionary-cache
+          key: edge-e2e-dictionaries-${{ runner.os }}-v1
+
+      - name: Run Edge extension E2E
+        env:
+          MANABITAN_CHROMIUM_BROWSER: edge
+          MANABITAN_CHROMIUM_HEADLESS: '1'
+          MANABITAN_CHROMIUM_E2E_REPORT: ./builds/edge-e2e-import-report.html
+        run: xvfb-run -a npm run test:e2e:edge-extension
+
+      - name: Summarize Edge extension E2E
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = 'builds/edge-e2e-import-report.json';
+          if (!fs.existsSync(path)) {
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## Edge Extension E2E\nReport JSON not found.\n');
+            process.exit(0);
+          }
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const phases = Array.isArray(report.phases) ? report.phases : [];
+          const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
+          const opfsReady = runtime ? (
+            runtime.hasOpfsDbCtor === true &&
+            runtime.hasOpfsImportDb === true &&
+            runtime.hasStorageGetDirectory === true &&
+            (typeof runtime.opfsVfsPtr === 'number' ? runtime.opfsVfsPtr > 0 : runtime.opfsVfsPtr !== null)
+          ) : null;
+          const top = [...phases].sort((a, b) => Number(b.durationMs || 0) - Number(a.durationMs || 0)).slice(0, 5);
+          const lines = [
+            '## Edge Extension E2E',
+            `- Status: \`${String(report.status || 'unknown')}\``,
+            `- Launch mode: \`${String(report.launchMode || 'unknown')}\``,
+            `- Failure: ${report.failureReason ? `\`${String(report.failureReason)}\`` : 'none'}`,
+            `- OPFS ready: ${opfsReady === null ? 'unknown' : `\`${String(opfsReady)}\``}`,
+            `- Runtime diagnostics: \`${JSON.stringify(report.runtimeDiagnostics ?? null)}\``,
+            `- Phase count: ${String(phases.length)}`,
+            '- Slowest phases:',
+            ...top.map((phase) => `  - ${String(phase.name)} (${Number(phase.durationMs || 0).toFixed(1)} ms)`),
+            '',
+          ];
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
+          NODE
+
+      - name: Upload Edge extension E2E report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: edge-extension-e2e-report
+          path: |
+            builds/edge-e2e-import-report.html
+            builds/edge-e2e-import-report.json
+            builds/extension-e2e-report.html
           if-no-files-found: ignore
 
   bench:

@@ -84,6 +84,8 @@ export class DictionaryImportController {
         this._recommendedDictionaryQueue = [];
         /** @type {boolean} */
         this._recommendedDictionaryActiveImport = false;
+        /** @type {DictionaryWorker|null} */
+        this._sessionDictionaryWorker = null;
     }
 
     /** */
@@ -109,9 +111,47 @@ export class DictionaryImportController {
         if (recommendedDictionaryButton) {
             recommendedDictionaryButton.addEventListener('click', this._renderRecommendedDictionaries.bind(this), false);
         }
+        globalThis.addEventListener('beforeunload', this._onBeforeUnload.bind(this), {once: true});
     }
 
     // Private
+
+    /**
+     * @param {boolean} useImportSession
+     * @returns {DictionaryWorker}
+     */
+    _getDictionaryWorker(useImportSession) {
+        if (!useImportSession) {
+            return new DictionaryWorker({reuseWorker: false});
+        }
+        if (this._sessionDictionaryWorker === null) {
+            this._sessionDictionaryWorker = new DictionaryWorker({reuseWorker: true});
+        }
+        return this._sessionDictionaryWorker;
+    }
+
+    /**
+     * @param {DictionaryWorker} dictionaryWorker
+     * @param {boolean} useImportSession
+     */
+    _releaseDictionaryWorker(dictionaryWorker, useImportSession) {
+        if (useImportSession) {
+            if (this._sessionDictionaryWorker === dictionaryWorker) {
+                this._sessionDictionaryWorker.destroy();
+                this._sessionDictionaryWorker = null;
+            }
+            return;
+        }
+        dictionaryWorker.destroy();
+    }
+
+    /** */
+    _onBeforeUnload() {
+        if (this._sessionDictionaryWorker !== null) {
+            this._sessionDictionaryWorker.destroy();
+            this._sessionDictionaryWorker = null;
+        }
+    }
 
     /**
      * @param {MouseEvent} e
@@ -614,7 +654,8 @@ export class DictionaryImportController {
         /** @type {Error[]} */
         let errors = [];
         const useImportSession = this._getUseImportSession();
-        const dictionaryWorker = new DictionaryWorker({reuseWorker: useImportSession});
+        log.log(`[ImportTiming] import session reuse enabled=${String(useImportSession)} (globalOverride=${String(this._getUseImportSession())})`);
+        const dictionaryWorker = this._getDictionaryWorker(useImportSession);
         const importStartTime = safePerformance.now();
         try {
             this._setModifying(true);
@@ -652,6 +693,7 @@ export class DictionaryImportController {
                 importProgressTracker.onNextDictionary();
                 if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
                 const dictionaryLoopStartTime = safePerformance.now();
+                const finalizeImportSession = useImportSession && i >= (importProgressTracker.dictionaryCount - 1);
                 const nextDictionary = await dictionaries.next();
                 const fileValue = nextDictionary.done ? null : nextDictionary.value;
                 /** @type {File} */
@@ -673,8 +715,7 @@ export class DictionaryImportController {
                         importDetails,
                         dictionaryWorker,
                         useImportSession,
-                        (!useImportSession || i === 0),
-                        (useImportSession && i === importProgressTracker.dictionaryCount - 1),
+                        finalizeImportSession,
                         onProgress,
                     ) ?? []),
                 ];
@@ -692,9 +733,9 @@ export class DictionaryImportController {
             for (const progress of [...progressContainers, ...recommendedProgressContainers]) { progress.hidden = true; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
             this._setModifying(false);
+            this._releaseDictionaryWorker(dictionaryWorker, useImportSession);
             this._triggerStorageChanged();
             if (onImportDone) { onImportDone(); }
-            dictionaryWorker.destroy();
         }
     }
 
@@ -703,13 +744,13 @@ export class DictionaryImportController {
      */
     _getFileImportSteps() {
         return [
-            {label: '', callback: this._triggerStorageChanged.bind(this)}, // Dictionary import is uninitialized
+            {label: ''}, // Dictionary import is uninitialized
             {label: 'Initializing import'}, // Dictionary import is uninitialized
             {label: 'Loading dictionary'}, // Load dictionary archive and validate index
             {label: 'Loading schemas'}, // Load schemas and get archive files
             {label: 'Validating data'}, // Load and validate dictionary data
             {label: 'Importing data'}, // Add dictionary descriptor, load, and import data
-            {label: 'Finalizing import', callback: this._triggerStorageChanged.bind(this)}, // Update dictionary descriptor
+            {label: 'Finalizing import'}, // Update dictionary descriptor
         ];
     }
 
@@ -780,52 +821,66 @@ export class DictionaryImportController {
      * @param {import('dictionary-importer').ImportDetails} importDetails
      * @param {DictionaryWorker} dictionaryWorker
      * @param {boolean} useImportSession
-     * @param {boolean} includeExistingDatabaseSeed
      * @param {boolean} finalizeImportSession
      * @param {import('dictionary-worker').ImportProgressCallback} onProgress
      * @returns {Promise<Error[] | undefined>}
      */
-    async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, dictionaryWorker, useImportSession, includeExistingDatabaseSeed, finalizeImportSession, onProgress) {
+    async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, dictionaryWorker, useImportSession, finalizeImportSession, onProgress) {
         const dictionaryTitle = file.name || 'unknown-dictionary';
         const importStartTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] starting import`);
 
         const readStartTime = safePerformance.now();
         const archiveContent = await this._readFile(file);
+        const archiveContentBytes = new Uint8Array(archiveContent);
         const readEndTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] read archive ${formatDurationMs(readEndTime - readStartTime)}`);
 
-        let importDetailsWithSeed = importDetails;
-        if (includeExistingDatabaseSeed) {
-            try {
-                const seedExportStartTime = safePerformance.now();
-                importDetailsWithSeed = {
-                    ...importDetails,
-                    existingDatabaseContentBase64: await this._settingsController.application.api.exportDictionaryDatabase(),
-                };
-                const seedExportEndTime = safePerformance.now();
-                log.log(`[ImportTiming] [${dictionaryTitle}] export existing fallback DB ${formatDurationMs(seedExportEndTime - seedExportStartTime)}`);
-            } catch (e) {
-                log.warn(e);
-            }
-        }
-
         const workerImportStartTime = safePerformance.now();
-        const importResult = /** @type {import('dictionary-importer').ImportResult & {fallbackDatabaseContentBase64?: string}} */ (
-            await dictionaryWorker.importDictionary(
-                archiveContent,
-                {
-                    ...importDetailsWithSeed,
-                    ...(Reflect.get(globalThis, 'manabitanForceSqliteFallback') === true ? {forceMemoryOnly: true} : {}),
-                    ...(useImportSession ? {useImportSession: true, finalizeImportSession} : {}),
-                },
-                onProgress,
-            )
-        );
+        /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean}}} */
+        let importResult;
+        const maxImportAttempts = 15;
+        for (let attempt = 1; ; ++attempt) {
+            try {
+                const archiveContentAttempt = new Uint8Array(archiveContentBytes).buffer;
+                importResult = /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean}}} */ (
+                    await dictionaryWorker.importDictionary(
+                        archiveContentAttempt,
+                        {
+                            ...importDetails,
+                            ...(useImportSession ? {useImportSession: true, finalizeImportSession} : {}),
+                        },
+                        onProgress,
+                    )
+                );
+            } catch (error) {
+                const message = (error instanceof Error) ? error.message : String(error);
+                const isCantOpenThrown = message.includes('SQLITE_CANTOPEN');
+                if (!isCantOpenThrown || attempt >= maxImportAttempts) {
+                    throw error;
+                }
+                log.log(`[ImportTiming] [${dictionaryTitle}] retrying import after thrown SQLITE_CANTOPEN (attempt ${attempt})`);
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 1000);
+                });
+                continue;
+            }
+            const isCantOpenError = Array.isArray(importResult.errors) && importResult.errors.some((error) => {
+                const message = (error instanceof Error) ? error.message : String(error);
+                return message.includes('SQLITE_CANTOPEN');
+            });
+            if (!isCantOpenError || attempt >= maxImportAttempts) {
+                break;
+            }
+            log.log(`[ImportTiming] [${dictionaryTitle}] retrying import after SQLITE_CANTOPEN (attempt ${attempt})`);
+            await new Promise((resolve) => {
+                setTimeout(resolve, 1000);
+            });
+        }
         const workerImportEndTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] worker importDictionary ${formatDurationMs(workerImportEndTime - workerImportStartTime)}`);
 
-        const {result, errors, fallbackDatabaseContentBase64} = importResult;
+        const {result, errors, debug} = importResult;
         if (!result) {
             Reflect.set(globalThis, '__manabitanLastImportDebug', {
                 dictionaryTitle,
@@ -833,16 +888,31 @@ export class DictionaryImportController {
                 resultTitle: null,
                 errorCount: Array.isArray(errors) ? errors.length : -1,
                 addSettingsErrorCount: null,
-                fallbackDatabaseContentBase64Length: typeof fallbackDatabaseContentBase64 === 'string' ? fallbackDatabaseContentBase64.length : null,
+                fallbackDatabaseContentBase64Length: null,
+                usesFallbackStorage: debug?.usesFallbackStorage ?? null,
+                openStorageDiagnostics: debug?.openStorageDiagnostics ?? null,
+                useImportSession: debug?.useImportSession ?? null,
+                finalizeImportSession: debug?.finalizeImportSession ?? null,
             });
             return errors;
         }
 
-        if (typeof fallbackDatabaseContentBase64 === 'string') {
-            const fallbackImportStartTime = safePerformance.now();
-            await this._settingsController.application.api.importDictionaryDatabase(fallbackDatabaseContentBase64);
-            const fallbackImportEndTime = safePerformance.now();
-            log.log(`[ImportTiming] [${dictionaryTitle}] import fallback DB snapshot ${formatDurationMs(fallbackImportEndTime - fallbackImportStartTime)}`);
+        if (debug?.usesFallbackStorage === true) {
+            const fallbackError = new Error(`OPFS is required for import but fallback storage was detected. diagnostics=${JSON.stringify(debug.openStorageDiagnostics ?? null)}`);
+            const errorsWithOpfsRequirement = [...errors, fallbackError];
+            Reflect.set(globalThis, '__manabitanLastImportDebug', {
+                dictionaryTitle,
+                hasResult: false,
+                resultTitle: result.title || null,
+                errorCount: errorsWithOpfsRequirement.length,
+                addSettingsErrorCount: null,
+                fallbackDatabaseContentBase64Length: null,
+                usesFallbackStorage: debug.usesFallbackStorage,
+                openStorageDiagnostics: debug.openStorageDiagnostics ?? null,
+                useImportSession: debug.useImportSession ?? null,
+                finalizeImportSession: debug.finalizeImportSession ?? null,
+            });
+            return errorsWithOpfsRequirement;
         }
 
         const addSettingsStartTime = safePerformance.now();
@@ -855,13 +925,21 @@ export class DictionaryImportController {
             resultTitle: result.title || null,
             errorCount: Array.isArray(errors) ? errors.length : -1,
             addSettingsErrorCount: errors2.length,
-            fallbackDatabaseContentBase64Length: typeof fallbackDatabaseContentBase64 === 'string' ? fallbackDatabaseContentBase64.length : null,
+            fallbackDatabaseContentBase64Length: null,
+            usesFallbackStorage: debug?.usesFallbackStorage ?? null,
+            openStorageDiagnostics: debug?.openStorageDiagnostics ?? null,
+            useImportSession: debug?.useImportSession ?? null,
+            finalizeImportSession: debug?.finalizeImportSession ?? null,
         });
 
-        const triggerDatabaseUpdatedStartTime = safePerformance.now();
-        await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
-        const triggerDatabaseUpdatedEndTime = safePerformance.now();
-        log.log(`[ImportTiming] [${dictionaryTitle}] triggerDatabaseUpdated ${formatDurationMs(triggerDatabaseUpdatedEndTime - triggerDatabaseUpdatedStartTime)}`);
+        if (!(useImportSession && !finalizeImportSession)) {
+            const triggerDatabaseUpdatedStartTime = safePerformance.now();
+            await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+            const triggerDatabaseUpdatedEndTime = safePerformance.now();
+            log.log(`[ImportTiming] [${dictionaryTitle}] triggerDatabaseUpdated ${formatDurationMs(triggerDatabaseUpdatedEndTime - triggerDatabaseUpdatedStartTime)}`);
+        } else {
+            log.log(`[ImportTiming] [${dictionaryTitle}] triggerDatabaseUpdated deferred until import session finalize`);
+        }
 
         // Only runs if updating a dictionary
         if (profilesDictionarySettings !== null) {

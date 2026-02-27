@@ -2725,12 +2725,16 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _refreshDictionaryDatabaseAfterUpdate() {
+        if (!this._dictionaryDatabase.isPrepared()) {
+            return;
+        }
         if (this._dictionaryRefreshPromise !== null) {
             await this._dictionaryRefreshPromise;
             return;
         }
         this._dictionaryRefreshPromise = (async () => {
             try {
+                await this._dictionaryDatabase.close();
                 await this._dictionaryDatabase.prepare();
             } catch (e) {
                 log.error(e);

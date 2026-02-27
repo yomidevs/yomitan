@@ -20,6 +20,7 @@ import {vi} from 'vitest';
  *
  */
 export function setupStubs() {
+    vi.stubGlobal('manabitanRequireOpfs', false);
     vi.stubGlobal('self', {
         constructor: {
             name: 'Window',

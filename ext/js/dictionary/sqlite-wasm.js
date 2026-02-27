@@ -21,10 +21,17 @@ export const DICTIONARY_DB_FILE = '/dict.sqlite3';
 
 const DICTIONARY_DB_FILE_ALT = 'dict.sqlite3';
 
-const FALLBACK_IMPORT_DB_FILE = '/dict-import.sqlite3';
-/** @type {Uint8Array|null} */
-let fallbackImportedContent = null;
 let lastOpenUsedFallbackStorage = false;
+/** @type {{mode: string, forceFallback: boolean, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, attempts?: Array<{strategy: string, target: string, flags: string, error: string}>, lastError?: string|null}} */
+let lastOpenStorageDiagnostics = {
+    mode: 'unknown',
+    forceFallback: false,
+    hasOpfsDbCtor: false,
+    hasOpfsImportDb: false,
+    hasWasmfsDir: false,
+    attempts: [],
+    lastError: null,
+};
 
 /**
  * @typedef {object} SqliteOpfsApi
@@ -110,25 +117,54 @@ export async function getSqlite3() {
 export async function openOpfsDatabase() {
     lastOpenUsedFallbackStorage = false;
     const sqlite3 = await getSqlite3();
-    if (Reflect.get(globalThis, 'manabitanForceSqliteFallback') === true) {
-        lastOpenUsedFallbackStorage = true;
-        if (fallbackImportedContent !== null) {
-            sqlite3.capi.sqlite3_js_posix_create_file(FALLBACK_IMPORT_DB_FILE, fallbackImportedContent);
-            fallbackImportedContent = null;
-            return new sqlite3.oo1.DB(FALLBACK_IMPORT_DB_FILE, 'c');
+    const allowFallback = (
+        Reflect.get(globalThis, 'manabitanRequireOpfs') === false ||
+        Reflect.get(globalThis, 'manabitanAllowSqliteMemoryFallback') === true ||
+        typeof Reflect.get(globalThis, 'chrome') === 'undefined'
+    );
+    const forceFallback = Reflect.get(globalThis, 'manabitanForceSqliteFallback') === true;
+    const OpfsDb = sqlite3.oo1.OpfsDb;
+    const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
+    const wasmfsPaths = getWasmfsDatabasePaths(sqlite3);
+    lastOpenStorageDiagnostics = {
+        mode: 'opening',
+        forceFallback,
+        hasOpfsDbCtor: typeof OpfsDb === 'function',
+        hasOpfsImportDb: typeof opfs?.importDb === 'function',
+        hasWasmfsDir: wasmfsPaths.length > 0,
+        attempts: [],
+        lastError: null,
+    };
+    const attempts = /** @type {Array<{strategy: string, target: string, flags: string, error: string}>} */ (lastOpenStorageDiagnostics.attempts);
+    /**
+     * @param {string} strategy
+     * @param {string} target
+     * @param {string} flags
+     * @param {unknown} error
+     */
+    const pushAttemptError = (strategy, target, flags, error) => {
+        const message = (error instanceof Error) ? error.message : String(error);
+        attempts.push({strategy, target, flags, error: message});
+        if (attempts.length > 40) {
+            attempts.shift();
         }
-        return new sqlite3.oo1.DB(':memory:', 'c');
+        lastOpenStorageDiagnostics.lastError = message;
+    };
+    if (forceFallback) {
+        lastOpenStorageDiagnostics.mode = 'forced-fallback-disallowed';
+        throw new Error(`OPFS is required; forced fallback is disabled. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)}`);
     }
     /**
      * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
      */
     const tryOpenWasmfsPersistent = () => {
-        const wasmfsPaths = getWasmfsDatabasePaths(sqlite3);
-        for (const dbPath of wasmfsPaths) {
+        const persistentPaths = getWasmfsDatabasePaths(sqlite3);
+        for (const dbPath of persistentPaths) {
             for (const flags of ['cw', 'c']) {
                 try {
                     return new sqlite3.oo1.DB(dbPath, flags);
-                } catch (_) {
+                } catch (error) {
+                    pushAttemptError('wasmfs-persistent', dbPath, flags, error);
                     // Try the next wasmfs path/flag combination.
                 }
             }
@@ -144,14 +180,14 @@ export async function openOpfsDatabase() {
             for (const flags of ['cw', 'c']) {
                 try {
                     return new sqlite3.oo1.DB(uri, flags);
-                } catch (_) {
+                } catch (error) {
+                    pushAttemptError('uri-opfs', uri, flags, error);
                     // Try the next URI/flag combination.
                 }
             }
         }
         return null;
     };
-    const OpfsDb = sqlite3.oo1.OpfsDb;
     if (typeof OpfsDb === 'function') {
         /**
          * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
@@ -161,7 +197,8 @@ export async function openOpfsDatabase() {
                 for (const flags of ['cw', 'c']) {
                     try {
                         return new OpfsDb(dbPath, flags);
-                    } catch (_) {
+                    } catch (error) {
+                        pushAttemptError('opfsdb', dbPath, flags, error);
                         // Try the next path/flag combination.
                     }
                 }
@@ -169,37 +206,60 @@ export async function openOpfsDatabase() {
             return null;
         };
 
-        const opened = tryOpen();
-        if (opened !== null) {
-            return opened;
-        }
+        /**
+         * @returns {Promise<import('@sqlite.org/sqlite-wasm').Database|null>}
+         */
+        const tryOpenWithRetry = async () => {
+            const maxAttempts = 20;
+            for (let attempt = 0; attempt < maxAttempts; ++attempt) {
+                const opened = tryOpen();
+                if (opened !== null) { return opened; }
+                const retryableError = attempts.length > 0 ? attempts[attempts.length - 1].error : '';
+                const shouldRetry = (
+                    retryableError.includes('SQLITE_CANTOPEN') ||
+                    retryableError.includes('SQLITE_BUSY') ||
+                    retryableError.includes('database is locked')
+                );
+                if (!shouldRetry) { break; }
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 100);
+                });
+            }
+            return null;
+        };
 
-        const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
-        await deleteOpfsDatabaseFilesInternal(opfs);
-        const openedAfterCleanup = tryOpen();
-        if (openedAfterCleanup !== null) {
-            return openedAfterCleanup;
+        const opened = await tryOpenWithRetry();
+        if (opened !== null) {
+            lastOpenStorageDiagnostics.mode = 'opfsdb';
+            return opened;
         }
     }
 
     const openedViaUri = tryOpenViaUri();
     if (openedViaUri !== null) {
+        lastOpenStorageDiagnostics.mode = 'uri-opfs';
         return openedViaUri;
     }
 
     const openedViaWasmfsPersistentPath = tryOpenWasmfsPersistent();
     if (openedViaWasmfsPersistentPath !== null) {
+        lastOpenStorageDiagnostics.mode = 'wasmfs-persistent';
         return openedViaWasmfsPersistentPath;
     }
 
-    lastOpenUsedFallbackStorage = true;
-    if (fallbackImportedContent !== null) {
-        sqlite3.capi.sqlite3_js_posix_create_file(FALLBACK_IMPORT_DB_FILE, fallbackImportedContent);
-        fallbackImportedContent = null;
-        return new sqlite3.oo1.DB(FALLBACK_IMPORT_DB_FILE, 'c');
+    if (!allowFallback) {
+        lastOpenStorageDiagnostics.mode = 'opfs-unavailable';
+        throw new Error(`OPFS is required but unavailable. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)}`);
     }
 
-    return new sqlite3.oo1.DB(':memory:', 'c');
+    lastOpenUsedFallbackStorage = true;
+    try {
+        lastOpenStorageDiagnostics.mode = 'fallback-memory';
+        return new sqlite3.oo1.DB(':memory:', 'ct');
+    } catch (e) {
+        lastOpenStorageDiagnostics.mode = 'fallback-memory-open-failed';
+        throw new Error(`Fallback in-memory database open failed. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)} error=${String(e)}`);
+    }
 }
 
 /**
@@ -210,14 +270,28 @@ export function didLastOpenUseFallbackStorage() {
 }
 
 /**
+ * @returns {{mode: string, forceFallback: boolean, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean}}
+ */
+export function getLastOpenStorageDiagnostics() {
+    return {...lastOpenStorageDiagnostics};
+}
+
+/**
  * @returns {Promise<boolean>}
  */
 export async function deleteOpfsDatabaseFiles() {
     const sqlite3 = await getSqlite3();
+    const allowFallback = (
+        Reflect.get(globalThis, 'manabitanRequireOpfs') === false ||
+        Reflect.get(globalThis, 'manabitanAllowSqliteMemoryFallback') === true ||
+        typeof Reflect.get(globalThis, 'chrome') === 'undefined'
+    );
     const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
     if (typeof opfs?.unlink !== 'function') {
-        fallbackImportedContent = null;
-        return true;
+        if (allowFallback) {
+            return false;
+        }
+        throw new Error('OPFS unlink API is unavailable');
     }
     await deleteOpfsDatabaseFilesInternal(opfs);
 
@@ -232,8 +306,7 @@ export async function importOpfsDatabase(content) {
     const sqlite3 = await getSqlite3();
     const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
     if (typeof opfs?.importDb !== 'function') {
-        fallbackImportedContent = Uint8Array.from(new Uint8Array(content));
-        return;
+        throw new Error('OPFS importDb API is unavailable');
     }
     const bytes = new Uint8Array(content);
     for (const dbPath of getDatabasePaths()) {
@@ -244,5 +317,5 @@ export async function importOpfsDatabase(content) {
             // Try alternate path variant.
         }
     }
-    fallbackImportedContent = Uint8Array.from(bytes);
+    throw new Error('Failed to import OPFS database using available path variants');
 }

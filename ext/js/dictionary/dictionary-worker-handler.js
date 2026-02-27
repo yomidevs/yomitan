@@ -17,7 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
+import {log} from '../core/log.js';
 import {DictionaryDatabase} from './dictionary-database.js';
 import {DictionaryImporter} from './dictionary-importer.js';
 import {DictionaryWorkerMediaLoader} from './dictionary-worker-media-loader.js';
@@ -89,16 +89,6 @@ export class DictionaryWorkerHandler {
      * @returns {Promise<import('dictionary-worker').MessageCompleteResultSerialized>}
      */
     async _importDictionary({details, archiveContent}, onProgress) {
-        Reflect.set(
-            globalThis,
-            'manabitanForceSqliteFallback',
-            (
-                typeof details === 'object' &&
-                details !== null &&
-                !Array.isArray(details) &&
-                Reflect.get(details, 'forceMemoryOnly') === true
-            ),
-        );
         const useImportSession = (
             typeof details === 'object' &&
             details !== null &&
@@ -112,46 +102,53 @@ export class DictionaryWorkerHandler {
             Reflect.get(details, 'finalizeImportSession') === true
         );
         const createdImportSessionDatabase = useImportSession && this._importSessionDictionaryDatabase === null;
+        log.log(`[ImportTiming][worker] useImportSession=${String(useImportSession)} finalizeImportSession=${String(finalizeImportSession)} createdSessionDb=${String(createdImportSessionDatabase)} hasExistingSessionDb=${String(this._importSessionDictionaryDatabase !== null)}`);
         const dictionaryDatabase = useImportSession ?
             (this._importSessionDictionaryDatabase ?? await this._getPreparedDictionaryDatabase()) :
             await this._getPreparedDictionaryDatabase();
+        const usesFallbackStorage = dictionaryDatabase.usesFallbackStorage();
+        const openStorageDiagnostics = (
+            typeof dictionaryDatabase.getOpenStorageDiagnostics === 'function' ?
+                dictionaryDatabase.getOpenStorageDiagnostics() :
+                null
+        );
+        if (usesFallbackStorage) {
+            throw new Error(`OPFS is required for dictionary import. diagnostics=${JSON.stringify(openStorageDiagnostics)}`);
+        }
         if (createdImportSessionDatabase) {
             this._importSessionDictionaryDatabase = dictionaryDatabase;
         }
         try {
-            const existingDatabaseContentBase64 = (
-                typeof details === 'object' &&
-                details !== null &&
-                !Array.isArray(details) &&
-                typeof Reflect.get(details, 'existingDatabaseContentBase64') === 'string'
-            ) ?
-                /** @type {string} */ (Reflect.get(details, 'existingDatabaseContentBase64')) :
-                null;
-            if (existingDatabaseContentBase64 !== null && (!useImportSession || createdImportSessionDatabase)) {
-                await dictionaryDatabase.importDatabase(base64ToArrayBuffer(existingDatabaseContentBase64));
-            }
             const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
-            const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
-            const shouldExportFallbackSnapshot = (!useImportSession || finalizeImportSession);
-            let fallbackDatabaseContent = null;
-            if (shouldExportFallbackSnapshot) {
-                try {
-                    fallbackDatabaseContent = await dictionaryDatabase.exportDatabase();
-                } catch (_) {
-                    // Keep the import result usable even if fallback snapshot export fails.
-                }
+            let result;
+            let errors;
+            try {
+                ({result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details));
+            } catch (error) {
+                const diagnostics = (
+                    typeof dictionaryDatabase.getOpenStorageDiagnostics === 'function' ?
+                        dictionaryDatabase.getOpenStorageDiagnostics() :
+                        openStorageDiagnostics
+                );
+                const message = (error instanceof Error) ? error.message : String(error);
+                throw new Error(`Dictionary import failed: ${message}. workerStorageDiagnostics=${JSON.stringify(diagnostics)}`);
             }
             return {
                 result,
                 errors: errors.map((error) => ExtensionError.serialize(error)),
-                fallbackDatabaseContentBase64: fallbackDatabaseContent === null ? null : arrayBufferToBase64(fallbackDatabaseContent),
+                debug: {
+                    usesFallbackStorage,
+                    openStorageDiagnostics,
+                    useImportSession,
+                    finalizeImportSession,
+                },
             };
         } finally {
             if (useImportSession && finalizeImportSession && this._importSessionDictionaryDatabase !== null) {
-                void this._importSessionDictionaryDatabase.close();
+                await this._importSessionDictionaryDatabase.close();
                 this._importSessionDictionaryDatabase = null;
             } else if (!useImportSession) {
-                void dictionaryDatabase.close();
+                await dictionaryDatabase.close();
             }
         }
     }

@@ -275,11 +275,12 @@ export class DictionaryWorker {
      * @returns {import('dictionary-worker').MessageCompleteResult}
      */
     _formatImportDictionaryResult(response) {
-        const {result, errors, fallbackDatabaseContentBase64} = response;
+        const {result, errors, debug} = response;
+        const debugResult = (typeof debug === 'object' && debug !== null && !Array.isArray(debug)) ? debug : null;
         return {
             result,
             errors: errors.map((error) => ExtensionError.deserialize(error)),
-            fallbackDatabaseContentBase64,
+            debug: debugResult,
         };
     }
 }
