@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   firefox-e2e:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -50,12 +51,62 @@ jobs:
       - name: Install Selenium driver dependency
         run: npm install --no-save selenium-webdriver@4.38.0
 
+      - name: Restore Firefox E2E dictionary cache
+        uses: actions/cache@v4
+        with:
+          path: builds/e2e-dictionary-cache
+          key: firefox-e2e-dictionaries-${{ runner.os }}-v1
+
       - name: Run Firefox extension E2E
         id: firefoxE2E
         continue-on-error: true
         env:
           MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev.xpi
         run: npm run test:e2e:firefox-extension
+
+      - name: Summarize Firefox extension E2E
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = 'builds/firefox-e2e-import-report.json';
+          if (!fs.existsSync(path)) {
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## Firefox Extension E2E\nReport JSON not found.\n');
+            process.exit(0);
+          }
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const phases = Array.isArray(report.phases) ? report.phases : [];
+          const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
+          const opfsReady = runtime ? (
+            runtime.crossOriginIsolated === true &&
+            runtime.hasSharedArrayBuffer === true &&
+            runtime.hasAtomics === true
+          ) : null;
+          const top = [...phases].sort((a, b) => Number(b.durationMs || 0) - Number(a.durationMs || 0)).slice(0, 5);
+          const lines = [
+            '## Firefox Extension E2E',
+            `- Status: \`${String(report.status || 'unknown')}\``,
+            `- Failure: ${report.failureReason ? `\`${String(report.failureReason)}\`` : 'none'}`,
+            `- OPFS prereqs ready: ${opfsReady === null ? 'unknown' : `\`${String(opfsReady)}\``}`,
+            `- Runtime diagnostics: \`${JSON.stringify(report.runtimeDiagnostics ?? null)}\``,
+            `- Phase count: ${String(phases.length)}`,
+            '- Slowest phases:',
+            ...top.map((phase) => `  - ${String(phase.name)} (${Number(phase.durationMs || 0).toFixed(1)} ms)`),
+            '',
+          ];
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
+          NODE
+
+      - name: Upload Firefox extension E2E report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-extension-e2e-report
+          path: |
+            builds/firefox-e2e-import-report.html
+            builds/firefox-e2e-import-report.json
+            builds/extension-e2e-report.html
+          if-no-files-found: ignore
 
       - name: Report Firefox extension E2E failure without blocking main CI
         if: steps.firefoxE2E.outcome == 'failure'

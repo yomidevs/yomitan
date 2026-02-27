@@ -63,13 +63,20 @@ export type MessageData<TResponseRaw = unknown> = MessageCompleteData<TResponseR
 export type MessageCompleteResultSerialized = {
     result: DictionaryImporter.Summary | null;
     errors: Core.SerializedError[];
-    fallbackDatabaseContentBase64: string | null;
+    debug?: ImportDebug | null;
 };
 
 export type MessageCompleteResult = {
     result: DictionaryImporter.Summary | null;
     errors: Error[];
-    fallbackDatabaseContentBase64: string | null;
+    debug?: ImportDebug | null;
+};
+
+export type ImportDebug = {
+    usesFallbackStorage?: boolean;
+    openStorageDiagnostics?: unknown;
+    useImportSession?: boolean;
+    finalizeImportSession?: boolean;
 };
 
 export type ImportProgressCallback = (details: DictionaryImporter.ProgressData) => void;

@@ -114,39 +114,56 @@ export class Offscreen {
         return this._prepareDatabasePromise;
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
+    async _ensureDatabasePrepared() {
+        if (this._dictionaryDatabase.isPrepared()) {
+            return;
+        }
+        await this._prepareDatabaseHandler();
+    }
+
     /** @type {import('offscreen').ApiHandler<'getDictionaryInfoOffscreen'>} */
     async _getDictionaryInfoHandler() {
+        await this._ensureDatabasePrepared();
         return await this._dictionaryDatabase.getDictionaryInfo();
     }
 
     /** @type {import('offscreen').ApiHandler<'databasePurgeOffscreen'>} */
     async _purgeDatabaseHandler() {
+        await this._ensureDatabasePrepared();
         return await this._dictionaryDatabase.purge();
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseGetMediaOffscreen'>} */
     async _getMediaHandler({targets}) {
+        await this._ensureDatabasePrepared();
         const media = await this._dictionaryDatabase.getMedia(targets);
         return media.map((m) => ({...m, content: arrayBufferToBase64(m.content)}));
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseExportOffscreen'>} */
     async _exportDatabaseHandler() {
+        await this._ensureDatabasePrepared();
         return arrayBufferToBase64(await this._dictionaryDatabase.exportDatabase());
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseImportOffscreen'>} */
     async _importDatabaseHandler({content}) {
+        await this._ensureDatabasePrepared();
         await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
     }
 
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
-    _prepareTranslatorHandler() {
+    async _prepareTranslatorHandler() {
+        await this._ensureDatabasePrepared();
         this._translator.prepare();
     }
 
     /** @type {import('offscreen').ApiHandler<'findKanjiOffscreen'>} */
     async _findKanjiHandler({text, options}) {
+        await this._ensureDatabasePrepared();
         /** @type {import('translation').FindKanjiOptions} */
         const modifiedOptions = {
             ...options,
@@ -157,6 +174,7 @@ export class Offscreen {
 
     /** @type {import('offscreen').ApiHandler<'findTermsOffscreen'>} */
     async _findTermsHandler({mode, text, options}) {
+        await this._ensureDatabasePrepared();
         const enabledDictionaryMap = new Map(options.enabledDictionaryMap);
         const excludeDictionaryDefinitions = (
             options.excludeDictionaryDefinitions !== null ?
@@ -183,7 +201,8 @@ export class Offscreen {
     }
 
     /** @type {import('offscreen').ApiHandler<'getTermFrequenciesOffscreen'>} */
-    _getTermFrequenciesHandler({termReadingList, dictionaries}) {
+    async _getTermFrequenciesHandler({termReadingList, dictionaries}) {
+        await this._ensureDatabasePrepared();
         return this._translator.getTermFrequencies(termReadingList, dictionaries);
     }
 

@@ -254,7 +254,7 @@ describe('Database', () => {
         const testDataFilePath = join(dirname, 'data/database-test-cases.json');
         /** @type {import('test/database').DatabaseTestData} */
         const testData = parseJson(readFileSync(testDataFilePath, {encoding: 'utf8'}));
-        test('Seeds existing database content for sequential fallback worker imports', async ({expect}) => {
+        test('Rejects worker imports when fallback storage is detected', async ({expect}) => {
             const dictionaryWorkerHandler = new DictionaryWorkerHandler();
             /**
              * @type {{
@@ -276,7 +276,6 @@ describe('Database', () => {
                 result: /** @type {import('dictionary-importer').Summary} */ ({title: 'mock', revision: 'mock', sequenced: true, version: 3, importDate: 0, prefixWildcardsSupported: false, styles: ''}),
                 errors: [],
             });
-            const importDatabaseSpy = vi.spyOn(fakeDatabase, 'importDatabase');
 
             const importDictionaryInternal = /** @type {(params: import('dictionary-worker-handler').ImportDictionaryMessageParams, onProgress: (...args: unknown[]) => void) => Promise<import('dictionary-worker').MessageCompleteResultSerialized>} */ (
                 Reflect.get(dictionaryWorkerHandler, '_importDictionary').bind(dictionaryWorkerHandler)
@@ -286,18 +285,14 @@ describe('Database', () => {
                 prefixWildcardsSupported: false,
                 yomitanVersion: '0.0.0.0',
             };
-
-            await importDictionaryInternal({details: importDetails, archiveContent: new ArrayBuffer(0)}, () => {});
-            expect.soft(importDatabaseSpy).toHaveBeenCalledTimes(0);
-
-            await importDictionaryInternal({
-                details: {...importDetails, existingDatabaseContentBase64: 'AQID'},
-                archiveContent: new ArrayBuffer(0),
-            }, () => {});
-            expect.soft(importDatabaseSpy).toHaveBeenCalledTimes(1);
-
-            getPreparedDictionaryDatabaseSpy.mockRestore();
-            importDictionarySpy.mockRestore();
+            try {
+                await expect.soft(
+                    importDictionaryInternal({details: importDetails, archiveContent: new ArrayBuffer(0)}, () => {}),
+                ).rejects.toThrow('OPFS is required for dictionary import');
+            } finally {
+                getPreparedDictionaryDatabaseSpy.mockRestore();
+                importDictionarySpy.mockRestore();
+            }
         });
         test('Deduplicates shared term entry content', async ({expect}) => {
             const dictionaryDatabase = new DictionaryDatabase();

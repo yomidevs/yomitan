@@ -255,25 +255,42 @@ export class Translator {
         let originalTextLength = 0;
         /** @type {import('translation-internal').TermDictionaryEntry[]} */
         const dictionaryEntries = [];
+        /** @type {Set<number>} */
         const ids = new Set();
+        /** @type {Map<number, number>} */
+        const idToIndex = new Map();
         for (const {databaseEntries, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates} of deinflections) {
             if (databaseEntries.length === 0) { continue; }
             originalTextLength = Math.max(originalTextLength, originalText.length);
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
                 if (ids.has(id)) {
-                    const existingEntryInfo = this._findExistingEntry(dictionaryEntries, id);
-                    if (!existingEntryInfo) {
+                    const existingIndex = idToIndex.get(id);
+                    if (typeof existingIndex !== 'number') {
                         continue;
                     }
-                    const {existingEntry, existingIndex} = existingEntryInfo;
+                    const existingEntry = dictionaryEntries[existingIndex];
+                    if (!existingEntry) {
+                        continue;
+                    }
 
                     const existingTransformedLength = existingEntry.headwords[0].sources[0].transformedText.length;
                     if (transformedText.length < existingTransformedLength) {
                         continue;
                     }
                     if (transformedText.length > existingTransformedLength) {
-                        dictionaryEntries.splice(existingIndex, 1, this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading));
+                        dictionaryEntries[existingIndex] = this._createTermDictionaryEntryFromDatabaseEntry(
+                            databaseEntry,
+                            originalText,
+                            transformedText,
+                            deinflectedText,
+                            textProcessorRuleChainCandidates,
+                            inflectionRuleChainCandidates,
+                            true,
+                            enabledDictionaryMap,
+                            tagAggregator,
+                            primaryReading,
+                        );
                     } else {
                         this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
                         this._mergeTextProcessorRuleChains(existingEntry, textProcessorRuleChainCandidates);
@@ -282,28 +299,11 @@ export class Translator {
                     const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading);
                     dictionaryEntries.push(dictionaryEntry);
                     ids.add(id);
+                    idToIndex.set(id, dictionaryEntries.length - 1);
                 }
             }
         }
         return {dictionaryEntries, originalTextLength};
-    }
-
-    /**
-     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
-     * @param {number} id
-     * @returns {{existingEntry: import('translation-internal').TermDictionaryEntry, existingIndex: number} | null}
-     */
-    _findExistingEntry(dictionaryEntries, id) {
-        let existingIndex = null;
-        let existingEntry = null;
-        for (const [index, entry] of dictionaryEntries.entries()) {
-            if (entry.definitions.some((definition) => definition.id === id)) {
-                existingIndex = index;
-                existingEntry = entry;
-                return {existingEntry, existingIndex};
-            }
-        }
-        return null;
     }
 
     /**
@@ -312,14 +312,13 @@ export class Translator {
      */
     _mergeTextProcessorRuleChains(existingEntry, textProcessorRuleChainCandidates) {
         const existingChains = existingEntry.textProcessorRuleChainCandidates;
+        const existingSignatures = new Set(existingChains.map((existingChain) => this._createUnorderedArraySignature(existingChain)));
 
         for (const textProcessorRules of textProcessorRuleChainCandidates) {
-            const duplicate = existingChains.find((existingChain) => {
-                return this._areArraysEqualIgnoreOrder(existingChain, textProcessorRules);
-            });
-            if (!duplicate) {
-                existingEntry.textProcessorRuleChainCandidates.push(textProcessorRules);
-            }
+            const signature = this._createUnorderedArraySignature(textProcessorRules);
+            if (existingSignatures.has(signature)) { continue; }
+            existingEntry.textProcessorRuleChainCandidates.push(textProcessorRules);
+            existingSignatures.add(signature);
         }
     }
 
@@ -329,45 +328,31 @@ export class Translator {
      */
     _mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates) {
         const existingChains = existingEntry.inflectionRuleChainCandidates;
+        /** @type {Map<string, number>} */
+        const signatureToIndex = new Map();
+        for (const [index, existingChain] of existingChains.entries()) {
+            signatureToIndex.set(this._createUnorderedArraySignature(existingChain.inflectionRules), index);
+        }
 
         for (const {source, inflectionRules} of inflectionRuleChainCandidates) {
-            const duplicate = existingChains.find((existingChain) => {
-                return this._areArraysEqualIgnoreOrder(existingChain.inflectionRules, inflectionRules);
-            });
-            if (!duplicate) {
+            const signature = this._createUnorderedArraySignature(inflectionRules);
+            const duplicateIndex = signatureToIndex.get(signature);
+            if (typeof duplicateIndex === 'undefined') {
                 existingEntry.inflectionRuleChainCandidates.push({source, inflectionRules});
-            } else if (duplicate.source !== source) {
+                signatureToIndex.set(signature, existingEntry.inflectionRuleChainCandidates.length - 1);
+            } else if (existingChains[duplicateIndex].source !== source) {
+                const duplicate = existingChains[duplicateIndex];
                 duplicate.source = 'both';
             }
         }
     }
 
     /**
-     * @param {string[]} array1
-     * @param {string[]} array2
-     * @returns {boolean}
+     * @param {string[]} values
+     * @returns {string}
      */
-    _areArraysEqualIgnoreOrder(array1, array2) {
-        if (array1.length !== array2.length) {
-            return false;
-        }
-
-        /** @type {Map<string, number>} */
-        const frequencyCounter = new Map();
-
-        for (const element of array1) {
-            frequencyCounter.set(element, (frequencyCounter.get(element) || 0) + 1);
-        }
-
-        for (const element of array2) {
-            const frequency = frequencyCounter.get(element);
-            if (!frequency) {
-                return false;
-            }
-            frequencyCounter.set(element, frequency - 1);
-        }
-
-        return true;
+    _createUnorderedArraySignature(values) {
+        return JSON.stringify([...values].sort());
     }
 
 

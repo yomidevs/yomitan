@@ -26,7 +26,7 @@ import {parseJson} from '../core/json.js';
 import {log} from '../core/log.js';
 import {safePerformance} from '../core/safe-performance.js';
 import {stringReverse} from '../core/utilities.js';
-import {deleteOpfsDatabaseFiles, didLastOpenUseFallbackStorage, getSqlite3, importOpfsDatabase, openOpfsDatabase} from './sqlite-wasm.js';
+import {deleteOpfsDatabaseFiles, didLastOpenUseFallbackStorage, getLastOpenStorageDiagnostics, getSqlite3, importOpfsDatabase, openOpfsDatabase} from './sqlite-wasm.js';
 import {
     compressTermContentZstd,
     decompressTermContentZstd,
@@ -55,6 +55,8 @@ export class DictionaryDatabase {
         this._isOpening = false;
         /** @type {boolean} */
         this._usesFallbackStorage = false;
+        /** @type {{mode: string, forceFallback: boolean, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, attempts?: Array<{strategy: string, target: string, flags: string, error: string}>, lastError?: string|null}|null} */
+        this._openStorageDiagnostics = null;
         /** @type {number} */
         this._bulkImportDepth = 0;
         /** @type {boolean} */
@@ -218,6 +220,16 @@ export class DictionaryDatabase {
         return this._usesFallbackStorage;
     }
 
+    /**
+     * @returns {{mode: string, forceFallback: boolean, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, attempts?: Array<{strategy: string, target: string, flags: string, error: string}>, lastError?: string|null}|null}
+     */
+    getOpenStorageDiagnostics() {
+        if (this._openStorageDiagnostics === null) {
+            return null;
+        }
+        return {...this._openStorageDiagnostics};
+    }
+
     /** */
     async startBulkImport() {
         const db = this._requireDb();
@@ -365,6 +377,10 @@ export class DictionaryDatabase {
     async exportDatabase() {
         const db = this._requireDb();
         const sqlite3 = this._requireSqlite3();
+        const pageCount = this._asNumber(db.selectValue('PRAGMA page_count'), -1);
+        const pageSize = this._asNumber(db.selectValue('PRAGMA page_size'), -1);
+        const freelistCount = this._asNumber(db.selectValue('PRAGMA freelist_count'), -1);
+        const approxDbBytes = (pageCount > 0 && pageSize > 0) ? pageCount * pageSize : -1;
 
         // Release cached prepared statements before serialization to reduce wasm heap pressure.
         this._clearCachedStatements();
@@ -378,19 +394,47 @@ export class DictionaryDatabase {
         } catch (_) {
             // In-memory/non-WAL databases may reject checkpoint pragmas.
         }
-        const exportBinaryImage = /** @type {unknown} */ (Reflect.get(db, 'exportBinaryImage'));
-        if (typeof exportBinaryImage === 'function') {
-            const raw = /** @type {() => Uint8Array|ArrayBuffer} */ (exportBinaryImage).call(db);
-            const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
-            return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+        try {
+            /** @type {ArrayBuffer|null} */
+            let exported = null;
+            const exportBinaryImage = /** @type {unknown} */ (Reflect.get(db, 'exportBinaryImage'));
+            if (typeof exportBinaryImage === 'function') {
+                try {
+                    const raw = /** @type {() => Uint8Array|ArrayBuffer} */ (exportBinaryImage).call(db);
+                    const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
+                    if (bytes.byteLength > 0) {
+                        exported = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+                    }
+                } catch (_) {
+                    // Fall back to sqlite3_js_db_export below.
+                }
+            }
+            if (exported === null) {
+                const dbPointer = db.pointer;
+                if (typeof dbPointer !== 'number') {
+                    throw new Error('sqlite database pointer is unavailable');
+                }
+                const raw = sqlite3.capi.sqlite3_js_db_export(dbPointer);
+                const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
+                if (bytes.byteLength > 0) {
+                    exported = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+                }
+            }
+            if (exported === null || exported.byteLength === 0) {
+                throw new Error('Database export returned an empty payload');
+            }
+            return exported;
+        } catch (e) {
+            const storageDiagnostics = this.getOpenStorageDiagnostics();
+            const wrappedError = new Error(
+                `Database serialization failed: ${String(e && typeof e === 'object' && 'message' in e ? Reflect.get(e, 'message') : e)} ` +
+                `(usesFallbackStorage=${String(this._usesFallbackStorage)} ` +
+                `pageCount=${String(pageCount)} pageSize=${String(pageSize)} freelistCount=${String(freelistCount)} ` +
+                `approxDbBytes=${String(approxDbBytes)} storageDiagnostics=${JSON.stringify(storageDiagnostics)})`,
+            );
+            log.warn(wrappedError);
+            throw wrappedError;
         }
-        const dbPointer = db.pointer;
-        if (typeof dbPointer !== 'number') {
-            throw new Error('sqlite database pointer is unavailable');
-        }
-        const raw = sqlite3.capi.sqlite3_js_db_export(dbPointer);
-        const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
-        return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
     }
 
     /**
@@ -2118,8 +2162,15 @@ export class DictionaryDatabase {
      */
     async _openConnection() {
         this._sqlite3 = await getSqlite3();
-        this._db = await openOpfsDatabase();
+        try {
+            this._db = await openOpfsDatabase();
+        } catch (error) {
+            const diagnostics = getLastOpenStorageDiagnostics();
+            const message = (error instanceof Error) ? error.message : String(error);
+            throw new Error(`Dictionary database open failed: ${message}. diagnostics=${JSON.stringify(diagnostics)}`);
+        }
         this._usesFallbackStorage = didLastOpenUseFallbackStorage();
+        this._openStorageDiagnostics = getLastOpenStorageDiagnostics();
         await this._termContentStore.prepare();
         await this._termRecordStore.prepare();
         this._clearTermsVtabCursorState();

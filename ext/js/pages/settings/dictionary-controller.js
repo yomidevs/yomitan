@@ -1197,6 +1197,7 @@ export class DictionaryController {
 
     /** */
     async _checkIntegrity() {
+        if (Reflect.get(globalThis, 'manabitanDisableIntegrityCounts') === true) { return; }
         if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isTaskQueueRunning) { return; }
 
         try {
