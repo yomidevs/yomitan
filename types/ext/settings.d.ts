@@ -64,6 +64,7 @@ export type Options = {
 export type GlobalOptions = {
     database: GlobalDatabaseOptions;
     dataTransmissionConsentShown: boolean;
+    autoUpdateDictionaries: boolean;
 };
 
 export type GlobalDatabaseOptions = {

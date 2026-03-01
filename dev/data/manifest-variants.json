@@ -68,7 +68,8 @@
             "declarativeNetRequest",
             "scripting",
             "offscreen",
-            "contextMenus"
+            "contextMenus",
+            "alarms"
         ],
         "optional_permissions": [
             "clipboardRead",

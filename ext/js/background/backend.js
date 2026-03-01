@@ -24,6 +24,7 @@ import {YomitanApi} from '../comm/yomitan-api.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {fetchText} from '../core/fetch-utilities.js';
+import {readResponseJson} from '../core/json.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
@@ -32,7 +33,9 @@ import {generateAnkiNoteMediaFileName, INVALID_NOTE_ID, isNoteDataValid} from '.
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
+import {compareRevisions} from '../dictionary/dictionary-data-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {DictionaryWorker} from '../dictionary/dictionary-worker.js';
 import {Environment} from '../extension/environment.js';
 import {CacheMap} from '../general/cache-map.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
@@ -139,6 +142,8 @@ export class Backend {
         this._permissions = null;
         /** @type {Map<string, (() => void)[]>} */
         this._applicationReadyHandlers = new Map();
+        /** @type {boolean} */
+        this._isAutoUpdatingDictionaries = false;
 
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('api').ApiMap} */
@@ -266,6 +271,11 @@ export class Backend {
         }
 
         chrome.runtime.onInstalled.addListener(this._onInstalled.bind(this));
+
+        if (isObjectNotArray(chrome.alarms)) {
+            const onAlarm = this._onWebExtensionEventWrapper(this._onAlarm.bind(this));
+            chrome.alarms.onAlarm.addListener(onAlarm);
+        }
     }
 
     /** @type {import('api').PmApiHandler<'connectToDatabaseWorker'>} */
@@ -1515,6 +1525,8 @@ export class Backend {
         this._textParseCache.clear();
 
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
+
+        this._updateAutoUpdateAlarm();
     }
 
     /**
@@ -2978,5 +2990,140 @@ export class Backend {
             this._applicationReadyHandlers.delete(key);
         }
         return true;
+    }
+
+    // Dictionary auto-update
+
+    /**
+     * @param {chrome.alarms.Alarm} alarm
+     */
+    _onAlarm(alarm) {
+        if (alarm.name === 'dictionary-auto-update') {
+            void this._autoUpdateDictionaries();
+        }
+    }
+
+    /** */
+    _updateAutoUpdateAlarm() {
+        if (!isObjectNotArray(chrome.alarms)) { return; }
+        try {
+            const options = this._getOptionsFull(false);
+            if (options.global.autoUpdateDictionaries) {
+                void chrome.alarms.create('dictionary-auto-update', {periodInMinutes: 24 * 60});
+            } else {
+                void chrome.alarms.clear('dictionary-auto-update');
+            }
+        } catch (e) {
+            log.error(e);
+        }
+    }
+
+    /** */
+    async _autoUpdateDictionaries() {
+        if (this._isAutoUpdatingDictionaries) { return; }
+        this._isAutoUpdatingDictionaries = true;
+
+        try {
+            const options = this._getOptionsFull(false);
+            if (!options.global.autoUpdateDictionaries) { return; }
+
+            /** @type {import('dictionary-importer').Summary[]} */
+            const dictionaries = await this._dictionaryDatabase.getDictionaryInfo();
+
+            for (const dict of dictionaries) {
+                try {
+                    await this._autoUpdateSingleDictionary(dict, options);
+                } catch (e) {
+                    log.error(e);
+                }
+            }
+        } catch (e) {
+            log.error(e);
+        } finally {
+            this._isAutoUpdatingDictionaries = false;
+        }
+    }
+
+    /**
+     * @param {import('dictionary-importer').Summary} dictionaryInfo
+     * @param {import('settings').Options} options
+     */
+    async _autoUpdateSingleDictionary(dictionaryInfo, options) {
+        const {title, isUpdatable, indexUrl, revision: currentRevision, downloadUrl: currentDownloadUrl} = dictionaryInfo;
+        if (!isUpdatable || !indexUrl || !currentDownloadUrl) { return; }
+
+        // Check for update by fetching the remote index
+        const response = await fetch(indexUrl);
+        if (!response.ok) { return; }
+
+        /** @type {unknown} */
+        const index = await readResponseJson(response);
+        if (typeof index !== 'object' || index === null) { return; }
+
+        const {revision: latestRevision, downloadUrl: latestDownloadUrl} = /** @type {{revision?: string, downloadUrl?: string}} */ (index);
+        if (typeof latestRevision !== 'string' || !compareRevisions(currentRevision, latestRevision)) { return; }
+
+        const downloadUrl = latestDownloadUrl ?? currentDownloadUrl;
+
+        // Save existing dictionary settings from all profiles before deletion
+        /** @type {Map<number, import('settings').DictionaryOptions>} */
+        const savedSettings = new Map();
+        const {profiles} = options;
+        for (let i = 0; i < profiles.length; i++) {
+            for (const dict of profiles[i].options.dictionaries) {
+                if (dict.name === title) {
+                    savedSettings.set(i, {...dict});
+                    break;
+                }
+            }
+        }
+
+        // Download new dictionary before deleting the old one to avoid data loss on failure
+        const zipResponse = await fetch(downloadUrl);
+        if (!zipResponse.ok) {
+            throw new Error(`Failed to download dictionary update from ${downloadUrl}`);
+        }
+        const archiveContent = await zipResponse.arrayBuffer();
+
+        // Delete old dictionary from database
+        await new DictionaryWorker().deleteDictionary(title, null);
+        this._triggerDatabaseUpdated('dictionary', 'delete');
+
+        // Import new dictionary
+        const importDetails = {
+            prefixWildcardsSupported: options.global.database.prefixWildcardsSupported,
+            yomitanVersion: chrome.runtime.getManifest().version,
+        };
+        const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, null);
+        if (errors.length > 0) {
+            log.warn(`Dictionary auto-update for "${title}" completed with ${errors.length} error(s)`);
+        }
+        if (!result) { return; }
+
+        // Update dictionary settings in all profiles to match the new title
+        /** @type {import('settings-modifications').ScopedModification[]} */
+        const targets = [];
+        for (let i = 0; i < profiles.length; i++) {
+            const saved = savedSettings.get(i);
+            if (typeof saved !== 'undefined') {
+                const alias = saved.alias === saved.name ? result.title : saved.alias;
+                targets.push({
+                    action: /** @type {const} */ ('set'),
+                    path: `profiles[${i}].options.dictionaries`,
+                    value: profiles[i].options.dictionaries.map((d) => {
+                        return d.name === title ? {...saved, name: result.title, alias, styles: result.styles ?? ''} : d;
+                    }),
+                    scope: /** @type {const} */ ('global'),
+                    optionsContext: null,
+                });
+            }
+        }
+
+        if (targets.length > 0) {
+            await this._modifySettings(targets, 'backend');
+        }
+
+        this._triggerDatabaseUpdated('dictionary', 'import');
+        log.log(`Dictionary "${title}" auto-updated to revision ${latestRevision}`);
     }
 }
