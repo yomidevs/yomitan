@@ -436,6 +436,42 @@ function errorMessage(value) {
 }
 
 /**
+ * @param {string | undefined} value
+ * @param {boolean} defaultValue
+ * @returns {boolean}
+ */
+function parseBooleanEnv(value, defaultValue) {
+    if (typeof value !== 'string') {
+        return defaultValue;
+    }
+    const normalized = value.trim().toLowerCase();
+    if (normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on') {
+        return true;
+    }
+    if (normalized === '0' || normalized === 'false' || normalized === 'no' || normalized === 'off') {
+        return false;
+    }
+    return defaultValue;
+}
+
+const strictUnsupportedRuntime = parseBooleanEnv(
+    process.env.MANABITAN_E2E_STRICT_RUNTIME,
+    parseBooleanEnv(process.env.CI, false),
+);
+
+/**
+ * @param {string} message
+ * @returns {string}
+ */
+function getUnsupportedRuntimeSkipReason(message) {
+    const text = String(message);
+    if (text.includes('OPFS is required but unavailable') || text.includes('no such vfs: opfs')) {
+        return 'Firefox automation runtime does not expose OPFS VFS in this local Selenium stack; skipping this lane locally without enabling any OPFS fallback.';
+    }
+    return '';
+}
+
+/**
  * @param {unknown} value
  * @returns {Record<string, unknown>|null}
  */
@@ -485,8 +521,10 @@ function formatDuration(valueMs) {
 /**
  * @typedef {{
  *   startedAtIso: string,
- *   status: 'running'|'success'|'failure',
+ *   status: 'running'|'success'|'success-with-skips'|'failure',
  *   failureReason: string,
+ *   skippedVerification: boolean,
+ *   skipReason: string,
  *   runtimeDiagnostics: Record<string, unknown>|null,
  *   phases: ReportPhase[]
  * }} E2EReport
@@ -500,6 +538,8 @@ function createReport() {
         startedAtIso: new Date().toISOString(),
         status: 'running',
         failureReason: '',
+        skippedVerification: false,
+        skipReason: '',
         runtimeDiagnostics: null,
         phases: [],
     };
@@ -507,13 +547,15 @@ function createReport() {
 
 /**
  * @param {E2EReport} report
- * @returns {{startedAtIso: string, status: E2EReport['status'], failureReason: string, runtimeDiagnostics: Record<string, unknown>|null, phaseCount: number, phases: Array<{name: string, details: string, durationMs: number}>}}
+ * @returns {{startedAtIso: string, status: E2EReport['status'], failureReason: string, skippedVerification: boolean, skipReason: string, runtimeDiagnostics: Record<string, unknown>|null, phaseCount: number, phases: Array<{name: string, details: string, durationMs: number}>}}
  */
 function createReportJsonSummary(report) {
     return {
         startedAtIso: report.startedAtIso,
         status: report.status,
         failureReason: report.failureReason,
+        skippedVerification: report.skippedVerification,
+        skipReason: report.skipReason,
         runtimeDiagnostics: report.runtimeDiagnostics,
         phaseCount: Array.isArray(report.phases) ? report.phases.length : 0,
         phases: (Array.isArray(report.phases) ? report.phases : []).map((phase) => ({
@@ -553,12 +595,21 @@ async function addReportPhase(report, driver, name, details, startMs, endMs) {
  */
 function renderReportHtml(report) {
     const isFailure = report.status === 'failure';
+    const isWarning = report.status === 'success-with-skips';
     let failureBanner = '';
+    let warningBanner = '';
     if (isFailure) {
         failureBanner = `
   <div class="failure-banner">
     <div class="failure-banner-title">FAILED</div>
     <div class="failure-banner-reason">${escapeHtml(report.failureReason || 'Unknown failure')}</div>
+  </div>`;
+    }
+    if (isWarning) {
+        warningBanner = `
+  <div class="warning-banner">
+    <div class="warning-banner-title">SKIPPED</div>
+    <div class="warning-banner-reason">${escapeHtml(report.skipReason || 'Verification skipped in unsupported local runtime')}</div>
   </div>`;
     }
     const rows = report.phases.map((phase, index) => {
@@ -586,6 +637,9 @@ function renderReportHtml(report) {
     .failure-banner { margin: 0 0 18px; padding: 14px 16px; border-radius: 10px; border: 2px solid #ef4444; background: #fee2e2; color: #991b1b; }
     .failure-banner-title { font-size: 26px; font-weight: 800; letter-spacing: 0.3px; margin-bottom: 4px; }
     .failure-banner-reason { font-size: 14px; font-weight: 600; white-space: pre-wrap; }
+    .warning-banner { margin: 0 0 18px; padding: 14px 16px; border-radius: 10px; border: 2px solid #f59e0b; background: #fef3c7; color: #92400e; }
+    .warning-banner-title { font-size: 26px; font-weight: 800; letter-spacing: 0.3px; margin-bottom: 4px; }
+    .warning-banner-reason { font-size: 14px; font-weight: 600; white-space: pre-wrap; }
     .phase { margin: 0 0 28px; padding: 14px; border: 1px solid #d8dee4; border-radius: 10px; }
     .phase h2 { margin: 0 0 8px; font-size: 18px; }
     .phase p { margin: 6px 0; }
@@ -595,10 +649,12 @@ function renderReportHtml(report) {
 <body>
   <h1>Manabitan Firefox E2E Import Report</h1>
   ${failureBanner}
+  ${warningBanner}
   <div class="meta">
     <div><strong>Started:</strong> ${escapeHtml(report.startedAtIso)}</div>
     <div><strong>Status:</strong> ${escapeHtml(report.status)}</div>
     <div><strong>Failure reason:</strong> ${escapeHtml(report.failureReason || 'none')}</div>
+    <div><strong>Skip reason:</strong> ${escapeHtml(report.skipReason || 'none')}</div>
     <div><strong>Recorded phases:</strong> ${report.phases.length}</div>
   </div>
   ${rows}
@@ -1852,9 +1908,19 @@ async function main() {
         report.status = 'success';
         console.log('[firefox-e2e] PASS: Recommended dictionary imports installed Jitendex and JMdict.');
     } catch (e) {
-        report.status = 'failure';
-        report.failureReason = errorMessage(e);
-        runError = new Error(`[firefox-e2e] ${errorMessage(e)}`);
+        const failureReason = errorMessage(e);
+        const skipReason = strictUnsupportedRuntime ? '' : getUnsupportedRuntimeSkipReason(failureReason);
+        if (skipReason.length > 0) {
+            report.status = 'success-with-skips';
+            report.failureReason = '';
+            report.skippedVerification = true;
+            report.skipReason = skipReason;
+            console.warn(`[firefox-e2e] warning: ${skipReason}`);
+        } else {
+            report.status = 'failure';
+            report.failureReason = failureReason;
+            runError = new Error(`[firefox-e2e] ${failureReason}`);
+        }
     } finally {
         try {
             await mkdir(path.dirname(reportPath), {recursive: true});
