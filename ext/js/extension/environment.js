@@ -17,6 +17,9 @@
  */
 
 export class Environment {
+    /** @type {number} */
+    static platformInfoTimeoutMs = 250;
+
     constructor() {
         /** @type {?import('environment').Info} */
         this._cachedEnvironmentInfo = null;
@@ -55,15 +58,16 @@ export class Environment {
      * @returns {Promise<import('environment').OperatingSystem>}
      */
     async _getOperatingSystem() {
+        const fallbackOs = this._getOperatingSystemFromUserAgent();
         try {
-            const {os} = await this._getPlatformInfo();
-            if (typeof os === 'string') {
-                return os;
+            const platformInfo = await this._getPlatformInfoWithTimeout();
+            if (platformInfo !== null && typeof platformInfo.os === 'string') {
+                return platformInfo.os;
             }
         } catch (e) {
             // NOP
         }
-        return 'unknown';
+        return fallbackOs;
     }
 
     /**
@@ -80,6 +84,41 @@ export class Environment {
                 }
             });
         });
+    }
+
+    /**
+     * @returns {Promise<chrome.runtime.PlatformInfo|null>}
+     */
+    async _getPlatformInfoWithTimeout() {
+        const timeoutMs = Environment.platformInfoTimeoutMs;
+        /**
+         * @returns {Promise<null>}
+         */
+        const timeoutPromise = new Promise((resolve) => {
+            setTimeout(() => resolve(null), timeoutMs);
+        });
+        return await Promise.race([
+            this._getPlatformInfo(),
+            timeoutPromise,
+        ]);
+    }
+
+    /**
+     * @returns {import('environment').OperatingSystem}
+     */
+    _getOperatingSystemFromUserAgent() {
+        let userAgent = '';
+        try {
+            userAgent = String(navigator.userAgent ?? '').toLowerCase();
+        } catch (e) {
+            // NOP
+        }
+        if (userAgent.includes('android')) { return 'android'; }
+        if (userAgent.includes('cros')) { return 'cros'; }
+        if (userAgent.includes('mac os x') || userAgent.includes('macintosh')) { return 'mac'; }
+        if (userAgent.includes('windows')) { return 'win'; }
+        if (userAgent.includes('linux')) { return 'linux'; }
+        return 'unknown';
     }
 
     /**

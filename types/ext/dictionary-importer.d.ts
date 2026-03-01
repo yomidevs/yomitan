@@ -46,7 +46,6 @@ export type ImportDetails = {
     useImportSession?: boolean;
     finalizeImportSession?: boolean;
     forceMemoryOnly?: boolean;
-    skipSchemaValidation?: boolean;
     enableBulkImportIndexOptimization?: boolean;
     disableProgressEvents?: boolean;
     enableTermEntryContentDedup?: boolean;

@@ -50,8 +50,9 @@ async function exists(filePath) {
  */
 export async function writeCombinedTabbedReport(options) {
     const {chromiumReportPath, edgeReportPath, firefoxReportPath, outputPath} = options;
+    const edgeReportPathValue = typeof edgeReportPath === 'string' ? edgeReportPath : '';
     const hasChromium = await exists(chromiumReportPath);
-    const hasEdge = typeof edgeReportPath === 'string' && edgeReportPath.length > 0 ? await exists(edgeReportPath) : false;
+    const hasEdge = edgeReportPathValue.length > 0 ? await exists(edgeReportPathValue) : false;
     const hasFirefox = await exists(firefoxReportPath);
     const tabs = [];
     if (hasChromium) {
@@ -65,7 +66,7 @@ export async function writeCombinedTabbedReport(options) {
         tabs.push({
             id: 'edge',
             label: 'Edge',
-            src: path.basename(edgeReportPath),
+            src: path.basename(edgeReportPathValue),
         });
     }
     if (hasFirefox) {

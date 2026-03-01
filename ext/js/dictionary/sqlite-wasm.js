@@ -16,6 +16,7 @@
  */
 
 import sqlite3InitModule from '../../lib/sqlite/index.mjs';
+import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 
 export const DICTIONARY_DB_FILE = '/dict.sqlite3';
 
@@ -152,6 +153,10 @@ export async function openOpfsDatabase() {
     };
     if (forceFallback) {
         lastOpenStorageDiagnostics.mode = 'forced-fallback-disallowed';
+        reportDiagnostics('opfs-open-failed', {
+            stage: 'forced-fallback-disallowed',
+            diagnostics: lastOpenStorageDiagnostics,
+        });
         throw new Error(`OPFS is required; forced fallback is disabled. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)}`);
     }
     /**
@@ -249,15 +254,27 @@ export async function openOpfsDatabase() {
 
     if (!allowFallback) {
         lastOpenStorageDiagnostics.mode = 'opfs-unavailable';
+        reportDiagnostics('opfs-open-failed', {
+            stage: 'opfs-unavailable',
+            diagnostics: lastOpenStorageDiagnostics,
+        });
         throw new Error(`OPFS is required but unavailable. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)}`);
     }
 
     lastOpenUsedFallbackStorage = true;
     try {
         lastOpenStorageDiagnostics.mode = 'fallback-memory';
+        reportDiagnostics('opfs-open-fallback-memory', {
+            diagnostics: lastOpenStorageDiagnostics,
+        });
         return new sqlite3.oo1.DB(':memory:', 'ct');
     } catch (e) {
         lastOpenStorageDiagnostics.mode = 'fallback-memory-open-failed';
+        reportDiagnostics('opfs-open-failed', {
+            stage: 'fallback-memory-open-failed',
+            diagnostics: lastOpenStorageDiagnostics,
+            error: String(e),
+        });
         throw new Error(`Fallback in-memory database open failed. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)} error=${String(e)}`);
     }
 }

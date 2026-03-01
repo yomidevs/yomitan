@@ -17,6 +17,7 @@
  */
 
 import {log} from '../core/log.js';
+import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {WebExtension} from '../extension/web-extension.js';
 import {Backend} from './backend.js';
 
@@ -24,6 +25,20 @@ import {Backend} from './backend.js';
 async function main() {
     const webExtension = new WebExtension();
     log.configure(webExtension.extensionName);
+    let manifestVersion = '';
+    let runtimeId = '';
+    try {
+        const manifest = chrome.runtime.getManifest();
+        manifestVersion = typeof manifest.version === 'string' ? manifest.version : '';
+        runtimeId = typeof chrome.runtime.id === 'string' ? chrome.runtime.id : '';
+    } catch (_) {
+        // NOP
+    }
+    reportDiagnostics('extension-start', {
+        extensionName: webExtension.extensionName,
+        manifestVersion,
+        runtimeId,
+    });
 
     const backend = new Backend(webExtension);
     await backend.prepare();
