@@ -87,6 +87,8 @@ jobs:
           const lines = [
             '## Firefox Extension E2E',
             `- Status: \`${String(report.status || 'unknown')}\``,
+            `- Skipped verification: \`${String(report.skippedVerification === true)}\``,
+            `- Skip reason: ${report.skipReason ? `\`${String(report.skipReason)}\`` : 'none'}`,
             `- Failure: ${report.failureReason ? `\`${String(report.failureReason)}\`` : 'none'}`,
             `- OPFS prereqs ready: ${opfsReady === null ? 'unknown' : `\`${String(opfsReady)}\``}`,
             `- Runtime diagnostics: \`${JSON.stringify(report.runtimeDiagnostics ?? null)}\``,

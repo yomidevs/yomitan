@@ -151,6 +151,8 @@ jobs:
           const lines = [
             '## Chromium Extension E2E',
             `- Status: \`${String(report.status || 'unknown')}\``,
+            `- Skipped verification: \`${String(report.skippedVerification === true)}\``,
+            `- Skip reason: ${report.skipReason ? `\`${String(report.skipReason)}\`` : 'none'}`,
             `- Launch mode: \`${String(report.launchMode || 'unknown')}\``,
             `- Failure: ${report.failureReason ? `\`${String(report.failureReason)}\`` : 'none'}`,
             `- OPFS ready: ${opfsReady === null ? 'unknown' : `\`${String(opfsReady)}\``}`,
@@ -226,6 +228,8 @@ jobs:
           const lines = [
             '## Edge Extension E2E',
             `- Status: \`${String(report.status || 'unknown')}\``,
+            `- Skipped verification: \`${String(report.skippedVerification === true)}\``,
+            `- Skip reason: ${report.skipReason ? `\`${String(report.skipReason)}\`` : 'none'}`,
             `- Launch mode: \`${String(report.launchMode || 'unknown')}\``,
             `- Failure: ${report.failureReason ? `\`${String(report.failureReason)}\`` : 'none'}`,
             `- OPFS ready: ${opfsReady === null ? 'unknown' : `\`${String(opfsReady)}\``}`,
