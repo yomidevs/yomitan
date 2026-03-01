@@ -17,6 +17,7 @@
  */
 
 import {PanelElement} from '../../dom/panel-element.js';
+import {reportDiagnostics} from '../../core/diagnostics-reporter.js';
 
 export class Modal extends PanelElement {
     /**
@@ -48,7 +49,45 @@ export class Modal extends PanelElement {
         }
     }
 
+    /**
+     * @param {boolean} value
+     * @param {boolean} [animate]
+     */
+    setVisible(value, animate = true) {
+        const wasVisible = this.isVisible();
+        super.setVisible(value, animate);
+        const visible = this.isVisible();
+        if (visible === wasVisible) { return; }
+        const modalId = this._getModalId();
+        globalThis.dispatchEvent(new CustomEvent('manabitan:modal-visibility-changed', {
+            detail: {
+                modalId,
+                visible,
+                animate,
+                source: 'modal.setVisible',
+            },
+        }));
+        if (modalId === 'recommended-dictionaries') {
+            reportDiagnostics('recommended-dictionaries-modal-framework-visibility', {
+                modalId,
+                visible,
+                animate,
+                source: 'modal.setVisible',
+            });
+        }
+    }
+
     // Private
+
+    /**
+     * @returns {string|null}
+     */
+    _getModalId() {
+        const id = this.node.id;
+        if (typeof id !== 'string' || id.length === 0) { return null; }
+        const suffix = '-modal';
+        return id.endsWith(suffix) ? id.slice(0, -suffix.length) : id;
+    }
 
     /**
      * @param {MouseEvent} e

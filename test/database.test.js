@@ -249,6 +249,28 @@ describe('Database', () => {
                 await dictionaryDatabase.close();
             });
         });
+
+        test('Rejects unsupported dictionary index versions', async ({expect}) => {
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const testDictionarySource = await createTestDictionaryArchiveData('invalid-dictionary1');
+
+            /** @type {import('dictionary-importer').ImportDetails} */
+            const importDetails = {prefixWildcardsSupported: false, yomitanVersion: '0.0.0.0'};
+            try {
+                const {result, errors} = await createDictionaryImporter(expect).importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    importDetails,
+                );
+                expect.soft(result).toBeNull();
+                expect.soft(errors.some((error) => error.message.includes('Unsupported dictionary format version: 0'))).toBe(true);
+                expect.soft(await dictionaryDatabase.getDictionaryInfo()).toStrictEqual([]);
+            } finally {
+                await dictionaryDatabase.close();
+            }
+        });
     });
     describe('Database valid usage', () => {
         const testDataFilePath = join(dirname, 'data/database-test-cases.json');
@@ -494,6 +516,201 @@ describe('Database', () => {
 
             // Close
             await dictionaryDatabase.close();
+        });
+
+        test('Removes partially imported dictionaries after import failure', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const originalBulkAdd = dictionaryDatabase.bulkAdd.bind(dictionaryDatabase);
+            let injectedFailureTriggered = false;
+            const bulkAddSpy = vi.spyOn(dictionaryDatabase, 'bulkAdd').mockImplementation(async (...args) => {
+                const [objectStoreName] = args;
+                await originalBulkAdd(...args);
+                if (objectStoreName === 'termMeta') {
+                    injectedFailureTriggered = true;
+                    throw new Error('Injected import failure');
+                }
+            });
+
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(injectedFailureTriggered).toBe(true);
+                expect.soft(result).toBeNull();
+                expect.soft(errors.some((error) => error.message.includes('Injected import failure'))).toBe(true);
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info).toStrictEqual([]);
+
+                const counts = await dictionaryDatabase.getDictionaryCounts([], true);
+                expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
+            } finally {
+                bulkAddSpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
+        });
+
+        test('Cleans incomplete dictionaries during prepare', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            const dictionaryImporter = createDictionaryImporter(expect);
+
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+            // eslint-disable-next-line no-underscore-dangle
+            const db = dictionaryDatabase._requireDb();
+            const summaryRow = db.selectObject('SELECT summaryJson FROM dictionaries WHERE title = $title LIMIT 1', {$title: testDictionaryIndex.title});
+            expect.soft(typeof summaryRow).toBe('object');
+            if (typeof summaryRow === 'undefined') {
+                throw new Error('Imported dictionary summary row missing');
+            }
+            const summaryJson = summaryRow.summaryJson;
+            expect.soft(typeof summaryJson).toBe('string');
+            if (typeof summaryJson !== 'string') {
+                throw new Error('Imported dictionary summaryJson is not a string');
+            }
+            const summary = /** @type {{importSuccess?: boolean}} */ (parseJson(summaryJson));
+            summary.importSuccess = false;
+            db.exec({
+                sql: 'UPDATE dictionaries SET summaryJson = $summaryJson WHERE title = $title',
+                bind: {
+                    $summaryJson: JSON.stringify(summary),
+                    $title: testDictionaryIndex.title,
+                },
+            });
+            await dictionaryDatabase.close();
+
+            const reopenedDictionaryDatabase = new DictionaryDatabase();
+            await reopenedDictionaryDatabase.prepare();
+            try {
+                const info = await reopenedDictionaryDatabase.getDictionaryInfo();
+                expect.soft(info).toStrictEqual([]);
+
+                const counts = await reopenedDictionaryDatabase.getDictionaryCounts([], true);
+                expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
+            } finally {
+                await reopenedDictionaryDatabase.close();
+            }
+        });
+
+        test('Cleans dictionaries with corrupted summary JSON during prepare', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            const dictionaryImporter = createDictionaryImporter(expect);
+
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+            // eslint-disable-next-line no-underscore-dangle
+            const db = dictionaryDatabase._requireDb();
+            db.exec({
+                sql: 'UPDATE dictionaries SET summaryJson = $summaryJson WHERE title = $title',
+                bind: {
+                    $summaryJson: '{invalid-json',
+                    $title: testDictionaryIndex.title,
+                },
+            });
+            await dictionaryDatabase.close();
+
+            const reopenedDictionaryDatabase = new DictionaryDatabase();
+            await reopenedDictionaryDatabase.prepare();
+            try {
+                const info = await reopenedDictionaryDatabase.getDictionaryInfo();
+                expect.soft(info).toStrictEqual([]);
+
+                const counts = await reopenedDictionaryDatabase.getDictionaryCounts([], true);
+                expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
+            } finally {
+                await reopenedDictionaryDatabase.close();
+            }
+        });
+
+        test('Reports startup cleanup summary counts and failures', async ({expect}) => {
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            // eslint-disable-next-line no-underscore-dangle
+            const db = dictionaryDatabase._requireDb();
+            db.exec({
+                sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
+                bind: {
+                    $title: 'Healthy',
+                    $version: 3,
+                    $summaryJson: JSON.stringify({title: 'Healthy', revision: '1', version: 3, importSuccess: true}),
+                },
+            });
+            db.exec({
+                sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
+                bind: {
+                    $title: '',
+                    $version: 3,
+                    $summaryJson: JSON.stringify({title: '', revision: '1', version: 3, importSuccess: false}),
+                },
+            });
+            db.exec({
+                sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
+                bind: {
+                    $title: 'Broken Parse',
+                    $version: 3,
+                    $summaryJson: '{broken-json',
+                },
+            });
+            db.exec({
+                sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
+                bind: {
+                    $title: 'Broken Flag',
+                    $version: 3,
+                    $summaryJson: JSON.stringify({title: 'Broken Flag', revision: '1', version: 3, importSuccess: false}),
+                },
+            });
+
+            const originalDeleteDictionary = dictionaryDatabase.deleteDictionary.bind(dictionaryDatabase);
+            const deleteDictionarySpy = vi.spyOn(dictionaryDatabase, 'deleteDictionary').mockImplementation(async (title, deleteStepSize, onProgress) => {
+                if (title === 'Broken Flag') {
+                    throw new Error('Injected startup cleanup delete failure');
+                }
+                await originalDeleteDictionary(title, deleteStepSize, onProgress);
+            });
+
+            try {
+                const cleanupMethod = Reflect.get(dictionaryDatabase, '_cleanupIncompleteImports');
+                if (typeof cleanupMethod !== 'function') {
+                    throw new Error('Expected _cleanupIncompleteImports method');
+                }
+                const summary = await Promise.resolve(cleanupMethod.call(dictionaryDatabase));
+                expect.soft(summary).toStrictEqual({
+                    scannedCount: 4,
+                    removedCount: 2,
+                    removedTitles: ['Broken Parse'],
+                    removedEmptyTitleRows: 1,
+                    failedCount: 1,
+                    failedTitles: ['Broken Flag'],
+                    parseErrorCount: 1,
+                });
+
+                const remainingTitles = db.selectObjects('SELECT title FROM dictionaries ORDER BY title ASC').map((row) => row.title);
+                expect.soft(remainingTitles).toStrictEqual(['Broken Flag', 'Healthy']);
+            } finally {
+                deleteDictionarySpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
         });
     });
     describe('Database cleanup', () => {

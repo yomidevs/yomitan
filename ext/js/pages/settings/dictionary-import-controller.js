@@ -17,6 +17,7 @@
  */
 
 import {ExtensionError} from '../../core/extension-error.js';
+import {reportDiagnostics} from '../../core/diagnostics-reporter.js';
 import {parseJson, readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {safePerformance} from '../../core/safe-performance.js';
@@ -32,6 +33,38 @@ import {DictionaryController} from './dictionary-controller.js';
  */
 function formatDurationMs(valueMs) {
     return `${valueMs.toFixed(1)}ms`;
+}
+
+/**
+ * @param {string} url
+ * @returns {string}
+ */
+function summarizeUrlForDiagnostics(url) {
+    const trimmed = url.trim();
+    if (trimmed.startsWith('manabitan-e2e-dict:')) { return trimmed; }
+    try {
+        const parsed = new URL(trimmed);
+        return `${parsed.origin}${parsed.pathname}`;
+    } catch (_) {
+        return trimmed;
+    }
+}
+
+/**
+ * @returns {{name: string, version: string, id: string}|null}
+ */
+function getExtensionBuildStamp() {
+    try {
+        const manifest = chrome.runtime.getManifest();
+        const id = typeof chrome.runtime.id === 'string' ? chrome.runtime.id : '';
+        return {
+            name: typeof manifest.name === 'string' ? manifest.name : '',
+            version: typeof manifest.version === 'string' ? manifest.version : '',
+            id,
+        };
+    } catch (_) {
+        return null;
+    }
 }
 
 export class DictionaryImportController {
@@ -67,8 +100,14 @@ export class DictionaryImportController {
         this._importURLText = querySelectorNotNull(document, '#dictionary-import-url-text');
         /** @type {?import('./modal.js').Modal} */
         this._purgeConfirmModal = null;
+        /** @type {?import('./modal.js').Modal} */
+        this._recommendedDictionariesModal = null;
         /** @type {HTMLElement} */
         this._errorContainer = querySelectorNotNull(document, '#dictionary-error');
+        /** @type {HTMLElement|null} */
+        this._recommendedDiagnosticsContainer = document.querySelector('#recommended-dictionaries-diagnostics');
+        /** @type {boolean} */
+        this._showRecommendedDiagnosticsInUi = (Reflect.get(globalThis, 'manabitanShowRecommendedDiagnosticsInUi') === true);
         /** @type {[originalMessage: string, newMessage: string][]} */
         this._errorToStringOverrides = [
             [
@@ -86,12 +125,29 @@ export class DictionaryImportController {
         this._recommendedDictionaryActiveImport = false;
         /** @type {DictionaryWorker|null} */
         this._sessionDictionaryWorker = null;
+        /** @type {boolean} */
+        this._recommendedDictionariesRenderPending = false;
+        /** @type {boolean} */
+        this._recommendedDictionariesPrimed = false;
+        /** @type {(event: MouseEvent) => void} */
+        this._onDocumentClickCaptureBind = this._onDocumentClickCapture.bind(this);
+        /** @type {(event: Event) => void} */
+        this._onModalVisibilityChangedEventBind = this._onModalVisibilityChangedEvent.bind(this);
+        /** @type {(details: {visible: boolean}) => void} */
+        this._onRecommendedDictionariesModalVisibilityChangedBind = this._onRecommendedDictionariesModalVisibilityChanged.bind(this);
+        reportDiagnostics('dictionary-import-controller-constructed', {
+            href: globalThis.location?.href ?? null,
+        });
     }
 
     /** */
     prepare() {
+        reportDiagnostics('dictionary-import-controller-prepare-begin', {
+            href: globalThis.location?.href ?? null,
+        });
         this._importModal = this._modalController.getModal('dictionary-import');
         this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
+        this._recommendedDictionariesModal = this._modalController.getModal('recommended-dictionaries');
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
@@ -107,11 +163,15 @@ export class DictionaryImportController {
 
         this._settingsController.on('importDictionaryFromUrl', this._onEventImportDictionaryFromUrl.bind(this));
 
-        const recommendedDictionaryButton = document.querySelector('[data-modal-action="show,recommended-dictionaries"]');
-        if (recommendedDictionaryButton) {
-            recommendedDictionaryButton.addEventListener('click', this._renderRecommendedDictionaries.bind(this), false);
-        }
+        document.addEventListener('click', this._onDocumentClickCaptureBind, true);
+        globalThis.addEventListener('manabitan:modal-visibility-changed', this._onModalVisibilityChangedEventBind, false);
+        this._recommendedDictionariesModal?.on('visibilityChanged', this._onRecommendedDictionariesModalVisibilityChangedBind);
         globalThis.addEventListener('beforeunload', this._onBeforeUnload.bind(this), {once: true});
+        reportDiagnostics('dictionary-import-controller-prepare-complete', {
+            hasRecommendedModal: this._recommendedDictionariesModal !== null,
+            href: globalThis.location?.href ?? null,
+        });
+        this._primeRecommendedDictionaries('prepare');
     }
 
     // Private
@@ -147,6 +207,9 @@ export class DictionaryImportController {
 
     /** */
     _onBeforeUnload() {
+        document.removeEventListener('click', this._onDocumentClickCaptureBind, true);
+        globalThis.removeEventListener('manabitan:modal-visibility-changed', this._onModalVisibilityChangedEventBind, false);
+        this._recommendedDictionariesModal?.off('visibilityChanged', this._onRecommendedDictionariesModalVisibilityChangedBind);
         if (this._sessionDictionaryWorker !== null) {
             this._sessionDictionaryWorker.destroy();
             this._sessionDictionaryWorker = null;
@@ -154,54 +217,228 @@ export class DictionaryImportController {
     }
 
     /**
+     * @param {{visible: boolean}} details
+     */
+    _onRecommendedDictionariesModalVisibilityChanged({visible}) {
+        if (!visible || this._recommendedDictionariesRenderPending) { return; }
+        this._recommendedDictionariesRenderPending = true;
+        void this._onRecommendedDictionariesOpen();
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onDocumentClickCapture(e) {
+        const target = e.target;
+        if (!(target instanceof Element)) { return; }
+        const actionNode = target.closest('[data-modal-action="show,recommended-dictionaries"]');
+        if (!(actionNode instanceof HTMLElement)) { return; }
+        reportDiagnostics('recommended-dictionaries-click-capture', {
+            pending: this._recommendedDictionariesRenderPending,
+            href: globalThis.location?.href ?? null,
+        });
+        if (this._recommendedDictionariesRenderPending) { return; }
+        this._recommendedDictionariesRenderPending = true;
+        void this._onRecommendedDictionariesOpen();
+    }
+
+    /**
+     * @param {Event} event
+     */
+    _onModalVisibilityChangedEvent(event) {
+        if (!(event instanceof CustomEvent)) { return; }
+        const detail = /** @type {unknown} */ (event.detail);
+        if (!(typeof detail === 'object' && detail !== null)) { return; }
+        if (Reflect.get(detail, 'modalId') !== 'recommended-dictionaries') { return; }
+        if (Reflect.get(detail, 'visible') !== true) { return; }
+        reportDiagnostics('recommended-dictionaries-modal-visibility-listener', {
+            pending: this._recommendedDictionariesRenderPending,
+            source: Reflect.get(detail, 'source'),
+            animate: Reflect.get(detail, 'animate'),
+            href: globalThis.location?.href ?? null,
+        });
+        if (this._recommendedDictionariesRenderPending) { return; }
+        reportDiagnostics('recommended-dictionaries-modal-visible-event', {
+            source: Reflect.get(detail, 'source'),
+            animate: Reflect.get(detail, 'animate'),
+        });
+        this._recommendedDictionariesRenderPending = true;
+        void this._onRecommendedDictionariesOpen();
+    }
+
+    /**
+     * @param {string} source
+     */
+    _primeRecommendedDictionaries(source) {
+        if (this._recommendedDictionariesPrimed || this._recommendedDictionariesRenderPending) { return; }
+        this._recommendedDictionariesRenderPending = true;
+        const startedAt = safePerformance.now();
+        reportDiagnostics('recommended-dictionaries-prime-begin', {
+            source,
+            href: globalThis.location?.href ?? null,
+        });
+        void (async () => {
+            try {
+                await this._renderRecommendedDictionaries();
+                this._recommendedDictionariesPrimed = true;
+                reportDiagnostics('recommended-dictionaries-prime-complete', {
+                    source,
+                    elapsedMs: Math.max(0, safePerformance.now() - startedAt),
+                });
+            } catch (error) {
+                const e = toError(error);
+                reportDiagnostics('recommended-dictionaries-prime-failed', {
+                    source,
+                    message: e.message,
+                });
+                log.error(e);
+            } finally {
+                this._recommendedDictionariesRenderPending = false;
+            }
+        })();
+    }
+
+    /**
      * @param {MouseEvent} e
      */
     async _onRecommendedImportClick(e) {
-        if (!e.target || !(e.target instanceof HTMLButtonElement)) { return; }
+        if (!e.target || !(e.target instanceof HTMLButtonElement)) {
+            reportDiagnostics('recommended-dictionaries-import-click-ignored', {
+                reason: 'target-not-button',
+                targetType: typeof e.target,
+            });
+            return;
+        }
 
         const import_url = e.target.attributes.getNamedItem('data-import-url');
-        if (!import_url) { return; }
-        this._recommendedDictionaryQueue.push(import_url.value);
+        if (!import_url) {
+            reportDiagnostics('recommended-dictionaries-import-click-ignored', {
+                reason: 'missing-data-import-url',
+                buttonText: e.target.textContent ?? '',
+            });
+            return;
+        }
+        const importUrl = import_url.value;
+        this._recommendedDictionaryQueue.push(importUrl);
 
         e.target.disabled = true;
+        reportDiagnostics('recommended-dictionaries-import-clicked', {
+            importUrl: summarizeUrlForDiagnostics(importUrl),
+            queueLength: this._recommendedDictionaryQueue.length,
+        });
 
         if (this._recommendedDictionaryActiveImport) { return; }
 
-        while (this._recommendedDictionaryQueue.length > 0) {
-            this._recommendedDictionaryActiveImport = true;
-            try {
+        this._recommendedDictionaryActiveImport = true;
+        try {
+            while (this._recommendedDictionaryQueue.length > 0) {
                 const url = this._recommendedDictionaryQueue[0];
-                if (!url) { continue; }
+                if (!url) {
+                    void this._recommendedDictionaryQueue.shift();
+                    continue;
+                }
+                reportDiagnostics('recommended-dictionaries-import-queue-item-start', {
+                    importUrl: summarizeUrlForDiagnostics(url),
+                    queueLength: this._recommendedDictionaryQueue.length,
+                });
 
-                const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), 1);
-                const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
-                await this._importDictionaries(
-                    this._generateFilesFromUrls([url], onProgress),
-                    null,
-                    null,
-                    importProgressTracker,
-                );
-                void this._recommendedDictionaryQueue.shift();
-            } catch (error) {
-                log.error(error);
+                try {
+                    const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), 1);
+                    const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
+                    await this._importDictionaries(
+                        this._generateFilesFromUrls([url], onProgress),
+                        null,
+                        null,
+                        importProgressTracker,
+                    );
+                } catch (error) {
+                    const e2 = toError(error);
+                    log.error(e2);
+                    this._showErrors([e2]);
+                    reportDiagnostics('recommended-dictionaries-import-failed', {
+                        importUrl: summarizeUrlForDiagnostics(url),
+                        message: e2.message,
+                    });
+                    this._setRecommendedImportButtonDisabled(url, false);
+                } finally {
+                    void this._recommendedDictionaryQueue.shift();
+                    reportDiagnostics('recommended-dictionaries-import-queue-item-finished', {
+                        importUrl: summarizeUrlForDiagnostics(url),
+                        queueLength: this._recommendedDictionaryQueue.length,
+                    });
+                }
             }
+        } finally {
+            this._recommendedDictionaryActiveImport = false;
+            reportDiagnostics('recommended-dictionaries-import-queue-idle', {
+                queueLength: this._recommendedDictionaryQueue.length,
+            });
         }
-        this._recommendedDictionaryActiveImport = false;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _onRecommendedDictionariesOpen() {
+        const startedAt = safePerformance.now();
+        log.log('[recommended-dictionaries] open requested');
+        const buildStamp = getExtensionBuildStamp();
+        let buildStampText = 'build=unknown';
+        if (buildStamp !== null) {
+            buildStampText = `build=${buildStamp.name} v${buildStamp.version} id=${buildStamp.id}`;
+        }
+        this._setRecommendedDiagnostics(`${buildStampText}\nLoading recommended dictionaries...`);
+        reportDiagnostics('recommended-dictionaries-open-requested', {
+            buildStamp,
+        });
+        try {
+            await this._renderRecommendedDictionaries();
+            const endedAt = safePerformance.now();
+            log.log(`[recommended-dictionaries] render completed in ${formatDurationMs(endedAt - startedAt)}`);
+        } catch (error) {
+            const e = toError(error);
+            log.error(e);
+            this._setRecommendedDiagnostics(`FAILED to render recommended dictionaries:\n${e.message}`);
+            reportDiagnostics('recommended-dictionaries-open-failed', {
+                message: e.message,
+            });
+            this._showErrors([e]);
+        } finally {
+            this._recommendedDictionariesRenderPending = false;
+        }
     }
 
     /** */
     async _renderRecommendedDictionaries() {
         const url = '../../data/recommended-dictionaries.json';
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
+        /** @type {string[]} */
+        const diagnostics = [];
+        diagnostics.push(`source=${url}`);
+        /** @type {import('dictionary-recommended.js').RecommendedDictionaries|null} */
+        let recommendedDictionaries = null;
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                mode: 'no-cors',
+                cache: 'default',
+                credentials: 'omit',
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ${url}: ${response.status}`);
+            }
+            recommendedDictionaries = (await readResponseJson(response));
+            diagnostics.push('fetch=ok');
+        } catch (error) {
+            log.warn(`Using fallback recommended dictionaries due to fetch/parse error: ${toError(error).message}`);
+            diagnostics.push(`fetch=failed:${toError(error).message}`);
+        }
+        if (!(recommendedDictionaries && typeof recommendedDictionaries === 'object' && !Array.isArray(recommendedDictionaries))) {
+            recommendedDictionaries = this._getFallbackRecommendedDictionaries();
+            diagnostics.push('feed=fallback');
+        } else {
+            diagnostics.push('feed=extension-data');
         }
 
         /** @type {import('dictionary-recommended.js').RecommendedDictionaryElementMap[]} */
@@ -213,11 +450,34 @@ export class DictionaryImportController {
             {property: 'pronunciation', element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-pronunciation-dictionaries'), '.recommended-dictionary-list')},
         ];
 
-        const language = (await this._settingsController.getOptions()).general.language;
-        /** @type {import('dictionary-recommended.js').RecommendedDictionaries} */
-        const recommendedDictionaries = (await readResponseJson(response));
+        const language = String((await this._settingsController.getOptions()).general.language || '').trim();
+        const languageCandidates = [];
+        if (language.length > 0) {
+            languageCandidates.push(language);
+            const baseLanguage = language.split('-')[0];
+            if (baseLanguage.length > 0 && baseLanguage !== language) {
+                languageCandidates.push(baseLanguage);
+            }
+        }
+        if (!languageCandidates.includes('ja')) {
+            languageCandidates.push('ja');
+        }
+        const categories = ['terms', 'kanji', 'frequency', 'grammar', 'pronunciation'];
+        let resolvedLanguage = languageCandidates.find((candidate) => candidate in recommendedDictionaries);
+        if (typeof resolvedLanguage === 'string') {
+            const languageConfig = /** @type {Record<string, unknown>} */ (recommendedDictionaries[resolvedLanguage]);
+            const hasAnyRecommendedEntries = categories.some((category) => {
+                const values = Reflect.get(languageConfig, category);
+                return Array.isArray(values) && values.length > 0;
+            });
+            if (!hasAnyRecommendedEntries && resolvedLanguage !== 'ja' && ('ja' in recommendedDictionaries)) {
+                resolvedLanguage = 'ja';
+            }
+        }
 
-        if (!(language in recommendedDictionaries)) {
+        if (typeof resolvedLanguage !== 'string') {
+            diagnostics.push(`requestedLanguage="${language}" resolvedLanguage=none`);
+            this._setRecommendedDiagnostics(diagnostics.join('\n'));
             for (const {element} of recommendedDictionaryCategories) {
                 const dictionaryCategoryParent = element.parentElement;
                 if (dictionaryCategoryParent) {
@@ -227,27 +487,119 @@ export class DictionaryImportController {
             return;
         }
 
-        const installedDictionaries = await this._settingsController.getDictionaryInfo();
+        /** @type {import('dictionary-importer').Summary[]} */
+        let installedDictionaries = [];
+        try {
+            installedDictionaries = await this._settingsController.getDictionaryInfo();
+            diagnostics.push(`installedQuery=ok count=${String(installedDictionaries.length)}`);
+        } catch (error) {
+            const e = toError(error);
+            log.warn(`[recommended-dictionaries] getDictionaryInfo failed; continuing with empty installed set. ${e.message}`);
+            diagnostics.push(`installedQuery=failed:${e.message}`);
+        }
         /** @type {Set<string>} */
         const installedDictionaryNames = new Set();
         /** @type {Set<string>} */
         const installedDictionaryDownloadUrls = new Set();
         for (const dictionary of installedDictionaries) {
-            installedDictionaryNames.add(dictionary.title);
-            if (dictionary.downloadUrl) {
-                installedDictionaryDownloadUrls.add(dictionary.downloadUrl);
+            if (!(typeof dictionary === 'object' && dictionary !== null && !Array.isArray(dictionary))) {
+                continue;
+            }
+            const titleValue = /** @type {unknown} */ (Reflect.get(dictionary, 'title'));
+            const downloadUrlValue = /** @type {unknown} */ (Reflect.get(dictionary, 'downloadUrl'));
+            const title = typeof titleValue === 'string' ? titleValue : '';
+            const downloadUrl = typeof downloadUrlValue === 'string' ? downloadUrlValue : '';
+            if (title.length > 0) {
+                installedDictionaryNames.add(title);
+            }
+            if (downloadUrl.length > 0) {
+                installedDictionaryDownloadUrls.add(downloadUrl);
             }
         }
 
+        /** @type {number} */
+        let renderedRecommendationCount = 0;
         for (const {property, element} of recommendedDictionaryCategories) {
-            this._renderRecommendedDictionaryGroup(recommendedDictionaries[language][property], element, installedDictionaryNames, installedDictionaryDownloadUrls);
+            const languageConfig = /** @type {Record<string, unknown>} */ (recommendedDictionaries[resolvedLanguage]);
+            const values = Reflect.get(languageConfig, property);
+            const dictionariesForCategory = /** @type {import('dictionary-recommended.js').RecommendedDictionary[]} */ (Array.isArray(values) ? values : []);
+            renderedRecommendationCount += dictionariesForCategory.length;
+            this._renderRecommendedDictionaryGroup(dictionariesForCategory, element, installedDictionaryNames, installedDictionaryDownloadUrls);
         }
+
+        if (renderedRecommendationCount === 0 && resolvedLanguage !== 'ja' && ('ja' in recommendedDictionaries)) {
+            log.warn(`[recommended-dictionaries] zero entries for "${resolvedLanguage}", falling back to "ja"`);
+            for (const {property, element} of recommendedDictionaryCategories) {
+                const jaConfig = /** @type {Record<string, unknown>} */ (recommendedDictionaries.ja);
+                const values = Reflect.get(jaConfig, property);
+                const dictionariesForCategory = /** @type {import('dictionary-recommended.js').RecommendedDictionary[]} */ (Array.isArray(values) ? values : []);
+                this._renderRecommendedDictionaryGroup(dictionariesForCategory, element, installedDictionaryNames, installedDictionaryDownloadUrls);
+            }
+            diagnostics.push('renderedFrom=ja-fallback');
+        } else {
+            diagnostics.push(`renderedFrom=${resolvedLanguage}`);
+        }
+        log.log(`[recommended-dictionaries] resolvedLanguage="${resolvedLanguage}" renderedCount=${String(renderedRecommendationCount)}`);
+        diagnostics.push(
+            `requestedLanguage="${language}" resolvedLanguage="${resolvedLanguage}"`,
+            `renderedRecommendationCount=${String(renderedRecommendationCount)}`,
+        );
+        this._setRecommendedDiagnostics(diagnostics.join('\n'));
+        reportDiagnostics('recommended-dictionaries-render', {
+            requestedLanguage: language,
+            resolvedLanguage,
+            renderedRecommendationCount,
+            diagnostics,
+        });
 
         /** @type {NodeListOf<HTMLElement>} */
         const buttons = document.querySelectorAll('.action-button[data-action=import-recommended-dictionary]');
         for (const button of buttons) {
             button.addEventListener('click', this._onRecommendedImportClick.bind(this), false);
         }
+    }
+
+    /**
+     * @param {string} text
+     */
+    _setRecommendedDiagnostics(text) {
+        const container = this._recommendedDiagnosticsContainer;
+        if (!(container instanceof HTMLElement)) { return; }
+        if (!this._showRecommendedDiagnosticsInUi) {
+            container.textContent = '';
+            container.hidden = true;
+            return;
+        }
+        container.textContent = text;
+        container.hidden = false;
+    }
+
+    /**
+     * @returns {import('dictionary-recommended.js').RecommendedDictionaries}
+     */
+    _getFallbackRecommendedDictionaries() {
+        return {
+            ja: {
+                terms: [
+                    {
+                        name: 'Jitendex',
+                        description: 'Japanese-to-English dictionary with example sentences and usage notes.',
+                        homepage: 'https://jitendex.org',
+                        downloadUrl: 'https://github.com/stephenmk/stephenmk.github.io/releases/latest/download/jitendex-yomitan.zip',
+                    },
+                    {
+                        name: 'JMdict',
+                        description: 'Large Japanese multilingual dictionary from the Electronic Dictionary Research and Development Group.',
+                        homepage: 'https://www.edrdg.org/jmdict/j_jmdict.html',
+                        downloadUrl: 'https://github.com/yomidevs/jmdict-yomitan/releases/latest/download/JMdict_english.zip',
+                    },
+                ],
+                kanji: [],
+                frequency: [],
+                grammar: [],
+                pronunciation: [],
+            },
+        };
     }
 
     /**
@@ -297,6 +649,19 @@ export class DictionaryImportController {
 
                 dictionariesList.append(template);
             }
+        }
+    }
+
+    /**
+     * @param {string} importUrl
+     * @param {boolean} disabled
+     */
+    _setRecommendedImportButtonDisabled(importUrl, disabled) {
+        /** @type {NodeListOf<HTMLButtonElement>} */
+        const buttons = document.querySelectorAll('.action-button[data-action=import-recommended-dictionary]');
+        for (const button of buttons) {
+            if (button.dataset.importUrl !== importUrl) { continue; }
+            button.disabled = disabled;
         }
     }
 
@@ -513,6 +878,9 @@ export class DictionaryImportController {
             const trimmedUrl = url.trim();
             const downloadStartTime = safePerformance.now();
             log.log(`[ImportTiming] download started: ${trimmedUrl}`);
+            reportDiagnostics('dictionary-url-download-begin', {
+                url: summarizeUrlForDiagnostics(trimmedUrl),
+            });
 
             try {
                 if (trimmedUrl.startsWith('manabitan-e2e-dict:')) {
@@ -525,6 +893,12 @@ export class DictionaryImportController {
                     const file = new File([this._base64ToUint8Array(inlineArchiveBase64)], `${safeName}.zip`, {type: 'application/zip'});
                     const downloadEndTime = safePerformance.now();
                     log.log(`[ImportTiming] download completed in ${formatDurationMs(downloadEndTime - downloadStartTime)}: ${trimmedUrl} (inline archive)`);
+                    reportDiagnostics('dictionary-url-download-complete', {
+                        url: summarizeUrlForDiagnostics(trimmedUrl),
+                        inline: true,
+                        elapsedMs: Math.max(0, downloadEndTime - downloadStartTime),
+                        sizeBytes: file.size,
+                    });
                     yield file;
                     continue;
                 }
@@ -563,10 +937,21 @@ export class DictionaryImportController {
                 const file = await blobPromise;
                 const downloadEndTime = safePerformance.now();
                 log.log(`[ImportTiming] download completed in ${formatDurationMs(downloadEndTime - downloadStartTime)}: ${trimmedUrl}`);
+                reportDiagnostics('dictionary-url-download-complete', {
+                    url: summarizeUrlForDiagnostics(trimmedUrl),
+                    inline: false,
+                    elapsedMs: Math.max(0, downloadEndTime - downloadStartTime),
+                    sizeBytes: file.size,
+                });
                 yield file;
             } catch (error) {
                 const downloadEndTime = safePerformance.now();
                 log.log(`[ImportTiming] download failed after ${formatDurationMs(downloadEndTime - downloadStartTime)}: ${trimmedUrl}`);
+                reportDiagnostics('dictionary-url-download-failed', {
+                    url: summarizeUrlForDiagnostics(trimmedUrl),
+                    elapsedMs: Math.max(0, downloadEndTime - downloadStartTime),
+                    message: toError(error).message,
+                });
                 if (trimmedUrl.startsWith('manabitan-e2e-dict:')) {
                     throw error;
                 }
@@ -655,6 +1040,11 @@ export class DictionaryImportController {
         let errors = [];
         const useImportSession = this._getUseImportSession();
         log.log(`[ImportTiming] import session reuse enabled=${String(useImportSession)} (globalOverride=${String(this._getUseImportSession())})`);
+        reportDiagnostics('dictionary-import-session-begin', {
+            dictionaryCount: importProgressTracker.dictionaryCount,
+            useImportSession,
+            hasProfilesDictionarySettings: profilesDictionarySettings !== null,
+        });
         const dictionaryWorker = this._getDictionaryWorker(useImportSession);
         const importStartTime = safePerformance.now();
         try {
@@ -684,6 +1074,11 @@ export class DictionaryImportController {
                 if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
                 const dictionaryLoopStartTime = safePerformance.now();
                 const finalizeImportSession = useImportSession && i >= (importProgressTracker.dictionaryCount - 1);
+                reportDiagnostics('dictionary-import-item-begin', {
+                    index: i + 1,
+                    dictionaryCount: importProgressTracker.dictionaryCount,
+                    finalizeImportSession,
+                });
                 const nextDictionary = await dictionaries.next();
                 const fileValue = nextDictionary.done ? null : nextDictionary.value;
                 /** @type {File} */
@@ -695,6 +1090,11 @@ export class DictionaryImportController {
                     file = new File([blobPart], 'fileFromURL.zip', {type: 'application/zip'});
                 } else {
                     errors.push(new Error(`Failed to read file ${i + 1} of ${importProgressTracker.dictionaryCount} (value-type=${typeof fileValue}, value=${String(fileValue)}).`));
+                    reportDiagnostics('dictionary-import-item-invalid-file', {
+                        index: i + 1,
+                        dictionaryCount: importProgressTracker.dictionaryCount,
+                        valueType: typeof fileValue,
+                    });
                     continue;
                 }
                 errors = [
@@ -711,13 +1111,28 @@ export class DictionaryImportController {
                 ];
                 const dictionaryLoopEndTime = safePerformance.now();
                 log.log(`[ImportTiming] dictionary ${i + 1}/${importProgressTracker.dictionaryCount} total ${formatDurationMs(dictionaryLoopEndTime - dictionaryLoopStartTime)}`);
+                reportDiagnostics('dictionary-import-item-complete', {
+                    index: i + 1,
+                    dictionaryCount: importProgressTracker.dictionaryCount,
+                    elapsedMs: Math.max(0, dictionaryLoopEndTime - dictionaryLoopStartTime),
+                    cumulativeErrorCount: errors.length,
+                    fileName: file.name || null,
+                });
             }
         } catch (error) {
             errors.push(toError(error));
+            reportDiagnostics('dictionary-import-session-error', {
+                message: toError(error).message,
+            });
         } finally {
             importProgressTracker.onImportComplete(errors.length);
             const importEndTime = safePerformance.now();
             log.log(`[ImportTiming] import session complete in ${formatDurationMs(importEndTime - importStartTime)} (errors=${errors.length})`);
+            reportDiagnostics('dictionary-import-session-complete', {
+                dictionaryCount: importProgressTracker.dictionaryCount,
+                elapsedMs: Math.max(0, importEndTime - importStartTime),
+                errorCount: errors.length,
+            });
             this._showErrors(errors);
             prevention.end();
             for (const progress of [...progressContainers, ...recommendedProgressContainers]) { progress.hidden = true; }
@@ -807,6 +1222,12 @@ export class DictionaryImportController {
         const dictionaryTitle = file.name || 'unknown-dictionary';
         const importStartTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] starting import`);
+        reportDiagnostics('dictionary-import-zip-begin', {
+            dictionaryTitle,
+            sizeBytes: file.size,
+            useImportSession,
+            finalizeImportSession,
+        });
 
         const readStartTime = safePerformance.now();
         const archiveContent = await this._readFile(file);
@@ -860,6 +1281,11 @@ export class DictionaryImportController {
 
         const {result, errors, debug} = importResult;
         if (!result) {
+            reportDiagnostics('dictionary-import-zip-no-result', {
+                dictionaryTitle,
+                errorCount: Array.isArray(errors) ? errors.length : -1,
+                usesFallbackStorage: debug?.usesFallbackStorage ?? null,
+            });
             Reflect.set(globalThis, '__manabitanLastImportDebug', {
                 dictionaryTitle,
                 hasResult: false,
@@ -878,6 +1304,10 @@ export class DictionaryImportController {
         if (debug?.usesFallbackStorage === true) {
             const fallbackError = new Error(`OPFS is required for import but fallback storage was detected. diagnostics=${JSON.stringify(debug.openStorageDiagnostics ?? null)}`);
             const errorsWithOpfsRequirement = [...errors, fallbackError];
+            reportDiagnostics('dictionary-import-zip-opfs-fallback-detected', {
+                dictionaryTitle,
+                errorCount: errorsWithOpfsRequirement.length,
+            });
             Reflect.set(globalThis, '__manabitanLastImportDebug', {
                 dictionaryTitle,
                 hasResult: false,
@@ -942,6 +1372,13 @@ export class DictionaryImportController {
 
         const importEndTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] total import path ${formatDurationMs(importEndTime - importStartTime)} (errors=${errors.length + errors2.length})`);
+        reportDiagnostics('dictionary-import-zip-complete', {
+            dictionaryTitle,
+            elapsedMs: Math.max(0, importEndTime - importStartTime),
+            importErrors: errors.length,
+            settingsErrors: errors2.length,
+            resultTitle: result.title || null,
+        });
 
         if (errors.length > 0) {
             errors.push(new Error(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`));
@@ -1035,6 +1472,10 @@ export class DictionaryImportController {
      * @param {Error[]} errors
      */
     _showErrors(errors) {
+        reportDiagnostics('dictionary-import-errors-shown', {
+            errorCount: errors.length,
+            messages: errors.slice(0, 5).map((error) => this._errorToString(error)),
+        });
         /** @type {Map<string, number>} */
         const uniqueErrors = new Map();
         for (const error of errors) {

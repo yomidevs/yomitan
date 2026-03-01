@@ -21,10 +21,12 @@
 
 import {initWasm, Resvg} from '../../lib/resvg-wasm.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {log} from '../core/log.js';
 import {safePerformance} from '../core/safe-performance.js';
+import {toError} from '../core/to-error.js';
 import {stringReverse} from '../core/utilities.js';
 import {deleteOpfsDatabaseFiles, didLastOpenUseFallbackStorage, getLastOpenStorageDiagnostics, getSqlite3, importOpfsDatabase, openOpfsDatabase} from './sqlite-wasm.js';
 import {
@@ -150,6 +152,7 @@ export class DictionaryDatabase {
             await initializeTermContentZstd();
             this._termContentZstdInitialized = true;
             await this._deleteLegacyIndexedDb();
+            await this._cleanupIncompleteImports();
 
             // keep existing draw worker split behaviour.
             const isWorker = self.constructor.name !== 'Window';
@@ -1304,6 +1307,104 @@ export class DictionaryDatabase {
         const db = this._requireDb();
         const rows = db.selectObjects('SELECT summaryJson FROM dictionaries ORDER BY id ASC');
         return rows.map((row) => /** @type {import('dictionary-importer').Summary} */ (this._safeParseJson(this._asString(row.summaryJson), {})));
+    }
+
+    /**
+     * @returns {Promise<{
+     *   scannedCount: number,
+     *   removedCount: number,
+     *   removedTitles: string[],
+     *   removedEmptyTitleRows: number,
+     *   failedCount: number,
+     *   failedTitles: string[],
+     *   parseErrorCount: number
+     * }>}
+     */
+    async _cleanupIncompleteImports() {
+        const db = this._requireDb();
+        const rows = db.selectObjects('SELECT id, title, summaryJson FROM dictionaries ORDER BY id ASC');
+        if (rows.length === 0) {
+            const summary = {
+                scannedCount: 0,
+                removedCount: 0,
+                removedTitles: [],
+                removedEmptyTitleRows: 0,
+                failedCount: 0,
+                failedTitles: [],
+                parseErrorCount: 0,
+            };
+            reportDiagnostics('dictionary-startup-cleanup-summary', summary);
+            return summary;
+        }
+
+        /** @type {Set<string>} */
+        const dictionaryTitlesToDelete = new Set();
+        /** @type {number} */
+        let removedEmptyTitleRows = 0;
+        /** @type {number} */
+        let parseErrorCount = 0;
+        for (const row of rows) {
+            const id = this._asNumber(row.id, 0);
+            const title = this._asString(row.title).trim();
+            const summaryJson = this._asString(row.summaryJson);
+            let summaryParseFailed = false;
+            /** @type {unknown} */
+            let summary;
+            try {
+                summary = /** @type {unknown} */ (parseJson(summaryJson));
+            } catch (_) {
+                summary = null;
+                summaryParseFailed = true;
+            }
+            if (summaryParseFailed) {
+                parseErrorCount += 1;
+            }
+            const importSuccess = (
+                typeof summary === 'object' &&
+                summary !== null &&
+                !Array.isArray(summary)
+            ) ?
+                /** @type {unknown} */ (Reflect.get(summary, 'importSuccess')) :
+                void 0;
+            if (summary !== null && importSuccess !== false) {
+                continue;
+            }
+            if (title.length === 0) {
+                db.exec({sql: 'DELETE FROM dictionaries WHERE id = $id', bind: {$id: id}});
+                log.warn('Removed incomplete dictionary summary row with empty title.');
+                removedEmptyTitleRows += 1;
+                continue;
+            }
+            dictionaryTitlesToDelete.add(title);
+        }
+
+        /** @type {string[]} */
+        const removedTitles = [];
+        /** @type {string[]} */
+        const failedTitles = [];
+        for (const dictionaryTitle of dictionaryTitlesToDelete) {
+            try {
+                await this.deleteDictionary(dictionaryTitle, 1000, () => {});
+                log.warn(`Removed incomplete dictionary import during startup: ${dictionaryTitle}`);
+                removedTitles.push(dictionaryTitle);
+            } catch (e) {
+                const error = toError(e);
+                log.error(new Error(`Failed to remove incomplete dictionary import '${dictionaryTitle}': ${error.message}`));
+                failedTitles.push(dictionaryTitle);
+            }
+        }
+
+        const summary = {
+            scannedCount: rows.length,
+            removedCount: removedTitles.length + removedEmptyTitleRows,
+            removedTitles: [...removedTitles].sort((a, b) => a.localeCompare(b)),
+            removedEmptyTitleRows,
+            failedCount: failedTitles.length,
+            failedTitles: [...failedTitles].sort((a, b) => a.localeCompare(b)),
+            parseErrorCount,
+        };
+        reportDiagnostics('dictionary-startup-cleanup-summary', summary);
+        return summary;
     }
 
     /**

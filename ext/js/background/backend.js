@@ -27,6 +27,8 @@ import {fetchText} from '../core/fetch-utilities.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
+import {reportDiagnostics} from '../core/diagnostics-reporter.js';
+import {safePerformance} from '../core/safe-performance.js';
 import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
 import {generateAnkiNoteMediaFileName, INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
 import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
@@ -290,10 +292,64 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _prepareInternal() {
+        const prepareStartedAt = safePerformance.now();
+        /** @type {Array<{phase: string, durationMs: number}>} */
+        const preparePhases = [];
+        reportDiagnostics('backend-prepare-begin', {
+            context: self.constructor?.name ?? 'unknown',
+        });
+        /**
+         * @param {string} phase
+         * @param {number} startedAt
+         */
+        const recordPhase = (phase, startedAt) => {
+            preparePhases.push({
+                phase,
+                durationMs: Math.max(0, safePerformance.now() - startedAt),
+            });
+        };
+        /**
+         * @template T
+         * @param {string} phase
+         * @param {() => Promise<T>} callback
+         * @returns {Promise<T>}
+         */
+        const measureAsyncPhase = async (phase, callback) => {
+            const startedAt = safePerformance.now();
+            try {
+                return await callback();
+            } finally {
+                recordPhase(phase, startedAt);
+            }
+        };
         try {
-            this._prepareInternalSync();
+            {
+                const startedAt = safePerformance.now();
+                this._prepareInternalSync();
+                recordPhase('_prepareInternalSync', startedAt);
+            }
 
-            this._permissions = await getAllPermissions();
+            const permissionsPromise = measureAsyncPhase('getAllPermissions', async () => await getAllPermissions());
+            const requestBuilderPreparePromise = measureAsyncPhase('requestBuilder.prepare', async () => {
+                await this._requestBuilder.prepare();
+            });
+            const environmentPreparePromise = measureAsyncPhase('environment.prepare', async () => {
+                await this._environment.prepare();
+            });
+            let offscreenPreparePromise = Promise.resolve();
+            if (this._offscreen !== null) {
+                offscreenPreparePromise = measureAsyncPhase('offscreen.prepare', async () => {
+                    await this._offscreen?.prepare();
+                });
+            }
+            const optionsUtilPreparePromise = measureAsyncPhase('optionsUtil.prepare', async () => {
+                await this._optionsUtil.prepare();
+            });
+            const defaultTemplatesPromise = measureAsyncPhase('fetch(default-anki-field-templates)', async () => (
+                await fetchText('/data/templates/default-anki-field-templates.handlebars')
+            ).trim());
+
+            this._permissions = await permissionsPromise;
             this._defaultBrowserActionTitle = this._getBrowserIconTitle();
             this._badgePrepareDelayTimer = setTimeout(() => {
                 this._badgePrepareDelayTimer = null;
@@ -303,15 +359,16 @@ export class Backend {
 
             log.on('logGenericError', this._onLogGenericError.bind(this));
 
-            await this._requestBuilder.prepare();
-            await this._environment.prepare();
-            if (this._offscreen !== null) {
-                await this._offscreen.prepare();
-            }
+            await Promise.all([
+                requestBuilderPreparePromise,
+                environmentPreparePromise,
+                offscreenPreparePromise,
+            ]);
             this._clipboardReader.browser = this._environment.getInfo().browser;
 
             // if this is Firefox and therefore not running in Service Worker, we need to use a SharedWorker to setup a MessageChannel to postMessage with the popup
             if (self.constructor.name === 'Window') {
+                const startedAt = safePerformance.now();
                 const sharedWorkerBridge = new SharedWorker(new URL('../comm/shared-worker-bridge.js', import.meta.url), {type: 'module'});
                 sharedWorkerBridge.port.postMessage({action: 'registerBackendPort'});
                 sharedWorkerBridge.port.addEventListener('message', (/** @type {MessageEvent} */ e) => {
@@ -320,33 +377,71 @@ export class Backend {
                 });
                 sharedWorkerBridge.port.addEventListener('messageerror', this._onPmMessageError.bind(this));
                 sharedWorkerBridge.port.start();
+                recordPhase('sharedWorkerBridge.setup', startedAt);
             }
             try {
+                const startedAt = safePerformance.now();
                 await this._dictionaryDatabase.prepare();
+                recordPhase('dictionaryDatabase.prepare', startedAt);
             } catch (e) {
                 log.error(e);
             }
 
             void this._translator.prepare();
 
-            await this._optionsUtil.prepare();
-            this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
-            this._options = await this._optionsUtil.load();
+            await optionsUtilPreparePromise;
+            this._defaultAnkiFieldTemplates = await defaultTemplatesPromise;
+            {
+                const startedAt = safePerformance.now();
+                this._options = await this._optionsUtil.load();
+                recordPhase('optionsUtil.load', startedAt);
+            }
 
-            this._applyOptions('background');
+            await measureAsyncPhase('pruneStaleProfileDictionaryOptions', async () => {
+                await this._pruneStaleProfileDictionaryOptions();
+            });
 
-            this._attachOmniboxListener();
+            {
+                const startedAt = safePerformance.now();
+                this._applyOptions('background');
+                recordPhase('applyOptions(background)', startedAt);
+            }
 
+            {
+                const startedAt = safePerformance.now();
+                this._attachOmniboxListener();
+                recordPhase('attachOmniboxListener', startedAt);
+            }
+
+            const optionsStartedAt = safePerformance.now();
             const options = this._getProfileOptions({current: true}, false);
+            recordPhase('getProfileOptions(current)', optionsStartedAt);
             if (options.general.showGuide) {
                 void this._openWelcomeGuidePageOnce();
             }
 
-            this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
+            {
+                const startedAt = safePerformance.now();
+                this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
+                recordPhase('clipboardMonitor.on(change)', startedAt);
+            }
 
             this._sendMessageAllTabsIgnoreResponse({action: 'applicationBackendReady'});
             this._sendMessageIgnoreResponse({action: 'applicationBackendReady'});
+            reportDiagnostics('backend-prepare-complete', {
+                totalElapsedMs: Math.max(0, safePerformance.now() - prepareStartedAt),
+                phaseCount: preparePhases.length,
+                slowestPhases: [...preparePhases].sort((a, b) => b.durationMs - a.durationMs).slice(0, 10),
+                phases: preparePhases,
+            });
         } catch (e) {
+            reportDiagnostics('backend-prepare-failed', {
+                totalElapsedMs: Math.max(0, safePerformance.now() - prepareStartedAt),
+                phaseCount: preparePhases.length,
+                slowestPhases: [...preparePhases].sort((a, b) => b.durationMs - a.durationMs).slice(0, 10),
+                phases: preparePhases,
+                message: e instanceof Error ? e.message : String(e),
+            });
             log.error(e);
             throw e;
         } finally {
@@ -928,63 +1023,13 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getDictionaryInfo'>} */
     async _onApiGetDictionaryInfo() {
-        const dictionaries = await this._dictionaryDatabase.getDictionaryInfo();
-        if (dictionaries.length > 0) {
-            return dictionaries;
-        }
-        return this._getFallbackDictionaryInfoFromOptions();
+        return await this._dictionaryDatabase.getDictionaryInfo();
     }
 
     /** @type {import('api').ApiHandler<'purgeDatabase'>} */
     async _onApiPurgeDatabase() {
         await this._dictionaryDatabase.purge();
         this._triggerDatabaseUpdated('dictionary', 'purge');
-    }
-
-    /**
-     * @returns {import('dictionary-importer').Summary[]}
-     */
-    _getFallbackDictionaryInfoFromOptions() {
-        const options = this._options;
-        if (!(typeof options === 'object' && options !== null && Array.isArray(options.profiles))) {
-            return [];
-        }
-        /** @type {Set<string>} */
-        const seen = new Set();
-        /** @type {import('dictionary-importer').Summary[]} */
-        const result = [];
-        for (const profile of options.profiles) {
-            const dictionaries = profile?.options?.dictionaries;
-            if (!Array.isArray(dictionaries)) {
-                continue;
-            }
-            for (const dictionary of dictionaries) {
-                const title = typeof dictionary?.name === 'string' ? dictionary.name.trim() : '';
-                if (title.length === 0 || seen.has(title)) {
-                    continue;
-                }
-                seen.add(title);
-                result.push({
-                    title,
-                    revision: '',
-                    sequenced: false,
-                    version: 0,
-                    importDate: 0,
-                    prefixWildcardsSupported: false,
-                    counts: {
-                        terms: {total: 0},
-                        termMeta: {total: 0},
-                        kanji: {total: 0},
-                        kanjiMeta: {total: 0},
-                        tagMeta: {total: 0},
-                        media: {total: 0},
-                    },
-                    styles: '',
-                    importSuccess: false,
-                });
-            }
-        }
-        return result;
     }
 
     /** @type {import('api').ApiHandler<'exportDictionaryDatabase'>} */
@@ -2725,7 +2770,12 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _refreshDictionaryDatabaseAfterUpdate() {
-        if (!this._dictionaryDatabase.isPrepared()) {
+        const dictionaryDatabase = this._dictionaryDatabase;
+        if (!(
+            'isPrepared' in dictionaryDatabase &&
+            typeof dictionaryDatabase.isPrepared === 'function' &&
+            dictionaryDatabase.isPrepared()
+        )) {
             return;
         }
         if (this._dictionaryRefreshPromise !== null) {
@@ -2734,8 +2784,10 @@ export class Backend {
         }
         this._dictionaryRefreshPromise = (async () => {
             try {
-                await this._dictionaryDatabase.close();
-                await this._dictionaryDatabase.prepare();
+                if ('close' in dictionaryDatabase && typeof dictionaryDatabase.close === 'function') {
+                    await dictionaryDatabase.close();
+                }
+                await dictionaryDatabase.prepare();
             } catch (e) {
                 log.error(e);
             }
@@ -2755,6 +2807,144 @@ export class Backend {
         const options = this._getOptionsFull(false);
         await this._optionsUtil.save(options);
         this._applyOptions(source);
+    }
+
+    /**
+     * Removes dictionary option entries that no longer correspond to installed dictionaries.
+     * This keeps profile settings in sync with startup cleanup that removes incomplete imports.
+     * @returns {Promise<{
+     *   skipped: boolean,
+     *   reason: string,
+     *   message?: string,
+     *   removedEntryCount: number,
+     *   removedNames: string[],
+     *   affectedProfiles: number,
+     *   installedCount: number,
+     *   mainDictionaryResets: number,
+     *   sortFrequencyDictionaryResets: number
+     * }>}
+     */
+    async _pruneStaleProfileDictionaryOptions() {
+        const options = this._options;
+        if (options === null) {
+            return {
+                skipped: true,
+                reason: 'options-unavailable',
+                removedEntryCount: 0,
+                removedNames: [],
+                affectedProfiles: 0,
+                installedCount: 0,
+                mainDictionaryResets: 0,
+                sortFrequencyDictionaryResets: 0,
+            };
+        }
+
+        /** @type {import('dictionary-importer').Summary[]} */
+        let dictionaryInfo;
+        try {
+            dictionaryInfo = await this._dictionaryDatabase.getDictionaryInfo();
+        } catch (e) {
+            const error = e instanceof Error ? e : new Error(String(e));
+            const summary = {
+                skipped: true,
+                reason: 'dictionary-info-failed',
+                message: error.message,
+                removedEntryCount: 0,
+                removedNames: [],
+                affectedProfiles: 0,
+                installedCount: 0,
+                mainDictionaryResets: 0,
+                sortFrequencyDictionaryResets: 0,
+            };
+            reportDiagnostics('dictionary-options-prune-startup-skipped', summary);
+            log.warn(`Skipping startup dictionary options pruning; dictionary info unavailable: ${error.message}`);
+            return summary;
+        }
+
+        /** @type {Set<string>} */
+        const installedDictionaryNames = new Set();
+        for (const dictionary of dictionaryInfo) {
+            if (typeof dictionary?.title === 'string' && dictionary.title.length > 0) {
+                installedDictionaryNames.add(dictionary.title);
+            }
+        }
+
+        /** @type {string[]} */
+        const removedDictionaryNames = [];
+        /** @type {number} */
+        let affectedProfiles = 0;
+        /** @type {number} */
+        let mainDictionaryResets = 0;
+        /** @type {number} */
+        let sortFrequencyDictionaryResets = 0;
+        for (const profile of options.profiles) {
+            const dictionaries = profile.options.dictionaries;
+            const nextDictionaries = dictionaries.filter((dictionary) => installedDictionaryNames.has(dictionary.name));
+            let profileChanged = false;
+            if (nextDictionaries.length !== dictionaries.length) {
+                profile.options.dictionaries = nextDictionaries;
+                profileChanged = true;
+            }
+            for (const dictionary of dictionaries) {
+                if (!installedDictionaryNames.has(dictionary.name)) {
+                    removedDictionaryNames.push(dictionary.name);
+                }
+            }
+
+            if (typeof profile.options.general.mainDictionary === 'string' && profile.options.general.mainDictionary.length > 0) {
+                const mainDictionary = profile.options.general.mainDictionary;
+                if (!installedDictionaryNames.has(mainDictionary)) {
+                    profile.options.general.mainDictionary = '';
+                    mainDictionaryResets += 1;
+                    profileChanged = true;
+                }
+            }
+
+            if (typeof profile.options.general.sortFrequencyDictionary === 'string' && profile.options.general.sortFrequencyDictionary.length > 0) {
+                const sortFrequencyDictionary = profile.options.general.sortFrequencyDictionary;
+                if (!installedDictionaryNames.has(sortFrequencyDictionary)) {
+                    profile.options.general.sortFrequencyDictionary = null;
+                    sortFrequencyDictionaryResets += 1;
+                    profileChanged = true;
+                }
+            }
+
+            if (profileChanged) {
+                affectedProfiles += 1;
+            }
+        }
+
+        const removedNames = [...new Set(removedDictionaryNames)].sort((a, b) => a.localeCompare(b));
+        const summary = {
+            skipped: false,
+            reason: 'completed',
+            removedEntryCount: removedDictionaryNames.length,
+            removedNames,
+            affectedProfiles,
+            installedCount: installedDictionaryNames.size,
+            mainDictionaryResets,
+            sortFrequencyDictionaryResets,
+        };
+
+        if (removedDictionaryNames.length === 0 && mainDictionaryResets === 0 && sortFrequencyDictionaryResets === 0) {
+            reportDiagnostics('dictionary-options-prune-startup-summary', summary);
+            return summary;
+        }
+
+        await this._optionsUtil.save(options);
+        this._clearProfileConditionsSchemaCache();
+        reportDiagnostics('dictionary-options-prune-startup-summary', summary);
+        log.warn(
+            `Pruned ${String(removedDictionaryNames.length)} stale dictionary option entries from ` +
+            `${String(affectedProfiles)} profile(s).`,
+        );
+        if (mainDictionaryResets > 0 || sortFrequencyDictionaryResets > 0) {
+            log.warn(
+                `Reset stale dictionary selectors (main=${String(mainDictionaryResets)}, ` +
+                `sortFrequency=${String(sortFrequencyDictionaryResets)}).`,
+            );
+        }
+        return summary;
     }
 
     /**
