@@ -58,6 +58,57 @@ jobs:
           prerelease: false
           files: builds/*
 
+      - name: Verify release is published with assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          node - <<'NODE'
+          const token = process.env.GITHUB_TOKEN;
+          const repo = process.env.GITHUB_REPOSITORY;
+          const tag = process.env.RELEASE_TAG;
+          if (typeof token !== 'string' || token.length === 0) {
+            throw new Error('Missing GITHUB_TOKEN');
+          }
+          if (typeof repo !== 'string' || repo.length === 0) {
+            throw new Error('Missing GITHUB_REPOSITORY');
+          }
+          if (typeof tag !== 'string' || tag.length === 0) {
+            throw new Error('Missing RELEASE_TAG');
+          }
+          const response = await fetch(`https://api.github.com/repos/${repo}/releases/tags/${encodeURIComponent(tag)}`, {
+            headers: {
+              authorization: `Bearer ${token}`,
+              accept: 'application/vnd.github+json',
+            },
+          });
+          if (!response.ok) {
+            throw new Error(`Failed to read release for tag ${tag}: HTTP ${response.status}`);
+          }
+          const release = await response.json();
+          if (release.draft === true) {
+            throw new Error(`Release ${tag} exists but is still draft.`);
+          }
+          if (release.prerelease === true) {
+            throw new Error(`Release ${tag} exists but is marked as prerelease.`);
+          }
+          if (!(typeof release.published_at === 'string' && release.published_at.length > 0)) {
+            throw new Error(`Release ${tag} is not published (missing published_at).`);
+          }
+          const assets = Array.isArray(release.assets) ? release.assets : [];
+          if (assets.length === 0) {
+            throw new Error(`Release ${tag} has no uploaded assets.`);
+          }
+          const assetNames = assets
+            .map((asset) => (typeof asset?.name === 'string' ? asset.name : ''))
+            .filter((name) => name.length > 0);
+          if (!assetNames.some((name) => name.endsWith('.zip') || name.endsWith('.xpi'))) {
+            throw new Error(`Release ${tag} has assets but no extension package files: ${assetNames.join(', ')}`);
+          }
+          console.log(`Verified published release ${tag} with ${assets.length} assets.`);
+          NODE
+
       - name: Dispatch publish-firefox-development
         uses: aurelien-baudet/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7 # pin@v2
         with:

@@ -20,7 +20,7 @@
 
 import {createServer} from 'node:http';
 import {execFile} from 'node:child_process';
-import {access, mkdir, readFile, writeFile} from 'node:fs/promises';
+import {access, mkdir, readFile, stat, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {promisify} from 'node:util';
 import {fileURLToPath} from 'node:url';
@@ -1391,9 +1391,9 @@ async function installRecommendedDictionariesMock(driver, recommendedDictionarie
  * @throws {Error}
  */
 async function main() {
-    const defaultFirefoxZipPath = path.join(root, 'builds', 'manabitan-firefox-dev.zip');
     const defaultFirefoxXpiPath = path.join(root, 'builds', 'manabitan-firefox-dev.xpi');
-    let xpiPath = process.env.MANABITAN_FIREFOX_XPI ?? defaultFirefoxZipPath;
+    const defaultFirefoxZipPath = path.join(root, 'builds', 'manabitan-firefox-dev.zip');
+    let xpiPath = process.env.MANABITAN_FIREFOX_XPI ?? defaultFirefoxXpiPath;
     const reportPath = process.env.MANABITAN_FIREFOX_E2E_REPORT ?? path.join(root, 'builds', 'firefox-e2e-import-report.html');
     const reportJsonPath = reportPath.replace(/\.html$/i, '.json');
     const chromiumReportPath = path.join(root, 'builds', 'chromium-e2e-import-report.html');
@@ -1402,19 +1402,31 @@ async function main() {
     const report = createReport();
     /** @type {Error | undefined} */
     let runError;
-    try {
-        await access(xpiPath);
-    } catch (_) {
-        if (!process.env.MANABITAN_FIREFOX_XPI) {
-            try {
-                await access(defaultFirefoxXpiPath);
-                xpiPath = defaultFirefoxXpiPath;
-            } catch (_error) {
-                fail(`Extension package not found at: ${xpiPath} (fallback also missing: ${defaultFirefoxXpiPath})`);
-            }
-        } else {
+    if (process.env.MANABITAN_FIREFOX_XPI) {
+        try {
+            await access(xpiPath);
+        } catch (_) {
             fail(`Extension package not found at: ${xpiPath}`);
         }
+    } else {
+        /** @type {Array<{path: string, mtimeMs: number}>} */
+        const candidates = [];
+        for (const candidatePath of [defaultFirefoxZipPath, defaultFirefoxXpiPath]) {
+            try {
+                const stats = await stat(candidatePath);
+                candidates.push({
+                    path: candidatePath,
+                    mtimeMs: Number(stats.mtimeMs || 0),
+                });
+            } catch (_) {
+                // Ignore missing candidate.
+            }
+        }
+        if (candidates.length === 0) {
+            fail(`Extension package not found at: ${defaultFirefoxZipPath} or ${defaultFirefoxXpiPath}`);
+        }
+        candidates.sort((a, b) => b.mtimeMs - a.mtimeMs);
+        xpiPath = candidates[0].path;
     }
     const firefoxOptions = new firefox.Options();
     const headlessEnv = (process.env.MANABITAN_FIREFOX_HEADLESS ?? '1').trim().toLowerCase();
@@ -1423,6 +1435,12 @@ async function main() {
         firefoxOptions.addArguments('-headless');
     }
     firefoxOptions.setPreference('xpinstall.signatures.required', false);
+    // Selenium Firefox profiles can start with stricter defaults that keep
+    // SharedArrayBuffer unavailable even when extension pages set COOP/COEP.
+    // Ensure test runtime exposes the required shared-memory primitives for OPFS.
+    firefoxOptions.setPreference('javascript.options.shared_memory', true);
+    firefoxOptions.setPreference('dom.postMessage.sharedArrayBuffer.withCOOP_COEP', true);
+    firefoxOptions.setPreference('dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled', true);
     const firefoxDeveloperEditionPath = '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox';
     try {
         await access(firefoxDeveloperEditionPath);

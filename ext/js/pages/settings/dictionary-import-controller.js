@@ -27,6 +27,8 @@ import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryController} from './dictionary-controller.js';
 
+const OPFS_REQUIRED_USER_MESSAGE = 'Manabitan requires OPFS storage support. Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension.';
+
 /**
  * @param {number} valueMs
  * @returns {string}
@@ -48,6 +50,19 @@ function summarizeUrlForDiagnostics(url) {
     } catch (_) {
         return trimmed;
     }
+}
+
+/**
+ * @param {string} message
+ * @returns {boolean}
+ */
+function isOpfsUnavailableMessage(message) {
+    return (
+        message.includes('OPFS is required') ||
+        message.includes('OPFS unlink API is unavailable') ||
+        message.includes('OPFS importDb API is unavailable') ||
+        message.includes('no such vfs: opfs')
+    );
 }
 
 /**
@@ -106,6 +121,8 @@ export class DictionaryImportController {
         this._errorContainer = querySelectorNotNull(document, '#dictionary-error');
         /** @type {HTMLElement|null} */
         this._recommendedDiagnosticsContainer = document.querySelector('#recommended-dictionaries-diagnostics');
+        /** @type {HTMLElement|null} */
+        this._recommendedErrorContainer = document.querySelector('#recommended-dictionaries-error');
         /** @type {boolean} */
         this._showRecommendedDiagnosticsInUi = (Reflect.get(globalThis, 'manabitanShowRecommendedDiagnosticsInUi') === true);
         /** @type {[originalMessage: string, newMessage: string][]} */
@@ -117,6 +134,14 @@ export class DictionaryImportController {
             [
                 'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
                 'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.',
+            ],
+            [
+                'OPFS is required',
+                OPFS_REQUIRED_USER_MESSAGE,
+            ],
+            [
+                'no such vfs: opfs',
+                OPFS_REQUIRED_USER_MESSAGE,
             ],
         ];
         /** @type {string[]} */
@@ -387,6 +412,7 @@ export class DictionaryImportController {
         if (buildStamp !== null) {
             buildStampText = `build=${buildStamp.name} v${buildStamp.version} id=${buildStamp.id}`;
         }
+        this._clearRecommendedError();
         this._setRecommendedDiagnostics(`${buildStampText}\nLoading recommended dictionaries...`);
         reportDiagnostics('recommended-dictionaries-open-requested', {
             buildStamp,
@@ -398,11 +424,15 @@ export class DictionaryImportController {
         } catch (error) {
             const e = toError(error);
             log.error(e);
+            const userError = this._errorToString(e);
+            this._setRecommendedError(userError);
             this._setRecommendedDiagnostics(`FAILED to render recommended dictionaries:\n${e.message}`);
             reportDiagnostics('recommended-dictionaries-open-failed', {
                 message: e.message,
             });
-            this._showErrors([e]);
+            if (!isOpfsUnavailableMessage(e.message)) {
+                this._showErrors([e]);
+            }
         } finally {
             this._recommendedDictionariesRenderPending = false;
         }
@@ -494,6 +524,9 @@ export class DictionaryImportController {
             diagnostics.push(`installedQuery=ok count=${String(installedDictionaries.length)}`);
         } catch (error) {
             const e = toError(error);
+            if (isOpfsUnavailableMessage(e.message)) {
+                throw new Error(OPFS_REQUIRED_USER_MESSAGE);
+            }
             log.warn(`[recommended-dictionaries] getDictionaryInfo failed; continuing with empty installed set. ${e.message}`);
             diagnostics.push(`installedQuery=failed:${e.message}`);
         }
@@ -572,6 +605,24 @@ export class DictionaryImportController {
         }
         container.textContent = text;
         container.hidden = false;
+    }
+
+    /**
+     * @param {string} text
+     */
+    _setRecommendedError(text) {
+        const container = this._recommendedErrorContainer;
+        if (!(container instanceof HTMLElement)) { return; }
+        container.textContent = text;
+        container.hidden = false;
+    }
+
+    /** */
+    _clearRecommendedError() {
+        const container = this._recommendedErrorContainer;
+        if (!(container instanceof HTMLElement)) { return; }
+        container.textContent = '';
+        container.hidden = true;
     }
 
     /**
