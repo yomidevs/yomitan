@@ -66,6 +66,36 @@ function errorMessage(value) {
     return value instanceof Error ? value.message : String(value);
 }
 
+function parseBooleanEnv(value, defaultValue) {
+    if (typeof value !== 'string') {
+        return defaultValue;
+    }
+    const normalized = value.trim().toLowerCase();
+    if (normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on') {
+        return true;
+    }
+    if (normalized === '0' || normalized === 'false' || normalized === 'no' || normalized === 'off') {
+        return false;
+    }
+    return defaultValue;
+}
+
+const strictUnsupportedRuntime = parseBooleanEnv(
+    process.env.MANABITAN_E2E_STRICT_RUNTIME,
+    parseBooleanEnv(process.env.CI, false),
+);
+
+function getUnsupportedRuntimeSkipReason(message) {
+    const text = String(message);
+    if (text.includes('OPFS runtime unavailable for')) {
+        return `${browserFlavor} extension runtime does not expose OPFS VFS in this local launch stack; skipping this lane locally without enabling any OPFS fallback.`;
+    }
+    if (browserFlavor === 'edge' && text.includes('Edge browser executable was not found')) {
+        return 'Microsoft Edge is not installed on this machine; skipping local Edge extension E2E.';
+    }
+    return '';
+}
+
 function escapeHtml(value) {
     return value
         .replaceAll('&', '&amp;')
@@ -1400,10 +1430,22 @@ async function main() {
         report.status = 'success';
         console.log(`${e2eLogTag} PASS: Two-dictionary import profiling and verification completed.`);
     } catch (e) {
-        report.status = 'failure';
-        report.failureReason = errorMessage(e);
-        appendLog(report, 'failure', report.failureReason);
-        runError = new Error(withE2ETag(errorMessage(e)));
+        const failureReason = errorMessage(e);
+        const skipReason = strictUnsupportedRuntime ? '' : getUnsupportedRuntimeSkipReason(failureReason);
+        if (skipReason.length > 0) {
+            report.status = 'success-with-skips';
+            report.failureReason = '';
+            report.skippedVerification = true;
+            report.skipReason = skipReason;
+            appendLog(report, 'warning', `${skipReason} originalError=${failureReason}`);
+            console.warn(`${e2eLogTag} warning: ${skipReason}`);
+            runError = undefined;
+        } else {
+            report.status = 'failure';
+            report.failureReason = failureReason;
+            appendLog(report, 'failure', report.failureReason);
+            runError = new Error(withE2ETag(failureReason));
+        }
     } finally {
         try {
             await mkdir(path.dirname(reportPath), {recursive: true});
