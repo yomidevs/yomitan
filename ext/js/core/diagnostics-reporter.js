@@ -16,6 +16,28 @@
  */
 
 const DEFAULT_DEV_DIAGNOSTICS_ENDPOINT = 'http://127.0.0.1:17352/ingest';
+const DEFAULT_DEV_DIAGNOSTICS_VERBOSITY = 'basic';
+const BASIC_DIAGNOSTICS_EVENTS = new Set([
+    'extension-start',
+    'backend-prepare-complete',
+    'backend-prepare-failed',
+    'startup-health-check',
+    'opfs-open-failed',
+]);
+/** @type {Promise<DiagnosticsConfig>|null} */
+let diagnosticsConfigPromise = null;
+
+/**
+ * @typedef {'off'|'basic'|'verbose'} DiagnosticsVerbosity
+ */
+
+/**
+ * @typedef {{
+ *   enabled: boolean,
+ *   endpoint: string|null,
+ *   verbosity: DiagnosticsVerbosity
+ * }} DiagnosticsConfig
+ */
 
 /**
  * @returns {chrome.runtime.Manifest|null}
@@ -75,14 +97,86 @@ async function getDiagnosticsEndpoint() {
 }
 
 /**
+ * @returns {Promise<DiagnosticsConfig>}
+ */
+async function getDiagnosticsConfig() {
+    if (diagnosticsConfigPromise !== null) {
+        return await diagnosticsConfigPromise;
+    }
+    diagnosticsConfigPromise = (async () => {
+        const endpoint = await getDiagnosticsEndpoint();
+        if (endpoint === null) {
+            return {
+                enabled: false,
+                endpoint: null,
+                verbosity: /** @type {DiagnosticsVerbosity} */ ('off'),
+            };
+        }
+        let enabled = true;
+        /** @type {DiagnosticsVerbosity} */
+        let verbosity = /** @type {DiagnosticsVerbosity} */ (DEFAULT_DEV_DIAGNOSTICS_VERBOSITY);
+        const chromeValue = Reflect.get(globalThis, 'chrome');
+        const storage = /** @type {{storage?: {local?: {get?: (keys: string[]|string, callback: (result: Record<string, unknown>) => void) => void}}}} */ (chromeValue)?.storage;
+        const localGet = storage?.local?.get;
+        if (typeof localGet === 'function') {
+            try {
+                const result = await new Promise(/** @type {(resolve: (value: Record<string, unknown>) => void, reject: (reason?: unknown) => void) => void} */ ((resolve, reject) => {
+                    localGet(['manabitanDiagnosticsEnabled', 'manabitanDiagnosticsVerbosity'], (value) => {
+                        const runtimeError = /** @type {{runtime?: {lastError?: {message?: string}}}} */ (chromeValue)?.runtime?.lastError;
+                        if (runtimeError) {
+                            reject(new Error(runtimeError.message || 'storage.local.get failed'));
+                            return;
+                        }
+                        resolve(/** @type {Record<string, unknown>} */ (value));
+                    });
+                }));
+                const enabledValue = Reflect.get(result, 'manabitanDiagnosticsEnabled');
+                if (typeof enabledValue === 'boolean') {
+                    enabled = enabledValue;
+                }
+                const verbosityValue = Reflect.get(result, 'manabitanDiagnosticsVerbosity');
+                if (verbosityValue === 'off' || verbosityValue === 'basic' || verbosityValue === 'verbose') {
+                    verbosity = verbosityValue;
+                }
+            } catch (_) {
+                // Fall back to defaults.
+            }
+        }
+        return {
+            enabled,
+            endpoint,
+            verbosity,
+        };
+    })();
+    return await diagnosticsConfigPromise;
+}
+
+/**
+ * @param {string} event
+ * @param {DiagnosticsVerbosity} verbosity
+ * @returns {boolean}
+ */
+function shouldReportDiagnosticsEvent(event, verbosity) {
+    if (verbosity === 'off') { return false; }
+    if (verbosity === 'verbose') { return true; }
+    return (
+        BASIC_DIAGNOSTICS_EVENTS.has(event) ||
+        event.endsWith('-failed') ||
+        event.endsWith('-error') ||
+        event.endsWith('-summary')
+    );
+}
+
+/**
  * @param {string} event
  * @param {Record<string, unknown>} payload
  * @returns {void}
  */
 export function reportDiagnostics(event, payload = {}) {
     void (async () => {
-        const endpoint = await getDiagnosticsEndpoint();
-        if (endpoint === null) { return; }
+        const {enabled, endpoint, verbosity} = await getDiagnosticsConfig();
+        if (!enabled || endpoint === null) { return; }
+        if (!shouldReportDiagnosticsEvent(event, verbosity)) { return; }
         const manifest = getManifestOrNull();
         const chromeValue = Reflect.get(globalThis, 'chrome');
         const runtimeId = /** @type {{runtime?: {id?: string}}} */ (chromeValue)?.runtime?.id;

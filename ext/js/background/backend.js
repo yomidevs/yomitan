@@ -24,6 +24,7 @@ import {YomitanApi} from '../comm/yomitan-api.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {fetchText} from '../core/fetch-utilities.js';
+import {readResponseJson} from '../core/json.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
@@ -399,6 +400,9 @@ export class Backend {
 
             await measureAsyncPhase('pruneStaleProfileDictionaryOptions', async () => {
                 await this._pruneStaleProfileDictionaryOptions();
+            });
+            await measureAsyncPhase('reportStartupHealthCheck', async () => {
+                await this._reportStartupHealthCheck();
             });
 
             {
@@ -2945,6 +2949,101 @@ export class Backend {
             );
         }
         return summary;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _reportStartupHealthCheck() {
+        const dictionaryDatabase = this._dictionaryDatabase;
+        const isPreparedValue = /** @type {unknown} */ (Reflect.get(dictionaryDatabase, 'isPrepared'));
+        let dbOpened = null;
+        if (typeof isPreparedValue === 'function') {
+            const value = /** @type {unknown} */ (isPreparedValue.call(dictionaryDatabase));
+            if (typeof value === 'boolean') {
+                dbOpened = value;
+            }
+        }
+        const usesFallbackStorageValue = /** @type {unknown} */ (Reflect.get(dictionaryDatabase, 'usesFallbackStorage'));
+        let usesFallbackStorage = null;
+        if (typeof usesFallbackStorageValue === 'function') {
+            const value = /** @type {unknown} */ (usesFallbackStorageValue.call(dictionaryDatabase));
+            if (typeof value === 'boolean') {
+                usesFallbackStorage = value;
+            }
+        }
+        const getOpenStorageDiagnosticsValue = /** @type {unknown} */ (Reflect.get(dictionaryDatabase, 'getOpenStorageDiagnostics'));
+        let openStorageDiagnostics = null;
+        if (typeof getOpenStorageDiagnosticsValue === 'function') {
+            const value = /** @type {unknown} */ (getOpenStorageDiagnosticsValue.call(dictionaryDatabase));
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                openStorageDiagnostics = value;
+            }
+        }
+        let opfsReady = null;
+        if (typeof openStorageDiagnostics === 'object' && openStorageDiagnostics !== null && !Array.isArray(openStorageDiagnostics)) {
+            const mode = /** @type {unknown} */ (Reflect.get(openStorageDiagnostics, 'mode'));
+            if (typeof mode === 'string') {
+                opfsReady = (mode !== 'opfs-unavailable' && mode !== 'fallback-memory' && mode !== 'fallback-memory-open-failed');
+            }
+        }
+        if (usesFallbackStorage === true) {
+            opfsReady = false;
+        }
+
+        let installedDictionaryCount = null;
+        let installedDictionaryError = null;
+        try {
+            const getDictionaryInfoValue = /** @type {unknown} */ (Reflect.get(dictionaryDatabase, 'getDictionaryInfo'));
+            if (typeof getDictionaryInfoValue === 'function') {
+                const dictionaryInfo = /** @type {unknown} */ (await getDictionaryInfoValue.call(dictionaryDatabase));
+                if (Array.isArray(dictionaryInfo)) {
+                    installedDictionaryCount = dictionaryInfo.length;
+                }
+            }
+        } catch (e) {
+            installedDictionaryError = e instanceof Error ? e.message : String(e);
+        }
+
+        let recommendedFeedLoaded = null;
+        let recommendedFeedLanguageCount = null;
+        let recommendedFeedError = null;
+        try {
+            const response = await fetch('/data/recommended-dictionaries.json', {
+                method: 'GET',
+                cache: 'no-store',
+                credentials: 'omit',
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP ${String(response.status)}`);
+            }
+            const data = /** @type {unknown} */ (await readResponseJson(response));
+            if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+                recommendedFeedLoaded = true;
+                recommendedFeedLanguageCount = Object.keys(/** @type {Record<string, unknown>} */ (data)).length;
+            } else {
+                recommendedFeedLoaded = false;
+                recommendedFeedError = 'invalid-feed-format';
+            }
+        } catch (e) {
+            recommendedFeedLoaded = false;
+            recommendedFeedError = e instanceof Error ? e.message : String(e);
+        }
+
+        reportDiagnostics('startup-health-check', {
+            browser: this._environment.getInfo().browser,
+            dbOpened,
+            opfsReady,
+            usesFallbackStorage,
+            openStorageDiagnostics,
+            installedDictionaryCount,
+            installedDictionaryError,
+            recommendedFeedLoaded,
+            recommendedFeedLanguageCount,
+            recommendedFeedError,
+        });
     }
 
     /**
