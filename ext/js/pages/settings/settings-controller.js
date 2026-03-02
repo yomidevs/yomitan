@@ -45,6 +45,8 @@ export class SettingsController extends EventDispatcher {
         this._pageExitPreventionEventListeners = new EventListenerCollection();
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
+        /** @type {import('settings').Options|null} */
+        this._preparedOptionsFull = null;
     }
 
     /** @type {import('../../application.js').Application} */
@@ -86,6 +88,7 @@ export class SettingsController extends EventDispatcher {
             chrome.permissions.onRemoved.addListener(this._onPermissionsChanged.bind(this));
         }
         const optionsFull = await this.getOptionsFull();
+        this._preparedOptionsFull = optionsFull;
         const {profiles, profileCurrent} = optionsFull;
         if (profileCurrent >= 0 && profileCurrent < profiles.length) {
             this._profileIndex = profileCurrent;
@@ -110,6 +113,17 @@ export class SettingsController extends EventDispatcher {
      */
     async getOptionsFull() {
         return await this._application.api.optionsGetFull();
+    }
+
+    /**
+     * Returns prepared profile options when available to avoid duplicate startup fetches.
+     * @returns {import('settings').ProfileOptions|null}
+     */
+    getPreparedProfileOptions() {
+        const optionsFull = this._preparedOptionsFull;
+        if (optionsFull === null) { return null; }
+        const profile = optionsFull.profiles[this._profileIndex];
+        return profile?.options ?? null;
     }
 
     /**

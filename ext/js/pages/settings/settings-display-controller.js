@@ -98,7 +98,12 @@ export class SettingsDisplayController {
 
     /** */
     async _setTheme() {
-        this._themeController.theme = (await this._settingsController.getOptions()).general.popupTheme;
+        const preparedOptions = this._settingsController.getPreparedProfileOptions();
+        if (preparedOptions !== null) {
+            this._themeController.theme = preparedOptions.general.popupTheme;
+        } else {
+            this._themeController.theme = (await this._settingsController.getOptions()).general.popupTheme;
+        }
         this._themeController.siteOverride = true;
         this._themeController.updateTheme();
     }

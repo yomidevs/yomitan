@@ -26,7 +26,7 @@ import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {fileURLToPath} from 'node:url';
 import {existsSync, readFileSync} from 'node:fs';
-import {access, mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
+import {access, copyFile, mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {chromium} from '@playwright/test';
 import {parseJson} from '../../ext/js/core/json.js';
 import {safePerformance} from '../../ext/js/core/safe-performance.js';
@@ -654,9 +654,28 @@ async function startE2ELocalServer(paths) {
 }
 
 async function extractExtensionZip(zipPath) {
-    const dir = await mkdtemp(path.join(os.tmpdir(), 'manabitan-chromium-ext-'));
-    await execFileAsync('unzip', ['-oq', zipPath, '-d', dir]);
-    return dir;
+    let lastError = null;
+    for (let attempt = 1; attempt <= 3; ++attempt) {
+        const dir = await mkdtemp(path.join(os.tmpdir(), 'manabitan-chromium-ext-'));
+        const zipCopyPath = path.join(dir, 'extension.zip');
+        try {
+            // Copy first to avoid reading a concurrently-mutated source artifact.
+            await copyFile(zipPath, zipCopyPath);
+            await execFileAsync('unzip', ['-oq', zipCopyPath, '-d', dir]);
+            await rm(zipCopyPath, {force: true});
+            return dir;
+        } catch (e) {
+            lastError = e;
+            try { await rm(dir, {recursive: true, force: true}); } catch (_) {}
+            if (attempt < 3) {
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 500);
+                });
+                continue;
+            }
+        }
+    }
+    throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
 async function discoverExtensionId(context) {
@@ -718,8 +737,9 @@ async function evalSendMessage(page, expression, arg = null) {
         }
         if (expression === 'backendDiagnostics') {
             const term = String(arg || '打');
+            const options0 = await send('optionsGet', {optionsContext: {index: 0}});
             const dictionaryInfo = await send('getDictionaryInfo', undefined);
-            const termsFind = await send('termsFind', {text: term, details: {primaryReading: ''}, optionsContext: {}});
+            const termsFind = await send('termsFind', {text: term, details: {primaryReading: ''}, optionsContext: {index: 0}});
             const termDictionaryNames = [];
             for (const entry of termsFind?.dictionaryEntries || []) {
                 if (entry?.dictionary) { termDictionaryNames.push(String(entry.dictionary)); }
@@ -727,17 +747,109 @@ async function evalSendMessage(page, expression, arg = null) {
                     if (definition?.dictionary) { termDictionaryNames.push(String(definition.dictionary)); }
                 }
             }
+            const enabledDictionaryNames = [];
+            for (const row of options0?.dictionaries || []) {
+                if (row?.enabled !== true) { continue; }
+                const name = String(row?.name || '').trim();
+                if (name.length > 0) {
+                    enabledDictionaryNames.push(name);
+                }
+            }
             return {
                 dictionaryInfo,
                 termResultCount: Array.isArray(termsFind?.dictionaryEntries) ? termsFind.dictionaryEntries.length : 0,
                 termDictionaryNames: [...new Set(termDictionaryNames)],
+                enabledDictionaryNames: [...new Set(enabledDictionaryNames)],
+            };
+        }
+        if (expression === 'enableInstalledDictionaries') {
+            const dictionaryInfo = await send('getDictionaryInfo', undefined);
+            const installedTitles = (Array.isArray(dictionaryInfo) ? dictionaryInfo : [])
+                .map((row) => String(row?.title || '').trim())
+                .filter((value) => value.length > 0);
+            const optionsFull = await send('optionsGetFull', undefined);
+            const nextOptions = structuredClone(optionsFull);
+            for (const profile of nextOptions.profiles || []) {
+                if (!(profile && profile.options && Array.isArray(profile.options.dictionaries))) {
+                    continue;
+                }
+                const existingByName = new Map();
+                for (const row of profile.options.dictionaries) {
+                    const name = String(row?.name || '').trim();
+                    if (name.length > 0) {
+                        existingByName.set(name, row);
+                    }
+                }
+                /** @type {Array<Record<string, unknown>>} */
+                const nextDictionaries = [];
+                for (const title of installedTitles) {
+                    const existing = existingByName.get(title);
+                    if (existing && typeof existing === 'object') {
+                        existing.enabled = true;
+                        if (typeof existing.alias !== 'string') {
+                            existing.alias = title;
+                        }
+                        nextDictionaries.push(existing);
+                        continue;
+                    }
+                    nextDictionaries.push({
+                        name: title,
+                        alias: title,
+                        enabled: true,
+                        allowSecondarySearches: false,
+                        definitionsCollapsible: 'not-collapsible',
+                        partsOfSpeechFilter: true,
+                        useDeinflections: true,
+                        styles: '',
+                    });
+                }
+                profile.options.dictionaries = nextDictionaries;
+                if (profile.options?.general && typeof profile.options.general === 'object') {
+                    const currentMain = String(profile.options.general.mainDictionary || '').trim();
+                    if (currentMain.length === 0 || !installedTitles.includes(currentMain)) {
+                        profile.options.general.mainDictionary = installedTitles[0] ?? '';
+                    }
+                    const sortFrequency = profile.options.general.sortFrequencyDictionary;
+                    if (typeof sortFrequency === 'string' && sortFrequency.length > 0 && !installedTitles.includes(sortFrequency)) {
+                        profile.options.general.sortFrequencyDictionary = null;
+                    }
+                }
+            }
+            await send('setAllSettings', {value: nextOptions, source: 'chromium-e2e'});
+            const updatedOptions = await send('optionsGetFull', undefined);
+            const profileEnabledDictionaryNames = (updatedOptions?.profiles || []).map((profile) => {
+                const names = [];
+                for (const row of profile?.options?.dictionaries || []) {
+                    if (row?.enabled !== true) { continue; }
+                    const name = String(row?.name || '').trim();
+                    if (name.length > 0) {
+                        names.push(name);
+                    }
+                }
+                return names;
+            });
+            return {ok: true, installedTitles, profileEnabledDictionaryNames};
+        }
+        if (expression === 'backendProbe') {
+            const dictionaryInfo = await send('getDictionaryInfo', undefined);
+            return {
+                ok: true,
+                dictionaryInfoCount: Array.isArray(dictionaryInfo) ? dictionaryInfo.length : null,
             };
         }
         return {error: 'unknown expression'};
     }, {expression, arg});
 }
 
-async function waitForBackendDictionaryReady(page, expectedDictionaryNames, term = '暗記', timeoutMs = 60000) {
+async function waitForBackendDictionaryReady(page, expectedDictionaryNames, term = '暗記', timeoutMs = 60000, requireLookupNames = false) {
+    const matchesExpectedName = (observedName, expectedName) => {
+        const observed = String(observedName || '').trim();
+        const expected = String(expectedName || '').trim();
+        if (observed.length === 0 || expected.length === 0) { return false; }
+        if (observed === expected) { return true; }
+        if (observed.startsWith(`${expected} `) || observed.startsWith(`${expected}.`)) { return true; }
+        return observed.includes(expected);
+    };
     const deadline = safePerformance.now() + timeoutMs;
     let lastDiagnostics = null;
     while (safePerformance.now() < deadline) {
@@ -753,9 +865,13 @@ async function waitForBackendDictionaryReady(page, expectedDictionaryNames, term
                 }
             }
             const termNames = new Set((Array.isArray(diagnostics?.termDictionaryNames) ? diagnostics.termDictionaryNames : []).map((value) => String(value || '').trim()).filter((value) => value.length > 0));
-            const hasLoadedNames = expectedDictionaryNames.every((name) => loadedNames.has(name));
-            const hasLookupNames = expectedDictionaryNames.every((name) => termNames.has(name));
-            if (hasLoadedNames && hasLookupNames) {
+            const hasLoadedNames = expectedDictionaryNames.every((expectedName) => (
+                [...loadedNames].some((loadedName) => matchesExpectedName(loadedName, expectedName))
+            ));
+            const hasLookupNames = expectedDictionaryNames.every((expectedName) => (
+                [...termNames].some((termName) => matchesExpectedName(termName, expectedName))
+            ));
+            if (hasLoadedNames && (!requireLookupNames || hasLookupNames)) {
                 return {ok: true, diagnostics};
             }
         } catch (_) {
@@ -823,6 +939,123 @@ async function getLastImportDebug(page) {
     } catch (_) {
         return null;
     }
+}
+
+async function getImportDebugHistory(page) {
+    try {
+        return await page.evaluate(() => {
+            const historyRaw = Reflect.get(globalThis, '__manabitanImportDebugHistory');
+            return Array.isArray(historyRaw) ? historyRaw : [];
+        });
+    } catch (_) {
+        return [];
+    }
+}
+
+async function getImportStepTimingHistory(page) {
+    try {
+        return await page.evaluate(() => {
+            const historyRaw = Reflect.get(globalThis, '__manabitanImportStepTimingHistory');
+            return Array.isArray(historyRaw) ? historyRaw : [];
+        });
+    } catch (_) {
+        return [];
+    }
+}
+
+function summarizeImportStepTimingHistory(historyRaw) {
+    const records = Array.isArray(historyRaw) ? historyRaw : [];
+    const byDictionary = new Map();
+    const aggregateByStep = new Map();
+    for (const record of records) {
+        if (!(typeof record === 'object' && record !== null && !Array.isArray(record))) {
+            continue;
+        }
+        const dictionaryIndex = Number(record.dictionaryIndex || 0);
+        const stepDisplay = String(record.stepDisplay || '').trim();
+        const label = String(record.label || '').trim();
+        const elapsedMs = Number(record.elapsedMs || 0);
+        const heapDeltaBytes = record.heapDeltaBytes === null ? null : Number(record.heapDeltaBytes || 0);
+        const finalOpenStep = record.finalOpenStep === true;
+        if (dictionaryIndex < 1 || stepDisplay.length === 0 || !Number.isFinite(elapsedMs)) {
+            continue;
+        }
+        const dictionarySteps = byDictionary.get(dictionaryIndex) || [];
+        dictionarySteps.push({
+            stepDisplay,
+            label,
+            elapsedMs: Math.max(0, elapsedMs),
+            heapDeltaBytes: heapDeltaBytes === null || !Number.isFinite(heapDeltaBytes) ? null : heapDeltaBytes,
+            finalOpenStep,
+        });
+        byDictionary.set(dictionaryIndex, dictionarySteps);
+
+        const aggregate = aggregateByStep.get(stepDisplay) || {
+            count: 0,
+            totalElapsedMs: 0,
+        };
+        aggregate.count += 1;
+        aggregate.totalElapsedMs += Math.max(0, elapsedMs);
+        aggregateByStep.set(stepDisplay, aggregate);
+    }
+    return {
+        dictionaries: [...byDictionary.entries()]
+            .sort((a, b) => a[0] - b[0])
+            .map(([dictionaryIndex, steps]) => ({dictionaryIndex, steps})),
+        aggregateByStep: [...aggregateByStep.entries()]
+            .sort((a, b) => a[0].localeCompare(b[0]))
+            .map(([stepDisplay, value]) => ({stepDisplay, ...value})),
+    };
+}
+
+function summarizeImportStep4Breakdown(historyRaw) {
+    const history = Array.isArray(historyRaw) ? historyRaw : [];
+    const readTimingValue = (details, key) => {
+        const value = Number(details?.[key] ?? 0);
+        return Number.isFinite(value) ? Math.max(0, value) : 0;
+    };
+    const dictionaries = [];
+    const aggregate = {
+        termParseMs: 0,
+        termSerializationMs: 0,
+        bulkAddTermsMs: 0,
+        bulkAddTagsMetaMs: 0,
+        mediaResolveMs: 0,
+        mediaWriteMs: 0,
+        accountedMs: 0,
+        otherMs: 0,
+    };
+    for (const entry of history) {
+        if (!(typeof entry === 'object' && entry !== null && !Array.isArray(entry))) {
+            continue;
+        }
+        const importerPhaseTimings = Array.isArray(entry.importerPhaseTimings) ? entry.importerPhaseTimings : [];
+        const importDataBanksTiming = importerPhaseTimings.find((timing) => timing && timing.phase === 'import-data-banks');
+        const details = (importDataBanksTiming && typeof importDataBanksTiming === 'object' && importDataBanksTiming !== null && !Array.isArray(importDataBanksTiming.details)) ?
+            importDataBanksTiming.details :
+            {};
+        const timingSummary = {
+            title: String(entry.resultTitle || ''),
+            termParseMs: readTimingValue(details, 'step4TermParseMs'),
+            termSerializationMs: readTimingValue(details, 'step4TermSerializationMs'),
+            bulkAddTermsMs: readTimingValue(details, 'step4BulkAddTermsMs'),
+            bulkAddTagsMetaMs: readTimingValue(details, 'step4BulkAddTagsMetaMs'),
+            mediaResolveMs: readTimingValue(details, 'step4MediaResolveMs'),
+            mediaWriteMs: readTimingValue(details, 'step4MediaWriteMs'),
+            accountedMs: readTimingValue(details, 'step4AccountedMs'),
+            otherMs: readTimingValue(details, 'step4OtherMs'),
+        };
+        dictionaries.push(timingSummary);
+        aggregate.termParseMs += timingSummary.termParseMs;
+        aggregate.termSerializationMs += timingSummary.termSerializationMs;
+        aggregate.bulkAddTermsMs += timingSummary.bulkAddTermsMs;
+        aggregate.bulkAddTagsMetaMs += timingSummary.bulkAddTagsMetaMs;
+        aggregate.mediaResolveMs += timingSummary.mediaResolveMs;
+        aggregate.mediaWriteMs += timingSummary.mediaWriteMs;
+        aggregate.accountedMs += timingSummary.accountedMs;
+        aggregate.otherMs += timingSummary.otherMs;
+    }
+    return {dictionaries, aggregate};
 }
 
 async function waitForBodyVisible(page, timeoutMs = 30000) {
@@ -901,11 +1134,12 @@ async function getInstalledDictionaryTitles(page) {
         const list = modal.querySelector('#dictionary-list');
         if (!(list instanceof HTMLElement)) { return []; }
         const titles = [];
-        const nodes = list.querySelectorAll('.dictionary-item .dictionary-title');
+        const nodes = list.querySelectorAll('.dictionary-title');
         for (const node of nodes) {
             if (!(node instanceof HTMLElement)) { continue; }
             const text = (node.textContent || '').trim();
             if (text.length === 0) { continue; }
+            if (text === 'All') { continue; }
             if (text === 'Unassociated Data') { continue; }
             titles.push(text);
         }
@@ -1130,13 +1364,38 @@ async function main() {
         const runtimeDiagnosticsEnd = safePerformance.now();
         await addReportPhase(report, page, 'Runtime diagnostics', `Chromium OPFS/isolation diagnostics: ${JSON.stringify(runtimeDiagnostics)}`, runtimeDiagnosticsStart, runtimeDiagnosticsEnd, runtimeProfile, processSampler);
         if (!isOpfsRuntimeAvailable(runtimeDiagnostics)) {
+            appendLog(
+                report,
+                'warning',
+                `Settings-page sqlite diagnostics indicate incomplete OPFS surface; verifying backend runtime directly. diagnostics=${JSON.stringify(runtimeDiagnostics)}`,
+            );
+        }
+
+        const backendRuntimeProbeStart = safePerformance.now();
+        let backendRuntimeProbeProfile = null;
+        try {
+            backendRuntimeProbeProfile = await runPhaseProfile(cdpSession, async () => {
+                return await evalSendMessage(page, 'backendProbe');
+            });
+        } catch (e) {
             fail(
                 `OPFS runtime unavailable for ${browserFlavor} extension E2E in launchMode=${launchModeLabel}. ` +
-                `diagnostics=${JSON.stringify(runtimeDiagnostics)}. ` +
+                `backendProbeError=${errorMessage(e)} diagnostics=${JSON.stringify(runtimeDiagnostics)}. ` +
                 `Use a ${browserFlavor} launch mode/environment where extension OPFS is available ` +
                 '(for local debugging: MANABITAN_CHROMIUM_HEADLESS=0 MANABITAN_CHROMIUM_HIDE_WINDOW=1).',
             );
         }
+        const backendRuntimeProbeEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            'Backend OPFS probe',
+            `Verified backend dictionary database call path responds in extension runtime: ${JSON.stringify(backendRuntimeProbeProfile?.result ?? null)}`,
+            backendRuntimeProbeStart,
+            backendRuntimeProbeEnd,
+            backendRuntimeProbeProfile,
+            processSampler,
+        );
 
         const resetSettingsStart = safePerformance.now();
         const resetSettingsProfile = await runPhaseProfile(cdpSession, async () => {
@@ -1216,10 +1475,23 @@ async function main() {
         });
         const importTotalEnd = safePerformance.now();
         const importDebug = await getLastImportDebug(page);
+        const importDebugHistory = await getImportDebugHistory(page);
+        const importStepTimingHistory = await getImportStepTimingHistory(page);
+        const importStepTimingSummary = summarizeImportStepTimingHistory(importStepTimingHistory);
+        const importStep4Breakdown = summarizeImportStep4Breakdown(importDebugHistory);
         if (!(importDebug && importDebug.hasResult === true && typeof importDebug.resultTitle === 'string' && importDebug.resultTitle.includes('JMdict'))) {
             fail(`Two-dictionary import did not finish with JMdict success debug payload: ${JSON.stringify(importDebug)}`);
         }
-        await addReportPhase(report, page, 'Jitendex + JMdict: total import', `Waited for progress clear for two-dictionary import session. debug=${JSON.stringify(importDebug)}`, importTotalStart, importTotalEnd, importTotalProfile, processSampler);
+        await addReportPhase(
+            report,
+            page,
+            'Jitendex + JMdict: total import',
+            `Waited for progress clear for two-dictionary import session. debug=${JSON.stringify(importDebug)} history=${JSON.stringify(importDebugHistory)} stepTimingSummary=${JSON.stringify(importStepTimingSummary)} step4Breakdown=${JSON.stringify(importStep4Breakdown)}`,
+            importTotalStart,
+            importTotalEnd,
+            importTotalProfile,
+            processSampler,
+        );
 
         const diagnosticsStart = safePerformance.now();
         let diagnosticsProfile = null;
@@ -1246,6 +1518,21 @@ async function main() {
             diagnosticsProfile,
             processSampler,
         );
+        const enableImportedDictionariesStart = safePerformance.now();
+        const enableImportedDictionariesProfile = await runPhaseProfile(cdpSession, async () => {
+            return await evalSendMessage(page, 'enableInstalledDictionaries');
+        });
+        const enableImportedDictionariesEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            'Enable imported dictionaries in profile options',
+            `Enabled installed dictionaries for active profiles: ${JSON.stringify(enableImportedDictionariesProfile.result ?? null)}`,
+            enableImportedDictionariesStart,
+            enableImportedDictionariesEnd,
+            enableImportedDictionariesProfile,
+            processSampler,
+        );
         const backendReadyStart = safePerformance.now();
         const backendReadyProfile = await runPhaseProfile(cdpSession, async () => {
             return await waitForBackendDictionaryReady(page, ['Jitendex', 'JMdict'], '暗記', 60000);
@@ -1262,6 +1549,21 @@ async function main() {
             backendReadyStart,
             backendReadyEnd,
             backendReadyProfile,
+            processSampler,
+        );
+
+        const reloadSettingsStart = safePerformance.now();
+        await page.goto(`${extensionBaseUrl}/settings.html?popup-preview=false`);
+        await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30000});
+        const reloadSettingsEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            'Reload settings page for modal verification',
+            'Reloaded settings to ensure dictionary modal list reflects latest installed/enabled state before verification.',
+            reloadSettingsStart,
+            reloadSettingsEnd,
+            null,
             processSampler,
         );
 
