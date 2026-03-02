@@ -70,6 +70,8 @@ export class DictionaryImporter {
         this._textEncoder = new TextEncoder();
         /** @type {Map<string, string>} */
         this._jsonQuotedStringCache = new Map();
+        /** @type {number} */
+        this._progressMinIntervalMs = 1000;
     }
 
     /**
@@ -99,6 +101,29 @@ export class DictionaryImporter {
         this._imageMetadataByPath.clear();
         this._jsonQuotedStringCache.clear();
         const tImportStart = Date.now();
+        /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
+        const phaseTimings = [];
+        /** @type {{termParseMs: number, termSerializationMs: number, bulkAddTermsMs: number, bulkAddTagsMetaMs: number, mediaResolveMs: number, mediaWriteMs: number}} */
+        const step4TimingBreakdown = {
+            termParseMs: 0,
+            termSerializationMs: 0,
+            bulkAddTermsMs: 0,
+            bulkAddTagsMetaMs: 0,
+            mediaResolveMs: 0,
+            mediaWriteMs: 0,
+        };
+
+        /**
+         * @param {string} phase
+         * @param {number} startTime
+         * @param {Record<string, string|number|boolean|null>} [phaseDetails]
+         */
+        const recordPhaseTiming = (phase, startTime, phaseDetails = {}) => {
+            const elapsedMs = Math.max(0, Date.now() - startTime);
+            const phaseTiming = {phase, elapsedMs, details: phaseDetails};
+            phaseTimings.push(phaseTiming);
+            this._logImport(`phase ${phase} ${elapsedMs}ms details=${JSON.stringify(phaseDetails)}`);
+        };
 
         /**
          * @template {import('dictionary-database').ObjectStoreName} T
@@ -157,6 +182,7 @@ export class DictionaryImporter {
             return {
                 errors: [new Error(`Dictionary ${dictionaryTitle} is already imported, skipped it.`)],
                 result: null,
+                debug: {phaseTimings},
             };
         }
         dictionaryDatabase.setTermEntryContentDedupEnabled(enableTermEntryContentDedup);
@@ -179,6 +205,8 @@ export class DictionaryImporter {
 
         // termFiles is doubled due to media importing.
         this._progressNextStep((termFiles.length * 2 + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length) * bulkAddProgressAllowance);
+        const previousProgressInterval = this._progressMinIntervalMs;
+        this._setProgressInterval(250);
 
         let importSuccess = false;
 
@@ -296,19 +324,39 @@ export class DictionaryImporter {
                     );
                     termReadResult = await readCurrent;
                 }
+                step4TimingBreakdown.termParseMs += Math.max(0, Date.now() - tTermParseStart);
 
                 let termList = termReadResult.termList;
                 const requirements = termReadResult.requirements;
                 if (useMediaPipeline && requirements !== null && uniqueMediaPaths !== null) {
-                    const alreadyAddedRequirements = requirements.filter((x) => uniqueMediaPaths.has(x.source.path));
-                    const notAddedRequirements = requirements.filter((x) => !uniqueMediaPaths.has(x.source.path));
-                    for (const requirement of requirements) { uniqueMediaPaths.add(requirement.source.path); }
+                    /** @type {import('dictionary-importer').ImportRequirement[]} */
+                    const alreadyAddedRequirements = [];
+                    /** @type {import('dictionary-importer').ImportRequirement[]} */
+                    const notAddedRequirements = [];
+                    for (const requirement of requirements) {
+                        const mediaPath = requirement.source.path;
+                        if (uniqueMediaPaths.has(mediaPath)) {
+                            alreadyAddedRequirements.push(requirement);
+                            continue;
+                        }
+                        uniqueMediaPaths.add(mediaPath);
+                        notAddedRequirements.push(requirement);
+                    }
 
+                    const tMediaResolveStart = Date.now();
                     const tResolveExisting = Date.now();
-                    await this._resolveAsyncRequirements(alreadyAddedRequirements, fileMap); // already added must also be resolved for the term dict to have correct data
+                    if (alreadyAddedRequirements.length > 0) {
+                        // Existing media requirements still need to resolve so term entries can reference the right media records.
+                        await this._resolveAsyncRequirements(alreadyAddedRequirements, fileMap);
+                    }
                     const tResolveNew = Date.now();
-                    let {media} = await this._resolveAsyncRequirements(notAddedRequirements, fileMap);
+                    /** @type {import('dictionary-database').MediaDataArrayBufferContent[]} */
+                    let media = [];
+                    if (notAddedRequirements.length > 0) {
+                        ({media} = await this._resolveAsyncRequirements(notAddedRequirements, fileMap));
+                    }
                     const tResolved = Date.now();
+                    step4TimingBreakdown.mediaResolveMs += Math.max(0, tResolved - tMediaResolveStart);
                     this._logImport(
                         `term file ${termFile.filename}: resolve existing=${alreadyAddedRequirements.length} ` +
                         `${tResolveNew - tResolveExisting}ms new=${notAddedRequirements.length} ` +
@@ -318,6 +366,7 @@ export class DictionaryImporter {
                     const tMediaWriteStart = Date.now();
                     await bulkAdd('media', media);
                     const tMediaWriteEnd = Date.now();
+                    step4TimingBreakdown.mediaWriteMs += Math.max(0, tMediaWriteEnd - tMediaWriteStart);
                     counts.media.total += media.length;
                     this._logImport(`term file ${termFile.filename}: media write rows=${media.length} elapsed=${tMediaWriteEnd - tMediaWriteStart}ms`);
 
@@ -326,11 +375,14 @@ export class DictionaryImporter {
                 }
 
                 if (useMediaPipeline) {
+                    const tSerializationStart = Date.now();
                     this._prepareTermImportSerialization(termList, enableTermEntryContentDedup);
+                    step4TimingBreakdown.termSerializationMs += Math.max(0, Date.now() - tSerializationStart);
                 }
                 const tTermsWriteStart = Date.now();
                 await bulkAdd('terms', termList);
                 const tTermsWriteEnd = Date.now();
+                step4TimingBreakdown.bulkAddTermsMs += Math.max(0, tTermsWriteEnd - tTermsWriteStart);
                 counts.terms.total += termList.length;
                 this._logImport(`term file ${termFile.filename}: terms write rows=${termList.length} elapsed=${tTermsWriteEnd - tTermsWriteStart}ms`);
                 this._logImport(`term file ${termFile.filename}: total elapsed=${Date.now() - tTermFile}ms`);
@@ -344,7 +396,9 @@ export class DictionaryImporter {
                 const tTermMetaFile = Date.now();
                 let termMetaList = await this._readFileSequence([termMetaFile], this._convertTermMetaBankEntry.bind(this), dictionaryTitle);
 
+                const tMetaWriteStart = Date.now();
                 await bulkAdd('termMeta', termMetaList);
+                step4TimingBreakdown.bulkAddTagsMetaMs += Math.max(0, Date.now() - tMetaWriteStart);
                 for (const [key, value] of Object.entries(this._getMetaCounts(termMetaList))) {
                     if (key in counts.termMeta) {
                         counts.termMeta[key] += value;
@@ -367,7 +421,9 @@ export class DictionaryImporter {
                         this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV3.bind(this), dictionaryTitle)
                 );
 
+                const tKanjiWriteStart = Date.now();
                 await bulkAdd('kanji', kanjiList);
+                step4TimingBreakdown.bulkAddTagsMetaMs += Math.max(0, Date.now() - tKanjiWriteStart);
                 counts.kanji.total += kanjiList.length;
 
                 this._progress();
@@ -380,7 +436,9 @@ export class DictionaryImporter {
                 const tKanjiMetaFile = Date.now();
                 let kanjiMetaList = await this._readFileSequence([kanjiMetaFile], this._convertKanjiMetaBankEntry.bind(this), dictionaryTitle);
 
+                const tKanjiMetaWriteStart = Date.now();
                 await bulkAdd('kanjiMeta', kanjiMetaList);
+                step4TimingBreakdown.bulkAddTagsMetaMs += Math.max(0, Date.now() - tKanjiMetaWriteStart);
                 for (const [key, value] of Object.entries(this._getMetaCounts(kanjiMetaList))) {
                     if (key in counts.kanjiMeta) {
                         counts.kanjiMeta[key] += value;
@@ -400,7 +458,9 @@ export class DictionaryImporter {
                 let tagList = await this._readFileSequence([tagFile], this._convertTagBankEntry.bind(this), dictionaryTitle);
                 this._addOldIndexTags(index, tagList, dictionaryTitle);
 
+                const tTagWriteStart = Date.now();
                 await bulkAdd('tagMeta', tagList);
+                step4TimingBreakdown.bulkAddTagsMetaMs += Math.max(0, Date.now() - tTagWriteStart);
                 counts.tagMeta.total += tagList.length;
 
                 this._progress();
@@ -408,9 +468,35 @@ export class DictionaryImporter {
 
                 tagList = [];
             }
+            const importDataBanksElapsedMs = Math.max(0, Date.now() - tImportBanksStart);
+            const step4AccountedMs = (
+                step4TimingBreakdown.termParseMs +
+                step4TimingBreakdown.termSerializationMs +
+                step4TimingBreakdown.bulkAddTermsMs +
+                step4TimingBreakdown.bulkAddTagsMetaMs +
+                step4TimingBreakdown.mediaResolveMs +
+                step4TimingBreakdown.mediaWriteMs
+            );
+            recordPhaseTiming('import-data-banks', tImportBanksStart, {
+                terms: counts.terms.total,
+                termMeta: counts.termMeta.total,
+                kanji: counts.kanji.total,
+                kanjiMeta: counts.kanjiMeta.total,
+                tagMeta: counts.tagMeta.total,
+                media: counts.media.total,
+                step4TermParseMs: Math.max(0, step4TimingBreakdown.termParseMs),
+                step4TermSerializationMs: Math.max(0, step4TimingBreakdown.termSerializationMs),
+                step4BulkAddTermsMs: Math.max(0, step4TimingBreakdown.bulkAddTermsMs),
+                step4BulkAddTagsMetaMs: Math.max(0, step4TimingBreakdown.bulkAddTagsMetaMs),
+                step4MediaResolveMs: Math.max(0, step4TimingBreakdown.mediaResolveMs),
+                step4MediaWriteMs: Math.max(0, step4TimingBreakdown.mediaWriteMs),
+                step4AccountedMs: Math.max(0, step4AccountedMs),
+                step4OtherMs: Math.max(0, importDataBanksElapsedMs - step4AccountedMs),
+            });
 
             // Finalize dictionary descriptor
             this._progressNextStep(0);
+            const tFinalizeDescriptorStart = Date.now();
 
             const stylesFileName = 'styles.css';
             const stylesFile = fileMap.get(stylesFileName);
@@ -434,6 +520,7 @@ export class DictionaryImporter {
             }
             return {result: summary, errors};
         } finally {
+            this._setProgressInterval(previousProgressInterval);
             dictionaryDatabase.setImportDebugLogging(false);
             this._progressNextStep(20);
             this._progressData.index = 0;
@@ -454,17 +541,27 @@ export class DictionaryImporter {
                 const cleanupError = toError(e);
                 errors.push(new Error(`Failed to clean up partially imported dictionary ${dictionaryTitle}: ${cleanupError.message}`));
             }
-            return {result: null, errors};
+            return {
+                result: null,
+                errors,
+                debug: {phaseTimings},
+            };
         }
 
         importSuccess = true;
         summaryDetails = {prefixWildcardsSupported, counts, styles, yomitanVersion, importSuccess};
         summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
+        const tSummaryUpdateStart = Date.now();
         await dictionaryDatabase.bulkUpdate('dictionaries', [{data: summary, primaryKey: dictionarySummaryPrimaryKey}], 0, 1);
+        recordPhaseTiming('write-summary', tSummaryUpdateStart, {ok: true});
         this._logImport(`import done ${Date.now() - tImportStart}ms terms=${counts.terms.total} media=${counts.media.total}`);
 
         this._progress();
-        return {result: summary, errors};
+        return {
+            result: summary,
+            errors,
+            debug: {phaseTimings},
+        };
     }
 
     /**
@@ -557,11 +654,20 @@ export class DictionaryImporter {
 
     /**
      * @param {number} count
+     * @param {boolean} [advanceStep]
      */
-    _progressNextStep(count) {
+    _progressNextStep(count, advanceStep = true) {
         this._progressData.index = 0;
         this._progressData.count = count;
-        this._progress(true);
+        this._progress(advanceStep);
+    }
+
+    /**
+     * @param {number} intervalMs
+     */
+    _setProgressInterval(intervalMs) {
+        const normalizedIntervalMs = Number.isFinite(intervalMs) ? Math.max(50, Math.trunc(intervalMs)) : this._progressMinIntervalMs;
+        this._progressMinIntervalMs = normalizedIntervalMs;
     }
 
     /**

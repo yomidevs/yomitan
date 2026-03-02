@@ -129,17 +129,20 @@ await Application.main(true, async (application) => {
     const preparePromises = [];
 
     const modalController = new ModalController(['shared-modals', 'settings-modals']);
-    {
-        const startedAt = getNowMs();
-        await modalController.prepare();
-        recordPhase(startupPhases, 'modalController.prepare', startedAt);
-    }
-
     const settingsController = new SettingsController(application);
     {
-        const startedAt = getNowMs();
-        await settingsController.prepare();
-        recordPhase(startupPhases, 'settingsController.prepare', startedAt);
+        const modalStartedAt = getNowMs();
+        const settingsStartedAt = getNowMs();
+        await Promise.all([
+            (async () => {
+                await modalController.prepare();
+                recordPhase(startupPhases, 'modalController.prepare', modalStartedAt);
+            })(),
+            (async () => {
+                await settingsController.prepare();
+                recordPhase(startupPhases, 'settingsController.prepare', settingsStartedAt);
+            })(),
+        ]);
     }
 
     const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
