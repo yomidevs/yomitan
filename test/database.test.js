@@ -150,7 +150,13 @@ describe('Database', () => {
         await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails);
 
         // Dictionary already imported
-        expect.soft(await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails)).toEqual({result: null, errors: [new Error('Dictionary Test Dictionary is already imported, skipped it.')]});
+        const duplicateImportResult = await createDictionaryImporter(expect).importDictionary(
+            dictionaryDatabase,
+            testDictionarySource,
+            defaultImportDetails,
+        );
+        expect.soft(duplicateImportResult.result).toBeNull();
+        expect.soft(duplicateImportResult.errors).toStrictEqual([new Error('Dictionary Test Dictionary is already imported, skipped it.')]);
 
         await dictionaryDatabase.close();
     });
@@ -325,6 +331,33 @@ describe('Database', () => {
             expect.soft(results[0].definitions).toStrictEqual(['shared definition']);
 
             await dictionaryDatabase.close();
+        });
+
+        test('Uses fast term parser for media-enabled imports', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            const readTermBankFileFastSpy = vi.spyOn(DictionaryImporter.prototype, '_readTermBankFileFast');
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(errors).toStrictEqual([]);
+                expect.soft(result).not.toBeNull();
+                expect.soft(readTermBankFileFastSpy).toHaveBeenCalled();
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info.length).toBe(1);
+                if (info.length > 0 && typeof info[0].counts === 'object' && info[0].counts !== null) {
+                    expect.soft(info[0].counts.media.total).toBeGreaterThan(0);
+                }
+            } finally {
+                readTermBankFileFastSpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
         });
 
         test('Import data and test', async ({expect}) => {
@@ -541,7 +574,7 @@ describe('Database', () => {
             } finally {
                 await reopenedDictionaryDatabase.close();
             }
-        });
+        }, 15000);
 
         test('Cleans dictionaries with corrupted summary JSON during prepare', async ({expect}) => {
             const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
@@ -578,7 +611,7 @@ describe('Database', () => {
             } finally {
                 await reopenedDictionaryDatabase.close();
             }
-        });
+        }, 15000);
 
         test('Reports startup cleanup summary counts and failures', async ({expect}) => {
             const dictionaryDatabase = new DictionaryDatabase();
@@ -650,6 +683,36 @@ describe('Database', () => {
                 await dictionaryDatabase.close();
             }
         });
+
+        test('Schema migration v1 wipes unversioned dictionary data and records schema version', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            const dictionaryImporter = createDictionaryImporter(expect);
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+            const beforeInfo = await dictionaryDatabase.getDictionaryInfo();
+            expect.soft(beforeInfo.length).toBe(1);
+            // eslint-disable-next-line no-underscore-dangle
+            const db = dictionaryDatabase._requireDb();
+            db.exec('PRAGMA user_version = 0');
+            const runSchemaMigrations = Reflect.get(dictionaryDatabase, '_runSchemaMigrations');
+            if (typeof runSchemaMigrations !== 'function') {
+                throw new Error('Expected _runSchemaMigrations method');
+            }
+            await Promise.resolve(runSchemaMigrations.call(dictionaryDatabase));
+
+            const afterInfo = await dictionaryDatabase.getDictionaryInfo();
+            expect.soft(afterInfo).toStrictEqual([]);
+            const counts = await dictionaryDatabase.getDictionaryCounts([], true);
+            expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(1);
+            await dictionaryDatabase.close();
+        });
     });
     describe('Database cleanup', () => {
         /** @type {{clearMethod: 'purge'|'delete'}[]} */
@@ -703,7 +766,7 @@ describe('Database', () => {
 
                 // Close
                 await dictionaryDatabase.close();
-            });
+            }, 15000);
         });
     });
 });

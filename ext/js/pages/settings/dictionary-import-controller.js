@@ -38,6 +38,99 @@ function formatDurationMs(valueMs) {
 }
 
 /**
+ * @returns {{source: 'performance.memory'|'unavailable', usedJSHeapSize: number|null, totalJSHeapSize: number|null, jsHeapSizeLimit: number|null, usedHeapPercent: number|null}}
+ */
+function getImportMemorySnapshot() {
+    const performanceValue = Reflect.get(globalThis, 'performance');
+    if (!(typeof performanceValue === 'object' && performanceValue !== null)) {
+        return {
+            source: 'unavailable',
+            usedJSHeapSize: null,
+            totalJSHeapSize: null,
+            jsHeapSizeLimit: null,
+            usedHeapPercent: null,
+        };
+    }
+    const memoryValue = Reflect.get(/** @type {Record<string, unknown>} */ (/** @type {unknown} */ (performanceValue)), 'memory');
+    if (!(typeof memoryValue === 'object' && memoryValue !== null)) {
+        return {
+            source: 'unavailable',
+            usedJSHeapSize: null,
+            totalJSHeapSize: null,
+            jsHeapSizeLimit: null,
+            usedHeapPercent: null,
+        };
+    }
+    const memoryRecord = /** @type {Record<string, unknown>} */ (memoryValue);
+    const usedJSHeapSizeRaw = Reflect.get(memoryRecord, 'usedJSHeapSize');
+    const totalJSHeapSizeRaw = Reflect.get(memoryRecord, 'totalJSHeapSize');
+    const jsHeapSizeLimitRaw = Reflect.get(memoryRecord, 'jsHeapSizeLimit');
+    const usedJSHeapSize = typeof usedJSHeapSizeRaw === 'number' && Number.isFinite(usedJSHeapSizeRaw) ? usedJSHeapSizeRaw : null;
+    const totalJSHeapSize = typeof totalJSHeapSizeRaw === 'number' && Number.isFinite(totalJSHeapSizeRaw) ? totalJSHeapSizeRaw : null;
+    const jsHeapSizeLimit = typeof jsHeapSizeLimitRaw === 'number' && Number.isFinite(jsHeapSizeLimitRaw) ? jsHeapSizeLimitRaw : null;
+    let usedHeapPercent = null;
+    if (
+        usedJSHeapSize !== null &&
+        totalJSHeapSize !== null &&
+        totalJSHeapSize > 0
+    ) {
+        usedHeapPercent = (usedJSHeapSize / totalJSHeapSize) * 100;
+    }
+    return {
+        source: 'performance.memory',
+        usedJSHeapSize,
+        totalJSHeapSize,
+        jsHeapSizeLimit,
+        usedHeapPercent,
+    };
+}
+
+/**
+ * @param {{source: 'performance.memory'|'unavailable', usedJSHeapSize: number|null}} start
+ * @param {{source: 'performance.memory'|'unavailable', usedJSHeapSize: number|null}} end
+ * @returns {number|null}
+ */
+function getHeapDeltaBytes(start, end) {
+    if (start.source !== 'performance.memory' || end.source !== 'performance.memory') { return null; }
+    if (typeof start.usedJSHeapSize !== 'number' || typeof end.usedJSHeapSize !== 'number') { return null; }
+    return end.usedJSHeapSize - start.usedJSHeapSize;
+}
+
+/**
+ * @param {unknown} value
+ * @returns {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>}
+ */
+function normalizeImporterPhaseTimings(value) {
+    if (!Array.isArray(value)) { return []; }
+    /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
+    const results = [];
+    for (const item of value) {
+        if (!(typeof item === 'object' && item !== null && !Array.isArray(item))) {
+            continue;
+        }
+        const phaseRaw = /** @type {unknown} */ (Reflect.get(item, 'phase'));
+        const elapsedMsRaw = /** @type {unknown} */ (Reflect.get(item, 'elapsedMs'));
+        const detailsRaw = /** @type {unknown} */ (Reflect.get(item, 'details'));
+        if (typeof phaseRaw !== 'string' || typeof elapsedMsRaw !== 'number' || !Number.isFinite(elapsedMsRaw)) {
+            continue;
+        }
+        if (typeof detailsRaw === 'object' && detailsRaw !== null && !Array.isArray(detailsRaw)) {
+            results.push({
+                phase: phaseRaw,
+                elapsedMs: Math.max(0, elapsedMsRaw),
+                details: /** @type {Record<string, string|number|boolean|null>} */ (detailsRaw),
+            });
+            continue;
+        }
+        results.push({
+            phase: phaseRaw,
+            elapsedMs: Math.max(0, elapsedMsRaw),
+        });
+    }
+    return results;
+}
+
+/**
  * @param {string} url
  * @returns {string}
  */
@@ -1086,6 +1179,7 @@ export class DictionaryImportController {
         const prevention = this._preventPageExit();
 
         const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
+        Reflect.set(globalThis, '__manabitanImportStepTimingHistory', []);
 
         /** @type {Error[]} */
         let errors = [];
@@ -1106,25 +1200,17 @@ export class DictionaryImportController {
 
             const optionsFull = await this._settingsController.getOptionsFull();
             const {
-                enableBulkImportIndexOptimization,
-                disableProgressEvents,
-                enableTermEntryContentDedup,
                 skipImageMetadata,
                 skipMediaImport,
                 mediaResolutionConcurrency,
-                structuredContentImportFastPath,
                 debugImportLogging,
             } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
                 yomitanVersion: chrome.runtime.getManifest().version,
-                enableBulkImportIndexOptimization,
-                disableProgressEvents,
-                enableTermEntryContentDedup,
                 skipImageMetadata,
                 skipMediaImport,
                 mediaResolutionConcurrency,
-                structuredContentImportFastPath,
                 debugImportLogging,
             };
 
@@ -1176,6 +1262,7 @@ export class DictionaryImportController {
                     elapsedMs: Math.max(0, dictionaryLoopEndTime - dictionaryLoopStartTime),
                     cumulativeErrorCount: errors.length,
                     fileName: file.name || null,
+                    memory: getImportMemorySnapshot(),
                 });
             }
         } catch (error) {
@@ -1185,12 +1272,14 @@ export class DictionaryImportController {
             });
         } finally {
             importProgressTracker.onImportComplete(errors.length);
+            Reflect.set(globalThis, '__manabitanImportStepTimingHistory', importProgressTracker.getStepTimingHistory());
             const importEndTime = safePerformance.now();
             log.log(`[ImportTiming] import session complete in ${formatDurationMs(importEndTime - importStartTime)} (errors=${errors.length})`);
             reportDiagnostics('dictionary-import-session-complete', {
                 dictionaryCount: importProgressTracker.dictionaryCount,
                 elapsedMs: Math.max(0, importEndTime - importStartTime),
                 errorCount: errors.length,
+                memory: getImportMemorySnapshot(),
             });
             this._showErrors(errors);
             prevention.end();
@@ -1226,32 +1315,24 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{enableBulkImportIndexOptimization: boolean, disableProgressEvents: boolean, enableTermEntryContentDedup: boolean, skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, structuredContentImportFastPath: boolean, debugImportLogging: boolean}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
         if (typeof flags !== 'object' || flags === null || Array.isArray(flags)) {
             return {
-                enableBulkImportIndexOptimization: true,
-                disableProgressEvents: true,
-                enableTermEntryContentDedup: false,
                 skipImageMetadata: false,
                 skipMediaImport: false,
                 mediaResolutionConcurrency: 8,
-                structuredContentImportFastPath: true,
                 debugImportLogging: false,
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
         const mediaResolutionConcurrency = Number.isFinite(flagsRecord.mediaResolutionConcurrency) ? Math.trunc(/** @type {number} */ (flagsRecord.mediaResolutionConcurrency)) : 8;
         return {
-            enableBulkImportIndexOptimization: flagsRecord.enableBulkImportIndexOptimization !== false,
-            disableProgressEvents: flagsRecord.disableProgressEvents !== false,
-            enableTermEntryContentDedup: flagsRecord.enableTermEntryContentDedup === true,
             skipImageMetadata: flagsRecord.skipImageMetadata === true,
             skipMediaImport: flagsRecord.skipMediaImport === true,
             mediaResolutionConcurrency: Math.max(1, Math.min(32, mediaResolutionConcurrency)),
-            structuredContentImportFastPath: flagsRecord.structuredContentImportFastPath === true,
             debugImportLogging: flagsRecord.debugImportLogging === true,
         };
     }
@@ -1261,6 +1342,28 @@ export class DictionaryImportController {
      */
     _getUseImportSession() {
         return Reflect.get(globalThis, 'manabitanImportUseSession') !== false;
+    }
+
+    /**
+     * @param {Record<string, unknown>} snapshot
+     */
+    _recordImportDebugSnapshot(snapshot) {
+        Reflect.set(globalThis, '__manabitanLastImportDebug', snapshot);
+        const historyRaw = /** @type {unknown} */ (Reflect.get(globalThis, '__manabitanImportDebugHistory'));
+        /** @type {Record<string, unknown>[]} */
+        const history = [];
+        if (Array.isArray(historyRaw)) {
+            for (const entry of /** @type {unknown[]} */ (historyRaw)) {
+                if (typeof entry === 'object' && entry !== null && !Array.isArray(entry)) {
+                    history.push(/** @type {Record<string, unknown>} */ (entry));
+                }
+            }
+        }
+        history.push(snapshot);
+        if (history.length > 20) {
+            history.splice(0, history.length - 20);
+        }
+        Reflect.set(globalThis, '__manabitanImportDebugHistory', history);
     }
 
     /**
@@ -1288,6 +1391,19 @@ export class DictionaryImportController {
     async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, dictionaryWorker, useImportSession, finalizeImportSession, onProgress) {
         const dictionaryTitle = file.name || 'unknown-dictionary';
         const importStartTime = safePerformance.now();
+        /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
+        const localPhaseTimings = [];
+        /**
+         * @param {string} phase
+         * @param {number} startTime
+         * @param {number} endTime
+         * @param {Record<string, string|number|boolean|null>} [details]
+         */
+        const recordLocalPhase = (phase, startTime, endTime, details = {}) => {
+            const elapsedMs = Math.max(0, endTime - startTime);
+            localPhaseTimings.push({phase, elapsedMs, details});
+            log.log(`[ImportTiming] [${dictionaryTitle}] phase ${phase} ${formatDurationMs(elapsedMs)} details=${JSON.stringify(details)}`);
+        };
         log.log(`[ImportTiming] [${dictionaryTitle}] starting import`);
         reportDiagnostics('dictionary-import-zip-begin', {
             dictionaryTitle,
@@ -1301,15 +1417,18 @@ export class DictionaryImportController {
         const archiveContentBytes = new Uint8Array(archiveContent);
         const readEndTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] read archive ${formatDurationMs(readEndTime - readStartTime)}`);
+        recordLocalPhase('read-archive', readStartTime, readEndTime, {
+            sizeBytes: archiveContentBytes.byteLength,
+        });
 
         const workerImportStartTime = safePerformance.now();
-        /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean}}} */
+        /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}} */
         let importResult;
         const maxImportAttempts = 15;
         for (let attempt = 1; ; ++attempt) {
             try {
                 const archiveContentAttempt = new Uint8Array(archiveContentBytes).buffer;
-                importResult = /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean}}} */ (
+                importResult = /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}} */ (
                     await dictionaryWorker.importDictionary(
                         archiveContentAttempt,
                         {
@@ -1345,15 +1464,35 @@ export class DictionaryImportController {
         }
         const workerImportEndTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] worker importDictionary ${formatDurationMs(workerImportEndTime - workerImportStartTime)}`);
+        recordLocalPhase('worker-import-dictionary', workerImportStartTime, workerImportEndTime, {
+            useImportSession,
+            finalizeImportSession,
+        });
 
         const {result, errors, debug} = importResult;
+        const importerPhaseTimings = normalizeImporterPhaseTimings(debug?.importerDebug?.phaseTimings ?? null);
+        reportDiagnostics('dictionary-import-worker-phase-summary', {
+            dictionaryTitle,
+            elapsedMs: Math.max(0, workerImportEndTime - workerImportStartTime),
+            importerPhaseTimings,
+            localPhaseTimings,
+            memory: getImportMemorySnapshot(),
+        });
+        for (const phase of importerPhaseTimings) {
+            log.log(
+                `[ImportTiming] [${dictionaryTitle}] worker phase "${phase.phase}" ${formatDurationMs(phase.elapsedMs)}` +
+                `${phase.details ? ` details=${JSON.stringify(phase.details)}` : ''}`,
+            );
+        }
         if (!result) {
             reportDiagnostics('dictionary-import-zip-no-result', {
                 dictionaryTitle,
                 errorCount: Array.isArray(errors) ? errors.length : -1,
                 usesFallbackStorage: debug?.usesFallbackStorage ?? null,
+                importerPhaseTimings,
+                localPhaseTimings,
             });
-            Reflect.set(globalThis, '__manabitanLastImportDebug', {
+            this._recordImportDebugSnapshot({
                 dictionaryTitle,
                 hasResult: false,
                 resultTitle: null,
@@ -1364,6 +1503,8 @@ export class DictionaryImportController {
                 openStorageDiagnostics: debug?.openStorageDiagnostics ?? null,
                 useImportSession: debug?.useImportSession ?? null,
                 finalizeImportSession: debug?.finalizeImportSession ?? null,
+                importerPhaseTimings,
+                localPhaseTimings,
             });
             return errors;
         }
@@ -1375,7 +1516,7 @@ export class DictionaryImportController {
                 dictionaryTitle,
                 errorCount: errorsWithOpfsRequirement.length,
             });
-            Reflect.set(globalThis, '__manabitanLastImportDebug', {
+            this._recordImportDebugSnapshot({
                 dictionaryTitle,
                 hasResult: false,
                 resultTitle: result.title || null,
@@ -1386,6 +1527,8 @@ export class DictionaryImportController {
                 openStorageDiagnostics: debug.openStorageDiagnostics ?? null,
                 useImportSession: debug.useImportSession ?? null,
                 finalizeImportSession: debug.finalizeImportSession ?? null,
+                importerPhaseTimings,
+                localPhaseTimings,
             });
             return errorsWithOpfsRequirement;
         }
@@ -1394,7 +1537,10 @@ export class DictionaryImportController {
         const errors2 = await this._addDictionarySettings(result, profilesDictionarySettings);
         const addSettingsEndTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] add dictionary settings ${formatDurationMs(addSettingsEndTime - addSettingsStartTime)}`);
-        Reflect.set(globalThis, '__manabitanLastImportDebug', {
+        recordLocalPhase('add-dictionary-settings', addSettingsStartTime, addSettingsEndTime, {
+            settingsErrorCount: errors2.length,
+        });
+        this._recordImportDebugSnapshot({
             dictionaryTitle,
             hasResult: true,
             resultTitle: result.title || null,
@@ -1405,6 +1551,8 @@ export class DictionaryImportController {
             openStorageDiagnostics: debug?.openStorageDiagnostics ?? null,
             useImportSession: debug?.useImportSession ?? null,
             finalizeImportSession: debug?.finalizeImportSession ?? null,
+            importerPhaseTimings,
+            localPhaseTimings,
         });
 
         if (!(useImportSession && !finalizeImportSession)) {
@@ -1412,8 +1560,14 @@ export class DictionaryImportController {
             await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
             const triggerDatabaseUpdatedEndTime = safePerformance.now();
             log.log(`[ImportTiming] [${dictionaryTitle}] triggerDatabaseUpdated ${formatDurationMs(triggerDatabaseUpdatedEndTime - triggerDatabaseUpdatedStartTime)}`);
+            recordLocalPhase('trigger-database-updated', triggerDatabaseUpdatedStartTime, triggerDatabaseUpdatedEndTime);
         } else {
             log.log(`[ImportTiming] [${dictionaryTitle}] triggerDatabaseUpdated deferred until import session finalize`);
+            localPhaseTimings.push({
+                phase: 'trigger-database-updated',
+                elapsedMs: 0,
+                details: {deferred: true},
+            });
         }
 
         // Only runs if updating a dictionary
@@ -1435,6 +1589,7 @@ export class DictionaryImportController {
             await this._settingsController.setAllSettings(options);
             const profileUpdateEndTime = safePerformance.now();
             log.log(`[ImportTiming] [${dictionaryTitle}] update profile dictionary references ${formatDurationMs(profileUpdateEndTime - profileUpdateStartTime)}`);
+            recordLocalPhase('update-profile-dictionary-references', profileUpdateStartTime, profileUpdateEndTime);
         }
 
         const importEndTime = safePerformance.now();
@@ -1445,6 +1600,9 @@ export class DictionaryImportController {
             importErrors: errors.length,
             settingsErrors: errors2.length,
             resultTitle: result.title || null,
+            importerPhaseTimings,
+            localPhaseTimings,
+            memory: getImportMemorySnapshot(),
         });
 
         if (errors.length > 0) {
@@ -1672,6 +1830,12 @@ export class ImportProgressTracker {
         this._stepStartTime = this._importStartTime;
         /** @type {number} */
         this._stepChangeCount = 0;
+        /** @type {Array<Record<string, unknown>>} */
+        this._stepTimingHistory = [];
+        /** @type {ReturnType<typeof getImportMemorySnapshot>} */
+        this._stepStartMemory = getImportMemorySnapshot();
+        /** @type {ReturnType<typeof getImportMemorySnapshot>} */
+        this._dictionaryStartMemory = this._stepStartMemory;
 
         const progressSelector = '.dictionary-import-progress';
         /** @type {NodeListOf<HTMLElement>} */
@@ -1680,6 +1844,12 @@ export class ImportProgressTracker {
         this._infoLabels = (document.querySelectorAll(`${progressSelector} .progress-info`));
         /** @type {NodeListOf<HTMLElement>} */
         this._statusLabels = (document.querySelectorAll(`${progressSelector} .progress-status`));
+        /** @type {string} */
+        this._lastInfoLabelText = '';
+        /** @type {string} */
+        this._lastStatusText = '';
+        /** @type {number} */
+        this._lastPercent = -1;
 
         this.onProgress({nextStep: false, index: 0, count: 0});
     }
@@ -1704,6 +1874,13 @@ export class ImportProgressTracker {
         return this._dictionaryCount;
     }
 
+    /**
+     * @returns {Array<Record<string, unknown>>}
+     */
+    getStepTimingHistory() {
+        return this._stepTimingHistory.map((item) => ({...item}));
+    }
+
     /** @type {import('dictionary-worker').ImportProgressCallback} */
     onProgress(data) {
         const {nextStep, index, count} = data;
@@ -1713,14 +1890,25 @@ export class ImportProgressTracker {
         }
         const currentStep = this.currentStep;
         const currentLabel = currentStep?.label ?? 'Working';
-        const labelText = `${this.statusPrefix} - Step ${this._stepIndex + 1} of ${this.stepCount}: ${currentLabel}...`;
-        for (const label of this._infoLabels) { label.textContent = labelText; }
+        const currentStepDisplay = `Step ${this._stepIndex + 1} of ${this.stepCount}`;
+        const labelText = `${this.statusPrefix} - ${currentStepDisplay}: ${currentLabel}...`;
+        if (labelText !== this._lastInfoLabelText) {
+            this._lastInfoLabelText = labelText;
+            for (const label of this._infoLabels) { label.textContent = labelText; }
+        }
 
-        const percent = count > 0 ? (index / count * 100) : 0;
-        const cssString = `${percent}%`;
+        const percentRaw = count > 0 ? (index / count * 100) : 0;
+        const percent = Math.max(0, Math.min(100, percentRaw));
+        if (this._lastPercent < 0 || Math.abs(percent - this._lastPercent) >= 0.1) {
+            this._lastPercent = percent;
+            const cssString = `${percent.toFixed(2)}%`;
+            for (const progressBar of this._progressBars) { progressBar.style.width = cssString; }
+        }
         const statusString = `${Math.floor(percent).toFixed(0)}%`;
-        for (const progressBar of this._progressBars) { progressBar.style.width = cssString; }
-        for (const label of this._statusLabels) { label.textContent = statusString; }
+        if (statusString !== this._lastStatusText) {
+            this._lastStatusText = statusString;
+            for (const label of this._statusLabels) { label.textContent = statusString; }
+        }
 
         if (currentStep && typeof currentStep.callback === 'function') {
             currentStep.callback();
@@ -1729,10 +1917,34 @@ export class ImportProgressTracker {
         if (nextStep && this._steps.length > 0 && this._stepIndex !== previousStepIndex) {
             const now = safePerformance.now();
             const completedStep = this._steps[previousStepIndex];
-            const completedLabel = completedStep?.label ?? `Step ${previousStepIndex + 1}`;
+            const completedLabel = (typeof completedStep?.label === 'string' && completedStep.label.length > 0) ? completedStep.label : 'Starting import state';
             const stepDuration = now - this._stepStartTime;
-            log.log(`[ImportTiming] ${this.statusPrefix} completed "${completedLabel}" in ${formatDurationMs(stepDuration)}`);
+            const stepEndMemory = getImportMemorySnapshot();
+            const stepHeapDeltaBytes = getHeapDeltaBytes(this._stepStartMemory, stepEndMemory);
+            log.log(`[ImportTiming] ${this.statusPrefix} completed Step ${previousStepIndex + 1} of ${this.stepCount} "${completedLabel}" in ${formatDurationMs(stepDuration)}`);
+            const stepTiming = {
+                dictionaryIndex: this._dictionaryIndex,
+                dictionaryCount: this._dictionaryCount,
+                stepIndex: previousStepIndex + 1,
+                stepCount: this.stepCount,
+                stepDisplay: `Step ${previousStepIndex + 1} of ${this.stepCount}`,
+                label: completedLabel,
+                uiLabelText: `${this.statusPrefix} - Step ${previousStepIndex + 1} of ${this.stepCount}: ${completedLabel}...`,
+                nextUiLabelText: labelText,
+                elapsedMs: Math.max(0, stepDuration),
+                dictionaryElapsedMs: Math.max(0, now - this._dictionaryStartTime),
+                totalElapsedMs: Math.max(0, now - this._importStartTime),
+                memoryStart: this._stepStartMemory,
+                memoryEnd: stepEndMemory,
+                heapDeltaBytes: stepHeapDeltaBytes,
+            };
+            this._stepTimingHistory.push(stepTiming);
+            if (this._stepTimingHistory.length > 256) {
+                this._stepTimingHistory.splice(0, this._stepTimingHistory.length - 256);
+            }
+            reportDiagnostics('dictionary-import-step-complete', stepTiming);
             this._stepStartTime = now;
+            this._stepStartMemory = stepEndMemory;
             this._stepChangeCount += 1;
         }
     }
@@ -1748,7 +1960,16 @@ export class ImportProgressTracker {
         this._stepIndex = 0;
         this._dictionaryStartTime = now;
         this._stepStartTime = now;
+        this._dictionaryStartMemory = getImportMemorySnapshot();
+        this._stepStartMemory = this._dictionaryStartMemory;
         log.log(`[ImportTiming] dictionary ${this._dictionaryIndex}/${this._dictionaryCount} started`);
+        reportDiagnostics('dictionary-import-dictionary-start', {
+            dictionaryIndex: this._dictionaryIndex,
+            dictionaryCount: this._dictionaryCount,
+            stepDisplay: `Step 1 of ${this.stepCount}`,
+            totalElapsedMs: Math.max(0, now - this._importStartTime),
+            memoryStart: this._dictionaryStartMemory,
+        });
         this.onProgress({
             nextStep: true,
             index: 0,
@@ -1765,8 +1986,45 @@ export class ImportProgressTracker {
         const currentStepDuration = now - this._stepStartTime;
         const currentDictionaryDuration = now - this._dictionaryStartTime;
         const totalDuration = now - this._importStartTime;
+        const memoryEnd = getImportMemorySnapshot();
         log.log(`[ImportTiming] ${this.statusPrefix} current step "${currentStepLabel}" open for ${formatDurationMs(currentStepDuration)}`);
         log.log(`[ImportTiming] dictionary ${this._dictionaryIndex}/${this._dictionaryCount} total progress phase time ${formatDurationMs(currentDictionaryDuration)}`);
         log.log(`[ImportTiming] all dictionaries progress phases complete in ${formatDurationMs(totalDuration)} (step-transitions=${this._stepChangeCount}, errors=${errorCount})`);
+        const finalStepTiming = {
+            dictionaryIndex: this._dictionaryIndex,
+            dictionaryCount: this._dictionaryCount,
+            stepIndex: this._stepIndex + 1,
+            stepCount: this.stepCount,
+            stepDisplay: `Step ${this._stepIndex + 1} of ${this.stepCount}`,
+            label: currentStepLabel,
+            elapsedMs: Math.max(0, currentStepDuration),
+            dictionaryElapsedMs: Math.max(0, currentDictionaryDuration),
+            totalElapsedMs: Math.max(0, totalDuration),
+            memoryStart: this._stepStartMemory,
+            memoryEnd,
+            heapDeltaBytes: getHeapDeltaBytes(this._stepStartMemory, memoryEnd),
+            finalOpenStep: true,
+        };
+        this._stepTimingHistory.push(finalStepTiming);
+        if (this._stepTimingHistory.length > 256) {
+            this._stepTimingHistory.splice(0, this._stepTimingHistory.length - 256);
+        }
+        reportDiagnostics('dictionary-import-step-final', finalStepTiming);
+        reportDiagnostics('dictionary-import-progress-summary', {
+            dictionaryIndex: this._dictionaryIndex,
+            dictionaryCount: this._dictionaryCount,
+            currentStepIndex: this._stepIndex + 1,
+            currentStepDisplay: `Step ${this._stepIndex + 1} of ${this.stepCount}`,
+            currentStepLabel,
+            currentStepElapsedMs: Math.max(0, currentStepDuration),
+            currentDictionaryElapsedMs: Math.max(0, currentDictionaryDuration),
+            totalElapsedMs: Math.max(0, totalDuration),
+            stepTransitions: this._stepChangeCount,
+            errorCount,
+            memoryStart: this._dictionaryStartMemory,
+            memoryEnd,
+            dictionaryHeapDeltaBytes: getHeapDeltaBytes(this._dictionaryStartMemory, memoryEnd),
+            currentStepHeapDeltaBytes: getHeapDeltaBytes(this._stepStartMemory, memoryEnd),
+        });
     }
 }

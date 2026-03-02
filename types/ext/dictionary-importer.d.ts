@@ -37,6 +37,17 @@ export type ImportResult = {
     result: Summary | null;
     errors: Error[];
     fallbackDatabaseContentBase64?: string | null;
+    debug?: ImportDebug;
+};
+
+export type ImportDebug = {
+    phaseTimings: ImportPhaseTiming[];
+};
+
+export type ImportPhaseTiming = {
+    phase: string;
+    elapsedMs: number;
+    details?: Record<string, string | number | boolean | null>;
 };
 
 export type ImportDetails = {
@@ -46,14 +57,10 @@ export type ImportDetails = {
     useImportSession?: boolean;
     finalizeImportSession?: boolean;
     forceMemoryOnly?: boolean;
-    enableBulkImportIndexOptimization?: boolean;
-    disableProgressEvents?: boolean;
-    enableTermEntryContentDedup?: boolean;
     skipImageMetadata?: boolean;
     skipMediaImport?: boolean;
     mediaResolutionConcurrency?: number;
     debugImportLogging?: boolean;
-    structuredContentImportFastPath?: boolean;
 };
 
 export type Summary = {

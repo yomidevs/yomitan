@@ -39,6 +39,8 @@ import {
 import {TermContentOpfsStore} from './term-content-opfs-store.js';
 import {TermRecordOpfsStore} from './term-record-opfs-store.js';
 
+const CURRENT_DICTIONARY_SCHEMA_VERSION = 1;
+
 /**
  * @typedef {object} InsertStatement
  * @property {string} sql
@@ -113,6 +115,8 @@ export class DictionaryDatabase {
         this._termBulkAddFailFastMinRowsBeforeCheck = 32768;
         /** @type {number} */
         this._termBulkAddFailFastWindowSize = 5;
+        /** @type {number} */
+        this._termBulkAddBatchSize = 25000;
         /** @type {TermContentOpfsStore} */
         this._termContentStore = new TermContentOpfsStore();
         /** @type {TermRecordOpfsStore} */
@@ -1728,7 +1732,7 @@ export class DictionaryDatabase {
         const pendingContentRows = [];
         /** @type {Map<string, number>} */
         const pendingContentRowIndexByHash = new Map();
-        const termBatchSize = 25000;
+        const termBatchSize = this._termBulkAddBatchSize;
         const contentBatchSize = 8192;
 
         if (useLocalTransaction) {
@@ -2070,7 +2074,7 @@ export class DictionaryDatabase {
      */
     async _bulkAddTermsWithoutContentDedup(items, start, count) {
         const useLocalTransaction = !this._bulkImportTransactionOpen;
-        const batchSize = 25000;
+        const batchSize = this._termBulkAddBatchSize;
 
         if (useLocalTransaction) {
             this._requireDb().exec('BEGIN IMMEDIATE');
@@ -2260,7 +2264,7 @@ export class DictionaryDatabase {
     async _openConnection() {
         this._sqlite3 = await getSqlite3();
         try {
-            this._db = await openOpfsDatabase();
+            this._db = await openOpfsDatabase('DictionaryDatabase._openConnection');
         } catch (error) {
             const diagnostics = getLastOpenStorageDiagnostics();
             const message = (error instanceof Error) ? error.message : String(error);
@@ -2276,6 +2280,7 @@ export class DictionaryDatabase {
         this._applyRuntimePragmas();
 
         await this._initializeSchema();
+        await this._runSchemaMigrations();
     }
 
     /** */
@@ -2359,6 +2364,109 @@ export class DictionaryDatabase {
         for (const createIndexSql of this._createIndexesSql()) {
             db.exec(createIndexSql);
         }
+    }
+
+    /** */
+    async _runSchemaMigrations() {
+        const db = this._requireDb();
+        const installedSchemaVersion = Math.max(0, this._asNumber(db.selectValue('PRAGMA user_version'), 0));
+        if (installedSchemaVersion > CURRENT_DICTIONARY_SCHEMA_VERSION) {
+            reportDiagnostics('dictionary-schema-migration-skipped', {
+                reason: 'newer-installed-version',
+                installedSchemaVersion,
+                currentSchemaVersion: CURRENT_DICTIONARY_SCHEMA_VERSION,
+            });
+            return;
+        }
+        let currentSchemaVersion = installedSchemaVersion;
+        let migrationCount = 0;
+        while (currentSchemaVersion < CURRENT_DICTIONARY_SCHEMA_VERSION) {
+            const nextVersion = currentSchemaVersion + 1;
+            const migrationStart = safePerformance.now();
+            const migrationSummary = await this._runSchemaMigrationToVersion(nextVersion);
+            db.exec(`PRAGMA user_version = ${nextVersion}`);
+            ++migrationCount;
+            reportDiagnostics('dictionary-schema-migration-applied', {
+                fromVersion: currentSchemaVersion,
+                toVersion: nextVersion,
+                elapsedMs: Math.max(0, safePerformance.now() - migrationStart),
+                summary: migrationSummary,
+            });
+            currentSchemaVersion = nextVersion;
+        }
+        reportDiagnostics('dictionary-schema-migration-summary', {
+            installedSchemaVersion,
+            currentSchemaVersion,
+            migrationCount,
+        });
+    }
+
+    /**
+     * @param {number} version
+     * @returns {Promise<Record<string, number|string|boolean|null>>}
+     */
+    async _runSchemaMigrationToVersion(version) {
+        switch (version) {
+            case 1:
+                return await this._wipeDictionaryDataForSchemaMigration();
+            default:
+                throw new Error(`Unhandled dictionary schema migration target version: ${version}`);
+        }
+    }
+
+    /**
+     * Migration v1: reset all imported dictionary data when legacy installs had no schema version.
+     * @returns {Promise<Record<string, number|string|boolean|null>>}
+     */
+    async _wipeDictionaryDataForSchemaMigration() {
+        const db = this._requireDb();
+        const dictionariesBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM dictionaries'), 0);
+        const termMetaBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM termMeta'), 0);
+        const kanjiBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM kanji'), 0);
+        const kanjiMetaBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM kanjiMeta'), 0);
+        const tagMetaBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM tagMeta'), 0);
+        const mediaBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM media'), 0);
+        const termContentBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM termEntryContent'), 0);
+        const termRecordsBefore = this._termRecordStore.size;
+
+        await this._termContentStore.reset();
+        await this._termRecordStore.reset();
+        db.exec('BEGIN IMMEDIATE');
+        try {
+            db.exec('DELETE FROM media');
+            db.exec('DELETE FROM tagMeta');
+            db.exec('DELETE FROM kanjiMeta');
+            db.exec('DELETE FROM kanji');
+            db.exec('DELETE FROM termMeta');
+            db.exec('DELETE FROM termEntryContent');
+            db.exec('DELETE FROM dictionaries');
+            db.exec('COMMIT');
+        } catch (e) {
+            try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+            throw e;
+        }
+
+        this._termEntryContentCache.clear();
+        this._termEntryContentIdByHash.clear();
+        this._termEntryContentMetaByHash.clear();
+        this._termExactPresenceCache.clear();
+        this._termPrefixNegativeCache.clear();
+        this._directTermIndexByDictionary.clear();
+        this._termEntryContentIdByKey.clear();
+        this._termsVirtualTableDirty = false;
+        this._deferTermsVirtualTableSync = false;
+
+        return {
+            migration: 'wipe-unversioned-dictionary-data',
+            dictionariesBefore,
+            termRecordsBefore,
+            termContentBefore,
+            termMetaBefore,
+            kanjiBefore,
+            kanjiMetaBefore,
+            tagMetaBefore,
+            mediaBefore,
+        };
     }
 
     /**
@@ -3455,7 +3563,10 @@ export class DictionaryDatabase {
         db.exec('PRAGMA cache_size = -131072');
         db.exec('PRAGMA cache_spill = OFF');
         db.exec('PRAGMA wal_autocheckpoint = 0');
-        db.exec('PRAGMA locking_mode = EXCLUSIVE');
+        // OPFS-backed sqlite handles can see generic I/O/CANTOPEN failures under
+        // contention when EXCLUSIVE mode is held for long imports. Keep NORMAL
+        // here so concurrent extension handles can continue to cooperate.
+        db.exec('PRAGMA locking_mode = NORMAL');
     }
 
     /**

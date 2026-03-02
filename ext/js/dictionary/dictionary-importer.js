@@ -96,13 +96,13 @@ export class DictionaryImporter {
         const errors = [];
         const maxTransactionLength = 262144;
         const bulkAddProgressAllowance = 1000;
-        const enableBulkImportIndexOptimization = details.enableBulkImportIndexOptimization !== false;
+        const enableBulkImportIndexOptimization = true;
         const enableTermEntryContentDedup = true;
         this._skipImageMetadata = details.skipImageMetadata === true;
         this._skipMediaImport = details.skipMediaImport === true;
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
         this._debugImportLogging = details.debugImportLogging === true;
-        this._structuredContentImportFastPath = details.structuredContentImportFastPath === true;
+        this._structuredContentImportFastPath = true;
         this._pendingImageMediaByPath.clear();
         this._imageMetadataByPath.clear();
         this._jsonQuotedStringCache.clear();
@@ -211,7 +211,7 @@ export class DictionaryImporter {
         dictionaryDatabase.setTermEntryContentDedupEnabled(enableTermEntryContentDedup);
         dictionaryDatabase.setImportDebugLogging(this._debugImportLogging);
 
-        this._disableProgressEvents = !!details.disableProgressEvents;
+        this._disableProgressEvents = false;
 
         // Files
         /** @type {import('dictionary-importer').QueryDetails} */
@@ -232,7 +232,7 @@ export class DictionaryImporter {
         // This transition enters "Importing data".
         this._progressNextStep((termFiles.length * 2 + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length) * bulkAddProgressAllowance);
         const previousProgressInterval = this._progressMinIntervalMs;
-        this._setProgressInterval(250);
+        this._setProgressInterval(100);
 
         let importSuccess = false;
 
@@ -260,33 +260,20 @@ export class DictionaryImporter {
             if (enableBulkImportIndexOptimization) {
                 await dictionaryDatabase.startBulkImport();
             }
-            const useMediaPipeline = !(this._skipMediaImport && this._structuredContentImportFastPath);
+            const useMediaPipeline = !this._skipMediaImport;
             const uniqueMediaPaths = useMediaPipeline ? new Set() : null;
             for (let termFileIndex = 0; termFileIndex < termFiles.length; ++termFileIndex) {
                 const termFile = termFiles[termFileIndex];
                 const tTermFile = Date.now();
                 const tTermParseStart = Date.now();
-                let termReadResult;
-                if (useMediaPipeline) {
-                    termReadResult = await this._readTermBankFile(
-                        termFile,
-                        version,
-                        dictionaryTitle,
-                        prefixWildcardsSupported,
-                        true,
-                        enableTermEntryContentDedup,
-                    );
-                } else {
-                    const readCurrent = this._readTermBankFile(
-                        termFile,
-                        version,
-                        dictionaryTitle,
-                        prefixWildcardsSupported,
-                        false,
-                        enableTermEntryContentDedup,
-                    );
-                    termReadResult = await readCurrent;
-                }
+                const termReadResult = await this._readTermBankFile(
+                    termFile,
+                    version,
+                    dictionaryTitle,
+                    prefixWildcardsSupported,
+                    useMediaPipeline,
+                    enableTermEntryContentDedup,
+                );
                 step4TimingBreakdown.termParseMs += Math.max(0, Date.now() - tTermParseStart);
 
                 let termList = termReadResult.termList;
@@ -789,7 +776,7 @@ export class DictionaryImporter {
      * @returns {import('dictionary-data').TermGlossaryStructuredContent}
      */
     _formatStructuredContent(data, entry, requirements) {
-        if (this._structuredContentImportFastPath) {
+        if (this._structuredContentImportFastPath && this._skipMediaImport) {
             return data;
         }
         const content = this._prepareStructuredContent(data.content, entry, requirements);
@@ -1311,9 +1298,16 @@ export class DictionaryImporter {
         useMediaPipeline,
         enableTermEntryContentDedup,
     ) {
-        if (!useMediaPipeline && this._structuredContentImportFastPath) {
+        if (this._structuredContentImportFastPath) {
             try {
-                return await this._readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, enableTermEntryContentDedup);
+                return await this._readTermBankFileFast(
+                    termFile,
+                    version,
+                    dictionaryTitle,
+                    prefixWildcardsSupported,
+                    useMediaPipeline,
+                    enableTermEntryContentDedup,
+                );
             } catch (e) {
                 this._logImport(`term file ${termFile.filename}: wasm parse fallback (${/** @type {Error} */ (toError(e)).message})`);
             }
@@ -1369,12 +1363,15 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').IndexVersion} version
      * @param {string} dictionaryTitle
      * @param {boolean} prefixWildcardsSupported
+     * @param {boolean} useMediaPipeline
      * @param {boolean} enableTermEntryContentDedup
-     * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: null}>}
+     * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
      */
-    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, enableTermEntryContentDedup) {
+    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, useMediaPipeline, enableTermEntryContentDedup) {
         const bytes = await this._getData(termFile, new Uint8ArrayWriter());
         const parsedRows = await parseTermBankWithWasm(bytes, version);
+        /** @type {import('dictionary-importer').ImportRequirement[]|null} */
+        const requirements = useMediaPipeline ? [] : null;
         /** @type {import('dictionary-database').DatabaseTermEntry[]} */
         const termList = [];
         termList.length = parsedRows.length;
@@ -1390,10 +1387,20 @@ export class DictionaryImporter {
                 rules: row.rules,
                 score: row.score,
                 glossary: [],
-                glossaryJson: row.glossaryJson,
                 termTags: row.termTags,
                 dictionary: dictionaryTitle,
             };
+            if (requirements === null) {
+                entry.glossaryJson = row.glossaryJson;
+            } else {
+                const glossaryList = this._parseGlossaryJsonFromFastRow(row.glossaryJson, termFile.filename);
+                for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
+                    const glossary = glossaryList[j];
+                    if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
+                    glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+                }
+                entry.glossary = glossaryList;
+            }
             if (typeof row.sequence === 'number') {
                 entry.sequence = row.sequence;
             }
@@ -1401,15 +1408,38 @@ export class DictionaryImporter {
                 entry.expressionReverse = stringReverse(entry.expression);
                 entry.readingReverse = stringReverse(entry.reading);
             }
-            if (enableTermEntryContentDedup && typeof row.termEntryContentHash === 'string' && row.termEntryContentBytes instanceof Uint8Array) {
+            if (
+                requirements === null &&
+                enableTermEntryContentDedup &&
+                typeof row.termEntryContentHash === 'string' &&
+                row.termEntryContentBytes instanceof Uint8Array
+            ) {
                 entry.termEntryContentHash = row.termEntryContentHash;
                 entry.termEntryContentBytes = row.termEntryContentBytes;
-            } else {
+            } else if (requirements === null) {
                 this._prepareTermEntrySerialization(entry, enableTermEntryContentDedup);
             }
             termList[i] = entry;
         }
-        return {termList, requirements: null};
+        return {termList, requirements};
+    }
+
+    /**
+     * @param {string} glossaryJson
+     * @param {string} fileName
+     * @returns {import('dictionary-data').TermGlossary[]}
+     * @throws {Error}
+     */
+    _parseGlossaryJsonFromFastRow(glossaryJson, fileName) {
+        try {
+            const glossary = /** @type {unknown} */ (parseJson(glossaryJson));
+            return Array.isArray(glossary) ? glossary : [];
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new Error(error.message + ` in '${fileName}'`);
+            }
+            throw error;
+        }
     }
 
     /**

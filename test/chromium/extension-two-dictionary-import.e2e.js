@@ -84,7 +84,24 @@ const strictUnsupportedRuntime = parseBooleanEnv(
     process.env.MANABITAN_E2E_STRICT_RUNTIME,
     parseBooleanEnv(process.env.CI, false),
 );
-
+const quickImportBenchmarkMode = parseBooleanEnv(process.env.MANABITAN_E2E_IMPORT_BENCH_QUICK, false);
+const e2eImportFlagsJsonRaw = process.env.MANABITAN_E2E_IMPORT_FLAGS_JSON;
+let e2eImportFlags = null;
+if (typeof e2eImportFlagsJsonRaw === 'string') {
+    const normalizedImportFlagsJson = e2eImportFlagsJsonRaw.trim();
+    if (normalizedImportFlagsJson.length > 0) {
+        try {
+            const parsedImportFlags = parseJson(normalizedImportFlagsJson);
+            if (typeof parsedImportFlags === 'object' && parsedImportFlags !== null && !Array.isArray(parsedImportFlags)) {
+                e2eImportFlags = /** @type {Record<string, unknown>} */ (parsedImportFlags);
+            } else {
+                fail(`MANABITAN_E2E_IMPORT_FLAGS_JSON must be a JSON object, got: ${normalizedImportFlagsJson}`);
+            }
+        } catch (e) {
+            fail(`MANABITAN_E2E_IMPORT_FLAGS_JSON parse failed: ${errorMessage(e)}`);
+        }
+    }
+}
 function getUnsupportedRuntimeSkipReason(message) {
     const text = String(message);
     if (text.includes('OPFS runtime unavailable for')) {
@@ -842,14 +859,6 @@ async function evalSendMessage(page, expression, arg = null) {
 }
 
 async function waitForBackendDictionaryReady(page, expectedDictionaryNames, term = '暗記', timeoutMs = 60000, requireLookupNames = false) {
-    const matchesExpectedName = (observedName, expectedName) => {
-        const observed = String(observedName || '').trim();
-        const expected = String(expectedName || '').trim();
-        if (observed.length === 0 || expected.length === 0) { return false; }
-        if (observed === expected) { return true; }
-        if (observed.startsWith(`${expected} `) || observed.startsWith(`${expected}.`)) { return true; }
-        return observed.includes(expected);
-    };
     const deadline = safePerformance.now() + timeoutMs;
     let lastDiagnostics = null;
     while (safePerformance.now() < deadline) {
@@ -866,10 +875,10 @@ async function waitForBackendDictionaryReady(page, expectedDictionaryNames, term
             }
             const termNames = new Set((Array.isArray(diagnostics?.termDictionaryNames) ? diagnostics.termDictionaryNames : []).map((value) => String(value || '').trim()).filter((value) => value.length > 0));
             const hasLoadedNames = expectedDictionaryNames.every((expectedName) => (
-                [...loadedNames].some((loadedName) => matchesExpectedName(loadedName, expectedName))
+                [...loadedNames].some((loadedName) => matchesDictionaryName(loadedName, expectedName))
             ));
             const hasLookupNames = expectedDictionaryNames.every((expectedName) => (
-                [...termNames].some((termName) => matchesExpectedName(termName, expectedName))
+                [...termNames].some((termName) => matchesDictionaryName(termName, expectedName))
             ));
             if (hasLoadedNames && (!requireLookupNames || hasLookupNames)) {
                 return {ok: true, diagnostics};
@@ -1161,6 +1170,135 @@ async function waitForInstalledDictionaryTitles(page, timeoutMs = 30000) {
     return {ok: false, titles: lastTitles};
 }
 
+function matchesDictionaryName(observedName, expectedName) {
+    const observed = String(observedName || '').trim();
+    const expected = String(expectedName || '').trim();
+    if (observed.length === 0 || expected.length === 0) { return false; }
+    if (observed === expected) { return true; }
+    if (observed.startsWith(`${expected} `) || observed.startsWith(`${expected}.`)) { return true; }
+    return observed.includes(expected);
+}
+
+async function requestDictionaryDeleteFromInstalledModal(page, dictionaryName) {
+    await page.evaluate((targetName) => {
+        const aliases = Array.from(document.querySelectorAll('#dictionary-list .dictionary-alias'));
+        const targetIndex = aliases.findIndex((aliasNode) => {
+            const text = (aliasNode.textContent || '').trim();
+            return text.length > 0 && text !== 'All' && text !== 'Unassociated Data' && (
+                text === targetName ||
+                text.startsWith(`${targetName} `) ||
+                text.startsWith(`${targetName}.`) ||
+                text.includes(targetName)
+            );
+        });
+        if (targetIndex < 0) {
+            throw new Error(`Unable to find installed dictionary row for "${targetName}"`);
+        }
+        const menuButtons = Array.from(document.querySelectorAll('#dictionary-list .dictionary-menu-button'));
+        const menuButton = menuButtons[targetIndex];
+        if (!(menuButton instanceof HTMLElement)) {
+            throw new Error(`Unable to find dictionary menu button for "${targetName}" at row index ${String(targetIndex)}`);
+        }
+        menuButton.click();
+    }, dictionaryName);
+    await page.waitForFunction(() => {
+        const menus = Array.from(document.querySelectorAll('.popup-menu-container'));
+        return menus.some((menuNode) => (
+            menuNode instanceof HTMLElement &&
+            !menuNode.hidden &&
+            menuNode.querySelector('.popup-menu-item[data-menu-action="showDetails"]') !== null &&
+            menuNode.querySelector('.popup-menu-item[data-menu-action="delete"]') !== null
+        ));
+    }, {timeout: 30000});
+    await page.evaluate(() => {
+        const menu = Array.from(document.querySelectorAll('.popup-menu-container')).find((menuNode) => (
+            menuNode instanceof HTMLElement &&
+            !menuNode.hidden &&
+            menuNode.querySelector('.popup-menu-item[data-menu-action="showDetails"]') !== null &&
+            menuNode.querySelector('.popup-menu-item[data-menu-action="delete"]') !== null
+        ));
+        if (!(menu instanceof HTMLElement)) {
+            throw new Error('Dictionary action menu did not become visible');
+        }
+        const deleteButton = menu.querySelector('.popup-menu-item[data-menu-action="delete"]');
+        if (!(deleteButton instanceof HTMLElement)) {
+            throw new Error('Dictionary action menu is missing delete button');
+        }
+        deleteButton.click();
+    });
+    await page.waitForSelector('#dictionary-confirm-delete-modal:not([hidden])', {timeout: 30000});
+    await page.evaluate((targetName) => {
+        const modal = document.querySelector('#dictionary-confirm-delete-modal');
+        if (!(modal instanceof HTMLElement)) {
+            throw new Error('Delete confirmation modal is missing');
+        }
+        const nameNode = modal.querySelector('#dictionary-confirm-delete-name');
+        const shownName = (nameNode?.textContent || '').trim();
+        const nameMatches = shownName === targetName || shownName.startsWith(`${targetName} `) || shownName.startsWith(`${targetName}.`) || shownName.includes(targetName);
+        if (!nameMatches) {
+            throw new Error(`Delete confirmation title mismatch: expected "${targetName}", saw "${shownName}"`);
+        }
+        const confirmButton = modal.querySelector('#dictionary-confirm-delete-button');
+        if (!(confirmButton instanceof HTMLElement)) {
+            throw new Error('Delete confirmation button missing');
+        }
+        confirmButton.click();
+    }, dictionaryName);
+}
+
+async function waitForDictionaryDeleteCompletion(page, deletedDictionaryName, expectedRemainingNames, timeoutMs = 240000) {
+    const startedAt = safePerformance.now();
+    const deadline = safePerformance.now() + timeoutMs;
+    let sawDeleteProgress = false;
+    let progressVisibleMs = 0;
+    let lastProgressChangeAt = startedAt;
+    let previousProgressVisible = false;
+    /** @type {string[]} */
+    let lastTitles = [];
+    while (safePerformance.now() < deadline) {
+        const now = safePerformance.now();
+        const progressVisible = await page.evaluate(() => {
+            const progress = document.querySelector('#dictionaries-modal .dictionary-delete-progress');
+            return progress instanceof HTMLElement && !progress.hidden;
+        });
+        if (progressVisible !== previousProgressVisible) {
+            if (previousProgressVisible) {
+                progressVisibleMs += Math.max(0, now - lastProgressChangeAt);
+            }
+            previousProgressVisible = progressVisible;
+            lastProgressChangeAt = now;
+        }
+        if (progressVisible) {
+            sawDeleteProgress = true;
+        }
+        lastTitles = await getInstalledDictionaryTitles(page);
+        const hasDeletedDictionary = lastTitles.some((title) => matchesDictionaryName(title, deletedDictionaryName));
+        const hasExpectedRemaining = expectedRemainingNames.every((expectedName) => (
+            lastTitles.some((title) => matchesDictionaryName(title, expectedName))
+        ));
+        if (!progressVisible && !hasDeletedDictionary && hasExpectedRemaining) {
+            return {
+                ok: true,
+                sawDeleteProgress,
+                progressVisibleMs: Math.max(0, progressVisibleMs),
+                elapsedMs: Math.max(0, safePerformance.now() - startedAt),
+                titles: lastTitles,
+            };
+        }
+        await page.waitForTimeout(250);
+    }
+    if (previousProgressVisible) {
+        progressVisibleMs += Math.max(0, safePerformance.now() - lastProgressChangeAt);
+    }
+    return {
+        ok: false,
+        sawDeleteProgress,
+        progressVisibleMs: Math.max(0, progressVisibleMs),
+        elapsedMs: Math.max(0, safePerformance.now() - startedAt),
+        titles: lastTitles,
+    };
+}
+
 async function searchTermAndGetDictionaryHitCounts(page, term, expectedDictionaryNames, timeoutMs = 15000) {
     await page.waitForSelector('#search-textbox', {state: 'attached', timeout: 30000});
     if (!(await waitForBodyVisible(page, 30000))) {
@@ -1410,38 +1548,48 @@ async function main() {
 
         const configureImportSessionStart = safePerformance.now();
         const configureImportSessionProfile = await runPhaseProfile(cdpSession, async () => {
-            await page.evaluate(() => {
+            const importFlags = e2eImportFlags;
+            await page.evaluate((flagsFromRunner) => {
                 globalThis.manabitanImportUseSession = true;
                 globalThis.manabitanDisableIntegrityCounts = true;
-                globalThis.manabitanImportPerformanceFlags = {
-                    enableBulkImportIndexOptimization: false,
-                };
-            });
+                globalThis.manabitanImportPerformanceFlags = (flagsFromRunner && typeof flagsFromRunner === 'object') ? {...flagsFromRunner} : {};
+            }, importFlags);
         });
         const configureImportSessionEnd = safePerformance.now();
-        await addReportPhase(report, page, 'Enable import session reuse', 'Set globalThis.manabitanImportUseSession=true; disable bulk index import optimization in test flags to avoid OPFS locking-mode regressions while profiling full flow', configureImportSessionStart, configureImportSessionEnd, configureImportSessionProfile, processSampler);
+        const importSessionDetails = (e2eImportFlags !== null) ?
+            `Set globalThis.manabitanImportUseSession=true; applied explicit import flags ${JSON.stringify(e2eImportFlags)}` :
+            'Set globalThis.manabitanImportUseSession=true for shared backend session reuse during import profiling';
+        await addReportPhase(report, page, 'Enable import session reuse', importSessionDetails, configureImportSessionStart, configureImportSessionEnd, configureImportSessionProfile, processSampler);
 
         await addReportPhase(
             report,
             page,
             'Warmup real dictionary cache',
-            `Resolved and cached Jitendex/JMdict archives from recommended feed, then served locally at ${localServer.baseUrl}`,
+            `Resolved and cached Jitendex/JMdict archives from recommended feed, then served locally at ${localServer.baseUrl}. quickImportBenchmarkMode=${quickImportBenchmarkMode}`,
             cacheWarmupStart,
             cacheWarmupEnd,
             null,
             processSampler,
         );
 
+        const importFiles = quickImportBenchmarkMode ?
+            [cachedDictionaries.jitendexPath] :
+            [cachedDictionaries.jitendexPath, cachedDictionaries.jmdictPath];
+        const importSessionLabel = quickImportBenchmarkMode ? 'Jitendex' : 'Jitendex + JMdict';
+        const importTriggerDescription = quickImportBenchmarkMode ?
+            `Triggered quick one-file import session using cached archive ${cachedDictionaries.jitendexPath}` :
+            `Triggered a single two-file import session using cached archives ${cachedDictionaries.jitendexPath} and ${cachedDictionaries.jmdictPath}`;
+
         const importTriggerStart = safePerformance.now();
         const importTriggerProfile = await runPhaseProfile(cdpSession, async () => {
-            await page.setInputFiles('#dictionary-import-file-input', [cachedDictionaries.jitendexPath, cachedDictionaries.jmdictPath]);
+            await page.setInputFiles('#dictionary-import-file-input', importFiles);
         });
         const importTriggerEnd = safePerformance.now();
         await addReportPhase(
             report,
             page,
-            'Import Jitendex + JMdict via file input',
-            `Triggered a single two-file import session using cached archives ${cachedDictionaries.jitendexPath} and ${cachedDictionaries.jmdictPath}`,
+            quickImportBenchmarkMode ? 'Import Jitendex via file input' : 'Import Jitendex + JMdict via file input',
+            importTriggerDescription,
             importTriggerStart,
             importTriggerEnd,
             importTriggerProfile,
@@ -1452,7 +1600,7 @@ async function main() {
         const importTotalProfile = await runPhaseProfile(cdpSession, async () => {
             await waitForImportCompletion(
                 page,
-                'Jitendex + JMdict',
+                importSessionLabel,
                 300000,
                 async (label, stepStart, stepEnd) => {
                     const baseName = `Import progress: ${label}`;
@@ -1479,19 +1627,26 @@ async function main() {
         const importStepTimingHistory = await getImportStepTimingHistory(page);
         const importStepTimingSummary = summarizeImportStepTimingHistory(importStepTimingHistory);
         const importStep4Breakdown = summarizeImportStep4Breakdown(importDebugHistory);
-        if (!(importDebug && importDebug.hasResult === true && typeof importDebug.resultTitle === 'string' && importDebug.resultTitle.includes('JMdict'))) {
-            fail(`Two-dictionary import did not finish with JMdict success debug payload: ${JSON.stringify(importDebug)}`);
+        const expectedResultDictionary = quickImportBenchmarkMode ? 'Jitendex' : 'JMdict';
+        if (!(importDebug && importDebug.hasResult === true && typeof importDebug.resultTitle === 'string' && importDebug.resultTitle.includes(expectedResultDictionary))) {
+            fail(`Import did not finish with expected ${expectedResultDictionary} success debug payload: ${JSON.stringify(importDebug)}`);
         }
         await addReportPhase(
             report,
             page,
-            'Jitendex + JMdict: total import',
-            `Waited for progress clear for two-dictionary import session. debug=${JSON.stringify(importDebug)} history=${JSON.stringify(importDebugHistory)} stepTimingSummary=${JSON.stringify(importStepTimingSummary)} step4Breakdown=${JSON.stringify(importStep4Breakdown)}`,
+            `${importSessionLabel}: total import`,
+            `Waited for progress clear for import session (${importSessionLabel}). debug=${JSON.stringify(importDebug)} history=${JSON.stringify(importDebugHistory)} stepTimingSummary=${JSON.stringify(importStepTimingSummary)} step4Breakdown=${JSON.stringify(importStep4Breakdown)}`,
             importTotalStart,
             importTotalEnd,
             importTotalProfile,
             processSampler,
         );
+
+        if (quickImportBenchmarkMode) {
+            report.status = 'success';
+            console.log(`${e2eLogTag} PASS: Quick import benchmark mode completed (${importSessionLabel}).`);
+            return;
+        }
 
         const diagnosticsStart = safePerformance.now();
         let diagnosticsProfile = null;
@@ -1725,6 +1880,94 @@ async function main() {
                 );
             }
         }
+
+        const reloadSettingsForDeleteStart = safePerformance.now();
+        await page.goto(`${extensionBaseUrl}/settings.html?popup-preview=false`);
+        await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30000});
+        const reloadSettingsForDeleteEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            'Reload settings page for deletion profiling',
+            'Reloaded settings page after lookup profiling so dictionary delete flow runs through the real settings modal path.',
+            reloadSettingsForDeleteStart,
+            reloadSettingsForDeleteEnd,
+            null,
+            processSampler,
+        );
+
+        const deletionTarget = 'Jitendex';
+        const deletionExpectedRemaining = ['JMdict'];
+        const deletePhaseStart = safePerformance.now();
+        let deletePhaseProfile = null;
+        let deletePhaseResult = null;
+        let deletePhaseError = '';
+        try {
+            deletePhaseProfile = await runPhaseProfile(cdpSession, async () => {
+                await openInstalledDictionariesModal(page);
+                await requestDictionaryDeleteFromInstalledModal(page, deletionTarget);
+                return await waitForDictionaryDeleteCompletion(page, deletionTarget, deletionExpectedRemaining, 240000);
+            });
+            deletePhaseResult = deletePhaseProfile.result;
+            if (!(deletePhaseResult && deletePhaseResult.ok === true)) {
+                throw new Error(`Dictionary delete did not converge. result=${JSON.stringify(deletePhaseResult)}`);
+            }
+        } catch (e) {
+            deletePhaseError = errorMessage(e);
+            verificationErrors.push(`Dictionary deletion profiling failed (${deletionTarget}): ${deletePhaseError}`);
+        }
+        const deletePhaseEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            `Delete dictionary: ${deletionTarget}`,
+            deletePhaseError.length > 0 ?
+                `Delete failed for ${deletionTarget}: ${deletePhaseError}` :
+                `Deleted ${deletionTarget} via dictionaries modal. result=${JSON.stringify(deletePhaseResult)}`,
+            deletePhaseStart,
+            deletePhaseEnd,
+            deletePhaseProfile,
+            processSampler,
+        );
+
+        const postDeleteDiagnosticsStart = safePerformance.now();
+        let postDeleteDiagnosticsProfile = null;
+        let postDeleteDiagnosticsError = '';
+        let postDeleteDiagnostics = null;
+        try {
+            postDeleteDiagnosticsProfile = await runPhaseProfile(cdpSession, async () => {
+                return await evalSendMessage(page, 'backendDiagnostics', '暗記');
+            });
+            postDeleteDiagnostics = postDeleteDiagnosticsProfile.result;
+            const loadedNames = (Array.isArray(postDeleteDiagnostics?.dictionaryInfo) ? postDeleteDiagnostics.dictionaryInfo : [])
+                .map((entry) => String(entry?.title || '').trim())
+                .filter((value) => value.length > 0);
+            const hasExpectedRemaining = deletionExpectedRemaining.every((expectedName) => (
+                loadedNames.some((loadedName) => matchesDictionaryName(loadedName, expectedName))
+            ));
+            const deletedStillPresent = loadedNames.some((loadedName) => matchesDictionaryName(loadedName, deletionTarget));
+            if (!hasExpectedRemaining || deletedStillPresent) {
+                throw new Error(
+                    `Post-delete backend dictionary set mismatch. loaded=${JSON.stringify(loadedNames)} expectedRemaining=${JSON.stringify(deletionExpectedRemaining)} deletedTarget=${deletionTarget}`,
+                );
+            }
+        } catch (e) {
+            postDeleteDiagnosticsError = errorMessage(e);
+            verificationErrors.push(`Post-delete backend diagnostics failed: ${postDeleteDiagnosticsError}`);
+        }
+        const postDeleteDiagnosticsEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            'Post-delete backend verification (lookup + metadata)',
+            postDeleteDiagnosticsError.length > 0 ?
+                `Post-delete verification failed: ${postDeleteDiagnosticsError}` :
+                `Ran getDictionaryInfo + termsFind('暗記') after delete to confirm remaining dictionaries and lookup path: ${JSON.stringify(postDeleteDiagnostics)}`,
+            postDeleteDiagnosticsStart,
+            postDeleteDiagnosticsEnd,
+            postDeleteDiagnosticsProfile,
+            processSampler,
+        );
 
         if (verificationErrors.length > 0) {
             fail(`Verification failures (${verificationErrors.length}): ${verificationErrors.join(' | ')}`);
