@@ -107,6 +107,17 @@ function countKanjiWithCharacter(kanji, character) {
     return i;
 }
 
+/**
+ * @param {DictionaryDatabase} dictionaryDatabase
+ * @returns {number}
+ */
+function getDictionarySchemaVersion(dictionaryDatabase) {
+    // eslint-disable-next-line no-underscore-dangle
+    const db = dictionaryDatabase._requireDb();
+    const value = db.selectValue('PRAGMA user_version');
+    return typeof value === 'number' ? value : Number(value);
+}
+
 
 /** */
 describe('Database', () => {
@@ -154,6 +165,59 @@ describe('Database', () => {
 
         await dictionaryDatabase.close();
     });
+    describe('Schema migrations', () => {
+        test('Sets schema version on fresh database', async ({expect}) => {
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            expect.soft(getDictionarySchemaVersion(dictionaryDatabase)).toBe(1);
+            await dictionaryDatabase.close();
+        });
+
+        test('Wipes legacy unversioned dictionary data and upgrades schema version', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            /** @type {import('dictionary-importer').ImportDetails} */
+            const importDetails = {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'};
+
+            const sourceDatabase = new DictionaryDatabase();
+            await sourceDatabase.prepare();
+            const importResult = await createDictionaryImporter(expect).importDictionary(sourceDatabase, testDictionarySource, importDetails);
+            expect.soft(importResult.errors).toStrictEqual([]);
+
+            // Simulate legacy DBs that predate schema-version stamping.
+            // eslint-disable-next-line no-underscore-dangle
+            sourceDatabase._requireDb().exec('PRAGMA user_version = 0');
+            const legacyContent = await sourceDatabase.exportDatabase();
+            await sourceDatabase.close();
+
+            const migratedDatabase = new DictionaryDatabase();
+            await migratedDatabase.importDatabase(legacyContent);
+            expect.soft(getDictionarySchemaVersion(migratedDatabase)).toBe(1);
+            expect.soft(await migratedDatabase.getDictionaryInfo()).toStrictEqual([]);
+            await migratedDatabase.close();
+        });
+
+        test('Keeps already-versioned dictionary data on reopen', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            /** @type {import('dictionary-importer').ImportDetails} */
+            const importDetails = {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'};
+
+            const sourceDatabase = new DictionaryDatabase();
+            await sourceDatabase.prepare();
+            const importResult = await createDictionaryImporter(expect).importDictionary(sourceDatabase, testDictionarySource, importDetails);
+            expect.soft(importResult.errors).toStrictEqual([]);
+            const currentContent = await sourceDatabase.exportDatabase();
+            await sourceDatabase.close();
+
+            const reopenedDatabase = new DictionaryDatabase();
+            await reopenedDatabase.importDatabase(currentContent);
+            expect.soft(getDictionarySchemaVersion(reopenedDatabase)).toBe(1);
+            const info = await reopenedDatabase.getDictionaryInfo();
+            expect.soft(info.length).toBe(1);
+            expect.soft(info[0]?.title).toBe(testDictionaryIndex.title);
+            await reopenedDatabase.close();
+        });
+    });
     describe('Invalid dictionaries', () => {
         const invalidDictionaries = [
             {name: 'invalid-dictionary1'},
@@ -172,7 +236,16 @@ describe('Database', () => {
 
                 /** @type {import('dictionary-importer').ImportDetails} */
                 const detaultImportDetails = {prefixWildcardsSupported: false, yomitanVersion: '0.0.0.0'};
-                await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary has invalid data');
+                try {
+                    const {result, errors} = await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails);
+                    expect.soft(result).toBe(null);
+                    expect.soft(errors.length).toBeGreaterThan(0);
+                    for (const error of errors) {
+                        expect.soft(error.message).toContain('Dictionary has invalid data');
+                    }
+                } catch (error) {
+                    expect.soft(String(error)).toContain('Dictionary has invalid data');
+                }
                 await dictionaryDatabase.close();
             });
         });

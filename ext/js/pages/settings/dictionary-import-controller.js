@@ -624,27 +624,17 @@ export class DictionaryImportController {
 
             const optionsFull = await this._settingsController.getOptionsFull();
             const {
-                skipSchemaValidation,
-                enableBulkImportIndexOptimization,
-                disableProgressEvents,
-                enableTermEntryContentDedup,
                 skipImageMetadata,
                 skipMediaImport,
                 mediaResolutionConcurrency,
-                structuredContentImportFastPath,
                 debugImportLogging,
             } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
                 yomitanVersion: chrome.runtime.getManifest().version,
-                skipSchemaValidation,
-                enableBulkImportIndexOptimization,
-                disableProgressEvents,
-                enableTermEntryContentDedup,
                 skipImageMetadata,
                 skipMediaImport,
                 mediaResolutionConcurrency,
-                structuredContentImportFastPath,
                 debugImportLogging,
             };
 
@@ -705,9 +695,7 @@ export class DictionaryImportController {
         return [
             {label: '', callback: this._triggerStorageChanged.bind(this)}, // Dictionary import is uninitialized
             {label: 'Initializing import'}, // Dictionary import is uninitialized
-            {label: 'Loading dictionary'}, // Load dictionary archive and validate index
-            {label: 'Loading schemas'}, // Load schemas and get archive files
-            {label: 'Validating data'}, // Load and validate dictionary data
+            {label: 'Loading dictionary'}, // Load dictionary archive and index metadata
             {label: 'Importing data'}, // Add dictionary descriptor, load, and import data
             {label: 'Finalizing import', callback: this._triggerStorageChanged.bind(this)}, // Update dictionary descriptor
         ];
@@ -723,34 +711,24 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipSchemaValidation: boolean, enableBulkImportIndexOptimization: boolean, disableProgressEvents: boolean, enableTermEntryContentDedup: boolean, skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, structuredContentImportFastPath: boolean, debugImportLogging: boolean}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
         if (typeof flags !== 'object' || flags === null || Array.isArray(flags)) {
             return {
-                skipSchemaValidation: true,
-                enableBulkImportIndexOptimization: true,
-                disableProgressEvents: true,
-                enableTermEntryContentDedup: false,
                 skipImageMetadata: false,
                 skipMediaImport: false,
                 mediaResolutionConcurrency: 8,
-                structuredContentImportFastPath: true,
                 debugImportLogging: false,
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
         const mediaResolutionConcurrency = Number.isFinite(flagsRecord.mediaResolutionConcurrency) ? Math.trunc(/** @type {number} */ (flagsRecord.mediaResolutionConcurrency)) : 8;
         return {
-            skipSchemaValidation: flagsRecord.skipSchemaValidation !== false,
-            enableBulkImportIndexOptimization: flagsRecord.enableBulkImportIndexOptimization !== false,
-            disableProgressEvents: flagsRecord.disableProgressEvents !== false,
-            enableTermEntryContentDedup: flagsRecord.enableTermEntryContentDedup === true,
             skipImageMetadata: flagsRecord.skipImageMetadata === true,
             skipMediaImport: flagsRecord.skipMediaImport === true,
             mediaResolutionConcurrency: Math.max(1, Math.min(32, mediaResolutionConcurrency)),
-            structuredContentImportFastPath: flagsRecord.structuredContentImportFastPath === true,
             debugImportLogging: flagsRecord.debugImportLogging === true,
         };
     }

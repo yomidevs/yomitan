@@ -46,15 +46,11 @@ export type ImportDetails = {
     useImportSession?: boolean;
     finalizeImportSession?: boolean;
     forceMemoryOnly?: boolean;
-    skipSchemaValidation?: boolean;
-    enableBulkImportIndexOptimization?: boolean;
-    disableProgressEvents?: boolean;
     enableTermEntryContentDedup?: boolean;
     skipImageMetadata?: boolean;
     skipMediaImport?: boolean;
     mediaResolutionConcurrency?: number;
     debugImportLogging?: boolean;
-    structuredContentImportFastPath?: boolean;
 };
 
 export type Summary = {

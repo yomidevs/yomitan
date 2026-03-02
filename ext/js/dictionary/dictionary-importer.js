@@ -57,8 +57,6 @@ export class DictionaryImporter {
         /** @type {number} */
         this._lastProgressTimestamp = 0;
         /** @type {boolean} */
-        this._disableProgressEvents = false;
-        /** @type {boolean} */
         this._skipImageMetadata = false;
         /** @type {boolean} */
         this._skipMediaImport = false;
@@ -70,8 +68,6 @@ export class DictionaryImporter {
         this._imageMetadataByPath = new Map();
         /** @type {boolean} */
         this._debugImportLogging = false;
-        /** @type {boolean} */
-        this._structuredContentImportFastPath = false;
         /** @type {TextEncoder} */
         this._textEncoder = new TextEncoder();
         /** @type {Map<string, string>} */
@@ -96,14 +92,11 @@ export class DictionaryImporter {
         const errors = [];
         const maxTransactionLength = 262144;
         const bulkAddProgressAllowance = 1000;
-        const skipSchemaValidation = !!details.skipSchemaValidation;
-        const enableBulkImportIndexOptimization = details.enableBulkImportIndexOptimization !== false;
         const enableTermEntryContentDedup = true;
         this._skipImageMetadata = details.skipImageMetadata === true;
         this._skipMediaImport = details.skipMediaImport === true;
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
         this._debugImportLogging = details.debugImportLogging === true;
-        this._structuredContentImportFastPath = details.structuredContentImportFastPath === true;
         this._pendingImageMediaByPath.clear();
         this._imageMetadataByPath.clear();
         this._jsonQuotedStringCache.clear();
@@ -136,11 +129,9 @@ export class DictionaryImporter {
                 );
 
                 this._progressData.index += progressIndexIncrease;
-                if (!this._disableProgressEvents) {
-                    const isLastChunk = ((i + count) >= entryCount);
-                    if (isLastChunk || (chunkIndex % 64) === 0) {
-                        this._progress();
-                    }
+                const isLastChunk = ((i + count) >= entryCount);
+                if (isLastChunk || (chunkIndex % 64) === 0) {
+                    this._progress();
                 }
             }
         };
@@ -157,7 +148,7 @@ export class DictionaryImporter {
         // Read archive
         const tArchiveStart = Date.now();
         const fileMap = await this._getFilesFromArchive(archiveContent);
-        const index = await this._readAndValidateIndex(fileMap, skipSchemaValidation);
+        const index = await this._readAndValidateIndex(fileMap);
         this._logImport(`archive+index ${Date.now() - tArchiveStart}ms files=${fileMap.size}`);
 
         const dictionaryTitle = index.title;
@@ -172,12 +163,6 @@ export class DictionaryImporter {
         }
         dictionaryDatabase.setTermEntryContentDedupEnabled(enableTermEntryContentDedup);
         dictionaryDatabase.setImportDebugLogging(this._debugImportLogging);
-
-        this._disableProgressEvents = !!details.disableProgressEvents;
-
-        // Load schemas
-        this._progressNextStep(0);
-        const dataBankSchemas = skipSchemaValidation ? [] : this._getDataBankSchemas(version);
 
         // Files
         /** @type {import('dictionary-importer').QueryDetails} */
@@ -194,20 +179,7 @@ export class DictionaryImporter {
         // Load data
         const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
 
-        this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
-
-        if (!skipSchemaValidation) {
-            for (const termFile of termFiles) { await this._validateFile(termFile, dataBankSchemas[0]); }
-            for (const termMetaFile of termMetaFiles) { await this._validateFile(termMetaFile, dataBankSchemas[1]); }
-            for (const kanjiFile of kanjiFiles) { await this._validateFile(kanjiFile, dataBankSchemas[2]); }
-            for (const kanjiMetaFile of kanjiMetaFiles) { await this._validateFile(kanjiMetaFile, dataBankSchemas[3]); }
-            for (const tagFile of tagFiles) { await this._validateFile(tagFile, dataBankSchemas[4]); }
-        } else {
-            this._progressData.index = this._progressData.count;
-            this._progress();
-        }
-
-        // termFiles is doubled due to media importing
+        // termFiles is doubled due to media importing.
         this._progressNextStep((termFiles.length * 2 + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length) * bulkAddProgressAllowance);
 
         let importSuccess = false;
@@ -228,38 +200,23 @@ export class DictionaryImporter {
 
         let summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         const dictionarySummaryPrimaryKey = await dictionaryDatabase.addWithResult('dictionaries', summary);
-        if (enableBulkImportIndexOptimization) {
-            await dictionaryDatabase.startBulkImport();
-        }
+        await dictionaryDatabase.startBulkImport();
 
         try {
             try {
-                const useMediaPipeline = !(this._skipMediaImport && this._structuredContentImportFastPath);
+                const useMediaPipeline = !this._skipMediaImport;
                 const uniqueMediaPaths = useMediaPipeline ? new Set() : null;
                 for (let termFileIndex = 0; termFileIndex < termFiles.length; ++termFileIndex) {
                     const termFile = termFiles[termFileIndex];
                     const tTermFile = Date.now();
-                    let termReadResult;
-                    if (useMediaPipeline) {
-                        termReadResult = await this._readTermBankFile(
-                            termFile,
-                            version,
-                            dictionaryTitle,
-                            prefixWildcardsSupported,
-                            true,
-                            enableTermEntryContentDedup,
-                        );
-                    } else {
-                        const readCurrent = this._readTermBankFile(
-                            termFile,
-                            version,
-                            dictionaryTitle,
-                            prefixWildcardsSupported,
-                            false,
-                            enableTermEntryContentDedup,
-                        );
-                        termReadResult = await readCurrent;
-                    }
+                    const termReadResult = await this._readTermBankFile(
+                        termFile,
+                        version,
+                        dictionaryTitle,
+                        prefixWildcardsSupported,
+                        useMediaPipeline,
+                        enableTermEntryContentDedup,
+                    );
 
                     let termList = termReadResult.termList;
                     const requirements = termReadResult.requirements;
@@ -373,7 +330,7 @@ export class DictionaryImporter {
                     tagList = [];
                 }
 
-                importSuccess = true;
+                importSuccess = (errors.length === 0);
             } catch (e) {
                 errors.push(toError(e));
             }
@@ -402,22 +359,22 @@ export class DictionaryImporter {
 
             this._progress();
 
+            if (!importSuccess || errors.length > 0) {
+                return {result: null, errors};
+            }
             return {result: summary, errors};
         } finally {
             dictionaryDatabase.setImportDebugLogging(false);
-            if (enableBulkImportIndexOptimization) {
-                this._progressNextStep(20);
-                this._progressData.index = 0;
+            this._progressNextStep(20);
+            this._progressData.index = 0;
+            this._progress();
+            await dictionaryDatabase.finishBulkImport((checkpointIndex, total) => {
+                this._progressData.index = Math.max(1, Math.floor((checkpointIndex / total) * this._progressData.count));
                 this._progress();
-                await dictionaryDatabase.finishBulkImport((checkpointIndex, total) => {
-                    this._progressData.index = Math.max(1, Math.floor((checkpointIndex / total) * this._progressData.count));
-                    this._progress();
-                    this._logImport(`bulk finalization ${checkpointIndex}/${total}`);
-                });
-                this._progressData.index = this._progressData.count;
-                this._progress();
-            }
-            this._disableProgressEvents = false;
+                this._logImport(`bulk finalization ${checkpointIndex}/${total}`);
+            });
+            this._progressData.index = this._progressData.count;
+            this._progress();
         }
     }
 
@@ -455,11 +412,10 @@ export class DictionaryImporter {
 
     /**
      * @param {import('dictionary-importer').ArchiveFileMap} fileMap
-     * @param {boolean} skipSchemaValidation
      * @returns {Promise<import('dictionary-data').Index>}
      * @throws {Error}
      */
-    async _readAndValidateIndex(fileMap, skipSchemaValidation = false) {
+    async _readAndValidateIndex(fileMap) {
         const indexFile = fileMap.get(INDEX_FILE_NAME);
         if (typeof indexFile === 'undefined') {
             const redundantDirectories = this._findRedundantDirectories(fileMap);
@@ -473,7 +429,7 @@ export class DictionaryImporter {
         const indexContent = await this._getData(indexFile2, new TextWriter());
         const index = /** @type {unknown} */ (parseJson(indexContent));
 
-        if (!skipSchemaValidation && !ajvSchemas.dictionaryIndex(index)) {
+        if (!ajvSchemas.dictionaryIndex(index)) {
             throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, INDEX_FILE_NAME);
         }
 
@@ -483,7 +439,7 @@ export class DictionaryImporter {
         validIndex.version = version;
 
         const {title, revision} = validIndex;
-        if (typeof version !== 'number' || !title || !revision) {
+        if (typeof version !== 'number' || !title || !revision || (version !== 1 && version !== 3)) {
             throw new Error('Unrecognized dictionary format');
         }
 
@@ -521,7 +477,7 @@ export class DictionaryImporter {
      */
     _progress(nextStep = false) {
         const now = Date.now();
-        const minInterval = this._disableProgressEvents ? 10000 : 1000;
+        const minInterval = 1000;
         if (!nextStep && (now - this._lastProgressTimestamp) < minInterval) {
             return;
         }
@@ -623,28 +579,6 @@ export class DictionaryImporter {
     }
 
     /**
-     * @param {number} version
-     * @returns {import('dictionary-importer').CompiledSchemaNameArray}
-     */
-    _getDataBankSchemas(version) {
-        const termBank = (
-            version === 1 ?
-            'dictionaryTermBankV1' :
-            'dictionaryTermBankV3'
-        );
-        const termMetaBank = 'dictionaryTermMetaBankV3';
-        const kanjiBank = (
-            version === 1 ?
-            'dictionaryKanjiBankV1' :
-            'dictionaryKanjiBankV3'
-        );
-        const kanjiMetaBank = 'dictionaryKanjiMetaBankV3';
-        const tagBank = 'dictionaryTagBankV3';
-
-        return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
-    }
-
-    /**
      * @param {string} css
      * @returns {Error[]}
      */
@@ -701,7 +635,7 @@ export class DictionaryImporter {
      * @returns {import('dictionary-data').TermGlossaryStructuredContent}
      */
     _formatStructuredContent(data, entry, requirements) {
-        if (this._structuredContentImportFastPath) {
+        if (this._skipMediaImport) {
             return data;
         }
         const content = this._prepareStructuredContent(data.content, entry, requirements);
@@ -995,8 +929,19 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').TermV1} entry
      * @param {string} dictionary
      * @returns {import('dictionary-database').DatabaseTermEntry}
+     * @throws {Error}
      */
     _convertTermBankEntryV1(entry, dictionary) {
+        if (
+            !Array.isArray(entry) ||
+            typeof entry[0] !== 'string' ||
+            typeof entry[1] !== 'string' ||
+            typeof entry[2] !== 'string' ||
+            typeof entry[3] !== 'string' ||
+            typeof entry[4] !== 'number'
+        ) {
+            throw new Error('Dictionary has invalid data');
+        }
         let [expression, reading, definitionTags, rules, score, ...glossary] = entry;
         reading = reading.length > 0 ? reading : expression;
         return {expression, reading, definitionTags, rules, score, glossary, dictionary};
@@ -1006,8 +951,22 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').TermV3} entry
      * @param {string} dictionary
      * @returns {import('dictionary-database').DatabaseTermEntry}
+     * @throws {Error}
      */
     _convertTermBankEntryV3(entry, dictionary) {
+        if (
+            !Array.isArray(entry) ||
+            typeof entry[0] !== 'string' ||
+            typeof entry[1] !== 'string' ||
+            typeof entry[2] !== 'string' ||
+            typeof entry[3] !== 'string' ||
+            typeof entry[4] !== 'number' ||
+            !Array.isArray(entry[5]) ||
+            (typeof entry[6] !== 'number' && typeof entry[6] !== 'undefined') ||
+            typeof entry[7] !== 'string'
+        ) {
+            throw new Error('Dictionary has invalid data');
+        }
         let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
         reading = reading.length > 0 ? reading : expression;
         return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, dictionary};
@@ -1087,8 +1046,16 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').TermMeta} entry
      * @param {string} dictionary
      * @returns {import('dictionary-database').DatabaseTermMeta}
+     * @throws {Error}
      */
     _convertTermMetaBankEntry(entry, dictionary) {
+        if (
+            !Array.isArray(entry) ||
+            typeof entry[0] !== 'string' ||
+            typeof entry[1] !== 'string'
+        ) {
+            throw new Error('Dictionary has invalid data');
+        }
         const [expression, mode, data] = entry;
         return /** @type {import('dictionary-database').DatabaseTermMeta} */ ({expression, mode, data, dictionary});
     }
@@ -1097,8 +1064,18 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').KanjiV1} entry
      * @param {string} dictionary
      * @returns {import('dictionary-database').DatabaseKanjiEntry}
+     * @throws {Error}
      */
     _convertKanjiBankEntryV1(entry, dictionary) {
+        if (
+            !Array.isArray(entry) ||
+            typeof entry[0] !== 'string' ||
+            typeof entry[1] !== 'string' ||
+            typeof entry[2] !== 'string' ||
+            typeof entry[3] !== 'string'
+        ) {
+            throw new Error('Dictionary has invalid data');
+        }
         const [character, onyomi, kunyomi, tags, ...meanings] = entry;
         return {character, onyomi, kunyomi, tags, meanings, dictionary};
     }
@@ -1107,8 +1084,19 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').KanjiV3} entry
      * @param {string} dictionary
      * @returns {import('dictionary-database').DatabaseKanjiEntry}
+     * @throws {Error}
      */
     _convertKanjiBankEntryV3(entry, dictionary) {
+        if (
+            !Array.isArray(entry) ||
+            typeof entry[0] !== 'string' ||
+            typeof entry[1] !== 'string' ||
+            typeof entry[2] !== 'string' ||
+            typeof entry[3] !== 'string' ||
+            !Array.isArray(entry[4])
+        ) {
+            throw new Error('Dictionary has invalid data');
+        }
         const [character, onyomi, kunyomi, tags, meanings, stats] = entry;
         return {character, onyomi, kunyomi, tags, meanings, stats, dictionary};
     }
@@ -1117,8 +1105,16 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').KanjiMeta} entry
      * @param {string} dictionary
      * @returns {import('dictionary-database').DatabaseKanjiMeta}
+     * @throws {Error}
      */
     _convertKanjiMetaBankEntry(entry, dictionary) {
+        if (
+            !Array.isArray(entry) ||
+            typeof entry[0] !== 'string' ||
+            typeof entry[1] !== 'string'
+        ) {
+            throw new Error('Dictionary has invalid data');
+        }
         const [character, mode, data] = entry;
         return {character, mode, data, dictionary};
     }
@@ -1127,8 +1123,19 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').Tag} entry
      * @param {string} dictionary
      * @returns {import('dictionary-database').Tag}
+     * @throws {Error}
      */
     _convertTagBankEntry(entry, dictionary) {
+        if (
+            !Array.isArray(entry) ||
+            typeof entry[0] !== 'string' ||
+            typeof entry[1] !== 'string' ||
+            typeof entry[2] !== 'number' ||
+            typeof entry[3] !== 'string' ||
+            typeof entry[4] !== 'number'
+        ) {
+            throw new Error('Dictionary has invalid data');
+        }
         const [name, category, order, notes, score] = entry;
         return {name, category, order, notes, score, dictionary};
     }
@@ -1197,9 +1204,17 @@ export class DictionaryImporter {
                 }
             }
 
-            if (Array.isArray(entries)) {
-                for (const entry of /** @type {TEntry[]} */ (entries)) {
+            if (!Array.isArray(entries)) {
+                throw new Error(`Dictionary has invalid data in '${file.filename}'`);
+            }
+            for (const entry of /** @type {TEntry[]} */ (entries)) {
+                try {
                     results.push(convertEntry(entry, dictionaryTitle));
+                } catch (error) {
+                    if (error instanceof Error) {
+                        throw new Error(`${error.message} in '${file.filename}'`);
+                    }
+                    throw error;
                 }
             }
         }
@@ -1223,12 +1238,17 @@ export class DictionaryImporter {
         useMediaPipeline,
         enableTermEntryContentDedup,
     ) {
-        if (!useMediaPipeline && this._structuredContentImportFastPath) {
-            try {
-                return await this._readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, enableTermEntryContentDedup);
-            } catch (e) {
-                this._logImport(`term file ${termFile.filename}: wasm parse fallback (${/** @type {Error} */ (toError(e)).message})`);
-            }
+        try {
+            return await this._readTermBankFileFast(
+                termFile,
+                version,
+                dictionaryTitle,
+                prefixWildcardsSupported,
+                useMediaPipeline,
+                enableTermEntryContentDedup,
+            );
+        } catch (e) {
+            this._logImport(`term file ${termFile.filename}: wasm parse fallback (${/** @type {Error} */ (toError(e)).message})`);
         }
         const content = await this._getData(termFile, new TextWriter());
         let entries = /** @type {unknown} */ ([]);
@@ -1240,7 +1260,7 @@ export class DictionaryImporter {
             }
         }
         if (!Array.isArray(entries)) {
-            return {termList: [], requirements: null};
+            throw new Error(`Dictionary has invalid data in '${termFile.filename}'`);
         }
         const parsedEntries = /** @type {unknown[]} */ (entries);
         /** @type {import('dictionary-importer').ImportRequirement[]|null} */
@@ -1281,12 +1301,15 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').IndexVersion} version
      * @param {string} dictionaryTitle
      * @param {boolean} prefixWildcardsSupported
+     * @param {boolean} useMediaPipeline
      * @param {boolean} enableTermEntryContentDedup
-     * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: null}>}
+     * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
      */
-    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, enableTermEntryContentDedup) {
+    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, useMediaPipeline, enableTermEntryContentDedup) {
         const bytes = await this._getData(termFile, new Uint8ArrayWriter());
         const parsedRows = await parseTermBankWithWasm(bytes, version);
+        /** @type {import('dictionary-importer').ImportRequirement[]|null} */
+        const requirements = useMediaPipeline ? [] : null;
         /** @type {import('dictionary-database').DatabaseTermEntry[]} */
         const termList = [];
         termList.length = parsedRows.length;
@@ -1302,10 +1325,20 @@ export class DictionaryImporter {
                 rules: row.rules,
                 score: row.score,
                 glossary: [],
-                glossaryJson: row.glossaryJson,
                 termTags: row.termTags,
                 dictionary: dictionaryTitle,
             };
+            if (requirements === null) {
+                entry.glossaryJson = row.glossaryJson;
+            } else {
+                const glossaryList = this._parseGlossaryJsonFromFastRow(row.glossaryJson, termFile.filename);
+                for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
+                    const glossary = glossaryList[j];
+                    if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
+                    glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+                }
+                entry.glossary = glossaryList;
+            }
             if (typeof row.sequence === 'number') {
                 entry.sequence = row.sequence;
             }
@@ -1313,44 +1346,38 @@ export class DictionaryImporter {
                 entry.expressionReverse = stringReverse(entry.expression);
                 entry.readingReverse = stringReverse(entry.reading);
             }
-            if (enableTermEntryContentDedup && typeof row.termEntryContentHash === 'string' && row.termEntryContentBytes instanceof Uint8Array) {
+            if (
+                requirements === null &&
+                enableTermEntryContentDedup &&
+                typeof row.termEntryContentHash === 'string' &&
+                row.termEntryContentBytes instanceof Uint8Array
+            ) {
                 entry.termEntryContentHash = row.termEntryContentHash;
                 entry.termEntryContentBytes = row.termEntryContentBytes;
-            } else {
+            } else if (requirements === null) {
                 this._prepareTermEntrySerialization(entry, enableTermEntryContentDedup);
             }
             termList[i] = entry;
         }
-        return {termList, requirements: null};
+        return {termList, requirements};
     }
 
     /**
-     * @param {import('@zip.js/zip.js').Entry} file
-     * @param {import('dictionary-importer').CompiledSchemaName} schemaName
-     * @returns {Promise<boolean>}
+     * @param {string} glossaryJson
+     * @param {string} fileName
+     * @returns {import('dictionary-data').TermGlossary[]}
+     * @throws {Error}
      */
-    async _validateFile(file, schemaName) {
-        const content = await this._getData(file, new TextWriter());
-        let entries;
-
+    _parseGlossaryJsonFromFastRow(glossaryJson, fileName) {
         try {
-            /** @type {unknown} */
-            entries = parseJson(content);
+            const glossary = /** @type {unknown} */ (parseJson(glossaryJson));
+            return Array.isArray(glossary) ? glossary : [];
         } catch (error) {
             if (error instanceof Error) {
-                throw new Error(error.message + ` in '${file.filename}'`);
+                throw new Error(error.message + ` in '${fileName}'`);
             }
+            throw error;
         }
-
-        const schema = ajvSchemas[schemaName];
-        if (!schema(entries)) {
-            throw this._formatAjvSchemaError(schema, file.filename);
-        }
-
-        ++this._progressData.index;
-        this._progress();
-
-        return true;
     }
 
     /**

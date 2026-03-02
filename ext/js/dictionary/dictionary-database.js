@@ -43,6 +43,8 @@ import {TermRecordOpfsStore} from './term-record-opfs-store.js';
  * @property {(item: unknown) => import('@sqlite.org/sqlite-wasm').BindingSpec} bind
  */
 
+const DICTIONARY_DB_SCHEMA_VERSION = 1;
+
 export class DictionaryDatabase {
     constructor() {
         /** @type {import('@sqlite.org/sqlite-wasm').Sqlite3Static|null} */
@@ -91,6 +93,8 @@ export class DictionaryDatabase {
         this._termsVtabModule = null;
         /** @type {boolean} */
         this._termsVtabModuleRegistered = false;
+        /** @type {boolean} */
+        this._forceDropTermsTableOnInit = false;
         /** @type {Map<number, {ids: number[], index: number}>} */
         this._termsVtabCursorState = new Map();
         /** @type {boolean} */
@@ -2197,6 +2201,7 @@ export class DictionaryDatabase {
                 content BLOB NOT NULL
             );
         `);
+        await this._runSchemaMigrations();
         await this._ensureTermsVirtualTable();
         await this._migrateTermsContentSchema();
         if (!this._enableSqliteSecondaryIndexes) {
@@ -2207,6 +2212,70 @@ export class DictionaryDatabase {
         for (const createIndexSql of this._createIndexesSql()) {
             db.exec(createIndexSql);
         }
+    }
+
+    /** */
+    async _runSchemaMigrations() {
+        const db = this._requireDb();
+        const currentVersion = this._getSchemaVersion();
+        if (currentVersion > DICTIONARY_DB_SCHEMA_VERSION) {
+            throw new Error(`Unsupported dictionary schema version: ${currentVersion}`);
+        }
+        for (let nextVersion = currentVersion + 1; nextVersion <= DICTIONARY_DB_SCHEMA_VERSION; ++nextVersion) {
+            switch (nextVersion) {
+                case 1:
+                    await this._migrateSchemaVersion1();
+                    break;
+                default:
+                    throw new Error(`Missing dictionary schema migration for version ${nextVersion}`);
+            }
+            db.exec(`PRAGMA user_version = ${nextVersion}`);
+        }
+    }
+
+    /**
+     * @returns {number}
+     */
+    _getSchemaVersion() {
+        const db = this._requireDb();
+        return this._asNumber(db.selectValue('PRAGMA user_version'), 0);
+    }
+
+    /**
+     * Initial schema migration for legacy unversioned databases.
+     * Resets dictionary payloads/artifacts so partially-compatible legacy layouts
+     * cannot survive into schema-versioned startup.
+     * @returns {Promise<void>}
+     */
+    async _migrateSchemaVersion1() {
+        const db = this._requireDb();
+        db.exec('BEGIN IMMEDIATE');
+        try {
+            db.exec('DELETE FROM dictionaries');
+            db.exec('DELETE FROM termEntryContent');
+            db.exec('DELETE FROM termMeta');
+            db.exec('DELETE FROM kanji');
+            db.exec('DELETE FROM kanjiMeta');
+            db.exec('DELETE FROM tagMeta');
+            db.exec('DELETE FROM media');
+            db.exec('COMMIT');
+        } catch (e) {
+            try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+            throw e;
+        }
+
+        await this._termContentStore.reset();
+        await this._termRecordStore.reset();
+        this._termEntryContentIdByKey.clear();
+        this._termEntryContentIdByHash.clear();
+        this._termEntryContentMetaByHash.clear();
+        this._termEntryContentCache.clear();
+        this._termExactPresenceCache.clear();
+        this._termPrefixNegativeCache.clear();
+        this._directTermIndexByDictionary.clear();
+        this._termsVirtualTableDirty = false;
+        this._termEntryContentHasExistingRows = false;
+        this._forceDropTermsTableOnInit = true;
     }
 
     /**
@@ -2270,7 +2339,9 @@ export class DictionaryDatabase {
         const termsType = typeof termsEntry === 'undefined' ? '' : this._asString(termsEntry.type);
         const termsSql = typeof termsEntry === 'undefined' ? '' : this._asString(termsEntry.sql).toUpperCase();
         const isVirtualTerms = termsSql.startsWith('CREATE VIRTUAL TABLE');
-        if (termsType === 'table' && !isVirtualTerms) {
+        if (this._forceDropTermsTableOnInit && termsType.length > 0) {
+            db.exec('DROP TABLE terms');
+        } else if (termsType === 'table' && !isVirtualTerms) {
             await this._migrateLegacyTermsTableToExternalStore();
             db.exec('DROP TABLE terms');
         } else if (isVirtualTerms && !termsSql.includes('MANABITAN_TERMS')) {
@@ -2295,6 +2366,7 @@ export class DictionaryDatabase {
                 sequence
             )
         `);
+        this._forceDropTermsTableOnInit = false;
         this._termsVirtualTableDirty = false;
     }
 

@@ -763,10 +763,6 @@ async function installRecommendedDictionariesMock(driver, recommendedDictionarie
         const normalizedFlags = (typeof existingFlags === 'object' && existingFlags !== null && !Array.isArray(existingFlags)) ? existingFlags : {};
         Reflect.set(globalThis, 'manabitanImportPerformanceFlags', {
             ...normalizedFlags,
-            skipSchemaValidation: false,
-            enableBulkImportIndexOptimization: false,
-            disableProgressEvents: false,
-            structuredContentImportFastPath: false,
             debugImportLogging: true,
         });
         Reflect.set(globalThis, 'manabitanImportUseSession', false);
