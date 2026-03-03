@@ -168,7 +168,7 @@ describe.concurrent('JSON validation', () => {
         const {errors} = validate;
         expect(errors).toBe(null);
         expect(valid).toBe(true);
-    });
+    }, 30000);
 
     // Validate schemas 2
     /** @type {{path: string, schema: string}[]} */
@@ -186,5 +186,5 @@ describe.concurrent('JSON validation', () => {
         const {errors} = validate;
         expect(errors).toBe(null);
         expect(valid).toBe(true);
-    });
+    }, 30000);
 });

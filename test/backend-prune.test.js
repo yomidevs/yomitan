@@ -55,6 +55,7 @@ describe('Backend stale dictionary option pruning', () => {
             _dictionaryDatabase: {
                 getDictionaryInfo: async () => [{title: 'A'}, {title: 'Shared'}],
             },
+            _ensureDictionaryDatabaseReady: async () => {},
             _optionsUtil: {
                 save: optionsUtilSave,
             },
@@ -103,6 +104,7 @@ describe('Backend stale dictionary option pruning', () => {
             _dictionaryDatabase: {
                 getDictionaryInfo: async () => [{title: 'A'}],
             },
+            _ensureDictionaryDatabaseReady: async () => {},
             _optionsUtil: {
                 save: optionsUtilSave,
             },
@@ -135,6 +137,7 @@ describe('Backend stale dictionary option pruning', () => {
                     throw new Error('dictionary info unavailable');
                 },
             },
+            _ensureDictionaryDatabaseReady: async () => {},
             _optionsUtil: {
                 save: optionsUtilSave,
             },

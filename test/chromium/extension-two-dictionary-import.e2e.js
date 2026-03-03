@@ -85,6 +85,10 @@ const strictUnsupportedRuntime = parseBooleanEnv(
     parseBooleanEnv(process.env.CI, false),
 );
 const quickImportBenchmarkMode = parseBooleanEnv(process.env.MANABITAN_E2E_IMPORT_BENCH_QUICK, false);
+const concurrentDbOpenPressureEnabled = (
+    !quickImportBenchmarkMode &&
+    parseBooleanEnv(process.env.MANABITAN_E2E_DB_OPEN_PRESSURE, true)
+);
 const e2eImportFlagsJsonRaw = process.env.MANABITAN_E2E_IMPORT_FLAGS_JSON;
 let e2eImportFlags = null;
 if (typeof e2eImportFlagsJsonRaw === 'string') {
@@ -854,6 +858,121 @@ async function evalSendMessage(page, expression, arg = null) {
                 dictionaryInfoCount: Array.isArray(dictionaryInfo) ? dictionaryInfo.length : null,
             };
         }
+        if (expression === 'concurrentDbPressure') {
+            const durationMsRaw = Number(arg && typeof arg === 'object' ? arg.durationMs : 10000);
+            const batchDelayMsRaw = Number(arg && typeof arg === 'object' ? arg.batchDelayMs : 35);
+            const parallelismRaw = Number(arg && typeof arg === 'object' ? arg.parallelism : 6);
+            const durationMs = Number.isFinite(durationMsRaw) ? Math.max(1000, durationMsRaw) : 10000;
+            const batchDelayMs = Number.isFinite(batchDelayMsRaw) ? Math.max(0, batchDelayMsRaw) : 35;
+            const parallelism = Number.isFinite(parallelismRaw) ? Math.min(24, Math.max(1, Math.trunc(parallelismRaw))) : 6;
+            const actions = ['termsFind', 'getDictionaryCounts', 'deleteDictionaryByTitle'];
+            /**
+             * @param {string} action
+             * @returns {Record<string, unknown>}
+             */
+            const getParamsForAction = (action) => {
+                switch (action) {
+                    case 'termsFind':
+                        return {text: '打', details: {primaryReading: ''}, optionsContext: {index: 0}};
+                    case 'getDictionaryCounts':
+                        return {dictionaryNames: [], getTotal: true};
+                    default:
+                        return {dictionaryTitle: '__manabitan_e2e_missing_dictionary__'};
+                }
+            };
+            /**
+             * @param {string} lowerMessage
+             * @returns {string}
+             */
+            const getErrorBucket = (lowerMessage) => {
+                if (lowerMessage.includes('sqlite_cantopen') || lowerMessage.includes('unable to open database file')) {
+                    return 'sqlite-cantopen';
+                }
+                if (lowerMessage.includes('sqlite_busy') || lowerMessage.includes('database is locked')) {
+                    return 'sqlite-locked';
+                }
+                if (lowerMessage.includes('suspended while import is in progress')) {
+                    return 'import-mode-suspended';
+                }
+                return 'other';
+            };
+            /** @type {Record<string, {ok: number, error: number}>} */
+            const perAction = {
+                termsFind: {ok: 0, error: 0},
+                getDictionaryCounts: {ok: 0, error: 0},
+                deleteDictionaryByTitle: {ok: 0, error: 0},
+            };
+            /** @type {Record<string, number>} */
+            const errorBuckets = {};
+            /** @type {Array<{action: string, message: string}>} */
+            const sampleErrors = [];
+            let okCount = 0;
+            let errorCount = 0;
+            let sqliteCantopenCount = 0;
+            let suspendedCount = 0;
+            let attemptCount = 0;
+            const now = () => Date.now();
+            const stopAt = now() + durationMs;
+            while (now() < stopAt) {
+                const tasks = [];
+                for (let i = 0; i < parallelism; ++i) {
+                    const action = actions[(attemptCount + i) % actions.length];
+                    const params = getParamsForAction(action);
+                    tasks.push((async () => {
+                        try {
+                            await send(action, params);
+                            return {action, ok: true, message: ''};
+                        } catch (e) {
+                            const message = e instanceof Error ? e.message : String(e);
+                            return {action, ok: false, message};
+                        }
+                    })());
+                }
+                const results = await Promise.all(tasks);
+                for (const result of results) {
+                    ++attemptCount;
+                    const actionStats = perAction[result.action] || (perAction[result.action] = {ok: 0, error: 0});
+                    if (result.ok) {
+                        ++okCount;
+                        ++actionStats.ok;
+                        continue;
+                    }
+                    ++errorCount;
+                    ++actionStats.error;
+                    const message = String(result.message || '');
+                    const lower = message.toLowerCase();
+                    if (lower.includes('sqlite_cantopen') || lower.includes('unable to open database file')) {
+                        ++sqliteCantopenCount;
+                    }
+                    if (lower.includes('suspended while import is in progress')) {
+                        ++suspendedCount;
+                    }
+                    const bucket = getErrorBucket(lower);
+                    errorBuckets[bucket] = (errorBuckets[bucket] || 0) + 1;
+                    if (sampleErrors.length < 24) {
+                        sampleErrors.push({action: result.action, message});
+                    }
+                }
+                if (batchDelayMs > 0) {
+                    await new Promise((resolve) => {
+                        setTimeout(resolve, batchDelayMs);
+                    });
+                }
+            }
+            return {
+                durationMs,
+                parallelism,
+                batchDelayMs,
+                attemptCount,
+                okCount,
+                errorCount,
+                sqliteCantopenCount,
+                suspendedCount,
+                errorBuckets,
+                perAction,
+                sampleErrors,
+            };
+        }
         return {error: 'unknown expression'};
     }, {expression, arg});
 }
@@ -1612,6 +1731,18 @@ async function main() {
             importTriggerProfile,
             processSampler,
         );
+        let concurrentDbPressurePromise = null;
+        let concurrentDbPressureStart = 0;
+        if (concurrentDbOpenPressureEnabled) {
+            concurrentDbPressureStart = safePerformance.now();
+            concurrentDbPressurePromise = runPhaseProfile(cdpSession, async () => {
+                return await evalSendMessage(page, 'concurrentDbPressure', {
+                    durationMs: 15000,
+                    batchDelayMs: 35,
+                    parallelism: 6,
+                });
+            });
+        }
         const importTotalStart = safePerformance.now();
         const importStepIndexByLabel = new Map();
         const importTotalProfile = await runPhaseProfile(cdpSession, async () => {
@@ -1658,6 +1789,25 @@ async function main() {
             importTotalProfile,
             processSampler,
         );
+        if (concurrentDbPressurePromise !== null) {
+            const concurrentDbPressureEnd = safePerformance.now();
+            const concurrentDbPressureProfile = await concurrentDbPressurePromise;
+            const concurrentDbPressureResult = concurrentDbPressureProfile.result;
+            await addReportPhase(
+                report,
+                page,
+                'Concurrent DB-open pressure during import',
+                `Ran parallel termsFind/getDictionaryCounts/deleteDictionaryByTitle requests during import to force DB-open contention and classify failures: ${JSON.stringify(concurrentDbPressureResult)}`,
+                concurrentDbPressureStart,
+                concurrentDbPressureEnd,
+                concurrentDbPressureProfile,
+                processSampler,
+            );
+            const sqliteCantopenCount = Number(concurrentDbPressureResult?.sqliteCantopenCount ?? 0);
+            if (Number.isFinite(sqliteCantopenCount) && sqliteCantopenCount > 0) {
+                fail(`Concurrent DB pressure observed SQLITE_CANTOPEN failures during import: ${JSON.stringify(concurrentDbPressureResult)}`);
+            }
+        }
 
         if (quickImportBenchmarkMode) {
             report.status = 'success';
