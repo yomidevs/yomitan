@@ -55,8 +55,6 @@ export class DictionaryImporter {
         /** @type {number} */
         this._lastProgressTimestamp = 0;
         /** @type {boolean} */
-        this._disableProgressEvents = false;
-        /** @type {boolean} */
         this._skipImageMetadata = false;
         /** @type {boolean} */
         this._skipMediaImport = false;
@@ -68,14 +66,14 @@ export class DictionaryImporter {
         this._imageMetadataByPath = new Map();
         /** @type {boolean} */
         this._debugImportLogging = false;
-        /** @type {boolean} */
-        this._structuredContentImportFastPath = false;
-        /** @type {boolean} */
-        this._skipMediaGlossaryJsonParseFastPath = false;
         /** @type {TextEncoder} */
         this._textEncoder = new TextEncoder();
+        /** @type {TextDecoder} */
+        this._textDecoder = new TextDecoder();
         /** @type {Map<string, string>} */
         this._jsonQuotedStringCache = new Map();
+        /** @type {Map<string, string>} */
+        this._termEntryContentJsHashByWasmHash = new Map();
         /** @type {number} */
         this._progressMinIntervalMs = 1000;
     }
@@ -98,17 +96,15 @@ export class DictionaryImporter {
         const errors = [];
         const maxTransactionLength = 262144;
         const bulkAddProgressAllowance = 1000;
-        const enableBulkImportIndexOptimization = true;
         const enableTermEntryContentDedup = true;
         this._skipImageMetadata = details.skipImageMetadata === true;
         this._skipMediaImport = details.skipMediaImport === true;
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
         this._debugImportLogging = details.debugImportLogging === true;
-        this._structuredContentImportFastPath = true;
-        this._skipMediaGlossaryJsonParseFastPath = details.skipMediaGlossaryJsonParseFastPath === true;
         this._pendingImageMediaByPath.clear();
         this._imageMetadataByPath.clear();
         this._jsonQuotedStringCache.clear();
+        this._termEntryContentJsHashByWasmHash.clear();
         const tImportStart = Date.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
         const phaseTimings = [];
@@ -161,9 +157,7 @@ export class DictionaryImporter {
                 );
 
                 this._progressData.index += progressIndexIncrease;
-                if (!this._disableProgressEvents) {
-                    this._progress();
-                }
+                this._progress();
             }
         };
 
@@ -214,8 +208,6 @@ export class DictionaryImporter {
         dictionaryDatabase.setTermEntryContentDedupEnabled(enableTermEntryContentDedup);
         dictionaryDatabase.setImportDebugLogging(this._debugImportLogging);
 
-        this._disableProgressEvents = false;
-
         // Files
         /** @type {import('dictionary-importer').QueryDetails} */
         const queryDetails = [
@@ -260,9 +252,7 @@ export class DictionaryImporter {
         const tImportBanksStart = Date.now();
 
         try {
-            if (enableBulkImportIndexOptimization) {
-                await dictionaryDatabase.startBulkImport();
-            }
+            await dictionaryDatabase.startBulkImport();
             const useMediaPipeline = !this._skipMediaImport;
             const uniqueMediaPaths = useMediaPipeline ? new Set() : null;
             for (let termFileIndex = 0; termFileIndex < termFiles.length; ++termFileIndex) {
@@ -472,28 +462,25 @@ export class DictionaryImporter {
         } finally {
             this._setProgressInterval(previousProgressInterval);
             dictionaryDatabase.setImportDebugLogging(false);
-            if (enableBulkImportIndexOptimization) {
-                const tBulkFinalizationStart = Date.now();
-                this._progressNextStep(20, false);
-                this._progressData.index = 0;
-                this._progress();
-                try {
-                    await dictionaryDatabase.finishBulkImport((checkpointIndex, total) => {
-                        this._progressData.index = Math.max(1, Math.floor((checkpointIndex / total) * this._progressData.count));
-                        this._progress();
-                        this._logImport(`bulk finalization ${checkpointIndex}/${total}`);
-                    });
-                } catch (e) {
-                    importFailed = true;
-                    errors.push(toError(e));
-                }
-                this._progressData.index = this._progressData.count;
-                this._progress();
-                recordPhaseTiming('bulk-finalization', tBulkFinalizationStart, {
-                    ok: !importFailed,
+            const tBulkFinalizationStart = Date.now();
+            this._progressNextStep(20, false);
+            this._progressData.index = 0;
+            this._progress();
+            try {
+                await dictionaryDatabase.finishBulkImport((checkpointIndex, total) => {
+                    this._progressData.index = Math.max(1, Math.floor((checkpointIndex / total) * this._progressData.count));
+                    this._progress();
+                    this._logImport(`bulk finalization ${checkpointIndex}/${total}`);
                 });
+            } catch (e) {
+                importFailed = true;
+                errors.push(toError(e));
             }
-            this._disableProgressEvents = false;
+            this._progressData.index = this._progressData.count;
+            this._progress();
+            recordPhaseTiming('bulk-finalization', tBulkFinalizationStart, {
+                ok: !importFailed,
+            });
         }
 
         if (importFailed) {
@@ -632,8 +619,7 @@ export class DictionaryImporter {
      */
     _progress(nextStep = false) {
         const now = Date.now();
-        const minInterval = this._disableProgressEvents ? 10000 : this._progressMinIntervalMs;
-        if (!nextStep && (now - this._lastProgressTimestamp) < minInterval) {
+        if (!nextStep && (now - this._lastProgressTimestamp) < this._progressMinIntervalMs) {
             return;
         }
         this._lastProgressTimestamp = now;
@@ -779,7 +765,7 @@ export class DictionaryImporter {
      * @returns {import('dictionary-data').TermGlossaryStructuredContent}
      */
     _formatStructuredContent(data, entry, requirements) {
-        if (this._structuredContentImportFastPath && this._skipMediaImport) {
+        if (this._skipMediaImport) {
             return data;
         }
         const content = this._prepareStructuredContent(data.content, entry, requirements);
@@ -1309,19 +1295,17 @@ export class DictionaryImporter {
         useMediaPipeline,
         enableTermEntryContentDedup,
     ) {
-        if (this._structuredContentImportFastPath) {
-            try {
-                return await this._readTermBankFileFast(
-                    termFile,
-                    version,
-                    dictionaryTitle,
-                    prefixWildcardsSupported,
-                    useMediaPipeline,
-                    enableTermEntryContentDedup,
-                );
-            } catch (e) {
-                this._logImport(`term file ${termFile.filename}: wasm parse fallback (${/** @type {Error} */ (toError(e)).message})`);
-            }
+        try {
+            return await this._readTermBankFileFast(
+                termFile,
+                version,
+                dictionaryTitle,
+                prefixWildcardsSupported,
+                useMediaPipeline,
+                enableTermEntryContentDedup,
+            );
+        } catch (e) {
+            this._logImport(`term file ${termFile.filename}: wasm parse fallback (${/** @type {Error} */ (toError(e)).message})`);
         }
         const content = await this._getData(termFile, new TextWriter());
         let entries = /** @type {unknown} */ ([]);
@@ -1404,19 +1388,33 @@ export class DictionaryImporter {
             if (requirements === null) {
                 entry.glossaryJson = row.glossaryJson;
             } else {
-                const skipGlossaryParse = (
-                    this._skipMediaGlossaryJsonParseFastPath &&
-                    !this._glossaryJsonLikelyContainsMedia(row.glossaryJson)
-                );
+                const skipGlossaryParse = !this._glossaryJsonLikelyContainsMedia(row.glossaryJson);
                 if (skipGlossaryParse) {
-                    entry.glossaryJson = row.glossaryJson;
-                    if (
+                    const requiresCanonicalTermContent = (
                         enableTermEntryContentDedup &&
-                        typeof row.termEntryContentHash === 'string' &&
-                        row.termEntryContentBytes instanceof Uint8Array
-                    ) {
-                        entry.termEntryContentHash = row.termEntryContentHash;
-                        entry.termEntryContentBytes = row.termEntryContentBytes;
+                        this._termContentNeedsCanonicalGlossary(row.glossaryJson)
+                    );
+                    if (requiresCanonicalTermContent) {
+                        const glossaryList = this._parseGlossaryJsonFromFastRow(row.glossaryJson, termFile.filename);
+                        this._normalizePlainTextGlossaryItems(glossaryList);
+                        entry.glossary = glossaryList;
+                    } else {
+                        entry.glossaryJson = row.glossaryJson;
+                        if (
+                            enableTermEntryContentDedup &&
+                            typeof row.termEntryContentHash === 'string' &&
+                            row.termEntryContentBytes instanceof Uint8Array
+                        ) {
+                            entry.termEntryContentBytes = row.termEntryContentBytes;
+                            const cachedHash = this._termEntryContentJsHashByWasmHash.get(row.termEntryContentHash);
+                            if (typeof cachedHash === 'string' && cachedHash.length > 0) {
+                                entry.termEntryContentHash = cachedHash;
+                            } else {
+                                const jsHash = this._hashEntryContent(this._textDecoder.decode(row.termEntryContentBytes));
+                                entry.termEntryContentHash = jsHash;
+                                this._termEntryContentJsHashByWasmHash.set(row.termEntryContentHash, jsHash);
+                            }
+                        }
                     }
                 } else {
                     const glossaryList = this._parseGlossaryJsonFromFastRow(row.glossaryJson, termFile.filename);
@@ -1456,11 +1454,32 @@ export class DictionaryImporter {
      * @returns {boolean}
      */
     _glossaryJsonLikelyContainsMedia(glossaryJson) {
+        return /"type"\s*:\s*"image"|"tag"\s*:\s*"img"/.test(glossaryJson);
+    }
+
+    /**
+     * @param {string} glossaryJson
+     * @returns {boolean}
+     */
+    _termContentNeedsCanonicalGlossary(glossaryJson) {
         return (
-            glossaryJson.includes('"type":"image"') ||
-            glossaryJson.includes('"type": "image"') ||
-            glossaryJson.includes('"tag":"img"')
+            glossaryJson.includes('\\') ||
+            glossaryJson.includes('"type":"text"') ||
+            glossaryJson.includes('"type": "text"')
         );
+    }
+
+    /**
+     * @param {import('dictionary-data').TermGlossary[]} glossaryList
+     */
+    _normalizePlainTextGlossaryItems(glossaryList) {
+        for (let i = 0, ii = glossaryList.length; i < ii; ++i) {
+            const glossary = glossaryList[i];
+            if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
+            if (glossary.type === 'text' && typeof glossary.text === 'string') {
+                glossaryList[i] = glossary.text;
+            }
+        }
     }
 
     /**

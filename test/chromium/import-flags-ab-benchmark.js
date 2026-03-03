@@ -39,6 +39,7 @@ const pairIterations = Number.isFinite(pairIterationsOverride) && pairIterations
     pairIterationsOverride :
     Math.max(1, Number.isFinite(pairIterationsFromPercent) ? pairIterationsFromPercent : 1);
 const quickMode = (process.env.MANABITAN_AB_QUICK_MODE ?? '1').trim() !== '0';
+const collectBulkAddBytesMetrics = (process.env.MANABITAN_AB_BULKADD_BYTES_METRICS ?? '1').trim() !== '0';
 
 /**
  * @typedef {object} VariantSpec
@@ -94,8 +95,35 @@ function parseStep4Breakdown(details) {
 }
 
 /**
+ * @param {unknown} logsRaw
+ * @returns {{rows: number, totalMs: number, estimatedBytes: number, bytesPerRow: number, rowsPerSecond: number, msPerKRows: number}}
+ */
+function summarizeBulkAddTermsLogs(logsRaw) {
+    const logs = Array.isArray(logsRaw) ? logsRaw : [];
+    const pattern = /bulkAdd terms done rows=(\d+) total=([\d.]+)ms[\s\S]*?\sbps=([\d.]+)/;
+    let rows = 0;
+    let totalMs = 0;
+    let estimatedBytes = 0;
+    for (const entry of logs) {
+        const text = String(entry);
+        const match = text.match(pattern);
+        if (!match) { continue; }
+        const batchRows = asNumber(match[1]);
+        const batchTotalMs = asNumber(match[2]);
+        const batchBytesPerSecond = asNumber(match[3]);
+        rows += batchRows;
+        totalMs += batchTotalMs;
+        estimatedBytes += batchBytesPerSecond * (batchTotalMs / 1000);
+    }
+    const bytesPerRow = rows > 0 ? (estimatedBytes / rows) : 0;
+    const rowsPerSecond = totalMs > 0 ? ((rows * 1000) / totalMs) : 0;
+    const msPerKRows = rows > 0 ? ((totalMs * 1000) / rows) : 0;
+    return {rows, totalMs, estimatedBytes, bytesPerRow, rowsPerSecond, msPerKRows};
+}
+
+/**
  * @param {Record<string, unknown>} report
- * @returns {{totalImportMs: number, step4BulkAddTermsMs: number, step4AccountedMs: number}}
+ * @returns {{totalImportMs: number, step4BulkAddTermsMs: number, step4AccountedMs: number, bulkAddTermsPayloadBytesPerRow: number, bulkAddTermsEstimatedBytes: number, bulkAddTermsRowsPerSecond: number, bulkAddTermsMsPerKRows: number}}
  * @throws {Error}
  */
 function summarizeReport(report) {
@@ -125,10 +153,15 @@ function summarizeReport(report) {
         throw new Error('Missing step4Breakdown.aggregate');
     }
     const aggregate = /** @type {Record<string, unknown>} */ (aggregateRaw);
+    const bulkAddTermsFromLogs = summarizeBulkAddTermsLogs(report.logs);
     return {
         totalImportMs: asNumber(totalImportPhase.durationMs),
         step4BulkAddTermsMs: asNumber(aggregate.bulkAddTermsMs),
         step4AccountedMs: asNumber(aggregate.accountedMs),
+        bulkAddTermsPayloadBytesPerRow: bulkAddTermsFromLogs.bytesPerRow,
+        bulkAddTermsEstimatedBytes: bulkAddTermsFromLogs.estimatedBytes,
+        bulkAddTermsRowsPerSecond: bulkAddTermsFromLogs.rowsPerSecond,
+        bulkAddTermsMsPerKRows: bulkAddTermsFromLogs.msPerKRows,
     };
 }
 
@@ -193,44 +226,69 @@ async function runOnce(runId, envOverrides) {
 /**
  * @param {VariantSpec} variant
  * @param {boolean} skipBuildForFirstBaseline
- * @returns {Promise<{variant: VariantSpec, runPairs: Array<{iteration: number, baseline: Awaited<ReturnType<typeof runOnce>>, variant: Awaited<ReturnType<typeof runOnce>>, deltas: {totalImportMsDelta: number, totalImportPercentDelta: number, targetedMetricDelta: number, targetedMetricPercentDelta: number}}>, medians: {baselineTotalImportMs: number, variantTotalImportMs: number, baselineTargetedMetricMs: number, variantTargetedMetricMs: number, totalImportMsDelta: number, totalImportPercentDelta: number, targetedMetricDelta: number, targetedMetricPercentDelta: number}}>}
+ * @returns {Promise<{variant: VariantSpec, runPairs: Array<{iteration: number, baseline: Awaited<ReturnType<typeof runOnce>>, variant: Awaited<ReturnType<typeof runOnce>>, deltas: {totalImportMsDelta: number, totalImportPercentDelta: number, targetedMetricDelta: number, targetedMetricPercentDelta: number, bulkAddPayloadBytesPerRowDelta: number, bulkAddPayloadBytesPerRowPercentDelta: number, bulkAddRowsPerSecondDelta: number, bulkAddRowsPerSecondPercentDelta: number, bulkAddMsPerKRowsDelta: number, bulkAddMsPerKRowsPercentDelta: number}}>, medians: {baselineTotalImportMs: number, variantTotalImportMs: number, baselineTargetedMetricMs: number, variantTargetedMetricMs: number, totalImportMsDelta: number, totalImportPercentDelta: number, targetedMetricDelta: number, targetedMetricPercentDelta: number, baselineBulkAddPayloadBytesPerRow: number, variantBulkAddPayloadBytesPerRow: number, bulkAddPayloadBytesPerRowDelta: number, bulkAddPayloadBytesPerRowPercentDelta: number, baselineBulkAddRowsPerSecond: number, variantBulkAddRowsPerSecond: number, bulkAddRowsPerSecondDelta: number, bulkAddRowsPerSecondPercentDelta: number, baselineBulkAddMsPerKRows: number, variantBulkAddMsPerKRows: number, bulkAddMsPerKRowsDelta: number, bulkAddMsPerKRowsPercentDelta: number}}>}
  */
 async function runPairedVariant(variant, skipBuildForFirstBaseline) {
-    /** @type {Array<{iteration: number, baseline: Awaited<ReturnType<typeof runOnce>>, variant: Awaited<ReturnType<typeof runOnce>>, deltas: {totalImportMsDelta: number, totalImportPercentDelta: number, targetedMetricDelta: number, targetedMetricPercentDelta: number}}>} */
+    /** @type {Array<{iteration: number, baseline: Awaited<ReturnType<typeof runOnce>>, variant: Awaited<ReturnType<typeof runOnce>>, deltas: {totalImportMsDelta: number, totalImportPercentDelta: number, targetedMetricDelta: number, targetedMetricPercentDelta: number, bulkAddPayloadBytesPerRowDelta: number, bulkAddPayloadBytesPerRowPercentDelta: number, bulkAddRowsPerSecondDelta: number, bulkAddRowsPerSecondPercentDelta: number, bulkAddMsPerKRowsDelta: number, bulkAddMsPerKRowsPercentDelta: number}}>} */
     const runPairs = [];
     const baselineTotals = [];
     const variantTotals = [];
     const baselineTargeted = [];
     const variantTargeted = [];
+    const baselineBulkAddPayloadBytesPerRowValues = [];
+    const variantBulkAddPayloadBytesPerRowValues = [];
+    const baselineBulkAddRowsPerSecondValues = [];
+    const variantBulkAddRowsPerSecondValues = [];
+    const baselineBulkAddMsPerKRowsValues = [];
+    const variantBulkAddMsPerKRowsValues = [];
     const totalDeltas = [];
     const targetedDeltas = [];
     const totalPercentDeltas = [];
     const targetedPercentDeltas = [];
+    const bulkAddPayloadBytesPerRowDeltas = [];
+    const bulkAddPayloadBytesPerRowPercentDeltas = [];
+    const bulkAddRowsPerSecondDeltas = [];
+    const bulkAddRowsPerSecondPercentDeltas = [];
+    const bulkAddMsPerKRowsDeltas = [];
+    const bulkAddMsPerKRowsPercentDeltas = [];
 
     for (let iteration = 1; iteration <= pairIterations; ++iteration) {
         const runIdPrefix = `${variant.id}-iter${String(iteration)}`;
         const baselineReportPath = path.join(buildsDir, `chromium-e2e-import-report-iso-${runIdPrefix}-baseline-${timestamp}.html`);
         const variantReportPath = path.join(buildsDir, `chromium-e2e-import-report-iso-${runIdPrefix}-variant-${timestamp}.html`);
+        const baselineRunImportFlags = {
+            ...baselineImportFlags,
+            ...(collectBulkAddBytesMetrics ? {debugImportLogging: true} : {}),
+        };
         const baseline = await runOnce(`${runIdPrefix}:baseline`, {
             MANABITAN_CHROMIUM_E2E_REPORT: baselineReportPath,
             MANABITAN_E2E_SKIP_BUILD: (iteration === 1 && !skipBuildForFirstBaseline) ? '0' : '1',
-            MANABITAN_E2E_IMPORT_FLAGS_JSON: JSON.stringify(baselineImportFlags),
+            MANABITAN_E2E_IMPORT_FLAGS_JSON: JSON.stringify(baselineRunImportFlags),
             MANABITAN_E2E_IMPORT_BENCH_QUICK: quickMode ? '1' : '0',
+            MANABITAN_CHROMIUM_E2E_MAX_LOG_LINES: collectBulkAddBytesMetrics ? '10000' : '1000',
         });
         const variantImportFlags = {
             ...baselineImportFlags,
             ...variant.importFlags,
+            ...(collectBulkAddBytesMetrics ? {debugImportLogging: true} : {}),
         };
         const variantRun = await runOnce(`${runIdPrefix}:variant`, {
             MANABITAN_CHROMIUM_E2E_REPORT: variantReportPath,
             MANABITAN_E2E_SKIP_BUILD: '1',
             MANABITAN_E2E_IMPORT_FLAGS_JSON: JSON.stringify(variantImportFlags),
             MANABITAN_E2E_IMPORT_BENCH_QUICK: quickMode ? '1' : '0',
+            MANABITAN_CHROMIUM_E2E_MAX_LOG_LINES: collectBulkAddBytesMetrics ? '10000' : '1000',
         });
         const totalImportMsDelta = variantRun.summary.totalImportMs - baseline.summary.totalImportMs;
         const totalImportPercentDelta = percentDelta(baseline.summary.totalImportMs, variantRun.summary.totalImportMs);
         const targetedMetricDelta = variantRun.summary.step4BulkAddTermsMs - baseline.summary.step4BulkAddTermsMs;
         const targetedMetricPercentDelta = percentDelta(baseline.summary.step4BulkAddTermsMs, variantRun.summary.step4BulkAddTermsMs);
+        const bulkAddPayloadBytesPerRowDelta = variantRun.summary.bulkAddTermsPayloadBytesPerRow - baseline.summary.bulkAddTermsPayloadBytesPerRow;
+        const bulkAddPayloadBytesPerRowPercentDelta = percentDelta(baseline.summary.bulkAddTermsPayloadBytesPerRow, variantRun.summary.bulkAddTermsPayloadBytesPerRow);
+        const bulkAddRowsPerSecondDelta = variantRun.summary.bulkAddTermsRowsPerSecond - baseline.summary.bulkAddTermsRowsPerSecond;
+        const bulkAddRowsPerSecondPercentDelta = percentDelta(baseline.summary.bulkAddTermsRowsPerSecond, variantRun.summary.bulkAddTermsRowsPerSecond);
+        const bulkAddMsPerKRowsDelta = variantRun.summary.bulkAddTermsMsPerKRows - baseline.summary.bulkAddTermsMsPerKRows;
+        const bulkAddMsPerKRowsPercentDelta = percentDelta(baseline.summary.bulkAddTermsMsPerKRows, variantRun.summary.bulkAddTermsMsPerKRows);
         runPairs.push({
             iteration,
             baseline,
@@ -240,16 +298,34 @@ async function runPairedVariant(variant, skipBuildForFirstBaseline) {
                 totalImportPercentDelta,
                 targetedMetricDelta,
                 targetedMetricPercentDelta,
+                bulkAddPayloadBytesPerRowDelta,
+                bulkAddPayloadBytesPerRowPercentDelta,
+                bulkAddRowsPerSecondDelta,
+                bulkAddRowsPerSecondPercentDelta,
+                bulkAddMsPerKRowsDelta,
+                bulkAddMsPerKRowsPercentDelta,
             },
         });
         baselineTotals.push(baseline.summary.totalImportMs);
         variantTotals.push(variantRun.summary.totalImportMs);
         baselineTargeted.push(baseline.summary.step4BulkAddTermsMs);
         variantTargeted.push(variantRun.summary.step4BulkAddTermsMs);
+        baselineBulkAddPayloadBytesPerRowValues.push(baseline.summary.bulkAddTermsPayloadBytesPerRow);
+        variantBulkAddPayloadBytesPerRowValues.push(variantRun.summary.bulkAddTermsPayloadBytesPerRow);
+        baselineBulkAddRowsPerSecondValues.push(baseline.summary.bulkAddTermsRowsPerSecond);
+        variantBulkAddRowsPerSecondValues.push(variantRun.summary.bulkAddTermsRowsPerSecond);
+        baselineBulkAddMsPerKRowsValues.push(baseline.summary.bulkAddTermsMsPerKRows);
+        variantBulkAddMsPerKRowsValues.push(variantRun.summary.bulkAddTermsMsPerKRows);
         totalDeltas.push(totalImportMsDelta);
         targetedDeltas.push(targetedMetricDelta);
         totalPercentDeltas.push(totalImportPercentDelta);
         targetedPercentDeltas.push(targetedMetricPercentDelta);
+        bulkAddPayloadBytesPerRowDeltas.push(bulkAddPayloadBytesPerRowDelta);
+        bulkAddPayloadBytesPerRowPercentDeltas.push(bulkAddPayloadBytesPerRowPercentDelta);
+        bulkAddRowsPerSecondDeltas.push(bulkAddRowsPerSecondDelta);
+        bulkAddRowsPerSecondPercentDeltas.push(bulkAddRowsPerSecondPercentDelta);
+        bulkAddMsPerKRowsDeltas.push(bulkAddMsPerKRowsDelta);
+        bulkAddMsPerKRowsPercentDeltas.push(bulkAddMsPerKRowsPercentDelta);
     }
 
     const medians = {
@@ -261,6 +337,18 @@ async function runPairedVariant(variant, skipBuildForFirstBaseline) {
         totalImportPercentDelta: median(totalPercentDeltas),
         targetedMetricDelta: median(targetedDeltas),
         targetedMetricPercentDelta: median(targetedPercentDeltas),
+        baselineBulkAddPayloadBytesPerRow: median(baselineBulkAddPayloadBytesPerRowValues),
+        variantBulkAddPayloadBytesPerRow: median(variantBulkAddPayloadBytesPerRowValues),
+        bulkAddPayloadBytesPerRowDelta: median(bulkAddPayloadBytesPerRowDeltas),
+        bulkAddPayloadBytesPerRowPercentDelta: median(bulkAddPayloadBytesPerRowPercentDeltas),
+        baselineBulkAddRowsPerSecond: median(baselineBulkAddRowsPerSecondValues),
+        variantBulkAddRowsPerSecond: median(variantBulkAddRowsPerSecondValues),
+        bulkAddRowsPerSecondDelta: median(bulkAddRowsPerSecondDeltas),
+        bulkAddRowsPerSecondPercentDelta: median(bulkAddRowsPerSecondPercentDeltas),
+        baselineBulkAddMsPerKRows: median(baselineBulkAddMsPerKRowsValues),
+        variantBulkAddMsPerKRows: median(variantBulkAddMsPerKRowsValues),
+        bulkAddMsPerKRowsDelta: median(bulkAddMsPerKRowsDeltas),
+        bulkAddMsPerKRowsPercentDelta: median(bulkAddMsPerKRowsPercentDeltas),
     };
 
     return {variant, runPairs, medians};
@@ -299,7 +387,8 @@ async function main() {
         iterationPercent,
         pairIterations,
         quickMode,
-        note: 'Each variant is tested in isolation against an immediate paired baseline run.',
+        collectBulkAddBytesMetrics,
+        note: 'Each variant is tested in isolation against an immediate paired baseline run. "Payload bytes/row" is data density, not speed.',
         results: results.map((entry) => {
             if (!entry.ok) {
                 return {
@@ -332,6 +421,7 @@ async function main() {
         iterationPercent,
         pairIterations,
         quickMode,
+        collectBulkAddBytesMetrics,
         baselineImportFlags,
         variants: results.map((entry) => {
             if (!entry.ok) {
@@ -359,6 +449,24 @@ async function main() {
                     variantMedian: Math.round(result.medians.variantTargetedMetricMs),
                     deltaMedian: Math.round(result.medians.targetedMetricDelta),
                     percentDeltaMedian: Number(result.medians.targetedMetricPercentDelta.toFixed(2)),
+                },
+                bulkAddPayloadBytesPerRow: {
+                    baselineMedian: Number(result.medians.baselineBulkAddPayloadBytesPerRow.toFixed(2)),
+                    variantMedian: Number(result.medians.variantBulkAddPayloadBytesPerRow.toFixed(2)),
+                    deltaMedian: Number(result.medians.bulkAddPayloadBytesPerRowDelta.toFixed(2)),
+                    percentDeltaMedian: Number(result.medians.bulkAddPayloadBytesPerRowPercentDelta.toFixed(2)),
+                },
+                bulkAddRowsPerSecond: {
+                    baselineMedian: Number(result.medians.baselineBulkAddRowsPerSecond.toFixed(1)),
+                    variantMedian: Number(result.medians.variantBulkAddRowsPerSecond.toFixed(1)),
+                    deltaMedian: Number(result.medians.bulkAddRowsPerSecondDelta.toFixed(1)),
+                    percentDeltaMedian: Number(result.medians.bulkAddRowsPerSecondPercentDelta.toFixed(2)),
+                },
+                bulkAddMsPerKRows: {
+                    baselineMedian: Number(result.medians.baselineBulkAddMsPerKRows.toFixed(2)),
+                    variantMedian: Number(result.medians.variantBulkAddMsPerKRows.toFixed(2)),
+                    deltaMedian: Number(result.medians.bulkAddMsPerKRowsDelta.toFixed(2)),
+                    percentDeltaMedian: Number(result.medians.bulkAddMsPerKRowsPercentDelta.toFixed(2)),
                 },
             };
         }),

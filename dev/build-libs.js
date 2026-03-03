@@ -21,6 +21,7 @@ import standaloneCode from 'ajv/dist/standalone/index.js';
 import esbuild from 'esbuild';
 import fs from 'fs';
 import {createRequire} from 'module';
+import {execFileSync} from 'node:child_process';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import {parseJson} from './json.js';
@@ -71,6 +72,48 @@ async function copyZstdAssets(out) {
         throw new Error(`Missing vendored zstd dictionary asset: ${jmdictDictPath}`);
     }
     fs.copyFileSync(jmdictDictPath, path.join(zstdDictOutPath, 'jmdict.zdict'));
+}
+
+/**
+ * @param {string} out
+ */
+async function buildDictionaryWasm(out) {
+    const wasmSources = [
+        {
+            sourcePath: path.join(extDir, 'js', 'dictionary', 'wasm', 'term-bank-parser.c'),
+            outputPath: path.join(out, 'term-bank-parser.wasm'),
+            exports: ['wasm_reset_heap', 'wasm_alloc', 'parse_term_bank', 'encode_term_content'],
+        },
+        {
+            sourcePath: path.join(extDir, 'js', 'dictionary', 'wasm', 'term-record-encoder.c'),
+            outputPath: path.join(out, 'term-record-encoder.wasm'),
+            exports: ['wasm_reset_heap', 'wasm_alloc', 'calc_encoded_size', 'encode_records'],
+        },
+    ];
+
+    try {
+        execFileSync('clang', ['--version'], {stdio: 'ignore'});
+    } catch (e) {
+        throw new Error(
+            'Missing clang required to build dictionary wasm assets. ' +
+            'Install clang (e.g. Xcode command line tools on macOS or clang/llvm packages on Linux).',
+            {cause: e},
+        );
+    }
+
+    for (const target of wasmSources) {
+        const args = [
+            '--target=wasm32',
+            '-O3',
+            '-nostdlib',
+            '-Wl,--no-entry',
+        ];
+        for (const exportName of target.exports) {
+            args.push(`-Wl,--export=${exportName}`);
+        }
+        args.push('-Wl,--strip-all', '-o', target.outputPath, target.sourcePath);
+        execFileSync('clang', args, {stdio: 'inherit'});
+    }
 }
 
 
@@ -130,4 +173,5 @@ export async function buildLibs() {
     await copyWasm(path.join(extDir, 'lib'));
     await copySqliteWasm(path.join(extDir, 'lib'));
     await copyZstdAssets(path.join(extDir, 'lib'));
+    await buildDictionaryWasm(path.join(extDir, 'lib'));
 }

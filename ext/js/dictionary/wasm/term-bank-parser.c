@@ -252,6 +252,143 @@ static inline int write_bytes_and_hash(
     return 1;
 }
 
+static int token_equals_literal(
+    const uint8_t* src,
+    uint32_t start,
+    uint32_t length,
+    const uint8_t* literal,
+    uint32_t literal_length
+) {
+    if (length != literal_length) { return 0; }
+    for (uint32_t i = 0u; i < length; ++i) {
+        if (src[start + i] != literal[i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static int glossary_object_try_extract_text_value(
+    const uint8_t* src,
+    uint32_t src_len,
+    uint32_t start,
+    uint32_t end,
+    uint32_t* out_text_start,
+    uint32_t* out_text_length
+) {
+    static const uint8_t KEY_TYPE[] = "\"type\"";
+    static const uint8_t KEY_TEXT[] = "\"text\"";
+    static const uint8_t VALUE_TEXT[] = "\"text\"";
+
+    if (start >= end || src[start] != '{') { return 0; }
+
+    uint32_t i = skip_ws(src, src_len, start + 1u);
+    int has_type_text = 0;
+    int has_text_value = 0;
+    uint32_t text_start = 0u;
+    uint32_t text_length = 0u;
+
+    while (i < end) {
+        i = skip_ws(src, src_len, i);
+        if (i >= end) { return 0; }
+        if (src[i] == '}') { break; }
+
+        uint32_t key_end = 0u;
+        if (!parse_string_span(src, src_len, i, &key_end)) { return 0; }
+        const uint32_t key_start = i;
+        const uint32_t key_length = key_end - key_start;
+
+        i = skip_ws(src, src_len, key_end);
+        if (i >= end || src[i] != ':') { return 0; }
+        i = skip_ws(src, src_len, i + 1u);
+
+        uint32_t value_end = 0u;
+        if (!parse_value_span(src, src_len, i, &value_end)) { return 0; }
+        const uint32_t value_start = i;
+        const uint32_t value_length = value_end - value_start;
+
+        if (token_equals_literal(src, key_start, key_length, KEY_TYPE, sizeof(KEY_TYPE) - 1u)) {
+            if (token_equals_literal(src, value_start, value_length, VALUE_TEXT, sizeof(VALUE_TEXT) - 1u)) {
+                has_type_text = 1;
+            }
+        } else if (token_equals_literal(src, key_start, key_length, KEY_TEXT, sizeof(KEY_TEXT) - 1u)) {
+            if (value_length > 0u && src[value_start] == '"') {
+                has_text_value = 1;
+                text_start = value_start;
+                text_length = value_length;
+            }
+        }
+
+        i = skip_ws(src, src_len, value_end);
+        if (i < end && src[i] == ',') {
+            i += 1u;
+            continue;
+        }
+        if (i < end && src[i] == '}') {
+            break;
+        }
+    }
+
+    if (!(has_type_text && has_text_value)) {
+        return 0;
+    }
+
+    *out_text_start = text_start;
+    *out_text_length = text_length;
+    return 1;
+}
+
+static int write_normalized_glossary_value_and_hash(
+    const uint8_t* src,
+    uint32_t src_len,
+    uint32_t value_start,
+    uint32_t value_end,
+    uint8_t* out,
+    uint32_t out_capacity,
+    uint32_t* cursor,
+    uint32_t* h1,
+    uint32_t* h2
+) {
+    if (value_start >= value_end) { return 0; }
+    const uint8_t c = src[value_start];
+    if (c == '[') {
+        if (!write_byte_and_hash(out, out_capacity, cursor, '[', h1, h2)) { return 0; }
+        uint32_t i = value_start + 1u;
+        int first = 1;
+        while (i < value_end) {
+            i = skip_ws(src, src_len, i);
+            if (i >= value_end) { return 0; }
+            if (src[i] == ']') { break; }
+
+            uint32_t element_end = 0u;
+            if (!parse_value_span(src, src_len, i, &element_end)) { return 0; }
+            if (!first) {
+                if (!write_byte_and_hash(out, out_capacity, cursor, ',', h1, h2)) { return 0; }
+            }
+            if (!write_normalized_glossary_value_and_hash(src, src_len, i, element_end, out, out_capacity, cursor, h1, h2)) {
+                return 0;
+            }
+            first = 0;
+            i = skip_ws(src, src_len, element_end);
+            if (i < value_end && src[i] == ',') {
+                i += 1u;
+            }
+        }
+        if (!write_byte_and_hash(out, out_capacity, cursor, ']', h1, h2)) { return 0; }
+        return 1;
+    }
+
+    if (c == '{') {
+        uint32_t text_start = 0u;
+        uint32_t text_length = 0u;
+        if (glossary_object_try_extract_text_value(src, src_len, value_start, value_end, &text_start, &text_length)) {
+            return write_bytes_and_hash(out, out_capacity, cursor, src + text_start, text_length, h1, h2);
+        }
+    }
+
+    return write_bytes_and_hash(out, out_capacity, cursor, src + value_start, value_end - value_start, h1, h2);
+}
+
 static int encode_term_content_row(
     const uint8_t* src,
     const TermRowMeta* row,
@@ -294,7 +431,17 @@ static int encode_term_content_row(
 
     if (!write_bytes_and_hash(out, out_capacity, cursor, PREFIX_GLOSSARY, sizeof(PREFIX_GLOSSARY) - 1u, &h1, &h2)) { return 0; }
     if (row->glossary_length > 0u) {
-        if (!write_bytes_and_hash(out, out_capacity, cursor, src + row->glossary_start, row->glossary_length, &h1, &h2)) { return 0; }
+        if (!write_normalized_glossary_value_and_hash(
+            src,
+            row->glossary_start + row->glossary_length,
+            row->glossary_start,
+            row->glossary_start + row->glossary_length,
+            out,
+            out_capacity,
+            cursor,
+            &h1,
+            &h2
+        )) { return 0; }
     } else {
         static const uint8_t EMPTY_ARRAY[] = "[]";
         if (!write_bytes_and_hash(out, out_capacity, cursor, EMPTY_ARRAY, sizeof(EMPTY_ARRAY) - 1u, &h1, &h2)) { return 0; }

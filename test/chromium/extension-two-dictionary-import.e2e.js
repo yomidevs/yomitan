@@ -84,6 +84,8 @@ const strictUnsupportedRuntime = parseBooleanEnv(
     process.env.MANABITAN_E2E_STRICT_RUNTIME,
     parseBooleanEnv(process.env.CI, false),
 );
+const maxReportLogLinesRaw = Number.parseInt(process.env.MANABITAN_CHROMIUM_E2E_MAX_LOG_LINES ?? '1000', 10);
+const maxReportLogLines = Number.isFinite(maxReportLogLinesRaw) && maxReportLogLinesRaw > 0 ? maxReportLogLinesRaw : 1000;
 const quickImportBenchmarkMode = parseBooleanEnv(process.env.MANABITAN_E2E_IMPORT_BENCH_QUICK, false);
 const concurrentDbOpenPressureEnabled = (
     !quickImportBenchmarkMode &&
@@ -329,7 +331,7 @@ function appendLog(report, level, message) {
     if (!(report && Array.isArray(report.logs))) { return; }
     const line = `[${new Date().toISOString()}] [${level}] ${message}`;
     report.logs.push(line);
-    if (report.logs.length > 300) {
+    if (report.logs.length > maxReportLogLines) {
         report.logs.shift();
     }
 }
