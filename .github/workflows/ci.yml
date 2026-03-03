@@ -74,8 +74,8 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
 
-      - name: Build Firefox dev package
-        run: npm run build -- --target firefox-dev
+      - name: Build Firefox dev E2E package
+        run: npm run build -- --target firefox-dev-e2e
 
       - name: Install Selenium driver dependency
         run: npm install --no-save selenium-webdriver@4.38.0
@@ -95,7 +95,7 @@ jobs:
 
       - name: Run Firefox extension E2E
         env:
-          MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev.zip
+          MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev-e2e.zip
           MANABITAN_FIREFOX_HEADLESS: '0'
           MANABITAN_E2E_STRICT_RUNTIME: '1'
         run: xvfb-run -a npm run test:e2e:firefox-extension

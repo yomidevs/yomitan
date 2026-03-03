@@ -1347,67 +1347,6 @@ function summarizeDictionaryInfoHealth(dictionaryInfoEntries) {
 
 /**
  * @param {import('selenium-webdriver').ThenableWebDriver} driver
- * @returns {Promise<void>}
- */
-async function purgeDictionaryDatabase(driver) {
-    await driver.executeAsyncScript(`
-        const done = arguments[arguments.length - 1];
-        const send = (action, params) => new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({action, params}, (response) => {
-                const runtimeError = chrome.runtime.lastError;
-                if (runtimeError) {
-                    reject(new Error(runtimeError.message || String(runtimeError)));
-                    return;
-                }
-                if (response && typeof response === 'object' && 'error' in response) {
-                    reject(new Error(JSON.stringify(response.error)));
-                    return;
-                }
-                resolve(response && typeof response === 'object' ? response.result : response);
-            });
-        });
-        (async () => {
-            await send('purgeDatabase', undefined);
-            const optionsFull = await send('optionsGetFull', undefined);
-            if (!(optionsFull && typeof optionsFull === 'object' && Array.isArray(optionsFull.profiles))) {
-                throw new Error('optionsGetFull returned unexpected payload');
-            }
-            const nextOptions = structuredClone(optionsFull);
-            for (const profile of nextOptions.profiles) {
-                if (!profile || typeof profile !== 'object') { continue; }
-                if (!profile.options || typeof profile.options !== 'object') { continue; }
-                profile.options.dictionaries = [];
-                if (profile.options.general && typeof profile.options.general === 'object') {
-                    profile.options.general.enable = true;
-                }
-                if (profile.options.scanning && typeof profile.options.scanning === 'object') {
-                    profile.options.scanning.enableOnSearchPage = true;
-                    profile.options.scanning.scanWithoutMousemove = true;
-                    const inputs = Array.isArray(profile.options.scanning.inputs) ? profile.options.scanning.inputs : [];
-                    if (inputs.length > 0 && inputs[0] && typeof inputs[0] === 'object') {
-                        inputs[0].include = 'shift';
-                        inputs[0].exclude = 'mouse0';
-                        if (inputs[0].options && typeof inputs[0].options === 'object') {
-                            inputs[0].options.searchTerms = true;
-                            inputs[0].options.searchKanji = true;
-                        }
-                    }
-                }
-            }
-            await send('setAllSettings', {value: nextOptions, source: 'firefox-e2e'});
-            done({ok: true});
-        })().catch((e) => {
-            done({error: String(e && e.message ? e.message : e)});
-        });
-    `).then((result) => {
-        if (!(typeof result === 'object' && result !== null && !Array.isArray(result) && result.ok === true)) {
-            fail(`purgeDatabase failed: ${JSON.stringify(result)}`);
-        }
-    });
-}
-
-/**
- * @param {import('selenium-webdriver').ThenableWebDriver} driver
  * @param {Record<string, unknown>} recommendedDictionaries
  * @returns {Promise<void>}
  */
@@ -1444,9 +1383,11 @@ async function installRecommendedDictionariesMock(driver, recommendedDictionarie
  * @throws {Error}
  */
 async function main() {
-    const defaultFirefoxXpiPath = path.join(root, 'builds', 'manabitan-firefox-dev.xpi');
-    const defaultFirefoxZipPath = path.join(root, 'builds', 'manabitan-firefox-dev.zip');
-    let xpiPath = process.env.MANABITAN_FIREFOX_XPI ?? defaultFirefoxXpiPath;
+    const defaultFirefoxE2EXpiPath = path.join(root, 'builds', 'manabitan-firefox-dev-e2e.xpi');
+    const defaultFirefoxE2EZipPath = path.join(root, 'builds', 'manabitan-firefox-dev-e2e.zip');
+    const defaultFirefoxLegacyXpiPath = path.join(root, 'builds', 'manabitan-firefox-dev.xpi');
+    const defaultFirefoxLegacyZipPath = path.join(root, 'builds', 'manabitan-firefox-dev.zip');
+    let xpiPath = process.env.MANABITAN_FIREFOX_XPI ?? defaultFirefoxE2EXpiPath;
     const reportPath = process.env.MANABITAN_FIREFOX_E2E_REPORT ?? path.join(root, 'builds', 'firefox-e2e-import-report.html');
     const reportJsonPath = reportPath.replace(/\.html$/i, '.json');
     const chromiumReportPath = path.join(root, 'builds', 'chromium-e2e-import-report.html');
@@ -1464,7 +1405,12 @@ async function main() {
     } else {
         /** @type {Array<{path: string, mtimeMs: number}>} */
         const candidates = [];
-        for (const candidatePath of [defaultFirefoxZipPath, defaultFirefoxXpiPath]) {
+        for (const candidatePath of [
+            defaultFirefoxE2EZipPath,
+            defaultFirefoxE2EXpiPath,
+            defaultFirefoxLegacyZipPath,
+            defaultFirefoxLegacyXpiPath,
+        ]) {
             try {
                 const stats = await stat(candidatePath);
                 candidates.push({
@@ -1476,7 +1422,10 @@ async function main() {
             }
         }
         if (candidates.length === 0) {
-            fail(`Extension package not found at: ${defaultFirefoxZipPath} or ${defaultFirefoxXpiPath}`);
+            fail(
+                `Extension package not found at: ${defaultFirefoxE2EZipPath}, ${defaultFirefoxE2EXpiPath}, ` +
+                `${defaultFirefoxLegacyZipPath}, or ${defaultFirefoxLegacyXpiPath}`,
+            );
         }
         candidates.sort((a, b) => b.mtimeMs - a.mtimeMs);
         xpiPath = candidates[0].path;
@@ -1546,10 +1495,8 @@ async function main() {
         await ensurePageProfiler(driver);
         const settingsOpenEnd = safePerformance.now();
         await addReportPhase(report, driver, 'Open settings page', 'Settings loaded and dictionary import controls visible', settingsOpenStart, settingsOpenEnd);
-        const purgeStart = safePerformance.now();
-        await purgeDictionaryDatabase(driver);
-        const purgeEnd = safePerformance.now();
-        await addReportPhase(report, driver, 'Purge dictionary database', 'Cleared persisted dictionaries to avoid stale state from prior runs', purgeStart, purgeEnd);
+        // Selenium launches Firefox with a fresh profile for this run, so there is
+        // no prior dictionary DB state to purge here.
         // Selenium executeScript return value is untyped (`any`).
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const runtimeDiagnostics = await driver.executeAsyncScript(`
