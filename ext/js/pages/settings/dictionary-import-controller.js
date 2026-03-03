@@ -1254,6 +1254,7 @@ export class DictionaryImportController {
                 skipMediaImport,
                 mediaResolutionConcurrency,
                 debugImportLogging,
+                skipMediaGlossaryJsonParseFastPath,
             } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
@@ -1262,6 +1263,7 @@ export class DictionaryImportController {
                 skipMediaImport,
                 mediaResolutionConcurrency,
                 debugImportLogging,
+                skipMediaGlossaryJsonParseFastPath,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -1372,7 +1374,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, skipMediaGlossaryJsonParseFastPath: boolean}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1382,6 +1384,7 @@ export class DictionaryImportController {
                 skipMediaImport: false,
                 mediaResolutionConcurrency: 8,
                 debugImportLogging: false,
+                skipMediaGlossaryJsonParseFastPath: false,
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
@@ -1391,6 +1394,7 @@ export class DictionaryImportController {
             skipMediaImport: flagsRecord.skipMediaImport === true,
             mediaResolutionConcurrency: Math.max(1, Math.min(32, mediaResolutionConcurrency)),
             debugImportLogging: flagsRecord.debugImportLogging === true,
+            skipMediaGlossaryJsonParseFastPath: flagsRecord.skipMediaGlossaryJsonParseFastPath === true,
         };
     }
 

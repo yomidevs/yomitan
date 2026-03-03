@@ -70,6 +70,8 @@ export class DictionaryImporter {
         this._debugImportLogging = false;
         /** @type {boolean} */
         this._structuredContentImportFastPath = false;
+        /** @type {boolean} */
+        this._skipMediaGlossaryJsonParseFastPath = false;
         /** @type {TextEncoder} */
         this._textEncoder = new TextEncoder();
         /** @type {Map<string, string>} */
@@ -103,6 +105,7 @@ export class DictionaryImporter {
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
         this._debugImportLogging = details.debugImportLogging === true;
         this._structuredContentImportFastPath = true;
+        this._skipMediaGlossaryJsonParseFastPath = details.skipMediaGlossaryJsonParseFastPath === true;
         this._pendingImageMediaByPath.clear();
         this._imageMetadataByPath.clear();
         this._jsonQuotedStringCache.clear();
@@ -1103,6 +1106,14 @@ export class DictionaryImporter {
      * @param {boolean} enableTermEntryContentDedup
      */
     _prepareTermEntrySerialization(entry, enableTermEntryContentDedup) {
+        if (
+            typeof entry.termEntryContentHash === 'string' &&
+            entry.termEntryContentHash.length > 0 &&
+            entry.termEntryContentBytes instanceof Uint8Array &&
+            typeof entry.glossaryJson === 'string'
+        ) {
+            return;
+        }
         const glossaryJson = (typeof entry.glossaryJson === 'string') ? entry.glossaryJson : JSON.stringify(entry.glossary);
         if (!enableTermEntryContentDedup) {
             entry.glossaryJson = glossaryJson;
@@ -1393,13 +1404,29 @@ export class DictionaryImporter {
             if (requirements === null) {
                 entry.glossaryJson = row.glossaryJson;
             } else {
-                const glossaryList = this._parseGlossaryJsonFromFastRow(row.glossaryJson, termFile.filename);
-                for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
-                    const glossary = glossaryList[j];
-                    if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
-                    glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+                const skipGlossaryParse = (
+                    this._skipMediaGlossaryJsonParseFastPath &&
+                    !this._glossaryJsonLikelyContainsMedia(row.glossaryJson)
+                );
+                if (skipGlossaryParse) {
+                    entry.glossaryJson = row.glossaryJson;
+                    if (
+                        enableTermEntryContentDedup &&
+                        typeof row.termEntryContentHash === 'string' &&
+                        row.termEntryContentBytes instanceof Uint8Array
+                    ) {
+                        entry.termEntryContentHash = row.termEntryContentHash;
+                        entry.termEntryContentBytes = row.termEntryContentBytes;
+                    }
+                } else {
+                    const glossaryList = this._parseGlossaryJsonFromFastRow(row.glossaryJson, termFile.filename);
+                    for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
+                        const glossary = glossaryList[j];
+                        if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
+                        glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+                    }
+                    entry.glossary = glossaryList;
                 }
-                entry.glossary = glossaryList;
             }
             if (typeof row.sequence === 'number') {
                 entry.sequence = row.sequence;
@@ -1422,6 +1449,18 @@ export class DictionaryImporter {
             termList[i] = entry;
         }
         return {termList, requirements};
+    }
+
+    /**
+     * @param {string} glossaryJson
+     * @returns {boolean}
+     */
+    _glossaryJsonLikelyContainsMedia(glossaryJson) {
+        return (
+            glossaryJson.includes('"type":"image"') ||
+            glossaryJson.includes('"type": "image"') ||
+            glossaryJson.includes('"tag":"img"')
+        );
     }
 
     /**

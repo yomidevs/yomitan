@@ -61,6 +61,7 @@ export type ImportDetails = {
     skipMediaImport?: boolean;
     mediaResolutionConcurrency?: number;
     debugImportLogging?: boolean;
+    skipMediaGlossaryJsonParseFastPath?: boolean;
 };
 
 export type Summary = {
