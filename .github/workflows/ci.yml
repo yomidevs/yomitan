@@ -89,6 +89,7 @@ jobs:
       - name: Run Firefox extension E2E
         env:
           MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev.zip
+          MANABITAN_FIREFOX_TEMPORARY_ADDON: '0'
           MANABITAN_E2E_STRICT_RUNTIME: '1'
         run: npm run test:e2e:firefox-extension
 

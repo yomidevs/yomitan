@@ -1528,7 +1528,8 @@ async function main() {
         });
         const cacheWarmupEnd = safePerformance.now();
 
-        await driver.installAddon(xpiPath, true);
+        const temporaryAddonInstall = parseBooleanEnv(process.env.MANABITAN_FIREFOX_TEMPORARY_ADDON, true);
+        await driver.installAddon(xpiPath, temporaryAddonInstall);
         const firefoxPid = await getFirefoxProcessId(driver);
 
         const baseUrlStart = safePerformance.now();
