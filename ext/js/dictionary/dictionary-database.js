@@ -40,6 +40,7 @@ import {TermContentOpfsStore} from './term-content-opfs-store.js';
 import {TermRecordOpfsStore} from './term-record-opfs-store.js';
 
 const CURRENT_DICTIONARY_SCHEMA_VERSION = 2;
+const TERM_ENTRY_CONTENT_CACHE_MAX_ENTRIES = 4096;
 
 /**
  * @typedef {object} InsertStatement
@@ -83,8 +84,10 @@ export class DictionaryDatabase {
         this._enableTermEntryContentDedup = true;
         /** @type {Map<string, import('@sqlite.org/sqlite-wasm').PreparedStatement>} */
         this._statementCache = new Map();
-        /** @type {Map<string, {definitionTags: string|null, termTags: string|undefined, rules: string, glossary: import('dictionary-data').TermGlossary[]}>} */
+        /** @type {Map<string, {definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson: string, glossary?: import('dictionary-data').TermGlossary[]}>} */
         this._termEntryContentCache = new Map();
+        /** @type {number} */
+        this._termEntryContentCacheMaxEntries = TERM_ENTRY_CONTENT_CACHE_MAX_ENTRIES;
         /** @type {TextEncoder} */
         this._textEncoder = new TextEncoder();
         /** @type {TextDecoder} */
@@ -3346,50 +3349,87 @@ export class DictionaryDatabase {
         let rules;
         /** @type {import('dictionary-data').TermGlossary[]} */
         let glossary;
+        /** @type {(() => import('dictionary-data').TermGlossary[])|null} */
+        let glossaryResolver = null;
 
         if (cacheKey.length > 0) {
-            const cached = this._termEntryContentCache.get(cacheKey);
-            if (typeof cached !== 'undefined') {
-                definitionTags = cached.definitionTags;
-                termTags = cached.termTags;
-                rules = cached.rules;
-                glossary = cached.glossary;
-            } else {
+            let cached = this._getCachedTermEntryContent(cacheKey);
+            if (typeof cached === 'undefined') {
                 const contentBytes = (contentOffset >= 0 && contentLength > 0) ? this._termContentStore.readSlice(contentOffset, contentLength) : null;
                 if (contentBytes !== null && contentBytes.length > 0) {
                     try {
                         const contentJson = (contentDictName === 'raw') ?
                             this._textDecoder.decode(contentBytes) :
                             this._textDecoder.decode(decompressTermContentZstd(contentBytes, contentDictName.length > 0 ? contentDictName : null));
-                        const content = /** @type {{rules?: string, definitionTags?: string, termTags?: string, glossary?: import('dictionary-data').TermGlossary[]}} */ (
-                            this._safeParseJson(contentJson, {})
-                        );
-                        definitionTags = this._asNullableString(content.definitionTags) ?? null;
-                        termTags = this._asNullableString(content.termTags);
-                        rules = this._asString(content.rules);
-                        glossary = Array.isArray(content.glossary) ? content.glossary : [];
+                        const parsedHeader = this._parseSerializedTermEntryContentHeader(contentJson);
+                        if (parsedHeader !== null) {
+                            definitionTags = parsedHeader.definitionTags;
+                            termTags = parsedHeader.termTags;
+                            rules = parsedHeader.rules;
+                            glossary = [];
+                            cached = {
+                                definitionTags,
+                                termTags,
+                                rules,
+                                glossaryJson: parsedHeader.glossaryJson,
+                            };
+                        } else {
+                            const content = /** @type {{rules?: string, definitionTags?: string, termTags?: string, glossary?: import('dictionary-data').TermGlossary[]}} */ (
+                                this._safeParseJson(contentJson, {})
+                            );
+                            definitionTags = this._asNullableString(content.definitionTags) ?? null;
+                            termTags = this._asNullableString(content.termTags);
+                            rules = this._asString(content.rules);
+                            glossary = Array.isArray(content.glossary) ? content.glossary : [];
+                            cached = {
+                                definitionTags,
+                                termTags,
+                                rules,
+                                glossaryJson: JSON.stringify(glossary),
+                                glossary,
+                            };
+                        }
                     } catch (e) {
                         logTermContentZstdError(e);
                         definitionTags = null;
                         termTags = '';
                         rules = '';
                         glossary = [];
+                        cached = {
+                            definitionTags,
+                            termTags,
+                            rules,
+                            glossaryJson: '[]',
+                            glossary,
+                        };
                     }
                 } else {
                     definitionTags = null;
                     termTags = '';
                     rules = '';
                     glossary = [];
+                    cached = {
+                        definitionTags,
+                        termTags,
+                        rules,
+                        glossaryJson: '[]',
+                        glossary,
+                    };
                 }
-                this._termEntryContentCache.set(cacheKey, {definitionTags, termTags, rules, glossary});
+                this._setCachedTermEntryContent(cacheKey, cached);
             }
+            definitionTags = cached.definitionTags;
+            termTags = cached.termTags;
+            rules = cached.rules;
+            glossary = [];
+            glossaryResolver = () => this._resolveCachedTermEntryGlossary(cached);
         } else {
             definitionTags = this._asNullableString(row.definitionTags) ?? null;
             termTags = this._asNullableString(row.termTags);
             rules = this._asString(row.rules);
             glossary = this._safeParseJson(this._asString(row.glossaryJson), []);
         }
-        return {
+        const termEntry = {
             id: this._asNumber(row.id, -1),
             expression: this._asString(row.expression),
             reading: this._asString(row.reading),
@@ -3402,6 +3442,145 @@ export class DictionaryDatabase {
             sequence: this._asNullableNumber(row.sequence),
             termTags,
             dictionary: this._asString(row.dictionary),
+        };
+        if (glossaryResolver !== null) {
+            Object.defineProperty(termEntry, 'glossary', {
+                enumerable: true,
+                configurable: true,
+                get: () => {
+                    const resolvedGlossary = glossaryResolver();
+                    Object.defineProperty(termEntry, 'glossary', {
+                        enumerable: true,
+                        configurable: true,
+                        writable: true,
+                        value: resolvedGlossary,
+                    });
+                    return resolvedGlossary;
+                },
+                set: (value) => {
+                    Object.defineProperty(termEntry, 'glossary', {
+                        enumerable: true,
+                        configurable: true,
+                        writable: true,
+                        value: Array.isArray(value) ? value : [],
+                    });
+                },
+            });
+        }
+        return termEntry;
+    }
+
+    /**
+     * @param {string} cacheKey
+     * @returns {{definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson: string, glossary?: import('dictionary-data').TermGlossary[]}|undefined}
+     */
+    _getCachedTermEntryContent(cacheKey) {
+        const cached = this._termEntryContentCache.get(cacheKey);
+        if (typeof cached === 'undefined') {
+            return void 0;
+        }
+        // Promote recently used entries.
+        this._termEntryContentCache.delete(cacheKey);
+        this._termEntryContentCache.set(cacheKey, cached);
+        return cached;
+    }
+
+    /**
+     * @param {string} cacheKey
+     * @param {{definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson: string, glossary?: import('dictionary-data').TermGlossary[]}} value
+     */
+    _setCachedTermEntryContent(cacheKey, value) {
+        if (this._termEntryContentCache.has(cacheKey)) {
+            this._termEntryContentCache.delete(cacheKey);
+        }
+        this._termEntryContentCache.set(cacheKey, value);
+        while (this._termEntryContentCache.size > this._termEntryContentCacheMaxEntries) {
+            const oldestKey = this._termEntryContentCache.keys().next().value;
+            if (typeof oldestKey !== 'string') { break; }
+            this._termEntryContentCache.delete(oldestKey);
+        }
+    }
+
+    /**
+     * @param {{glossaryJson: string, glossary?: import('dictionary-data').TermGlossary[]}} cached
+     * @returns {import('dictionary-data').TermGlossary[]}
+     */
+    _resolveCachedTermEntryGlossary(cached) {
+        if (Array.isArray(cached.glossary)) {
+            return cached.glossary;
+        }
+        const parsedGlossary = this._safeParseJson(cached.glossaryJson, []);
+        cached.glossary = Array.isArray(parsedGlossary) ? parsedGlossary : [];
+        return cached.glossary;
+    }
+
+    /**
+     * @param {string} value
+     * @param {number} startIndex
+     * @returns {{token: string, endIndex: number}|null}
+     */
+    _readJsonStringToken(value, startIndex) {
+        if (startIndex < 0 || startIndex >= value.length || value[startIndex] !== '"') {
+            return null;
+        }
+        let i = startIndex + 1;
+        const ii = value.length;
+        while (i < ii) {
+            const c = value[i];
+            if (c === '\\') {
+                i += 2;
+                continue;
+            }
+            if (c === '"') {
+                return {
+                    token: value.slice(startIndex, i + 1),
+                    endIndex: i + 1,
+                };
+            }
+            ++i;
+        }
+        return null;
+    }
+
+    /**
+     * @param {string} contentJson
+     * @returns {{rules: string, definitionTags: string|null, termTags: string|undefined, glossaryJson: string}|null}
+     */
+    _parseSerializedTermEntryContentHeader(contentJson) {
+        const prefixRules = '{"rules":';
+        const prefixDefinitionTags = ',"definitionTags":';
+        const prefixTermTags = ',"termTags":';
+        const prefixGlossary = ',"glossary":';
+        if (!contentJson.startsWith(prefixRules) || !contentJson.endsWith('}')) {
+            return null;
+        }
+
+        let index = prefixRules.length;
+        const rulesToken = this._readJsonStringToken(contentJson, index);
+        if (rulesToken === null) { return null; }
+        index = rulesToken.endIndex;
+        if (!contentJson.startsWith(prefixDefinitionTags, index)) { return null; }
+        index += prefixDefinitionTags.length;
+
+        const definitionTagsToken = this._readJsonStringToken(contentJson, index);
+        if (definitionTagsToken === null) { return null; }
+        index = definitionTagsToken.endIndex;
+        if (!contentJson.startsWith(prefixTermTags, index)) { return null; }
+        index += prefixTermTags.length;
+
+        const termTagsToken = this._readJsonStringToken(contentJson, index);
+        if (termTagsToken === null) { return null; }
+        index = termTagsToken.endIndex;
+        if (!contentJson.startsWith(prefixGlossary, index)) { return null; }
+        index += prefixGlossary.length;
+        if (index > contentJson.length - 1) { return null; }
+
+        const glossaryJson = contentJson.slice(index, -1);
+        return {
+            rules: /** @type {string} */ (this._safeParseJson(rulesToken.token, '')),
+            definitionTags: this._asNullableString(this._safeParseJson(definitionTagsToken.token, '')) ?? null,
+            termTags: this._asNullableString(this._safeParseJson(termTagsToken.token, '')),
+            glossaryJson,
         };
     }
 
@@ -3669,8 +3848,9 @@ export class DictionaryDatabase {
     _hashEntryContent(contentJson) {
         let h1 = 0x811c9dc5;
         let h2 = 0x9e3779b9;
-        for (let i = 0, ii = contentJson.length; i < ii; ++i) {
-            const code = contentJson.charCodeAt(i);
+        const bytes = this._textEncoder.encode(contentJson);
+        for (let i = 0, ii = bytes.length; i < ii; ++i) {
+            const code = bytes[i];
             h1 = Math.imul((h1 ^ code) >>> 0, 0x01000193);
             h2 = Math.imul((h2 ^ code) >>> 0, 0x85ebca6b);
             h2 = (h2 ^ (h2 >>> 13)) >>> 0;

@@ -336,7 +336,6 @@ export class DictionaryImportController {
             hasRecommendedModal: this._recommendedDictionariesModal !== null,
             href: globalThis.location?.href ?? null,
         });
-        this._primeRecommendedDictionaries('prepare');
     }
 
     // Private

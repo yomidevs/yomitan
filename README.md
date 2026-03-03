@@ -157,6 +157,12 @@ The generated browser packages are written to the `builds/` directory, including
 - `manabitan-firefox-dev.zip`
 - `manabitan-edge.zip`
 
+### Release Tagging
+
+- Tag releases with `./tag.sh` from the repository root.
+- By default, the script requires you to be on `main` and creates a CalVer-style 4-part tag (`YY.M.D.N`).
+- To tag from a different branch, set `MANABITAN_RELEASE_BRANCH=<branch>` when running the script.
+
 ## Third-Party Libraries
 
 Manabitan uses several third-party libraries to function.
