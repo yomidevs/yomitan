@@ -1379,15 +1379,66 @@ async function installRecommendedDictionariesMock(driver, recommendedDictionarie
 }
 
 /**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @returns {Promise<{ok: boolean, dictionaryCount: number|null, error: string|null}>}
+ */
+async function checkBackendApiAvailability(driver) {
+    // Selenium executeAsyncScript return value is untyped (`any`).
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const result = await driver.executeAsyncScript(`
+        const done = arguments[arguments.length - 1];
+        const send = (action, params) => new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({action, params}, (response) => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || String(runtimeError)));
+                    return;
+                }
+                if (response && typeof response === 'object' && 'error' in response) {
+                    reject(new Error(JSON.stringify(response.error)));
+                    return;
+                }
+                resolve(response && typeof response === 'object' ? response.result : response);
+            });
+        });
+        (async () => {
+            const dictionaryInfo = await send('getDictionaryInfo', undefined);
+            done({
+                ok: true,
+                dictionaryCount: Array.isArray(dictionaryInfo) ? dictionaryInfo.length : null,
+                error: null,
+            });
+        })().catch((e) => {
+            done({
+                ok: false,
+                dictionaryCount: null,
+                error: String(e && e.message ? e.message : e),
+            });
+        });
+    `);
+    if (!(typeof result === 'object' && result !== null && !Array.isArray(result))) {
+        return {ok: false, dictionaryCount: null, error: `Unexpected backend preflight payload: ${String(result)}`};
+    }
+    // Selenium executeAsyncScript return value is untyped (`any`).
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const resultRecord = /** @type {Record<string, unknown>} */ (result);
+    const dictionaryCountValue = resultRecord.dictionaryCount;
+    const errorValue = resultRecord.error;
+    return {
+        ok: resultRecord.ok === true,
+        dictionaryCount: Number.isFinite(Number(dictionaryCountValue)) ? Number(dictionaryCountValue) : null,
+        error: typeof errorValue === 'string' ? errorValue : null,
+    };
+}
+
+/**
  * @returns {Promise<void>}
  * @throws {Error}
  */
 async function main() {
-    const defaultFirefoxE2EXpiPath = path.join(root, 'builds', 'manabitan-firefox-dev-e2e.xpi');
-    const defaultFirefoxE2EZipPath = path.join(root, 'builds', 'manabitan-firefox-dev-e2e.zip');
-    const defaultFirefoxLegacyXpiPath = path.join(root, 'builds', 'manabitan-firefox-dev.xpi');
-    const defaultFirefoxLegacyZipPath = path.join(root, 'builds', 'manabitan-firefox-dev.zip');
-    let xpiPath = process.env.MANABITAN_FIREFOX_XPI ?? defaultFirefoxE2EXpiPath;
+    const defaultFirefoxXpiPath = path.join(root, 'builds', 'manabitan-firefox-dev.xpi');
+    const defaultFirefoxZipPath = path.join(root, 'builds', 'manabitan-firefox-dev.zip');
+    let xpiPath = process.env.MANABITAN_FIREFOX_XPI ?? defaultFirefoxXpiPath;
     const reportPath = process.env.MANABITAN_FIREFOX_E2E_REPORT ?? path.join(root, 'builds', 'firefox-e2e-import-report.html');
     const reportJsonPath = reportPath.replace(/\.html$/i, '.json');
     const chromiumReportPath = path.join(root, 'builds', 'chromium-e2e-import-report.html');
@@ -1405,12 +1456,7 @@ async function main() {
     } else {
         /** @type {Array<{path: string, mtimeMs: number}>} */
         const candidates = [];
-        for (const candidatePath of [
-            defaultFirefoxE2EZipPath,
-            defaultFirefoxE2EXpiPath,
-            defaultFirefoxLegacyZipPath,
-            defaultFirefoxLegacyXpiPath,
-        ]) {
+        for (const candidatePath of [defaultFirefoxZipPath, defaultFirefoxXpiPath]) {
             try {
                 const stats = await stat(candidatePath);
                 candidates.push({
@@ -1422,10 +1468,7 @@ async function main() {
             }
         }
         if (candidates.length === 0) {
-            fail(
-                `Extension package not found at: ${defaultFirefoxE2EZipPath}, ${defaultFirefoxE2EXpiPath}, ` +
-                `${defaultFirefoxLegacyZipPath}, or ${defaultFirefoxLegacyXpiPath}`,
-            );
+            fail(`Extension package not found at: ${defaultFirefoxZipPath} or ${defaultFirefoxXpiPath}`);
         }
         candidates.sort((a, b) => b.mtimeMs - a.mtimeMs);
         xpiPath = candidates[0].path;
@@ -1537,6 +1580,22 @@ async function main() {
             diagnosticsStart,
             diagnosticsEnd,
         );
+        const backendPreflightStart = safePerformance.now();
+        const backendPreflight = await checkBackendApiAvailability(driver);
+        const backendPreflightEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Backend API preflight',
+            backendPreflight.ok ?
+                `Runtime message API reachable; dictionaryInfo count=${String(backendPreflight.dictionaryCount)}` :
+                `Runtime message API failed: ${String(backendPreflight.error || 'unknown error')}`,
+            backendPreflightStart,
+            backendPreflightEnd,
+        );
+        if (!backendPreflight.ok) {
+            fail(`Backend preflight failed: ${String(backendPreflight.error || 'unknown error')}`);
+        }
 
         await addReportPhase(
             report,

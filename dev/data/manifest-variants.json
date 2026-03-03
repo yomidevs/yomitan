@@ -336,39 +336,6 @@
             ]
         },
         {
-            "name": "firefox-dev-e2e",
-            "inherit": "firefox-dev",
-            "fileName": "manabitan-firefox-dev-e2e.zip",
-            "modifications": [
-                {
-                    "action": "delete",
-                    "path": [
-                        "background",
-                        "page"
-                    ]
-                },
-                {
-                    "action": "set",
-                    "path": [
-                        "background",
-                        "service_worker"
-                    ],
-                    "value": "sw.js"
-                },
-                {
-                    "action": "set",
-                    "path": [
-                        "background",
-                        "type"
-                    ],
-                    "value": "module"
-                }
-            ],
-            "excludeFiles": [
-                "background.html"
-            ]
-        },
-        {
             "name": "firefox-android",
             "inherit": "firefox",
             "fileName": "manabitan-firefox-android"
