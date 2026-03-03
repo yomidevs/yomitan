@@ -314,6 +314,38 @@ export class DictionaryDatabase {
         }
     }
 
+    /** */
+    async abortBulkImport() {
+        if (this._bulkImportDepth <= 0) {
+            return;
+        }
+        const db = this._requireDb();
+        this._bulkImportDepth = 0;
+        try {
+            if (this._bulkImportTransactionOpen) {
+                db.exec('ROLLBACK');
+                this._bulkImportTransactionOpen = false;
+            }
+            await this._termContentStore.abortImportSession();
+            await this._termRecordStore.abortImportSession();
+            this._termsVirtualTableDirty = false;
+        } finally {
+            if (this._bulkImportTransactionOpen) {
+                try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+                this._bulkImportTransactionOpen = false;
+            }
+            this._termEntryContentIdByKey.clear();
+            this._termEntryContentIdByHash.clear();
+            this._termEntryContentMetaByHash.clear();
+            this._termEntryContentCache.clear();
+            this._termExactPresenceCache.clear();
+            this._termPrefixNegativeCache.clear();
+            this._directTermIndexByDictionary.clear();
+            this._deferTermsVirtualTableSync = false;
+            this._applyRuntimePragmas();
+        }
+    }
+
     /**
      * @param {boolean} value
      */
@@ -472,6 +504,8 @@ export class DictionaryDatabase {
      */
     async deleteDictionary(dictionaryName, progressRate, onProgress) {
         const db = this._requireDb();
+        const tDeleteStart = safePerformance.now();
+        const tCountStart = safePerformance.now();
 
         /** @type {[table: string, keyColumn: string][]} */
         const targets = [
@@ -493,8 +527,9 @@ export class DictionaryDatabase {
 
         /** @type {number[]} */
         const counts = [];
-        const termCount = this._termRecordStore.getDictionaryIndex(dictionaryName).expression.size > 0 ?
-            [...this._termRecordStore.getDictionaryIndex(dictionaryName).expression.values()].reduce((sum, list) => sum + list.length, 0) :
+        const termRecordIndex = this._termRecordStore.getDictionaryIndex(dictionaryName);
+        const termCount = termRecordIndex.expression.size > 0 ?
+            [...termRecordIndex.expression.values()].reduce((sum, list) => sum + list.length, 0) :
             0;
         progressData.count += termCount;
         counts.push(termCount);
@@ -507,15 +542,22 @@ export class DictionaryDatabase {
         }
 
         progressData.storesProcesed = 0;
+        const countElapsedMs = Math.max(0, safePerformance.now() - tCountStart);
+        const tDeleteWorkStart = safePerformance.now();
+        let termRecordDeleteElapsedMs = 0;
+        let sqlDeleteElapsedMs = 0;
 
         db.exec('BEGIN IMMEDIATE');
         try {
             let countIndex = 1;
+            const tTermRecordDeleteStart = safePerformance.now();
             const deletedTerms = await this._termRecordStore.deleteByDictionary(dictionaryName);
+            termRecordDeleteElapsedMs = Math.max(0, safePerformance.now() - tTermRecordDeleteStart);
             this._termsVirtualTableDirty = true;
             progressData.processed += deletedTerms;
             ++progressData.storesProcesed;
             onProgress(progressData);
+            const tSqlDeleteStart = safePerformance.now();
             for (let i = 0; i < targets.length; ++i) {
                 const [table, keyColumn] = targets[i];
                 db.exec({sql: `DELETE FROM ${table} WHERE ${keyColumn} = $value`, bind: {$value: dictionaryName}});
@@ -525,6 +567,7 @@ export class DictionaryDatabase {
                     onProgress(progressData);
                 }
             }
+            sqlDeleteElapsedMs = Math.max(0, safePerformance.now() - tSqlDeleteStart);
             db.exec('COMMIT');
         } catch (e) {
             try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
@@ -538,6 +581,17 @@ export class DictionaryDatabase {
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
+        const totalElapsedMs = Math.max(0, safePerformance.now() - tDeleteStart);
+        reportDiagnostics('dictionary-delete-summary', {
+            dictionary: dictionaryName,
+            expectedRows: progressData.count,
+            processedRows: progressData.processed,
+            countElapsedMs,
+            deleteWorkElapsedMs: Math.max(0, safePerformance.now() - tDeleteWorkStart),
+            termRecordDeleteElapsedMs,
+            sqlDeleteElapsedMs,
+            totalElapsedMs,
+        });
     }
 
     /**
@@ -2370,19 +2424,27 @@ export class DictionaryDatabase {
     async _runSchemaMigrations() {
         const db = this._requireDb();
         const currentVersion = this._getSchemaVersion();
+        const schemaMigrations = this._getSchemaMigrations();
         if (currentVersion > DICTIONARY_DB_SCHEMA_VERSION) {
             throw new Error(`Unsupported dictionary schema version: ${currentVersion}`);
         }
         for (let nextVersion = currentVersion + 1; nextVersion <= DICTIONARY_DB_SCHEMA_VERSION; ++nextVersion) {
-            switch (nextVersion) {
-                case 1:
-                    await this._migrateSchemaVersion1();
-                    break;
-                default:
-                    throw new Error(`Missing dictionary schema migration for version ${nextVersion}`);
+            const migration = schemaMigrations.get(nextVersion);
+            if (typeof migration !== 'function') {
+                throw new Error(`Missing dictionary schema migration for version ${nextVersion}`);
             }
+            await migration();
             db.exec(`PRAGMA user_version = ${nextVersion}`);
         }
+    }
+
+    /**
+     * @returns {Map<number, (() => Promise<void>)>}
+     */
+    _getSchemaMigrations() {
+        return new Map([
+            [1, this._migrateSchemaVersion1.bind(this)],
+        ]);
     }
 
     /**

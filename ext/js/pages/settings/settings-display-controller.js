@@ -99,11 +99,9 @@ export class SettingsDisplayController {
     /** */
     async _setTheme() {
         const preparedOptions = this._settingsController.getPreparedProfileOptions();
-        if (preparedOptions !== null) {
-            this._themeController.theme = preparedOptions.general.popupTheme;
-        } else {
-            this._themeController.theme = (await this._settingsController.getOptions()).general.popupTheme;
-        }
+        this._themeController.theme = preparedOptions !== null ?
+            preparedOptions.general.popupTheme :
+            (await this._settingsController.getOptions()).general.popupTheme;
         this._themeController.siteOverride = true;
         this._themeController.updateTheme();
     }

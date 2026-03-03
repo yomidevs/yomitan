@@ -1155,6 +1155,7 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
             target.scrollIntoView({block: 'center', inline: 'center'});
         }
     `, targetElement);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const moveOrigin = /** @type {import('selenium-webdriver').WebElement} */ (targetElement);
     /** @type {Array<string|null>} */
     const modifierCandidates = [Key.SHIFT, Key.ALT, Key.CONTROL, null];
@@ -1164,11 +1165,13 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
             await driver.actions({async: true}).keyDown(modifier).perform();
         }
         try {
+            /* eslint-disable @typescript-eslint/no-unsafe-assignment */
             await driver.actions({async: true}).move({origin: moveOrigin, x: -12, y: -8}).perform();
             await driver.actions({async: true})
                 .move({origin: moveOrigin, x: 2, y: 2})
                 .move({origin: moveOrigin, x: 10, y: 2, duration: 220})
                 .perform();
+            /* eslint-enable @typescript-eslint/no-unsafe-assignment */
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const visibleWithModifier = await driver.wait(async () => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -1192,9 +1195,11 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
     try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const frames = /** @type {import('selenium-webdriver').WebElement[]} */ (await driver.findElements(By.css('iframe.yomitan-popup')));
+        /** @type {import('selenium-webdriver').WebElement|null} */
         let popupFrame = null;
         for (const frame of frames) {
             if (await frame.isDisplayed()) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 popupFrame = frame;
                 break;
             }
@@ -1484,6 +1489,7 @@ async function main() {
         candidates.sort((a, b) => b.mtimeMs - a.mtimeMs);
         xpiPath = candidates[0].path;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const firefoxOptions = new firefox.Options();
     const headlessEnv = (process.env.MANABITAN_FIREFOX_HEADLESS ?? '1').trim().toLowerCase();
     const headless = !(headlessEnv === '0' || headlessEnv === 'false' || headlessEnv === 'no');
@@ -1504,6 +1510,7 @@ async function main() {
     } catch (_) {
         // Use default Firefox binary when Developer Edition is unavailable.
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const driver = /** @type {import('selenium-webdriver').ThenableWebDriver} */ (
         new Builder()
             .forBrowser(Browser.FIREFOX)
