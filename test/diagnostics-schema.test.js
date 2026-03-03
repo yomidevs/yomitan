@@ -113,6 +113,7 @@ describe('Diagnostics payload schema', () => {
             _dictionaryDatabase: {
                 getDictionaryInfo: async () => [{title: 'A'}, {title: 'Shared'}],
             },
+            _ensureDictionaryDatabaseReady: async () => {},
             _optionsUtil: {save: async () => {}},
             _clearProfileConditionsSchemaCache: () => {},
         };
@@ -135,6 +136,9 @@ describe('Diagnostics payload schema', () => {
                 getDictionaryInfo: async () => {
                     throw new Error('dictionary info unavailable');
                 },
+            },
+            _ensureDictionaryDatabaseReady: async () => {
+                throw new Error('dictionary info unavailable');
             },
             _optionsUtil: {save: async () => {}},
             _clearProfileConditionsSchemaCache: () => {},

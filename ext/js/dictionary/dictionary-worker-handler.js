@@ -122,8 +122,14 @@ export class DictionaryWorkerHandler {
             const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
             let result;
             let errors;
+            /** @type {import('dictionary-importer').ImportDebug|null} */
+            let importerDebug = null;
             try {
-                ({result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details));
+                const importPayload = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
+                ({result, errors} = importPayload);
+                importerDebug = (typeof importPayload === 'object' && importPayload !== null && !Array.isArray(importPayload)) ?
+                    (/** @type {import('dictionary-importer').ImportDebug|null} */ (Reflect.get(importPayload, 'debug') ?? null)) :
+                    null;
             } catch (error) {
                 const diagnostics = (
                     typeof dictionaryDatabase.getOpenStorageDiagnostics === 'function' ?
@@ -141,6 +147,7 @@ export class DictionaryWorkerHandler {
                     openStorageDiagnostics,
                     useImportSession,
                     finalizeImportSession,
+                    importerDebug,
                 },
             };
         } finally {

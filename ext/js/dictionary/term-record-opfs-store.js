@@ -16,9 +16,13 @@
  */
 
 import {parseJson} from '../core/json.js';
+import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {encodeTermRecordsWithWasm} from './term-record-wasm-encoder.js';
 
-const FILE_NAME = 'manabitan-term-records.ndjson';
+const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
+const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
+const SHARD_FILE_PREFIX = 'dict-';
+const SHARD_FILE_SUFFIX = '.mbtr';
 const BINARY_MAGIC_TEXT = 'MBTRREC1';
 const BINARY_MAGIC_BYTES = 8;
 const RECORD_HEADER_BYTES = 44;
@@ -39,18 +43,24 @@ const U32_NULL = 0xffffffff;
  * @property {number|null} sequence
  */
 
+/**
+ * @typedef {object} TermRecordShardState
+ * @property {string} fileName
+ * @property {FileSystemFileHandle} fileHandle
+ * @property {FileSystemWritableFileStream|null} writable
+ * @property {number} fileLength
+ * @property {number} pendingWriteBytes
+ * @property {Uint8Array[]} pendingWriteChunks
+ */
+
 export class TermRecordOpfsStore {
     constructor() {
-        /** @type {FileSystemFileHandle|null} */
-        this._fileHandle = null;
-        /** @type {FileSystemWritableFileStream|null} */
-        this._writable = null;
-        /** @type {number} */
-        this._fileLength = 0;
-        /** @type {number} */
-        this._pendingWriteBytes = 0;
-        /** @type {Uint8Array[]} */
-        this._pendingWriteChunks = [];
+        /** @type {FileSystemDirectoryHandle|null} */
+        this._rootDirectoryHandle = null;
+        /** @type {FileSystemDirectoryHandle|null} */
+        this._recordsDirectoryHandle = null;
+        /** @type {Map<string, TermRecordShardState>} */
+        this._shardStateByFileName = new Map();
         /** @type {number} */
         this._flushThresholdBytes = 16 * 1024 * 1024;
         /** @type {boolean} */
@@ -71,36 +81,34 @@ export class TermRecordOpfsStore {
         this._textDecoder = new TextDecoder();
         /** @type {boolean} */
         this._wasmEncoderUnavailable = false;
+        /** @type {string[]} */
+        this._invalidShardFileNames = [];
     }
 
     /**
      * @returns {Promise<void>}
      */
     async prepare() {
-        await this._closeWritable();
+        await this._closeAllWritables();
         this._recordsById.clear();
         this._indexByDictionary.clear();
         this._nextId = 1;
         this._deferIndexBuild = false;
         this._indexDirty = false;
-        this._pendingWriteBytes = 0;
-        this._pendingWriteChunks = [];
+        this._rootDirectoryHandle = null;
+        this._recordsDirectoryHandle = null;
+        this._shardStateByFileName.clear();
+        this._invalidShardFileNames = [];
         if (typeof navigator === 'undefined' || !('storage' in navigator) || !('getDirectory' in navigator.storage)) {
             return;
         }
-        const root = await navigator.storage.getDirectory();
-        this._fileHandle = await root.getFileHandle(FILE_NAME, {create: true});
-        const file = await this._fileHandle.getFile();
-        this._fileLength = file.size;
-        if (file.size <= 0) { return; }
+        const rootDirectoryHandle = await navigator.storage.getDirectory();
+        this._rootDirectoryHandle = rootDirectoryHandle;
+        this._recordsDirectoryHandle = await rootDirectoryHandle.getDirectoryHandle(SHARD_DIRECTORY_NAME, {create: true});
 
-        const content = new Uint8Array(await file.arrayBuffer());
-        if (this._isBinaryFormat(content)) {
-            this._loadBinary(content);
-        } else {
-            this._loadLegacyNdjson(content);
-            await this._rewriteAllBinary();
-        }
+        const shardFileCount = await this._loadShardFiles();
+        await (shardFileCount === 0 ? this._migrateLegacyMonolithicIfPresent() : this._deleteLegacyMonolithicIfPresent());
+        await this.verifyIntegrity();
         this._rebuildIndexesFromRecords();
     }
 
@@ -115,25 +123,22 @@ export class TermRecordOpfsStore {
         this._deferIndexBuild = true;
         this._indexDirty = true;
         this._indexByDictionary.clear();
-        this._pendingWriteBytes = 0;
-        this._pendingWriteChunks = [];
-        if (this._fileHandle === null) {
-            return;
+        for (const state of this._shardStateByFileName.values()) {
+            state.pendingWriteBytes = 0;
+            state.pendingWriteChunks = [];
         }
-        this._writable = await this._fileHandle.createWritable({keepExistingData: true});
-        await this._writable.seek(this._fileLength);
     }
 
     /**
      * @returns {Promise<void>}
      */
     async endImportSession() {
-        if (!this._importSessionActive && this._writable === null) {
+        if (!this._importSessionActive && !this._hasPendingShardWrites()) {
             return;
         }
         this._importSessionActive = false;
         await this._flushPendingWrites();
-        await this._closeWritable();
+        await this._closeAllWritables();
         this._deferIndexBuild = false;
         if (this._indexDirty) {
             this._rebuildIndexesFromRecords();
@@ -144,21 +149,26 @@ export class TermRecordOpfsStore {
      * @returns {Promise<void>}
      */
     async reset() {
-        await this._closeWritable();
+        await this._closeAllWritables();
         this._recordsById.clear();
         this._indexByDictionary.clear();
         this._nextId = 1;
-        this._fileLength = 0;
         this._deferIndexBuild = false;
         this._indexDirty = false;
-        this._pendingWriteBytes = 0;
-        this._pendingWriteChunks = [];
-        if (this._fileHandle === null) {
+        this._shardStateByFileName.clear();
+        this._invalidShardFileNames = [];
+        if (this._recordsDirectoryHandle === null) {
             return;
         }
-        const writable = await this._fileHandle.createWritable();
-        await writable.truncate(0);
-        await writable.close();
+        const shardFileNames = await this._listShardFileNames();
+        for (const fileName of shardFileNames) {
+            try {
+                await this._recordsDirectoryHandle.removeEntry(fileName);
+            } catch (_) {
+                // NOP
+            }
+        }
+        await this._deleteLegacyMonolithicIfPresent();
     }
 
     /**
@@ -181,8 +191,8 @@ export class TermRecordOpfsStore {
      */
     async appendBatch(records) {
         if (records.length === 0) { return; }
-        /** @type {TermRecord[]} */
-        const mappedRecords = [];
+        /** @type {Map<string, TermRecord[]>} */
+        const recordsByDictionary = new Map();
         for (const row of records) {
             const id = this._nextId++;
             const record = {
@@ -199,7 +209,12 @@ export class TermRecordOpfsStore {
                 sequence: row.sequence,
             };
             this._recordsById.set(id, record);
-            mappedRecords.push(record);
+            const dictionaryRecords = recordsByDictionary.get(record.dictionary);
+            if (typeof dictionaryRecords === 'undefined') {
+                recordsByDictionary.set(record.dictionary, [record]);
+            } else {
+                dictionaryRecords.push(record);
+            }
             if (!this._deferIndexBuild) {
                 this._addToIndex(record);
             }
@@ -207,7 +222,11 @@ export class TermRecordOpfsStore {
         if (this._deferIndexBuild) {
             this._indexDirty = true;
         }
-        await this._appendEncodedChunk(await this._encodeRecords(mappedRecords));
+        for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
+            const state = await this._getOrCreateShardState(dictionaryName);
+            if (state === null) { continue; }
+            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords));
+        }
     }
 
     /**
@@ -217,20 +236,19 @@ export class TermRecordOpfsStore {
     async deleteByDictionary(dictionaryName) {
         this._ensureIndexesReady();
         const index = this._indexByDictionary.get(dictionaryName);
-        if (typeof index === 'undefined') {
-            return 0;
-        }
         const ids = new Set();
-        for (const list of index.expression.values()) {
-            for (const id of list) {
-                ids.add(id);
+        if (typeof index !== 'undefined') {
+            for (const list of index.expression.values()) {
+                for (const id of list) {
+                    ids.add(id);
+                }
             }
         }
         for (const id of ids) {
             this._recordsById.delete(this._asNumber(id, -1));
         }
         this._indexByDictionary.delete(dictionaryName);
-        await this._rewriteAllBinary();
+        await this._deleteShardByDictionary(dictionaryName);
         return ids.size;
     }
 
@@ -285,6 +303,106 @@ export class TermRecordOpfsStore {
      */
     getById(id) {
         return this._recordsById.get(id);
+    }
+
+    /**
+     * @param {string[]|null} [expectedDictionaryNames]
+     * @returns {Promise<{
+     *   expectedShardCount: number,
+     *   actualShardCount: number,
+     *   missingShardCount: number,
+     *   missingShardFileNames: string[],
+     *   missingDictionaryNames: string[],
+     *   orphanShardCount: number,
+     *   orphanShardFileNames: string[],
+     *   orphanDictionaryNames: string[],
+     *   removedOrphanShardCount: number,
+     *   invalidShardPayloadCount: number,
+     *   invalidShardFileNames: string[],
+     *   rewroteAllShardsFromMemory: boolean
+     * }>}
+     */
+    async verifyIntegrity(expectedDictionaryNames = null) {
+        /** @type {Set<string>} */
+        const expectedFileNames = new Set();
+        /** @type {Set<string>} */
+        const expectedFileNamesFromRecords = new Set();
+        for (const record of this._recordsById.values()) {
+            const fileName = this._getShardFileName(record.dictionary);
+            expectedFileNames.add(fileName);
+            expectedFileNamesFromRecords.add(fileName);
+        }
+        if (Array.isArray(expectedDictionaryNames)) {
+            for (const dictionaryName of expectedDictionaryNames) {
+                if (typeof dictionaryName !== 'string' || dictionaryName.length === 0) { continue; }
+                expectedFileNames.add(this._getShardFileName(dictionaryName));
+            }
+        }
+
+        /** @type {string[]} */
+        const missingShardFileNames = [];
+        /** @type {string[]} */
+        const orphanShardFileNames = [];
+        for (const fileName of expectedFileNames) {
+            if (!this._shardStateByFileName.has(fileName)) {
+                missingShardFileNames.push(fileName);
+            }
+        }
+        for (const fileName of this._shardStateByFileName.keys()) {
+            if (!expectedFileNames.has(fileName)) {
+                orphanShardFileNames.push(fileName);
+            }
+        }
+
+        let removedOrphanShardCount = 0;
+        for (const fileName of orphanShardFileNames) {
+            if (this._recordsDirectoryHandle !== null) {
+                try {
+                    await this._recordsDirectoryHandle.removeEntry(fileName);
+                    ++removedOrphanShardCount;
+                } catch (_) {
+                    // NOP
+                }
+            }
+            this._shardStateByFileName.delete(fileName);
+        }
+
+        let rewroteAllShardsFromMemory = false;
+        let shouldRewriteFromMemory = false;
+        for (const fileName of missingShardFileNames) {
+            if (expectedFileNamesFromRecords.has(fileName)) {
+                shouldRewriteFromMemory = true;
+                break;
+            }
+        }
+        if (shouldRewriteFromMemory) {
+            await this._rewriteAllShardsFromMemory();
+            rewroteAllShardsFromMemory = true;
+        }
+
+        const missingDictionaryNames = missingShardFileNames
+            .map((fileName) => this._decodeDictionaryNameFromShardFileName(fileName))
+            .filter((value) => typeof value === 'string');
+        const orphanDictionaryNames = orphanShardFileNames
+            .map((fileName) => this._decodeDictionaryNameFromShardFileName(fileName))
+            .filter((value) => typeof value === 'string');
+
+        const summary = {
+            expectedShardCount: expectedFileNames.size,
+            actualShardCount: this._shardStateByFileName.size,
+            missingShardCount: missingShardFileNames.length,
+            missingShardFileNames: [...missingShardFileNames].sort(),
+            missingDictionaryNames: [...new Set(missingDictionaryNames)].sort(),
+            orphanShardCount: orphanShardFileNames.length,
+            orphanShardFileNames: [...orphanShardFileNames].sort(),
+            orphanDictionaryNames: [...new Set(orphanDictionaryNames)].sort(),
+            removedOrphanShardCount,
+            invalidShardPayloadCount: this._invalidShardFileNames.length,
+            invalidShardFileNames: [...this._invalidShardFileNames].sort(),
+            rewroteAllShardsFromMemory,
+        };
+        reportDiagnostics('term-record-shard-integrity-summary', summary);
+        return summary;
     }
 
     /**
@@ -488,22 +606,22 @@ export class TermRecordOpfsStore {
     }
 
     /**
+     * @param {TermRecordShardState} state
      * @param {Uint8Array} chunk
      * @returns {Promise<void>}
      */
-    async _appendEncodedChunk(chunk) {
+    async _appendEncodedChunk(state, chunk) {
         if (chunk.byteLength <= 0) { return; }
-        if (this._fileHandle === null) { return; }
 
-        const withHeader = this._fileLength === 0 ? this._withBinaryHeader(chunk) : chunk;
-        this._pendingWriteChunks.push(withHeader);
-        this._pendingWriteBytes += withHeader.byteLength;
-        this._fileLength += withHeader.byteLength;
+        const withHeader = state.fileLength === 0 ? this._withBinaryHeader(chunk) : chunk;
+        state.pendingWriteChunks.push(withHeader);
+        state.pendingWriteBytes += withHeader.byteLength;
+        state.fileLength += withHeader.byteLength;
 
-        if (!this._importSessionActive || this._pendingWriteBytes >= this._flushThresholdBytes) {
-            await this._flushPendingWrites();
+        if (!this._importSessionActive || state.pendingWriteBytes >= this._flushThresholdBytes) {
+            await this._flushPendingWritesForShard(state);
             if (!this._importSessionActive) {
-                await this._closeWritable();
+                await this._closeShardWritable(state);
             }
         }
     }
@@ -524,61 +642,326 @@ export class TermRecordOpfsStore {
      * @returns {Promise<void>}
      */
     async _flushPendingWrites() {
-        if (this._pendingWriteBytes <= 0 || this._pendingWriteChunks.length === 0 || this._fileHandle === null) {
+        if (this._shardStateByFileName.size === 0) {
             return;
         }
-        if (this._writable === null) {
-            this._writable = await this._fileHandle.createWritable({keepExistingData: true});
-            const seekOffset = this._fileLength - this._pendingWriteBytes;
-            await this._writable.seek(Math.max(0, seekOffset));
+        for (const state of this._shardStateByFileName.values()) {
+            await this._flushPendingWritesForShard(state);
         }
-        let merged = this._pendingWriteChunks[0];
-        if (this._pendingWriteChunks.length > 1) {
-            merged = new Uint8Array(this._pendingWriteBytes);
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _closeAllWritables() {
+        for (const state of this._shardStateByFileName.values()) {
+            await this._closeShardWritable(state);
+        }
+    }
+
+    /**
+     * @param {TermRecordShardState} state
+     * @returns {Promise<void>}
+     */
+    async _closeShardWritable(state) {
+        if (state.writable === null) {
+            return;
+        }
+        try {
+            await state.writable.close();
+        } finally {
+            state.writable = null;
+        }
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _rewriteAllShardsFromMemory() {
+        if (this._recordsDirectoryHandle === null) {
+            return;
+        }
+        await this._closeAllWritables();
+        this._shardStateByFileName.clear();
+
+        const existingShardFileNames = await this._listShardFileNames();
+        for (const fileName of existingShardFileNames) {
+            try {
+                await this._recordsDirectoryHandle.removeEntry(fileName);
+            } catch (_) {
+                // NOP
+            }
+        }
+
+        /** @type {Map<string, TermRecord[]>} */
+        const recordsByDictionary = new Map();
+        const orderedRecords = [...this._recordsById.values()].sort((a, b) => a.id - b.id);
+        for (const record of orderedRecords) {
+            const list = recordsByDictionary.get(record.dictionary);
+            if (typeof list === 'undefined') {
+                recordsByDictionary.set(record.dictionary, [record]);
+            } else {
+                list.push(record);
+            }
+        }
+
+        for (const [dictionaryName, records] of recordsByDictionary) {
+            const payload = await this._encodeRecords(records);
+            const fileName = this._getShardFileName(dictionaryName);
+            const fileHandle = await this._recordsDirectoryHandle.getFileHandle(fileName, {create: true});
+            const writable = await fileHandle.createWritable();
+            await writable.truncate(0);
+            let fileLength = 0;
+            if (payload.byteLength > 0) {
+                const output = this._withBinaryHeader(payload);
+                await writable.write(output);
+                fileLength = output.byteLength;
+            }
+            await writable.close();
+            this._shardStateByFileName.set(fileName, this._createShardState(fileName, fileHandle, fileLength));
+        }
+    }
+
+    /**
+     * @returns {Promise<number>}
+     */
+    async _loadShardFiles() {
+        if (this._recordsDirectoryHandle === null) {
+            return 0;
+        }
+        let shardFileCount = 0;
+        for await (const entry of this._recordsDirectoryHandle.entries()) {
+            const name = String(entry[0] ?? '');
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const fileSystemHandle = /** @type {FileSystemHandle} */ (/** @type {unknown} */ (entry[1]));
+            if (fileSystemHandle.kind !== 'file' || !this._isShardFileName(name)) {
+                continue;
+            }
+            const fileHandle = /** @type {FileSystemFileHandle} */ (fileSystemHandle);
+            let file;
+            try {
+                file = await fileHandle.getFile();
+            } catch (_) {
+                continue;
+            }
+            ++shardFileCount;
+            const state = this._createShardState(name, fileHandle, file.size);
+            this._shardStateByFileName.set(name, state);
+            if (file.size <= 0) {
+                continue;
+            }
+            const arrayBuffer = await file.arrayBuffer();
+            const content = new Uint8Array(arrayBuffer);
+            if (this._isBinaryFormat(content)) {
+                this._loadBinary(content);
+                continue;
+            }
+            // Invalid shard payloads are discarded so they cannot poison future reads.
+            this._invalidShardFileNames.push(name);
+            this._shardStateByFileName.delete(name);
+            if (this._recordsDirectoryHandle !== null) {
+                try {
+                    await this._recordsDirectoryHandle.removeEntry(name);
+                } catch (_) {
+                    // NOP
+                }
+            }
+        }
+        return shardFileCount;
+    }
+
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async _migrateLegacyMonolithicIfPresent() {
+        if (this._rootDirectoryHandle === null) {
+            return false;
+        }
+        let fileHandle;
+        try {
+            fileHandle = await this._rootDirectoryHandle.getFileHandle(LEGACY_FILE_NAME, {create: false});
+        } catch (_) {
+            return false;
+        }
+        const file = await fileHandle.getFile();
+        if (file.size <= 0) {
+            await this._deleteLegacyMonolithicIfPresent();
+            return false;
+        }
+        const content = new Uint8Array(await file.arrayBuffer());
+        if (this._isBinaryFormat(content)) {
+            this._loadBinary(content);
+        } else {
+            this._loadLegacyNdjson(content);
+        }
+        await this._rewriteAllShardsFromMemory();
+        await this._deleteLegacyMonolithicIfPresent();
+        return true;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _deleteLegacyMonolithicIfPresent() {
+        if (this._rootDirectoryHandle === null) {
+            return;
+        }
+        try {
+            await this._rootDirectoryHandle.removeEntry(LEGACY_FILE_NAME);
+        } catch (_) {
+            // NOP
+        }
+    }
+
+    /**
+     * @returns {Promise<string[]>}
+     */
+    async _listShardFileNames() {
+        if (this._recordsDirectoryHandle === null) {
+            return [];
+        }
+        /** @type {string[]} */
+        const names = [];
+        for await (const entry of this._recordsDirectoryHandle.entries()) {
+            const name = String(entry[0] ?? '');
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const fileSystemHandle = /** @type {FileSystemHandle} */ (/** @type {unknown} */ (entry[1]));
+            if (fileSystemHandle.kind === 'file' && this._isShardFileName(name)) {
+                names.push(name);
+            }
+        }
+        return names;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    _hasPendingShardWrites() {
+        for (const state of this._shardStateByFileName.values()) {
+            if (state.writable !== null || state.pendingWriteBytes > 0 || state.pendingWriteChunks.length > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param {string} dictionaryName
+     * @returns {Promise<TermRecordShardState|null>}
+     */
+    async _getOrCreateShardState(dictionaryName) {
+        if (this._recordsDirectoryHandle === null) {
+            return null;
+        }
+        const fileName = this._getShardFileName(dictionaryName);
+        const existing = this._shardStateByFileName.get(fileName);
+        if (typeof existing !== 'undefined') {
+            return existing;
+        }
+        const fileHandle = await this._recordsDirectoryHandle.getFileHandle(fileName, {create: true});
+        const file = await fileHandle.getFile();
+        const created = this._createShardState(fileName, fileHandle, file.size);
+        this._shardStateByFileName.set(fileName, created);
+        return created;
+    }
+
+    /**
+     * @param {TermRecordShardState} state
+     * @returns {Promise<void>}
+     */
+    async _flushPendingWritesForShard(state) {
+        if (state.pendingWriteBytes <= 0 || state.pendingWriteChunks.length === 0) {
+            return;
+        }
+        if (state.writable === null) {
+            state.writable = await state.fileHandle.createWritable({keepExistingData: true});
+            const seekOffset = state.fileLength - state.pendingWriteBytes;
+            await state.writable.seek(Math.max(0, seekOffset));
+        }
+        let merged = state.pendingWriteChunks[0];
+        if (state.pendingWriteChunks.length > 1) {
+            merged = new Uint8Array(state.pendingWriteBytes);
             let cursor = 0;
-            for (const chunk of this._pendingWriteChunks) {
+            for (const chunk of state.pendingWriteChunks) {
                 merged.set(chunk, cursor);
                 cursor += chunk.byteLength;
             }
         }
-        await this._writable.write(merged);
-        this._pendingWriteChunks = [];
-        this._pendingWriteBytes = 0;
+        await state.writable.write(merged);
+        state.pendingWriteChunks = [];
+        state.pendingWriteBytes = 0;
     }
 
     /**
+     * @param {string} dictionaryName
      * @returns {Promise<void>}
      */
-    async _closeWritable() {
-        if (this._writable === null) {
+    async _deleteShardByDictionary(dictionaryName) {
+        if (this._recordsDirectoryHandle === null) {
             return;
         }
+        const fileName = this._getShardFileName(dictionaryName);
+        const state = this._shardStateByFileName.get(fileName);
+        if (typeof state !== 'undefined') {
+            await this._flushPendingWritesForShard(state);
+            await this._closeShardWritable(state);
+            this._shardStateByFileName.delete(fileName);
+        }
         try {
-            await this._writable.close();
-        } finally {
-            this._writable = null;
+            await this._recordsDirectoryHandle.removeEntry(fileName);
+        } catch (_) {
+            // NOP
         }
     }
 
     /**
-     * @returns {Promise<void>}
+     * @param {string} fileName
+     * @param {FileSystemFileHandle} fileHandle
+     * @param {number} fileLength
+     * @returns {TermRecordShardState}
      */
-    async _rewriteAllBinary() {
-        if (this._fileHandle === null) { return; }
-        await this._closeWritable();
-        this._pendingWriteBytes = 0;
-        this._pendingWriteChunks = [];
-        const allRecords = this.getAllIds().map((id) => this._recordsById.get(id)).filter((record) => typeof record !== 'undefined');
-        const payload = await this._encodeRecords(/** @type {TermRecord[]} */ (allRecords));
-        const writable = await this._fileHandle.createWritable();
-        await writable.truncate(0);
-        if (payload.byteLength > 0) {
-            await writable.write(this._withBinaryHeader(payload));
-            this._fileLength = BINARY_MAGIC_BYTES + payload.byteLength;
-        } else {
-            this._fileLength = 0;
+    _createShardState(fileName, fileHandle, fileLength) {
+        return {
+            fileName,
+            fileHandle,
+            writable: null,
+            fileLength,
+            pendingWriteBytes: 0,
+            pendingWriteChunks: [],
+        };
+    }
+
+    /**
+     * @param {string} dictionaryName
+     * @returns {string}
+     */
+    _getShardFileName(dictionaryName) {
+        return `${SHARD_FILE_PREFIX}${encodeURIComponent(dictionaryName)}${SHARD_FILE_SUFFIX}`;
+    }
+
+    /**
+     * @param {string} fileName
+     * @returns {boolean}
+     */
+    _isShardFileName(fileName) {
+        return fileName.startsWith(SHARD_FILE_PREFIX) && fileName.endsWith(SHARD_FILE_SUFFIX);
+    }
+
+    /**
+     * @param {string} fileName
+     * @returns {string|null}
+     */
+    _decodeDictionaryNameFromShardFileName(fileName) {
+        if (!this._isShardFileName(fileName)) {
+            return null;
         }
-        await writable.close();
+        const encoded = fileName.slice(SHARD_FILE_PREFIX.length, fileName.length - SHARD_FILE_SUFFIX.length);
+        try {
+            const decoded = decodeURIComponent(encoded);
+            return decoded.length > 0 ? decoded : null;
+        } catch (_) {
+            return null;
+        }
     }
 
     /** */

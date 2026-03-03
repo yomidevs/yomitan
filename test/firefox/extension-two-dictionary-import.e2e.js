@@ -468,6 +468,9 @@ function getUnsupportedRuntimeSkipReason(message) {
     if (text.includes('OPFS is required but unavailable') || text.includes('no such vfs: opfs')) {
         return 'Firefox automation runtime does not expose OPFS VFS in this local Selenium stack; skipping this lane locally without enabling any OPFS fallback.';
     }
+    if (text.includes('background.service_worker is currently disabled')) {
+        return 'Firefox automation runtime does not support MV3 background service workers in this local Selenium/browser stack; skipping this lane locally.';
+    }
     return '';
 }
 

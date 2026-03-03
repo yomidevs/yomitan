@@ -39,7 +39,7 @@ import {
 import {TermContentOpfsStore} from './term-content-opfs-store.js';
 import {TermRecordOpfsStore} from './term-record-opfs-store.js';
 
-const CURRENT_DICTIONARY_SCHEMA_VERSION = 1;
+const CURRENT_DICTIONARY_SCHEMA_VERSION = 2;
 
 /**
  * @typedef {object} InsertStatement
@@ -59,6 +59,10 @@ export class DictionaryDatabase {
         this._usesFallbackStorage = false;
         /** @type {{mode: string, forceFallback: boolean, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, attempts?: Array<{strategy: string, target: string, flags: string, error: string}>, lastError?: string|null}|null} */
         this._openStorageDiagnostics = null;
+        /** @type {Record<string, unknown>|null} */
+        this._startupCleanupIncompleteImportsSummary = null;
+        /** @type {Record<string, unknown>|null} */
+        this._startupCleanupMissingTermRecordShardsSummary = null;
         /** @type {number} */
         this._bulkImportDepth = 0;
         /** @type {boolean} */
@@ -153,6 +157,7 @@ export class DictionaryDatabase {
             this._termContentZstdInitialized = true;
             await this._deleteLegacyIndexedDb();
             await this._cleanupIncompleteImports();
+            await this._cleanupMissingTermRecordShards();
 
             // keep existing draw worker split behaviour.
             const isWorker = self.constructor.name !== 'Window';
@@ -231,6 +236,20 @@ export class DictionaryDatabase {
             return null;
         }
         return {...this._openStorageDiagnostics};
+    }
+
+    /**
+     * @returns {Record<string, unknown>|null}
+     */
+    getStartupCleanupIncompleteImportsSummary() {
+        return this._startupCleanupIncompleteImportsSummary;
+    }
+
+    /**
+     * @returns {Record<string, unknown>|null}
+     */
+    getStartupCleanupMissingTermRecordShardsSummary() {
+        return this._startupCleanupMissingTermRecordShardsSummary;
     }
 
     /** */
@@ -1333,6 +1352,7 @@ export class DictionaryDatabase {
                 failedTitles: [],
                 parseErrorCount: 0,
             };
+            this._startupCleanupIncompleteImportsSummary = summary;
             reportDiagnostics('dictionary-startup-cleanup-summary', summary);
             return summary;
         }
@@ -1403,7 +1423,99 @@ export class DictionaryDatabase {
             failedTitles: [...failedTitles].sort((a, b) => a.localeCompare(b)),
             parseErrorCount,
         };
+        this._startupCleanupIncompleteImportsSummary = summary;
         reportDiagnostics('dictionary-startup-cleanup-summary', summary);
+        return summary;
+    }
+
+    /**
+     * @returns {Promise<{
+     *   scannedCount: number,
+     *   expectedTermDictionaryCount: number,
+     *   missingShardDictionaryCount: number,
+     *   missingShardDictionaryNames: string[],
+     *   removedCount: number,
+     *   removedTitles: string[],
+     *   failedCount: number,
+     *   failedTitles: string[],
+     *   parseErrorCount: number,
+     *   shardIntegrity: {
+     *     expectedShardCount: number,
+     *     actualShardCount: number,
+     *     missingShardCount: number,
+     *     missingShardFileNames: string[],
+     *     missingDictionaryNames: string[],
+     *     orphanShardCount: number,
+     *     orphanShardFileNames: string[],
+     *     orphanDictionaryNames: string[],
+     *     removedOrphanShardCount: number,
+     *     invalidShardPayloadCount: number,
+     *     invalidShardFileNames: string[],
+     *     rewroteAllShardsFromMemory: boolean
+     *   }
+     * }>}
+     */
+    async _cleanupMissingTermRecordShards() {
+        const db = this._requireDb();
+        const rows = db.selectObjects('SELECT title, summaryJson FROM dictionaries ORDER BY id ASC');
+        /** @type {string[]} */
+        const expectedTermDictionaryNames = [];
+        let parseErrorCount = 0;
+        for (const row of rows) {
+            const title = this._asString(row.title).trim();
+            if (title.length === 0) { continue; }
+            let summary;
+            try {
+                summary = /** @type {unknown} */ (parseJson(this._asString(row.summaryJson)));
+            } catch (_) {
+                ++parseErrorCount;
+                continue;
+            }
+            if (typeof summary !== 'object' || summary === null || Array.isArray(summary)) {
+                continue;
+            }
+            const counts = /** @type {unknown} */ (Reflect.get(summary, 'counts'));
+            const terms = (typeof counts === 'object' && counts !== null) ? /** @type {unknown} */ (Reflect.get(counts, 'terms')) : null;
+            const total = (typeof terms === 'object' && terms !== null) ? this._asNumber(Reflect.get(terms, 'total'), 0) : 0;
+            if (total > 0) {
+                expectedTermDictionaryNames.push(title);
+            }
+        }
+        const shardIntegrity = await this._termRecordStore.verifyIntegrity(expectedTermDictionaryNames);
+        const missingShardDictionaryNames = [...new Set(
+            (Array.isArray(shardIntegrity.missingDictionaryNames) ? shardIntegrity.missingDictionaryNames : [])
+                .filter((name) => typeof name === 'string' && name.length > 0),
+        )].sort((a, b) => a.localeCompare(b));
+
+        /** @type {string[]} */
+        const removedTitles = [];
+        /** @type {string[]} */
+        const failedTitles = [];
+        for (const title of missingShardDictionaryNames) {
+            try {
+                await this.deleteDictionary(title, 1000, () => {});
+                removedTitles.push(title);
+            } catch (e) {
+                const error = toError(e);
+                log.error(new Error(`Failed to remove dictionary with missing term-record shard '${title}': ${error.message}`));
+                failedTitles.push(title);
+            }
+        }
+
+        const summary = {
+            scannedCount: rows.length,
+            expectedTermDictionaryCount: expectedTermDictionaryNames.length,
+            missingShardDictionaryCount: missingShardDictionaryNames.length,
+            missingShardDictionaryNames,
+            removedCount: removedTitles.length,
+            removedTitles: [...removedTitles].sort((a, b) => a.localeCompare(b)),
+            failedCount: failedTitles.length,
+            failedTitles: [...failedTitles].sort((a, b) => a.localeCompare(b)),
+            parseErrorCount,
+            shardIntegrity,
+        };
+        this._startupCleanupMissingTermRecordShardsSummary = summary;
+        reportDiagnostics('dictionary-term-record-integrity-summary', summary);
         return summary;
     }
 
@@ -2409,6 +2521,8 @@ export class DictionaryDatabase {
         switch (version) {
             case 1:
                 return await this._wipeDictionaryDataForSchemaMigration();
+            case 2:
+                return await this._migrateSchemaVersion2();
             default:
                 throw new Error(`Unhandled dictionary schema migration target version: ${version}`);
         }
@@ -2466,6 +2580,17 @@ export class DictionaryDatabase {
             kanjiMetaBefore,
             tagMetaBefore,
             mediaBefore,
+        };
+    }
+
+    /**
+     * Migration v2: reserved scaffold for future schema changes.
+     * @returns {Promise<Record<string, number|string|boolean|null>>}
+     */
+    async _migrateSchemaVersion2() {
+        await Promise.resolve();
+        return {
+            migration: 'schema-v2-noop',
         };
     }
 

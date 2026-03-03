@@ -77,6 +77,7 @@ export type ImportDebug = {
     openStorageDiagnostics?: unknown;
     useImportSession?: boolean;
     finalizeImportSession?: boolean;
+    importerDebug?: DictionaryImporter.ImportDebug | null;
 };
 
 export type ImportProgressCallback = (details: DictionaryImporter.ProgressData) => void;

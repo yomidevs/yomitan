@@ -105,7 +105,6 @@ jobs:
     name: Full Extension E2E (Chromium)
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
@@ -128,6 +127,38 @@ jobs:
           MANABITAN_E2E_STRICT_RUNTIME: '1'
         run: xvfb-run -a npm run test:e2e:chromium-extension
 
+      - name: Enforce Chromium extension E2E success
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = 'builds/chromium-e2e-import-report.json';
+          if (!fs.existsSync(path)) {
+            console.error('Chromium extension E2E report JSON not found.');
+            process.exit(1);
+          }
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
+          const opfsReady = runtime !== null && (
+            runtime.hasOpfsDbCtor === true &&
+            runtime.hasOpfsImportDb === true &&
+            runtime.hasStorageGetDirectory === true &&
+            (typeof runtime.opfsVfsPtr === 'number' ? runtime.opfsVfsPtr > 0 : runtime.opfsVfsPtr !== null)
+          );
+          if (report.status !== 'success') {
+            console.error(`Chromium extension E2E status is not success: ${String(report.status)}`);
+            process.exit(1);
+          }
+          if (report.skippedVerification === true) {
+            console.error(`Chromium extension E2E skipped verification: ${String(report.skipReason || 'no reason')}`);
+            process.exit(1);
+          }
+          if (!opfsReady) {
+            console.error(`Chromium extension OPFS readiness check failed. runtimeDiagnostics=${JSON.stringify(runtime)}`);
+            process.exit(1);
+          }
+          NODE
+
       - name: Summarize Chromium extension E2E
         if: always()
         run: |
@@ -141,6 +172,23 @@ jobs:
           const report = JSON.parse(fs.readFileSync(path, 'utf8'));
           const phases = Array.isArray(report.phases) ? report.phases : [];
           const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
+          const startupDiagnostics = runtime && typeof runtime.startupDiagnosticsSnapshot === 'object' && runtime.startupDiagnosticsSnapshot !== null ?
+            runtime.startupDiagnosticsSnapshot :
+            null;
+          const startupIncompleteCleanup = startupDiagnostics && typeof startupDiagnostics.dictionaryStartupCleanupSummary === 'object' && startupDiagnostics.dictionaryStartupCleanupSummary !== null ?
+            startupDiagnostics.dictionaryStartupCleanupSummary :
+            null;
+          const startupIntegrityCleanup = startupDiagnostics && typeof startupDiagnostics.dictionaryTermRecordIntegritySummary === 'object' && startupDiagnostics.dictionaryTermRecordIntegritySummary !== null ?
+            startupDiagnostics.dictionaryTermRecordIntegritySummary :
+            null;
+          const formatCleanupCounts = (summary) => {
+            if (!(summary && typeof summary === 'object')) {
+              return 'unknown';
+            }
+            const removedCount = typeof summary.removedCount === 'number' ? summary.removedCount : 'n/a';
+            const failedCount = typeof summary.failedCount === 'number' ? summary.failedCount : 'n/a';
+            return `removed=${String(removedCount)}, failed=${String(failedCount)}`;
+          };
           const opfsReady = runtime ? (
             runtime.hasOpfsDbCtor === true &&
             runtime.hasOpfsImportDb === true &&
@@ -157,6 +205,8 @@ jobs:
             `- Failure: ${report.failureReason ? `\`${String(report.failureReason)}\`` : 'none'}`,
             `- OPFS ready: ${opfsReady === null ? 'unknown' : `\`${String(opfsReady)}\``}`,
             `- Runtime diagnostics: \`${JSON.stringify(report.runtimeDiagnostics ?? null)}\``,
+            `- Startup cleanup (incomplete imports): ${formatCleanupCounts(startupIncompleteCleanup)}`,
+            `- Startup cleanup (term-record integrity): ${formatCleanupCounts(startupIntegrityCleanup)}`,
             `- Phase count: ${String(phases.length)}`,
             '- Slowest phases:',
             ...top.map((phase) => `  - ${String(phase.name)} (${Number(phase.durationMs || 0).toFixed(1)} ms)`),
@@ -218,6 +268,23 @@ jobs:
           const report = JSON.parse(fs.readFileSync(path, 'utf8'));
           const phases = Array.isArray(report.phases) ? report.phases : [];
           const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
+          const startupDiagnostics = runtime && typeof runtime.startupDiagnosticsSnapshot === 'object' && runtime.startupDiagnosticsSnapshot !== null ?
+            runtime.startupDiagnosticsSnapshot :
+            null;
+          const startupIncompleteCleanup = startupDiagnostics && typeof startupDiagnostics.dictionaryStartupCleanupSummary === 'object' && startupDiagnostics.dictionaryStartupCleanupSummary !== null ?
+            startupDiagnostics.dictionaryStartupCleanupSummary :
+            null;
+          const startupIntegrityCleanup = startupDiagnostics && typeof startupDiagnostics.dictionaryTermRecordIntegritySummary === 'object' && startupDiagnostics.dictionaryTermRecordIntegritySummary !== null ?
+            startupDiagnostics.dictionaryTermRecordIntegritySummary :
+            null;
+          const formatCleanupCounts = (summary) => {
+            if (!(summary && typeof summary === 'object')) {
+              return 'unknown';
+            }
+            const removedCount = typeof summary.removedCount === 'number' ? summary.removedCount : 'n/a';
+            const failedCount = typeof summary.failedCount === 'number' ? summary.failedCount : 'n/a';
+            return `removed=${String(removedCount)}, failed=${String(failedCount)}`;
+          };
           const opfsReady = runtime ? (
             runtime.hasOpfsDbCtor === true &&
             runtime.hasOpfsImportDb === true &&
@@ -234,6 +301,8 @@ jobs:
             `- Failure: ${report.failureReason ? `\`${String(report.failureReason)}\`` : 'none'}`,
             `- OPFS ready: ${opfsReady === null ? 'unknown' : `\`${String(opfsReady)}\``}`,
             `- Runtime diagnostics: \`${JSON.stringify(report.runtimeDiagnostics ?? null)}\``,
+            `- Startup cleanup (incomplete imports): ${formatCleanupCounts(startupIncompleteCleanup)}`,
+            `- Startup cleanup (term-record integrity): ${formatCleanupCounts(startupIntegrityCleanup)}`,
             `- Phase count: ${String(phases.length)}`,
             '- Slowest phases:',
             ...top.map((phase) => `  - ${String(phase.name)} (${Number(phase.durationMs || 0).toFixed(1)} ms)`),

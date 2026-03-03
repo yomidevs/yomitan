@@ -22,7 +22,21 @@ const BASIC_DIAGNOSTICS_EVENTS = new Set([
     'backend-prepare-complete',
     'backend-prepare-failed',
     'startup-health-check',
+    'offscreen-opfs-preflight',
+    'opfs-sqlite-init',
+    'opfs-open-begin',
+    'opfs-open-success',
     'opfs-open-failed',
+    'opfs-delete-files-unavailable',
+    'opfs-import-db-unavailable',
+    'dictionary-import-session-begin',
+    'dictionary-import-session-complete',
+    'dictionary-import-item-complete',
+    'dictionary-import-dictionary-start',
+    'dictionary-import-step-complete',
+    'dictionary-import-step-final',
+    'dictionary-import-zip-complete',
+    'dictionary-import-worker-phase-summary',
 ]);
 /** @type {Promise<DiagnosticsConfig>|null} */
 let diagnosticsConfigPromise = null;

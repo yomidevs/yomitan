@@ -49,6 +49,8 @@ import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
 
+const STARTUP_DIAGNOSTICS_STORAGE_KEY = 'manabitanStartupDiagnostics';
+
 /**
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
@@ -70,9 +72,9 @@ export class Backend {
         if (!chrome.offscreen) {
             /** @type {?OffscreenProxy} */
             this._offscreen = null;
-            /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
+            /** @type {DictionaryDatabase} */
             this._dictionaryDatabase = new DictionaryDatabase();
-            /** @type {Translator|TranslatorProxy} */
+            /** @type {Translator} */
             this._translator = new Translator(this._dictionaryDatabase);
             /** @type {ClipboardReader|ClipboardReaderProxy} */
             this._clipboardReader = new ClipboardReader(
@@ -118,6 +120,8 @@ export class Backend {
         this._searchPopupTabCreatePromise = null;
         /** @type {?Promise<void>} */
         this._dictionaryRefreshPromise = null;
+        /** @type {?Promise<void>} */
+        this._dictionaryDatabasePreparePromise = null;
 
         /** @type {boolean} */
         this._isPrepared = false;
@@ -218,6 +222,8 @@ export class Backend {
         this._yomitanApi = new YomitanApi(this._apiMap, this._offscreen);
         /** @type {CacheMap<string, {originalTextLength: number, textSegments: import('api').ParseTextSegment[]}>} */
         this._textParseCache = new CacheMap(10000, 3600000); // 1 hour idle time, ~32MB per 1000 entries for Japanese
+        /** @type {Record<string, unknown>|null} */
+        this._startupDiagnosticsSnapshot = null;
     }
 
     /**
@@ -278,6 +284,7 @@ export class Backend {
     /** @type {import('api').PmApiHandler<'connectToDatabaseWorker'>} */
     async _onPmConnectToDatabaseWorker(_params, ports) {
         if (ports !== null && ports.length > 0) {
+            await this._ensureDictionaryDatabaseReady();
             await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
         }
     }
@@ -382,7 +389,7 @@ export class Backend {
             }
             try {
                 const startedAt = safePerformance.now();
-                await this._dictionaryDatabase.prepare();
+                await this._ensureDictionaryDatabaseReady();
                 recordPhase('dictionaryDatabase.prepare', startedAt);
             } catch (e) {
                 log.error(e);
@@ -398,8 +405,11 @@ export class Backend {
                 recordPhase('optionsUtil.load', startedAt);
             }
 
-            await measureAsyncPhase('pruneStaleProfileDictionaryOptions', async () => {
-                await this._pruneStaleProfileDictionaryOptions();
+            const dictionaryOptionsPruneSummary = await measureAsyncPhase('pruneStaleProfileDictionaryOptions', async () => (
+                await this._pruneStaleProfileDictionaryOptions()
+            ));
+            await measureAsyncPhase('captureStartupCleanupDiagnostics', async () => {
+                await this._captureStartupCleanupDiagnostics(dictionaryOptionsPruneSummary);
             });
             await measureAsyncPhase('reportStartupHealthCheck', async () => {
                 await this._reportStartupHealthCheck();
@@ -644,6 +654,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'kanjiFind'>} */
     async _onApiKanjiFind({text, optionsContext}) {
+        await this._ensureDictionaryDatabaseReady();
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {maxResults}} = options;
         const findKanjiOptions = this._getTranslatorFindKanjiOptions(options);
@@ -654,6 +665,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'termsFind'>} */
     async _onApiTermsFind({text, details, optionsContext}) {
+        await this._ensureDictionaryDatabaseReady();
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {resultOutputMode: mode, maxResults}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
@@ -1027,23 +1039,27 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getDictionaryInfo'>} */
     async _onApiGetDictionaryInfo() {
+        await this._ensureDictionaryDatabaseReady();
         return await this._dictionaryDatabase.getDictionaryInfo();
     }
 
     /** @type {import('api').ApiHandler<'purgeDatabase'>} */
     async _onApiPurgeDatabase() {
+        await this._ensureDictionaryDatabaseReady();
         await this._dictionaryDatabase.purge();
         this._triggerDatabaseUpdated('dictionary', 'purge');
     }
 
     /** @type {import('api').ApiHandler<'exportDictionaryDatabase'>} */
     async _onApiExportDictionaryDatabase() {
+        await this._ensureDictionaryDatabaseReady();
         const content = await this._dictionaryDatabase.exportDatabase();
         return arrayBufferToBase64(content);
     }
 
     /** @type {import('api').ApiHandler<'importDictionaryDatabase'>} */
     async _onApiImportDictionaryDatabase({content}) {
+        await this._ensureDictionaryDatabaseReady();
         await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
         this._triggerDatabaseUpdated('dictionary', 'import');
     }
@@ -1200,6 +1216,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getTermFrequencies'>} */
     async _onApiGetTermFrequencies({termReadingList, dictionaries}) {
+        await this._ensureDictionaryDatabaseReady();
         return await this._translator.getTermFrequencies(termReadingList, dictionaries);
     }
 
@@ -1797,6 +1814,7 @@ export class Backend {
      * @returns {Promise<import('api').ParseTextLine[]>}
      */
     async _textParseScanning(text, scanLength, optionsContext) {
+        await this._ensureDictionaryDatabaseReady();
         /** @type {import('translator').FindTermsMode} */
         const mode = 'simple';
         const options = this._getProfileOptions(optionsContext, false);
@@ -2775,6 +2793,28 @@ export class Backend {
      */
     async _refreshDictionaryDatabaseAfterUpdate() {
         const dictionaryDatabase = this._dictionaryDatabase;
+        if (
+            'refreshConnection' in dictionaryDatabase &&
+            typeof dictionaryDatabase.refreshConnection === 'function'
+        ) {
+            if (this._dictionaryRefreshPromise !== null) {
+                await this._dictionaryRefreshPromise;
+                return;
+            }
+            this._dictionaryRefreshPromise = (async () => {
+                try {
+                    await dictionaryDatabase.refreshConnection();
+                } catch (e) {
+                    log.error(e);
+                }
+            })();
+            try {
+                await this._dictionaryRefreshPromise;
+            } finally {
+                this._dictionaryRefreshPromise = null;
+            }
+            return;
+        }
         if (!(
             'isPrepared' in dictionaryDatabase &&
             typeof dictionaryDatabase.isPrepared === 'function' &&
@@ -2846,6 +2886,7 @@ export class Backend {
         /** @type {import('dictionary-importer').Summary[]} */
         let dictionaryInfo;
         try {
+            await this._ensureDictionaryDatabaseReady();
             dictionaryInfo = await this._dictionaryDatabase.getDictionaryInfo();
         } catch (e) {
             const error = e instanceof Error ? e : new Error(String(e));
@@ -2952,6 +2993,72 @@ export class Backend {
     }
 
     /**
+     * @param {Record<string, unknown>} dictionaryOptionsPruneSummary
+     * @returns {Promise<void>}
+     */
+    async _captureStartupCleanupDiagnostics(dictionaryOptionsPruneSummary) {
+        const dictionaryDatabase = this._dictionaryDatabase;
+        /** @type {Record<string, unknown>|null} */
+        let dictionaryStartupCleanupSummary = null;
+        /** @type {Record<string, unknown>|null} */
+        let dictionaryTermRecordIntegritySummary = null;
+
+        const getStartupCleanupIncompleteImportsSummary = /** @type {unknown} */ (
+            Reflect.get(dictionaryDatabase, 'getStartupCleanupIncompleteImportsSummary')
+        );
+        if (typeof getStartupCleanupIncompleteImportsSummary === 'function') {
+            const value = /** @type {unknown} */ (getStartupCleanupIncompleteImportsSummary.call(dictionaryDatabase));
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                dictionaryStartupCleanupSummary = /** @type {Record<string, unknown>} */ (value);
+            }
+        }
+
+        const getStartupCleanupMissingTermRecordShardsSummary = /** @type {unknown} */ (
+            Reflect.get(dictionaryDatabase, 'getStartupCleanupMissingTermRecordShardsSummary')
+        );
+        if (typeof getStartupCleanupMissingTermRecordShardsSummary === 'function') {
+            const value = /** @type {unknown} */ (getStartupCleanupMissingTermRecordShardsSummary.call(dictionaryDatabase));
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                dictionaryTermRecordIntegritySummary = /** @type {Record<string, unknown>} */ (value);
+            }
+        }
+
+        const snapshot = {
+            createdAtIso: new Date().toISOString(),
+            dictionaryOptionsPruneStartupSummary: dictionaryOptionsPruneSummary,
+            dictionaryStartupCleanupSummary,
+            dictionaryTermRecordIntegritySummary,
+        };
+        this._startupDiagnosticsSnapshot = snapshot;
+        await this._storeStartupDiagnosticsSnapshot(snapshot);
+    }
+
+    /**
+     * @param {Record<string, unknown>} snapshot
+     * @returns {Promise<void>}
+     */
+    async _storeStartupDiagnosticsSnapshot(snapshot) {
+        const localStorageArea = chrome.storage?.local;
+        if (!isObjectNotArray(localStorageArea) || typeof localStorageArea.set !== 'function') {
+            return;
+        }
+        try {
+            await new Promise((resolve, reject) => {
+                localStorageArea.set({[STARTUP_DIAGNOSTICS_STORAGE_KEY]: snapshot}, () => {
+                    const runtimeError = chrome.runtime.lastError;
+                    if (runtimeError) {
+                        reject(new Error(runtimeError.message || 'storage.local.set failed'));
+                        return;
+                    }
+                    resolve(void 0);
+                });
+            });
+        } catch (_) {
+            // Best effort startup diagnostics snapshot persistence.
+        }
+    }
+
+    /**
      * @returns {Promise<void>}
      */
     async _reportStartupHealthCheck() {
@@ -3043,6 +3150,7 @@ export class Backend {
             recommendedFeedLoaded,
             recommendedFeedLanguageCount,
             recommendedFeedError,
+            startupDiagnosticsSnapshot: this._startupDiagnosticsSnapshot,
         });
     }
 
@@ -3307,6 +3415,7 @@ export class Backend {
      * @returns {Promise<import('dictionary-database').MediaDataStringContent[]>}
      */
     async _getNormalizedDictionaryDatabaseMedia(targets) {
+        await this._ensureDictionaryDatabaseReady();
         const results = [];
         for (const item of await this._dictionaryDatabase.getMedia(targets)) {
             const {content, dictionary, height, mediaType, path, width} = item;
@@ -3314,6 +3423,35 @@ export class Backend {
             results.push({content: content2, dictionary, height, mediaType, path, width});
         }
         return results;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _ensureDictionaryDatabaseReady() {
+        const isPreparedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'isPrepared'));
+        if (typeof isPreparedMethod === 'function') {
+            const isPrepared = /** @type {() => boolean} */ (isPreparedMethod).call(this._dictionaryDatabase);
+            if (isPrepared) {
+                return;
+            }
+        }
+        if (this._dictionaryDatabasePreparePromise !== null) {
+            await this._dictionaryDatabasePreparePromise;
+            return;
+        }
+        this._dictionaryDatabasePreparePromise = (async () => {
+            await this._dictionaryDatabase.prepare();
+            const clearResult = this._translator.clearDatabaseCaches();
+            if (clearResult instanceof Promise) {
+                await clearResult;
+            }
+        })();
+        try {
+            await this._dictionaryDatabasePreparePromise;
+        } finally {
+            this._dictionaryDatabasePreparePromise = null;
+        }
     }
 
     /**

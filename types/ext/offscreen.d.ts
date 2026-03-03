@@ -35,6 +35,10 @@ type ApiSurface = {
         params: void;
         return: void;
     };
+    databaseRefreshOffscreen: {
+        params: void;
+        return: void;
+    };
     getDictionaryInfoOffscreen: {
         params: void;
         return: DictionaryImporter.Summary[];

@@ -21,15 +21,25 @@ import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 export const DICTIONARY_DB_FILE = '/dict.sqlite3';
 
 const DICTIONARY_DB_FILE_ALT = 'dict.sqlite3';
+const OPFS_SAHPOOL_VFS_NAME = 'opfs-sahpool';
 
 let lastOpenUsedFallbackStorage = false;
-/** @type {{mode: string, forceFallback: boolean, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, attempts?: Array<{strategy: string, target: string, flags: string, error: string}>, lastError?: string|null}} */
+/** @type {{mode: string, caller: string, runtimeContext: ReturnType<typeof getRuntimeContextDiagnostics>|null, forceFallback: boolean, opfsReadyTimeoutMs: number, opfsReadyWait: {attempts: number, elapsedMs: number, ready: boolean}|null, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasInstallOpfsSAHPoolVfs: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null, attempts?: Array<{strategy: string, target: string, flags: string, error: string}>, lastError?: string|null}} */
 let lastOpenStorageDiagnostics = {
     mode: 'unknown',
+    caller: 'unknown',
+    runtimeContext: null,
     forceFallback: false,
+    opfsReadyTimeoutMs: 0,
+    opfsReadyWait: null,
     hasOpfsDbCtor: false,
     hasOpfsImportDb: false,
     hasWasmfsDir: false,
+    hasInstallOpfsSAHPoolVfs: false,
+    hasOpfsVfs: false,
+    hasOpfsSahpoolVfs: false,
+    opfsVfsPtr: null,
+    opfsSahpoolVfsPtr: null,
     attempts: [],
     lastError: null,
 };
@@ -42,6 +52,51 @@ let lastOpenStorageDiagnostics = {
 
 /** @type {Promise<import('@sqlite.org/sqlite-wasm').Sqlite3Static>|null} */
 let sqlite3Promise = null;
+/** @type {Promise<boolean>|null} */
+let opfsSahpoolInstallPromise = null;
+/** @type {boolean} */
+let sqliteInitDiagnosticsReported = false;
+
+/**
+ * @returns {{href: string|null, origin: string|null, globalConstructor: string|null, isWindow: boolean, isWorkerGlobalScope: boolean, isServiceWorkerGlobalScope: boolean, crossOriginIsolated: boolean|null, hasSharedArrayBuffer: boolean, hasAtomics: boolean, hasNavigatorStorage: boolean, hasStorageGetDirectory: boolean, hasFileSystemHandle: boolean, hasFileSystemDirectoryHandle: boolean, hasFileSystemFileHandle: boolean, hasCreateSyncAccessHandle: boolean, userAgent: string|null}}
+ */
+function getRuntimeContextDiagnostics() {
+    const locationValue = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'location') ?? {}));
+    const navigatorValue = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'navigator') ?? {}));
+    const storageValue = /** @type {Record<string, unknown>} */ (Reflect.get(navigatorValue, 'storage') ?? {});
+    const globalCtorName = (
+        typeof Reflect.get(globalThis, 'constructor') === 'function' &&
+        typeof Reflect.get(/** @type {Record<string, unknown>} */ (Reflect.get(globalThis, 'constructor')), 'name') === 'string'
+    ) ? /** @type {string} */ (Reflect.get(/** @type {Record<string, unknown>} */ (Reflect.get(globalThis, 'constructor')), 'name')) : null;
+    const isWindow = (typeof Window === 'function' && globalThis instanceof Window);
+    const isWorkerGlobalScope = (typeof WorkerGlobalScope === 'function' && globalThis instanceof WorkerGlobalScope);
+    const isServiceWorkerGlobalScope = (typeof ServiceWorkerGlobalScope === 'function' && globalThis instanceof ServiceWorkerGlobalScope);
+    const crossOriginIsolatedValue = Reflect.get(globalThis, 'crossOriginIsolated');
+    return {
+        href: typeof locationValue.href === 'string' ? locationValue.href : null,
+        origin: typeof locationValue.origin === 'string' ? locationValue.origin : null,
+        globalConstructor: globalCtorName,
+        isWindow,
+        isWorkerGlobalScope,
+        isServiceWorkerGlobalScope,
+        crossOriginIsolated: typeof crossOriginIsolatedValue === 'boolean' ? crossOriginIsolatedValue : null,
+        hasSharedArrayBuffer: typeof Reflect.get(globalThis, 'SharedArrayBuffer') === 'function',
+        hasAtomics: typeof Reflect.get(globalThis, 'Atomics') === 'object' && Reflect.get(globalThis, 'Atomics') !== null,
+        hasNavigatorStorage: typeof navigatorValue === 'object' && navigatorValue !== null && typeof storageValue === 'object' && storageValue !== null,
+        hasStorageGetDirectory: typeof storageValue.getDirectory === 'function',
+        hasFileSystemHandle: typeof Reflect.get(globalThis, 'FileSystemHandle') === 'function',
+        hasFileSystemDirectoryHandle: typeof Reflect.get(globalThis, 'FileSystemDirectoryHandle') === 'function',
+        hasFileSystemFileHandle: typeof Reflect.get(globalThis, 'FileSystemFileHandle') === 'function',
+        hasCreateSyncAccessHandle: (
+            typeof Reflect.get(globalThis, 'FileSystemFileHandle') === 'function' &&
+            typeof Reflect.get(
+                /** @type {{prototype?: Record<string, unknown>}} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'FileSystemFileHandle'))).prototype ?? {},
+                'createSyncAccessHandle',
+            ) === 'function'
+        ),
+        userAgent: typeof navigatorValue.userAgent === 'string' ? navigatorValue.userAgent : null,
+    };
+}
 
 /**
  * @returns {string[]}
@@ -69,6 +124,67 @@ function getWasmfsDatabasePaths(sqlite3) {
         return [];
     }
     return [`${opfsDir}/dict.sqlite3`];
+}
+
+/**
+ * @param {unknown} pointer
+ * @returns {boolean}
+ */
+function isNonZeroPointer(pointer) {
+    if (typeof pointer === 'number') {
+        return Number.isFinite(pointer) && pointer !== 0;
+    }
+    if (typeof pointer === 'bigint') {
+        return pointer !== 0n;
+    }
+    return pointer !== null && pointer !== undefined;
+}
+
+/**
+ * @param {unknown} pointer
+ * @returns {string|number|null}
+ */
+function serializePointer(pointer) {
+    if (typeof pointer === 'number') {
+        return Number.isFinite(pointer) ? pointer : null;
+    }
+    if (typeof pointer === 'bigint') {
+        return pointer.toString();
+    }
+    return null;
+}
+
+/**
+ * @param {import('@sqlite.org/sqlite-wasm').Sqlite3Static} sqlite3
+ * @returns {{OpfsDb: unknown, opfs: SqliteOpfsApi|undefined, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null}}
+ */
+function getOpfsCapabilitySnapshot(sqlite3) {
+    const OpfsDb = /** @type {unknown} */ (sqlite3?.oo1?.OpfsDb);
+    const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
+    const findVfs = sqlite3?.capi?.sqlite3_vfs_find;
+    const opfsVfsRaw = typeof findVfs === 'function' ? findVfs('opfs') : null;
+    const opfsSahpoolVfsRaw = typeof findVfs === 'function' ? findVfs(OPFS_SAHPOOL_VFS_NAME) : null;
+    return {
+        OpfsDb,
+        opfs,
+        hasOpfsDbCtor: typeof OpfsDb === 'function',
+        hasOpfsImportDb: typeof opfs?.importDb === 'function',
+        hasWasmfsDir: getWasmfsDatabasePaths(sqlite3).length > 0,
+        hasOpfsVfs: isNonZeroPointer(opfsVfsRaw),
+        hasOpfsSahpoolVfs: isNonZeroPointer(opfsSahpoolVfsRaw),
+        opfsVfsPtr: serializePointer(opfsVfsRaw),
+        opfsSahpoolVfsPtr: serializePointer(opfsSahpoolVfsRaw),
+    };
+}
+
+/**
+ * @param {number} ms
+ * @returns {Promise<void>}
+ */
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
 }
 
 /**
@@ -109,13 +225,31 @@ export async function getSqlite3() {
     sqlite3Promise = initWithOptions({
         locateFile,
     });
-    return await sqlite3Promise;
+    const sqlite3 = await sqlite3Promise;
+    if (!sqliteInitDiagnosticsReported) {
+        sqliteInitDiagnosticsReported = true;
+        const snapshot = getOpfsCapabilitySnapshot(sqlite3);
+        reportDiagnostics('opfs-sqlite-init', {
+            context: getRuntimeContextDiagnostics(),
+            hasOpfsDbCtor: snapshot.hasOpfsDbCtor,
+            hasInstallOpfsSAHPoolVfs: typeof Reflect.get(sqlite3, 'installOpfsSAHPoolVfs') === 'function',
+            hasOpfsImportDb: snapshot.hasOpfsImportDb,
+            hasWasmfsDir: snapshot.hasWasmfsDir,
+            hasOpfsVfs: snapshot.hasOpfsVfs,
+            hasOpfsSahpoolVfs: snapshot.hasOpfsSahpoolVfs,
+            opfsVfsPtr: snapshot.opfsVfsPtr,
+            opfsSahpoolVfsPtr: snapshot.opfsSahpoolVfsPtr,
+            sqliteVersion: sqlite3?.version?.libVersion ?? null,
+        });
+    }
+    return sqlite3;
 }
 
 /**
+ * @param {string} [caller]
  * @returns {Promise<import('@sqlite.org/sqlite-wasm').Database>}
  */
-export async function openOpfsDatabase() {
+export async function openOpfsDatabase(caller = 'unknown') {
     lastOpenUsedFallbackStorage = false;
     const sqlite3 = await getSqlite3();
     const allowFallback = (
@@ -124,15 +258,30 @@ export async function openOpfsDatabase() {
         typeof Reflect.get(globalThis, 'chrome') === 'undefined'
     );
     const forceFallback = Reflect.get(globalThis, 'manabitanForceSqliteFallback') === true;
-    const OpfsDb = sqlite3.oo1.OpfsDb;
-    const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
-    const wasmfsPaths = getWasmfsDatabasePaths(sqlite3);
+    const installOpfsSAHPoolVfs = /** @type {unknown} */ (Reflect.get(sqlite3, 'installOpfsSAHPoolVfs'));
+    const contextDiagnostics = getRuntimeContextDiagnostics();
+    const opfsReadyTimeoutMsRaw = Reflect.get(globalThis, 'manabitanOpfsReadyTimeoutMs');
+    const opfsReadyTimeoutMs = (
+        typeof opfsReadyTimeoutMsRaw === 'number' &&
+        Number.isFinite(opfsReadyTimeoutMsRaw) &&
+        opfsReadyTimeoutMsRaw >= 0
+    ) ? opfsReadyTimeoutMsRaw : 3000;
+    let capability = getOpfsCapabilitySnapshot(sqlite3);
     lastOpenStorageDiagnostics = {
         mode: 'opening',
+        caller,
+        runtimeContext: contextDiagnostics,
         forceFallback,
-        hasOpfsDbCtor: typeof OpfsDb === 'function',
-        hasOpfsImportDb: typeof opfs?.importDb === 'function',
-        hasWasmfsDir: wasmfsPaths.length > 0,
+        opfsReadyTimeoutMs,
+        opfsReadyWait: null,
+        hasOpfsDbCtor: capability.hasOpfsDbCtor,
+        hasOpfsImportDb: capability.hasOpfsImportDb,
+        hasWasmfsDir: capability.hasWasmfsDir,
+        hasInstallOpfsSAHPoolVfs: typeof installOpfsSAHPoolVfs === 'function',
+        hasOpfsVfs: capability.hasOpfsVfs,
+        hasOpfsSahpoolVfs: capability.hasOpfsSahpoolVfs,
+        opfsVfsPtr: capability.opfsVfsPtr,
+        opfsSahpoolVfsPtr: capability.opfsSahpoolVfsPtr,
         attempts: [],
         lastError: null,
     };
@@ -151,14 +300,64 @@ export async function openOpfsDatabase() {
         }
         lastOpenStorageDiagnostics.lastError = message;
     };
+    /**
+     * @returns {ReturnType<typeof getOpfsCapabilitySnapshot>}
+     */
+    const syncCapabilityIntoDiagnostics = () => {
+        capability = getOpfsCapabilitySnapshot(sqlite3);
+        lastOpenStorageDiagnostics.hasOpfsDbCtor = capability.hasOpfsDbCtor;
+        lastOpenStorageDiagnostics.hasOpfsImportDb = capability.hasOpfsImportDb;
+        lastOpenStorageDiagnostics.hasWasmfsDir = capability.hasWasmfsDir;
+        lastOpenStorageDiagnostics.hasOpfsVfs = capability.hasOpfsVfs;
+        lastOpenStorageDiagnostics.hasOpfsSahpoolVfs = capability.hasOpfsSahpoolVfs;
+        lastOpenStorageDiagnostics.opfsVfsPtr = capability.opfsVfsPtr;
+        lastOpenStorageDiagnostics.opfsSahpoolVfsPtr = capability.opfsSahpoolVfsPtr;
+        return capability;
+    };
+    /**
+     * @returns {boolean}
+     */
+    const isOpfsReadyForOpen = () => (
+        capability.hasOpfsDbCtor ||
+        capability.hasOpfsVfs ||
+        capability.hasWasmfsDir ||
+        capability.hasOpfsImportDb ||
+        capability.hasOpfsSahpoolVfs
+    );
+    reportDiagnostics('opfs-open-begin', {
+        caller,
+        allowFallback,
+        forceFallback,
+        opfsReadyTimeoutMs,
+        context: contextDiagnostics,
+        diagnostics: lastOpenStorageDiagnostics,
+    });
     if (forceFallback) {
         lastOpenStorageDiagnostics.mode = 'forced-fallback-disallowed';
         reportDiagnostics('opfs-open-failed', {
             stage: 'forced-fallback-disallowed',
+            caller,
+            context: contextDiagnostics,
             diagnostics: lastOpenStorageDiagnostics,
         });
         throw new Error(`OPFS is required; forced fallback is disabled. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)}`);
     }
+    if (!isOpfsReadyForOpen() && opfsReadyTimeoutMs > 0) {
+        const start = Date.now();
+        let waitAttempts = 0;
+        while ((Date.now() - start) < opfsReadyTimeoutMs) {
+            await sleep(100);
+            ++waitAttempts;
+            syncCapabilityIntoDiagnostics();
+            if (isOpfsReadyForOpen()) { break; }
+        }
+        lastOpenStorageDiagnostics.opfsReadyWait = {
+            attempts: waitAttempts,
+            elapsedMs: Date.now() - start,
+            ready: isOpfsReadyForOpen(),
+        };
+    }
+    syncCapabilityIntoDiagnostics();
     /**
      * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
      */
@@ -193,7 +392,56 @@ export async function openOpfsDatabase() {
         }
         return null;
     };
-    if (typeof OpfsDb === 'function') {
+    /**
+     * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
+     */
+    const tryOpenViaSahpoolUri = () => {
+        for (const dbPath of getDatabasePaths()) {
+            const uri = `file:${dbPath}?vfs=${OPFS_SAHPOOL_VFS_NAME}`;
+            for (const flags of ['cw', 'c']) {
+                try {
+                    return new sqlite3.oo1.DB(uri, flags);
+                } catch (error) {
+                    pushAttemptError('uri-opfs-sahpool', uri, flags, error);
+                    // Try the next URI/flag combination.
+                }
+            }
+        }
+        return null;
+    };
+    /**
+     * @returns {Promise<boolean>}
+     */
+    const ensureOpfsSahpoolVfs = async () => {
+        const findVfs2 = sqlite3?.capi?.sqlite3_vfs_find;
+        if (typeof findVfs2 === 'function' && isNonZeroPointer(findVfs2(OPFS_SAHPOOL_VFS_NAME))) {
+            return true;
+        }
+        if (typeof installOpfsSAHPoolVfs !== 'function') {
+            return false;
+        }
+        if (opfsSahpoolInstallPromise === null) {
+            opfsSahpoolInstallPromise = (async () => {
+                try {
+                    await /** @type {(opts: {name?: string}) => Promise<unknown>} */ (installOpfsSAHPoolVfs)({
+                        name: OPFS_SAHPOOL_VFS_NAME,
+                    });
+                    return true;
+                } catch (error) {
+                    pushAttemptError('install-opfs-sahpool-vfs', OPFS_SAHPOOL_VFS_NAME, '-', error);
+                    return false;
+                }
+            })();
+        }
+        const installed = await opfsSahpoolInstallPromise;
+        syncCapabilityIntoDiagnostics();
+        if (typeof findVfs2 === 'function') {
+            return isNonZeroPointer(findVfs2(OPFS_SAHPOOL_VFS_NAME));
+        }
+        return installed;
+    };
+    if (typeof sqlite3.oo1.OpfsDb === 'function') {
+        const OpfsDb = sqlite3.oo1.OpfsDb;
         /**
          * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
          */
@@ -236,6 +484,11 @@ export async function openOpfsDatabase() {
         const opened = await tryOpenWithRetry();
         if (opened !== null) {
             lastOpenStorageDiagnostics.mode = 'opfsdb';
+            reportDiagnostics('opfs-open-success', {
+                caller,
+                context: contextDiagnostics,
+                diagnostics: lastOpenStorageDiagnostics,
+            });
             return opened;
         }
     }
@@ -243,19 +496,47 @@ export async function openOpfsDatabase() {
     const openedViaUri = tryOpenViaUri();
     if (openedViaUri !== null) {
         lastOpenStorageDiagnostics.mode = 'uri-opfs';
+        reportDiagnostics('opfs-open-success', {
+            caller,
+            context: contextDiagnostics,
+            diagnostics: lastOpenStorageDiagnostics,
+        });
         return openedViaUri;
     }
 
     const openedViaWasmfsPersistentPath = tryOpenWasmfsPersistent();
     if (openedViaWasmfsPersistentPath !== null) {
         lastOpenStorageDiagnostics.mode = 'wasmfs-persistent';
+        reportDiagnostics('opfs-open-success', {
+            caller,
+            context: contextDiagnostics,
+            diagnostics: lastOpenStorageDiagnostics,
+        });
         return openedViaWasmfsPersistentPath;
     }
 
+    if (await ensureOpfsSahpoolVfs()) {
+        const openedViaSahpoolUri = tryOpenViaSahpoolUri();
+        if (openedViaSahpoolUri !== null) {
+            lastOpenStorageDiagnostics.mode = 'uri-opfs-sahpool';
+            syncCapabilityIntoDiagnostics();
+            reportDiagnostics('opfs-open-success', {
+                caller,
+                context: contextDiagnostics,
+                diagnostics: lastOpenStorageDiagnostics,
+            });
+            return openedViaSahpoolUri;
+        }
+        syncCapabilityIntoDiagnostics();
+    }
+
     if (!allowFallback) {
+        syncCapabilityIntoDiagnostics();
         lastOpenStorageDiagnostics.mode = 'opfs-unavailable';
         reportDiagnostics('opfs-open-failed', {
             stage: 'opfs-unavailable',
+            caller,
+            context: contextDiagnostics,
             diagnostics: lastOpenStorageDiagnostics,
         });
         throw new Error(`OPFS is required but unavailable. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)}`);
@@ -265,6 +546,8 @@ export async function openOpfsDatabase() {
     try {
         lastOpenStorageDiagnostics.mode = 'fallback-memory';
         reportDiagnostics('opfs-open-fallback-memory', {
+            caller,
+            context: contextDiagnostics,
             diagnostics: lastOpenStorageDiagnostics,
         });
         return new sqlite3.oo1.DB(':memory:', 'ct');
@@ -272,6 +555,8 @@ export async function openOpfsDatabase() {
         lastOpenStorageDiagnostics.mode = 'fallback-memory-open-failed';
         reportDiagnostics('opfs-open-failed', {
             stage: 'fallback-memory-open-failed',
+            caller,
+            context: contextDiagnostics,
             diagnostics: lastOpenStorageDiagnostics,
             error: String(e),
         });
@@ -287,7 +572,7 @@ export function didLastOpenUseFallbackStorage() {
 }
 
 /**
- * @returns {{mode: string, forceFallback: boolean, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean}}
+ * @returns {{mode: string, caller: string, runtimeContext: ReturnType<typeof getRuntimeContextDiagnostics>|null, forceFallback: boolean, opfsReadyTimeoutMs: number, opfsReadyWait: {attempts: number, elapsedMs: number, ready: boolean}|null, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasInstallOpfsSAHPoolVfs: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null}}
  */
 export function getLastOpenStorageDiagnostics() {
     return {...lastOpenStorageDiagnostics};
@@ -305,6 +590,11 @@ export async function deleteOpfsDatabaseFiles() {
     );
     const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
     if (typeof opfs?.unlink !== 'function') {
+        reportDiagnostics('opfs-delete-files-unavailable', {
+            allowFallback,
+            context: getRuntimeContextDiagnostics(),
+            diagnostics: getLastOpenStorageDiagnostics(),
+        });
         if (allowFallback) {
             return false;
         }
@@ -323,6 +613,11 @@ export async function importOpfsDatabase(content) {
     const sqlite3 = await getSqlite3();
     const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
     if (typeof opfs?.importDb !== 'function') {
+        reportDiagnostics('opfs-import-db-unavailable', {
+            context: getRuntimeContextDiagnostics(),
+            diagnostics: getLastOpenStorageDiagnostics(),
+            contentBytes: content.byteLength,
+        });
         throw new Error('OPFS importDb API is unavailable');
     }
     const bytes = new Uint8Array(content);

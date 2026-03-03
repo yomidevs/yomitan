@@ -184,6 +184,13 @@ export class DictionaryDatabaseProxy {
     }
 
     /**
+     * @returns {Promise<void>}
+     */
+    async refreshConnection() {
+        await this._offscreen.sendMessagePromise({action: 'databaseRefreshOffscreen'});
+    }
+
+    /**
      * @returns {Promise<import('dictionary-importer').Summary[]>}
      */
     async getDictionaryInfo() {

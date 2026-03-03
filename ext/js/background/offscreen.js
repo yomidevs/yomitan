@@ -21,11 +21,10 @@ import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
+import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {sanitizeCSS} from '../core/utilities.js';
-import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
-import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {getSqlite3} from '../dictionary/sqlite-wasm.js';
 import {WebExtension} from '../extension/web-extension.js';
-import {Translator} from '../language/translator.js';
 
 /**
  * This class controls the core logic of the extension, including API calls
@@ -36,10 +35,6 @@ export class Offscreen {
      * Creates a new instance.
      */
     constructor() {
-        /** @type {DictionaryDatabase} */
-        this._dictionaryDatabase = new DictionaryDatabase();
-        /** @type {Translator} */
-        this._translator = new Translator(this._dictionaryDatabase);
         /** @type {ClipboardReader} */
         this._clipboardReader = new ClipboardReader(
             (typeof document === 'object' && document !== null ? document : null),
@@ -54,6 +49,7 @@ export class Offscreen {
             ['clipboardGetImageOffscreen',     this._getImageHandler.bind(this)],
             ['clipboardSetBrowserOffscreen',   this._setClipboardBrowser.bind(this)],
             ['databasePrepareOffscreen',       this._prepareDatabaseHandler.bind(this)],
+            ['databaseRefreshOffscreen',       this._refreshDatabaseHandler.bind(this)],
             ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
             ['databasePurgeOffscreen',         this._purgeDatabaseHandler.bind(this)],
             ['databaseGetMediaOffscreen',      this._getMediaHandler.bind(this)],
@@ -74,8 +70,17 @@ export class Offscreen {
             ['connectToDatabaseWorker', this._connectToDatabaseWorkerHandler.bind(this)],
         ]);
 
-        /** @type {?Promise<void>} */
+        /** @type {?Promise<unknown>} */
         this._prepareDatabasePromise = null;
+        /** @type {Worker} */
+        this._dictionaryWorker = new Worker('/js/background/offscreen-dictionary-worker.js', {type: 'module'});
+        /** @type {Map<number, {resolve: (value: unknown) => void, reject: (reason?: unknown) => void}>} */
+        this._dictionaryWorkerResponseHandlers = new Map();
+        /** @type {number} */
+        this._dictionaryWorkerRequestId = 0;
+        this._dictionaryWorker.addEventListener('message', this._onDictionaryWorkerMessage.bind(this));
+        this._dictionaryWorker.addEventListener('messageerror', this._onDictionaryWorkerMessageError.bind(this));
+        this._dictionaryWorker.addEventListener('error', this._onDictionaryWorkerError.bind(this));
 
         /**
          * @type {API}
@@ -88,6 +93,82 @@ export class Offscreen {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         navigator.serviceWorker.addEventListener('controllerchange', this._createAndRegisterPort.bind(this));
         this._createAndRegisterPort();
+        void this._reportOpfsPreflight();
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _reportOpfsPreflight() {
+        const locationValue = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'location') ?? {}));
+        const navigatorValue = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'navigator') ?? {}));
+        const storageValue = /** @type {Record<string, unknown>} */ (Reflect.get(navigatorValue, 'storage') ?? {});
+        const crossOriginIsolatedValue = Reflect.get(globalThis, 'crossOriginIsolated');
+        /** @type {Record<string, unknown>} */
+        const payload = {
+            context: {
+                href: typeof locationValue.href === 'string' ? locationValue.href : null,
+                origin: typeof locationValue.origin === 'string' ? locationValue.origin : null,
+                crossOriginIsolated: typeof crossOriginIsolatedValue === 'boolean' ? crossOriginIsolatedValue : null,
+                hasSharedArrayBuffer: typeof Reflect.get(globalThis, 'SharedArrayBuffer') === 'function',
+                hasAtomics: typeof Reflect.get(globalThis, 'Atomics') === 'object' && Reflect.get(globalThis, 'Atomics') !== null,
+                hasNavigatorStorage: typeof storageValue === 'object' && storageValue !== null,
+                hasStorageGetDirectory: typeof storageValue.getDirectory === 'function',
+                hasFileSystemHandle: typeof Reflect.get(globalThis, 'FileSystemHandle') === 'function',
+                hasFileSystemDirectoryHandle: typeof Reflect.get(globalThis, 'FileSystemDirectoryHandle') === 'function',
+                hasFileSystemFileHandle: typeof Reflect.get(globalThis, 'FileSystemFileHandle') === 'function',
+                hasCreateSyncAccessHandle: (
+                    typeof Reflect.get(globalThis, 'FileSystemFileHandle') === 'function' &&
+                    typeof Reflect.get(
+                        /** @type {{prototype?: Record<string, unknown>}} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'FileSystemFileHandle'))).prototype ?? {},
+                        'createSyncAccessHandle',
+                    ) === 'function'
+                ),
+                userAgent: typeof navigatorValue.userAgent === 'string' ? navigatorValue.userAgent : null,
+            },
+        };
+        try {
+            const sqlite3 = await getSqlite3();
+            /**
+             * @param {unknown} pointer
+             * @returns {string|number|null}
+             */
+            const serializePointer = (pointer) => {
+                if (typeof pointer === 'bigint') {
+                    return pointer.toString();
+                }
+                if (typeof pointer === 'number') {
+                    return pointer;
+                }
+                return null;
+            };
+            const findVfs = sqlite3?.capi?.sqlite3_vfs_find;
+            const opfsVfsRaw = typeof findVfs === 'function' ? findVfs('opfs') : null;
+            const opfsSahpoolVfsRaw = typeof findVfs === 'function' ? findVfs('opfs-sahpool') : null;
+            let wasmfsDir = null;
+            if (typeof sqlite3?.capi?.sqlite3_wasmfs_opfs_dir === 'function') {
+                try {
+                    wasmfsDir = String(sqlite3.capi.sqlite3_wasmfs_opfs_dir() ?? '');
+                } catch (_) {
+                    wasmfsDir = null;
+                }
+            }
+            payload.sqlite = {
+                sqliteVersion: sqlite3?.version?.libVersion ?? null,
+                hasOpfsDbCtor: typeof sqlite3.oo1?.OpfsDb === 'function',
+                hasInstallOpfsSAHPoolVfs: typeof Reflect.get(sqlite3, 'installOpfsSAHPoolVfs') === 'function',
+                hasOpfsImportDb: typeof /** @type {{opfs?: {importDb?: unknown}}} */ (/** @type {unknown} */ (sqlite3)).opfs?.importDb === 'function',
+                hasWasmfsDir: typeof wasmfsDir === 'string' && wasmfsDir.length > 0,
+                wasmfsDir,
+                hasOpfsVfs: opfsVfsRaw !== null && opfsVfsRaw !== 0 && opfsVfsRaw !== 0n,
+                hasOpfsSahpoolVfs: opfsSahpoolVfsRaw !== null && opfsSahpoolVfsRaw !== 0 && opfsSahpoolVfsRaw !== 0n,
+                opfsVfsPtr: serializePointer(opfsVfsRaw),
+                opfsSahpoolVfsPtr: serializePointer(opfsSahpoolVfsRaw),
+            };
+        } catch (e) {
+            payload.sqliteInitError = (e instanceof Error) ? e.message : String(e);
+        }
+        reportDiagnostics('offscreen-opfs-preflight', payload);
     }
 
     /** @type {import('offscreen').ApiHandler<'clipboardGetTextOffscreen'>} */
@@ -110,7 +191,14 @@ export class Offscreen {
         if (this._prepareDatabasePromise !== null) {
             return this._prepareDatabasePromise;
         }
-        this._prepareDatabasePromise = this._dictionaryDatabase.prepare();
+        this._prepareDatabasePromise = (async () => {
+            return await this._invokeDictionaryWorker('databasePrepareOffscreen', {});
+        })();
+        this._prepareDatabasePromise.finally(() => {
+            this._prepareDatabasePromise = null;
+        }).catch(() => {
+            // NOP
+        });
         return this._prepareDatabasePromise;
     }
 
@@ -118,97 +206,62 @@ export class Offscreen {
      * @returns {Promise<void>}
      */
     async _ensureDatabasePrepared() {
-        if (this._dictionaryDatabase.isPrepared()) {
-            return;
-        }
-        await this._prepareDatabaseHandler();
+        await /** @type {Promise<void>} */ (this._prepareDatabaseHandler());
     }
 
     /** @type {import('offscreen').ApiHandler<'getDictionaryInfoOffscreen'>} */
     async _getDictionaryInfoHandler() {
-        await this._ensureDatabasePrepared();
-        return await this._dictionaryDatabase.getDictionaryInfo();
+        return await this._invokeDictionaryWorker('getDictionaryInfoOffscreen', {});
+    }
+
+    /** @type {import('offscreen').ApiHandler<'databaseRefreshOffscreen'>} */
+    async _refreshDatabaseHandler() {
+        await this._invokeDictionaryWorker('databaseRefreshOffscreen', {});
     }
 
     /** @type {import('offscreen').ApiHandler<'databasePurgeOffscreen'>} */
     async _purgeDatabaseHandler() {
-        await this._ensureDatabasePrepared();
-        return await this._dictionaryDatabase.purge();
+        return await this._invokeDictionaryWorker('databasePurgeOffscreen', {});
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseGetMediaOffscreen'>} */
     async _getMediaHandler({targets}) {
-        await this._ensureDatabasePrepared();
-        const media = await this._dictionaryDatabase.getMedia(targets);
-        return media.map((m) => ({...m, content: arrayBufferToBase64(m.content)}));
+        return await this._invokeDictionaryWorker('databaseGetMediaOffscreen', {targets});
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseExportOffscreen'>} */
     async _exportDatabaseHandler() {
-        await this._ensureDatabasePrepared();
-        return arrayBufferToBase64(await this._dictionaryDatabase.exportDatabase());
+        return await this._invokeDictionaryWorker('databaseExportOffscreen', {});
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseImportOffscreen'>} */
     async _importDatabaseHandler({content}) {
-        await this._ensureDatabasePrepared();
-        await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
+        await this._invokeDictionaryWorker('databaseImportOffscreen', {content});
     }
 
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
     async _prepareTranslatorHandler() {
-        await this._ensureDatabasePrepared();
-        this._translator.prepare();
+        await this._invokeDictionaryWorker('translatorPrepareOffscreen', {});
     }
 
     /** @type {import('offscreen').ApiHandler<'findKanjiOffscreen'>} */
     async _findKanjiHandler({text, options}) {
-        await this._ensureDatabasePrepared();
-        /** @type {import('translation').FindKanjiOptions} */
-        const modifiedOptions = {
-            ...options,
-            enabledDictionaryMap: new Map(options.enabledDictionaryMap),
-        };
-        return await this._translator.findKanji(text, modifiedOptions);
+        return await this._invokeDictionaryWorker('findKanjiOffscreen', {text, options});
     }
 
     /** @type {import('offscreen').ApiHandler<'findTermsOffscreen'>} */
     async _findTermsHandler({mode, text, options}) {
-        await this._ensureDatabasePrepared();
-        const enabledDictionaryMap = new Map(options.enabledDictionaryMap);
-        const excludeDictionaryDefinitions = (
-            options.excludeDictionaryDefinitions !== null ?
-                new Set(options.excludeDictionaryDefinitions) :
-                null
-        );
-        const textReplacements = options.textReplacements.map((group) => {
-            if (group === null) { return null; }
-            return group.map((opt) => {
-                // https://stackoverflow.com/a/33642463
-                const match = opt.pattern.match(/\/(.*?)\/([a-z]*)?$/i);
-                const [, pattern, flags] = match !== null ? match : ['', '', ''];
-                return {...opt, pattern: new RegExp(pattern, flags ?? '')};
-            });
-        });
-        /** @type {import('translation').FindTermsOptions} */
-        const modifiedOptions = {
-            ...options,
-            enabledDictionaryMap,
-            excludeDictionaryDefinitions,
-            textReplacements,
-        };
-        return this._translator.findTerms(mode, text, modifiedOptions);
+        return await this._invokeDictionaryWorker('findTermsOffscreen', {mode, text, options});
     }
 
     /** @type {import('offscreen').ApiHandler<'getTermFrequenciesOffscreen'>} */
     async _getTermFrequenciesHandler({termReadingList, dictionaries}) {
-        await this._ensureDatabasePrepared();
-        return this._translator.getTermFrequencies(termReadingList, dictionaries);
+        return await this._invokeDictionaryWorker('getTermFrequenciesOffscreen', {termReadingList, dictionaries});
     }
 
     /** @type {import('offscreen').ApiHandler<'clearDatabaseCachesOffscreen'>} */
-    _clearDatabaseCachesHandler() {
-        this._translator.clearDatabaseCaches();
+    async _clearDatabaseCachesHandler() {
+        await this._invokeDictionaryWorker('clearDatabaseCachesOffscreen', {});
     }
 
     /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('offscreen').ApiMessageAny>} */
@@ -228,12 +281,69 @@ export class Offscreen {
 
     /** @type {import('offscreen').McApiHandler<'connectToDatabaseWorker'>} */
     async _connectToDatabaseWorkerHandler(_params, ports) {
-        await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
+        if (ports.length === 0) {
+            return;
+        }
+        await this._invokeDictionaryWorker('connectToDatabaseWorker', {}, [ports[0]]);
     }
 
     /** @type {import('offscreen').ApiHandler<'sanitizeCSSOffscreen'>} */
     _sanitizeCSSOffscreen(params) {
         return sanitizeCSS(params.css);
+    }
+
+    /**
+     * @param {string} action
+     * @param {import('core').SerializableObject} params
+     * @param {Transferable[]} [transferables]
+     * @returns {Promise<unknown>}
+     */
+    _invokeDictionaryWorker(action, params, transferables = []) {
+        const id = ++this._dictionaryWorkerRequestId;
+        return new Promise((resolve, reject) => {
+            this._dictionaryWorkerResponseHandlers.set(id, {resolve, reject});
+            this._dictionaryWorker.postMessage({id, action, params}, transferables);
+        });
+    }
+
+    /**
+     * @param {MessageEvent<{id: number, result?: unknown, error?: import('core').SerializableObject}>} event
+     */
+    _onDictionaryWorkerMessage(event) {
+        const {id, result, error} = event.data;
+        const handler = this._dictionaryWorkerResponseHandlers.get(id);
+        if (typeof handler === 'undefined') {
+            return;
+        }
+        this._dictionaryWorkerResponseHandlers.delete(id);
+        if (error) {
+            handler.reject(ExtensionError.deserialize(error));
+            return;
+        }
+        handler.resolve(result);
+    }
+
+    /**
+     * @param {MessageEvent} event
+     */
+    _onDictionaryWorkerMessageError(event) {
+        const error = new ExtensionError('Offscreen: Error receiving dictionary worker message');
+        error.data = event;
+        log.error(error);
+    }
+
+    /**
+     * @param {ErrorEvent} event
+     */
+    _onDictionaryWorkerError(event) {
+        const error = new ExtensionError('Offscreen: Dictionary worker terminated with an error');
+        error.data = {
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno,
+            message: event.message,
+        };
+        log.error(error);
     }
 
     /**

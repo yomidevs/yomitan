@@ -1480,6 +1480,22 @@ async function main() {
                 const mod = await import('/js/dictionary/sqlite-wasm.js');
                 const sqlite3 = await mod.getSqlite3();
                 const capi = sqlite3 && sqlite3.capi;
+                const startupDiagnosticsSnapshot = await new Promise((resolve) => {
+                    const localStorageArea = chrome.storage && chrome.storage.local;
+                    if (!localStorageArea || typeof localStorageArea.get !== 'function') {
+                        resolve(null);
+                        return;
+                    }
+                    localStorageArea.get(['manabitanStartupDiagnostics'], (value) => {
+                        const runtimeError = chrome.runtime.lastError;
+                        if (runtimeError) {
+                            resolve({error: runtimeError.message || String(runtimeError)});
+                            return;
+                        }
+                        const snapshot = value && typeof value === 'object' ? value.manabitanStartupDiagnostics : null;
+                        resolve(snapshot ?? null);
+                    });
+                });
                 let opfsVfsPtr = null;
                 if (typeof (capi && capi.sqlite3_vfs_find) === 'function') {
                     opfsVfsPtr = capi.sqlite3_vfs_find('opfs');
@@ -1494,6 +1510,7 @@ async function main() {
                     opfsVfsPtr,
                     manifestCoop: manifest.cross_origin_opener_policy || null,
                     manifestCoep: manifest.cross_origin_embedder_policy || null,
+                    startupDiagnosticsSnapshot,
                 };
             });
         });
