@@ -1494,12 +1494,22 @@ async function main() {
     firefoxOptions.setPreference('javascript.options.shared_memory', true);
     firefoxOptions.setPreference('dom.postMessage.sharedArrayBuffer.withCOOP_COEP', true);
     firefoxOptions.setPreference('dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled', true);
-    const firefoxDeveloperEditionPath = '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox';
-    try {
-        await access(firefoxDeveloperEditionPath);
-        firefoxOptions.setBinary(firefoxDeveloperEditionPath);
-    } catch (_) {
-        // Use default Firefox binary when Developer Edition is unavailable.
+    const configuredFirefoxBinary = String(process.env.MANABITAN_FIREFOX_BINARY || '').trim();
+    if (configuredFirefoxBinary.length > 0) {
+        try {
+            await access(configuredFirefoxBinary);
+        } catch (_) {
+            fail(`Configured Firefox binary not found: ${configuredFirefoxBinary}`);
+        }
+        firefoxOptions.setBinary(configuredFirefoxBinary);
+    } else {
+        const firefoxDeveloperEditionPath = '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox';
+        try {
+            await access(firefoxDeveloperEditionPath);
+            firefoxOptions.setBinary(firefoxDeveloperEditionPath);
+        } catch (_) {
+            // Use default Firefox binary when Developer Edition is unavailable.
+        }
     }
     const driver = /** @type {import('selenium-webdriver').ThenableWebDriver} */ (
         new Builder()
@@ -1758,9 +1768,11 @@ async function main() {
         }
         if (!(lastModalText.includes('Jitendex') && lastModalText.includes('JMdict'))) {
             const dictionaryErrorText = await getDictionaryErrorText(driver);
-            if (!profileHasBothDictionaries) {
-                fail(`Expected installed dictionary modal text to contain Jitendex and JMdict; saw "${lastModalText.slice(0, 240)}"; dictionary-error="${dictionaryErrorText}"`);
-            }
+            fail(
+                'Expected installed dictionary modal text to contain Jitendex and JMdict; ' +
+                `saw "${lastModalText.slice(0, 240)}"; dictionary-error="${dictionaryErrorText}" ` +
+                `profileHasBothDictionaries=${String(profileHasBothDictionaries)}`,
+            );
         }
         const verifyEnd = safePerformance.now();
         await addReportPhase(
@@ -1768,9 +1780,7 @@ async function main() {
             driver,
             'Verify installed dictionaries list',
             (
-                (lastModalText.includes('Jitendex') && lastModalText.includes('JMdict')) ?
-                `Opened dictionaries modal via ${dictionariesModalTrigger} and confirmed dictionary list text includes Jitendex + JMdict` :
-                `Modal text did not show both dictionaries (text="${lastModalText.slice(0, 240)}"), but backend profile dictionaries contained both names`
+                `Opened dictionaries modal via ${dictionariesModalTrigger} and confirmed dictionary list text includes Jitendex + JMdict`
             ),
             verifyStart,
             verifyEnd,
@@ -1796,12 +1806,12 @@ async function main() {
 
         const searchVerifyStart = safePerformance.now();
         const searchTerm = '暗記';
-        let dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, ['Jitendex', 'JMdict'], 10_000);
+        let dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, ['Jitendex', 'JMdict'], 20_000);
         if ((dictionaryHitCounts.Jitendex ?? 0) < 1 || (dictionaryHitCounts.JMdict ?? 0) < 1) {
             // Retry once after a hard refresh: Firefox extension search page can be flaky in CI.
             await driver.navigate().refresh();
             await driver.wait(until.elementLocated(By.css('#search-textbox')), 30_000);
-            dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, ['Jitendex', 'JMdict'], 10_000);
+            dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, ['Jitendex', 'JMdict'], 20_000);
         }
         if ((dictionaryHitCounts.Jitendex ?? 0) < 1 || (dictionaryHitCounts.JMdict ?? 0) < 1) {
             const searchDiagnostics = await getSearchPageDiagnostics(driver);
@@ -1809,12 +1819,12 @@ async function main() {
             await addReportPhase(
                 report,
                 driver,
-                'Verify search results include both dictionaries (non-blocking warning)',
+                'Verify search results include both dictionaries (failed)',
                 `UI search returned incomplete results. Counts=${JSON.stringify(dictionaryHitCounts)} backend=${JSON.stringify(backendDiagnostics)} diagnostics=${JSON.stringify(searchDiagnostics)}`,
                 searchVerifyStart,
                 searchVerifyEnd,
             );
-            console.warn(`[firefox-e2e] warning: UI search page did not show both dictionaries for ${searchTerm}. Continuing to hover-popup verification.`);
+            fail(`Expected search results for ${searchTerm} to include both Jitendex and JMdict; saw counts ${JSON.stringify(dictionaryHitCounts)} diagnostics=${JSON.stringify(searchDiagnostics)} backend=${JSON.stringify(backendDiagnostics)}`);
         } else {
             const searchVerifyEnd = safePerformance.now();
             await addReportPhase(report, driver, 'Verify search results include both dictionaries', `Searched ${searchTerm} and observed dictionary hit counts: ${JSON.stringify(dictionaryHitCounts)}`, searchVerifyStart, searchVerifyEnd);
@@ -1888,18 +1898,16 @@ async function main() {
             );
         } catch (hoverError) {
             const hoverDiagnostics = await getBackendLookupDiagnostics(driver, hoverTerm);
-            const dictionaryNames = Array.isArray(hoverDiagnostics.termDictionaryNames) ? hoverDiagnostics.termDictionaryNames.map(String) : [];
-            const hasBothViaBackend = dictionaryNames.includes('Jitendex') && dictionaryNames.includes('JMdict');
             const hoverLookupEnd = safePerformance.now();
             await addReportPhase(
                 report,
                 driver,
-                'Verify hover lookup on Wagahai page (warning)',
-                `Hover popup did not appear in this run. Backend dictionary names for ${hoverTerm}: ${JSON.stringify(dictionaryNames)} (hasBoth=${String(hasBothViaBackend)}). Original hover error: ${errorMessage(hoverError)}`,
+                'Verify hover lookup on Wagahai page (failed)',
+                `Hover popup verification failed for ${hoverTerm}. backend=${JSON.stringify(hoverDiagnostics)} error=${errorMessage(hoverError)}`,
                 hoverLookupStart,
                 hoverLookupEnd,
             );
-            console.warn(`[firefox-e2e] warning: hover popup not visible on this run; backend dictionary names for ${hoverTerm}: ${JSON.stringify(dictionaryNames)}.`);
+            fail(`Expected hover popup lookup for ${hoverTerm} to include both dictionaries. backend=${JSON.stringify(hoverDiagnostics)} error=${errorMessage(hoverError)}`);
         }
 
         report.status = 'success';

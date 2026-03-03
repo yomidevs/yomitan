@@ -68,7 +68,6 @@ jobs:
 
   test-firefox-extension-e2e:
     name: Full Extension E2E (Firefox)
-    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -93,12 +92,46 @@ jobs:
           MANABITAN_E2E_STRICT_RUNTIME: '1'
         run: npm run test:e2e:firefox-extension
 
+      - name: Enforce Firefox extension E2E success
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = 'builds/firefox-e2e-import-report.json';
+          if (!fs.existsSync(path)) {
+            console.error('Firefox extension E2E report JSON not found.');
+            process.exit(1);
+          }
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
+          const opfsPrereqsReady = runtime !== null && (
+            runtime.crossOriginIsolated === true &&
+            runtime.hasSharedArrayBuffer === true &&
+            runtime.hasAtomics === true
+          );
+          if (report.status !== 'success') {
+            console.error(`Firefox extension E2E status is not success: ${String(report.status)}`);
+            process.exit(1);
+          }
+          if (report.skippedVerification === true) {
+            console.error(`Firefox extension E2E skipped verification: ${String(report.skipReason || 'no reason')}`);
+            process.exit(1);
+          }
+          if (!opfsPrereqsReady) {
+            console.error(`Firefox extension OPFS prerequisite check failed. runtimeDiagnostics=${JSON.stringify(runtime)}`);
+            process.exit(1);
+          }
+          NODE
+
       - name: Upload Firefox extension E2E report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: firefox-extension-e2e-report
-          path: builds/firefox-e2e-import-report.html
+          path: |
+            builds/firefox-e2e-import-report.html
+            builds/firefox-e2e-import-report.json
+            builds/extension-e2e-report.html
           if-no-files-found: ignore
 
   test-chromium-extension-e2e:
@@ -230,7 +263,6 @@ jobs:
     name: Full Extension E2E (Edge)
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
@@ -254,6 +286,38 @@ jobs:
           MANABITAN_CHROMIUM_E2E_REPORT: ./builds/edge-e2e-import-report.html
           MANABITAN_E2E_STRICT_RUNTIME: '1'
         run: xvfb-run -a npm run test:e2e:edge-extension
+
+      - name: Enforce Edge extension E2E success
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = 'builds/edge-e2e-import-report.json';
+          if (!fs.existsSync(path)) {
+            console.error('Edge extension E2E report JSON not found.');
+            process.exit(1);
+          }
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
+          const opfsReady = runtime !== null && (
+            runtime.hasOpfsDbCtor === true &&
+            runtime.hasOpfsImportDb === true &&
+            runtime.hasStorageGetDirectory === true &&
+            (typeof runtime.opfsVfsPtr === 'number' ? runtime.opfsVfsPtr > 0 : runtime.opfsVfsPtr !== null)
+          );
+          if (report.status !== 'success') {
+            console.error(`Edge extension E2E status is not success: ${String(report.status)}`);
+            process.exit(1);
+          }
+          if (report.skippedVerification === true) {
+            console.error(`Edge extension E2E skipped verification: ${String(report.skipReason || 'no reason')}`);
+            process.exit(1);
+          }
+          if (!opfsReady) {
+            console.error(`Edge extension OPFS readiness check failed. runtimeDiagnostics=${JSON.stringify(runtime)}`);
+            process.exit(1);
+          }
+          NODE
 
       - name: Summarize Edge extension E2E
         if: always()
@@ -320,6 +384,92 @@ jobs:
             builds/edge-e2e-import-report.html
             builds/edge-e2e-import-report.json
             builds/extension-e2e-report.html
+          if-no-files-found: ignore
+
+  test-firefox-android-extension-e2e:
+    name: Full Extension E2E (Firefox Android)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup
+
+      - name: Build Firefox Android package
+        run: npm run build -- --target firefox-android
+
+      - name: Run Firefox Android extension E2E
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          MANABITAN_ANDROID_AUTO_INSTALL_FIREFOX: '1'
+          MANABITAN_ANDROID_FIREFOX_PACKAGE: org.mozilla.firefox
+          MANABITAN_ANDROID_WEB_EXT_TIMEOUT_MS: '45000'
+          MANABITAN_E2E_STRICT_RUNTIME: '1'
+        with:
+          api-level: 34
+          arch: x86_64
+          target: default
+          profile: pixel_6
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            adb wait-for-device
+            adb devices
+            npm run test:e2e:firefox-android-extension
+
+      - name: Enforce Firefox Android extension E2E success
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = 'builds/firefox-android-e2e-report.json';
+          if (!fs.existsSync(path)) {
+            console.error('Firefox Android extension E2E report JSON not found.');
+            process.exit(1);
+          }
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          if (report.status !== 'success') {
+            console.error(`Firefox Android extension E2E status is not success: ${String(report.status)} failure=${String(report.failureReason || '')}`);
+            process.exit(1);
+          }
+          NODE
+
+      - name: Summarize Firefox Android extension E2E
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = 'builds/firefox-android-e2e-report.json';
+          if (!fs.existsSync(path)) {
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## Firefox Android Extension E2E\nReport JSON not found.\n');
+            process.exit(0);
+          }
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const phases = Array.isArray(report.phases) ? report.phases : [];
+          const top = [...phases].sort((a, b) => Number(b.durationMs || 0) - Number(a.durationMs || 0)).slice(0, 5);
+          const lines = [
+            '## Firefox Android Extension E2E',
+            `- Status: \`${String(report.status || 'unknown')}\``,
+            `- Failure: ${report.failureReason ? `\`${String(report.failureReason)}\`` : 'none'}`,
+            `- ADB device: \`${String(report.adbDevice || 'unknown')}\``,
+            `- Firefox package: \`${String(report.firefoxPackage || 'unknown')}\``,
+            `- Source dir: \`${String(report.sourceDir || 'unknown')}\``,
+            `- Firefox APK URL: ${report.firefoxApkUrl ? `\`${String(report.firefoxApkUrl)}\`` : 'not-used'}`,
+            `- Phase count: ${String(phases.length)}`,
+            '- Slowest phases:',
+            ...top.map((phase) => `  - ${String(phase.name)} (${Number(phase.durationMs || 0).toFixed(1)} ms)`),
+            '',
+          ];
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
+          NODE
+
+      - name: Upload Firefox Android extension E2E report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-android-extension-e2e-report
+          path: |
+            builds/firefox-android-e2e-report.html
+            builds/firefox-android-e2e-report.json
           if-no-files-found: ignore
 
   bench:

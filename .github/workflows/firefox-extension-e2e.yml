@@ -18,7 +18,6 @@ permissions:
 
 jobs:
   firefox-e2e:
-    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -59,11 +58,41 @@ jobs:
 
       - name: Run Firefox extension E2E
         id: firefoxE2E
-        continue-on-error: true
         env:
           MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev.xpi
           MANABITAN_E2E_STRICT_RUNTIME: '1'
         run: npm run test:e2e:firefox-extension
+
+      - name: Enforce Firefox extension E2E success
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = 'builds/firefox-e2e-import-report.json';
+          if (!fs.existsSync(path)) {
+            console.error('Firefox extension E2E report JSON not found.');
+            process.exit(1);
+          }
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
+          const opfsPrereqsReady = runtime !== null && (
+            runtime.crossOriginIsolated === true &&
+            runtime.hasSharedArrayBuffer === true &&
+            runtime.hasAtomics === true
+          );
+          if (report.status !== 'success') {
+            console.error(`Firefox extension E2E status is not success: ${String(report.status)}`);
+            process.exit(1);
+          }
+          if (report.skippedVerification === true) {
+            console.error(`Firefox extension E2E skipped verification: ${String(report.skipReason || 'no reason')}`);
+            process.exit(1);
+          }
+          if (!opfsPrereqsReady) {
+            console.error(`Firefox extension OPFS prerequisite check failed. runtimeDiagnostics=${JSON.stringify(runtime)}`);
+            process.exit(1);
+          }
+          NODE
 
       - name: Summarize Firefox extension E2E
         if: always()
@@ -110,8 +139,3 @@ jobs:
             builds/firefox-e2e-import-report.json
             builds/extension-e2e-report.html
           if-no-files-found: ignore
-
-      - name: Report Firefox extension E2E failure without blocking main CI
-        if: steps.firefoxE2E.outcome == 'failure'
-        run: |
-          echo "::warning::Firefox Extension E2E failed (non-blocking). See this workflow run for logs."
