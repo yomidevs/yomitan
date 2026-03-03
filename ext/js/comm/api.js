@@ -249,6 +249,31 @@ export class API {
     }
 
     /**
+     * @param {import('api').ApiParam<'deleteDictionaryByTitle', 'dictionaryTitle'>} dictionaryTitle
+     * @returns {Promise<import('api').ApiReturn<'deleteDictionaryByTitle'>>}
+     */
+    deleteDictionaryByTitle(dictionaryTitle) {
+        return this._invoke('deleteDictionaryByTitle', {dictionaryTitle});
+    }
+
+    /**
+     * @param {import('api').ApiParam<'getDictionaryCounts', 'dictionaryNames'>} dictionaryNames
+     * @param {import('api').ApiParam<'getDictionaryCounts', 'getTotal'>} getTotal
+     * @returns {Promise<import('api').ApiReturn<'getDictionaryCounts'>>}
+     */
+    getDictionaryCounts(dictionaryNames, getTotal) {
+        return this._invoke('getDictionaryCounts', {dictionaryNames, getTotal});
+    }
+
+    /**
+     * @param {import('api').ApiParam<'setDictionaryImportMode', 'active'>} active
+     * @returns {Promise<import('api').ApiReturn<'setDictionaryImportMode'>>}
+     */
+    setDictionaryImportMode(active) {
+        return this._invoke('setDictionaryImportMode', {active});
+    }
+
+    /**
      * @returns {Promise<import('api').ApiReturn<'purgeDatabase'>>}
      */
     purgeDatabase() {

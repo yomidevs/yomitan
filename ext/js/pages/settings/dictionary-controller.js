@@ -22,7 +22,6 @@ import {readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {deferPromise} from '../../core/utilities.js';
 import {compareRevisions} from '../../dictionary/dictionary-data-util.js';
-import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
@@ -1206,7 +1205,7 @@ export class DictionaryController {
 
             const token = this._databaseStateToken;
             const dictionaryTitles = this._dictionaryEntries.map(({dictionaryTitle}) => dictionaryTitle);
-            const {counts, total} = await new DictionaryWorker().getDictionaryCounts(dictionaryTitles, true);
+            const {counts, total} = await this._settingsController.application.api.getDictionaryCounts(dictionaryTitles, true);
             if (this._databaseStateToken !== token) { return; }
 
             for (let i = 0, ii = Math.min(counts.length, this._dictionaryEntries.length); i < ii; ++i) {
@@ -1409,7 +1408,9 @@ export class DictionaryController {
      * @param {import('dictionary-worker').DeleteProgressCallback} onProgress
      */
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
-        await new DictionaryWorker().deleteDictionary(dictionaryTitle, onProgress);
+        onProgress({processed: 0, count: 1, storeCount: 1, storesProcesed: 0});
+        await this._settingsController.application.api.deleteDictionaryByTitle(dictionaryTitle);
+        onProgress({processed: 1, count: 1, storeCount: 1, storesProcesed: 1});
         /** @type {import('core').DeferredPromiseDetails<void>} */
         const {promise: dictionariesUpdatePromise, resolve} = deferPromise();
         this._onDictionariesUpdate = resolve;

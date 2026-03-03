@@ -159,6 +159,53 @@ function isOpfsUnavailableMessage(message) {
 }
 
 /**
+ * @param {string} message
+ * @returns {'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'}
+ */
+function classifyImportOpenFailure(message) {
+    const text = message.toLowerCase();
+    if (
+        text.includes('no such vfs') ||
+        text.includes('opfs is required') ||
+        text.includes('missing sharedarraybuffer')
+    ) {
+        return 'unsupported-opfs';
+    }
+    if (
+        text.includes('sqlite_busy') ||
+        text.includes('database is locked') ||
+        text.includes('database table is locked') ||
+        text.includes('locked')
+    ) {
+        return 'lock-contention';
+    }
+    if (
+        text.includes('sqlite_corrupt') ||
+        text.includes('database disk image is malformed') ||
+        text.includes('file is not a database')
+    ) {
+        return 'corruption';
+    }
+    if (
+        text.includes('sqlite_cantopen') ||
+        text.includes('unable to open database file')
+    ) {
+        return 'transient-open-race';
+    }
+    return 'unknown';
+}
+
+/**
+ * @param {number} attempt
+ * @returns {number}
+ */
+function getImportRetryDelayMs(attempt) {
+    const base = Math.min(1200, 100 * (2 ** (attempt - 1)));
+    const jitter = Math.floor(Math.random() * 50);
+    return base + jitter;
+}
+
+/**
  * @returns {{name: string, version: string, id: string}|null}
  */
 function getExtensionBuildStamp() {
@@ -1191,10 +1238,13 @@ export class DictionaryImportController {
             hasProfilesDictionarySettings: profilesDictionarySettings !== null,
         });
         const dictionaryWorker = this._getDictionaryWorker(useImportSession);
+        let importModeEnabled = false;
         const importStartTime = safePerformance.now();
         try {
             this._setModifying(true);
             this._hideErrors();
+            await this._settingsController.application.api.setDictionaryImportMode(true);
+            importModeEnabled = true;
 
             for (const progress of [...progressContainers, ...recommendedProgressContainers]) { progress.hidden = false; }
 
@@ -1287,6 +1337,13 @@ export class DictionaryImportController {
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
             this._setModifying(false);
             this._releaseDictionaryWorker(dictionaryWorker, useImportSession);
+            if (importModeEnabled) {
+                try {
+                    await this._settingsController.application.api.setDictionaryImportMode(false);
+                } catch (error) {
+                    log.error(error);
+                }
+            }
             this._triggerStorageChanged();
             if (onImportDone) { onImportDone(); }
         }
@@ -1424,7 +1481,7 @@ export class DictionaryImportController {
         const workerImportStartTime = safePerformance.now();
         /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}} */
         let importResult;
-        const maxImportAttempts = 15;
+        const maxImportAttempts = 6;
         for (let attempt = 1; ; ++attempt) {
             try {
                 const archiveContentAttempt = new Uint8Array(archiveContentBytes).buffer;
@@ -1440,26 +1497,28 @@ export class DictionaryImportController {
                 );
             } catch (error) {
                 const message = (error instanceof Error) ? error.message : String(error);
-                const isCantOpenThrown = message.includes('SQLITE_CANTOPEN');
-                if (!isCantOpenThrown || attempt >= maxImportAttempts) {
+                const failureClass = classifyImportOpenFailure(message);
+                const isRetryableThrown = (failureClass === 'lock-contention' || failureClass === 'transient-open-race');
+                if (!isRetryableThrown || attempt >= maxImportAttempts) {
                     throw error;
                 }
-                log.log(`[ImportTiming] [${dictionaryTitle}] retrying import after thrown SQLITE_CANTOPEN (attempt ${attempt})`);
+                log.log(`[ImportTiming] [${dictionaryTitle}] retrying import after transient open failure (${failureClass}) attempt ${attempt}`);
                 await new Promise((resolve) => {
-                    setTimeout(resolve, 1000);
+                    setTimeout(resolve, getImportRetryDelayMs(attempt));
                 });
                 continue;
             }
-            const isCantOpenError = Array.isArray(importResult.errors) && importResult.errors.some((error) => {
+            const retryableImportError = Array.isArray(importResult.errors) && importResult.errors.some((error) => {
                 const message = (error instanceof Error) ? error.message : String(error);
-                return message.includes('SQLITE_CANTOPEN');
+                const failureClass = classifyImportOpenFailure(message);
+                return (failureClass === 'lock-contention' || failureClass === 'transient-open-race');
             });
-            if (!isCantOpenError || attempt >= maxImportAttempts) {
+            if (!retryableImportError || attempt >= maxImportAttempts) {
                 break;
             }
-            log.log(`[ImportTiming] [${dictionaryTitle}] retrying import after SQLITE_CANTOPEN (attempt ${attempt})`);
+            log.log(`[ImportTiming] [${dictionaryTitle}] retrying import after transient open failure in importer result (attempt ${attempt})`);
             await new Promise((resolve) => {
-                setTimeout(resolve, 1000);
+                setTimeout(resolve, getImportRetryDelayMs(attempt));
             });
         }
         const workerImportEndTime = safePerformance.now();

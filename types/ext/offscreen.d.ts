@@ -39,9 +39,28 @@ type ApiSurface = {
         params: void;
         return: void;
     };
+    databaseSetSuspendedOffscreen: {
+        params: {
+            suspended: boolean;
+        };
+        return: void;
+    };
     getDictionaryInfoOffscreen: {
         params: void;
         return: DictionaryImporter.Summary[];
+    };
+    deleteDictionaryOffscreen: {
+        params: {
+            dictionaryTitle: string;
+        };
+        return: void;
+    };
+    getDictionaryCountsOffscreen: {
+        params: {
+            dictionaryNames: string[];
+            getTotal: boolean;
+        };
+        return: DictionaryDatabase.DictionaryCounts;
     };
     databasePurgeOffscreen: {
         params: void;

@@ -191,10 +191,37 @@ export class DictionaryDatabaseProxy {
     }
 
     /**
+     * @param {boolean} suspended
+     * @returns {Promise<void>}
+     */
+    async setSuspended(suspended) {
+        await this._offscreen.sendMessagePromise({action: 'databaseSetSuspendedOffscreen', params: {suspended}});
+    }
+
+    /**
      * @returns {Promise<import('dictionary-importer').Summary[]>}
      */
     async getDictionaryInfo() {
         return this._offscreen.sendMessagePromise({action: 'getDictionaryInfoOffscreen'});
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     * @param {number} [_progressRate]
+     * @param {import('dictionary-database').DeleteDictionaryProgressCallback} [_onProgress]
+     * @returns {Promise<void>}
+     */
+    async deleteDictionary(dictionaryTitle, _progressRate = 1000, _onProgress = () => {}) {
+        await this._offscreen.sendMessagePromise({action: 'deleteDictionaryOffscreen', params: {dictionaryTitle}});
+    }
+
+    /**
+     * @param {string[]} dictionaryNames
+     * @param {boolean} getTotal
+     * @returns {Promise<import('dictionary-database').DictionaryCounts>}
+     */
+    async getDictionaryCounts(dictionaryNames, getTotal) {
+        return await this._offscreen.sendMessagePromise({action: 'getDictionaryCountsOffscreen', params: {dictionaryNames, getTotal}});
     }
 
     /**

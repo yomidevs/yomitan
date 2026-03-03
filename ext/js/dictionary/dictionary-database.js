@@ -222,6 +222,22 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {boolean} suspended
+     * @returns {Promise<void>}
+     */
+    async setSuspended(suspended) {
+        if (suspended) {
+            if (this._db !== null) {
+                await this.close();
+            }
+            return;
+        }
+        if (this._db === null) {
+            await this.prepare();
+        }
+    }
+
+    /**
      * @returns {boolean}
      */
     usesFallbackStorage() {

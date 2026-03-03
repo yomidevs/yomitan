@@ -289,6 +289,25 @@ type ApiSurface = {
         params: void;
         return: DictionaryImporter.Summary[];
     };
+    deleteDictionaryByTitle: {
+        params: {
+            dictionaryTitle: string;
+        };
+        return: void;
+    };
+    getDictionaryCounts: {
+        params: {
+            dictionaryNames: string[];
+            getTotal: boolean;
+        };
+        return: DictionaryDatabase.DictionaryCounts;
+    };
+    setDictionaryImportMode: {
+        params: {
+            active: boolean;
+        };
+        return: void;
+    };
     purgeDatabase: {
         params: void;
         return: void;

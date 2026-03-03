@@ -729,10 +729,14 @@ export class TermRecordOpfsStore {
         if (this._recordsDirectoryHandle === null) {
             return 0;
         }
+        const entriesMethod = /** @type {unknown} */ (Reflect.get(this._recordsDirectoryHandle, 'entries'));
+        if (typeof entriesMethod !== 'function') {
+            return 0;
+        }
+        const entries = /** @type {() => AsyncIterable<[string, FileSystemHandle]>} */ (entriesMethod).call(this._recordsDirectoryHandle);
         let shardFileCount = 0;
-        for await (const entry of this._recordsDirectoryHandle.entries()) {
+        for await (const entry of entries) {
             const name = String(entry[0] ?? '');
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const fileSystemHandle = /** @type {FileSystemHandle} */ (/** @type {unknown} */ (entry[1]));
             if (fileSystemHandle.kind !== 'file' || !this._isShardFileName(name)) {
                 continue;
@@ -820,11 +824,15 @@ export class TermRecordOpfsStore {
         if (this._recordsDirectoryHandle === null) {
             return [];
         }
+        const entriesMethod = /** @type {unknown} */ (Reflect.get(this._recordsDirectoryHandle, 'entries'));
+        if (typeof entriesMethod !== 'function') {
+            return [];
+        }
+        const entries = /** @type {() => AsyncIterable<[string, FileSystemHandle]>} */ (entriesMethod).call(this._recordsDirectoryHandle);
         /** @type {string[]} */
         const names = [];
-        for await (const entry of this._recordsDirectoryHandle.entries()) {
+        for await (const entry of entries) {
             const name = String(entry[0] ?? '');
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const fileSystemHandle = /** @type {FileSystemHandle} */ (/** @type {unknown} */ (entry[1]));
             if (fileSystemHandle.kind === 'file' && this._isShardFileName(name)) {
                 names.push(name);

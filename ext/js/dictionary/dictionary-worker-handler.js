@@ -84,6 +84,45 @@ export class DictionaryWorkerHandler {
     }
 
     /**
+     * @template [T=unknown]
+     * @param {string} action
+     * @param {import('core').SerializableObject} params
+     * @returns {Promise<T>}
+     */
+    async _invokeBackendApi(action, params) {
+        const runtime = /** @type {typeof chrome.runtime|undefined} */ (Reflect.get(chrome, 'runtime'));
+        if (typeof runtime?.sendMessage !== 'function') {
+            throw new Error(`Cannot invoke backend action ${action}: chrome.runtime.sendMessage unavailable`);
+        }
+        return await new Promise((resolve, reject) => {
+            runtime.sendMessage({action, params}, (responseRaw) => {
+                const runtimeError = runtime.lastError;
+                if (typeof runtimeError !== 'undefined') {
+                    reject(new Error(runtimeError.message));
+                    return;
+                }
+                const response = /** @type {unknown} */ (responseRaw);
+                if (!(typeof response === 'object' && response !== null)) {
+                    reject(new Error(`Backend action ${action} returned invalid response`));
+                    return;
+                }
+                const responseRecord = /** @type {Record<string, unknown>} */ (response);
+                const error = /** @type {unknown} */ (Reflect.get(responseRecord, 'error'));
+                if (typeof error !== 'undefined' && error !== null) {
+                    if (typeof error === 'object' && !Array.isArray(error)) {
+                        reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */ (error)));
+                        return;
+                    }
+                    reject(new Error(`Backend action ${action} returned invalid error payload`));
+                    return;
+                }
+                const result = Reflect.get(responseRecord, 'result');
+                resolve(/** @type {T} */ (result));
+            });
+        });
+    }
+
+    /**
      * @param {import('dictionary-worker-handler').ImportDictionaryMessageParams} details
      * @param {import('dictionary-worker-handler').OnProgressCallback} onProgress
      * @returns {Promise<import('dictionary-worker').MessageCompleteResultSerialized>}
@@ -166,12 +205,9 @@ export class DictionaryWorkerHandler {
      * @returns {Promise<void>}
      */
     async _deleteDictionary({dictionaryTitle}, onProgress) {
-        const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
-        try {
-            return await dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, onProgress);
-        } finally {
-            void dictionaryDatabase.close();
-        }
+        onProgress({processed: 0, count: 1, storeCount: 1, storesProcesed: 0});
+        await this._invokeBackendApi('deleteDictionaryByTitle', {dictionaryTitle});
+        onProgress({processed: 1, count: 1, storeCount: 1, storesProcesed: 1});
     }
 
     /**
@@ -179,12 +215,7 @@ export class DictionaryWorkerHandler {
      * @returns {Promise<import('dictionary-database').DictionaryCounts>}
      */
     async _getDictionaryCounts({dictionaryNames, getTotal}) {
-        const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
-        try {
-            return await dictionaryDatabase.getDictionaryCounts(dictionaryNames, getTotal);
-        } finally {
-            void dictionaryDatabase.close();
-        }
+        return await this._invokeBackendApi('getDictionaryCounts', {dictionaryNames, getTotal});
     }
 
     /**

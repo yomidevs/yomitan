@@ -50,7 +50,10 @@ export class Offscreen {
             ['clipboardSetBrowserOffscreen',   this._setClipboardBrowser.bind(this)],
             ['databasePrepareOffscreen',       this._prepareDatabaseHandler.bind(this)],
             ['databaseRefreshOffscreen',       this._refreshDatabaseHandler.bind(this)],
+            ['databaseSetSuspendedOffscreen',  this._setDatabaseSuspendedHandler.bind(this)],
             ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
+            ['deleteDictionaryOffscreen',      this._deleteDictionaryHandler.bind(this)],
+            ['getDictionaryCountsOffscreen',   this._getDictionaryCountsHandler.bind(this)],
             ['databasePurgeOffscreen',         this._purgeDatabaseHandler.bind(this)],
             ['databaseGetMediaOffscreen',      this._getMediaHandler.bind(this)],
             ['databaseExportOffscreen',        this._exportDatabaseHandler.bind(this)],
@@ -70,7 +73,7 @@ export class Offscreen {
             ['connectToDatabaseWorker', this._connectToDatabaseWorkerHandler.bind(this)],
         ]);
 
-        /** @type {?Promise<unknown>} */
+        /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;
         /** @type {Worker} */
         this._dictionaryWorker = new Worker('/js/background/offscreen-dictionary-worker.js', {type: 'module'});
@@ -142,6 +145,19 @@ export class Offscreen {
                 }
                 return null;
             };
+            /**
+             * @param {unknown} pointer
+             * @returns {boolean}
+             */
+            const isNonZeroPointer = (pointer) => {
+                if (typeof pointer === 'bigint') {
+                    return pointer !== 0n;
+                }
+                if (typeof pointer === 'number') {
+                    return pointer !== 0;
+                }
+                return false;
+            };
             const findVfs = sqlite3?.capi?.sqlite3_vfs_find;
             const opfsVfsRaw = typeof findVfs === 'function' ? findVfs('opfs') : null;
             const opfsSahpoolVfsRaw = typeof findVfs === 'function' ? findVfs('opfs-sahpool') : null;
@@ -160,8 +176,8 @@ export class Offscreen {
                 hasOpfsImportDb: typeof /** @type {{opfs?: {importDb?: unknown}}} */ (/** @type {unknown} */ (sqlite3)).opfs?.importDb === 'function',
                 hasWasmfsDir: typeof wasmfsDir === 'string' && wasmfsDir.length > 0,
                 wasmfsDir,
-                hasOpfsVfs: opfsVfsRaw !== null && opfsVfsRaw !== 0 && opfsVfsRaw !== 0n,
-                hasOpfsSahpoolVfs: opfsSahpoolVfsRaw !== null && opfsSahpoolVfsRaw !== 0 && opfsSahpoolVfsRaw !== 0n,
+                hasOpfsVfs: opfsVfsRaw !== null && isNonZeroPointer(opfsVfsRaw),
+                hasOpfsSahpoolVfs: opfsSahpoolVfsRaw !== null && isNonZeroPointer(opfsSahpoolVfsRaw),
                 opfsVfsPtr: serializePointer(opfsVfsRaw),
                 opfsSahpoolVfsPtr: serializePointer(opfsSahpoolVfsRaw),
             };
@@ -192,7 +208,7 @@ export class Offscreen {
             return this._prepareDatabasePromise;
         }
         this._prepareDatabasePromise = (async () => {
-            return await this._invokeDictionaryWorker('databasePrepareOffscreen', {});
+            await this._invokeDictionaryWorker('databasePrepareOffscreen', {});
         })();
         this._prepareDatabasePromise.finally(() => {
             this._prepareDatabasePromise = null;
@@ -219,9 +235,24 @@ export class Offscreen {
         await this._invokeDictionaryWorker('databaseRefreshOffscreen', {});
     }
 
+    /** @type {import('offscreen').ApiHandler<'databaseSetSuspendedOffscreen'>} */
+    async _setDatabaseSuspendedHandler({suspended}) {
+        await this._invokeDictionaryWorker('databaseSetSuspendedOffscreen', {suspended});
+    }
+
     /** @type {import('offscreen').ApiHandler<'databasePurgeOffscreen'>} */
     async _purgeDatabaseHandler() {
         return await this._invokeDictionaryWorker('databasePurgeOffscreen', {});
+    }
+
+    /** @type {import('offscreen').ApiHandler<'deleteDictionaryOffscreen'>} */
+    async _deleteDictionaryHandler({dictionaryTitle}) {
+        await this._invokeDictionaryWorker('deleteDictionaryOffscreen', {dictionaryTitle});
+    }
+
+    /** @type {import('offscreen').ApiHandler<'getDictionaryCountsOffscreen'>} */
+    async _getDictionaryCountsHandler({dictionaryNames, getTotal}) {
+        return await this._invokeDictionaryWorker('getDictionaryCountsOffscreen', {dictionaryNames, getTotal});
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseGetMediaOffscreen'>} */
@@ -296,7 +327,7 @@ export class Offscreen {
      * @param {string} action
      * @param {import('core').SerializableObject} params
      * @param {Transferable[]} [transferables]
-     * @returns {Promise<unknown>}
+     * @returns {Promise<any>}
      */
     _invokeDictionaryWorker(action, params, transferables = []) {
         const id = ++this._dictionaryWorkerRequestId;
@@ -307,7 +338,7 @@ export class Offscreen {
     }
 
     /**
-     * @param {MessageEvent<{id: number, result?: unknown, error?: import('core').SerializableObject}>} event
+     * @param {MessageEvent<{id: number, result?: unknown, error?: import('core').SerializedError}>} event
      */
     _onDictionaryWorkerMessage(event) {
         const {id, result, error} = event.data;
@@ -317,7 +348,7 @@ export class Offscreen {
         }
         this._dictionaryWorkerResponseHandlers.delete(id);
         if (error) {
-            handler.reject(ExtensionError.deserialize(error));
+            handler.reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */ (error)));
             return;
         }
         handler.resolve(result);

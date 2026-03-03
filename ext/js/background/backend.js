@@ -69,29 +69,37 @@ export class Backend {
         /** @type {Mecab} */
         this._mecab = new Mecab();
 
+        /** @type {?OffscreenProxy} */
+        let offscreen = null;
+        /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
+        let dictionaryDatabase;
+        /** @type {Translator|TranslatorProxy} */
+        let translator;
+        /** @type {ClipboardReader|ClipboardReaderProxy} */
+        let clipboardReader;
         if (!chrome.offscreen) {
-            /** @type {?OffscreenProxy} */
-            this._offscreen = null;
-            /** @type {DictionaryDatabase} */
-            this._dictionaryDatabase = new DictionaryDatabase();
-            /** @type {Translator} */
-            this._translator = new Translator(this._dictionaryDatabase);
-            /** @type {ClipboardReader|ClipboardReaderProxy} */
-            this._clipboardReader = new ClipboardReader(
+            const database = new DictionaryDatabase();
+            dictionaryDatabase = database;
+            translator = new Translator(database);
+            clipboardReader = new ClipboardReader(
                 (typeof document === 'object' && document !== null ? document : null),
                 '#clipboard-paste-target',
                 '#clipboard-rich-content-paste-target',
             );
         } else {
-            /** @type {?OffscreenProxy} */
-            this._offscreen = new OffscreenProxy(webExtension);
-            /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
-            this._dictionaryDatabase = new DictionaryDatabaseProxy(this._offscreen);
-            /** @type {Translator|TranslatorProxy} */
-            this._translator = new TranslatorProxy(this._offscreen);
-            /** @type {ClipboardReader|ClipboardReaderProxy} */
-            this._clipboardReader = new ClipboardReaderProxy(this._offscreen);
+            offscreen = new OffscreenProxy(webExtension);
+            dictionaryDatabase = new DictionaryDatabaseProxy(offscreen);
+            translator = new TranslatorProxy(offscreen);
+            clipboardReader = new ClipboardReaderProxy(offscreen);
         }
+        /** @type {?OffscreenProxy} */
+        this._offscreen = offscreen;
+        /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
+        this._dictionaryDatabase = dictionaryDatabase;
+        /** @type {Translator|TranslatorProxy} */
+        this._translator = translator;
+        /** @type {ClipboardReader|ClipboardReaderProxy} */
+        this._clipboardReader = clipboardReader;
 
         /** @type {ClipboardMonitor} */
         this._clipboardMonitor = new ClipboardMonitor(this._clipboardReader);
@@ -179,6 +187,9 @@ export class Backend {
             ['getZoom',                      this._onApiGetZoom.bind(this)],
             ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)],
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
+            ['deleteDictionaryByTitle',      this._onApiDeleteDictionaryByTitle.bind(this)],
+            ['getDictionaryCounts',          this._onApiGetDictionaryCounts.bind(this)],
+            ['setDictionaryImportMode',      this._onApiSetDictionaryImportMode.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
             ['exportDictionaryDatabase',     this._onApiExportDictionaryDatabase.bind(this)],
             ['importDictionaryDatabase',     this._onApiImportDictionaryDatabase.bind(this)],
@@ -224,6 +235,10 @@ export class Backend {
         this._textParseCache = new CacheMap(10000, 3600000); // 1 hour idle time, ~32MB per 1000 entries for Japanese
         /** @type {Record<string, unknown>|null} */
         this._startupDiagnosticsSnapshot = null;
+        /** @type {boolean} */
+        this._dictionaryImportModeActive = false;
+        /** @type {Promise<void>|null} */
+        this._setDictionaryImportModePromise = null;
     }
 
     /**
@@ -1041,6 +1056,23 @@ export class Backend {
     async _onApiGetDictionaryInfo() {
         await this._ensureDictionaryDatabaseReady();
         return await this._dictionaryDatabase.getDictionaryInfo();
+    }
+
+    /** @type {import('api').ApiHandler<'deleteDictionaryByTitle'>} */
+    async _onApiDeleteDictionaryByTitle({dictionaryTitle}) {
+        await this._ensureDictionaryDatabaseReady();
+        await this._dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, () => {});
+    }
+
+    /** @type {import('api').ApiHandler<'getDictionaryCounts'>} */
+    async _onApiGetDictionaryCounts({dictionaryNames, getTotal}) {
+        await this._ensureDictionaryDatabaseReady();
+        return await this._dictionaryDatabase.getDictionaryCounts(dictionaryNames, getTotal);
+    }
+
+    /** @type {import('api').ApiHandler<'setDictionaryImportMode'>} */
+    async _onApiSetDictionaryImportMode({active}) {
+        await this._setDictionaryImportMode(active);
     }
 
     /** @type {import('api').ApiHandler<'purgeDatabase'>} */
@@ -2793,17 +2825,15 @@ export class Backend {
      */
     async _refreshDictionaryDatabaseAfterUpdate() {
         const dictionaryDatabase = this._dictionaryDatabase;
-        if (
-            'refreshConnection' in dictionaryDatabase &&
-            typeof dictionaryDatabase.refreshConnection === 'function'
-        ) {
+        const refreshConnectionMethod = /** @type {unknown} */ (Reflect.get(dictionaryDatabase, 'refreshConnection'));
+        if (typeof refreshConnectionMethod === 'function') {
             if (this._dictionaryRefreshPromise !== null) {
                 await this._dictionaryRefreshPromise;
                 return;
             }
             this._dictionaryRefreshPromise = (async () => {
                 try {
-                    await dictionaryDatabase.refreshConnection();
+                    await /** @type {() => Promise<void>} */ (refreshConnectionMethod).call(dictionaryDatabase);
                 } catch (e) {
                     log.error(e);
                 }
@@ -3429,6 +3459,9 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _ensureDictionaryDatabaseReady() {
+        if (this._dictionaryImportModeActive) {
+            throw new Error('Dictionary database access is suspended while import is in progress');
+        }
         const isPreparedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'isPrepared'));
         if (typeof isPreparedMethod === 'function') {
             const isPrepared = /** @type {() => boolean} */ (isPreparedMethod).call(this._dictionaryDatabase);
@@ -3442,15 +3475,66 @@ export class Backend {
         }
         this._dictionaryDatabasePreparePromise = (async () => {
             await this._dictionaryDatabase.prepare();
-            const clearResult = this._translator.clearDatabaseCaches();
-            if (clearResult instanceof Promise) {
-                await clearResult;
-            }
+            await Promise.resolve(this._translator.clearDatabaseCaches());
         })();
         try {
             await this._dictionaryDatabasePreparePromise;
         } finally {
             this._dictionaryDatabasePreparePromise = null;
+        }
+    }
+
+    /**
+     * @param {boolean} active
+     * @returns {Promise<void>}
+     */
+    async _setDictionaryImportMode(active) {
+        if (this._setDictionaryImportModePromise !== null) {
+            await this._setDictionaryImportModePromise;
+        }
+        this._setDictionaryImportModePromise = (async () => {
+            if (this._dictionaryImportModeActive === active) {
+                return;
+            }
+            if (active) {
+                this._dictionaryImportModeActive = true;
+                if (this._dictionaryDatabasePreparePromise !== null) {
+                    try {
+                        await this._dictionaryDatabasePreparePromise;
+                    } catch (_) {
+                        // NOP
+                    }
+                }
+                const setSuspendedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'setSuspended'));
+                if (typeof setSuspendedMethod === 'function') {
+                    await /** @type {(suspended: boolean) => Promise<void>} */ (setSuspendedMethod).call(this._dictionaryDatabase, true);
+                } else {
+                    const isPreparedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'isPrepared'));
+                    const closeMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'close'));
+                    if (typeof isPreparedMethod === 'function' && typeof closeMethod === 'function') {
+                        const isPrepared = /** @type {() => boolean} */ (isPreparedMethod).call(this._dictionaryDatabase);
+                        if (isPrepared) {
+                            await /** @type {() => Promise<void>} */ (closeMethod).call(this._dictionaryDatabase);
+                        }
+                    }
+                }
+                await Promise.resolve(this._translator.clearDatabaseCaches());
+                reportDiagnostics('dictionary-import-mode-changed', {active: true});
+                return;
+            }
+
+            this._dictionaryImportModeActive = false;
+            const setSuspendedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'setSuspended'));
+            const resumePromise = (typeof setSuspendedMethod === 'function') ?
+                /** @type {(suspended: boolean) => Promise<void>} */ (setSuspendedMethod).call(this._dictionaryDatabase, false) :
+                this._ensureDictionaryDatabaseReady();
+            await resumePromise;
+            reportDiagnostics('dictionary-import-mode-changed', {active: false});
+        })();
+        try {
+            await this._setDictionaryImportModePromise;
+        } finally {
+            this._setDictionaryImportModePromise = null;
         }
     }
 
