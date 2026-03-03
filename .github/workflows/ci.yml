@@ -84,7 +84,7 @@ jobs:
         run: |
           curl -fsSL "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -o /tmp/firefox-devedition.tar.bz2
           mkdir -p "$HOME/firefox-devedition"
-          tar -xjf /tmp/firefox-devedition.tar.bz2 -C "$HOME/firefox-devedition"
+          tar -xf /tmp/firefox-devedition.tar.bz2 -C "$HOME/firefox-devedition"
           echo "MANABITAN_FIREFOX_BINARY=$HOME/firefox-devedition/firefox/firefox" >> "$GITHUB_ENV"
 
       - name: Restore Firefox E2E dictionary cache
