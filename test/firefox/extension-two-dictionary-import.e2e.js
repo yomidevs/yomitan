@@ -1437,6 +1437,8 @@ async function main() {
         firefoxOptions.addArguments('-headless');
     }
     firefoxOptions.setPreference('xpinstall.signatures.required', false);
+    firefoxOptions.setPreference('extensions.manifestV3.enabled', true);
+    firefoxOptions.setPreference('extensions.backgroundServiceWorker.enabled', true);
     // Selenium Firefox profiles can start with stricter defaults that keep
     // SharedArrayBuffer unavailable even when extension pages set COOP/COEP.
     // Ensure test runtime exposes the required shared-memory primitives for OPFS.
