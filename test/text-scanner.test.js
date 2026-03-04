@@ -221,4 +221,58 @@ describe('TextScanner lookup robustness', () => {
         // Rejection from a stale timed-out lookup should not bubble to searchError.
         expect(searchErrorCount).toBe(0);
     });
+
+    test('repeated scans remain responsive with intermittent hung lookups', async () => {
+        /** @type {Array<(value: TermsFindResult) => void>} */
+        const pendingResolvers = [];
+        const totalScans = 30;
+        const termsFindImpl = vi.fn().mockImplementation(async () => {
+            const callIndex = termsFindImpl.mock.calls.length + 1;
+            if (callIndex % 7 === 0) {
+                return await new Promise((resolve) => {
+                    pendingResolvers.push(resolve);
+                });
+            }
+            return {
+                dictionaryEntries: [createMockTermEntry()],
+                originalTextLength: 2,
+            };
+        });
+        const termsFind = /** @type {import('../ext/js/comm/api.js').API['termsFind']} */ (/** @type {unknown} */ (termsFindImpl));
+        const sourceQueue = Array.from({length: totalScans}, (_, i) => createFakeTextSource(`語${String(i + 1)}`));
+        const scanner = createScanner(termsFind, sourceQueue);
+        Reflect.set(scanner, '_lookupTimeoutMs', 12);
+
+        let searchSuccessCount = 0;
+        let searchErrorCount = 0;
+        scanner.on('searchSuccess', () => {
+            ++searchSuccessCount;
+        });
+        scanner.on('searchError', () => {
+            ++searchErrorCount;
+        });
+
+        for (let i = 0; i < totalScans; ++i) {
+            await searchAt(scanner, 10 + i, 10, createInputInfo());
+        }
+
+        expect(termsFindImpl).toHaveBeenCalledTimes(totalScans);
+        expect(searchErrorCount).toBe(0);
+        expect(searchSuccessCount).toBe(totalScans - pendingResolvers.length);
+        expect(Reflect.get(scanner, '_pendingLookup')).toBe(false);
+
+        for (const resolvePending of pendingResolvers) {
+            resolvePending({
+                dictionaryEntries: [createMockTermEntry()],
+                originalTextLength: 2,
+            });
+        }
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
+
+        // Late completions from stale timed-out lookups must not emit extra events.
+        expect(searchSuccessCount).toBe(totalScans - pendingResolvers.length);
+        expect(searchErrorCount).toBe(0);
+    });
 });
