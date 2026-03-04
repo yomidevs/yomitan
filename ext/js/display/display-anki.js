@@ -23,7 +23,7 @@ import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
 import {getDynamicTemplates} from '../data/anki-template-util.js';
-import {INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
+import {getRootDeckName, INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
@@ -311,12 +311,6 @@ export class DisplayAnki {
 
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return null; }
-        const dupElements = container.getElementsByClassName('duplicate-indicator');
-        if (dupElements.length > 0) {
-            for (const elem of dupElements) {
-                elem.remove();
-            }
-        }
 
         // Create button from template
         const singleNoteActionButtons = /** @type {HTMLElement} */ (this._display.displayGenerator.instantiateTemplate('action-button-container'));
@@ -429,13 +423,40 @@ export class DisplayAnki {
                 if (cardFormat.type !== type) { continue; }
                 const skeletonNoteCardCopy = structuredClone(skeletonNoteTemplates[cardFormatIndex]);
                 const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntries[i]);
+
                 const firstFieldName = Object.keys(skeletonNoteCardCopy.note.fields)[0];
-                skeletonNoteCardCopy.note.deckName = cardFormat.deck;
-                skeletonNoteCardCopy.note.modelName = cardFormat.model;
                 const fieldValue = details.type === 'kanji' ? details.character : details.term;
-                skeletonNoteCardCopy.note.fields[firstFieldName] = fieldValue;
-                notesToCheck.push(skeletonNoteCardCopy);
                 noteTargets.push({index: i, cardFormatIndex, cardFormat});
+                let duplicateScopeCheckChildren = false;
+                let dupeScope = this._duplicateScope;
+                let duplicateScopeDeckName = null;
+                if (this._duplicateScope === 'deck-root') {
+                    dupeScope = 'deck';
+                    duplicateScopeDeckName = getRootDeckName(cardFormat.deck);
+                    duplicateScopeCheckChildren = true;
+                }
+                /** @type {import('anki').Note} */
+                const min = {
+                    fields: {[firstFieldName]: fieldValue},
+                    tags: [],
+                    deckName: cardFormat.deck,
+                    modelName: cardFormat.model,
+                    options: {
+                        allowDuplicate: true,
+                        duplicateScope: dupeScope,
+                        duplicateScopeOptions: {
+                            deckName: duplicateScopeDeckName,
+                            checkChildren: duplicateScopeCheckChildren,
+                            checkAllModels: this._duplicateScopeCheckAllModels,
+                        },
+                    },
+                };
+                const big = {
+                    note: min,
+                    errors: [],
+                    requirements: [],
+                };
+                notesToCheck.push(big);
             }
         }
         const infos = await this._display.application.api.getAnkiNoteInfo(notesToCheck.map((note) => note.note), this._isAdditionalInfoEnabled());
@@ -478,6 +499,7 @@ export class DisplayAnki {
                     text.textContent = ' NOT A DUPLICATE ';
                     container.appendChild(text);
                 }
+
                 if (displayTagsAndFlags !== 'never' && Array.isArray(noteInfos)) {
                     this._setupTagsIndicator(entryIndex, cardFormatIndex, noteInfos);
                     this._setupFlagsIndicator(entryIndex, cardFormatIndex, noteInfos);
@@ -486,7 +508,9 @@ export class DisplayAnki {
         }
     }
 
-    /** */
+    /**
+     *
+     */
     async _updateDictionaryEntryDetails() {
         if (!this._display.getOptions()?.anki.enable) { return; }
         const {dictionaryEntries} = this._display;
@@ -501,10 +525,13 @@ export class DisplayAnki {
         const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
         try {
             this._updateSaveButtonsPromise = promise;
+            let temp = null;
             if (this._checkForDuplicates === true) {
-                await this._quickDupeCheck(dictionaryEntries);
+                temp = this._quickDupeCheck(dictionaryEntries);
+                await temp;
             }
-            const dictionaryEntryDetails = await this._getDictionaryEntryDetails(dictionaryEntries);
+            const detailsPromise = this._getDictionaryEntryDetails(dictionaryEntries);
+            const dictionaryEntryDetails = await detailsPromise;
             if (this._updateDictionaryEntryDetailsToken !== token) { return; }
             this._dictionaryEntryDetails = dictionaryEntryDetails;
             this._updateSaveButtons(dictionaryEntryDetails);
@@ -568,6 +595,21 @@ export class DisplayAnki {
     }
 
     /**
+     *@param {number} entryIndex
+     */
+    _removeDupeIndicators(entryIndex) {
+        if (this._checkForDuplicates === false) { return; }
+        const entry = this._getEntry(entryIndex);
+        if (entry === null) { return; }
+        const container = entry.querySelector('.note-actions-container');
+        if (container === null) { return; }
+        const dupElements = container.getElementsByClassName('duplicate-indicator');
+
+        // Convert live collection to array before removing
+        for (const elem of dupElements) { elem.remove(); }
+    }
+
+    /**
      * @param {import('display-anki').DictionaryEntryDetails[]} dictionaryEntryDetails
      */
     _updateSaveButtons(dictionaryEntryDetails) {
@@ -581,8 +623,7 @@ export class DisplayAnki {
                     if (ankiError && ankiError.message !== 'Anki not connected') {
                         log.error(ankiError);
                     }
-
-                    // If entry has noteIds, show the "add duplicate" button.
+                    this._removeDupeIndicators(entryIndex);
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
                         this._updateSaveButtonForDuplicateBehavior(button, noteIds);
                     }
@@ -1135,7 +1176,6 @@ export class DisplayAnki {
                 }
             }
         }
-
         /** @type {import('display-anki').DictionaryEntryDetails[]} */
         const results = new Array(dictionaryEntries.length).fill(null).map(() => ({noteMap: new Map()}));
 
