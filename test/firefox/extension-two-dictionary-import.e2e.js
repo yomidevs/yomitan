@@ -1888,35 +1888,45 @@ async function main() {
         );
 
         const hoverLookupStart = safePerformance.now();
-        const hoverTerm = '暗記';
+        const hoverTargets = ['#target-word', '#target-cat', '#target-name', '#target-kotoba', '#target-born', '#target-mitou'];
+        /** @type {Array<{iteration: number, selector: string, popupTextPreview: string}>} */
+        const hoverIterationSummaries = [];
         try {
-            const popupText = await hoverLookupOnPage(
-                driver,
-                `${localServer.baseUrl}/wagahai-neko.html`,
-                '#target-word',
-                ['Jitendex', 'JMdict'],
-            );
+            for (let i = 0; i < 12; ++i) {
+                const selector = hoverTargets[i % hoverTargets.length];
+                const popupText = await hoverLookupOnPage(
+                    driver,
+                    `${localServer.baseUrl}/wagahai-neko.html`,
+                    selector,
+                    ['Jitendex', 'JMdict'],
+                );
+                hoverIterationSummaries.push({
+                    iteration: i + 1,
+                    selector,
+                    popupTextPreview: popupText.slice(0, 140),
+                });
+            }
             const hoverLookupEnd = safePerformance.now();
             await addReportPhase(
                 report,
                 driver,
-                'Verify hover lookup on Wagahai page',
-                `Opened local Wagahai page, hovered ${hoverTerm}, and confirmed popup includes both dictionaries. Popup text preview: ${popupText.slice(0, 240)}`,
+                'Verify repeated hover lookup on Wagahai page',
+                `Ran 12 hover-scan iterations across selectors ${JSON.stringify(hoverTargets)} and confirmed popup includes both dictionaries each time. iterations=${JSON.stringify(hoverIterationSummaries)}`,
                 hoverLookupStart,
                 hoverLookupEnd,
             );
         } catch (hoverError) {
-            const hoverDiagnostics = await getBackendLookupDiagnostics(driver, hoverTerm);
+            const hoverDiagnostics = await getBackendLookupDiagnostics(driver, '暗記');
             const hoverLookupEnd = safePerformance.now();
             await addReportPhase(
                 report,
                 driver,
-                'Verify hover lookup on Wagahai page (failed)',
-                `Hover popup verification failed for ${hoverTerm}. backend=${JSON.stringify(hoverDiagnostics)} error=${errorMessage(hoverError)}`,
+                'Verify repeated hover lookup on Wagahai page (failed)',
+                `Hover popup verification failed during repeated run. backend=${JSON.stringify(hoverDiagnostics)} error=${errorMessage(hoverError)} completedIterations=${JSON.stringify(hoverIterationSummaries)}`,
                 hoverLookupStart,
                 hoverLookupEnd,
             );
-            fail(`Expected hover popup lookup for ${hoverTerm} to include both dictionaries. backend=${JSON.stringify(hoverDiagnostics)} error=${errorMessage(hoverError)}`);
+            fail(`Expected repeated hover popup lookups to include both dictionaries. backend=${JSON.stringify(hoverDiagnostics)} error=${errorMessage(hoverError)} completedIterations=${JSON.stringify(hoverIterationSummaries)}`);
         }
 
         report.status = 'success';

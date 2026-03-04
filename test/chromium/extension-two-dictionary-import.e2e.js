@@ -1599,6 +1599,71 @@ async function searchTermAndGetDictionaryHitCounts(page, term, expectedDictionar
     return lastResult;
 }
 
+async function waitForVisiblePopupFrameHandle(page, timeoutMs = 6000) {
+    const deadline = safePerformance.now() + timeoutMs;
+    while (safePerformance.now() < deadline) {
+        const frameHandles = await page.$$('iframe.yomitan-popup');
+        for (const frameHandle of frameHandles) {
+            const box = await frameHandle.boundingBox();
+            if (box !== null && box.width > 0 && box.height > 0) {
+                return frameHandle;
+            }
+        }
+        await page.waitForTimeout(80);
+    }
+    return null;
+}
+
+async function hoverLookupOnWagahai(page, targetSelector) {
+    const target = page.locator(targetSelector).first();
+    await target.waitFor({state: 'visible', timeout: 10000});
+    await target.scrollIntoViewIfNeeded();
+    await page.bringToFront();
+    await page.locator('body').click({position: {x: 12, y: 12}});
+    const box = await target.boundingBox();
+    if (box === null) {
+        throw new Error(`Unable to resolve bounding box for selector ${targetSelector}`);
+    }
+    const hoverX = box.x + Math.max(2, Math.min(10, box.width * 0.25));
+    const hoverY = box.y + Math.max(2, Math.min(12, box.height * 0.5));
+    const resetX = Math.max(2, hoverX - 120);
+    const modifierCandidates = ['Shift', 'Alt', 'Control', null];
+    for (const modifier of modifierCandidates) {
+        if (modifier !== null) {
+            await page.keyboard.down(modifier);
+        }
+        try {
+            for (let attempt = 0; attempt < 3; ++attempt) {
+                await page.mouse.move(resetX, hoverY, {steps: 6});
+                await page.waitForTimeout(35);
+                await page.mouse.move(hoverX, hoverY, {steps: 16});
+                const popupFrameHandle = await waitForVisiblePopupFrameHandle(page, 3000);
+                if (popupFrameHandle === null) {
+                    continue;
+                }
+                const popupFrame = await popupFrameHandle.contentFrame();
+                if (popupFrame === null) {
+                    continue;
+                }
+                await popupFrame.waitForSelector('#dictionary-entries, #no-results, #no-dictionaries', {timeout: 5000});
+                const popupText = (await popupFrame.locator('body').textContent()) ?? '';
+                if (popupText.trim().length === 0) {
+                    continue;
+                }
+                return {
+                    popupText,
+                    usedModifier: modifier,
+                };
+            }
+        } finally {
+            if (modifier !== null) {
+                await page.keyboard.up(modifier);
+            }
+        }
+    }
+    throw new Error(`Hover scan did not produce a visible popup for selector ${targetSelector}`);
+}
+
 async function loadDictionaryProbeTermsFromArchive(zipPath, maxTerms = 80) {
     const maxTermsSafe = Number.isFinite(maxTerms) ? Math.max(8, Math.trunc(maxTerms)) : 80;
     /** @type {string[]} */
@@ -2355,6 +2420,87 @@ async function main() {
                 safePerformance.now(),
                 safePerformance.now(),
                 null,
+                processSampler,
+            );
+
+            const scanningStressStart = safePerformance.now();
+            let scanningStressProfile = null;
+            let scanningStressError = '';
+            let scanningStressResult = null;
+            let scanningStressSkippedReason = '';
+            try {
+                scanningStressProfile = await runPhaseProfile(cdpSession, async () => {
+                    if (localServer === null) {
+                        throw new Error('Local E2E server is unavailable for scanning stress test');
+                    }
+                    await page.goto(`${localServer.baseUrl}/wagahai-neko.html`);
+                    const scanTargets = [
+                        '#target-word',
+                        '#target-cat',
+                        '#target-name',
+                        '#target-kotoba',
+                        '#target-born',
+                        '#target-mitou',
+                    ];
+                    const iterations = [];
+                    for (let i = 0; i < 12; ++i) {
+                        const selector = scanTargets[i % scanTargets.length];
+                        const iterationStart = safePerformance.now();
+                        const {popupText, usedModifier} = await hoverLookupOnWagahai(page, selector);
+                        const iterationEnd = safePerformance.now();
+                        const hasDictionaryResult = /jmdict|jitendex/i.test(popupText);
+                        iterations.push({
+                            iteration: i + 1,
+                            selector,
+                            usedModifier,
+                            durationMs: Math.max(0, iterationEnd - iterationStart),
+                            hasDictionaryResult,
+                            popupTextPreview: popupText.replaceAll(/\s+/g, ' ').trim().slice(0, 180),
+                        });
+                        if (!hasDictionaryResult) {
+                            throw new Error(`Scan iteration ${String(i + 1)} (${selector}) produced popup without dictionary result`);
+                        }
+                        await page.mouse.move(8, 8, {steps: 4});
+                        await page.waitForTimeout(80);
+                    }
+                    return {
+                        iterationCount: iterations.length,
+                        iterations,
+                    };
+                });
+                scanningStressResult = scanningStressProfile.result;
+            } catch (e) {
+                scanningStressError = errorMessage(e);
+                const canSkipVisibilityFailure = (
+                    !strictUnsupportedRuntime &&
+                    launchModeLabel === 'headed-hidden-fallback' &&
+                    /did not produce a visible popup/i.test(scanningStressError)
+                );
+                if (canSkipVisibilityFailure) {
+                    scanningStressSkippedReason =
+                        'Skipping hover-scanning verification in headed-hidden-fallback mode; popup visibility is unreliable in this local runtime.';
+                    appendLog(report, 'warning', `${scanningStressSkippedReason} error=${scanningStressError}`);
+                    console.warn(`${e2eLogTag} warning: ${scanningStressSkippedReason}`);
+                } else {
+                    verificationErrors.push(`Repeated hover scanning became unresponsive: ${scanningStressError}`);
+                }
+            }
+            const scanningStressEnd = safePerformance.now();
+            const scanningStressDetails = scanningStressSkippedReason.length > 0 ?
+                `${scanningStressSkippedReason} error=${scanningStressError} result=${JSON.stringify(scanningStressResult)}` :
+                (
+                    scanningStressError.length > 0 ?
+                        `Hover scanning stress failed: ${scanningStressError} result=${JSON.stringify(scanningStressResult)}` :
+                        `Ran repeated hover scanning on local Wagahai fixture and observed dictionary popup results for all iterations: ${JSON.stringify(scanningStressResult)}`
+                );
+            await addReportPhase(
+                report,
+                page,
+                'Verify repeated hover scanning remains responsive',
+                scanningStressDetails,
+                scanningStressStart,
+                scanningStressEnd,
+                scanningStressProfile,
                 processSampler,
             );
         }
