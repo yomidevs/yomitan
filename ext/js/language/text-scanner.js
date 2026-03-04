@@ -92,7 +92,7 @@ export class TextScanner extends EventDispatcher {
         /** @type {boolean} */
         this._pendingLookup = false;
         /** @type {number} */
-        this._lookupTimeoutMs = 10_000;
+        this._lookupTimeoutMs = 3_000;
         /** @type {number} */
         this._lookupSequence = 0;
         /** @type {?number} */
