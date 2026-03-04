@@ -21,7 +21,7 @@ import {isObjectNotArray} from '../core/object-utilities.js';
 import {generateId} from '../core/utilities.js';
 
 const DISPLAY_HISTORY_MAX_ENTRIES = 32;
-const DISPLAY_HISTORY_MAX_CONTENT_ENTRIES = 6;
+const DISPLAY_HISTORY_MAX_CONTENT_ENTRIES = 2;
 
 /**
  * @augments EventDispatcher<import('display-history').Events>

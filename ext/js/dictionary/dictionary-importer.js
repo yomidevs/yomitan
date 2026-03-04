@@ -74,6 +74,16 @@ export class DictionaryImporter {
         this._jsonQuotedStringCache = new Map();
         /** @type {number} */
         this._progressMinIntervalMs = 1000;
+        /** @type {boolean} */
+        this._adaptiveTermBulkAddBatchSize = false;
+        /** @type {boolean} */
+        this._streamParseWritePipeline = false;
+        /** @type {boolean} */
+        this._reuseTermImportChunkBuffers = false;
+        /** @type {boolean} */
+        this._glossaryMediaFastScan = false;
+        /** @type {number} */
+        this._streamParseWritePipelineMaxInFlight = 3;
     }
 
     /**
@@ -99,9 +109,18 @@ export class DictionaryImporter {
         this._skipMediaImport = details.skipMediaImport === true;
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
         this._debugImportLogging = details.debugImportLogging === true;
+        this._adaptiveTermBulkAddBatchSize = details.adaptiveTermBulkAddBatchSize === true;
+        this._streamParseWritePipeline = details.streamParseWritePipeline === true;
+        this._reuseTermImportChunkBuffers = details.reuseTermImportChunkBuffers === true;
+        this._glossaryMediaFastScan = details.glossaryMediaFastScan === true;
+        const retryBeginImmediateTransaction = details.retryBeginImmediateTransaction === true;
         this._pendingImageMediaByPath.clear();
         this._imageMetadataByPath.clear();
         this._jsonQuotedStringCache.clear();
+        dictionaryDatabase.setImportOptimizationFlags({
+            adaptiveTermBulkAddBatchSize: this._adaptiveTermBulkAddBatchSize,
+            retryBeginImmediateTransaction,
+        });
         const tImportStart = Date.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
         const phaseTimings = [];
@@ -340,6 +359,11 @@ export class DictionaryImporter {
                             if (requirementsChunk !== null) {
                                 requirementsChunk.length = 0;
                             }
+                        },
+                        {
+                            enableParseWritePipeline: this._streamParseWritePipeline,
+                            enableChunkBufferReuse: this._reuseTermImportChunkBuffers,
+                            maxInFlightChunks: this._streamParseWritePipelineMaxInFlight,
                         },
                     );
                     streamedImportCompleted = true;
@@ -1404,99 +1428,195 @@ export class DictionaryImporter {
      * @param {boolean} useMediaPipeline
      * @param {boolean} enableTermEntryContentDedup
      * @param {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null) => Promise<void>|void} [onChunk]
+     * @param {{enableParseWritePipeline?: boolean, enableChunkBufferReuse?: boolean, maxInFlightChunks?: number}|null} [streamingOptions]
      * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
      */
-    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, useMediaPipeline, enableTermEntryContentDedup, onChunk = void 0) {
+    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, useMediaPipeline, enableTermEntryContentDedup, onChunk = void 0, streamingOptions = null) {
         const bytes = await this._getData(termFile, new Uint8ArrayWriter());
         const streamToChunkHandler = typeof onChunk === 'function';
+        const enableParseWritePipeline = (
+            streamToChunkHandler &&
+            typeof streamingOptions === 'object' &&
+            streamingOptions !== null &&
+            streamingOptions.enableParseWritePipeline === true
+        );
+        const enableChunkBufferReuse = (
+            streamToChunkHandler &&
+            typeof streamingOptions === 'object' &&
+            streamingOptions !== null &&
+            streamingOptions.enableChunkBufferReuse === true
+        );
+        const maxInFlightChunksRaw = (
+            typeof streamingOptions === 'object' &&
+            streamingOptions !== null &&
+            Number.isFinite(streamingOptions.maxInFlightChunks) ?
+                Math.trunc(/** @type {number} */ (streamingOptions.maxInFlightChunks)) :
+                3
+        );
+        const maxInFlightChunks = Math.max(1, Math.min(8, maxInFlightChunksRaw));
+        /** @type {Promise<void>} */
+        let chunkWriteTail = Promise.resolve();
+        /** @type {Promise<void>[]} */
+        const inFlightChunkWrites = [];
+        /** @type {import('dictionary-database').DatabaseTermEntry[][]} */
+        const termListChunkPool = [];
+        /** @type {import('dictionary-importer').ImportRequirement[][]} */
+        const requirementsChunkPool = [];
+        /** @type {Error|null} */
+        let chunkWriteError = null;
         /** @type {import('dictionary-importer').ImportRequirement[]|null} */
         const requirements = (useMediaPipeline && !streamToChunkHandler) ? [] : null;
         /** @type {import('dictionary-database').DatabaseTermEntry[]} */
         const termList = [];
-        await parseTermBankWithWasmChunks(
-            bytes,
-            version,
-            async (parsedRows) => {
-                /** @type {import('dictionary-importer').ImportRequirement[]|null} */
-                const requirementsForChunk = useMediaPipeline ? [] : null;
-                /** @type {import('dictionary-database').DatabaseTermEntry[]} */
-                const termListChunk = [];
-                termListChunk.length = parsedRows.length;
-                for (let i = 0, ii = parsedRows.length; i < ii; ++i) {
-                    const row = parsedRows[i];
-                    const expression = row.expression;
-                    const reading = row.reading.length > 0 ? row.reading : expression;
-                    /** @type {import('dictionary-database').DatabaseTermEntry} */
-                    const entry = {
-                        expression,
-                        reading,
-                        definitionTags: row.definitionTags,
-                        rules: row.rules,
-                        score: row.score,
-                        glossary: [],
-                        termTags: row.termTags,
-                        dictionary: dictionaryTitle,
-                    };
-                    if (requirementsForChunk === null) {
-                        entry.glossaryJson = row.glossaryJson;
-                    } else {
-                        const skipGlossaryParse = !this._glossaryJsonLikelyContainsMedia(row.glossaryJson);
-                        if (skipGlossaryParse) {
+        try {
+            await parseTermBankWithWasmChunks(
+                bytes,
+                version,
+                async (parsedRows) => {
+                    if (chunkWriteError !== null) {
+                        throw chunkWriteError;
+                    }
+                    /** @type {import('dictionary-importer').ImportRequirement[]|null} */
+                    const requirementsForChunk = useMediaPipeline ?
+                        (
+                            enableChunkBufferReuse && requirementsChunkPool.length > 0 ?
+                                /** @type {import('dictionary-importer').ImportRequirement[]} */ (requirementsChunkPool.pop()) :
+                                []
+                        ) :
+                        null;
+                    if (requirementsForChunk !== null) {
+                        requirementsForChunk.length = 0;
+                    }
+                    /** @type {import('dictionary-database').DatabaseTermEntry[]} */
+                    const termListChunk = (
+                        enableChunkBufferReuse && termListChunkPool.length > 0 ?
+                            /** @type {import('dictionary-database').DatabaseTermEntry[]} */ (termListChunkPool.pop()) :
+                            []
+                    );
+                    termListChunk.length = parsedRows.length;
+                    for (let i = 0, ii = parsedRows.length; i < ii; ++i) {
+                        const row = parsedRows[i];
+                        const expression = row.expression;
+                        const reading = row.reading.length > 0 ? row.reading : expression;
+                        /** @type {import('dictionary-database').DatabaseTermEntry} */
+                        const entry = {
+                            expression,
+                            reading,
+                            definitionTags: row.definitionTags,
+                            rules: row.rules,
+                            score: row.score,
+                            glossary: [],
+                            termTags: row.termTags,
+                            dictionary: dictionaryTitle,
+                        };
+                        if (requirementsForChunk === null) {
                             entry.glossaryJson = row.glossaryJson;
-                            if (
-                                enableTermEntryContentDedup &&
-                                typeof row.termEntryContentHash === 'string' &&
-                                row.termEntryContentBytes instanceof Uint8Array
-                            ) {
-                                entry.termEntryContentHash = row.termEntryContentHash;
-                                entry.termEntryContentBytes = row.termEntryContentBytes;
+                        } else {
+                            const skipGlossaryParse = !this._glossaryJsonLikelyContainsMedia(row.glossaryJson);
+                            if (skipGlossaryParse) {
+                                entry.glossaryJson = row.glossaryJson;
+                                if (
+                                    enableTermEntryContentDedup &&
+                                    typeof row.termEntryContentHash === 'string' &&
+                                    row.termEntryContentBytes instanceof Uint8Array
+                                ) {
+                                    entry.termEntryContentHash = row.termEntryContentHash;
+                                    entry.termEntryContentBytes = row.termEntryContentBytes;
+                                }
+                            } else {
+                                const glossaryList = this._parseGlossaryJsonFromFastRow(row.glossaryJson, termFile.filename);
+                                for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
+                                    const glossary = glossaryList[j];
+                                    if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
+                                    glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirementsForChunk);
+                                }
+                                entry.glossary = glossaryList;
+                            }
+                        }
+                        if (typeof row.sequence === 'number') {
+                            entry.sequence = row.sequence;
+                        }
+                        if (prefixWildcardsSupported) {
+                            entry.expressionReverse = stringReverse(entry.expression);
+                            entry.readingReverse = stringReverse(entry.reading);
+                        }
+                        if (
+                            requirementsForChunk === null &&
+                            enableTermEntryContentDedup &&
+                            typeof row.termEntryContentHash === 'string' &&
+                            row.termEntryContentBytes instanceof Uint8Array
+                        ) {
+                            entry.termEntryContentHash = row.termEntryContentHash;
+                            entry.termEntryContentBytes = row.termEntryContentBytes;
+                        } else if (requirementsForChunk === null) {
+                            this._prepareTermEntrySerialization(entry, enableTermEntryContentDedup);
+                        }
+                        termListChunk[i] = entry;
+                    }
+
+                    if (streamToChunkHandler) {
+                        if (!enableParseWritePipeline) {
+                            await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null) => Promise<void>|void} */ (onChunk)(
+                                termListChunk,
+                                requirementsForChunk,
+                            );
+                            if (enableChunkBufferReuse) {
+                                termListChunk.length = 0;
+                                termListChunkPool.push(termListChunk);
+                                if (requirementsForChunk !== null) {
+                                    requirementsForChunk.length = 0;
+                                    requirementsChunkPool.push(requirementsForChunk);
+                                }
                             }
                         } else {
-                            const glossaryList = this._parseGlossaryJsonFromFastRow(row.glossaryJson, termFile.filename);
-                            for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
-                                const glossary = glossaryList[j];
-                                if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
-                                glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirementsForChunk);
+                            const scheduledWrite = chunkWriteTail.then(async () => {
+                                await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null) => Promise<void>|void} */ (onChunk)(
+                                    termListChunk,
+                                    requirementsForChunk,
+                                );
+                                if (enableChunkBufferReuse) {
+                                    termListChunk.length = 0;
+                                    termListChunkPool.push(termListChunk);
+                                    if (requirementsForChunk !== null) {
+                                        requirementsForChunk.length = 0;
+                                        requirementsChunkPool.push(requirementsForChunk);
+                                    }
+                                }
+                            });
+                            chunkWriteTail = scheduledWrite.then(() => {}, (error) => {
+                                chunkWriteError = toError(error);
+                            });
+                            inFlightChunkWrites.push(scheduledWrite);
+                            if (inFlightChunkWrites.length >= maxInFlightChunks) {
+                                try {
+                                    await inFlightChunkWrites.shift();
+                                } catch (error) {
+                                    chunkWriteError = toError(error);
+                                    throw chunkWriteError;
+                                }
                             }
-                            entry.glossary = glossaryList;
+                        }
+                    } else {
+                        termList.push(...termListChunk);
+                        if (requirements !== null && requirementsForChunk !== null) {
+                            requirements.push(...requirementsForChunk);
                         }
                     }
-                    if (typeof row.sequence === 'number') {
-                        entry.sequence = row.sequence;
-                    }
-                    if (prefixWildcardsSupported) {
-                        entry.expressionReverse = stringReverse(entry.expression);
-                        entry.readingReverse = stringReverse(entry.reading);
-                    }
-                    if (
-                        requirementsForChunk === null &&
-                        enableTermEntryContentDedup &&
-                        typeof row.termEntryContentHash === 'string' &&
-                        row.termEntryContentBytes instanceof Uint8Array
-                    ) {
-                        entry.termEntryContentHash = row.termEntryContentHash;
-                        entry.termEntryContentBytes = row.termEntryContentBytes;
-                    } else if (requirementsForChunk === null) {
-                        this._prepareTermEntrySerialization(entry, enableTermEntryContentDedup);
-                    }
-                    termListChunk[i] = entry;
+                },
+                TERM_BANK_WASM_ROW_CHUNK_SIZE,
+                {copyContentBytes: false},
+            );
+            if (inFlightChunkWrites.length > 0) {
+                for (const pendingWrite of inFlightChunkWrites) {
+                    await pendingWrite;
                 }
-
-                if (streamToChunkHandler) {
-                    await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null) => Promise<void>|void} */ (onChunk)(
-                        termListChunk,
-                        requirementsForChunk,
-                    );
-                } else {
-                    termList.push(...termListChunk);
-                    if (requirements !== null && requirementsForChunk !== null) {
-                        requirements.push(...requirementsForChunk);
-                    }
-                }
-            },
-            TERM_BANK_WASM_ROW_CHUNK_SIZE,
-            {copyContentBytes: false},
-        );
+            }
+        } catch (error) {
+            throw toError(error);
+        }
+        if (chunkWriteError !== null) {
+            throw toError(chunkWriteError);
+        }
         return {termList, requirements};
     }
 
@@ -1505,7 +1625,20 @@ export class DictionaryImporter {
      * @returns {boolean}
      */
     _glossaryJsonLikelyContainsMedia(glossaryJson) {
+        if (this._glossaryMediaFastScan) {
+            return this._glossaryJsonLikelyContainsMediaFast(glossaryJson);
+        }
         return /"type"\s*:\s*"image"|"tag"\s*:\s*"img"/.test(glossaryJson);
+    }
+
+    /**
+     * @param {string} glossaryJson
+     * @returns {boolean}
+     */
+    _glossaryJsonLikelyContainsMediaFast(glossaryJson) {
+        const hasTypeImage = glossaryJson.includes('"type"') && glossaryJson.includes('"image"');
+        const hasTagImg = glossaryJson.includes('"tag"') && glossaryJson.includes('"img"');
+        return hasTypeImage || hasTagImg;
     }
 
     /**

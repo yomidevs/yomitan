@@ -16,6 +16,9 @@
  */
 
 const FILE_NAME = 'manabitan-term-content.bin';
+const READ_PAGE_SIZE_BYTES = 64 * 1024;
+const DEFAULT_READ_PAGE_CACHE_MAX_PAGES = 128;
+const LOW_MEMORY_READ_PAGE_CACHE_MAX_PAGES = 48;
 
 export class TermContentOpfsStore {
     constructor() {
@@ -39,6 +42,12 @@ export class TermContentOpfsStore {
         this._importSessionActive = false;
         /** @type {boolean} */
         this._loadedForRead = false;
+        /** @type {File|null} */
+        this._readFile = null;
+        /** @type {Map<number, Uint8Array>} */
+        this._readPageCache = new Map();
+        /** @type {number} */
+        this._readPageCacheMaxPages = this._computeReadPageCacheMaxPages();
     }
 
     /**
@@ -55,7 +64,7 @@ export class TermContentOpfsStore {
         this._length = file.size;
         this._chunks = [];
         this._chunkOffsets = [];
-        this._loadedForRead = false;
+        this._invalidateReadState();
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
         this._importSessionActive = false;
@@ -102,6 +111,7 @@ export class TermContentOpfsStore {
             this._pendingWriteBytes = 0;
             this._pendingWriteChunks = [];
             this._importSessionActive = false;
+            this._invalidateReadState();
             return;
         }
         const writable = await this._fileHandle.createWritable();
@@ -110,6 +120,7 @@ export class TermContentOpfsStore {
         this._chunks = [];
         this._chunkOffsets = [];
         this._length = 0;
+        this._invalidateReadState();
         this._loadedForRead = true;
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
@@ -129,7 +140,7 @@ export class TermContentOpfsStore {
             const length = chunk.byteLength;
             spans.push({offset: nextOffset, length});
             if (length > 0) {
-                if (!this._importSessionActive || this._loadedForRead || this._fileHandle === null) {
+                if (this._fileHandle === null) {
                     this._chunkOffsets.push(nextOffset);
                     this._chunks.push(chunk);
                 }
@@ -144,15 +155,12 @@ export class TermContentOpfsStore {
                 totalBytes += chunk.byteLength;
             }
             if (totalBytes > 0) {
-                const merged = new Uint8Array(totalBytes);
-                let mergeOffset = 0;
+                this._invalidateReadState();
                 for (const chunk of chunks) {
                     if (chunk.byteLength <= 0) { continue; }
-                    merged.set(chunk, mergeOffset);
-                    mergeOffset += chunk.byteLength;
+                    this._pendingWriteChunks.push(chunk);
+                    this._pendingWriteBytes += chunk.byteLength;
                 }
-                this._pendingWriteChunks.push(merged);
-                this._pendingWriteBytes += merged.byteLength;
                 if (!this._importSessionActive || this._pendingWriteBytes >= this._flushThresholdBytes) {
                     await this._flushPendingWrites();
                     if (!this._importSessionActive) {
@@ -181,11 +189,9 @@ export class TermContentOpfsStore {
             return;
         }
         const file = await this._fileHandle.getFile();
-        const content = await file.arrayBuffer();
-        const bytes = new Uint8Array(content);
-        this._chunks = bytes.byteLength > 0 ? [bytes] : [];
-        this._chunkOffsets = bytes.byteLength > 0 ? [0] : [];
-        this._length = bytes.byteLength;
+        this._length = file.size;
+        this._readFile = file;
+        this._readPageCache.clear();
         this._loadedForRead = true;
     }
 
@@ -201,16 +207,10 @@ export class TermContentOpfsStore {
             const seekOffset = this._length - this._pendingWriteBytes;
             await this._writable.seek(Math.max(0, seekOffset));
         }
-        let merged = this._pendingWriteChunks[0];
-        if (this._pendingWriteChunks.length > 1) {
-            merged = new Uint8Array(this._pendingWriteBytes);
-            let cursor = 0;
-            for (const chunk of this._pendingWriteChunks) {
-                merged.set(chunk, cursor);
-                cursor += chunk.byteLength;
-            }
+        for (const chunk of this._pendingWriteChunks) {
+            if (chunk.byteLength <= 0) { continue; }
+            await this._writable.write(chunk);
         }
-        await this._writable.write(merged);
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
     }
@@ -232,13 +232,30 @@ export class TermContentOpfsStore {
     /**
      * @param {number} offset
      * @param {number} length
-     * @returns {Uint8Array|null}
+     * @returns {Promise<Uint8Array|null>}
      */
-    readSlice(offset, length) {
+    async readSlice(offset, length) {
         if (offset < 0 || length <= 0) { return null; }
         const end = offset + length;
         if (end > this._length) { return null; }
+        if (this._fileHandle === null) {
+            if (this._chunks.length === 0) { return null; }
+            return this._readSliceFromMemory(offset, length);
+        }
+        if (!this._loadedForRead) {
+            await this.ensureLoadedForRead();
+        }
+        return await this._readSliceFromFile(offset, length);
+    }
+
+    /**
+     * @param {number} offset
+     * @param {number} length
+     * @returns {Uint8Array|null}
+     */
+    _readSliceFromMemory(offset, length) {
         if (this._chunks.length === 0) { return null; }
+        const end = offset + length;
 
         // Fast path for single chunk.
         if (this._chunks.length === 1) {
@@ -275,6 +292,85 @@ export class TermContentOpfsStore {
 
     /**
      * @param {number} offset
+     * @param {number} length
+     * @returns {Promise<Uint8Array|null>}
+     */
+    async _readSliceFromFile(offset, length) {
+        if (this._readFile === null) {
+            return null;
+        }
+        const output = new Uint8Array(length);
+        const pageSize = READ_PAGE_SIZE_BYTES;
+        const startPage = Math.floor(offset / pageSize);
+        const endPage = Math.floor((offset + length - 1) / pageSize);
+        let outputOffset = 0;
+        for (let pageIndex = startPage; pageIndex <= endPage; ++pageIndex) {
+            const page = await this._getReadPage(pageIndex);
+            if (page === null) {
+                return null;
+            }
+            const pageStartOffset = pageIndex * pageSize;
+            const rangeStart = Math.max(offset, pageStartOffset);
+            const rangeEnd = Math.min(offset + length, pageStartOffset + page.byteLength);
+            const copyLength = rangeEnd - rangeStart;
+            if (copyLength <= 0) { continue; }
+            const pageStart = rangeStart - pageStartOffset;
+            output.set(page.subarray(pageStart, pageStart + copyLength), outputOffset);
+            outputOffset += copyLength;
+        }
+        return outputOffset === length ? output : null;
+    }
+
+    /**
+     * @param {number} pageIndex
+     * @returns {Promise<Uint8Array|null>}
+     */
+    async _getReadPage(pageIndex) {
+        const cached = this._readPageCache.get(pageIndex);
+        if (typeof cached !== 'undefined') {
+            this._touchReadPage(pageIndex, cached);
+            return cached;
+        }
+        const file = this._readFile;
+        if (file === null) {
+            return null;
+        }
+        const pageOffset = pageIndex * READ_PAGE_SIZE_BYTES;
+        if (pageOffset >= this._length) {
+            return null;
+        }
+        const pageEnd = Math.min(this._length, pageOffset + READ_PAGE_SIZE_BYTES);
+        const bytes = new Uint8Array(await file.slice(pageOffset, pageEnd).arrayBuffer());
+        this._setReadPage(pageIndex, bytes);
+        return bytes;
+    }
+
+    /**
+     * @param {number} pageIndex
+     * @param {Uint8Array} page
+     */
+    _touchReadPage(pageIndex, page) {
+        this._readPageCache.delete(pageIndex);
+        this._readPageCache.set(pageIndex, page);
+    }
+
+    /**
+     * @param {number} pageIndex
+     * @param {Uint8Array} page
+     */
+    _setReadPage(pageIndex, page) {
+        this._readPageCache.set(pageIndex, page);
+        while (this._readPageCache.size > this._readPageCacheMaxPages) {
+            const first = this._readPageCache.keys().next();
+            if (first.done) {
+                break;
+            }
+            this._readPageCache.delete(first.value);
+        }
+    }
+
+    /**
+     * @param {number} offset
      * @returns {number}
      */
     _findChunkIndex(offset) {
@@ -293,5 +389,29 @@ export class TermContentOpfsStore {
             }
         }
         return Math.max(0, Math.min(low, this._chunks.length - 1));
+    }
+
+    /** */
+    _invalidateReadState() {
+        this._loadedForRead = false;
+        this._readFile = null;
+        this._readPageCache.clear();
+    }
+
+    /**
+     * @returns {number}
+     */
+    _computeReadPageCacheMaxPages() {
+        /** @type {number|null} */
+        let memoryGiB = null;
+        try {
+            const rawValue = /** @type {unknown} */ (Reflect.get(globalThis.navigator ?? {}, 'deviceMemory'));
+            if (typeof rawValue === 'number' && Number.isFinite(rawValue) && rawValue > 0) {
+                memoryGiB = rawValue;
+            }
+        } catch (_) {
+            // NOP
+        }
+        return memoryGiB !== null && memoryGiB <= 4 ? LOW_MEMORY_READ_PAGE_CACHE_MAX_PAGES : DEFAULT_READ_PAGE_CACHE_MAX_PAGES;
     }
 }

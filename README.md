@@ -61,6 +61,20 @@ Install from the latest GitHub release page:
 
 ### [Download for Chrome, Firefox, Edge](https://github.com/ManabiIO/manabitan/releases/latest)
 
+## Roadmap
+
+### Priority (unsorted)
+
+- [ ] Auto-update
+- [ ] Ereader performance
+- [ ] Improve onboarding for easier default installation
+
+### Backlog
+
+- [ ] Full-text search option per dictionary for searching glosses
+- [ ] Voice input for search
+- [ ] Default TTS
+
 ## Contributing
 
 🚀 **Dip your toes into contributing by looking at issues with the label [good first issue](https://github.com/ManabiIO/manabitan/issues?q=is%3Aissue+is%3Aopen+label%3A%22gоοd+fіrst+іssսe%22).**

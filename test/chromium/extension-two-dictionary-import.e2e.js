@@ -42,6 +42,35 @@ const browserFlavorRaw = (process.env.MANABITAN_CHROMIUM_BROWSER ?? 'chromium').
 const browserFlavor = (browserFlavorRaw === 'edge' || browserFlavorRaw === 'msedge') ? 'edge' : 'chromium';
 const e2eLogTag = `[${browserFlavor}-e2e]`;
 const browserChannel = browserFlavor === 'edge' ? 'msedge' : null;
+const expectedLookupDictionaries = ['Jitendex', 'JMdict'];
+const overlapLookupCandidates = [
+    '日本',
+    '名前',
+    '学生',
+    '食べる',
+    '見る',
+    '行く',
+    '言う',
+    '猫',
+    '水',
+    '暗記',
+    '人',
+    '日',
+    '月',
+    '本',
+    '大',
+    '小',
+    'する',
+    'ある',
+    'いる',
+    '家',
+    '言葉',
+    '学校',
+    '先生',
+    '時間',
+    '今日',
+];
+const lookupWords = ['暗記', '名前', '日本', '学生', '食べる', '見る', '言う', '行く', '水', '猫'];
 
 /**
  * @returns {string | null}
@@ -853,6 +882,44 @@ async function evalSendMessage(page, expression, arg = null) {
             });
             return {ok: true, installedTitles, profileEnabledDictionaryNames};
         }
+        if (expression === 'setEnabledDictionaries') {
+            const targetNames = (Array.isArray(arg) ? arg : [])
+                .map((value) => String(value || '').trim())
+                .filter((value) => value.length > 0);
+            const optionsFull = await send('optionsGetFull', undefined);
+            const nextOptions = structuredClone(optionsFull);
+            for (const profile of nextOptions.profiles || []) {
+                if (!(profile && profile.options && Array.isArray(profile.options.dictionaries))) {
+                    continue;
+                }
+                for (const row of profile.options.dictionaries) {
+                    const name = String(row?.name || '').trim();
+                    const enabled = targetNames.some((targetName) => (
+                        name === targetName ||
+                        name.startsWith(`${targetName} `) ||
+                        name.startsWith(`${targetName}.`) ||
+                        name.includes(targetName)
+                    ));
+                    if (row && typeof row === 'object') {
+                        row.enabled = enabled;
+                    }
+                }
+            }
+            await send('setAllSettings', {value: nextOptions, source: 'chromium-e2e-set-enabled-dictionaries'});
+            const updatedOptions = await send('optionsGetFull', undefined);
+            const profileEnabledDictionaryNames = (updatedOptions?.profiles || []).map((profile) => {
+                const names = [];
+                for (const row of profile?.options?.dictionaries || []) {
+                    if (row?.enabled !== true) { continue; }
+                    const name = String(row?.name || '').trim();
+                    if (name.length > 0) {
+                        names.push(name);
+                    }
+                }
+                return names;
+            });
+            return {ok: true, targetNames, profileEnabledDictionaryNames};
+        }
         if (expression === 'backendProbe') {
             const dictionaryInfo = await send('getDictionaryInfo', undefined);
             return {
@@ -1010,6 +1077,52 @@ async function waitForBackendDictionaryReady(page, expectedDictionaryNames, term
         await page.waitForTimeout(500);
     }
     return {ok: false, diagnostics: lastDiagnostics};
+}
+
+async function findOverlapLookupTerm(page, expectedDictionaryNames, candidates) {
+    /** @type {Array<{term: string, termResultCount: number, termDictionaryNames: string[]}>} */
+    const probes = [];
+    const normalizedCandidates = [...new Set(
+        (Array.isArray(candidates) ? candidates : [])
+            .map((value) => String(value || '').trim())
+            .filter((value) => value.length > 0),
+    )];
+    for (const term of normalizedCandidates) {
+        let diagnostics = null;
+        try {
+            diagnostics = await evalSendMessage(page, 'backendDiagnostics', term);
+        } catch (_) {
+            continue;
+        }
+        const termDictionaryNames = (Array.isArray(diagnostics?.termDictionaryNames) ? diagnostics.termDictionaryNames : [])
+            .map((value) => String(value || '').trim())
+            .filter((value) => value.length > 0);
+        probes.push({
+            term,
+            termResultCount: Number(diagnostics?.termResultCount || 0),
+            termDictionaryNames: [...new Set(termDictionaryNames)],
+        });
+        const hasAllExpected = expectedDictionaryNames.every((expectedName) => (
+            termDictionaryNames.some((observedName) => matchesDictionaryName(observedName, expectedName))
+        ));
+        if (hasAllExpected) {
+            return {ok: true, term, diagnostics, probes};
+        }
+    }
+    return {
+        ok: false,
+        term: normalizedCandidates[0] ?? '暗記',
+        diagnostics: null,
+        probes,
+    };
+}
+
+async function setEnabledDictionaries(page, dictionaryNames) {
+    const result = await evalSendMessage(page, 'setEnabledDictionaries', dictionaryNames);
+    if (!(result && result.ok === true)) {
+        throw new Error(`Unable to set enabled dictionaries: ${JSON.stringify(result)}`);
+    }
+    return result;
 }
 
 async function getImportProgressLabel(page) {
@@ -1429,12 +1542,21 @@ async function searchTermAndGetDictionaryHitCounts(page, term, expectedDictionar
     await page.fill('#search-textbox', term);
     await page.keyboard.press('Enter');
     const deadline = safePerformance.now() + timeoutMs;
-    let lastCounts = Object.fromEntries(expectedDictionaryNames.map((name) => [name, 0]));
+    let lastResult = {
+        expectedCounts: Object.fromEntries(expectedDictionaryNames.map((name) => [name, 0])),
+        observedCounts: {},
+        noResultsVisible: false,
+        entriesTextPreview: '',
+    };
     while (safePerformance.now() < deadline) {
-        const counts = await page.evaluate((names) => {
+        const snapshot = await page.evaluate(() => {
             const dictionaryEntries = document.querySelector('#dictionary-entries');
             if (!(dictionaryEntries instanceof HTMLElement)) {
-                return {};
+                return {
+                    observedCounts: {},
+                    noResultsVisible: false,
+                    entriesTextPreview: '',
+                };
             }
             const countMap = Object.create(null);
             const dictionaryNodes = dictionaryEntries.querySelectorAll('.definition-item[data-dictionary], .entry [data-dictionary]');
@@ -1443,23 +1565,77 @@ async function searchTermAndGetDictionaryHitCounts(page, term, expectedDictionar
                 if (dictionary.length === 0) { continue; }
                 countMap[dictionary] = (countMap[dictionary] || 0) + 1;
             }
-            const text = (dictionaryEntries.textContent || '');
-            for (const name of names) {
-                if (countMap[name]) { continue; }
-                const matchCount = text.length > 0 && name.length > 0 ? Math.max(0, text.split(name).length - 1) : 0;
-                if (matchCount > 0) {
-                    countMap[name] = matchCount;
-                }
+            const noResults = document.querySelector('#no-results');
+            const noResultsVisible = noResults instanceof HTMLElement ? !noResults.hidden : false;
+            const text = (dictionaryEntries.textContent || '').replaceAll(/\s+/g, ' ').trim();
+            return {
+                observedCounts: countMap,
+                noResultsVisible,
+                entriesTextPreview: text.slice(0, 200),
+            };
+        });
+        const observedEntries = Object.entries(snapshot?.observedCounts ?? {});
+        const expectedCounts = Object.fromEntries(expectedDictionaryNames.map((name) => [name, 0]));
+        for (const [observedNameRaw, countRaw] of observedEntries) {
+            const observedName = String(observedNameRaw || '').trim();
+            const count = Number(countRaw || 0);
+            if (!Number.isFinite(count) || count <= 0 || observedName.length === 0) { continue; }
+            for (const expectedName of expectedDictionaryNames) {
+                if (!matchesDictionaryName(observedName, expectedName)) { continue; }
+                expectedCounts[expectedName] = Number(expectedCounts[expectedName] || 0) + count;
             }
-            return countMap;
-        }, expectedDictionaryNames);
-        lastCounts = Object.fromEntries(expectedDictionaryNames.map((name) => [name, Number(counts[name] || 0)]));
-        if (expectedDictionaryNames.every((name) => (lastCounts[name] ?? 0) >= 1)) {
-            return lastCounts;
+        }
+        lastResult = {
+            expectedCounts,
+            observedCounts: snapshot?.observedCounts ?? {},
+            noResultsVisible: snapshot?.noResultsVisible === true,
+            entriesTextPreview: String(snapshot?.entriesTextPreview || ''),
+        };
+        if (expectedDictionaryNames.every((name) => (expectedCounts[name] ?? 0) >= 1)) {
+            return lastResult;
         }
         await page.waitForTimeout(250);
     }
-    return lastCounts;
+    return lastResult;
+}
+
+async function loadDictionaryProbeTermsFromArchive(zipPath, maxTerms = 80) {
+    const maxTermsSafe = Number.isFinite(maxTerms) ? Math.max(8, Math.trunc(maxTerms)) : 80;
+    /** @type {string[]} */
+    const terms = [];
+    const seen = new Set();
+    const hasJapanese = (value) => /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/u.test(value);
+    for (let bankIndex = 1; bankIndex <= 12 && terms.length < maxTermsSafe; ++bankIndex) {
+        let stdout = '';
+        try {
+            ({stdout} = await execFileAsync('unzip', ['-p', zipPath, `term_bank_${String(bankIndex)}.json`], {
+                maxBuffer: 32 * 1024 * 1024,
+            }));
+        } catch (_) {
+            continue;
+        }
+        let rows;
+        try {
+            rows = parseJson(stdout);
+        } catch (_) {
+            continue;
+        }
+        if (!Array.isArray(rows)) {
+            continue;
+        }
+        for (const row of rows) {
+            const term = String(Array.isArray(row) ? row[0] : '').trim();
+            if (term.length === 0 || term.length > 20 || !hasJapanese(term) || seen.has(term)) {
+                continue;
+            }
+            seen.add(term);
+            terms.push(term);
+            if (terms.length >= maxTermsSafe) {
+                break;
+            }
+        }
+    }
+    return terms;
 }
 
 async function ensureFreshChromeDevBuild(zipPath) {
@@ -1513,6 +1689,9 @@ async function main() {
 
         const cacheWarmupStart = safePerformance.now();
         const cachedDictionaries = await ensureRealDictionaryCache();
+        const jitendexProbeTerms = await loadDictionaryProbeTermsFromArchive(cachedDictionaries.jitendexPath, 80);
+        const jmdictProbeTerms = await loadDictionaryProbeTermsFromArchive(cachedDictionaries.jmdictPath, 80);
+        const lookupProbeCandidates = [...new Set([...overlapLookupCandidates, ...jitendexProbeTerms, ...jmdictProbeTerms])];
         localServer = await startE2ELocalServer({
             jitendexPath: cachedDictionaries.jitendexPath,
             jmdictPath: cachedDictionaries.jmdictPath,
@@ -1703,7 +1882,7 @@ async function main() {
             report,
             page,
             'Warmup real dictionary cache',
-            `Resolved and cached Jitendex/JMdict archives from recommended feed, then served locally at ${localServer.baseUrl}. quickImportBenchmarkMode=${quickImportBenchmarkMode}`,
+            `Resolved and cached Jitendex/JMdict archives from recommended feed, then served locally at ${localServer.baseUrl}. quickImportBenchmarkMode=${quickImportBenchmarkMode}. probeTerms: jitendex=${String(jitendexProbeTerms.length)} jmdict=${String(jmdictProbeTerms.length)} merged=${String(lookupProbeCandidates.length)}`,
             cacheWarmupStart,
             cacheWarmupEnd,
             null,
@@ -1857,19 +2036,93 @@ async function main() {
             enableImportedDictionariesProfile,
             processSampler,
         );
+        await setEnabledDictionaries(page, expectedLookupDictionaries);
+        const overlapProbeStart = safePerformance.now();
+        const overlapProbeProfile = await runPhaseProfile(cdpSession, async () => {
+            return await findOverlapLookupTerm(page, expectedLookupDictionaries, lookupProbeCandidates);
+        });
+        const overlapProbeEnd = safePerformance.now();
+        const hasOverlapLookupTerm = overlapProbeProfile.result && overlapProbeProfile.result.ok === true;
+        let overlapLookupTerm = String(overlapProbeProfile.result?.term || '暗記');
+        await addReportPhase(
+            report,
+            page,
+            'Discover overlap lookup term',
+            hasOverlapLookupTerm ?
+                `Selected lookup term "${overlapLookupTerm}" that resolves to ${expectedLookupDictionaries.join(' + ')}. probes=${JSON.stringify(overlapProbeProfile.result?.probes ?? [])}` :
+                `Could not find dual-dictionary overlap term; probing dictionaries in isolated mode. probes=${JSON.stringify(overlapProbeProfile.result?.probes ?? [])}`,
+            overlapProbeStart,
+            overlapProbeEnd,
+            overlapProbeProfile,
+            processSampler,
+        );
+        if (!hasOverlapLookupTerm) {
+            /** @type {string[]} */
+            const isolatedLookupUnavailable = [];
+            for (const dictionaryName of expectedLookupDictionaries) {
+                const isolatedEnableStart = safePerformance.now();
+                const isolatedEnableProfile = await runPhaseProfile(cdpSession, async () => {
+                    await setEnabledDictionaries(page, [dictionaryName]);
+                    return await findOverlapLookupTerm(page, [dictionaryName], lookupProbeCandidates);
+                });
+                const isolatedEnableEnd = safePerformance.now();
+                const isolatedResult = isolatedEnableProfile.result;
+                await addReportPhase(
+                    report,
+                    page,
+                    `Isolated lookup probe: ${dictionaryName}`,
+                    `Enabled only ${dictionaryName}; probe result=${JSON.stringify(isolatedResult ?? null)}`,
+                    isolatedEnableStart,
+                    isolatedEnableEnd,
+                    isolatedEnableProfile,
+                    processSampler,
+                );
+                if (!(isolatedResult && isolatedResult.ok === true)) {
+                    isolatedLookupUnavailable.push(dictionaryName);
+                }
+            }
+            const restoreDictionariesStart = safePerformance.now();
+            const restoreDictionariesProfile = await runPhaseProfile(cdpSession, async () => {
+                return await setEnabledDictionaries(page, expectedLookupDictionaries);
+            });
+            const restoreDictionariesEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                page,
+                'Restore dual-dictionary enablement',
+                `Restored enabled dictionaries after isolated probes: ${JSON.stringify(restoreDictionariesProfile.result ?? null)}`,
+                restoreDictionariesStart,
+                restoreDictionariesEnd,
+                restoreDictionariesProfile,
+                processSampler,
+            );
+            if (isolatedLookupUnavailable.length >= expectedLookupDictionaries.length) {
+                fail(`Unable to find lookup terms for any isolated dictionary in ${expectedLookupDictionaries.join(' + ')}. unavailable=${JSON.stringify(isolatedLookupUnavailable)}`);
+            }
+            if (isolatedLookupUnavailable.length > 0) {
+                report.logs.push(
+                    `${e2eLogTag} warning: isolated lookup probes returned no hits for ${isolatedLookupUnavailable.join(', ')}; continuing with combined-mode verification.`,
+                );
+            }
+            overlapLookupTerm = String(lookupProbeCandidates[0] || '暗記');
+        }
+        const readinessTerm = hasOverlapLookupTerm ? overlapLookupTerm : String(lookupProbeCandidates[0] || '暗記');
+
         const backendReadyStart = safePerformance.now();
         const backendReadyProfile = await runPhaseProfile(cdpSession, async () => {
-            return await waitForBackendDictionaryReady(page, ['Jitendex', 'JMdict'], '暗記', 60000);
+            return await waitForBackendDictionaryReady(page, expectedLookupDictionaries, readinessTerm, 60000, hasOverlapLookupTerm);
         });
         const backendReadyEnd = safePerformance.now();
         if (!(backendReadyProfile.result && backendReadyProfile.result.ok === true)) {
-            fail(`Backend dictionary readiness did not stabilize for Jitendex + JMdict within timeout. diagnostics=${JSON.stringify(backendReadyProfile.result?.diagnostics ?? null)}`);
+            fail(`Backend dictionary readiness did not stabilize for ${expectedLookupDictionaries.join(' + ')} within timeout using term "${readinessTerm}". diagnostics=${JSON.stringify(backendReadyProfile.result?.diagnostics ?? null)}`);
         }
         await addReportPhase(
             report,
             page,
             'Wait for backend dictionary readiness',
-            `Backend confirms loaded + lookup-visible dictionaries for 暗記: ${JSON.stringify(backendReadyProfile.result?.diagnostics ?? null)}`,
+            hasOverlapLookupTerm ?
+                `Backend confirms loaded + lookup-visible dictionaries for "${readinessTerm}": ${JSON.stringify(backendReadyProfile.result?.diagnostics ?? null)}` :
+                `Backend confirms dictionaries are loaded (lookup overlap unavailable in combined mode) for "${readinessTerm}": ${JSON.stringify(backendReadyProfile.result?.diagnostics ?? null)}`,
             backendReadyStart,
             backendReadyEnd,
             backendReadyProfile,
@@ -1966,7 +2219,6 @@ async function main() {
                 null,
                 processSampler,
             );
-            const lookupWords = ['暗記', '名前', '日本', '学生', '食べる', '見る', '言う', '行く', '水', '猫'];
             for (const word of lookupWords) {
                 const lookupChar = String([...word][0] || '').trim();
                 if (lookupChar.length === 0) { continue; }
@@ -1986,53 +2238,100 @@ async function main() {
         } else {
             const searchStart = safePerformance.now();
             let searchProfile = null;
-            let searchCounts = {Jitendex: 0, JMdict: 0};
+            let searchResult = {
+                expectedCounts: {Jitendex: 0, JMdict: 0},
+                observedCounts: {},
+                noResultsVisible: false,
+                entriesTextPreview: '',
+            };
             let searchError = '';
+            const searchVerificationTerm = hasOverlapLookupTerm ? overlapLookupTerm : readinessTerm;
             try {
                 searchProfile = await runPhaseProfile(cdpSession, async () => {
-                    return await searchTermAndGetDictionaryHitCounts(page, '暗記', ['Jitendex', 'JMdict']);
+                    return await searchTermAndGetDictionaryHitCounts(page, searchVerificationTerm, expectedLookupDictionaries);
                 });
-                searchCounts = searchProfile.result;
+                searchResult = searchProfile.result;
             } catch (e) {
                 searchError = errorMessage(e);
-                verificationErrors.push(`Search for 暗記 failed: ${searchError}`);
+                verificationErrors.push(`Search for ${searchVerificationTerm} failed: ${searchError}`);
             }
-            if (searchError.length === 0 && ((searchCounts.Jitendex ?? 0) < 1 || (searchCounts.JMdict ?? 0) < 1)) {
-                verificationErrors.push(`Expected search result counts for 暗記 from both dictionaries, saw ${JSON.stringify(searchCounts)}`);
+            if (searchError.length === 0) {
+                if (
+                    hasOverlapLookupTerm &&
+                    expectedLookupDictionaries.some((name) => (searchResult.expectedCounts?.[name] ?? 0) < 1)
+                ) {
+                    verificationErrors.push(
+                        `Expected search result counts for ${searchVerificationTerm} from both dictionaries, saw ` +
+                        `${JSON.stringify(searchResult.expectedCounts)} observed=${JSON.stringify(searchResult.observedCounts)} ` +
+                        `noResultsVisible=${String(searchResult.noResultsVisible)} preview=${JSON.stringify(searchResult.entriesTextPreview)}`,
+                    );
+                }
+                if (!hasOverlapLookupTerm) {
+                    const totalHits = expectedLookupDictionaries.reduce((sum, dictionaryName) => (
+                        sum + Number(searchResult.expectedCounts?.[dictionaryName] || 0)
+                    ), 0);
+                    if (totalHits < 1) {
+                        verificationErrors.push(
+                            `Combined-mode search for ${searchVerificationTerm} returned no recognized dictionary hits. expected=${JSON.stringify(searchResult.expectedCounts)} observed=${JSON.stringify(searchResult.observedCounts)} noResultsVisible=${String(searchResult.noResultsVisible)} preview=${JSON.stringify(searchResult.entriesTextPreview)}`,
+                        );
+                    }
+                }
             }
             const searchEnd = safePerformance.now();
+            let searchPhaseDetails = '';
+            if (searchError.length > 0) {
+                searchPhaseDetails = `Search attempt failed: ${searchError}`;
+            } else if (hasOverlapLookupTerm) {
+                searchPhaseDetails = `Searched ${searchVerificationTerm} and observed expected hit counts=${JSON.stringify(searchResult.expectedCounts)} observed=${JSON.stringify(searchResult.observedCounts)} noResultsVisible=${String(searchResult.noResultsVisible)} preview=${JSON.stringify(searchResult.entriesTextPreview)}`;
+            } else {
+                searchPhaseDetails = `Searched ${searchVerificationTerm} in combined mode (no overlap-term available); observed expected hit counts=${JSON.stringify(searchResult.expectedCounts)} observed=${JSON.stringify(searchResult.observedCounts)} noResultsVisible=${String(searchResult.noResultsVisible)} preview=${JSON.stringify(searchResult.entriesTextPreview)}`;
+            }
             await addReportPhase(
                 report,
                 page,
                 'Verify search results include both dictionaries',
-                searchError.length > 0 ?
-                    `Search attempt failed: ${searchError}` :
-                    `Searched 暗記 and observed dictionary hit counts: ${JSON.stringify(searchCounts)}`,
+                searchPhaseDetails,
                 searchStart,
                 searchEnd,
                 searchProfile,
                 processSampler,
             );
 
-            const lookupWords = ['暗記', '名前', '日本', '学生', '食べる', '見る', '言う', '行く', '水', '猫'];
+            /** @type {Record<string, number>} */
+            const aggregateLookupCounts = Object.fromEntries(expectedLookupDictionaries.map((name) => [name, 0]));
             for (const word of lookupWords) {
                 const lookupChar = String([...word][0] || '').trim();
                 if (lookupChar.length === 0) { continue; }
                 const lookupStart = safePerformance.now();
                 let lookupProfile = null;
-                let lookupCounts = {Jitendex: 0, JMdict: 0};
+                let lookupResult = {
+                    expectedCounts: {Jitendex: 0, JMdict: 0},
+                    observedCounts: {},
+                    noResultsVisible: false,
+                    entriesTextPreview: '',
+                };
                 let lookupError = '';
                 try {
                     lookupProfile = await runPhaseProfile(cdpSession, async () => {
-                        return await searchTermAndGetDictionaryHitCounts(page, lookupChar, ['Jitendex', 'JMdict'], 6000);
+                        return await searchTermAndGetDictionaryHitCounts(page, lookupChar, expectedLookupDictionaries, 6000);
                     });
-                    lookupCounts = lookupProfile.result;
+                    lookupResult = lookupProfile.result;
                 } catch (e) {
                     lookupError = errorMessage(e);
                     verificationErrors.push(`Lookup ${lookupChar} failed: ${lookupError}`);
                 }
-                if (lookupError.length === 0 && ((lookupCounts.Jitendex ?? 0) < 1 || (lookupCounts.JMdict ?? 0) < 1)) {
-                    verificationErrors.push(`Lookup ${lookupChar} missing dictionary hits: ${JSON.stringify(lookupCounts)}`);
+                if (lookupError.length === 0) {
+                    const totalHits = expectedLookupDictionaries.reduce((sum, dictionaryName) => (
+                        sum + Number(lookupResult.expectedCounts?.[dictionaryName] || 0)
+                    ), 0);
+                    if (totalHits < 1) {
+                        verificationErrors.push(
+                            `Lookup ${lookupChar} returned no recognized dictionary hits. expected=${JSON.stringify(lookupResult.expectedCounts)} observed=${JSON.stringify(lookupResult.observedCounts)} noResultsVisible=${String(lookupResult.noResultsVisible)} preview=${JSON.stringify(lookupResult.entriesTextPreview)}`,
+                        );
+                    }
+                    for (const dictionaryName of expectedLookupDictionaries) {
+                        aggregateLookupCounts[dictionaryName] = Number(aggregateLookupCounts[dictionaryName] || 0) + Number(lookupResult.expectedCounts?.[dictionaryName] || 0);
+                    }
                 }
                 const lookupEnd = safePerformance.now();
                 await addReportPhase(
@@ -2041,13 +2340,23 @@ async function main() {
                     `Profile lookup: ${lookupChar}`,
                     lookupError.length > 0 ?
                         `lookupChar=${lookupChar} failed: ${lookupError}` :
-                        `lookupChar=${lookupChar} counts=${JSON.stringify(lookupCounts)}`,
+                        `lookupChar=${lookupChar} expectedCounts=${JSON.stringify(lookupResult.expectedCounts)} observed=${JSON.stringify(lookupResult.observedCounts)} noResultsVisible=${String(lookupResult.noResultsVisible)} preview=${JSON.stringify(lookupResult.entriesTextPreview)}`,
                     lookupStart,
                     lookupEnd,
                     lookupProfile,
                     processSampler,
                 );
             }
+            await addReportPhase(
+                report,
+                page,
+                'Lookup aggregate coverage',
+                `Aggregate recognized dictionary hits across lookup profiling words=${JSON.stringify(lookupWords)} counts=${JSON.stringify(aggregateLookupCounts)}`,
+                safePerformance.now(),
+                safePerformance.now(),
+                null,
+                processSampler,
+            );
         }
 
         const reloadSettingsForDeleteStart = safePerformance.now();

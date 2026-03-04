@@ -61,6 +61,11 @@ export type ImportDetails = {
     skipMediaImport?: boolean;
     mediaResolutionConcurrency?: number;
     debugImportLogging?: boolean;
+    adaptiveTermBulkAddBatchSize?: boolean;
+    streamParseWritePipeline?: boolean;
+    reuseTermImportChunkBuffers?: boolean;
+    glossaryMediaFastScan?: boolean;
+    retryBeginImmediateTransaction?: boolean;
 };
 
 export type Summary = {
