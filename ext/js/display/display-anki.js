@@ -325,7 +325,7 @@ export class DisplayAnki {
         saveButton.dataset.cardFormatIndex = cardFormatIndex.toString();
         iconSpan.dataset.icon = cardFormat.icon;
 
-        const saveButtonIndex = container.children.length;
+        const saveButtonIndex = container.querySelectorAll('.action-button-container').length;
         if ([0, 1].includes(saveButtonIndex)) {
             saveButton.dataset.hotkey = `["addNote${saveButtonIndex + 1}","title","Add ${cardFormat.name} note"]`;
             // eslint-disable-next-line no-underscore-dangle
@@ -459,10 +459,19 @@ export class DisplayAnki {
                 notesToCheck.push(big);
             }
         }
-        const infos = await this._display.application.api.getAnkiNoteInfo(notesToCheck.map((note) => note.note), this._isAdditionalInfoEnabled());
+        let infos;
+        let ankiError = null;
+        try {
+            infos = await this._display.application.api.getAnkiNoteInfo(notesToCheck.map((note) => note.note), this._isAdditionalInfoEnabled());
+        } catch (error) {
+            infos = this._getAnkiNoteInfoForceValueIfValid(notesToCheck.map((note) => note.note), false);
+            ankiError = (error instanceof ExtensionError && error.message.includes('Anki connection failure')) ?
+                new Error('Anki not connected') :
+                toError(error);
+        }
+
         /** @type {import('display-anki').DictionaryEntryDetails[]} */
         const results = new Array(dictionaryEntries.length).fill(null).map(() => ({noteMap: new Map()}));
-        const ankiError = null;
         for (let i = 0, ii = notesToCheck.length; i < ii; ++i) {
             const {note, errors, requirements} = notesToCheck[i];
             const {canAdd, valid, noteIds, noteInfos} = infos[i];
