@@ -1255,6 +1255,8 @@ export class DictionaryImportController {
                 debugImportLogging,
                 adaptiveTermBulkAddBatchSize,
                 glossaryMediaFastScan,
+                lazyGlossaryDecodeForMedia,
+                reuseExpressionReverseForReading,
                 disableTermBankWasmFastPath,
                 artifactFirstImport,
                 wasmCanonicalRowsFastPath,
@@ -1274,6 +1276,8 @@ export class DictionaryImportController {
                 debugImportLogging,
                 adaptiveTermBulkAddBatchSize,
                 glossaryMediaFastScan,
+                lazyGlossaryDecodeForMedia,
+                reuseExpressionReverseForReading,
                 disableTermBankWasmFastPath,
                 artifactFirstImport,
                 wasmCanonicalRowsFastPath,
@@ -1393,7 +1397,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, adaptiveTermBulkAddBatchSize: boolean, glossaryMediaFastScan: boolean, disableTermBankWasmFastPath: boolean, artifactFirstImport: boolean, wasmCanonicalRowsFastPath: boolean, wasmPassThroughTermContent: boolean, retryBeginImmediateTransaction: boolean, termBankWasmRowChunkSize: number, skipIntraBatchContentDedup: boolean, termBulkAddStagingMaxRows: number, termRecordRowAppendFastPath: boolean}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, adaptiveTermBulkAddBatchSize: boolean, glossaryMediaFastScan: boolean, lazyGlossaryDecodeForMedia: boolean, reuseExpressionReverseForReading: boolean, disableTermBankWasmFastPath: boolean, artifactFirstImport: boolean, wasmCanonicalRowsFastPath: boolean, wasmPassThroughTermContent: boolean, retryBeginImmediateTransaction: boolean, termBankWasmRowChunkSize: number, skipIntraBatchContentDedup: boolean, termBulkAddStagingMaxRows: number, termRecordRowAppendFastPath: boolean}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1405,6 +1409,8 @@ export class DictionaryImportController {
                 debugImportLogging: false,
                 adaptiveTermBulkAddBatchSize: false,
                 glossaryMediaFastScan: false,
+                lazyGlossaryDecodeForMedia: false,
+                reuseExpressionReverseForReading: false,
                 disableTermBankWasmFastPath: false,
                 artifactFirstImport: false,
                 wasmCanonicalRowsFastPath: false,
@@ -1427,6 +1433,8 @@ export class DictionaryImportController {
             debugImportLogging: flagsRecord.debugImportLogging === true,
             adaptiveTermBulkAddBatchSize: flagsRecord.adaptiveTermBulkAddBatchSize === true,
             glossaryMediaFastScan: flagsRecord.glossaryMediaFastScan === true,
+            lazyGlossaryDecodeForMedia: flagsRecord.lazyGlossaryDecodeForMedia === true,
+            reuseExpressionReverseForReading: flagsRecord.reuseExpressionReverseForReading === true,
             disableTermBankWasmFastPath: flagsRecord.disableTermBankWasmFastPath === true,
             artifactFirstImport: flagsRecord.artifactFirstImport === true,
             wasmCanonicalRowsFastPath: flagsRecord.wasmCanonicalRowsFastPath === true,

@@ -233,6 +233,66 @@ export class TermRecordOpfsStore {
     }
 
     /**
+     * Fast-path append for SQL row arrays from dictionary-database bulk term insert.
+     * @param {unknown[][]} rows
+     * @param {number} start
+     * @param {number} count
+     * @returns {Promise<void>}
+     */
+    async appendBatchFromTermRows(rows, start, count) {
+        if (count <= 0) { return; }
+        /** @type {Map<string, TermRecord[]>} */
+        const recordsByDictionary = new Map();
+        for (let i = start, ii = start + count; i < ii; ++i) {
+            const row = rows[i];
+            const id = this._nextId++;
+            const dictionary = typeof row[0] === 'string' ? row[0] : String(row[0]);
+            const expression = typeof row[1] === 'string' ? row[1] : String(row[1]);
+            const reading = typeof row[2] === 'string' ? row[2] : String(row[2]);
+            const expressionReverseRaw = row[3];
+            const readingReverseRaw = row[4];
+            const entryContentDictNameRaw = row[8];
+            const scoreRaw = row[12];
+            const sequenceRaw = row[14];
+            /** @type {TermRecord} */
+            const record = {
+                id,
+                dictionary,
+                expression,
+                reading,
+                expressionReverse: typeof expressionReverseRaw === 'string' ? expressionReverseRaw : null,
+                readingReverse: typeof readingReverseRaw === 'string' ? readingReverseRaw : null,
+                entryContentOffset: typeof row[6] === 'number' ? row[6] : -1,
+                entryContentLength: typeof row[7] === 'number' ? row[7] : -1,
+                entryContentDictName: typeof entryContentDictNameRaw === 'string' ? entryContentDictNameRaw : 'raw',
+                score: typeof scoreRaw === 'number' ? scoreRaw : 0,
+                sequence: typeof sequenceRaw === 'number' ? sequenceRaw : null,
+            };
+            this._recordsById.set(id, record);
+            const dictionaryRecords = recordsByDictionary.get(dictionary);
+            if (typeof dictionaryRecords === 'undefined') {
+                recordsByDictionary.set(dictionary, [record]);
+            } else {
+                dictionaryRecords.push(record);
+            }
+            if (!this._deferIndexBuild) {
+                const existingIndex = this._indexByDictionary.get(dictionary);
+                if (typeof existingIndex !== 'undefined') {
+                    this._addRecordToDictionaryIndex(existingIndex, record);
+                }
+            }
+        }
+        if (this._deferIndexBuild) {
+            this._indexDirty = true;
+        }
+        for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
+            const state = await this._getOrCreateShardState(dictionaryName);
+            if (state === null) { continue; }
+            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords));
+        }
+    }
+
+    /**
      * @param {string} dictionaryName
      * @returns {Promise<number>}
      */

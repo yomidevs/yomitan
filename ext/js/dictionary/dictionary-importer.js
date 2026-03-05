@@ -83,6 +83,10 @@ export class DictionaryImporter {
         /** @type {boolean} */
         this._glossaryMediaFastScan = false;
         /** @type {boolean} */
+        this._lazyGlossaryDecodeForMedia = false;
+        /** @type {boolean} */
+        this._reuseExpressionReverseForReading = false;
+        /** @type {boolean} */
         this._disableTermBankWasmFastPath = false;
         /** @type {boolean} */
         this._artifactFirstImport = false;
@@ -119,6 +123,8 @@ export class DictionaryImporter {
         this._debugImportLogging = details.debugImportLogging === true;
         this._adaptiveTermBulkAddBatchSize = details.adaptiveTermBulkAddBatchSize === true;
         this._glossaryMediaFastScan = details.glossaryMediaFastScan === true;
+        this._lazyGlossaryDecodeForMedia = details.lazyGlossaryDecodeForMedia === true;
+        this._reuseExpressionReverseForReading = details.reuseExpressionReverseForReading === true;
         this._disableTermBankWasmFastPath = details.disableTermBankWasmFastPath === true;
         this._artifactFirstImport = details.artifactFirstImport === true;
         this._wasmCanonicalRowsFastPath = details.wasmCanonicalRowsFastPath === true;
@@ -1451,10 +1457,7 @@ export class DictionaryImporter {
             const raw = parsedEntries[i];
             const entry = version === 1 ? this._convertTermBankEntryV1(/** @type {import('dictionary-data').TermV1} */ (raw), dictionaryTitle) : this._convertTermBankEntryV3(/** @type {import('dictionary-data').TermV3} */ (raw), dictionaryTitle);
 
-            if (prefixWildcardsSupported) {
-                entry.expressionReverse = stringReverse(entry.expression);
-                entry.readingReverse = stringReverse(entry.reading);
-            }
+            this._assignPrefixReverseFields(entry, prefixWildcardsSupported);
 
             if (requirements !== null) {
                 const glossaryList = entry.glossary;
@@ -1526,12 +1529,18 @@ export class DictionaryImporter {
                             }
                             usePrecomputedTermContent = true;
                         } else {
-                            const rowGlossaryJson = (typeof row.glossaryJson === 'string') ? row.glossaryJson : '[]';
-                            const skipGlossaryParse = !this._glossaryJsonLikelyContainsMedia(rowGlossaryJson);
+                            const skipGlossaryParse = (
+                                typeof row.glossaryMayContainMedia === 'boolean' ?
+                                    !row.glossaryMayContainMedia :
+                                    !this._glossaryJsonLikelyContainsMedia(this._getFastRowGlossaryJson(row))
+                            );
                             if (skipGlossaryParse) {
-                                entry.glossaryJson = rowGlossaryJson;
+                                if (!this._wasmPassThroughTermContent) {
+                                    entry.glossaryJson = this._getFastRowGlossaryJson(row);
+                                }
                                 usePrecomputedTermContent = true;
                             } else {
+                                const rowGlossaryJson = this._getFastRowGlossaryJson(row);
                                 const glossaryList = this._parseGlossaryJsonFromFastRow(rowGlossaryJson, termFile.filename);
                                 for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
                                     const glossary = glossaryList[j];
@@ -1544,10 +1553,7 @@ export class DictionaryImporter {
                         if (typeof row.sequence === 'number') {
                             entry.sequence = row.sequence;
                         }
-                        if (prefixWildcardsSupported) {
-                            entry.expressionReverse = stringReverse(entry.expression);
-                            entry.readingReverse = stringReverse(entry.reading);
-                        }
+                        this._assignPrefixReverseFields(entry, prefixWildcardsSupported);
                         if (
                             usePrecomputedTermContent &&
                             this._wasmPassThroughTermContent &&
@@ -1569,6 +1575,16 @@ export class DictionaryImporter {
                                 )
                             )
                         ) {
+                            if (
+                                requirementsForChunk !== null &&
+                                typeof entry.glossaryJson !== 'string' &&
+                                (
+                                    !(typeof entry.termEntryContentHash === 'string' && entry.termEntryContentHash.length > 0) ||
+                                    !(entry.termEntryContentBytes instanceof Uint8Array)
+                                )
+                            ) {
+                                entry.glossaryJson = this._getFastRowGlossaryJson(row);
+                            }
                             this._prepareTermEntrySerialization(entry, enableTermEntryContentDedup);
                         }
                         termListChunk[i] = entry;
@@ -1590,6 +1606,8 @@ export class DictionaryImporter {
                 {
                     copyContentBytes: this._wasmPassThroughTermContent && !streamToChunkHandler,
                     minimalDecode,
+                    lazyGlossaryDecode: useMediaPipeline && (this._lazyGlossaryDecodeForMedia || this._glossaryMediaFastScan),
+                    mediaHintFastScan: useMediaPipeline && (this._lazyGlossaryDecodeForMedia || this._glossaryMediaFastScan),
                 },
             );
         } catch (error) {
@@ -1672,8 +1690,7 @@ export class DictionaryImporter {
                 entry.sequence = sequenceRaw;
             }
             if (prefixWildcardsSupported) {
-                entry.expressionReverse = stringReverse(expression);
-                entry.readingReverse = stringReverse(reading);
+                this._assignPrefixReverseFields(entry, true);
             }
             termList[i] = entry;
         }
@@ -1699,6 +1716,39 @@ export class DictionaryImporter {
         const hasTypeImage = glossaryJson.includes('"type"') && glossaryJson.includes('"image"');
         const hasTagImg = glossaryJson.includes('"tag"') && glossaryJson.includes('"img"');
         return hasTypeImage || hasTagImg;
+    }
+
+    /**
+     * @param {{glossaryJson?: string, glossaryJsonBytes?: Uint8Array}} row
+     * @returns {string}
+     */
+    _getFastRowGlossaryJson(row) {
+        if (typeof row.glossaryJson === 'string') {
+            return row.glossaryJson;
+        }
+        if (row.glossaryJsonBytes instanceof Uint8Array) {
+            const glossaryJson = this._textDecoder.decode(row.glossaryJsonBytes);
+            row.glossaryJson = glossaryJson;
+            return glossaryJson;
+        }
+        return '[]';
+    }
+
+    /**
+     * @param {import('dictionary-database').DatabaseTermEntry} entry
+     * @param {boolean} prefixWildcardsSupported
+     */
+    _assignPrefixReverseFields(entry, prefixWildcardsSupported) {
+        if (!prefixWildcardsSupported) {
+            return;
+        }
+        const expressionReverse = stringReverse(entry.expression);
+        entry.expressionReverse = expressionReverse;
+        if (this._reuseExpressionReverseForReading && entry.reading === entry.expression) {
+            entry.readingReverse = expressionReverse;
+            return;
+        }
+        entry.readingReverse = stringReverse(entry.reading);
     }
 
     /**

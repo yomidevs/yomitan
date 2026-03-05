@@ -63,6 +63,8 @@ export type ImportDetails = {
     debugImportLogging?: boolean;
     adaptiveTermBulkAddBatchSize?: boolean;
     glossaryMediaFastScan?: boolean;
+    lazyGlossaryDecodeForMedia?: boolean;
+    reuseExpressionReverseForReading?: boolean;
     disableTermBankWasmFastPath?: boolean;
     artifactFirstImport?: boolean;
     wasmCanonicalRowsFastPath?: boolean;
