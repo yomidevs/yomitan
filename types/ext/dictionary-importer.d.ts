@@ -61,6 +61,7 @@ export type ImportDetails = {
     skipMediaImport?: boolean;
     mediaResolutionConcurrency?: number;
     debugImportLogging?: boolean;
+    enableTermEntryContentDedup?: boolean;
     adaptiveTermBulkAddBatchSize?: boolean;
     glossaryMediaFastScan?: boolean;
     lazyGlossaryDecodeForMedia?: boolean;
@@ -74,11 +75,17 @@ export type ImportDetails = {
     termBankWasmInitialMetaCapacityDivisor?: number;
     termBankWasmInitialContentBytesPerRow?: number;
     adaptiveTermBankWasmRowChunkSize?: boolean;
+    adaptiveTermBankWasmRowChunkSizeTiered?: boolean;
     adaptiveTermBankWasmInitialCapacity?: boolean;
     streamTermArtifactChunks?: boolean;
     termArtifactRowChunkSize?: number;
     wasmSkipUnusedTermContentEncoding?: boolean;
+    wasmReuseExpressionForReadingDecode?: boolean;
+    wasmPreallocateChunkRows?: boolean;
+    usePrecomputedContentForMediaRows?: boolean;
+    leanCanonicalTermEntryObjects?: boolean;
     cacheReverseStrings?: boolean;
+    fastPrefixReverse?: boolean;
     reverseStringCacheMaxEntries?: number;
     skipIntraBatchContentDedup?: boolean;
     termBulkAddStagingMaxRows?: number;

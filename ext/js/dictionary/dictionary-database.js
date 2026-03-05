@@ -134,7 +134,7 @@ export class DictionaryDatabase {
         /** @type {number} */
         this._termBulkAddBatchSize = 25000;
         /** @type {boolean} */
-        this._adaptiveTermBulkAddBatchSize = false;
+        this._adaptiveTermBulkAddBatchSize = true;
         /** @type {boolean} */
         this._retryBeginImmediateTransaction = false;
         /** @type {boolean} */
@@ -142,7 +142,7 @@ export class DictionaryDatabase {
         /** @type {number} */
         this._termBulkAddStagingMaxRows = TERM_BULK_ADD_STAGING_MAX_ROWS;
         /** @type {boolean} */
-        this._termRecordRowAppendFastPath = false;
+        this._termRecordRowAppendFastPath = true;
         /** @type {TermContentOpfsStore} */
         this._termContentStore = new TermContentOpfsStore();
         /** @type {TermRecordOpfsStore} */
@@ -390,21 +390,21 @@ export class DictionaryDatabase {
      */
     setImportOptimizationFlags(value) {
         if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-            this._adaptiveTermBulkAddBatchSize = false;
+            this._adaptiveTermBulkAddBatchSize = true;
             this._retryBeginImmediateTransaction = false;
             this._skipIntraBatchContentDedup = false;
             this._termBulkAddStagingMaxRows = TERM_BULK_ADD_STAGING_MAX_ROWS;
-            this._termRecordRowAppendFastPath = false;
+            this._termRecordRowAppendFastPath = true;
             return;
         }
-        this._adaptiveTermBulkAddBatchSize = value.adaptiveTermBulkAddBatchSize === true;
+        this._adaptiveTermBulkAddBatchSize = value.adaptiveTermBulkAddBatchSize !== false;
         this._retryBeginImmediateTransaction = value.retryBeginImmediateTransaction === true;
         this._skipIntraBatchContentDedup = value.skipIntraBatchContentDedup === true;
         const termBulkAddStagingMaxRows = Number.isFinite(value.termBulkAddStagingMaxRows) ?
             Math.trunc(/** @type {number} */ (value.termBulkAddStagingMaxRows)) :
             TERM_BULK_ADD_STAGING_MAX_ROWS;
         this._termBulkAddStagingMaxRows = Math.max(512, Math.min(20000, termBulkAddStagingMaxRows));
-        this._termRecordRowAppendFastPath = value.termRecordRowAppendFastPath === true;
+        this._termRecordRowAppendFastPath = value.termRecordRowAppendFastPath !== false;
     }
 
     /**
@@ -1931,8 +1931,6 @@ export class DictionaryDatabase {
 
         /** @type {import('@sqlite.org/sqlite-wasm').Bindable[][]} */
         let termRows = [];
-        /** @type {(string|null)[]} */
-        let unresolvedTermContentHashes = [];
         /** @type {{contentHash: string, contentBytes: Uint8Array, contentDictName: string|null}[]} */
         let pendingContentRows = [];
         /** @type {Map<string, number>|null} */
@@ -1945,7 +1943,6 @@ export class DictionaryDatabase {
             const flushStagedRows = async () => {
                 if (termRows.length === 0) {
                     pendingContentRows = [];
-                    unresolvedTermContentHashes = [];
                     if (pendingContentRowIndexByHash !== null) {
                         pendingContentRowIndexByHash.clear();
                     }
@@ -1981,16 +1978,19 @@ export class DictionaryDatabase {
                     }
                 }
 
-                for (let i = 0, ii = unresolvedTermContentHashes.length; i < ii; ++i) {
-                    const contentHash = unresolvedTermContentHashes[i];
-                    if (contentHash === null) { continue; }
+                for (let i = 0, ii = termRows.length; i < ii; ++i) {
+                    const row = termRows[i];
+                    const contentHashValue = /** @type {unknown} */ (row[5]);
+                    if (typeof contentHashValue !== 'string' || contentHashValue.length === 0) { continue; }
+                    const contentHash = contentHashValue;
                     const meta = this._termEntryContentMetaByHash.get(contentHash);
                     if (typeof meta === 'undefined') {
                         throw new Error('Failed to resolve term entry content metadata for bulk term insert');
                     }
-                    termRows[i][6] = meta.offset;
-                    termRows[i][7] = meta.length;
-                    termRows[i][8] = meta.dictName;
+                    row[5] = null;
+                    row[6] = meta.offset;
+                    row[7] = meta.length;
+                    row[8] = meta.dictName;
                 }
 
                 for (let i = 0, ii = termRows.length; i < ii; i += termBatchSize) {
@@ -2029,7 +2029,6 @@ export class DictionaryDatabase {
                 }
 
                 termRows = [];
-                unresolvedTermContentHashes = [];
                 pendingContentRows = [];
                 pendingContentRowIndexByHash = shouldDedupWithinBatch ? new Map() : null;
             };
@@ -2072,7 +2071,6 @@ export class DictionaryDatabase {
                         '[]',
                         typeof row.sequence === 'number' ? row.sequence : null,
                     ]);
-                    unresolvedTermContentHashes.push(null);
                     continue;
                 }
 
@@ -2105,7 +2103,7 @@ export class DictionaryDatabase {
                     row.reading,
                     row.expressionReverse ?? null,
                     row.readingReverse ?? null,
-                    0,
+                    contentHash,
                     null,
                     null,
                     null,
@@ -2116,7 +2114,6 @@ export class DictionaryDatabase {
                     '[]',
                     typeof row.sequence === 'number' ? row.sequence : null,
                 ]);
-                unresolvedTermContentHashes.push(contentHash);
 
                 const tNow = safePerformance.now();
                 if (this._importDebugLogging && (tNow - lastProgressLog) >= this._termBulkAddLogIntervalMs) {
@@ -2318,41 +2315,27 @@ export class DictionaryDatabase {
             for (let i = start, ii = start + count; i < ii; i += batchSize) {
                 const chunkCount = Math.min(batchSize, ii - i);
                 /** @type {Uint8Array[]} */
-                const contentChunks = [];
-                /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
-                const recordRows = [];
+                const contentChunks = new Array(chunkCount);
                 for (let j = 0; j < chunkCount; ++j) {
                     const row = /** @type {import('dictionary-database').DatabaseTermEntry} */ (items[i + j]);
+                    const precomputedContentBytes = row.termEntryContentBytes;
+                    if (precomputedContentBytes instanceof Uint8Array) {
+                        contentChunks[j] = precomputedContentBytes;
+                        continue;
+                    }
                     const rules = row.rules ?? '';
                     const definitionTags = row.definitionTags ?? row.tags ?? '';
                     const termTags = row.termTags ?? '';
                     const contentJson = row.termEntryContentJson ?? this._serializeTermEntryContent(rules, definitionTags, termTags, row.glossary);
-                    const contentBytes = row.termEntryContentBytes instanceof Uint8Array ? row.termEntryContentBytes : this._textEncoder.encode(contentJson);
-                    contentChunks.push(contentBytes);
-                    recordRows.push({
-                        dictionary: row.dictionary,
-                        expression: row.expression,
-                        reading: row.reading,
-                        expressionReverse: row.expressionReverse ?? null,
-                        readingReverse: row.readingReverse ?? null,
-                        entryContentOffset: -1,
-                        entryContentLength: -1,
-                        entryContentDictName: 'raw',
-                        score: row.score,
-                        sequence: typeof row.sequence === 'number' ? row.sequence : null,
-                    });
+                    contentChunks[j] = this._textEncoder.encode(contentJson);
                 }
                 const spans = await this._termContentStore.appendBatch(contentChunks);
-                for (let j = 0; j < spans.length; ++j) {
-                    recordRows[j].entryContentOffset = spans[j].offset;
-                    recordRows[j].entryContentLength = spans[j].length;
-                }
-                await this._termRecordStore.appendBatch(recordRows);
+                await this._termRecordStore.appendBatchFromImportTermEntries(items, i, chunkCount, spans);
                 const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
                 if (deferVirtualTableWrite) {
                     this._termsVirtualTableDirty = true;
                 } else {
-                    await this._insertTermRowsIntoVirtualTable(recordRows.length);
+                    await this._insertTermRowsIntoVirtualTable(chunkCount);
                 }
             }
             if (useLocalTransaction) {
@@ -4032,7 +4015,7 @@ export class DictionaryDatabase {
         }
         let candidate = baseline;
         if (rowCount >= 300000) {
-            candidate = 100000;
+            candidate = 75000;
         } else if (rowCount >= 160000) {
             candidate = 75000;
         } else if (rowCount >= 60000) {

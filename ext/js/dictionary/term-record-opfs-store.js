@@ -244,35 +244,102 @@ export class TermRecordOpfsStore {
         /** @type {Map<string, TermRecord[]>} */
         const recordsByDictionary = new Map();
         for (let i = start, ii = start + count; i < ii; ++i) {
-            const row = rows[i];
+            const row = /** @type {[string, string, string, (string|null), (string|null), unknown, number, number, (string|null), unknown, unknown, unknown, number, unknown, (number|null)]} */ (rows[i]);
             const id = this._nextId++;
-            const dictionary = typeof row[0] === 'string' ? row[0] : String(row[0]);
-            const expression = typeof row[1] === 'string' ? row[1] : String(row[1]);
-            const reading = typeof row[2] === 'string' ? row[2] : String(row[2]);
-            const expressionReverseRaw = row[3];
-            const readingReverseRaw = row[4];
-            const entryContentDictNameRaw = row[8];
-            const scoreRaw = row[12];
-            const sequenceRaw = row[14];
+            const dictionary = row[0];
             /** @type {TermRecord} */
             const record = {
                 id,
                 dictionary,
-                expression,
-                reading,
-                expressionReverse: typeof expressionReverseRaw === 'string' ? expressionReverseRaw : null,
-                readingReverse: typeof readingReverseRaw === 'string' ? readingReverseRaw : null,
-                entryContentOffset: typeof row[6] === 'number' ? row[6] : -1,
-                entryContentLength: typeof row[7] === 'number' ? row[7] : -1,
-                entryContentDictName: typeof entryContentDictNameRaw === 'string' ? entryContentDictNameRaw : 'raw',
-                score: typeof scoreRaw === 'number' ? scoreRaw : 0,
-                sequence: typeof sequenceRaw === 'number' ? sequenceRaw : null,
+                expression: row[1],
+                reading: row[2],
+                expressionReverse: row[3],
+                readingReverse: row[4],
+                entryContentOffset: row[6],
+                entryContentLength: row[7],
+                entryContentDictName: row[8] ?? 'raw',
+                score: row[12],
+                sequence: row[14],
             };
             this._recordsById.set(id, record);
-            const dictionaryRecords = recordsByDictionary.get(dictionary);
+            let dictionaryRecords = recordsByDictionary.get(dictionary);
             if (typeof dictionaryRecords === 'undefined') {
-                recordsByDictionary.set(dictionary, [record]);
+                dictionaryRecords = [];
+                recordsByDictionary.set(dictionary, dictionaryRecords);
+            }
+            dictionaryRecords.push(record);
+            if (!this._deferIndexBuild) {
+                const existingIndex = this._indexByDictionary.get(dictionary);
+                if (typeof existingIndex !== 'undefined') {
+                    this._addRecordToDictionaryIndex(existingIndex, record);
+                }
+            }
+        }
+        if (this._deferIndexBuild) {
+            this._indexDirty = true;
+        }
+        for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
+            const state = await this._getOrCreateShardState(dictionaryName);
+            if (state === null) { continue; }
+            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords));
+        }
+    }
+
+    /**
+     * Fast-path append for importer DatabaseTermEntry arrays paired with content spans.
+     * @param {unknown[]} rows
+     * @param {number} start
+     * @param {number} count
+     * @param {{offset: number, length: number}[]} spans
+     * @returns {Promise<void>}
+     */
+    async appendBatchFromImportTermEntries(rows, start, count, spans) {
+        if (count <= 0) { return; }
+        if (spans.length < count) {
+            throw new Error('appendBatchFromImportTermEntries spans length is smaller than row count');
+        }
+        /** @type {Map<string, TermRecord[]>|null} */
+        let recordsByDictionary = null;
+        /** @type {TermRecord[]} */
+        const singleDictionaryRecords = [];
+        let singleDictionaryName = '';
+        for (let i = 0; i < count; ++i) {
+            const row = /** @type {{dictionary: string, expression: string, reading: string, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[start + i]);
+            const span = spans[i];
+            const id = this._nextId++;
+            const dictionary = row.dictionary;
+            /** @type {TermRecord} */
+            const record = {
+                id,
+                dictionary,
+                expression: row.expression,
+                reading: row.reading,
+                expressionReverse: row.expressionReverse ?? null,
+                readingReverse: row.readingReverse ?? null,
+                entryContentOffset: span.offset,
+                entryContentLength: span.length,
+                entryContentDictName: 'raw',
+                score: row.score,
+                sequence: typeof row.sequence === 'number' ? row.sequence : null,
+            };
+            this._recordsById.set(id, record);
+            if (i === 0) {
+                singleDictionaryName = dictionary;
+            }
+            if (recordsByDictionary === null) {
+                if (dictionary === singleDictionaryName) {
+                    singleDictionaryRecords.push(record);
+                } else {
+                    recordsByDictionary = new Map();
+                    recordsByDictionary.set(singleDictionaryName, singleDictionaryRecords);
+                    recordsByDictionary.set(dictionary, [record]);
+                }
             } else {
+                let dictionaryRecords = recordsByDictionary.get(dictionary);
+                if (typeof dictionaryRecords === 'undefined') {
+                    dictionaryRecords = [];
+                    recordsByDictionary.set(dictionary, dictionaryRecords);
+                }
                 dictionaryRecords.push(record);
             }
             if (!this._deferIndexBuild) {
@@ -284,6 +351,13 @@ export class TermRecordOpfsStore {
         }
         if (this._deferIndexBuild) {
             this._indexDirty = true;
+        }
+        if (recordsByDictionary === null) {
+            const state = await this._getOrCreateShardState(singleDictionaryName);
+            if (state !== null) {
+                await this._appendEncodedChunk(state, await this._encodeRecords(singleDictionaryRecords));
+            }
+            return;
         }
         for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
             const state = await this._getOrCreateShardState(dictionaryName);

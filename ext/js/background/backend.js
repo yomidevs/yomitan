@@ -691,6 +691,9 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'kanjiFind'>} */
     async _onApiKanjiFind({text, optionsContext}) {
+        if (this._dictionaryImportModeActive) {
+            return [];
+        }
         await this._ensureDictionaryDatabaseReady();
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {maxResults}} = options;
@@ -702,6 +705,9 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'termsFind'>} */
     async _onApiTermsFind({text, details, optionsContext}) {
+        if (this._dictionaryImportModeActive) {
+            return {dictionaryEntries: [], originalTextLength: 0};
+        }
         await this._ensureDictionaryDatabaseReady();
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {resultOutputMode: mode, maxResults}} = options;
@@ -1076,6 +1082,9 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getDictionaryInfo'>} */
     async _onApiGetDictionaryInfo() {
+        if (this._dictionaryImportModeActive) {
+            return [];
+        }
         await this._ensureDictionaryDatabaseReady();
         return await this._dictionaryDatabase.getDictionaryInfo();
     }
