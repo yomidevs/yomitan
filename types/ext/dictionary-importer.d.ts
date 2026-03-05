@@ -71,6 +71,15 @@ export type ImportDetails = {
     wasmPassThroughTermContent?: boolean;
     retryBeginImmediateTransaction?: boolean;
     termBankWasmRowChunkSize?: number;
+    termBankWasmInitialMetaCapacityDivisor?: number;
+    termBankWasmInitialContentBytesPerRow?: number;
+    adaptiveTermBankWasmRowChunkSize?: boolean;
+    adaptiveTermBankWasmInitialCapacity?: boolean;
+    streamTermArtifactChunks?: boolean;
+    termArtifactRowChunkSize?: number;
+    wasmSkipUnusedTermContentEncoding?: boolean;
+    cacheReverseStrings?: boolean;
+    reverseStringCacheMaxEntries?: number;
     skipIntraBatchContentDedup?: boolean;
     termBulkAddStagingMaxRows?: number;
     termRecordRowAppendFastPath?: boolean;

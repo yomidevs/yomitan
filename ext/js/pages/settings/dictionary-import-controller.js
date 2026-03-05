@@ -1263,6 +1263,15 @@ export class DictionaryImportController {
                 wasmPassThroughTermContent,
                 retryBeginImmediateTransaction,
                 termBankWasmRowChunkSize,
+                termBankWasmInitialMetaCapacityDivisor,
+                termBankWasmInitialContentBytesPerRow,
+                adaptiveTermBankWasmRowChunkSize,
+                adaptiveTermBankWasmInitialCapacity,
+                streamTermArtifactChunks,
+                termArtifactRowChunkSize,
+                wasmSkipUnusedTermContentEncoding,
+                cacheReverseStrings,
+                reverseStringCacheMaxEntries,
                 skipIntraBatchContentDedup,
                 termBulkAddStagingMaxRows,
                 termRecordRowAppendFastPath,
@@ -1284,6 +1293,15 @@ export class DictionaryImportController {
                 wasmPassThroughTermContent,
                 retryBeginImmediateTransaction,
                 termBankWasmRowChunkSize,
+                termBankWasmInitialMetaCapacityDivisor,
+                termBankWasmInitialContentBytesPerRow,
+                adaptiveTermBankWasmRowChunkSize,
+                adaptiveTermBankWasmInitialCapacity,
+                streamTermArtifactChunks,
+                termArtifactRowChunkSize,
+                wasmSkipUnusedTermContentEncoding,
+                cacheReverseStrings,
+                reverseStringCacheMaxEntries,
                 skipIntraBatchContentDedup,
                 termBulkAddStagingMaxRows,
                 termRecordRowAppendFastPath,
@@ -1397,7 +1415,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, adaptiveTermBulkAddBatchSize: boolean, glossaryMediaFastScan: boolean, lazyGlossaryDecodeForMedia: boolean, reuseExpressionReverseForReading: boolean, disableTermBankWasmFastPath: boolean, artifactFirstImport: boolean, wasmCanonicalRowsFastPath: boolean, wasmPassThroughTermContent: boolean, retryBeginImmediateTransaction: boolean, termBankWasmRowChunkSize: number, skipIntraBatchContentDedup: boolean, termBulkAddStagingMaxRows: number, termRecordRowAppendFastPath: boolean}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, adaptiveTermBulkAddBatchSize: boolean, glossaryMediaFastScan: boolean, lazyGlossaryDecodeForMedia: boolean, reuseExpressionReverseForReading: boolean, disableTermBankWasmFastPath: boolean, artifactFirstImport: boolean, wasmCanonicalRowsFastPath: boolean, wasmPassThroughTermContent: boolean, retryBeginImmediateTransaction: boolean, termBankWasmRowChunkSize: number, termBankWasmInitialMetaCapacityDivisor: number, termBankWasmInitialContentBytesPerRow: number, adaptiveTermBankWasmRowChunkSize: boolean, adaptiveTermBankWasmInitialCapacity: boolean, streamTermArtifactChunks: boolean, termArtifactRowChunkSize: number, wasmSkipUnusedTermContentEncoding: boolean, cacheReverseStrings: boolean, reverseStringCacheMaxEntries: number, skipIntraBatchContentDedup: boolean, termBulkAddStagingMaxRows: number, termRecordRowAppendFastPath: boolean}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1417,6 +1435,15 @@ export class DictionaryImportController {
                 wasmPassThroughTermContent: false,
                 retryBeginImmediateTransaction: false,
                 termBankWasmRowChunkSize: 2048,
+                termBankWasmInitialMetaCapacityDivisor: 24,
+                termBankWasmInitialContentBytesPerRow: 96,
+                adaptiveTermBankWasmRowChunkSize: false,
+                adaptiveTermBankWasmInitialCapacity: false,
+                streamTermArtifactChunks: false,
+                termArtifactRowChunkSize: 4096,
+                wasmSkipUnusedTermContentEncoding: true,
+                cacheReverseStrings: false,
+                reverseStringCacheMaxEntries: 16384,
                 skipIntraBatchContentDedup: false,
                 termBulkAddStagingMaxRows: 3000,
                 termRecordRowAppendFastPath: false,
@@ -1425,6 +1452,10 @@ export class DictionaryImportController {
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
         const mediaResolutionConcurrency = Number.isFinite(flagsRecord.mediaResolutionConcurrency) ? Math.trunc(/** @type {number} */ (flagsRecord.mediaResolutionConcurrency)) : 8;
         const termBankWasmRowChunkSize = Number.isFinite(flagsRecord.termBankWasmRowChunkSize) ? Math.trunc(/** @type {number} */ (flagsRecord.termBankWasmRowChunkSize)) : 2048;
+        const termBankWasmInitialMetaCapacityDivisor = Number.isFinite(flagsRecord.termBankWasmInitialMetaCapacityDivisor) ? Math.trunc(/** @type {number} */ (flagsRecord.termBankWasmInitialMetaCapacityDivisor)) : 24;
+        const termBankWasmInitialContentBytesPerRow = Number.isFinite(flagsRecord.termBankWasmInitialContentBytesPerRow) ? Math.trunc(/** @type {number} */ (flagsRecord.termBankWasmInitialContentBytesPerRow)) : 96;
+        const termArtifactRowChunkSize = Number.isFinite(flagsRecord.termArtifactRowChunkSize) ? Math.trunc(/** @type {number} */ (flagsRecord.termArtifactRowChunkSize)) : 4096;
+        const reverseStringCacheMaxEntries = Number.isFinite(flagsRecord.reverseStringCacheMaxEntries) ? Math.trunc(/** @type {number} */ (flagsRecord.reverseStringCacheMaxEntries)) : 16384;
         const termBulkAddStagingMaxRows = Number.isFinite(flagsRecord.termBulkAddStagingMaxRows) ? Math.trunc(/** @type {number} */ (flagsRecord.termBulkAddStagingMaxRows)) : 3000;
         return {
             skipImageMetadata: flagsRecord.skipImageMetadata === true,
@@ -1441,6 +1472,15 @@ export class DictionaryImportController {
             wasmPassThroughTermContent: flagsRecord.wasmPassThroughTermContent === true,
             retryBeginImmediateTransaction: flagsRecord.retryBeginImmediateTransaction === true,
             termBankWasmRowChunkSize: Math.max(256, Math.min(16384, termBankWasmRowChunkSize)),
+            termBankWasmInitialMetaCapacityDivisor: Math.max(8, Math.min(128, termBankWasmInitialMetaCapacityDivisor)),
+            termBankWasmInitialContentBytesPerRow: Math.max(16, Math.min(512, termBankWasmInitialContentBytesPerRow)),
+            adaptiveTermBankWasmRowChunkSize: flagsRecord.adaptiveTermBankWasmRowChunkSize === true,
+            adaptiveTermBankWasmInitialCapacity: flagsRecord.adaptiveTermBankWasmInitialCapacity === true,
+            streamTermArtifactChunks: flagsRecord.streamTermArtifactChunks === true,
+            termArtifactRowChunkSize: Math.max(256, Math.min(32768, termArtifactRowChunkSize)),
+            wasmSkipUnusedTermContentEncoding: flagsRecord.wasmSkipUnusedTermContentEncoding !== false,
+            cacheReverseStrings: flagsRecord.cacheReverseStrings === true,
+            reverseStringCacheMaxEntries: Math.max(1024, Math.min(131072, reverseStringCacheMaxEntries)),
             skipIntraBatchContentDedup: flagsRecord.skipIntraBatchContentDedup === true,
             termBulkAddStagingMaxRows: Math.max(512, Math.min(20000, termBulkAddStagingMaxRows)),
             termRecordRowAppendFastPath: flagsRecord.termRecordRowAppendFastPath === true,
@@ -2009,7 +2049,12 @@ export class ImportProgressTracker {
             for (const label of this._infoLabels) { label.textContent = labelText; }
         }
 
-        const percentRaw = count > 0 ? (index / count * 100) : 0;
+        const hasFiniteCount = Number.isFinite(count) && count > 0;
+        let percentRaw = hasFiniteCount ? (index / count * 100) : 0;
+        // Avoid showing a misleading 100% while a non-final step is still open.
+        if (!nextStep && hasFiniteCount && this._stepIndex < (this.stepCount - 1) && index >= count) {
+            percentRaw = 99.99;
+        }
         const percent = Math.max(0, Math.min(100, percentRaw));
         if (this._lastPercent < 0 || Math.abs(percent - this._lastPercent) >= 0.1) {
             this._lastPercent = percent;
