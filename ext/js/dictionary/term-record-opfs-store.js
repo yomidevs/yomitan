@@ -27,6 +27,8 @@ const BINARY_MAGIC_TEXT = 'MBTRREC1';
 const BINARY_MAGIC_BYTES = 8;
 const RECORD_HEADER_BYTES = 44;
 const U32_NULL = 0xffffffff;
+const DEFAULT_FLUSH_THRESHOLD_BYTES = 32 * 1024 * 1024;
+const LOW_MEMORY_FLUSH_THRESHOLD_BYTES = 16 * 1024 * 1024;
 
 /**
  * @typedef {object} TermRecord
@@ -62,7 +64,7 @@ export class TermRecordOpfsStore {
         /** @type {Map<string, TermRecordShardState>} */
         this._shardStateByFileName = new Map();
         /** @type {number} */
-        this._flushThresholdBytes = 16 * 1024 * 1024;
+        this._flushThresholdBytes = this._computeFlushThresholdBytes();
         /** @type {boolean} */
         this._importSessionActive = false;
         /** @type {Map<number, TermRecord>} */
@@ -241,8 +243,11 @@ export class TermRecordOpfsStore {
      */
     async appendBatchFromTermRows(rows, start, count) {
         if (count <= 0) { return; }
-        /** @type {Map<string, TermRecord[]>} */
-        const recordsByDictionary = new Map();
+        /** @type {Map<string, TermRecord[]>|null} */
+        let recordsByDictionary = null;
+        /** @type {TermRecord[]} */
+        const singleDictionaryRecords = [];
+        let singleDictionaryName = '';
         for (let i = start, ii = start + count; i < ii; ++i) {
             const row = /** @type {[string, string, string, (string|null), (string|null), unknown, number, number, (string|null), unknown, unknown, unknown, number, unknown, (number|null)]} */ (rows[i]);
             const id = this._nextId++;
@@ -262,12 +267,25 @@ export class TermRecordOpfsStore {
                 sequence: row[14],
             };
             this._recordsById.set(id, record);
-            let dictionaryRecords = recordsByDictionary.get(dictionary);
-            if (typeof dictionaryRecords === 'undefined') {
-                dictionaryRecords = [];
-                recordsByDictionary.set(dictionary, dictionaryRecords);
+            if (i === start) {
+                singleDictionaryName = dictionary;
             }
-            dictionaryRecords.push(record);
+            if (recordsByDictionary === null) {
+                if (dictionary === singleDictionaryName) {
+                    singleDictionaryRecords.push(record);
+                } else {
+                    recordsByDictionary = new Map();
+                    recordsByDictionary.set(singleDictionaryName, singleDictionaryRecords);
+                    recordsByDictionary.set(dictionary, [record]);
+                }
+            } else {
+                let dictionaryRecords = recordsByDictionary.get(dictionary);
+                if (typeof dictionaryRecords === 'undefined') {
+                    dictionaryRecords = [];
+                    recordsByDictionary.set(dictionary, dictionaryRecords);
+                }
+                dictionaryRecords.push(record);
+            }
             if (!this._deferIndexBuild) {
                 const existingIndex = this._indexByDictionary.get(dictionary);
                 if (typeof existingIndex !== 'undefined') {
@@ -277,6 +295,95 @@ export class TermRecordOpfsStore {
         }
         if (this._deferIndexBuild) {
             this._indexDirty = true;
+        }
+        if (recordsByDictionary === null) {
+            const state = await this._getOrCreateShardState(singleDictionaryName);
+            if (state !== null) {
+                await this._appendEncodedChunk(state, await this._encodeRecords(singleDictionaryRecords));
+            }
+            return;
+        }
+        for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
+            const state = await this._getOrCreateShardState(dictionaryName);
+            if (state === null) { continue; }
+            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords));
+        }
+    }
+
+    /**
+     * Fast-path append for importer DatabaseTermEntry arrays paired with resolved content refs.
+     * @param {unknown[]} rows
+     * @param {number} start
+     * @param {number} count
+     * @param {number[]} contentOffsets
+     * @param {number[]} contentLengths
+     * @param {(string|null)[]} contentDictNames
+     * @returns {Promise<void>}
+     */
+    async appendBatchFromResolvedImportTermEntries(rows, start, count, contentOffsets, contentLengths, contentDictNames) {
+        if (count <= 0) { return; }
+        if (contentOffsets.length < (start + count) || contentLengths.length < (start + count) || contentDictNames.length < (start + count)) {
+            throw new Error('appendBatchFromResolvedImportTermEntries content refs length is smaller than row count');
+        }
+        /** @type {Map<string, TermRecord[]>|null} */
+        let recordsByDictionary = null;
+        /** @type {TermRecord[]} */
+        const singleDictionaryRecords = [];
+        let singleDictionaryName = '';
+        for (let i = start, ii = start + count; i < ii; ++i) {
+            const row = /** @type {{dictionary: string, expression: string, reading: string, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[i]);
+            const id = this._nextId++;
+            const dictionary = row.dictionary;
+            /** @type {TermRecord} */
+            const record = {
+                id,
+                dictionary,
+                expression: row.expression,
+                reading: row.reading,
+                expressionReverse: row.expressionReverse ?? null,
+                readingReverse: row.readingReverse ?? null,
+                entryContentOffset: contentOffsets[i],
+                entryContentLength: contentLengths[i],
+                entryContentDictName: contentDictNames[i] ?? 'raw',
+                score: row.score,
+                sequence: typeof row.sequence === 'number' ? row.sequence : null,
+            };
+            this._recordsById.set(id, record);
+            if (i === start) {
+                singleDictionaryName = dictionary;
+            }
+            if (recordsByDictionary === null) {
+                if (dictionary === singleDictionaryName) {
+                    singleDictionaryRecords.push(record);
+                } else {
+                    recordsByDictionary = new Map();
+                    recordsByDictionary.set(singleDictionaryName, singleDictionaryRecords);
+                    recordsByDictionary.set(dictionary, [record]);
+                }
+            } else {
+                let dictionaryRecords = recordsByDictionary.get(dictionary);
+                if (typeof dictionaryRecords === 'undefined') {
+                    dictionaryRecords = [];
+                    recordsByDictionary.set(dictionary, dictionaryRecords);
+                }
+                dictionaryRecords.push(record);
+            }
+            if (!this._deferIndexBuild) {
+                const existingIndex = this._indexByDictionary.get(dictionary);
+                if (typeof existingIndex !== 'undefined') {
+                    this._addRecordToDictionaryIndex(existingIndex, record);
+                }
+            }
+        }
+        if (this._deferIndexBuild) {
+            this._indexDirty = true;
+        }
+        if (recordsByDictionary === null) {
+            const state = await this._getOrCreateShardState(singleDictionaryName);
+            if (state !== null) {
+                await this._appendEncodedChunk(state, await this._encodeRecords(singleDictionaryRecords));
+            }
+            return;
         }
         for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
             const state = await this._getOrCreateShardState(dictionaryName);
@@ -1067,6 +1174,23 @@ export class TermRecordOpfsStore {
             pendingWriteBytes: 0,
             pendingWriteChunks: [],
         };
+    }
+
+    /**
+     * @returns {number}
+     */
+    _computeFlushThresholdBytes() {
+        /** @type {number|null} */
+        let memoryGiB = null;
+        try {
+            const rawValue = /** @type {unknown} */ (Reflect.get(globalThis.navigator ?? {}, 'deviceMemory'));
+            if (typeof rawValue === 'number' && Number.isFinite(rawValue) && rawValue > 0) {
+                memoryGiB = rawValue;
+            }
+        } catch (_) {
+            // NOP
+        }
+        return memoryGiB !== null && memoryGiB <= 4 ? LOW_MEMORY_FLUSH_THRESHOLD_BYTES : DEFAULT_FLUSH_THRESHOLD_BYTES;
     }
 
     /**

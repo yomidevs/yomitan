@@ -46,6 +46,20 @@ const LOW_MEMORY_STATEMENT_CACHE_MAX_ENTRIES = 128;
 const DEFAULT_TERM_EXACT_PRESENCE_CACHE_MAX_ENTRIES = 25000;
 const LOW_MEMORY_TERM_EXACT_PRESENCE_CACHE_MAX_ENTRIES = 8000;
 const TERM_BULK_ADD_STAGING_MAX_ROWS = 3000;
+const DEFAULT_TERM_BULK_ADD_STAGING_MAX_ROWS = 4096;
+const HIGH_MEMORY_TERM_BULK_ADD_STAGING_MAX_ROWS = 6144;
+
+/**
+ * @param {string} value
+ * @returns {[number, number]|null}
+ */
+function parseContentHashHexPair(value) {
+    if (value.length !== 16) { return null; }
+    const hash1 = Number.parseInt(value.slice(0, 8), 16);
+    const hash2 = Number.parseInt(value.slice(8, 16), 16);
+    if (!Number.isFinite(hash1) || !Number.isFinite(hash2)) { return null; }
+    return [hash1 >>> 0, hash2 >>> 0];
+}
 
 /**
  * @typedef {object} InsertStatement
@@ -83,6 +97,8 @@ export class DictionaryDatabase {
         this._termEntryContentIdByHash = new Map();
         /** @type {Map<string, {id: number, offset: number, length: number, dictName: string}>} */
         this._termEntryContentMetaByHash = new Map();
+        /** @type {Map<number, Map<number, {id: number, offset: number, length: number, dictName: string}>>} */
+        this._termEntryContentMetaByHashPair = new Map();
         /** @type {boolean} */
         this._termEntryContentHasExistingRows = true;
         /** @type {boolean} */
@@ -140,7 +156,7 @@ export class DictionaryDatabase {
         /** @type {boolean} */
         this._skipIntraBatchContentDedup = false;
         /** @type {number} */
-        this._termBulkAddStagingMaxRows = TERM_BULK_ADD_STAGING_MAX_ROWS;
+        this._termBulkAddStagingMaxRows = this._computeDefaultTermBulkAddStagingMaxRows();
         /** @type {boolean} */
         this._termRecordRowAppendFastPath = true;
         /** @type {TermContentOpfsStore} */
@@ -305,7 +321,7 @@ export class DictionaryDatabase {
             }
             this._termEntryContentIdByKey.clear();
             this._termEntryContentIdByHash.clear();
-            this._termEntryContentMetaByHash.clear();
+            this._clearTermEntryContentMetaCaches();
             this._termEntryContentCache.clear();
             this._termExactPresenceCache.clear();
             this._termPrefixNegativeCache.clear();
@@ -318,25 +334,43 @@ export class DictionaryDatabase {
 
     /**
      * @param {((index: number, count: number) => void)?} [onCheckpoint]
+     * @returns {Promise<{commitMs: number, termContentEndImportSessionMs: number, termRecordEndImportSessionMs: number, termsVirtualTableSyncMs: number, createIndexesMs: number, createIndexesCheckpointCount: number, cacheResetMs: number, runtimePragmasMs: number, totalMs: number}|null>}
      */
     async finishBulkImport(onCheckpoint = null) {
         if (this._bulkImportDepth <= 0) {
-            return;
+            return null;
         }
         --this._bulkImportDepth;
         if (this._bulkImportDepth === 0) {
             const db = this._requireDb();
+            const tFinishBulkImportStart = safePerformance.now();
+            let commitMs = 0;
+            let termContentEndImportSessionMs = 0;
+            let termRecordEndImportSessionMs = 0;
+            let termsVirtualTableSyncMs = 0;
+            let createIndexesMs = 0;
+            let createIndexesCheckpointCount = 0;
+            let cacheResetMs = 0;
+            let runtimePragmasMs = 0;
             try {
                 if (this._bulkImportTransactionOpen) {
+                    const tCommitStart = safePerformance.now();
                     db.exec('COMMIT');
+                    commitMs = safePerformance.now() - tCommitStart;
                     this._bulkImportTransactionOpen = false;
                 }
+                const tTermContentEndImportSessionStart = safePerformance.now();
                 await this._termContentStore.endImportSession();
+                termContentEndImportSessionMs = safePerformance.now() - tTermContentEndImportSessionStart;
+                const tTermRecordEndImportSessionStart = safePerformance.now();
                 await this._termRecordStore.endImportSession();
+                termRecordEndImportSessionMs = safePerformance.now() - tTermRecordEndImportSessionStart;
                 if (this._termsVirtualTableDirty) {
                     await this._beginImmediateTransaction(db);
                     try {
+                        const tTermsVirtualTableSyncStart = safePerformance.now();
                         await this._syncTermsVirtualTableFromRecordStore();
+                        termsVirtualTableSyncMs = safePerformance.now() - tTermsVirtualTableSyncStart;
                         db.exec('COMMIT');
                         this._termsVirtualTableDirty = false;
                     } catch (e) {
@@ -345,21 +379,54 @@ export class DictionaryDatabase {
                     }
                 }
                 const createIndexStatements = this._createIndexesSql();
+                const tCreateIndexesStart = safePerformance.now();
                 for (let i = 0; i < createIndexStatements.length; ++i) {
                     db.exec(createIndexStatements[i]);
                     if (typeof onCheckpoint === 'function') {
                         onCheckpoint(i + 1, createIndexStatements.length);
                     }
                 }
+                createIndexesMs = safePerformance.now() - tCreateIndexesStart;
+                createIndexesCheckpointCount = createIndexStatements.length;
+                const tCacheResetStart = safePerformance.now();
                 this._termEntryContentIdByKey.clear();
                 this._termEntryContentIdByHash.clear();
-                this._termEntryContentMetaByHash.clear();
+                this._clearTermEntryContentMetaCaches();
                 this._termEntryContentCache.clear();
                 this._termExactPresenceCache.clear();
                 this._termPrefixNegativeCache.clear();
                 this._directTermIndexByDictionary.clear();
+                cacheResetMs = safePerformance.now() - tCacheResetStart;
                 this._deferTermsVirtualTableSync = false;
+                const tRuntimePragmasStart = safePerformance.now();
                 this._applyRuntimePragmas();
+                runtimePragmasMs = safePerformance.now() - tRuntimePragmasStart;
+                const totalMs = safePerformance.now() - tFinishBulkImportStart;
+                if (this._importDebugLogging) {
+                    log.log(
+                        '[manabitan-db-import] finishBulkImport ' +
+                        `total=${totalMs.toFixed(1)}ms ` +
+                        `commit=${commitMs.toFixed(1)}ms ` +
+                        `termContentEnd=${termContentEndImportSessionMs.toFixed(1)}ms ` +
+                        `termRecordEnd=${termRecordEndImportSessionMs.toFixed(1)}ms ` +
+                        `termsVtabSync=${termsVirtualTableSyncMs.toFixed(1)}ms ` +
+                        `createIndexes=${createIndexesMs.toFixed(1)}ms ` +
+                        `cacheReset=${cacheResetMs.toFixed(1)}ms ` +
+                        `runtimePragmas=${runtimePragmasMs.toFixed(1)}ms ` +
+                        `indexStatements=${createIndexesCheckpointCount}`,
+                    );
+                }
+                return {
+                    commitMs,
+                    termContentEndImportSessionMs,
+                    termRecordEndImportSessionMs,
+                    termsVirtualTableSyncMs,
+                    createIndexesMs,
+                    createIndexesCheckpointCount,
+                    cacheResetMs,
+                    runtimePragmasMs,
+                    totalMs,
+                };
             } finally {
                 if (this._bulkImportTransactionOpen) {
                     try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
@@ -393,7 +460,7 @@ export class DictionaryDatabase {
             this._adaptiveTermBulkAddBatchSize = true;
             this._retryBeginImmediateTransaction = false;
             this._skipIntraBatchContentDedup = false;
-            this._termBulkAddStagingMaxRows = TERM_BULK_ADD_STAGING_MAX_ROWS;
+            this._termBulkAddStagingMaxRows = this._computeDefaultTermBulkAddStagingMaxRows();
             this._termRecordRowAppendFastPath = true;
             return;
         }
@@ -402,7 +469,7 @@ export class DictionaryDatabase {
         this._skipIntraBatchContentDedup = value.skipIntraBatchContentDedup === true;
         const termBulkAddStagingMaxRows = Number.isFinite(value.termBulkAddStagingMaxRows) ?
             Math.trunc(/** @type {number} */ (value.termBulkAddStagingMaxRows)) :
-            TERM_BULK_ADD_STAGING_MAX_ROWS;
+            this._computeDefaultTermBulkAddStagingMaxRows();
         this._termBulkAddStagingMaxRows = Math.max(512, Math.min(20000, termBulkAddStagingMaxRows));
         this._termRecordRowAppendFastPath = value.termRecordRowAppendFastPath !== false;
     }
@@ -446,7 +513,7 @@ export class DictionaryDatabase {
         await this.prepare();
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
-        this._termEntryContentMetaByHash.clear();
+        this._clearTermEntryContentMetaCaches();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -538,7 +605,7 @@ export class DictionaryDatabase {
         await this._openConnection();
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
-        this._termEntryContentMetaByHash.clear();
+        this._clearTermEntryContentMetaCaches();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -613,7 +680,7 @@ export class DictionaryDatabase {
         onProgress(progressData);
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
-        this._termEntryContentMetaByHash.clear();
+        this._clearTermEntryContentMetaCaches();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -660,7 +727,7 @@ export class DictionaryDatabase {
         this._statementCache.clear();
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
-        this._termEntryContentMetaByHash.clear();
+        this._clearTermEntryContentMetaCaches();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -1674,7 +1741,7 @@ export class DictionaryDatabase {
             if (!this._bulkImportTransactionOpen) {
                 this._termEntryContentIdByHash.clear();
                 this._termEntryContentIdByKey.clear();
-                this._termEntryContentMetaByHash.clear();
+                this._clearTermEntryContentMetaCaches();
             }
             this._termExactPresenceCache.clear();
             this._termPrefixNegativeCache.clear();
@@ -1928,49 +1995,94 @@ export class DictionaryDatabase {
         let processedRowCount = 0;
         let insertedRowCount = 0;
         let totalPendingContentUniqueCount = 0;
+        const compressionDictName = count > 0 ? resolveTermContentZstdDictName((/** @type {import('dictionary-database').DatabaseTermEntry} */ (items[start])).dictionary) : null;
 
-        /** @type {import('@sqlite.org/sqlite-wasm').Bindable[][]} */
-        let termRows = [];
-        /** @type {{contentHash: string, contentBytes: Uint8Array, contentDictName: string|null}[]} */
-        let pendingContentRows = [];
+        /** @type {import('dictionary-database').DatabaseTermEntry[]} */
+        let stagedRows = [];
+        /** @type {number[]} */
+        let stagedPendingContentIndexes = [];
+        /** @type {number[]} */
+        let stagedContentOffsets = [];
+        /** @type {number[]} */
+        let stagedContentLengths = [];
+        /** @type {(string|null)[]} */
+        let stagedContentDictNames = [];
+        /** @type {(string|null)[]} */
+        let pendingContentHashes = [];
+        /** @type {number[]} */
+        let pendingContentHash1s = [];
+        /** @type {number[]} */
+        let pendingContentHash2s = [];
+        /** @type {Uint8Array[]} */
+        let pendingContentBytes = [];
+        /** @type {(string|null)[]} */
+        let pendingContentDictNames = [];
         /** @type {Map<string, number>|null} */
         let pendingContentRowIndexByHash = shouldDedupWithinBatch ? new Map() : null;
+        /** @type {Map<number, Map<number, number>>|null} */
+        let pendingContentRowIndexByHashPair = shouldDedupWithinBatch ? new Map() : null;
 
         if (useLocalTransaction) {
             await this._beginImmediateTransaction(db);
         }
         try {
             const flushStagedRows = async () => {
-                if (termRows.length === 0) {
-                    pendingContentRows = [];
+                if (stagedRows.length === 0) {
+                    stagedPendingContentIndexes = [];
+                    stagedContentOffsets = [];
+                    stagedContentLengths = [];
+                    stagedContentDictNames = [];
+                    pendingContentHashes = [];
+                    pendingContentHash1s = [];
+                    pendingContentHash2s = [];
+                    pendingContentBytes = [];
+                    pendingContentDictNames = [];
                     if (pendingContentRowIndexByHash !== null) {
                         pendingContentRowIndexByHash.clear();
+                    }
+                    if (pendingContentRowIndexByHashPair !== null) {
+                        pendingContentRowIndexByHashPair.clear();
                     }
                     return;
                 }
 
-                if (pendingContentRows.length > 0) {
-                    totalPendingContentUniqueCount += pendingContentRows.length;
+                if (pendingContentBytes.length > 0) {
+                    totalPendingContentUniqueCount += pendingContentBytes.length;
                     const tAppendStart = safePerformance.now();
-                    const contentChunks = pendingContentRows.map((row) => row.contentBytes);
-                    const spans = await this._termContentStore.appendBatch(contentChunks);
-                    for (const chunk of contentChunks) {
+                    const spans = await this._termContentStore.appendBatch(pendingContentBytes);
+                    for (const chunk of pendingContentBytes) {
                         appendedContentBytes += chunk.byteLength;
                     }
                     appendContentMs += safePerformance.now() - tAppendStart;
 
-                    for (let i = 0, ii = pendingContentRows.length; i < ii; i += contentBatchSize) {
+                    for (let i = 0, ii = stagedRows.length; i < ii; ++i) {
+                        const pendingIndex = stagedPendingContentIndexes[i];
+                        if (pendingIndex < 0) { continue; }
+                        const span = spans[pendingIndex];
+                        if (typeof span === 'undefined') {
+                            throw new Error('Failed to resolve staged term entry content span for bulk term insert');
+                        }
+                        stagedPendingContentIndexes[i] = -1;
+                        stagedContentOffsets[i] = span.offset;
+                        stagedContentLengths[i] = span.length;
+                        stagedContentDictNames[i] = pendingContentDictNames[pendingIndex] ?? 'raw';
+                    }
+
+                    for (let i = 0, ii = pendingContentBytes.length; i < ii; i += contentBatchSize) {
                         const chunkCount = Math.min(contentBatchSize, ii - i);
                         const tContentSqlStart = safePerformance.now();
                         for (let j = i, jj = i + chunkCount; j < jj; ++j) {
                             const span = spans[j];
-                            const row = pendingContentRows[j];
-                            this._termEntryContentMetaByHash.set(row.contentHash, {
-                                id: 0,
-                                offset: span.offset,
-                                length: span.length,
-                                dictName: row.contentDictName ?? 'raw',
-                            });
+                            const contentDictName = pendingContentDictNames[j];
+                            this._cacheTermEntryContentMeta(
+                                pendingContentHashes[j],
+                                span.offset,
+                                span.length,
+                                contentDictName,
+                                0,
+                                pendingContentHash1s[j],
+                                pendingContentHash2s[j],
+                            );
                         }
                         const contentBatchMs = safePerformance.now() - tContentSqlStart;
                         insertContentSqlMs += contentBatchMs;
@@ -1978,25 +2090,10 @@ export class DictionaryDatabase {
                     }
                 }
 
-                for (let i = 0, ii = termRows.length; i < ii; ++i) {
-                    const row = termRows[i];
-                    const contentHashValue = /** @type {unknown} */ (row[5]);
-                    if (typeof contentHashValue !== 'string' || contentHashValue.length === 0) { continue; }
-                    const contentHash = contentHashValue;
-                    const meta = this._termEntryContentMetaByHash.get(contentHash);
-                    if (typeof meta === 'undefined') {
-                        throw new Error('Failed to resolve term entry content metadata for bulk term insert');
-                    }
-                    row[5] = null;
-                    row[6] = meta.offset;
-                    row[7] = meta.length;
-                    row[8] = meta.dictName;
-                }
-
-                for (let i = 0, ii = termRows.length; i < ii; i += termBatchSize) {
+                for (let i = 0, ii = stagedRows.length; i < ii; i += termBatchSize) {
                     const chunkCount = Math.min(termBatchSize, ii - i);
                     const tTermSqlStart = safePerformance.now();
-                    const split = await this._insertResolvedTermRows(termRows, i, chunkCount);
+                    const split = await this._insertResolvedImportTermEntries(stagedRows, stagedContentOffsets, stagedContentLengths, stagedContentDictNames, i, chunkCount);
                     const termBatchMs = safePerformance.now() - tTermSqlStart;
                     insertTermsSqlMs += termBatchMs;
                     insertTermRecordAppendMs += split.termRecordAppendMs;
@@ -2028,9 +2125,18 @@ export class DictionaryDatabase {
                     }
                 }
 
-                termRows = [];
-                pendingContentRows = [];
+                stagedRows = [];
+                stagedPendingContentIndexes = [];
+                stagedContentOffsets = [];
+                stagedContentLengths = [];
+                stagedContentDictNames = [];
+                pendingContentHashes = [];
+                pendingContentHash1s = [];
+                pendingContentHash2s = [];
+                pendingContentBytes = [];
+                pendingContentDictNames = [];
                 pendingContentRowIndexByHash = shouldDedupWithinBatch ? new Map() : null;
+                pendingContentRowIndexByHashPair = shouldDedupWithinBatch ? new Map() : null;
             };
 
             for (let i = start, ii = start + count; i < ii; ++i) {
@@ -2038,93 +2144,109 @@ export class DictionaryDatabase {
                 const row = /** @type {import('dictionary-database').DatabaseTermEntry} */ (items[i]);
                 const tComputeStart = safePerformance.now();
                 const precomputedHash = (typeof row.termEntryContentHash === 'string' && row.termEntryContentHash.length > 0) ? row.termEntryContentHash : null;
+                const precomputedHash1 = Number.isInteger(row.termEntryContentHash1) ? (/** @type {number} */ (row.termEntryContentHash1) >>> 0) : -1;
+                const precomputedHash2 = Number.isInteger(row.termEntryContentHash2) ? (/** @type {number} */ (row.termEntryContentHash2) >>> 0) : -1;
+                const hasPrecomputedHashPair = precomputedHash1 >= 0 && precomputedHash2 >= 0;
                 const precomputedBytes = row.termEntryContentBytes instanceof Uint8Array ? row.termEntryContentBytes : null;
                 let contentHash = precomputedHash;
+                let contentHash1 = precomputedHash1;
+                let contentHash2 = precomputedHash2;
                 let contentBytes = precomputedBytes;
-                if (contentHash === null || contentBytes === null) {
+                if ((contentHash === null && !hasPrecomputedHashPair) || contentBytes === null) {
                     const rules = row.rules;
                     const definitionTags = row.definitionTags ?? row.tags ?? '';
                     const termTags = row.termTags ?? '';
                     const contentJson = row.termEntryContentJson ?? this._serializeTermEntryContent(rules, definitionTags, termTags, row.glossary);
                     contentHash = contentHash ?? this._hashEntryContent(contentJson);
                     contentBytes = contentBytes ?? this._textEncoder.encode(contentJson);
+                    if (contentHash1 < 0 || contentHash2 < 0) {
+                        const hashPair = parseContentHashHexPair(contentHash);
+                        if (hashPair !== null) {
+                            [contentHash1, contentHash2] = hashPair;
+                        }
+                    }
                 }
                 computeContentMs += safePerformance.now() - tComputeStart;
 
-                const existingMeta = this._termEntryContentMetaByHash.get(contentHash);
+                let existingMeta = (contentHash1 >= 0 && contentHash2 >= 0) ?
+                    this._getTermEntryContentMetaByHashPair(contentHash1, contentHash2) :
+                    void 0;
+                if (typeof existingMeta === 'undefined' && contentHash !== null) {
+                    existingMeta = this._termEntryContentMetaByHash.get(contentHash);
+                }
                 if (typeof existingMeta !== 'undefined') {
                     ++resolvedFromCacheCount;
-                    termRows.push([
-                        row.dictionary,
-                        row.expression,
-                        row.reading,
-                        row.expressionReverse ?? null,
-                        row.readingReverse ?? null,
-                        null,
-                        existingMeta.offset,
-                        existingMeta.length,
-                        existingMeta.dictName,
-                        '',
-                        '',
-                        '',
-                        row.score,
-                        '[]',
-                        typeof row.sequence === 'number' ? row.sequence : null,
-                    ]);
+                    stagedRows.push(row);
+                    stagedPendingContentIndexes.push(-1);
+                    stagedContentOffsets.push(existingMeta.offset);
+                    stagedContentLengths.push(existingMeta.length);
+                    stagedContentDictNames.push(existingMeta.dictName);
                     continue;
                 }
 
-                if (!shouldDedupWithinBatch || pendingContentRowIndexByHash === null || !pendingContentRowIndexByHash.has(contentHash)) {
+                let pendingContentIndex = -1;
+                if (pendingContentRowIndexByHashPair !== null && contentHash1 >= 0 && contentHash2 >= 0) {
+                    const pendingContentRowIndexByHash2 = pendingContentRowIndexByHashPair.get(contentHash1);
+                    if (typeof pendingContentRowIndexByHash2 !== 'undefined') {
+                        const existingPendingContentIndex = pendingContentRowIndexByHash2.get(contentHash2);
+                        if (typeof existingPendingContentIndex === 'number') {
+                            pendingContentIndex = existingPendingContentIndex;
+                        }
+                    }
+                }
+                if (pendingContentIndex < 0 && pendingContentRowIndexByHash !== null && contentHash !== null) {
+                    const existingPendingContentIndex = pendingContentRowIndexByHash.get(contentHash);
+                    if (typeof existingPendingContentIndex === 'number') {
+                        pendingContentIndex = existingPendingContentIndex;
+                    }
+                }
+                if (pendingContentIndex < 0) {
                     const tCompressStart = safePerformance.now();
-                    const contentDictName = resolveTermContentZstdDictName(row.dictionary);
                     let contentZstd = contentBytes;
                     let effectiveDictName = 'raw';
                     if (contentBytes.byteLength >= this._termContentCompressionMinBytes) {
-                        const compressed = compressTermContentZstd(contentBytes, contentDictName);
+                        const compressed = compressTermContentZstd(contentBytes, compressionDictName);
                         if (compressed.byteLength < contentBytes.byteLength) {
                             contentZstd = compressed;
-                            effectiveDictName = contentDictName ?? '';
+                            effectiveDictName = compressionDictName ?? '';
                         }
                     }
                     compressContentMs += safePerformance.now() - tCompressStart;
-                    if (pendingContentRowIndexByHash !== null) {
-                        pendingContentRowIndexByHash.set(contentHash, pendingContentRows.length);
+                    pendingContentIndex = pendingContentBytes.length;
+                    if (pendingContentRowIndexByHash !== null && contentHash !== null) {
+                        pendingContentRowIndexByHash.set(contentHash, pendingContentIndex);
                     }
-                    pendingContentRows.push({
-                        contentHash,
-                        contentBytes: contentZstd,
-                        contentDictName: effectiveDictName,
-                    });
+                    if (pendingContentRowIndexByHashPair !== null && contentHash1 >= 0 && contentHash2 >= 0) {
+                        let pendingContentRowIndexByHash2 = pendingContentRowIndexByHashPair.get(contentHash1);
+                        if (typeof pendingContentRowIndexByHash2 === 'undefined') {
+                            pendingContentRowIndexByHash2 = new Map();
+                            pendingContentRowIndexByHashPair.set(contentHash1, pendingContentRowIndexByHash2);
+                        }
+                        pendingContentRowIndexByHash2.set(contentHash2, pendingContentIndex);
+                    }
+                    pendingContentHashes.push(contentHash);
+                    pendingContentHash1s.push(contentHash1);
+                    pendingContentHash2s.push(contentHash2);
+                    pendingContentBytes.push(contentZstd);
+                    pendingContentDictNames.push(effectiveDictName);
                 }
 
-                termRows.push([
-                    row.dictionary,
-                    row.expression,
-                    row.reading,
-                    row.expressionReverse ?? null,
-                    row.readingReverse ?? null,
-                    contentHash,
-                    null,
-                    null,
-                    null,
-                    '',
-                    '',
-                    '',
-                    row.score,
-                    '[]',
-                    typeof row.sequence === 'number' ? row.sequence : null,
-                ]);
+                stagedRows.push(row);
+                stagedPendingContentIndexes.push(pendingContentIndex);
+                stagedContentOffsets.push(-1);
+                stagedContentLengths.push(-1);
+                stagedContentDictNames.push(null);
 
                 const tNow = safePerformance.now();
                 if (this._importDebugLogging && (tNow - lastProgressLog) >= this._termBulkAddLogIntervalMs) {
                     lastProgressLog = tNow;
                     log.log(
                         `[manabitan-db-import] bulkAdd terms progress rows=${processedRowCount}/${count} ` +
-                        `cached=${resolvedFromCacheCount} pendingUnique=${pendingContentRows.length}`,
+                        `cached=${resolvedFromCacheCount} pendingUnique=${pendingContentBytes.length}`,
                     );
                 }
 
-                if (termRows.length >= stagingBatchSize) {
+                if (stagedRows.length >= stagingBatchSize) {
                     await flushStagedRows();
                 }
             }
@@ -2209,6 +2331,52 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {import('dictionary-database').DatabaseTermEntry[]} rows
+     * @param {number[]} contentOffsets
+     * @param {number[]} contentLengths
+     * @param {(string|null)[]} contentDictNames
+     * @param {number} start
+     * @param {number} count
+     * @returns {Promise<{termRecordAppendMs: number, termsVtabInsertMs: number}>}
+     */
+    async _insertResolvedImportTermEntries(rows, contentOffsets, contentLengths, contentDictNames, start, count) {
+        const tRecordAppendStart = safePerformance.now();
+        if (this._termRecordRowAppendFastPath) {
+            await this._termRecordStore.appendBatchFromResolvedImportTermEntries(rows, start, count, contentOffsets, contentLengths, contentDictNames);
+        } else {
+            /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
+            const records = [];
+            for (let i = start, ii = start + count; i < ii; ++i) {
+                const row = rows[i];
+                records.push({
+                    dictionary: row.dictionary,
+                    expression: row.expression,
+                    reading: row.reading,
+                    expressionReverse: row.expressionReverse ?? null,
+                    readingReverse: row.readingReverse ?? null,
+                    entryContentOffset: contentOffsets[i],
+                    entryContentLength: contentLengths[i],
+                    entryContentDictName: contentDictNames[i],
+                    score: row.score,
+                    sequence: typeof row.sequence === 'number' ? row.sequence : null,
+                });
+            }
+            await this._termRecordStore.appendBatch(records);
+        }
+        const termRecordAppendMs = safePerformance.now() - tRecordAppendStart;
+        let termsVtabInsertMs = 0;
+        const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
+        if (deferVirtualTableWrite) {
+            this._termsVirtualTableDirty = true;
+        } else {
+            const tVtabStart = safePerformance.now();
+            await this._insertTermRowsIntoVirtualTable(count);
+            termsVtabInsertMs = safePerformance.now() - tVtabStart;
+        }
+        return {termRecordAppendMs, termsVtabInsertMs};
+    }
+
+    /**
      * @param {number} count
      * @returns {Promise<void>}
      */
@@ -2239,6 +2407,65 @@ export class DictionaryDatabase {
             }
         }
         await this._insertResolvedTermRows(rows.map((row) => row.values), 0, rows.length);
+    }
+
+    /** */
+    _clearTermEntryContentMetaCaches() {
+        this._termEntryContentMetaByHash.clear();
+        this._termEntryContentMetaByHashPair.clear();
+    }
+
+    /**
+     * @param {number} hash1
+     * @param {number} hash2
+     * @returns {{id: number, offset: number, length: number, dictName: string}|undefined}
+     */
+    _getTermEntryContentMetaByHashPair(hash1, hash2) {
+        const byHash2 = this._termEntryContentMetaByHashPair.get(hash1 >>> 0);
+        return typeof byHash2 !== 'undefined' ? byHash2.get(hash2 >>> 0) : void 0;
+    }
+
+    /**
+     * @param {number} hash1
+     * @param {number} hash2
+     * @param {{id: number, offset: number, length: number, dictName: string}} meta
+     */
+    _setTermEntryContentMetaByHashPair(hash1, hash2, meta) {
+        hash1 >>>= 0;
+        hash2 >>>= 0;
+        let byHash2 = this._termEntryContentMetaByHashPair.get(hash1);
+        if (typeof byHash2 === 'undefined') {
+            byHash2 = new Map();
+            this._termEntryContentMetaByHashPair.set(hash1, byHash2);
+        }
+        byHash2.set(hash2, meta);
+    }
+
+    /**
+     * @param {string|null} contentHash
+     * @param {number} offset
+     * @param {number} length
+     * @param {string|null|undefined} dictName
+     * @param {number} [id]
+     * @param {number} [hash1]
+     * @param {number} [hash2]
+     * @returns {{id: number, offset: number, length: number, dictName: string}}
+     */
+    _cacheTermEntryContentMeta(contentHash, offset, length, dictName, id = 0, hash1 = -1, hash2 = -1) {
+        const meta = {id, offset, length, dictName: dictName ?? 'raw'};
+        if (typeof contentHash === 'string' && contentHash.length > 0) {
+            this._termEntryContentMetaByHash.set(contentHash, meta);
+            if (hash1 < 0 || hash2 < 0) {
+                const parsedHashPair = parseContentHashHexPair(contentHash);
+                if (parsedHashPair !== null) {
+                    [hash1, hash2] = parsedHashPair;
+                }
+            }
+        }
+        if (hash1 >= 0 && hash2 >= 0) {
+            this._setTermEntryContentMetaByHashPair(hash1, hash2, meta);
+        }
+        return meta;
     }
 
     /**
@@ -2289,12 +2516,7 @@ export class DictionaryDatabase {
             const id = firstId + (i - start);
             this._termEntryContentIdByHash.set(rows[i].contentHash, id);
             this._termEntryContentIdByKey.set(rows[i].contentHash, id);
-            this._termEntryContentMetaByHash.set(rows[i].contentHash, {
-                id,
-                offset: spans[i].offset,
-                length: spans[i].length,
-                dictName: rows[i].contentDictName ?? 'raw',
-            });
+            this._cacheTermEntryContentMeta(rows[i].contentHash, spans[i].offset, spans[i].length, rows[i].contentDictName, id);
         }
     }
 
@@ -2376,7 +2598,7 @@ export class DictionaryDatabase {
                     const length = this._asNumber(row.contentLength, -1);
                     const dictName = this._asNullableString(row.contentDictName) ?? 'raw';
                     if (offset >= 0 && length > 0) {
-                        this._termEntryContentMetaByHash.set(contentHash, {id: cachedHashId, offset, length, dictName});
+                        this._cacheTermEntryContentMeta(contentHash, offset, length, dictName, cachedHashId);
                     }
                 }
             }
@@ -2402,12 +2624,7 @@ export class DictionaryDatabase {
         }
         this._termEntryContentIdByHash.set(contentHash, id);
         this._termEntryContentIdByKey.set(contentKey, id);
-        this._termEntryContentMetaByHash.set(contentHash, {
-            id,
-            offset: span.offset,
-            length: span.length,
-            dictName: contentDictName ?? 'raw',
-        });
+        this._cacheTermEntryContentMeta(contentHash, span.offset, span.length, contentDictName, id);
         return id;
     }
 
@@ -2429,7 +2646,7 @@ export class DictionaryDatabase {
                 if (!this._termEntryContentIdByHash.has(contentHash)) {
                     this._termEntryContentIdByHash.set(contentHash, id);
                 }
-                this._termEntryContentMetaByHash.set(contentHash, {id, offset, length, dictName});
+                this._cacheTermEntryContentMeta(contentHash, offset, length, dictName, id);
             }
         }
     }
@@ -2668,7 +2885,7 @@ export class DictionaryDatabase {
 
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
-        this._termEntryContentMetaByHash.clear();
+        this._clearTermEntryContentMetaCaches();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -3867,6 +4084,20 @@ export class DictionaryDatabase {
     _computeTermExactPresenceCacheMaxEntries() {
         const memoryGiB = this._getApproximateDeviceMemoryGiB();
         return memoryGiB !== null && memoryGiB <= 4 ? LOW_MEMORY_TERM_EXACT_PRESENCE_CACHE_MAX_ENTRIES : DEFAULT_TERM_EXACT_PRESENCE_CACHE_MAX_ENTRIES;
+    }
+
+    /**
+     * @returns {number}
+     */
+    _computeDefaultTermBulkAddStagingMaxRows() {
+        const memoryGiB = this._getApproximateDeviceMemoryGiB();
+        if (memoryGiB !== null && memoryGiB <= 4) {
+            return TERM_BULK_ADD_STAGING_MAX_ROWS;
+        }
+        if (memoryGiB !== null && memoryGiB >= 8) {
+            return HIGH_MEMORY_TERM_BULK_ADD_STAGING_MAX_ROWS;
+        }
+        return DEFAULT_TERM_BULK_ADD_STAGING_MAX_ROWS;
     }
 
     /**

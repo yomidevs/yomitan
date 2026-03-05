@@ -48,7 +48,7 @@ const ADAPTIVE_TERM_BANK_WASM_ROW_CHUNK_SIZE_THRESHOLD_BYTES = 8 * 1024 * 1024;
 const ADAPTIVE_TERM_BANK_WASM_ROW_CHUNK_SIZE_UPPER_BOUND_BYTES = 128 * 1024 * 1024;
 const ADAPTIVE_TERM_BANK_WASM_INITIAL_META_CAPACITY_DIVISOR = 18;
 const ADAPTIVE_TERM_BANK_WASM_INITIAL_CONTENT_BYTES_PER_ROW = 128;
-const REVERSE_STRING_CACHE_MAX_ENTRIES = 16384;
+const REVERSE_STRING_CACHE_MAX_ENTRIES = 4096;
 const TERM_BANK_ARTIFACT_MAGIC = 'MBTB0001';
 const TERM_BANK_ARTIFACT_MAGIC_BYTES = TERM_BANK_ARTIFACT_MAGIC.length;
 const HEX_BYTE_TABLE = Array.from({length: 256}, (_, i) => i.toString(16).padStart(2, '0'));
@@ -64,6 +64,22 @@ function reverseUtf16PreserveSurrogates(value) {
     const ii = value.length;
     if (ii <= 1) {
         return value;
+    }
+    // Most dictionary terms are BMP-only; use a cheaper code-unit reversal when no surrogate code units are present.
+    let hasSurrogates = false;
+    for (let i = 0; i < ii; ++i) {
+        if ((value.charCodeAt(i) & 0xf800) === 0xd800) {
+            hasSurrogates = true;
+            break;
+        }
+    }
+    if (!hasSurrogates) {
+        /** @type {string[]} */
+        const parts = new Array(ii);
+        for (let i = 0; i < ii; ++i) {
+            parts[i] = value[ii - 1 - i];
+        }
+        return parts.join('');
     }
     /** @type {string[]} */
     const parts = [];
@@ -107,6 +123,41 @@ function hashPairToHex(h1, h2) {
         HEX_BYTE_TABLE[b & 0xff]
     );
 }
+
+/**
+ * @param {{termEntryContentHash?: string, termEntryContentHash1?: number, termEntryContentHash2?: number, termEntryContentBytes?: Uint8Array}} entry
+ * @returns {boolean}
+ */
+function hasPrecomputedTermEntryContent(entry) {
+    return (
+        (
+            typeof entry.termEntryContentHash === 'string' &&
+            entry.termEntryContentHash.length > 0
+        ) ||
+        (
+            Number.isInteger(entry.termEntryContentHash1) &&
+            Number.isInteger(entry.termEntryContentHash2)
+        )
+    ) && entry.termEntryContentBytes instanceof Uint8Array;
+}
+
+/**
+ * @typedef {object} ParsedTermBankChunkRow
+ * @property {string} expression
+ * @property {string} reading
+ * @property {string} definitionTags
+ * @property {string} rules
+ * @property {number} score
+ * @property {string} glossaryJson
+ * @property {Uint8Array} [glossaryJsonBytes]
+ * @property {boolean} [glossaryMayContainMedia]
+ * @property {number|null} sequence
+ * @property {string} termTags
+ * @property {string} [termEntryContentHash]
+ * @property {number} [termEntryContentHash1]
+ * @property {number} [termEntryContentHash2]
+ * @property {Uint8Array} termEntryContentBytes
+ */
 
 /**
  * @param {Uint8Array} bytes
@@ -201,7 +252,7 @@ export class DictionaryImporter {
         /** @type {boolean} */
         this._leanCanonicalTermEntryObjects = false;
         /** @type {boolean} */
-        this._cacheReverseStrings = false;
+        this._cacheReverseStrings = true;
         /** @type {number} */
         this._reverseStringCacheMaxEntries = REVERSE_STRING_CACHE_MAX_ENTRIES;
         /** @type {Map<string, string>} */
@@ -262,14 +313,14 @@ export class DictionaryImporter {
         this._wasmPreallocateChunkRows = details.wasmPreallocateChunkRows === true;
         this._usePrecomputedContentForMediaRows = details.usePrecomputedContentForMediaRows === true;
         this._leanCanonicalTermEntryObjects = details.leanCanonicalTermEntryObjects === true;
-        this._cacheReverseStrings = details.cacheReverseStrings === true;
+        this._cacheReverseStrings = details.cacheReverseStrings !== false;
         this._fastPrefixReverse = details.fastPrefixReverse !== false;
         this._reverseStringCacheMaxEntries = Number.isFinite(details.reverseStringCacheMaxEntries) ?
             Math.max(1024, Math.min(131072, Math.trunc(/** @type {number} */ (details.reverseStringCacheMaxEntries)))) :
             REVERSE_STRING_CACHE_MAX_ENTRIES;
         const termBulkAddStagingMaxRows = Number.isFinite(details.termBulkAddStagingMaxRows) ?
             Math.max(512, Math.min(20000, Math.trunc(/** @type {number} */ (details.termBulkAddStagingMaxRows)))) :
-            3000;
+            void 0;
         const retryBeginImmediateTransaction = details.retryBeginImmediateTransaction === true;
         const skipIntraBatchContentDedup = details.skipIntraBatchContentDedup === true;
         const termRecordRowAppendFastPath = details.termRecordRowAppendFastPath !== false;
@@ -776,13 +827,14 @@ export class DictionaryImporter {
             });
         } finally {
             this._setProgressInterval(previousProgressInterval);
-            dictionaryDatabase.setImportDebugLogging(false);
             const tBulkFinalizationStart = Date.now();
+            /** @type {{commitMs?: number, termContentEndImportSessionMs?: number, termRecordEndImportSessionMs?: number, termsVirtualTableSyncMs?: number, createIndexesMs?: number, createIndexesCheckpointCount?: number, cacheResetMs?: number, runtimePragmasMs?: number, totalMs?: number}|null} */
+            let bulkFinalizationDetails = null;
             this._progressNextStep(20, false);
             this._progressData.index = 0;
             this._progress();
             try {
-                await dictionaryDatabase.finishBulkImport((checkpointIndex, total) => {
+                bulkFinalizationDetails = await dictionaryDatabase.finishBulkImport((checkpointIndex, total) => {
                     this._progressData.index = Math.max(1, Math.floor((checkpointIndex / total) * this._progressData.count));
                     this._progress();
                     this._logImport(`bulk finalization ${checkpointIndex}/${total}`);
@@ -793,9 +845,12 @@ export class DictionaryImporter {
             }
             this._progressData.index = this._progressData.count;
             this._progress();
-            recordPhaseTiming('bulk-finalization', tBulkFinalizationStart, {
-                ok: !importFailed,
-            });
+            const bulkFinalizationPhaseDetails = {ok: !importFailed};
+            if (bulkFinalizationDetails !== null) {
+                Object.assign(bulkFinalizationPhaseDetails, bulkFinalizationDetails);
+            }
+            recordPhaseTiming('bulk-finalization', tBulkFinalizationStart, bulkFinalizationPhaseDetails);
+            dictionaryDatabase.setImportDebugLogging(false);
         }
 
         if (importFailed) {
@@ -1462,16 +1517,12 @@ export class DictionaryImporter {
     _prepareTermEntrySerialization(entry, enableTermEntryContentDedup) {
         if (
             enableTermEntryContentDedup &&
-            typeof entry.termEntryContentHash === 'string' &&
-            entry.termEntryContentHash.length > 0 &&
-            entry.termEntryContentBytes instanceof Uint8Array
+            hasPrecomputedTermEntryContent(entry)
         ) {
             return;
         }
         if (
-            typeof entry.termEntryContentHash === 'string' &&
-            entry.termEntryContentHash.length > 0 &&
-            entry.termEntryContentBytes instanceof Uint8Array &&
+            hasPrecomputedTermEntryContent(entry) &&
             typeof entry.glossaryJson === 'string'
         ) {
             return;
@@ -1483,7 +1534,10 @@ export class DictionaryImporter {
         const definitionTags = entry.definitionTags ?? entry.tags ?? '';
         const termTags = entry.termTags ?? '';
         const contentJson = this._createTermEntryContentJson(entry.rules, definitionTags, termTags, glossaryJson);
-        entry.termEntryContentHash = this._hashEntryContent(contentJson);
+        const [hash1, hash2] = this._hashEntryContentPair(contentJson);
+        entry.termEntryContentHash1 = hash1;
+        entry.termEntryContentHash2 = hash2;
+        entry.termEntryContentHash = hashPairToHex(hash1, hash2);
         entry.termEntryContentBytes = this._textEncoder.encode(contentJson);
     }
 
@@ -1526,6 +1580,15 @@ export class DictionaryImporter {
      * @returns {string}
      */
     _hashEntryContent(contentJson) {
+        const [h1, h2] = this._hashEntryContentPair(contentJson);
+        return hashPairToHex(h1, h2);
+    }
+
+    /**
+     * @param {string} contentJson
+     * @returns {[number, number]}
+     */
+    _hashEntryContentPair(contentJson) {
         let h1 = 0x811c9dc5;
         let h2 = 0x9e3779b9;
         const bytes = this._textEncoder.encode(contentJson);
@@ -1538,7 +1601,7 @@ export class DictionaryImporter {
         if ((h1 | h2) === 0) {
             h1 = 1;
         }
-        return `${(h1 >>> 0).toString(16).padStart(8, '0')}${(h2 >>> 0).toString(16).padStart(8, '0')}`;
+        return [h1 >>> 0, h2 >>> 0];
     }
 
     /**
@@ -1810,14 +1873,10 @@ export class DictionaryImporter {
                     const termListChunk = [];
                     termListChunk.length = parsedRows.length;
                     for (let i = 0, ii = parsedRows.length; i < ii; ++i) {
-                        const row = parsedRows[i];
+                        const row = /** @type {ParsedTermBankChunkRow} */ (parsedRows[i]);
                         const expression = row.expression;
                         const reading = row.reading.length > 0 ? row.reading : expression;
-                        const hasPrecomputedTermContent = (
-                            typeof row.termEntryContentHash === 'string' &&
-                            row.termEntryContentHash.length > 0 &&
-                            row.termEntryContentBytes instanceof Uint8Array
-                        );
+                        const hasPrecomputedTermContent = hasPrecomputedTermEntryContent(row);
                         let usePrecomputedTermContent = false;
                         const useLeanTermEntryObject = (
                             this._leanCanonicalTermEntryObjects &&
@@ -1891,7 +1950,13 @@ export class DictionaryImporter {
                             this._wasmPassThroughTermContent &&
                             hasPrecomputedTermContent
                         ) {
-                            entry.termEntryContentHash = row.termEntryContentHash;
+                            if (typeof row.termEntryContentHash === 'string' && row.termEntryContentHash.length > 0) {
+                                entry.termEntryContentHash = row.termEntryContentHash;
+                            }
+                            if (Number.isInteger(row.termEntryContentHash1) && Number.isInteger(row.termEntryContentHash2)) {
+                                entry.termEntryContentHash1 = /** @type {number} */ (row.termEntryContentHash1);
+                                entry.termEntryContentHash2 = /** @type {number} */ (row.termEntryContentHash2);
+                            }
                             entry.termEntryContentBytes = row.termEntryContentBytes;
                         }
                         // Keep serialization canonical with the runtime deserializer.
@@ -1900,8 +1965,7 @@ export class DictionaryImporter {
                             (
                                 requirementsForChunk !== null &&
                                 (
-                                    !(typeof entry.termEntryContentHash === 'string' && entry.termEntryContentHash.length > 0) ||
-                                    !(entry.termEntryContentBytes instanceof Uint8Array)
+                                    !hasPrecomputedTermEntryContent(entry)
                                 )
                             )
                         ) {
@@ -1909,8 +1973,7 @@ export class DictionaryImporter {
                                 requirementsForChunk !== null &&
                                 typeof entry.glossaryJson !== 'string' &&
                                 (
-                                    !(typeof entry.termEntryContentHash === 'string' && entry.termEntryContentHash.length > 0) ||
-                                    !(entry.termEntryContentBytes instanceof Uint8Array)
+                                    !hasPrecomputedTermEntryContent(entry)
                                 )
                             ) {
                                 entry.glossaryJson = this._getFastRowGlossaryJson(row);
@@ -2042,7 +2105,8 @@ export class DictionaryImporter {
                 score,
                 glossary: EMPTY_TERM_GLOSSARY,
                 dictionary: dictionaryTitle,
-                termEntryContentHash: hashPairToHex(hash1, hash2),
+                termEntryContentHash1: hash1,
+                termEntryContentHash2: hash2,
                 termEntryContentBytes: bytes.subarray(contentStart, contentEnd),
                 sequence,
             };
@@ -2147,13 +2211,10 @@ export class DictionaryImporter {
         const reversed = this._fastPrefixReverse ?
             reverseUtf16PreserveSurrogates(value) :
             stringReverse(value);
-        this._reverseStringCache.set(value, reversed);
-        if (this._reverseStringCache.size > this._reverseStringCacheMaxEntries) {
-            const oldestKey = this._reverseStringCache.keys().next().value;
-            if (typeof oldestKey === 'string') {
-                this._reverseStringCache.delete(oldestKey);
-            }
+        if (this._reverseStringCache.size >= this._reverseStringCacheMaxEntries) {
+            this._reverseStringCache.clear();
         }
+        this._reverseStringCache.set(value, reversed);
         return reversed;
     }
 

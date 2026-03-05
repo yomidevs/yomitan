@@ -59,6 +59,10 @@ export type DatabaseTermEntry = {
     termEntryContentJson?: string;
     /** Precomputed dedupe payload hash for import fast-path. */
     termEntryContentHash?: string;
+    /** Precomputed dedupe payload hash high 32 bits for import fast-path. */
+    termEntryContentHash1?: number;
+    /** Precomputed dedupe payload hash low 32 bits for import fast-path. */
+    termEntryContentHash2?: number;
     /** Pre-encoded dedupe payload bytes for import fast-path. */
     termEntryContentBytes?: Uint8Array;
     sequence?: number;

@@ -61,7 +61,8 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     const wasm = await getWasm();
 
     const metasBuffer = new ArrayBuffer(records.length * META_BYTES);
-    const metasView = new DataView(metasBuffer);
+    const metasU32 = new Uint32Array(metasBuffer);
+    const metasI32 = new Int32Array(metasBuffer);
     /** @type {Uint8Array[]} */
     const stringChunks = [];
     let stringsTotal = 0;
@@ -85,7 +86,7 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
         return out;
     };
 
-    let metaOffset = 0;
+    let recordIndex = 0;
     for (const record of records) {
         const dictionary = internString(record.dictionary);
         const expression = internString(record.expression);
@@ -93,25 +94,25 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
         const expressionReverse = record.expressionReverse !== null ? internString(record.expressionReverse) : null;
         const readingReverse = record.readingReverse !== null ? internString(record.readingReverse) : null;
         const dictName = internString(record.entryContentDictName);
-
-        metasView.setUint32(metaOffset + 0, record.id, true);
-        metasView.setUint32(metaOffset + 4, dictionary.off, true);
-        metasView.setUint32(metaOffset + 8, dictionary.len, true);
-        metasView.setUint32(metaOffset + 12, expression.off, true);
-        metasView.setUint32(metaOffset + 16, expression.len, true);
-        metasView.setUint32(metaOffset + 20, reading.off, true);
-        metasView.setUint32(metaOffset + 24, reading.len, true);
-        metasView.setUint32(metaOffset + 28, expressionReverse?.off ?? U32_NULL, true);
-        metasView.setUint32(metaOffset + 32, expressionReverse?.len ?? U32_NULL, true);
-        metasView.setUint32(metaOffset + 36, readingReverse?.off ?? U32_NULL, true);
-        metasView.setUint32(metaOffset + 40, readingReverse?.len ?? U32_NULL, true);
-        metasView.setInt32(metaOffset + 44, record.entryContentOffset, true);
-        metasView.setInt32(metaOffset + 48, record.entryContentLength, true);
-        metasView.setUint32(metaOffset + 52, dictName.off, true);
-        metasView.setUint32(metaOffset + 56, dictName.len, true);
-        metasView.setInt32(metaOffset + 60, record.score, true);
-        metasView.setInt32(metaOffset + 64, record.sequence ?? -1, true);
-        metaOffset += META_BYTES;
+        const metaIndex = recordIndex * META_U32_FIELDS;
+        metasU32[metaIndex + 0] = record.id >>> 0;
+        metasU32[metaIndex + 1] = dictionary.off >>> 0;
+        metasU32[metaIndex + 2] = dictionary.len >>> 0;
+        metasU32[metaIndex + 3] = expression.off >>> 0;
+        metasU32[metaIndex + 4] = expression.len >>> 0;
+        metasU32[metaIndex + 5] = reading.off >>> 0;
+        metasU32[metaIndex + 6] = reading.len >>> 0;
+        metasU32[metaIndex + 7] = expressionReverse?.off ?? U32_NULL;
+        metasU32[metaIndex + 8] = expressionReverse?.len ?? U32_NULL;
+        metasU32[metaIndex + 9] = readingReverse?.off ?? U32_NULL;
+        metasU32[metaIndex + 10] = readingReverse?.len ?? U32_NULL;
+        metasI32[metaIndex + 11] = record.entryContentOffset | 0;
+        metasI32[metaIndex + 12] = record.entryContentLength | 0;
+        metasU32[metaIndex + 13] = dictName.off >>> 0;
+        metasU32[metaIndex + 14] = dictName.len >>> 0;
+        metasI32[metaIndex + 15] = record.score | 0;
+        metasI32[metaIndex + 16] = record.sequence ?? -1;
+        ++recordIndex;
     }
 
     const stringsBuffer = new Uint8Array(stringsTotal);

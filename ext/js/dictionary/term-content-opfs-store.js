@@ -21,8 +21,14 @@ const FILE_NAME = 'manabitan-term-content.bin';
 const READ_PAGE_SIZE_BYTES = 64 * 1024;
 const DEFAULT_READ_PAGE_CACHE_MAX_PAGES = 128;
 const LOW_MEMORY_READ_PAGE_CACHE_MAX_PAGES = 48;
-const WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
+const HIGH_MEMORY_READ_PAGE_CACHE_MAX_PAGES = 192;
+const DEFAULT_WRITE_COALESCE_TARGET_BYTES = 4 * 1024 * 1024;
+const LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
+const HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES = 8 * 1024 * 1024;
 const WRITE_COALESCE_MAX_CHUNKS = 512;
+const DEFAULT_WRITE_FLUSH_THRESHOLD_BYTES = 16 * 1024 * 1024;
+const LOW_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES = 8 * 1024 * 1024;
+const HIGH_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES = 64 * 1024 * 1024;
 
 export class TermContentOpfsStore {
     constructor() {
@@ -41,7 +47,7 @@ export class TermContentOpfsStore {
         /** @type {Uint8Array[]} */
         this._pendingWriteChunks = [];
         /** @type {number} */
-        this._flushThresholdBytes = 8 * 1024 * 1024;
+        this._flushThresholdBytes = this._computeWriteFlushThresholdBytes();
         /** @type {boolean} */
         this._importSessionActive = false;
         /** @type {boolean} */
@@ -52,6 +58,8 @@ export class TermContentOpfsStore {
         this._readPageCache = new Map();
         /** @type {number} */
         this._readPageCacheMaxPages = this._computeReadPageCacheMaxPages();
+        /** @type {number} */
+        this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
     }
 
     /**
@@ -257,13 +265,13 @@ export class TermContentOpfsStore {
         };
         for (const chunk of chunks) {
             if (chunk.byteLength <= 0) { continue; }
-            const wouldOverflow = groupBytes > 0 && (groupBytes + chunk.byteLength) > WRITE_COALESCE_TARGET_BYTES;
+            const wouldOverflow = groupBytes > 0 && (groupBytes + chunk.byteLength) > this._writeCoalesceTargetBytes;
             if (wouldOverflow) {
                 await flushGroup();
             }
             group.push(chunk);
             groupBytes += chunk.byteLength;
-            if (group.length >= WRITE_COALESCE_MAX_CHUNKS || groupBytes >= WRITE_COALESCE_TARGET_BYTES) {
+            if (group.length >= WRITE_COALESCE_MAX_CHUNKS || groupBytes >= this._writeCoalesceTargetBytes) {
                 await flushGroup();
             }
         }
@@ -569,6 +577,48 @@ export class TermContentOpfsStore {
      * @returns {number}
      */
     _computeReadPageCacheMaxPages() {
+        const memoryGiB = this._getDeviceMemoryGiB();
+        if (memoryGiB !== null && memoryGiB <= 4) {
+            return LOW_MEMORY_READ_PAGE_CACHE_MAX_PAGES;
+        }
+        if (memoryGiB !== null && memoryGiB >= 8) {
+            return HIGH_MEMORY_READ_PAGE_CACHE_MAX_PAGES;
+        }
+        return DEFAULT_READ_PAGE_CACHE_MAX_PAGES;
+    }
+
+    /**
+     * @returns {number}
+     */
+    _computeWriteCoalesceTargetBytes() {
+        const memoryGiB = this._getDeviceMemoryGiB();
+        if (memoryGiB !== null && memoryGiB <= 4) {
+            return LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES;
+        }
+        if (memoryGiB !== null && memoryGiB >= 8) {
+            return HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES;
+        }
+        return DEFAULT_WRITE_COALESCE_TARGET_BYTES;
+    }
+
+    /**
+     * @returns {number}
+     */
+    _computeWriteFlushThresholdBytes() {
+        const memoryGiB = this._getDeviceMemoryGiB();
+        if (memoryGiB !== null && memoryGiB <= 4) {
+            return LOW_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES;
+        }
+        if (memoryGiB !== null && memoryGiB >= 8) {
+            return HIGH_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES;
+        }
+        return DEFAULT_WRITE_FLUSH_THRESHOLD_BYTES;
+    }
+
+    /**
+     * @returns {number|null}
+     */
+    _getDeviceMemoryGiB() {
         /** @type {number|null} */
         let memoryGiB = null;
         try {
@@ -579,6 +629,6 @@ export class TermContentOpfsStore {
         } catch (_) {
             // NOP
         }
-        return memoryGiB !== null && memoryGiB <= 4 ? LOW_MEMORY_READ_PAGE_CACHE_MAX_PAGES : DEFAULT_READ_PAGE_CACHE_MAX_PAGES;
+        return memoryGiB;
     }
 }
