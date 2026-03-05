@@ -38,6 +38,7 @@ import {frenchTransforms} from './fr/french-transforms.js';
 import {irishTransforms} from './ga/irish-transforms.js';
 import {convertLatinToGreek} from './grc/ancient-greek-processors.js';
 import {ancientGreekTransforms} from './grc/ancient-greek-transforms.js';
+import {removeApostrophedWords} from './it/italian-processors.js';
 import {
     alphabeticToHiragana,
     alphanumericWidthVariants,
@@ -288,6 +289,7 @@ const languageDescriptors = [
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeAlphabeticDiacritics,
+            removeApostrophedWords,
         },
     },
     {
