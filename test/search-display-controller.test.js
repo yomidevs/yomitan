@@ -52,6 +52,10 @@ const searchDisplayController = new SearchDisplayController(display, displayAudi
 
 // eslint-disable-next-line no-underscore-dangle
 const onKeyDownMethod = searchDisplayController._onKeyDown.bind(searchDisplayController);
+// eslint-disable-next-line no-underscore-dangle
+const onSearchMethod = searchDisplayController._onSearch.bind(searchDisplayController);
+// eslint-disable-next-line no-underscore-dangle
+const onSearchKeydownMethod = searchDisplayController._onSearchKeydown.bind(searchDisplayController);
 
 /**
  * @type {HTMLInputElement}
@@ -100,5 +104,43 @@ describe('Keyboard Event Handling', () => {
         }
 
         expect(focusSpy.mock.calls.length).toBe(0);
+    });
+
+    test('search button click dispatches search', () => {
+        const searchSpy = vi.spyOn(searchDisplayController, '_search').mockImplementation(() => {});
+        const preventDefault = vi.fn();
+        const event = /** @type {MouseEvent} */ (/** @type {unknown} */ ({
+            preventDefault,
+        }));
+        onSearchMethod(event);
+        expect(preventDefault).toHaveBeenCalledTimes(1);
+        expect(searchSpy).toHaveBeenCalledTimes(1);
+        expect(searchSpy).toHaveBeenCalledWith(true, 'new', true, null);
+        searchSpy.mockRestore();
+    });
+
+    test('enter keydown dispatches search and prevents default behavior', () => {
+        const searchSpy = vi.spyOn(searchDisplayController, '_search').mockImplementation(() => {});
+        const blurSpy = vi.spyOn(display, 'blurElement').mockImplementation(() => {});
+        const preventDefault = vi.fn();
+        const stopImmediatePropagation = vi.fn();
+        const event = /** @type {KeyboardEvent} */ (/** @type {unknown} */ ({
+            isComposing: false,
+            keyCode: 13,
+            code: 'Enter',
+            key: 'Enter',
+            shiftKey: false,
+            currentTarget: queryInput,
+            preventDefault,
+            stopImmediatePropagation,
+        }));
+        onSearchKeydownMethod(event);
+        expect(preventDefault).toHaveBeenCalledTimes(1);
+        expect(stopImmediatePropagation).toHaveBeenCalledTimes(1);
+        expect(blurSpy).toHaveBeenCalledTimes(1);
+        expect(searchSpy).toHaveBeenCalledTimes(1);
+        expect(searchSpy).toHaveBeenCalledWith(true, 'new', true, null);
+        blurSpy.mockRestore();
+        searchSpy.mockRestore();
     });
 });

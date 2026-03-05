@@ -29,45 +29,88 @@ import {SearchActionPopupController} from './search-action-popup-controller.js';
 import {SearchDisplayController} from './search-display-controller.js';
 import {SearchPersistentStateController} from './search-persistent-state-controller.js';
 
-await Application.main(true, async (application) => {
-    const documentFocusController = new DocumentFocusController('#search-textbox');
-    documentFocusController.prepare();
+/**
+ * @param {string} message
+ */
+function showSearchInitializationError(message) {
+    const dictionaryEntries = document.querySelector('#dictionary-entries');
+    const noResults = document.querySelector('#no-results');
+    const noDictionaries = document.querySelector('#no-dictionaries');
+    if (noResults instanceof HTMLElement) { noResults.hidden = true; }
+    if (noDictionaries instanceof HTMLElement) { noDictionaries.hidden = true; }
+    if (!(dictionaryEntries instanceof HTMLElement)) { return; }
 
-    const searchPersistentStateController = new SearchPersistentStateController();
-    searchPersistentStateController.prepare();
+    const entry = document.createElement('div');
+    entry.className = 'entry';
+    const paragraph = document.createElement('p');
+    paragraph.textContent = message;
+    entry.append(paragraph);
 
-    const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
-    searchActionPopupController.prepare();
+    dictionaryEntries.replaceChildren(entry);
+}
 
-    const hotkeyHandler = new HotkeyHandler();
-    hotkeyHandler.prepare(application.crossFrame);
+let startupFailed = false;
+try {
+    await Application.main(true, async (application) => {
+        let callbackError = false;
+        try {
+            const documentFocusController = new DocumentFocusController('#search-textbox');
+            documentFocusController.prepare();
 
-    const display = new Display(application, 'search', documentFocusController, hotkeyHandler);
-    await display.prepare();
+            const searchPersistentStateController = new SearchPersistentStateController();
+            searchPersistentStateController.prepare();
 
-    const displayAudio = new DisplayAudio(display);
-    displayAudio.prepare();
+            const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
+            searchActionPopupController.prepare();
 
-    const displayAnki = new DisplayAnki(display, displayAudio);
-    displayAnki.prepare();
+            const hotkeyHandler = new HotkeyHandler();
+            hotkeyHandler.prepare(application.crossFrame);
 
-    const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
-    await searchDisplayController.prepare();
+            const display = new Display(application, 'search', documentFocusController, hotkeyHandler);
+            await display.prepare();
 
-    const modalController = new ModalController([]);
-    await modalController.prepare();
+            const displayAudio = new DisplayAudio(display);
+            displayAudio.prepare();
 
-    const settingsController = new SettingsController(application);
-    await settingsController.prepare();
+            const displayAnki = new DisplayAnki(display, displayAudio);
+            displayAnki.prepare();
 
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    await settingsDisplayController.prepare();
+            const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
+            await searchDisplayController.prepare();
 
+            const modalController = new ModalController([]);
+            await modalController.prepare();
+
+            const settingsController = new SettingsController(application);
+            await settingsController.prepare();
+
+            const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+            await settingsDisplayController.prepare();
+
+            documentFocusController.focusElement();
+            display.initializeState();
+            document.documentElement.dataset.loaded = 'true';
+            delete document.documentElement.dataset.loadError;
+        } catch (error) {
+            callbackError = true;
+            startupFailed = true;
+            throw error;
+        } finally {
+            document.body.hidden = false;
+            if (callbackError) {
+                document.documentElement.dataset.loaded = 'false';
+                document.documentElement.dataset.loadError = 'true';
+                showSearchInitializationError('Search failed to initialize. Reload the extension and try again.');
+            }
+        }
+    });
+} catch (_error) {
+    startupFailed = true;
+}
+
+if (startupFailed) {
     document.body.hidden = false;
-
-    documentFocusController.focusElement();
-
-    display.initializeState();
-
-    document.documentElement.dataset.loaded = 'true';
-});
+    document.documentElement.dataset.loaded = 'false';
+    document.documentElement.dataset.loadError = 'true';
+    showSearchInitializationError('Search failed to initialize. Reload the extension and try again.');
+}

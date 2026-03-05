@@ -65,6 +65,9 @@ export type ImportDetails = {
     streamParseWritePipeline?: boolean;
     reuseTermImportChunkBuffers?: boolean;
     glossaryMediaFastScan?: boolean;
+    disableTermBankWasmFastPath?: boolean;
+    artifactFirstImport?: boolean;
+    wasmCanonicalRowsFastPath?: boolean;
     retryBeginImmediateTransaction?: boolean;
 };
 

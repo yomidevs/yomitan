@@ -15,8 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {parseJson} from './json.js';
+
 const DEFAULT_DEV_DIAGNOSTICS_ENDPOINT = 'http://127.0.0.1:17352/ingest';
 const DEFAULT_DEV_DIAGNOSTICS_VERBOSITY = 'basic';
+const DIAGNOSTICS_LOG_STORAGE_KEY = 'manabitanDiagnosticsLog';
+const DIAGNOSTICS_LOG_SCHEMA_VERSION = 1;
+const DIAGNOSTICS_LOG_MAX_ENTRIES = 500;
 const BASIC_DIAGNOSTICS_EVENTS = new Set([
     'extension-start',
     'backend-prepare-complete',
@@ -40,6 +45,18 @@ const BASIC_DIAGNOSTICS_EVENTS = new Set([
 ]);
 /** @type {Promise<DiagnosticsConfig>|null} */
 let diagnosticsConfigPromise = null;
+
+/**
+ * @typedef {{
+ *   schemaVersion: number,
+ *   timestampIso: string,
+ *   event: string,
+ *   extensionId: string|null,
+ *   manifest: {name: string, version: string}|null,
+ *   contextUrl: string|null,
+ *   payload: unknown
+ * }} DiagnosticsLogEntry
+ */
 
 /**
  * @typedef {'off'|'basic'|'verbose'} DiagnosticsVerbosity
@@ -73,6 +90,154 @@ function getManifestOrNull() {
  */
 function isDevBuildManifest(manifest) {
     return typeof manifest.name === 'string' && manifest.name.includes('(dev)');
+}
+
+/**
+ * @returns {chrome.storage.LocalStorageArea|null}
+ */
+function getStorageLocalArea() {
+    const chromeValue = Reflect.get(globalThis, 'chrome');
+    const local = /** @type {{storage?: {local?: chrome.storage.LocalStorageArea}}} */ (chromeValue)?.storage?.local;
+    return (
+        typeof local?.get === 'function' &&
+        typeof local?.set === 'function'
+    ) ?
+        local :
+        null;
+}
+
+/**
+ * @param {string[]|string} keys
+ * @returns {Promise<Record<string, unknown>>}
+ */
+async function storageLocalGet(keys) {
+    const local = getStorageLocalArea();
+    if (local === null) { return {}; }
+    return await new Promise((resolve, reject) => {
+        local.get(keys, (result) => {
+            const chromeValue = Reflect.get(globalThis, 'chrome');
+            const lastError = /** @type {{runtime?: {lastError?: {message?: string}}}} */ (chromeValue)?.runtime?.lastError;
+            if (lastError) {
+                reject(new Error(lastError.message || 'storage.local.get failed'));
+                return;
+            }
+            resolve(/** @type {Record<string, unknown>} */ (result || {}));
+        });
+    });
+}
+
+/**
+ * @param {Record<string, unknown>} values
+ * @returns {Promise<void>}
+ */
+async function storageLocalSet(values) {
+    const local = getStorageLocalArea();
+    if (local === null) { return; }
+    await new Promise((resolve, reject) => {
+        local.set(values, () => {
+            const chromeValue = Reflect.get(globalThis, 'chrome');
+            const lastError = /** @type {{runtime?: {lastError?: {message?: string}}}} */ (chromeValue)?.runtime?.lastError;
+            if (lastError) {
+                reject(new Error(lastError.message || 'storage.local.set failed'));
+                return;
+            }
+            resolve(void 0);
+        });
+    });
+}
+
+/**
+ * @param {string[]|string} keys
+ * @returns {Promise<void>}
+ */
+async function storageLocalRemove(keys) {
+    const local = getStorageLocalArea();
+    if (local === null || typeof local.remove !== 'function') { return; }
+    await new Promise((resolve, reject) => {
+        local.remove(keys, () => {
+            const chromeValue = Reflect.get(globalThis, 'chrome');
+            const lastError = /** @type {{runtime?: {lastError?: {message?: string}}}} */ (chromeValue)?.runtime?.lastError;
+            if (lastError) {
+                reject(new Error(lastError.message || 'storage.local.remove failed'));
+                return;
+            }
+            resolve(void 0);
+        });
+    });
+}
+
+/**
+ * @param {unknown} value
+ * @returns {unknown}
+ */
+function toSerializableValue(value) {
+    try {
+        return parseJson(JSON.stringify(value));
+    } catch (_) {
+        return String(value);
+    }
+}
+
+/**
+ * @param {unknown} value
+ * @returns {DiagnosticsLogEntry[]}
+ */
+function normalizeDiagnosticsLogEntries(value) {
+    if (!Array.isArray(value)) { return []; }
+    /** @type {DiagnosticsLogEntry[]} */
+    const entries = [];
+    for (const item of value) {
+        if (!(typeof item === 'object' && item !== null)) { continue; }
+        const timestampIso = /** @type {unknown} */ (Reflect.get(item, 'timestampIso'));
+        const event = /** @type {unknown} */ (Reflect.get(item, 'event'));
+        if (!(typeof timestampIso === 'string' && timestampIso.length > 0)) { continue; }
+        if (!(typeof event === 'string' && event.length > 0)) { continue; }
+        entries.push({
+            schemaVersion: DIAGNOSTICS_LOG_SCHEMA_VERSION,
+            timestampIso,
+            event,
+            extensionId: typeof Reflect.get(item, 'extensionId') === 'string' ? /** @type {string} */ (Reflect.get(item, 'extensionId')) : null,
+            manifest: (() => {
+                const manifest = /** @type {unknown} */ (Reflect.get(item, 'manifest'));
+                if (!(typeof manifest === 'object' && manifest !== null)) { return null; }
+                const name = /** @type {unknown} */ (Reflect.get(manifest, 'name'));
+                const version = /** @type {unknown} */ (Reflect.get(manifest, 'version'));
+                return (typeof name === 'string' && typeof version === 'string') ? {name, version} : null;
+            })(),
+            contextUrl: typeof Reflect.get(item, 'contextUrl') === 'string' ? /** @type {string} */ (Reflect.get(item, 'contextUrl')) : null,
+            payload: Reflect.get(item, 'payload'),
+        });
+    }
+    if (entries.length <= DIAGNOSTICS_LOG_MAX_ENTRIES) {
+        return entries;
+    }
+    return entries.slice(entries.length - DIAGNOSTICS_LOG_MAX_ENTRIES);
+}
+
+/**
+ * @param {DiagnosticsLogEntry} entry
+ * @returns {Promise<void>}
+ */
+async function appendDiagnosticsLogEntry(entry) {
+    try {
+        const result = await storageLocalGet([DIAGNOSTICS_LOG_STORAGE_KEY]);
+        const existing = normalizeDiagnosticsLogEntries(Reflect.get(result, DIAGNOSTICS_LOG_STORAGE_KEY));
+        existing.push({
+            schemaVersion: DIAGNOSTICS_LOG_SCHEMA_VERSION,
+            timestampIso: entry.timestampIso,
+            event: entry.event,
+            extensionId: entry.extensionId,
+            manifest: entry.manifest,
+            contextUrl: entry.contextUrl,
+            payload: toSerializableValue(entry.payload),
+        });
+        const startIndex = Math.max(0, existing.length - DIAGNOSTICS_LOG_MAX_ENTRIES);
+        await storageLocalSet({
+            [DIAGNOSTICS_LOG_STORAGE_KEY]: existing.slice(startIndex),
+        });
+    } catch (_) {
+        // Best-effort local diagnostics buffer.
+    }
 }
 
 /**
@@ -119,13 +284,6 @@ async function getDiagnosticsConfig() {
     }
     diagnosticsConfigPromise = (async () => {
         const endpoint = await getDiagnosticsEndpoint();
-        if (endpoint === null) {
-            return {
-                enabled: false,
-                endpoint: null,
-                verbosity: /** @type {DiagnosticsVerbosity} */ ('off'),
-            };
-        }
         let enabled = true;
         /** @type {DiagnosticsVerbosity} */
         let verbosity = /** @type {DiagnosticsVerbosity} */ (DEFAULT_DEV_DIAGNOSTICS_VERBOSITY);
@@ -182,6 +340,35 @@ function shouldReportDiagnosticsEvent(event, verbosity) {
 }
 
 /**
+ * @param {number} [limit]
+ * @returns {Promise<{schemaVersion: number, entryCount: number, entries: DiagnosticsLogEntry[]}>}
+ */
+export async function getDiagnosticsLogSnapshot(limit = DIAGNOSTICS_LOG_MAX_ENTRIES) {
+    const normalizedLimit = (
+        typeof limit === 'number' &&
+        Number.isFinite(limit) &&
+        limit > 0
+    ) ?
+        Math.floor(limit) :
+        DIAGNOSTICS_LOG_MAX_ENTRIES;
+    const result = await storageLocalGet([DIAGNOSTICS_LOG_STORAGE_KEY]);
+    const entries = normalizeDiagnosticsLogEntries(Reflect.get(result, DIAGNOSTICS_LOG_STORAGE_KEY));
+    const startIndex = Math.max(0, entries.length - normalizedLimit);
+    return {
+        schemaVersion: DIAGNOSTICS_LOG_SCHEMA_VERSION,
+        entryCount: entries.length,
+        entries: entries.slice(startIndex),
+    };
+}
+
+/**
+ * @returns {Promise<void>}
+ */
+export async function clearDiagnosticsLogSnapshot() {
+    await storageLocalRemove(DIAGNOSTICS_LOG_STORAGE_KEY);
+}
+
+/**
  * @param {string} event
  * @param {Record<string, unknown>} payload
  * @returns {void}
@@ -189,7 +376,7 @@ function shouldReportDiagnosticsEvent(event, verbosity) {
 export function reportDiagnostics(event, payload = {}) {
     void (async () => {
         const {enabled, endpoint, verbosity} = await getDiagnosticsConfig();
-        if (!enabled || endpoint === null) { return; }
+        if (!enabled) { return; }
         if (!shouldReportDiagnosticsEvent(event, verbosity)) { return; }
         const manifest = getManifestOrNull();
         const chromeValue = Reflect.get(globalThis, 'chrome');
@@ -219,6 +406,7 @@ export function reportDiagnostics(event, payload = {}) {
         }
 
         const body = {
+            schemaVersion: DIAGNOSTICS_LOG_SCHEMA_VERSION,
             timestampIso: new Date().toISOString(),
             event,
             extensionId,
@@ -226,6 +414,8 @@ export function reportDiagnostics(event, payload = {}) {
             contextUrl,
             payload,
         };
+        await appendDiagnosticsLogEntry(body);
+        if (endpoint === null) { return; }
         try {
             await fetch(endpoint, {
                 method: 'POST',

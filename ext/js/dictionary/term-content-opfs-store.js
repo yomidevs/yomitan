@@ -15,10 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {reportDiagnostics} from '../core/diagnostics-reporter.js';
+
 const FILE_NAME = 'manabitan-term-content.bin';
 const READ_PAGE_SIZE_BYTES = 64 * 1024;
 const DEFAULT_READ_PAGE_CACHE_MAX_PAGES = 128;
 const LOW_MEMORY_READ_PAGE_CACHE_MAX_PAGES = 48;
+const WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
+const WRITE_COALESCE_MAX_CHUNKS = 512;
 
 export class TermContentOpfsStore {
     constructor() {
@@ -188,11 +192,19 @@ export class TermContentOpfsStore {
             this._loadedForRead = true;
             return;
         }
-        const file = await this._fileHandle.getFile();
-        this._length = file.size;
-        this._readFile = file;
-        this._readPageCache.clear();
-        this._loadedForRead = true;
+        try {
+            const file = await this._fileHandle.getFile();
+            this._length = file.size;
+            this._readFile = file;
+            this._readPageCache.clear();
+            this._loadedForRead = true;
+        } catch (error) {
+            if (!this._isNotReadableFileError(error)) {
+                throw error;
+            }
+            const recovered = await this._recoverFromNotReadableFileError('ensure-loaded', error);
+            this._loadedForRead = recovered;
+        }
     }
 
     /**
@@ -207,12 +219,55 @@ export class TermContentOpfsStore {
             const seekOffset = this._length - this._pendingWriteBytes;
             await this._writable.seek(Math.max(0, seekOffset));
         }
-        for (const chunk of this._pendingWriteChunks) {
-            if (chunk.byteLength <= 0) { continue; }
-            await this._writable.write(chunk);
-        }
+        await this._writePendingChunksCoalesced(this._pendingWriteChunks);
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
+    }
+
+    /**
+     * @param {Uint8Array[]} chunks
+     * @returns {Promise<void>}
+     */
+    async _writePendingChunksCoalesced(chunks) {
+        if (this._writable === null) { return; }
+        /** @type {Uint8Array[]} */
+        let group = [];
+        let groupBytes = 0;
+        const flushGroup = async () => {
+            if (group.length === 0 || this._writable === null) {
+                group = [];
+                groupBytes = 0;
+                return;
+            }
+            if (group.length === 1) {
+                await this._writable.write(group[0]);
+                group = [];
+                groupBytes = 0;
+                return;
+            }
+            const merged = new Uint8Array(groupBytes);
+            let offset = 0;
+            for (const chunk of group) {
+                merged.set(chunk, offset);
+                offset += chunk.byteLength;
+            }
+            await this._writable.write(merged);
+            group = [];
+            groupBytes = 0;
+        };
+        for (const chunk of chunks) {
+            if (chunk.byteLength <= 0) { continue; }
+            const wouldOverflow = groupBytes > 0 && (groupBytes + chunk.byteLength) > WRITE_COALESCE_TARGET_BYTES;
+            if (wouldOverflow) {
+                await flushGroup();
+            }
+            group.push(chunk);
+            groupBytes += chunk.byteLength;
+            if (group.length >= WRITE_COALESCE_MAX_CHUNKS || groupBytes >= WRITE_COALESCE_TARGET_BYTES) {
+                await flushGroup();
+            }
+        }
+        await flushGroup();
     }
 
     /**
@@ -299,26 +354,39 @@ export class TermContentOpfsStore {
         if (this._readFile === null) {
             return null;
         }
-        const output = new Uint8Array(length);
-        const pageSize = READ_PAGE_SIZE_BYTES;
-        const startPage = Math.floor(offset / pageSize);
-        const endPage = Math.floor((offset + length - 1) / pageSize);
-        let outputOffset = 0;
-        for (let pageIndex = startPage; pageIndex <= endPage; ++pageIndex) {
-            const page = await this._getReadPage(pageIndex);
-            if (page === null) {
-                return null;
+        for (let attempt = 0; attempt < 2; ++attempt) {
+            try {
+                const output = new Uint8Array(length);
+                const pageSize = READ_PAGE_SIZE_BYTES;
+                const startPage = Math.floor(offset / pageSize);
+                const endPage = Math.floor((offset + length - 1) / pageSize);
+                let outputOffset = 0;
+                for (let pageIndex = startPage; pageIndex <= endPage; ++pageIndex) {
+                    const page = await this._getReadPage(pageIndex);
+                    if (page === null) {
+                        return null;
+                    }
+                    const pageStartOffset = pageIndex * pageSize;
+                    const rangeStart = Math.max(offset, pageStartOffset);
+                    const rangeEnd = Math.min(offset + length, pageStartOffset + page.byteLength);
+                    const copyLength = rangeEnd - rangeStart;
+                    if (copyLength <= 0) { continue; }
+                    const pageStart = rangeStart - pageStartOffset;
+                    output.set(page.subarray(pageStart, pageStart + copyLength), outputOffset);
+                    outputOffset += copyLength;
+                }
+                return outputOffset === length ? output : null;
+            } catch (error) {
+                if (attempt > 0 || !this._isNotReadableFileError(error)) {
+                    throw error;
+                }
+                const recovered = await this._recoverFromNotReadableFileError('read-slice', error);
+                if (!recovered) {
+                    return null;
+                }
             }
-            const pageStartOffset = pageIndex * pageSize;
-            const rangeStart = Math.max(offset, pageStartOffset);
-            const rangeEnd = Math.min(offset + length, pageStartOffset + page.byteLength);
-            const copyLength = rangeEnd - rangeStart;
-            if (copyLength <= 0) { continue; }
-            const pageStart = rangeStart - pageStartOffset;
-            output.set(page.subarray(pageStart, pageStart + copyLength), outputOffset);
-            outputOffset += copyLength;
         }
-        return outputOffset === length ? output : null;
+        return null;
     }
 
     /**
@@ -396,6 +464,105 @@ export class TermContentOpfsStore {
         this._loadedForRead = false;
         this._readFile = null;
         this._readPageCache.clear();
+    }
+
+    /**
+     * @param {unknown} error
+     * @returns {boolean}
+     */
+    _isNotReadableFileError(error) {
+        const name = this._asErrorName(error);
+        if (name === 'NotReadableError') {
+            return true;
+        }
+        const text = this._asErrorText(error).toLowerCase();
+        return (
+            text.includes('notreadableerror') ||
+            text.includes('requested file could not be read')
+        );
+    }
+
+    /**
+     * @param {unknown} error
+     * @returns {string}
+     */
+    _asErrorName(error) {
+        return (typeof error === 'object' && error !== null && typeof Reflect.get(error, 'name') === 'string') ?
+            /** @type {string} */ (Reflect.get(error, 'name')) :
+            '';
+    }
+
+    /**
+     * @param {unknown} error
+     * @returns {string}
+     */
+    _asErrorText(error) {
+        if (error instanceof Error) {
+            return `${error.name}: ${error.message}`;
+        }
+        const name = this._asErrorName(error);
+        const message = (
+            typeof error === 'object' &&
+            error !== null &&
+            typeof Reflect.get(error, 'message') === 'string'
+        ) ?
+            /** @type {string} */ (Reflect.get(error, 'message')) :
+            String(error);
+        return name.length > 0 ? `${name}: ${message}` : message;
+    }
+
+    /**
+     * @param {string} phase
+     * @param {unknown} error
+     * @returns {Promise<boolean>}
+     */
+    async _recoverFromNotReadableFileError(phase, error) {
+        reportDiagnostics('term-content-opfs-read-error', {
+            phase,
+            reason: this._asErrorText(error),
+            action: 'retry-open-file',
+        });
+        this._readFile = null;
+        this._readPageCache.clear();
+        const refreshed = await this._refreshReadFileSnapshot({reacquireHandle: false});
+        if (refreshed) {
+            return true;
+        }
+        return await this._refreshReadFileSnapshot({reacquireHandle: true});
+    }
+
+    /**
+     * @param {{reacquireHandle: boolean}} options
+     * @returns {Promise<boolean>}
+     */
+    async _refreshReadFileSnapshot({reacquireHandle}) {
+        if (this._fileHandle === null) {
+            return false;
+        }
+        if (reacquireHandle) {
+            try {
+                if (
+                    typeof navigator !== 'undefined' &&
+                    'storage' in navigator &&
+                    'getDirectory' in navigator.storage
+                ) {
+                    const root = await navigator.storage.getDirectory();
+                    this._fileHandle = await root.getFileHandle(FILE_NAME, {create: true});
+                }
+            } catch (_) {
+                // NOP
+            }
+        }
+        try {
+            const file = await this._fileHandle.getFile();
+            this._length = file.size;
+            this._readFile = file;
+            this._readPageCache.clear();
+            this._loadedForRead = true;
+            return true;
+        } catch (_) {
+            return false;
+        }
     }
 
     /**

@@ -1031,36 +1031,42 @@ async function openSearchPageViaActionPopup(driver, extensionBaseUrl) {
  * @param {string} term
  * @param {string[]} expectedDictionaryNames
  * @param {number} [timeoutMs]
+ * @param {'enter'|'button'} [submitMode]
  * @returns {Promise<Record<string, number>>}
  */
-async function searchTermAndGetDictionaryHitCounts(driver, term, expectedDictionaryNames, timeoutMs = 60_000) {
+async function searchTermAndGetDictionaryHitCounts(driver, term, expectedDictionaryNames, timeoutMs = 60_000, submitMode = 'enter') {
     await driver.wait(async () => {
         // Selenium executeScript return value is untyped (`any`).
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const submitted = await driver.executeScript(`
             const textbox = document.querySelector('#search-textbox');
             const searchButton = document.querySelector('#search-button');
+            const submitMode = String(arguments[1] || 'enter');
             if (!(textbox instanceof HTMLTextAreaElement)) { return false; }
             textbox.value = '';
             textbox.dispatchEvent(new Event('input', {bubbles: true, cancelable: true}));
             textbox.value = String(arguments[0] || '');
             textbox.dispatchEvent(new Event('input', {bubbles: true, cancelable: true}));
-            textbox.dispatchEvent(new KeyboardEvent('keydown', {
-                bubbles: true,
-                cancelable: true,
-                key: 'Enter',
-                code: 'Enter',
-            }));
-            if (searchButton instanceof HTMLElement) {
+            if (submitMode === 'button') {
+                if (!(searchButton instanceof HTMLElement)) { return false; }
                 searchButton.dispatchEvent(new MouseEvent('click', {
                     bubbles: true,
                     cancelable: true,
                     composed: true,
                     button: 0,
                 }));
+            } else if (submitMode === 'enter') {
+                textbox.dispatchEvent(new KeyboardEvent('keydown', {
+                    bubbles: true,
+                    cancelable: true,
+                    key: 'Enter',
+                    code: 'Enter',
+                }));
+            } else {
+                return false;
             }
             return true;
-        `, term);
+        `, term, submitMode);
         return submitted === true;
     }, 30_000, 'Expected search textbox and button to be available on search page');
 
@@ -1927,6 +1933,35 @@ async function main() {
                 hoverLookupEnd,
             );
             fail(`Expected repeated hover popup lookups to include both dictionaries. backend=${JSON.stringify(hoverDiagnostics)} error=${errorMessage(hoverError)} completedIterations=${JSON.stringify(hoverIterationSummaries)}`);
+        }
+
+        const postHoverSearchStart = safePerformance.now();
+        const postHoverSearchTerm = '暗記';
+        let postHoverHitCounts = /** @type {Record<string, number>} */ ({});
+        let postHoverSearchError = '';
+        try {
+            await driver.get(`${extensionBaseUrl}/search.html?query=${encodeURIComponent(postHoverSearchTerm)}&type=terms&wildcards=off`);
+            await driver.wait(until.elementLocated(By.css('#search-textbox')), 30_000);
+            postHoverHitCounts = await searchTermAndGetDictionaryHitCounts(driver, postHoverSearchTerm, ['Jitendex', 'JMdict'], 20_000, 'button');
+            if ((postHoverHitCounts.Jitendex ?? 0) < 1 || (postHoverHitCounts.JMdict ?? 0) < 1) {
+                const searchDiagnostics = await getSearchPageDiagnostics(driver);
+                throw new Error(`Counts=${JSON.stringify(postHoverHitCounts)} diagnostics=${JSON.stringify(searchDiagnostics)}`);
+            }
+        } catch (postHoverError) {
+            postHoverSearchError = errorMessage(postHoverError);
+            fail(`Expected search button flow to include both dictionaries after hover stress. ${postHoverSearchError}`);
+        } finally {
+            const postHoverSearchEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                driver,
+                'Verify search remains responsive after hover stress',
+                postHoverSearchError.length > 0 ?
+                    `Search button verification failed after hover stress: ${postHoverSearchError}` :
+                    `Search button verification after hover stress succeeded for ${postHoverSearchTerm}. counts=${JSON.stringify(postHoverHitCounts)}`,
+                postHoverSearchStart,
+                postHoverSearchEnd,
+            );
         }
 
         report.status = 'success';

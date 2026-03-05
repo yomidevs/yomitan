@@ -237,6 +237,8 @@ export class Backend {
         this._startupDiagnosticsSnapshot = null;
         /** @type {boolean} */
         this._dictionaryImportModeActive = false;
+        /** @type {boolean} */
+        this._deferredDictionaryRefreshDuringImport = false;
         /** @type {Promise<void>|null} */
         this._setDictionaryImportModePromise = null;
     }
@@ -514,13 +516,33 @@ export class Backend {
     /**
      * @param {import('log').Events['logGenericError']} params
      */
-    _onLogGenericError({level}) {
+    _onLogGenericError({error, level, context}) {
         const levelValue = logErrorLevelToNumber(level);
         const currentLogErrorLevel = this._logErrorLevel !== null ? logErrorLevelToNumber(this._logErrorLevel) : 0;
         if (levelValue <= currentLogErrorLevel) { return; }
 
         this._logErrorLevel = level;
         this._updateBadge();
+        reportDiagnostics('runtime-log-generic-error', {
+            level,
+            contextUrl: (typeof context?.url === 'string' ? context.url : null),
+            message: (() => {
+                if (error instanceof Error) { return error.message; }
+                if (typeof error === 'string') { return error; }
+                try {
+                    return String(error);
+                } catch (_) {
+                    return 'unknown';
+                }
+            })(),
+            stack: (
+                error instanceof Error &&
+                typeof error.stack === 'string' &&
+                error.stack.length > 0
+            ) ?
+                error.stack :
+                null,
+        });
     }
 
     // WebExtension event handlers (with prepared checks)
@@ -2813,7 +2835,12 @@ export class Backend {
     _triggerDatabaseUpdated(type, cause) {
         void this._translator.clearDatabaseCaches();
         if (type === 'dictionary') {
-            void this._refreshDictionaryDatabaseAfterUpdate();
+            if (this._dictionaryImportModeActive) {
+                this._deferredDictionaryRefreshDuringImport = true;
+                reportDiagnostics('dictionary-refresh-deferred-during-import', {cause});
+            } else {
+                void this._refreshDictionaryDatabaseAfterUpdate();
+            }
         }
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationDatabaseUpdated', params: {type, cause}});
     }
@@ -2824,6 +2851,10 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _refreshDictionaryDatabaseAfterUpdate() {
+        if (this._dictionaryImportModeActive) {
+            this._deferredDictionaryRefreshDuringImport = true;
+            return;
+        }
         const dictionaryDatabase = this._dictionaryDatabase;
         const refreshConnectionMethod = /** @type {unknown} */ (Reflect.get(dictionaryDatabase, 'refreshConnection'));
         if (typeof refreshConnectionMethod === 'function') {
@@ -3530,6 +3561,10 @@ export class Backend {
                 this._ensureDictionaryDatabaseReady();
             await resumePromise;
             reportDiagnostics('dictionary-import-mode-changed', {active: false});
+            if (this._deferredDictionaryRefreshDuringImport) {
+                this._deferredDictionaryRefreshDuringImport = false;
+                await this._refreshDictionaryDatabaseAfterUpdate();
+            }
         })();
         try {
             await this._setDictionaryImportModePromise;

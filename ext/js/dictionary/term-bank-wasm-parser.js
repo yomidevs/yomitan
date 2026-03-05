@@ -288,15 +288,56 @@ function decodeParsedTermRow(source, metas, contentMetas, heap, contentOutPtr, v
 }
 
 /**
+ * @param {Uint8Array} source
+ * @param {Uint32Array} metas
+ * @param {Uint32Array} contentMetas
+ * @param {Uint8Array} heap
+ * @param {number} contentOutPtr
+ * @param {number} version
+ * @param {number} i
+ * @param {boolean} copyContentBytes
+ * @returns {{expression: string, reading: string, definitionTags: string, rules: string, score: number, glossaryJson: string, sequence: number|null, termTags: string, termEntryContentHash: string, termEntryContentBytes: Uint8Array}}
+ */
+function decodeParsedTermRowMinimal(source, metas, contentMetas, heap, contentOutPtr, version, i, copyContentBytes) {
+    const o = i * META_U32_FIELDS;
+    const c = i * CONTENT_META_U32_FIELDS;
+    const expression = decodeJsonStringToken(source, metas[o + 0], metas[o + 1]);
+    const reading = decodeJsonStringToken(source, metas[o + 2], metas[o + 3]);
+    const score = decodeNumberToken(source, metas[o + 8], metas[o + 9], 0);
+    const sequence = version >= 3 ? (isNullToken(source, metas[o + 12], metas[o + 13]) ? null : decodeNumberToken(source, metas[o + 12], metas[o + 13], 0)) : null;
+    const contentOffset = contentMetas[c + 0];
+    const contentLength = contentMetas[c + 1];
+    const hash1 = contentMetas[c + 2];
+    const hash2 = contentMetas[c + 3];
+    const contentStart = contentOutPtr + contentOffset;
+    const contentEnd = contentStart + contentLength;
+    const contentSlice = heap.subarray(contentStart, contentEnd);
+    const termEntryContentBytes = copyContentBytes ? Uint8Array.from(contentSlice) : contentSlice;
+    return {
+        expression,
+        reading,
+        definitionTags: '',
+        rules: '',
+        score,
+        glossaryJson: '[]',
+        sequence,
+        termTags: '',
+        termEntryContentHash: hashPairToHex(hash1, hash2),
+        termEntryContentBytes,
+    };
+}
+
+/**
  * @param {Uint8Array} contentBytes
  * @param {number} version
  * @param {(rows: {expression: string, reading: string, definitionTags: string, rules: string, score: number, glossaryJson: string, sequence: number|null, termTags: string, termEntryContentHash: string, termEntryContentBytes: Uint8Array}[]) => Promise<void>|void} onChunk
  * @param {number} [chunkSize]
- * @param {{copyContentBytes?: boolean}} [options]
+ * @param {{copyContentBytes?: boolean, minimalDecode?: boolean}} [options]
  * @returns {Promise<void>}
  */
 export async function parseTermBankWithWasmChunks(contentBytes, version, onChunk, chunkSize = DEFAULT_ROW_CHUNK_SIZE, options = {}) {
     const copyContentBytes = options.copyContentBytes === true;
+    const minimalDecode = options.minimalDecode === true;
     const {
         heap,
         source,
@@ -312,7 +353,11 @@ export async function parseTermBankWithWasmChunks(contentBytes, version, onChunk
     /** @type {{expression: string, reading: string, definitionTags: string, rules: string, score: number, glossaryJson: string, sequence: number|null, termTags: string, termEntryContentHash: string, termEntryContentBytes: Uint8Array}[]} */
     let rows = [];
     for (let i = 0; i < rowCount; ++i) {
-        rows.push(decodeParsedTermRow(source, metas, contentMetas, heap, contentOutPtr, version, i, copyContentBytes));
+        rows.push(
+            minimalDecode ?
+                decodeParsedTermRowMinimal(source, metas, contentMetas, heap, contentOutPtr, version, i, copyContentBytes) :
+                decodeParsedTermRow(source, metas, contentMetas, heap, contentOutPtr, version, i, copyContentBytes),
+        );
         if (rows.length >= normalizedChunkSize) {
             const chunk = rows;
             rows = [];

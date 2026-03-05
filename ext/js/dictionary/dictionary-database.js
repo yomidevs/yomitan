@@ -725,6 +725,15 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {string} dictionaryCacheKey
+     * @param {string} term
+     * @returns {string}
+     */
+    _createTermExactPresenceCacheKey(dictionaryCacheKey, term) {
+        return `${dictionaryCacheKey}\u001f${term}`;
+    }
+
+    /**
      * @param {string} dictionaryName
      * @returns {{expression: Map<string, number[]>, reading: Map<string, number[]>, expressionReverse: Map<string, number[]>, readingReverse: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}}
      */
@@ -792,9 +801,11 @@ export class DictionaryDatabase {
             const termIndexMap = new Map();
             /** @type {Map<number, {matchSource: import('dictionary-database').MatchSource, itemIndex: number}[]>} */
             const idMatches = new Map();
+            const dictionaryCacheKey = this._getDictionaryCacheKey(dictionaryNames);
             for (let i = 0; i < termList.length; ++i) {
                 const term = termList[i];
-                const cachedPresence = this._termExactPresenceCache.get(term);
+                const termPresenceKey = this._createTermExactPresenceCacheKey(dictionaryCacheKey, term);
+                const cachedPresence = this._termExactPresenceCache.get(termPresenceKey);
                 if (cachedPresence === false) {
                     continue;
                 }
@@ -849,7 +860,8 @@ export class DictionaryDatabase {
                         }
                     }
                 }
-                this._setTermExactPresenceCached(term, found);
+                const termPresenceKey = this._createTermExactPresenceCacheKey(dictionaryCacheKey, term);
+                this._setTermExactPresenceCached(termPresenceKey, found);
             }
 
             if (idMatches.size === 0) {
@@ -3420,7 +3432,16 @@ export class DictionaryDatabase {
         if (cacheKey.length > 0) {
             let cached = this._getCachedTermEntryContent(cacheKey);
             if (typeof cached === 'undefined') {
-                const contentBytes = (contentOffset >= 0 && contentLength > 0) ? await this._termContentStore.readSlice(contentOffset, contentLength) : null;
+                /** @type {Uint8Array|null} */
+                let contentBytes = null;
+                if (contentOffset >= 0 && contentLength > 0) {
+                    try {
+                        contentBytes = await this._termContentStore.readSlice(contentOffset, contentLength);
+                    } catch (e) {
+                        logTermContentZstdError(e);
+                        contentBytes = null;
+                    }
+                }
                 if (contentBytes !== null && contentBytes.length > 0) {
                     try {
                         const contentJson = (contentDictName === 'raw') ?
@@ -3567,14 +3588,14 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {string} term
+     * @param {string} cacheKey
      * @param {boolean} present
      */
-    _setTermExactPresenceCached(term, present) {
-        if (this._termExactPresenceCache.has(term)) {
-            this._termExactPresenceCache.delete(term);
+    _setTermExactPresenceCached(cacheKey, present) {
+        if (this._termExactPresenceCache.has(cacheKey)) {
+            this._termExactPresenceCache.delete(cacheKey);
         }
-        this._termExactPresenceCache.set(term, present);
+        this._termExactPresenceCache.set(cacheKey, present);
         while (this._termExactPresenceCache.size > this._termExactPresenceCacheMaxEntries) {
             const oldestKey = this._termExactPresenceCache.keys().next().value;
             if (typeof oldestKey !== 'string') { break; }

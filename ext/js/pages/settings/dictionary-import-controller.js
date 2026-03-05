@@ -1257,6 +1257,9 @@ export class DictionaryImportController {
                 streamParseWritePipeline,
                 reuseTermImportChunkBuffers,
                 glossaryMediaFastScan,
+                disableTermBankWasmFastPath,
+                artifactFirstImport,
+                wasmCanonicalRowsFastPath,
                 retryBeginImmediateTransaction,
             } = this._getImportPerformanceFlags();
             const importDetails = {
@@ -1270,6 +1273,9 @@ export class DictionaryImportController {
                 streamParseWritePipeline,
                 reuseTermImportChunkBuffers,
                 glossaryMediaFastScan,
+                disableTermBankWasmFastPath,
+                artifactFirstImport,
+                wasmCanonicalRowsFastPath,
                 retryBeginImmediateTransaction,
             };
 
@@ -1381,7 +1387,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, adaptiveTermBulkAddBatchSize: boolean, streamParseWritePipeline: boolean, reuseTermImportChunkBuffers: boolean, glossaryMediaFastScan: boolean, retryBeginImmediateTransaction: boolean}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, adaptiveTermBulkAddBatchSize: boolean, streamParseWritePipeline: boolean, reuseTermImportChunkBuffers: boolean, glossaryMediaFastScan: boolean, disableTermBankWasmFastPath: boolean, artifactFirstImport: boolean, wasmCanonicalRowsFastPath: boolean, retryBeginImmediateTransaction: boolean}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1395,6 +1401,9 @@ export class DictionaryImportController {
                 streamParseWritePipeline: false,
                 reuseTermImportChunkBuffers: false,
                 glossaryMediaFastScan: false,
+                disableTermBankWasmFastPath: false,
+                artifactFirstImport: false,
+                wasmCanonicalRowsFastPath: false,
                 retryBeginImmediateTransaction: false,
             };
         }
@@ -1409,6 +1418,9 @@ export class DictionaryImportController {
             streamParseWritePipeline: flagsRecord.streamParseWritePipeline === true,
             reuseTermImportChunkBuffers: flagsRecord.reuseTermImportChunkBuffers === true,
             glossaryMediaFastScan: flagsRecord.glossaryMediaFastScan === true,
+            disableTermBankWasmFastPath: flagsRecord.disableTermBankWasmFastPath === true,
+            artifactFirstImport: flagsRecord.artifactFirstImport === true,
+            wasmCanonicalRowsFastPath: flagsRecord.wasmCanonicalRowsFastPath === true,
             retryBeginImmediateTransaction: flagsRecord.retryBeginImmediateTransaction === true,
         };
     }

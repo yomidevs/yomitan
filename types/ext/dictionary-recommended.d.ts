@@ -30,6 +30,7 @@ export type LanguageRecommendedDictionaries = {
 export type RecommendedDictionary = {
     name: string;
     downloadUrl: string;
+    artifactUrl?: string;
     description: string;
     homepage?: string;
 };

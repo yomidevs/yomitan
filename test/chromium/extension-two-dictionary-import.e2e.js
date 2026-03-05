@@ -116,6 +116,7 @@ const strictUnsupportedRuntime = parseBooleanEnv(
 const maxReportLogLinesRaw = Number.parseInt(process.env.MANABITAN_CHROMIUM_E2E_MAX_LOG_LINES ?? '1000', 10);
 const maxReportLogLines = Number.isFinite(maxReportLogLinesRaw) && maxReportLogLinesRaw > 0 ? maxReportLogLinesRaw : 1000;
 const quickImportBenchmarkMode = parseBooleanEnv(process.env.MANABITAN_E2E_IMPORT_BENCH_QUICK, false);
+const stopAfterIsolatedProbes = parseBooleanEnv(process.env.MANABITAN_E2E_STOP_AFTER_ISOLATED_PROBES, false);
 const concurrentDbOpenPressureEnabled = (
     !quickImportBenchmarkMode &&
     parseBooleanEnv(process.env.MANABITAN_E2E_DB_OPEN_PRESSURE, true)
@@ -791,14 +792,33 @@ async function evalSendMessage(page, expression, arg = null) {
             const term = String(arg || '打');
             const options0 = await send('optionsGet', {optionsContext: {index: 0}});
             const dictionaryInfo = await send('getDictionaryInfo', undefined);
-            const termsFind = await send('termsFind', {text: term, details: {primaryReading: ''}, optionsContext: {index: 0}});
-            const termDictionaryNames = [];
-            for (const entry of termsFind?.dictionaryEntries || []) {
-                if (entry?.dictionary) { termDictionaryNames.push(String(entry.dictionary)); }
-                for (const definition of entry?.definitions || []) {
-                    if (definition?.dictionary) { termDictionaryNames.push(String(definition.dictionary)); }
+            const installedTitles = (Array.isArray(dictionaryInfo) ? dictionaryInfo : [])
+                .map((row) => String(row?.title || '').trim())
+                .filter((value) => value.length > 0);
+            const collectTermLookup = async (details) => {
+                const termsFind = await send('termsFind', {
+                    text: term,
+                    details: {
+                        primaryReading: '',
+                        ...details,
+                    },
+                    optionsContext: {index: 0},
+                });
+                const termDictionaryNames = [];
+                for (const entry of termsFind?.dictionaryEntries || []) {
+                    if (entry?.dictionary) { termDictionaryNames.push(String(entry.dictionary)); }
+                    for (const definition of entry?.definitions || []) {
+                        if (definition?.dictionary) { termDictionaryNames.push(String(definition.dictionary)); }
+                    }
                 }
-            }
+                return {
+                    termResultCount: Array.isArray(termsFind?.dictionaryEntries) ? termsFind.dictionaryEntries.length : 0,
+                    termDictionaryNames: [...new Set(termDictionaryNames)],
+                };
+            };
+            const termLookupDefault = await collectTermLookup({});
+            const termLookupExactNoDeinflect = await collectTermLookup({matchType: 'exact', deinflect: false});
+            const termLookupPrefixNoDeinflect = await collectTermLookup({matchType: 'prefix', deinflect: false});
             const enabledDictionaryNames = [];
             for (const row of options0?.dictionaries || []) {
                 if (row?.enabled !== true) { continue; }
@@ -807,10 +827,26 @@ async function evalSendMessage(page, expression, arg = null) {
                     enabledDictionaryNames.push(name);
                 }
             }
+            const dictionaryCounts = await send('getDictionaryCounts', {
+                dictionaryNames: installedTitles,
+                getTotal: true,
+            });
+            const enabledInstalledExactMatches = enabledDictionaryNames.filter((name) => installedTitles.includes(name));
             return {
                 dictionaryInfo,
-                termResultCount: Array.isArray(termsFind?.dictionaryEntries) ? termsFind.dictionaryEntries.length : 0,
-                termDictionaryNames: [...new Set(termDictionaryNames)],
+                installedTitles,
+                dictionaryCounts,
+                enabledInstalledExactMatches,
+                profileLanguage: String(options0?.general?.language || ''),
+                profileMainDictionary: String(options0?.general?.mainDictionary || ''),
+                profileResultOutputMode: String(options0?.general?.resultOutputMode || ''),
+                termResultCount: termLookupDefault.termResultCount,
+                termDictionaryNames: termLookupDefault.termDictionaryNames,
+                termLookupDiagnostics: {
+                    default: termLookupDefault,
+                    exactNoDeinflect: termLookupExactNoDeinflect,
+                    prefixNoDeinflect: termLookupPrefixNoDeinflect,
+                },
                 enabledDictionaryNames: [...new Set(enabledDictionaryNames)],
             };
         }
@@ -892,6 +928,8 @@ async function evalSendMessage(page, expression, arg = null) {
                 if (!(profile && profile.options && Array.isArray(profile.options.dictionaries))) {
                     continue;
                 }
+                /** @type {string[]} */
+                const enabledNames = [];
                 for (const row of profile.options.dictionaries) {
                     const name = String(row?.name || '').trim();
                     const enabled = targetNames.some((targetName) => (
@@ -902,6 +940,16 @@ async function evalSendMessage(page, expression, arg = null) {
                     ));
                     if (row && typeof row === 'object') {
                         row.enabled = enabled;
+                    }
+                    if (enabled && name.length > 0) {
+                        enabledNames.push(name);
+                    }
+                }
+                if (profile.options?.general && typeof profile.options.general === 'object') {
+                    profile.options.general.mainDictionary = enabledNames[0] || '';
+                    const sortFrequency = profile.options.general.sortFrequencyDictionary;
+                    if (typeof sortFrequency === 'string' && sortFrequency.length > 0 && !enabledNames.includes(sortFrequency)) {
+                        profile.options.general.sortFrequencyDictionary = null;
                     }
                 }
             }
@@ -918,7 +966,8 @@ async function evalSendMessage(page, expression, arg = null) {
                 }
                 return names;
             });
-            return {ok: true, targetNames, profileEnabledDictionaryNames};
+            const profileMainDictionaries = (updatedOptions?.profiles || []).map((profile) => String(profile?.options?.general?.mainDictionary || '').trim());
+            return {ok: true, targetNames, profileEnabledDictionaryNames, profileMainDictionaries};
         }
         if (expression === 'backendProbe') {
             const dictionaryInfo = await send('getDictionaryInfo', undefined);
@@ -1080,8 +1129,9 @@ async function waitForBackendDictionaryReady(page, expectedDictionaryNames, term
 }
 
 async function findOverlapLookupTerm(page, expectedDictionaryNames, candidates) {
-    /** @type {Array<{term: string, termResultCount: number, termDictionaryNames: string[]}>} */
+    /** @type {Array<{term: string, termResultCount: number, termDictionaryNames: string[], enabledDictionaryNames: string[], enabledInstalledExactMatches: string[], profileMainDictionary: string, profileResultOutputMode: string}>} */
     const probes = [];
+    let lastDiagnostics = null;
     const normalizedCandidates = [...new Set(
         (Array.isArray(candidates) ? candidates : [])
             .map((value) => String(value || '').trim())
@@ -1094,6 +1144,7 @@ async function findOverlapLookupTerm(page, expectedDictionaryNames, candidates) 
         } catch (_) {
             continue;
         }
+        lastDiagnostics = diagnostics;
         const termDictionaryNames = (Array.isArray(diagnostics?.termDictionaryNames) ? diagnostics.termDictionaryNames : [])
             .map((value) => String(value || '').trim())
             .filter((value) => value.length > 0);
@@ -1101,6 +1152,17 @@ async function findOverlapLookupTerm(page, expectedDictionaryNames, candidates) 
             term,
             termResultCount: Number(diagnostics?.termResultCount || 0),
             termDictionaryNames: [...new Set(termDictionaryNames)],
+            enabledDictionaryNames: (Array.isArray(diagnostics?.enabledDictionaryNames) ? diagnostics.enabledDictionaryNames : [])
+                .map((value) => String(value || '').trim())
+                .filter((value) => value.length > 0),
+            enabledInstalledExactMatches: (Array.isArray(diagnostics?.enabledInstalledExactMatches) ? diagnostics.enabledInstalledExactMatches : [])
+                .map((value) => String(value || '').trim())
+                .filter((value) => value.length > 0),
+            profileMainDictionary: String(diagnostics?.profileMainDictionary || ''),
+            profileResultOutputMode: String(diagnostics?.profileResultOutputMode || ''),
+            termLookupDiagnostics: (typeof diagnostics?.termLookupDiagnostics === 'object' && diagnostics?.termLookupDiagnostics !== null) ?
+                diagnostics.termLookupDiagnostics :
+                null,
         });
         const hasAllExpected = expectedDictionaryNames.every((expectedName) => (
             termDictionaryNames.some((observedName) => matchesDictionaryName(observedName, expectedName))
@@ -1112,7 +1174,7 @@ async function findOverlapLookupTerm(page, expectedDictionaryNames, candidates) 
     return {
         ok: false,
         term: normalizedCandidates[0] ?? '暗記',
-        diagnostics: null,
+        diagnostics: lastDiagnostics,
         probes,
     };
 }
@@ -1533,14 +1595,24 @@ async function waitForDictionaryDeleteCompletion(page, deletedDictionaryName, ex
     };
 }
 
-async function searchTermAndGetDictionaryHitCounts(page, term, expectedDictionaryNames, timeoutMs = 15000) {
+async function searchTermAndGetDictionaryHitCounts(page, term, expectedDictionaryNames, timeoutMs = 15000, submitMode = 'enter') {
     await page.waitForSelector('#search-textbox', {state: 'attached', timeout: 30000});
+    await page.waitForSelector('#search-button', {state: 'attached', timeout: 30000});
     if (!(await waitForBodyVisible(page, 30000))) {
         throw new Error('Search page body remained hidden');
     }
     await page.fill('#search-textbox', '');
     await page.fill('#search-textbox', term);
-    await page.keyboard.press('Enter');
+    switch (submitMode) {
+        case 'enter':
+            await page.keyboard.press('Enter');
+            break;
+        case 'button':
+            await page.click('#search-button');
+            break;
+        default:
+            throw new Error(`Unsupported search submit mode: ${submitMode}`);
+    }
     const deadline = safePerformance.now() + timeoutMs;
     let lastResult = {
         expectedCounts: Object.fromEntries(expectedDictionaryNames.map((name) => [name, 0])),
@@ -2171,6 +2243,12 @@ async function main() {
             }
             overlapLookupTerm = String(lookupProbeCandidates[0] || '暗記');
         }
+        if (stopAfterIsolatedProbes) {
+            report.status = 'success';
+            appendLog(report, 'info', 'Stopped after isolated dictionary probes by MANABITAN_E2E_STOP_AFTER_ISOLATED_PROBES=1.');
+            console.log(`${e2eLogTag} PASS: Stopped after isolated probes by MANABITAN_E2E_STOP_AFTER_ISOLATED_PROBES=1.`);
+            return;
+        }
         const readinessTerm = hasOverlapLookupTerm ? overlapLookupTerm : String(lookupProbeCandidates[0] || '暗記');
 
         const backendReadyStart = safePerformance.now();
@@ -2270,6 +2348,8 @@ async function main() {
             processSampler,
         );
 
+        const searchVerificationTerm = hasOverlapLookupTerm ? overlapLookupTerm : readinessTerm;
+
         if (!searchReady) {
             verificationErrors.push(`Unable to initialize search page: ${searchReadyError}`);
             const searchStart = safePerformance.now();
@@ -2310,7 +2390,6 @@ async function main() {
                 entriesTextPreview: '',
             };
             let searchError = '';
-            const searchVerificationTerm = hasOverlapLookupTerm ? overlapLookupTerm : readinessTerm;
             try {
                 searchProfile = await runPhaseProfile(cdpSession, async () => {
                     return await searchTermAndGetDictionaryHitCounts(page, searchVerificationTerm, expectedLookupDictionaries);
@@ -2501,6 +2580,67 @@ async function main() {
                 scanningStressStart,
                 scanningStressEnd,
                 scanningStressProfile,
+                processSampler,
+            );
+
+            const postUsageSearchStart = safePerformance.now();
+            let postUsageSearchProfile = null;
+            let postUsageSearchResult = null;
+            let postUsageSearchError = '';
+            try {
+                postUsageSearchProfile = await runPhaseProfile(cdpSession, async () => {
+                    await page.goto(`${extensionBaseUrl}/search.html`);
+                    return await searchTermAndGetDictionaryHitCounts(
+                        page,
+                        searchVerificationTerm,
+                        expectedLookupDictionaries,
+                        20000,
+                        'button',
+                    );
+                });
+                postUsageSearchResult = postUsageSearchProfile.result;
+                if (hasOverlapLookupTerm) {
+                    const hasAllDictionaryHits = expectedLookupDictionaries.every((name) => (
+                        Number(postUsageSearchResult?.expectedCounts?.[name] || 0) >= 1
+                    ));
+                    if (!hasAllDictionaryHits) {
+                        throw new Error(
+                            'Post-usage button-search did not include both dictionaries. ' +
+                            `expected=${JSON.stringify(postUsageSearchResult?.expectedCounts)} ` +
+                            `observed=${JSON.stringify(postUsageSearchResult?.observedCounts)} ` +
+                            `noResultsVisible=${String(postUsageSearchResult?.noResultsVisible)} ` +
+                            `preview=${JSON.stringify(postUsageSearchResult?.entriesTextPreview)}`,
+                        );
+                    }
+                } else {
+                    const totalHits = expectedLookupDictionaries.reduce((sum, dictionaryName) => (
+                        sum + Number(postUsageSearchResult?.expectedCounts?.[dictionaryName] || 0)
+                    ), 0);
+                    if (totalHits < 1) {
+                        throw new Error(
+                            'Post-usage button-search returned no recognized dictionary hits in combined mode. ' +
+                            `expected=${JSON.stringify(postUsageSearchResult?.expectedCounts)} ` +
+                            `observed=${JSON.stringify(postUsageSearchResult?.observedCounts)} ` +
+                            `noResultsVisible=${String(postUsageSearchResult?.noResultsVisible)} ` +
+                            `preview=${JSON.stringify(postUsageSearchResult?.entriesTextPreview)}`,
+                        );
+                    }
+                }
+            } catch (e) {
+                postUsageSearchError = errorMessage(e);
+                verificationErrors.push(`Post-usage search button verification failed: ${postUsageSearchError}`);
+            }
+            const postUsageSearchEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                page,
+                'Verify search remains responsive after hover stress',
+                postUsageSearchError.length > 0 ?
+                    `Button-triggered search failed after hover stress for ${searchVerificationTerm}: ${postUsageSearchError}` :
+                    `Button-triggered search after hover stress succeeded for ${searchVerificationTerm}. counts=${JSON.stringify(postUsageSearchResult?.expectedCounts)} observed=${JSON.stringify(postUsageSearchResult?.observedCounts)} noResultsVisible=${String(postUsageSearchResult?.noResultsVisible)} preview=${JSON.stringify(postUsageSearchResult?.entriesTextPreview)}`,
+                postUsageSearchStart,
+                postUsageSearchEnd,
+                postUsageSearchProfile,
                 processSampler,
             );
         }

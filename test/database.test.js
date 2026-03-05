@@ -681,6 +681,35 @@ describe('Database', () => {
             }
         });
 
+        test('Exact lookup negative cache is scoped to enabled dictionary set', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const dictionaryImporter = createDictionaryImporter(expect);
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+            const installedTitles = new Map([
+                [testDictionaryIndex.title, {alias: testDictionaryIndex.title, allowSecondarySearches: false}],
+            ]);
+            const missingTitles = new Map([
+                ['__manabitan_missing_dictionary__', {alias: '__manabitan_missing_dictionary__', allowSecondarySearches: false}],
+            ]);
+
+            const missingResults = await dictionaryDatabase.findTermsBulk(['打'], missingTitles, 'exact');
+            expect.soft(missingResults).toStrictEqual([]);
+
+            const installedResults = await dictionaryDatabase.findTermsBulk(['打'], installedTitles, 'exact');
+            expect.soft(installedResults.length).toBeGreaterThan(0);
+            expect.soft(countDictionaryDatabaseEntriesWithTerm(installedResults, '打')).toBeGreaterThan(0);
+            await dictionaryDatabase.close();
+        });
+
         test('Recovers incomplete import on startup when immediate cleanup fails', async ({expect}) => {
             const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
             const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
