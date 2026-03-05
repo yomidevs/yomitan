@@ -81,10 +81,6 @@ export class DictionaryImporter {
         /** @type {boolean} */
         this._adaptiveTermBulkAddBatchSize = false;
         /** @type {boolean} */
-        this._streamParseWritePipeline = false;
-        /** @type {boolean} */
-        this._reuseTermImportChunkBuffers = false;
-        /** @type {boolean} */
         this._glossaryMediaFastScan = false;
         /** @type {boolean} */
         this._disableTermBankWasmFastPath = false;
@@ -92,8 +88,10 @@ export class DictionaryImporter {
         this._artifactFirstImport = false;
         /** @type {boolean} */
         this._wasmCanonicalRowsFastPath = false;
+        /** @type {boolean} */
+        this._wasmPassThroughTermContent = false;
         /** @type {number} */
-        this._streamParseWritePipelineMaxInFlight = 3;
+        this._termBankWasmRowChunkSize = TERM_BANK_WASM_ROW_CHUNK_SIZE;
     }
 
     /**
@@ -120,19 +118,29 @@ export class DictionaryImporter {
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
         this._debugImportLogging = details.debugImportLogging === true;
         this._adaptiveTermBulkAddBatchSize = details.adaptiveTermBulkAddBatchSize === true;
-        this._streamParseWritePipeline = details.streamParseWritePipeline === true;
-        this._reuseTermImportChunkBuffers = details.reuseTermImportChunkBuffers === true;
         this._glossaryMediaFastScan = details.glossaryMediaFastScan === true;
         this._disableTermBankWasmFastPath = details.disableTermBankWasmFastPath === true;
         this._artifactFirstImport = details.artifactFirstImport === true;
         this._wasmCanonicalRowsFastPath = details.wasmCanonicalRowsFastPath === true;
+        this._wasmPassThroughTermContent = details.wasmPassThroughTermContent === true || this._wasmCanonicalRowsFastPath;
+        this._termBankWasmRowChunkSize = Number.isFinite(details.termBankWasmRowChunkSize) ?
+            Math.max(256, Math.min(16384, Math.trunc(/** @type {number} */ (details.termBankWasmRowChunkSize)))) :
+            TERM_BANK_WASM_ROW_CHUNK_SIZE;
+        const termBulkAddStagingMaxRows = Number.isFinite(details.termBulkAddStagingMaxRows) ?
+            Math.max(512, Math.min(20000, Math.trunc(/** @type {number} */ (details.termBulkAddStagingMaxRows)))) :
+            3000;
         const retryBeginImmediateTransaction = details.retryBeginImmediateTransaction === true;
+        const skipIntraBatchContentDedup = details.skipIntraBatchContentDedup === true;
+        const termRecordRowAppendFastPath = details.termRecordRowAppendFastPath === true;
         this._pendingImageMediaByPath.clear();
         this._imageMetadataByPath.clear();
         this._jsonQuotedStringCache.clear();
         dictionaryDatabase.setImportOptimizationFlags({
             adaptiveTermBulkAddBatchSize: this._adaptiveTermBulkAddBatchSize,
             retryBeginImmediateTransaction,
+            skipIntraBatchContentDedup,
+            termBulkAddStagingMaxRows,
+            termRecordRowAppendFastPath,
         });
         const tImportStart = Date.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
@@ -361,6 +369,7 @@ export class DictionaryImporter {
                 const termFile = activeTermFiles[termFileIndex];
                 const tTermFile = Date.now();
                 let streamedImportCompleted = false;
+                let termParseAlreadyAccounted = false;
                 let streamChunkWorkMs = 0;
                 const tFastParseStart = Date.now();
                 if (useTermArtifactFiles && /\.mbtb$/i.test(termFile.filename)) {
@@ -371,6 +380,7 @@ export class DictionaryImporter {
                         prefixWildcardsSupported,
                     );
                     step4TimingBreakdown.termParseMs += Math.max(0, Date.now() - tArtifactParseStart);
+                    termParseAlreadyAccounted = true;
                     await processTermChunk(termFile, termReadResult.termList, termReadResult.requirements);
                     streamedImportCompleted = true;
                 } else if (!this._disableTermBankWasmFastPath) {
@@ -391,11 +401,6 @@ export class DictionaryImporter {
                                     requirementsChunk.length = 0;
                                 }
                             },
-                            {
-                                enableParseWritePipeline: this._streamParseWritePipeline,
-                                enableChunkBufferReuse: this._reuseTermImportChunkBuffers,
-                                maxInFlightChunks: this._streamParseWritePipelineMaxInFlight,
-                            },
                         );
                         streamedImportCompleted = true;
                     } catch (error) {
@@ -407,8 +412,10 @@ export class DictionaryImporter {
                 }
 
                 if (streamedImportCompleted) {
-                    const totalFastReadMs = Math.max(0, Date.now() - tFastParseStart);
-                    step4TimingBreakdown.termParseMs += Math.max(0, totalFastReadMs - streamChunkWorkMs);
+                    if (!termParseAlreadyAccounted) {
+                        const totalFastReadMs = Math.max(0, Date.now() - tFastParseStart);
+                        step4TimingBreakdown.termParseMs += Math.max(0, totalFastReadMs - streamChunkWorkMs);
+                    }
                 } else {
                     const tTermParseStart = Date.now();
                     const termReadResult = await this._readTermBankFile(
@@ -1474,42 +1481,11 @@ export class DictionaryImporter {
      * @param {boolean} useMediaPipeline
      * @param {boolean} enableTermEntryContentDedup
      * @param {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null) => Promise<void>|void} [onChunk]
-     * @param {{enableParseWritePipeline?: boolean, enableChunkBufferReuse?: boolean, maxInFlightChunks?: number}|null} [streamingOptions]
      * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
      */
-    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, useMediaPipeline, enableTermEntryContentDedup, onChunk = void 0, streamingOptions = null) {
+    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, useMediaPipeline, enableTermEntryContentDedup, onChunk = void 0) {
         const bytes = await this._getData(termFile, new Uint8ArrayWriter());
         const streamToChunkHandler = typeof onChunk === 'function';
-        const enableParseWritePipeline = (
-            streamToChunkHandler &&
-            typeof streamingOptions === 'object' &&
-            streamingOptions !== null &&
-            streamingOptions.enableParseWritePipeline === true
-        );
-        const enableChunkBufferReuse = (
-            streamToChunkHandler &&
-            typeof streamingOptions === 'object' &&
-            streamingOptions !== null &&
-            streamingOptions.enableChunkBufferReuse === true
-        );
-        const maxInFlightChunksRaw = (
-            typeof streamingOptions === 'object' &&
-            streamingOptions !== null &&
-            Number.isFinite(streamingOptions.maxInFlightChunks) ?
-                Math.trunc(/** @type {number} */ (streamingOptions.maxInFlightChunks)) :
-                3
-        );
-        const maxInFlightChunks = Math.max(1, Math.min(8, maxInFlightChunksRaw));
-        /** @type {Promise<void>} */
-        let chunkWriteTail = Promise.resolve();
-        /** @type {Promise<void>[]} */
-        const inFlightChunkWrites = [];
-        /** @type {import('dictionary-database').DatabaseTermEntry[][]} */
-        const termListChunkPool = [];
-        /** @type {import('dictionary-importer').ImportRequirement[][]} */
-        const requirementsChunkPool = [];
-        /** @type {Error|null} */
-        let chunkWriteError = null;
         /** @type {import('dictionary-importer').ImportRequirement[]|null} */
         const requirements = (useMediaPipeline && !streamToChunkHandler) ? [] : null;
         /** @type {import('dictionary-database').DatabaseTermEntry[]} */
@@ -1520,31 +1496,19 @@ export class DictionaryImporter {
                 bytes,
                 version,
                 async (parsedRows) => {
-                    if (chunkWriteError !== null) {
-                        throw chunkWriteError;
-                    }
                     /** @type {import('dictionary-importer').ImportRequirement[]|null} */
-                    const requirementsForChunk = useMediaPipeline ?
-                        (
-                            enableChunkBufferReuse && requirementsChunkPool.length > 0 ?
-                                /** @type {import('dictionary-importer').ImportRequirement[]} */ (requirementsChunkPool.pop()) :
-                                []
-                        ) :
-                        null;
+                    const requirementsForChunk = useMediaPipeline ? [] : null;
                     if (requirementsForChunk !== null) {
                         requirementsForChunk.length = 0;
                     }
                     /** @type {import('dictionary-database').DatabaseTermEntry[]} */
-                    const termListChunk = (
-                        enableChunkBufferReuse && termListChunkPool.length > 0 ?
-                            /** @type {import('dictionary-database').DatabaseTermEntry[]} */ (termListChunkPool.pop()) :
-                            []
-                    );
+                    const termListChunk = [];
                     termListChunk.length = parsedRows.length;
                     for (let i = 0, ii = parsedRows.length; i < ii; ++i) {
                         const row = parsedRows[i];
                         const expression = row.expression;
                         const reading = row.reading.length > 0 ? row.reading : expression;
+                        let usePrecomputedTermContent = false;
                         /** @type {import('dictionary-database').DatabaseTermEntry} */
                         const entry = {
                             expression,
@@ -1560,11 +1524,13 @@ export class DictionaryImporter {
                             if (typeof row.glossaryJson === 'string') {
                                 entry.glossaryJson = row.glossaryJson;
                             }
+                            usePrecomputedTermContent = true;
                         } else {
                             const rowGlossaryJson = (typeof row.glossaryJson === 'string') ? row.glossaryJson : '[]';
                             const skipGlossaryParse = !this._glossaryJsonLikelyContainsMedia(rowGlossaryJson);
                             if (skipGlossaryParse) {
                                 entry.glossaryJson = rowGlossaryJson;
+                                usePrecomputedTermContent = true;
                             } else {
                                 const glossaryList = this._parseGlossaryJsonFromFastRow(rowGlossaryJson, termFile.filename);
                                 for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
@@ -1582,55 +1548,37 @@ export class DictionaryImporter {
                             entry.expressionReverse = stringReverse(entry.expression);
                             entry.readingReverse = stringReverse(entry.reading);
                         }
+                        if (
+                            usePrecomputedTermContent &&
+                            this._wasmPassThroughTermContent &&
+                            typeof row.termEntryContentHash === 'string' &&
+                            row.termEntryContentHash.length > 0 &&
+                            row.termEntryContentBytes instanceof Uint8Array
+                        ) {
+                            entry.termEntryContentHash = row.termEntryContentHash;
+                            entry.termEntryContentBytes = row.termEntryContentBytes;
+                        }
                         // Keep serialization canonical with the runtime deserializer.
-                        if (requirementsForChunk === null) {
+                        if (
+                            requirementsForChunk === null ||
+                            (
+                                requirementsForChunk !== null &&
+                                (
+                                    !(typeof entry.termEntryContentHash === 'string' && entry.termEntryContentHash.length > 0) ||
+                                    !(entry.termEntryContentBytes instanceof Uint8Array)
+                                )
+                            )
+                        ) {
                             this._prepareTermEntrySerialization(entry, enableTermEntryContentDedup);
                         }
                         termListChunk[i] = entry;
                     }
 
                     if (streamToChunkHandler) {
-                        if (!enableParseWritePipeline) {
-                            await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null) => Promise<void>|void} */ (onChunk)(
-                                termListChunk,
-                                requirementsForChunk,
-                            );
-                            if (enableChunkBufferReuse) {
-                                termListChunk.length = 0;
-                                termListChunkPool.push(termListChunk);
-                                if (requirementsForChunk !== null) {
-                                    requirementsForChunk.length = 0;
-                                    requirementsChunkPool.push(requirementsForChunk);
-                                }
-                            }
-                        } else {
-                            const scheduledWrite = chunkWriteTail.then(async () => {
-                                await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null) => Promise<void>|void} */ (onChunk)(
-                                    termListChunk,
-                                    requirementsForChunk,
-                                );
-                                if (enableChunkBufferReuse) {
-                                    termListChunk.length = 0;
-                                    termListChunkPool.push(termListChunk);
-                                    if (requirementsForChunk !== null) {
-                                        requirementsForChunk.length = 0;
-                                        requirementsChunkPool.push(requirementsForChunk);
-                                    }
-                                }
-                            });
-                            chunkWriteTail = scheduledWrite.then(() => {}, (error) => {
-                                chunkWriteError = toError(error);
-                            });
-                            inFlightChunkWrites.push(scheduledWrite);
-                            if (inFlightChunkWrites.length >= maxInFlightChunks) {
-                                try {
-                                    await inFlightChunkWrites.shift();
-                                } catch (error) {
-                                    chunkWriteError = toError(error);
-                                    throw chunkWriteError;
-                                }
-                            }
-                        }
+                        await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null) => Promise<void>|void} */ (onChunk)(
+                            termListChunk,
+                            requirementsForChunk,
+                        );
                     } else {
                         termList.push(...termListChunk);
                         if (requirements !== null && requirementsForChunk !== null) {
@@ -1638,22 +1586,14 @@ export class DictionaryImporter {
                         }
                     }
                 },
-                TERM_BANK_WASM_ROW_CHUNK_SIZE,
+                this._termBankWasmRowChunkSize,
                 {
-                    copyContentBytes: false,
+                    copyContentBytes: this._wasmPassThroughTermContent && !streamToChunkHandler,
                     minimalDecode,
                 },
             );
-            if (inFlightChunkWrites.length > 0) {
-                for (const pendingWrite of inFlightChunkWrites) {
-                    await pendingWrite;
-                }
-            }
         } catch (error) {
             throw toError(error);
-        }
-        if (chunkWriteError !== null) {
-            throw toError(chunkWriteError);
         }
         return {termList, requirements};
     }

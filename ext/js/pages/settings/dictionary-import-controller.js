@@ -1254,13 +1254,16 @@ export class DictionaryImportController {
                 mediaResolutionConcurrency,
                 debugImportLogging,
                 adaptiveTermBulkAddBatchSize,
-                streamParseWritePipeline,
-                reuseTermImportChunkBuffers,
                 glossaryMediaFastScan,
                 disableTermBankWasmFastPath,
                 artifactFirstImport,
                 wasmCanonicalRowsFastPath,
+                wasmPassThroughTermContent,
                 retryBeginImmediateTransaction,
+                termBankWasmRowChunkSize,
+                skipIntraBatchContentDedup,
+                termBulkAddStagingMaxRows,
+                termRecordRowAppendFastPath,
             } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
@@ -1270,13 +1273,16 @@ export class DictionaryImportController {
                 mediaResolutionConcurrency,
                 debugImportLogging,
                 adaptiveTermBulkAddBatchSize,
-                streamParseWritePipeline,
-                reuseTermImportChunkBuffers,
                 glossaryMediaFastScan,
                 disableTermBankWasmFastPath,
                 artifactFirstImport,
                 wasmCanonicalRowsFastPath,
+                wasmPassThroughTermContent,
                 retryBeginImmediateTransaction,
+                termBankWasmRowChunkSize,
+                skipIntraBatchContentDedup,
+                termBulkAddStagingMaxRows,
+                termRecordRowAppendFastPath,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -1387,7 +1393,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, adaptiveTermBulkAddBatchSize: boolean, streamParseWritePipeline: boolean, reuseTermImportChunkBuffers: boolean, glossaryMediaFastScan: boolean, disableTermBankWasmFastPath: boolean, artifactFirstImport: boolean, wasmCanonicalRowsFastPath: boolean, retryBeginImmediateTransaction: boolean}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, adaptiveTermBulkAddBatchSize: boolean, glossaryMediaFastScan: boolean, disableTermBankWasmFastPath: boolean, artifactFirstImport: boolean, wasmCanonicalRowsFastPath: boolean, wasmPassThroughTermContent: boolean, retryBeginImmediateTransaction: boolean, termBankWasmRowChunkSize: number, skipIntraBatchContentDedup: boolean, termBulkAddStagingMaxRows: number, termRecordRowAppendFastPath: boolean}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1398,30 +1404,38 @@ export class DictionaryImportController {
                 mediaResolutionConcurrency: 8,
                 debugImportLogging: false,
                 adaptiveTermBulkAddBatchSize: false,
-                streamParseWritePipeline: false,
-                reuseTermImportChunkBuffers: false,
                 glossaryMediaFastScan: false,
                 disableTermBankWasmFastPath: false,
                 artifactFirstImport: false,
                 wasmCanonicalRowsFastPath: false,
+                wasmPassThroughTermContent: false,
                 retryBeginImmediateTransaction: false,
+                termBankWasmRowChunkSize: 2048,
+                skipIntraBatchContentDedup: false,
+                termBulkAddStagingMaxRows: 3000,
+                termRecordRowAppendFastPath: false,
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
         const mediaResolutionConcurrency = Number.isFinite(flagsRecord.mediaResolutionConcurrency) ? Math.trunc(/** @type {number} */ (flagsRecord.mediaResolutionConcurrency)) : 8;
+        const termBankWasmRowChunkSize = Number.isFinite(flagsRecord.termBankWasmRowChunkSize) ? Math.trunc(/** @type {number} */ (flagsRecord.termBankWasmRowChunkSize)) : 2048;
+        const termBulkAddStagingMaxRows = Number.isFinite(flagsRecord.termBulkAddStagingMaxRows) ? Math.trunc(/** @type {number} */ (flagsRecord.termBulkAddStagingMaxRows)) : 3000;
         return {
             skipImageMetadata: flagsRecord.skipImageMetadata === true,
             skipMediaImport: flagsRecord.skipMediaImport === true,
             mediaResolutionConcurrency: Math.max(1, Math.min(32, mediaResolutionConcurrency)),
             debugImportLogging: flagsRecord.debugImportLogging === true,
             adaptiveTermBulkAddBatchSize: flagsRecord.adaptiveTermBulkAddBatchSize === true,
-            streamParseWritePipeline: flagsRecord.streamParseWritePipeline === true,
-            reuseTermImportChunkBuffers: flagsRecord.reuseTermImportChunkBuffers === true,
             glossaryMediaFastScan: flagsRecord.glossaryMediaFastScan === true,
             disableTermBankWasmFastPath: flagsRecord.disableTermBankWasmFastPath === true,
             artifactFirstImport: flagsRecord.artifactFirstImport === true,
             wasmCanonicalRowsFastPath: flagsRecord.wasmCanonicalRowsFastPath === true,
+            wasmPassThroughTermContent: flagsRecord.wasmPassThroughTermContent === true,
             retryBeginImmediateTransaction: flagsRecord.retryBeginImmediateTransaction === true,
+            termBankWasmRowChunkSize: Math.max(256, Math.min(16384, termBankWasmRowChunkSize)),
+            skipIntraBatchContentDedup: flagsRecord.skipIntraBatchContentDedup === true,
+            termBulkAddStagingMaxRows: Math.max(512, Math.min(20000, termBulkAddStagingMaxRows)),
+            termRecordRowAppendFastPath: flagsRecord.termRecordRowAppendFastPath === true,
         };
     }
 

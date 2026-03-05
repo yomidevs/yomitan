@@ -62,13 +62,16 @@ export type ImportDetails = {
     mediaResolutionConcurrency?: number;
     debugImportLogging?: boolean;
     adaptiveTermBulkAddBatchSize?: boolean;
-    streamParseWritePipeline?: boolean;
-    reuseTermImportChunkBuffers?: boolean;
     glossaryMediaFastScan?: boolean;
     disableTermBankWasmFastPath?: boolean;
     artifactFirstImport?: boolean;
     wasmCanonicalRowsFastPath?: boolean;
+    wasmPassThroughTermContent?: boolean;
     retryBeginImmediateTransaction?: boolean;
+    termBankWasmRowChunkSize?: number;
+    skipIntraBatchContentDedup?: boolean;
+    termBulkAddStagingMaxRows?: number;
+    termRecordRowAppendFastPath?: boolean;
 };
 
 export type Summary = {
