@@ -75,7 +75,12 @@ function createStringInterner(textEncoder) {
         return index;
     };
 
-    return {stringOffsets, stringLengths, internString, buildStringsBuffer: () => stringsBuffer.slice(0, stringsTotal)};
+    return {
+        stringOffsets,
+        stringLengths,
+        internString,
+        buildStringsBuffer: () => stringsBuffer.slice(0, stringsTotal),
+    };
 }
 
 /**
