@@ -6,10 +6,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-afb-en",
+                "name": "wty-afb-en",
                 "description": "Gulf Arabic to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-afb-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/afb/en/wty-afb-en.zip"
             }
         ]
     },
@@ -19,18 +19,18 @@
         "kanji": [],
         "pronunciation": [
             {
-                "name": "kty-aii-en-ipa",
+                "name": "wty-aii-en-ipa",
                 "description": "Assyrian Neo-Aramaic IPA dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-aii-en-ipa.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/aii/en/wty-aii-en-ipa.zip"
             }
         ],
         "terms": [
             {
-                "name": "kty-aii-en",
+                "name": "wty-aii-en",
                 "description": "Assyrian Neo-Aramaic to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-aii-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/aii/en/wty-aii-en.zip"
             }
         ]
     },
@@ -41,10 +41,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-ang-en",
+                "name": "wty-ang-en",
                 "description": "Old English to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ang-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ang/en/wty-ang-en.zip"
             }
         ]
     },
@@ -54,18 +54,18 @@
         "kanji": [],
         "pronunciation": [
             {
-                "name": "kty-ar-en-ipa",
+                "name": "wty-ar-en-ipa",
                 "description": "Arabic IPA dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ar-en-ipa.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ar/en/wty-ar-en-ipa.zip"
             }
         ],
         "terms": [
             {
-                "name": "kty-ar-en",
+                "name": "wty-ar-en",
                 "description": "Arabic to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ar-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ar/en/wty-ar-en.zip"
             }
         ]
     },
@@ -75,18 +75,18 @@
         "kanji": [],
         "pronunciation": [
             {
-                "name": "kty-ar-en-ipa",
+                "name": "wty-ar-en-ipa",
                 "description": "Arabic IPA dictionary created from Wiktionary data.",
-                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ar-en-ipa.zip"
+                "homepage": "https://github.com/yomidevs/wiktionary-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ar/en/wty-ar-en-ipa.zip"
             }
         ],
         "terms": [
             {
-                "name": "kty-ar-en",
+                "name": "wty-ar-en",
                 "description": "Arabic to English dictionary created from Wiktionary data.",
-                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ar-en.zip"
+                "homepage": "https://github.com/yomidevs/wiktionary-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ar/en/wty-ar-en.zip"
             }
         ]
     },
@@ -97,10 +97,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-cs-en",
+                "name": "wty-cs-en",
                 "description": "Czech to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-cs-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/cs/en/wty-cs-en.zip"
             }
         ]
     },
@@ -111,10 +111,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-de-en",
+                "name": "wty-de-en",
                 "description": "German to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-de-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/de/en/wty-de-en.zip"
             }
         ]
     },
@@ -125,10 +125,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-el-en",
+                "name": "wty-el-en",
                 "description": "Greek to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-el-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/el/en/wty-el-en.zip"
             }
         ]
     },
@@ -139,10 +139,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-en-en",
+                "name": "wty-en-en",
                 "description": "English to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-en-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/en/en/wty-en-en.zip"
             }
         ]
     },
@@ -153,10 +153,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-enm-en",
+                "name": "wty-enm-en",
                 "description": "Middle English to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-enm-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/enm/en/wty-enm-en.zip"
             }
         ]
     },
@@ -167,10 +167,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-eo-en",
+                "name": "wty-eo-en",
                 "description": "Esperanto to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-eo-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/eo/en/wty-eo-en.zip"
             }
         ]
     },
@@ -181,10 +181,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-es-en",
+                "name": "wty-es-en",
                 "description": "Spanish to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-es-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/es/en/wty-es-en.zip"
             }
         ]
     },
@@ -195,10 +195,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-fa-en",
+                "name": "wty-fa-en",
                 "description": "Persian  to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-fa-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/fa/en/wty-fa-en.zip"
             }
         ]
     },
@@ -209,10 +209,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-fi-en",
+                "name": "wty-fi-en",
                 "description": "Finnish to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-fi-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/fi/en/wty-fi-en.zip"
             }
         ]
     },
@@ -223,10 +223,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-fr-en",
+                "name": "wty-fr-en",
                 "description": "French to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-fr-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/fr/en/wty-fr-en.zip"
             }
         ]
     },
@@ -237,10 +237,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-grc-en",
+                "name": "wty-grc-en",
                 "description": "Ancient Greek to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-grc-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/grc/en/wty-grc-en.zip"
             }
         ]
     },
@@ -277,10 +277,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-he-en",
+                "name": "wty-he-en",
                 "description": "Hebrew to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-he-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/he/en/wty-he-en.zip"
             }
         ]
     },
@@ -291,10 +291,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-hi-en",
+                "name": "wty-hi-en",
                 "description": "Hindi to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-hi-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/hi/en/wty-hi-en.zip"
             }
         ]
     },
@@ -305,10 +305,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-hu-en",
+                "name": "wty-hu-en",
                 "description": "Hungarian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-hu-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/hu/en/wty-hu-en.zip"
             }
         ]
     },
@@ -319,10 +319,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-id-en",
+                "name": "wty-id-en",
                 "description": "Indonesian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-id-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/id/en/wty-id-en.zip"
             }
         ]
     },
@@ -333,10 +333,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-it-en",
+                "name": "wty-it-en",
                 "description": "Italian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-it-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/it/en/wty-it-en.zip"
             }
         ]
     },
@@ -393,10 +393,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-km-en",
+                "name": "wty-km-en",
                 "description": "Khmer to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-km-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/km/en/wty-km-en.zip"
             }
         ]
     },
@@ -407,10 +407,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-kn-en",
+                "name": "wty-kn-en",
                 "description": "Kannada to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-kn-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/kn/en/wty-kn-en.zip"
             }
         ]
     },
@@ -421,10 +421,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-ko-en",
+                "name": "wty-ko-en",
                 "description": "Korean to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ko-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ko/en/wty-ko-en.zip"
             }
         ]
     },
@@ -435,10 +435,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-la-en",
+                "name": "wty-la-en",
                 "description": "Latin to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-la-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/la/en/wty-la-en.zip"
             }
         ]
     },
@@ -449,10 +449,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-lv-en",
+                "name": "wty-lv-en",
                 "description": "Latvian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-lv-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/lv/en/wty-lv-en.zip"
             }
         ]
     },
@@ -463,10 +463,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-mn-en",
+                "name": "wty-mn-en",
                 "description": "Mongolian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-mn-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/mn/en/wty-mn-en.zip"
             }
         ]
     },
@@ -476,18 +476,18 @@
         "kanji": [],
         "pronunciation": [
             {
-                "name": "kty-mt-en-ipa",
+                "name": "wty-mt-en-ipa",
                 "description": "Maltese IPA dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-mt-en-ipa.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/mt/en/wty-mt-en-ipa.zip"
             }
         ],
         "terms": [
             {
-                "name": "kty-mt-en",
+                "name": "wty-mt-en",
                 "description": "Maltese to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-mt-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/mt/en/wty-mt-en.zip"
             }
         ]
     },
@@ -498,10 +498,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-nl-en",
+                "name": "wty-nl-en",
                 "description": "Dutch to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-nl-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/nl/en/wty-nl-en.zip"
             }
         ]
     },
@@ -512,16 +512,16 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-nb-en",
+                "name": "wty-nb-en",
                 "description": "Norwegian Bokmål to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-nb-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/nb/en/wty-nb-en.zip"
             },
             {
-                "name": "kty-nn-en",
+                "name": "wty-nn-en",
                 "description": "Norwegian Nynorsk to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-nn-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/nn/en/wty-nn-en.zip"
             }
         ]
     },
@@ -532,10 +532,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-pl-en",
+                "name": "wty-pl-en",
                 "description": "Polish to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-pl-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/pl/en/wty-pl-en.zip"
             }
         ]
     },
@@ -546,10 +546,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-pt-en",
+                "name": "wty-pt-en",
                 "description": "Portuguese to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-pt-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/pt/en/wty-pt-en.zip"
             }
         ]
     },
@@ -560,10 +560,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-ro-en",
+                "name": "wty-ro-en",
                 "description": "Romanian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ro-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ro/en/wty-ro-en.zip"
             }
         ]
     },
@@ -574,10 +574,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-ru-en",
+                "name": "wty-ru-en",
                 "description": "Russian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-ru-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ru/en/wty-ru-en.zip"
             },
             {
                 "name": "opr-ru-en",
@@ -594,10 +594,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-scn-en",
+                "name": "wty-scn-en",
                 "description": "Sicillian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-scn-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/scn/en/wty-scn-en.zip"
             }
         ]
     },
@@ -608,10 +608,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-sga-en",
+                "name": "wty-sga-en",
                 "description": "Old Irish to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-sga-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/sga/en/wty-sga-en.zip"
             }
         ]
     },
@@ -622,10 +622,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-sh-en",
+                "name": "wty-sh-en",
                 "description": "Serbo-Croatian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-sh-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/sh/en/wty-sh-en.zip"
             }
         ]
     },
@@ -636,10 +636,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-sq-en",
+                "name": "wty-sq-en",
                 "description": "Albanian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-sq-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/sq/en/wty-sq-en.zip"
             }
         ]
     },
@@ -650,10 +650,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-sv-en",
+                "name": "wty-sv-en",
                 "description": "Swedish to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-sv-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/sv/en/wty-sv-en.zip"
             }
         ]
     },
@@ -664,10 +664,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-th-en",
+                "name": "wty-th-en",
                 "description": "Thai to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-th-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/th/en/wty-th-en.zip"
             }
         ]
     },
@@ -678,10 +678,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-tl-en",
+                "name": "wty-tl-en",
                 "description": "Tagalog to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-tl-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/tl/en/wty-tl-en.zip"
             }
         ]
     },
@@ -790,10 +790,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-tr-en",
+                "name": "wty-tr-en",
                 "description": "Turkish to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-tr-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/tr/en/wty-tr-en.zip"
             }
         ]
     },
@@ -804,10 +804,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-uk-en",
+                "name": "wty-uk-en",
                 "description": "Ukranian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-uk-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/uk/en/wty-uk-en.zip"
             }
         ]
     },
@@ -818,10 +818,10 @@
         "pronunciation": [],
         "terms": [
             {
-                "name": "kty-vi-en",
+                "name": "wty-vi-en",
                 "description": "Vietnamese to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-vi-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/vi/en/wty-vi-en.zip"
             }
         ]
     },
@@ -891,10 +891,10 @@
                 "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.zip"
             },
             {
-                "name": "kty-zh-en",
+                "name": "wty-zh-en",
                 "description": "Chinese to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/kaikki-to-yomitan/",
-                "downloadUrl": "https://pub-c3d38cca4dc2403b88934c56748f5144.r2.dev/releases/latest/kty-zh-en.zip"
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/zh/en/wty-zh-en.zip"
             }
         ]
     }
