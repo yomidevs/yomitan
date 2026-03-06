@@ -34,6 +34,12 @@ let wasmPromise = null;
 
 /** @type {TextDecoder} */
 const textDecoder = new TextDecoder();
+/** @type {{bufferSetupMs: number, allocationMs: number, copyJsonMs: number, parseBankMs: number, encodeContentMs: number, rowDecodeMs: number, chunkDispatchMs: number, rowCount: number, chunkCount: number, chunkSize: number, minimalDecode: boolean, includeContentMetadata: boolean, copyContentBytes: boolean, reuseExpressionForReadingDecode: boolean, skipTagRuleDecode: boolean, lazyGlossaryDecode: boolean, mediaHintFastScan: boolean}|null} */
+let lastTermBankWasmParseProfile = null;
+/** @type {number} */
+let lastSuccessfulMetaCapacity = 0;
+/** @type {number} */
+let lastSuccessfulContentBytesPerRow = 0;
 
 /**
  * @returns {Promise<{memory: WebAssembly.Memory, wasm_reset_heap: () => void, wasm_alloc: (size: number) => number, parse_term_bank: (jsonPtr: number, jsonLen: number, outPtr: number, outCapacity: number) => number, encode_term_content: (jsonPtr: number, metasPtr: number, rowCount: number, outPtr: number, outCapacity: number, rowMetaPtr: number) => number}>}
@@ -66,6 +72,15 @@ async function getWasm() {
         };
     })();
     return await wasmPromise;
+}
+
+/**
+ * @returns {{bufferSetupMs: number, allocationMs: number, copyJsonMs: number, parseBankMs: number, encodeContentMs: number, rowDecodeMs: number, chunkDispatchMs: number, rowCount: number, chunkCount: number, chunkSize: number, minimalDecode: boolean, includeContentMetadata: boolean, copyContentBytes: boolean, reuseExpressionForReadingDecode: boolean, skipTagRuleDecode: boolean, lazyGlossaryDecode: boolean, mediaHintFastScan: boolean}|null}
+ */
+export function consumeLastTermBankWasmParseProfile() {
+    const value = lastTermBankWasmParseProfile;
+    lastTermBankWasmParseProfile = null;
+    return value;
 }
 
 /**
@@ -223,7 +238,7 @@ function tokenBytesEqual(source, startA, lengthA, startB, lengthB) {
  * @param {boolean} includeContentMetadata
  * @param {number} initialMetaCapacityDivisor
  * @param {number} initialContentBytesPerRow
- * @returns {Promise<{heap: Uint8Array, source: Uint8Array, metas: Uint32Array, contentMetas: Uint32Array, contentOutPtr: number, rowCount: number}>}
+ * @returns {Promise<{heap: Uint8Array, source: Uint8Array, metas: Uint32Array, contentMetas: Uint32Array, contentOutPtr: number, rowCount: number, allocationMs: number, copyJsonMs: number, parseBankMs: number, encodeContentMs: number}>}
  * @throws {Error}
  */
 async function parseTermBankWasmBuffers(contentBytes, includeContentMetadata, initialMetaCapacityDivisor, initialContentBytesPerRow) {
@@ -235,27 +250,46 @@ async function parseTermBankWasmBuffers(contentBytes, includeContentMetadata, in
             contentMetas: new Uint32Array(0),
             contentOutPtr: 0,
             rowCount: 0,
+            allocationMs: 0,
+            copyJsonMs: 0,
+            parseBankMs: 0,
+            encodeContentMs: 0,
         };
     }
     const wasm = await getWasm();
     wasm.wasm_reset_heap();
+    let allocationMs = 0;
+    let copyJsonMs = 0;
+    let parseBankMs = 0;
+    let encodeContentMs = 0;
+    let tStart = Date.now();
     const jsonPtr = wasm.wasm_alloc(contentBytes.byteLength);
+    allocationMs += Math.max(0, Date.now() - tStart);
     if (jsonPtr === 0) {
         throw new Error('Failed to allocate wasm json buffer');
     }
+    tStart = Date.now();
     new Uint8Array(wasm.memory.buffer).set(contentBytes, jsonPtr);
+    copyJsonMs += Math.max(0, Date.now() - tStart);
 
     const normalizedMetaCapacityDivisor = Number.isFinite(initialMetaCapacityDivisor) ? Math.max(8, Math.min(128, Math.trunc(initialMetaCapacityDivisor))) : 24;
     let capacity = Math.max(1024, Math.floor(contentBytes.byteLength / normalizedMetaCapacityDivisor));
     if (capacity < 8192) { capacity = 8192; }
+    if (lastSuccessfulMetaCapacity > 0) {
+        capacity = Math.max(capacity, lastSuccessfulMetaCapacity);
+    }
     let rowCount = -1;
     let outPtr = 0;
     for (let attempt = 0; attempt < 6; ++attempt) {
+        tStart = Date.now();
         outPtr = wasm.wasm_alloc(capacity * META_U32_FIELDS * 4);
+        allocationMs += Math.max(0, Date.now() - tStart);
         if (outPtr === 0) {
             throw new Error('Failed to allocate wasm term metadata buffer');
         }
+        tStart = Date.now();
         rowCount = wasm.parse_term_bank(jsonPtr, contentBytes.byteLength, outPtr, capacity);
+        parseBankMs += Math.max(0, Date.now() - tStart);
         if (rowCount >= 0) {
             break;
         }
@@ -267,6 +301,7 @@ async function parseTermBankWasmBuffers(contentBytes, includeContentMetadata, in
     if (rowCount < 0) {
         throw new Error(`term-bank parser exhausted capacity (code ${rowCount})`);
     }
+    lastSuccessfulMetaCapacity = Math.max(lastSuccessfulMetaCapacity, capacity);
 
     if (!includeContentMetadata) {
         const heap = new Uint8Array(wasm.memory.buffer);
@@ -279,22 +314,34 @@ async function parseTermBankWasmBuffers(contentBytes, includeContentMetadata, in
             contentMetas: new Uint32Array(0),
             contentOutPtr: 0,
             rowCount,
+            allocationMs,
+            copyJsonMs,
+            parseBankMs,
+            encodeContentMs,
         };
     }
 
+    tStart = Date.now();
     const contentMetaPtr = wasm.wasm_alloc(rowCount * CONTENT_META_U32_FIELDS * 4);
+    allocationMs += Math.max(0, Date.now() - tStart);
     if (contentMetaPtr === 0) {
         throw new Error('Failed to allocate wasm content metadata buffer');
     }
     const normalizedInitialContentBytesPerRow = Number.isFinite(initialContentBytesPerRow) ? Math.max(16, Math.min(512, Math.trunc(initialContentBytesPerRow))) : 96;
     let contentOutCapacity = Math.max(contentBytes.byteLength, rowCount * normalizedInitialContentBytesPerRow);
+    if (lastSuccessfulContentBytesPerRow > 0) {
+        contentOutCapacity = Math.max(contentOutCapacity, rowCount * lastSuccessfulContentBytesPerRow);
+    }
     let contentOutPtr = 0;
     let encodedContentBytes = -1;
     for (let attempt = 0; attempt < 6; ++attempt) {
+        tStart = Date.now();
         contentOutPtr = wasm.wasm_alloc(contentOutCapacity);
+        allocationMs += Math.max(0, Date.now() - tStart);
         if (contentOutPtr === 0) {
             throw new Error('Failed to allocate wasm content buffer');
         }
+        tStart = Date.now();
         encodedContentBytes = wasm.encode_term_content(
             jsonPtr,
             outPtr,
@@ -303,6 +350,7 @@ async function parseTermBankWasmBuffers(contentBytes, includeContentMetadata, in
             contentOutCapacity,
             contentMetaPtr,
         );
+        encodeContentMs += Math.max(0, Date.now() - tStart);
         if (encodedContentBytes >= 0) {
             break;
         }
@@ -313,6 +361,13 @@ async function parseTermBankWasmBuffers(contentBytes, includeContentMetadata, in
     }
     if (encodedContentBytes < 0) {
         throw new Error(`term-content encoder exhausted capacity (code ${encodedContentBytes})`);
+    }
+    if (rowCount > 0) {
+        const nextContentBytesPerRow = Math.max(
+            normalizedInitialContentBytesPerRow,
+            Math.ceil(encodedContentBytes / rowCount) + 8,
+        );
+        lastSuccessfulContentBytesPerRow = Math.max(lastSuccessfulContentBytesPerRow, nextContentBytesPerRow);
     }
 
     const heap = new Uint8Array(wasm.memory.buffer);
@@ -326,6 +381,10 @@ async function parseTermBankWasmBuffers(contentBytes, includeContentMetadata, in
         contentMetas,
         contentOutPtr,
         rowCount,
+        allocationMs,
+        copyJsonMs,
+        parseBankMs,
+        encodeContentMs,
     };
 }
 
@@ -481,6 +540,7 @@ export async function parseTermBankWithWasmChunks(contentBytes, version, onChunk
     const lazyGlossaryDecode = options.lazyGlossaryDecode === true;
     const mediaHintFastScan = options.mediaHintFastScan === true;
     const preallocateChunkRows = options.preallocateChunkRows === true;
+    const tBufferSetupStart = Date.now();
     const {
         heap,
         source,
@@ -488,13 +548,37 @@ export async function parseTermBankWithWasmChunks(contentBytes, version, onChunk
         contentMetas,
         contentOutPtr,
         rowCount,
+        allocationMs,
+        copyJsonMs,
+        parseBankMs,
+        encodeContentMs,
     } = await parseTermBankWasmBuffers(
         contentBytes,
         includeContentMetadata,
         initialMetaCapacityDivisor,
         initialContentBytesPerRow,
     );
+    const bufferSetupMs = Math.max(0, Date.now() - tBufferSetupStart);
     if (rowCount === 0) {
+        lastTermBankWasmParseProfile = {
+            bufferSetupMs,
+            allocationMs,
+            copyJsonMs,
+            parseBankMs,
+            encodeContentMs,
+            rowDecodeMs: 0,
+            chunkDispatchMs: 0,
+            rowCount: 0,
+            chunkCount: 0,
+            chunkSize: 0,
+            minimalDecode,
+            includeContentMetadata,
+            copyContentBytes,
+            reuseExpressionForReadingDecode,
+            skipTagRuleDecode,
+            lazyGlossaryDecode,
+            mediaHintFastScan,
+        };
         return;
     }
     const normalizedChunkSize = Number.isFinite(chunkSize) ? Math.max(1, Math.trunc(chunkSize)) : DEFAULT_ROW_CHUNK_SIZE;
@@ -508,10 +592,14 @@ export async function parseTermBankWithWasmChunks(contentBytes, version, onChunk
     let rows = preallocateChunkRows ? createRowBuffer(Math.min(normalizedChunkSize, rowCount)) : [];
     let rowsIndex = 0;
     let chunkIndex = 0;
+    let rowDecodeMs = 0;
+    let chunkDispatchMs = 0;
     for (let i = 0; i < rowCount; ++i) {
+        const tDecodeStart = Date.now();
         const row = minimalDecode ?
             decodeParsedTermRowMinimal(source, metas, contentMetas, heap, contentOutPtr, version, i, copyContentBytes, includeContentMetadata, reuseExpressionForReadingDecode) :
             decodeParsedTermRow(source, metas, contentMetas, heap, contentOutPtr, version, i, copyContentBytes, includeContentMetadata, reuseExpressionForReadingDecode, skipTagRuleDecode, lazyGlossaryDecode, mediaHintFastScan);
+        rowDecodeMs += Math.max(0, Date.now() - tDecodeStart);
         if (preallocateChunkRows) {
             rows[rowsIndex] = row;
             ++rowsIndex;
@@ -524,12 +612,14 @@ export async function parseTermBankWithWasmChunks(contentBytes, version, onChunk
             rows = preallocateChunkRows ? createRowBuffer(Math.min(normalizedChunkSize, rowCount - (i + 1))) : [];
             rowsIndex = 0;
             ++chunkIndex;
+            const tDispatchStart = Date.now();
             await onChunk(chunk, {
                 processedRows: i + 1,
                 totalRows: rowCount,
                 chunkIndex,
                 chunkCount,
             });
+            chunkDispatchMs += Math.max(0, Date.now() - tDispatchStart);
         }
     }
     if (rowsIndex > 0) {
@@ -537,13 +627,34 @@ export async function parseTermBankWithWasmChunks(contentBytes, version, onChunk
             rows.length = rowsIndex;
         }
         ++chunkIndex;
+        const tDispatchStart = Date.now();
         await onChunk(rows, {
             processedRows: rowCount,
             totalRows: rowCount,
             chunkIndex,
             chunkCount,
         });
+        chunkDispatchMs += Math.max(0, Date.now() - tDispatchStart);
     }
+    lastTermBankWasmParseProfile = {
+        bufferSetupMs,
+        allocationMs,
+        copyJsonMs,
+        parseBankMs,
+        encodeContentMs,
+        rowDecodeMs,
+        chunkDispatchMs,
+        rowCount,
+        chunkCount,
+        chunkSize: normalizedChunkSize,
+        minimalDecode,
+        includeContentMetadata,
+        copyContentBytes,
+        reuseExpressionForReadingDecode,
+        skipTagRuleDecode,
+        lazyGlossaryDecode,
+        mediaHintFastScan,
+    };
 }
 
 /**

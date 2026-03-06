@@ -1254,34 +1254,6 @@ export class DictionaryImportController {
                 mediaResolutionConcurrency,
                 debugImportLogging,
                 enableTermEntryContentDedup,
-                adaptiveTermBulkAddBatchSize,
-                glossaryMediaFastScan,
-                lazyGlossaryDecodeForMedia,
-                reuseExpressionReverseForReading,
-                disableTermBankWasmFastPath,
-                artifactFirstImport,
-                wasmCanonicalRowsFastPath,
-                wasmPassThroughTermContent,
-                retryBeginImmediateTransaction,
-                termBankWasmRowChunkSize,
-                termBankWasmInitialMetaCapacityDivisor,
-                termBankWasmInitialContentBytesPerRow,
-                adaptiveTermBankWasmRowChunkSize,
-                adaptiveTermBankWasmRowChunkSizeTiered,
-                adaptiveTermBankWasmInitialCapacity,
-                streamTermArtifactChunks,
-                termArtifactRowChunkSize,
-                wasmSkipUnusedTermContentEncoding,
-                wasmReuseExpressionForReadingDecode,
-                wasmPreallocateChunkRows,
-                usePrecomputedContentForMediaRows,
-                leanCanonicalTermEntryObjects,
-                cacheReverseStrings,
-                fastPrefixReverse,
-                reverseStringCacheMaxEntries,
-                skipIntraBatchContentDedup,
-                termBulkAddStagingMaxRows,
-                termRecordRowAppendFastPath,
             } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
@@ -1291,34 +1263,6 @@ export class DictionaryImportController {
                 mediaResolutionConcurrency,
                 debugImportLogging,
                 enableTermEntryContentDedup,
-                adaptiveTermBulkAddBatchSize,
-                glossaryMediaFastScan,
-                lazyGlossaryDecodeForMedia,
-                reuseExpressionReverseForReading,
-                disableTermBankWasmFastPath,
-                artifactFirstImport,
-                wasmCanonicalRowsFastPath,
-                wasmPassThroughTermContent,
-                retryBeginImmediateTransaction,
-                termBankWasmRowChunkSize,
-                termBankWasmInitialMetaCapacityDivisor,
-                termBankWasmInitialContentBytesPerRow,
-                adaptiveTermBankWasmRowChunkSize,
-                adaptiveTermBankWasmRowChunkSizeTiered,
-                adaptiveTermBankWasmInitialCapacity,
-                streamTermArtifactChunks,
-                termArtifactRowChunkSize,
-                wasmSkipUnusedTermContentEncoding,
-                wasmReuseExpressionForReadingDecode,
-                wasmPreallocateChunkRows,
-                usePrecomputedContentForMediaRows,
-                leanCanonicalTermEntryObjects,
-                cacheReverseStrings,
-                fastPrefixReverse,
-                reverseStringCacheMaxEntries,
-                skipIntraBatchContentDedup,
-                termBulkAddStagingMaxRows,
-                termRecordRowAppendFastPath,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -1429,7 +1373,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, adaptiveTermBulkAddBatchSize: boolean, glossaryMediaFastScan: boolean, lazyGlossaryDecodeForMedia: boolean, reuseExpressionReverseForReading: boolean, disableTermBankWasmFastPath: boolean, artifactFirstImport: boolean, wasmCanonicalRowsFastPath: boolean, wasmPassThroughTermContent: boolean, retryBeginImmediateTransaction: boolean, termBankWasmRowChunkSize: number, termBankWasmInitialMetaCapacityDivisor: number, termBankWasmInitialContentBytesPerRow: number, adaptiveTermBankWasmRowChunkSize: boolean, adaptiveTermBankWasmRowChunkSizeTiered: boolean, adaptiveTermBankWasmInitialCapacity: boolean, streamTermArtifactChunks: boolean, termArtifactRowChunkSize: number, wasmSkipUnusedTermContentEncoding: boolean, wasmReuseExpressionForReadingDecode: boolean, wasmPreallocateChunkRows: boolean, usePrecomputedContentForMediaRows: boolean, leanCanonicalTermEntryObjects: boolean, cacheReverseStrings: boolean, fastPrefixReverse: boolean, reverseStringCacheMaxEntries: number, skipIntraBatchContentDedup: boolean, termBulkAddStagingMaxRows?: number, termRecordRowAppendFastPath: boolean}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1440,77 +1384,16 @@ export class DictionaryImportController {
                 mediaResolutionConcurrency: 8,
                 debugImportLogging: false,
                 enableTermEntryContentDedup: true,
-                adaptiveTermBulkAddBatchSize: true,
-                glossaryMediaFastScan: false,
-                lazyGlossaryDecodeForMedia: false,
-                reuseExpressionReverseForReading: true,
-                disableTermBankWasmFastPath: false,
-                artifactFirstImport: false,
-                wasmCanonicalRowsFastPath: true,
-                wasmPassThroughTermContent: false,
-                retryBeginImmediateTransaction: false,
-                termBankWasmRowChunkSize: 2048,
-                termBankWasmInitialMetaCapacityDivisor: 24,
-                termBankWasmInitialContentBytesPerRow: 96,
-                adaptiveTermBankWasmRowChunkSize: false,
-                adaptiveTermBankWasmRowChunkSizeTiered: false,
-                adaptiveTermBankWasmInitialCapacity: false,
-                streamTermArtifactChunks: false,
-                termArtifactRowChunkSize: 4096,
-                wasmSkipUnusedTermContentEncoding: true,
-                wasmReuseExpressionForReadingDecode: true,
-                wasmPreallocateChunkRows: false,
-                usePrecomputedContentForMediaRows: false,
-                leanCanonicalTermEntryObjects: false,
-                cacheReverseStrings: true,
-                fastPrefixReverse: true,
-                reverseStringCacheMaxEntries: 4096,
-                skipIntraBatchContentDedup: false,
-                termRecordRowAppendFastPath: true,
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
         const mediaResolutionConcurrency = Number.isFinite(flagsRecord.mediaResolutionConcurrency) ? Math.trunc(/** @type {number} */ (flagsRecord.mediaResolutionConcurrency)) : 8;
-        const termBankWasmRowChunkSize = Number.isFinite(flagsRecord.termBankWasmRowChunkSize) ? Math.trunc(/** @type {number} */ (flagsRecord.termBankWasmRowChunkSize)) : 2048;
-        const termBankWasmInitialMetaCapacityDivisor = Number.isFinite(flagsRecord.termBankWasmInitialMetaCapacityDivisor) ? Math.trunc(/** @type {number} */ (flagsRecord.termBankWasmInitialMetaCapacityDivisor)) : 24;
-        const termBankWasmInitialContentBytesPerRow = Number.isFinite(flagsRecord.termBankWasmInitialContentBytesPerRow) ? Math.trunc(/** @type {number} */ (flagsRecord.termBankWasmInitialContentBytesPerRow)) : 96;
-        const termArtifactRowChunkSize = Number.isFinite(flagsRecord.termArtifactRowChunkSize) ? Math.trunc(/** @type {number} */ (flagsRecord.termArtifactRowChunkSize)) : 4096;
-        const reverseStringCacheMaxEntries = Number.isFinite(flagsRecord.reverseStringCacheMaxEntries) ? Math.trunc(/** @type {number} */ (flagsRecord.reverseStringCacheMaxEntries)) : 4096;
-        const termBulkAddStagingMaxRows = Number.isFinite(flagsRecord.termBulkAddStagingMaxRows) ? Math.trunc(/** @type {number} */ (flagsRecord.termBulkAddStagingMaxRows)) : null;
         return {
             skipImageMetadata: flagsRecord.skipImageMetadata === true,
             skipMediaImport: flagsRecord.skipMediaImport === true,
             mediaResolutionConcurrency: Math.max(1, Math.min(32, mediaResolutionConcurrency)),
             debugImportLogging: flagsRecord.debugImportLogging === true,
             enableTermEntryContentDedup: flagsRecord.enableTermEntryContentDedup !== false,
-            adaptiveTermBulkAddBatchSize: flagsRecord.adaptiveTermBulkAddBatchSize !== false,
-            glossaryMediaFastScan: flagsRecord.glossaryMediaFastScan === true,
-            lazyGlossaryDecodeForMedia: flagsRecord.lazyGlossaryDecodeForMedia === true,
-            reuseExpressionReverseForReading: flagsRecord.reuseExpressionReverseForReading !== false,
-            disableTermBankWasmFastPath: flagsRecord.disableTermBankWasmFastPath === true,
-            artifactFirstImport: flagsRecord.artifactFirstImport === true,
-            wasmCanonicalRowsFastPath: flagsRecord.wasmCanonicalRowsFastPath !== false,
-            wasmPassThroughTermContent: flagsRecord.wasmPassThroughTermContent === true,
-            retryBeginImmediateTransaction: flagsRecord.retryBeginImmediateTransaction === true,
-            termBankWasmRowChunkSize: Math.max(256, Math.min(16384, termBankWasmRowChunkSize)),
-            termBankWasmInitialMetaCapacityDivisor: Math.max(8, Math.min(128, termBankWasmInitialMetaCapacityDivisor)),
-            termBankWasmInitialContentBytesPerRow: Math.max(16, Math.min(512, termBankWasmInitialContentBytesPerRow)),
-            adaptiveTermBankWasmRowChunkSize: flagsRecord.adaptiveTermBankWasmRowChunkSize === true,
-            adaptiveTermBankWasmRowChunkSizeTiered: flagsRecord.adaptiveTermBankWasmRowChunkSizeTiered === true,
-            adaptiveTermBankWasmInitialCapacity: flagsRecord.adaptiveTermBankWasmInitialCapacity === true,
-            streamTermArtifactChunks: flagsRecord.streamTermArtifactChunks === true,
-            termArtifactRowChunkSize: Math.max(256, Math.min(32768, termArtifactRowChunkSize)),
-            wasmSkipUnusedTermContentEncoding: flagsRecord.wasmSkipUnusedTermContentEncoding !== false,
-            wasmReuseExpressionForReadingDecode: flagsRecord.wasmReuseExpressionForReadingDecode !== false,
-            wasmPreallocateChunkRows: flagsRecord.wasmPreallocateChunkRows === true,
-            usePrecomputedContentForMediaRows: flagsRecord.usePrecomputedContentForMediaRows === true,
-            leanCanonicalTermEntryObjects: flagsRecord.leanCanonicalTermEntryObjects === true,
-            cacheReverseStrings: flagsRecord.cacheReverseStrings !== false,
-            fastPrefixReverse: flagsRecord.fastPrefixReverse !== false,
-            reverseStringCacheMaxEntries: Math.max(1024, Math.min(131072, reverseStringCacheMaxEntries)),
-            skipIntraBatchContentDedup: flagsRecord.skipIntraBatchContentDedup === true,
-            ...(termBulkAddStagingMaxRows === null ? {} : {termBulkAddStagingMaxRows: Math.max(512, Math.min(20000, termBulkAddStagingMaxRows))}),
-            termRecordRowAppendFastPath: flagsRecord.termRecordRowAppendFastPath !== false,
         };
     }
 

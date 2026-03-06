@@ -147,10 +147,44 @@ export class TermContentOpfsStore {
         if (chunks.length === 0) { return []; }
         /** @type {Array<{offset: number, length: number}>} */
         const spans = [];
+        /** @type {number[]} */
+        const offsets = [];
+        /** @type {number[]} */
+        const lengths = [];
+        this._appendBatchInternal(chunks, offsets, lengths);
+        for (let i = 0, ii = offsets.length; i < ii; ++i) {
+            spans.push({offset: offsets[i], length: lengths[i]});
+        }
+        await this._finalizeAppendBatch(chunks);
+        return spans;
+    }
+
+    /**
+     * @param {Uint8Array[]} chunks
+     * @param {number[]} offsets
+     * @param {number[]} lengths
+     * @returns {Promise<void>}
+     */
+    async appendBatchToArrays(chunks, offsets, lengths) {
+        if (chunks.length === 0) { return; }
+        this._appendBatchInternal(chunks, offsets, lengths);
+        await this._finalizeAppendBatch(chunks);
+    }
+
+    /**
+     * @param {Uint8Array[]} chunks
+     * @param {number[]} offsets
+     * @param {number[]} lengths
+     * @returns {void}
+     */
+    _appendBatchInternal(chunks, offsets, lengths) {
+        offsets.length = 0;
+        lengths.length = 0;
         let nextOffset = this._length;
         for (const chunk of chunks) {
             const length = chunk.byteLength;
-            spans.push({offset: nextOffset, length});
+            offsets.push(nextOffset);
+            lengths.push(length);
             if (length > 0) {
                 if (this._fileHandle === null) {
                     this._chunkOffsets.push(nextOffset);
@@ -160,7 +194,13 @@ export class TermContentOpfsStore {
             }
         }
         this._length = nextOffset;
+    }
 
+    /**
+     * @param {Uint8Array[]} chunks
+     * @returns {Promise<void>}
+     */
+    async _finalizeAppendBatch(chunks) {
         if (this._fileHandle !== null) {
             let totalBytes = 0;
             for (const chunk of chunks) {
@@ -181,7 +221,6 @@ export class TermContentOpfsStore {
                 }
             }
         }
-        return spans;
     }
 
     /**

@@ -68,12 +68,22 @@ Install from the latest GitHub release page:
 - [ ] Auto-update
 - [ ] Ereader performance
 - [ ] Improve onboarding for easier default installation
+- [ ] Change Manabitan import/export to a smaller, optimized format, and provide separate Yomitan import/export paths
 
 ### Backlog
 
 - [ ] Full-text search option per dictionary for searching glosses
 - [ ] Voice input for search
 - [ ] Default TTS
+
+### Optimization TODO
+
+- [ ] Import
+- [ ] Export
+- [ ] Yomitan import
+- [ ] Yomitan export
+- [ ] Deletion
+- [ ] Lookups
 
 ## Contributing
 

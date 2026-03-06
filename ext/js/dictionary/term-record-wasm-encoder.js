@@ -23,6 +23,62 @@ const U32_NULL = 0xffffffff;
 let wasmPromise = null;
 
 /**
+ * @param {TextEncoder} textEncoder
+ * @returns {{stringOffsets: number[], stringLengths: number[], internString: (value: string) => number, buildStringsBuffer: () => Uint8Array}}
+ */
+function createStringInterner(textEncoder) {
+    let stringsTotal = 0;
+    let stringsCapacity = 64 * 1024;
+    let stringsBuffer = new Uint8Array(stringsCapacity);
+    /** @type {Map<string, number>} */
+    const encodedStringIndexByValue = new Map();
+    /** @type {number[]} */
+    const stringOffsets = [];
+    /** @type {number[]} */
+    const stringLengths = [];
+
+    /**
+     * @param {number} requiredCapacity
+     * @returns {void}
+     */
+    const ensureCapacity = (requiredCapacity) => {
+        if (requiredCapacity <= stringsCapacity) {
+            return;
+        }
+        let nextCapacity = stringsCapacity;
+        while (nextCapacity < requiredCapacity) {
+            nextCapacity *= 2;
+        }
+        const nextBuffer = new Uint8Array(nextCapacity);
+        nextBuffer.set(stringsBuffer.subarray(0, stringsTotal));
+        stringsBuffer = nextBuffer;
+        stringsCapacity = nextCapacity;
+    };
+
+    /**
+     * @param {string} value
+     * @returns {number}
+     */
+    const internString = (value) => {
+        const cachedIndex = encodedStringIndexByValue.get(value);
+        if (typeof cachedIndex === 'number') {
+            return cachedIndex;
+        }
+        const index = stringOffsets.length;
+        const offset = stringsTotal;
+        ensureCapacity(offset + (value.length * 3));
+        const {written = 0} = textEncoder.encodeInto(value, stringsBuffer.subarray(offset));
+        stringOffsets.push(stringsTotal);
+        stringLengths.push(written);
+        stringsTotal += written;
+        encodedStringIndexByValue.set(value, index);
+        return index;
+    };
+
+    return {stringOffsets, stringLengths, internString, buildStringsBuffer: () => stringsBuffer.slice(0, stringsTotal)};
+}
+
+/**
  * @returns {Promise<{memory: WebAssembly.Memory, wasm_reset_heap: () => void, wasm_alloc: (size: number) => number, calc_encoded_size: (count: number, metasPtr: number) => number, encode_records: (count: number, metasPtr: number, stringsPtr: number, outPtr: number) => number}>}
  */
 async function getWasm() {
@@ -63,64 +119,38 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     const metasBuffer = new ArrayBuffer(records.length * META_BYTES);
     const metasU32 = new Uint32Array(metasBuffer);
     const metasI32 = new Int32Array(metasBuffer);
-    /** @type {Uint8Array[]} */
-    const stringChunks = [];
-    let stringsTotal = 0;
-    /** @type {Map<string, {off: number, len: number}>} */
-    const encodedStringCache = new Map();
-
-    /**
-     * @param {string} value
-     * @returns {{off: number, len: number}}
-     */
-    const internString = (value) => {
-        const cached = encodedStringCache.get(value);
-        if (typeof cached !== 'undefined') {
-            return cached;
-        }
-        const bytes = textEncoder.encode(value);
-        const out = {off: stringsTotal, len: bytes.byteLength};
-        stringsTotal += bytes.byteLength;
-        stringChunks.push(bytes);
-        encodedStringCache.set(value, out);
-        return out;
-    };
+    const {stringOffsets, stringLengths, internString, buildStringsBuffer} = createStringInterner(textEncoder);
 
     let recordIndex = 0;
     for (const record of records) {
-        const dictionary = internString(record.dictionary);
-        const expression = internString(record.expression);
-        const reading = internString(record.reading);
-        const expressionReverse = record.expressionReverse !== null ? internString(record.expressionReverse) : null;
-        const readingReverse = record.readingReverse !== null ? internString(record.readingReverse) : null;
-        const dictName = internString(record.entryContentDictName);
+        const dictionaryIndex = internString(record.dictionary);
+        const expressionIndex = internString(record.expression);
+        const readingIndex = internString(record.reading);
+        const expressionReverseIndex = record.expressionReverse !== null ? internString(record.expressionReverse) : -1;
+        const readingReverseIndex = record.readingReverse !== null ? internString(record.readingReverse) : -1;
+        const dictNameIndex = internString(record.entryContentDictName);
         const metaIndex = recordIndex * META_U32_FIELDS;
         metasU32[metaIndex + 0] = record.id >>> 0;
-        metasU32[metaIndex + 1] = dictionary.off >>> 0;
-        metasU32[metaIndex + 2] = dictionary.len >>> 0;
-        metasU32[metaIndex + 3] = expression.off >>> 0;
-        metasU32[metaIndex + 4] = expression.len >>> 0;
-        metasU32[metaIndex + 5] = reading.off >>> 0;
-        metasU32[metaIndex + 6] = reading.len >>> 0;
-        metasU32[metaIndex + 7] = expressionReverse?.off ?? U32_NULL;
-        metasU32[metaIndex + 8] = expressionReverse?.len ?? U32_NULL;
-        metasU32[metaIndex + 9] = readingReverse?.off ?? U32_NULL;
-        metasU32[metaIndex + 10] = readingReverse?.len ?? U32_NULL;
+        metasU32[metaIndex + 1] = stringOffsets[dictionaryIndex] >>> 0;
+        metasU32[metaIndex + 2] = stringLengths[dictionaryIndex] >>> 0;
+        metasU32[metaIndex + 3] = stringOffsets[expressionIndex] >>> 0;
+        metasU32[metaIndex + 4] = stringLengths[expressionIndex] >>> 0;
+        metasU32[metaIndex + 5] = stringOffsets[readingIndex] >>> 0;
+        metasU32[metaIndex + 6] = stringLengths[readingIndex] >>> 0;
+        metasU32[metaIndex + 7] = expressionReverseIndex >= 0 ? (stringOffsets[expressionReverseIndex] >>> 0) : U32_NULL;
+        metasU32[metaIndex + 8] = expressionReverseIndex >= 0 ? (stringLengths[expressionReverseIndex] >>> 0) : U32_NULL;
+        metasU32[metaIndex + 9] = readingReverseIndex >= 0 ? (stringOffsets[readingReverseIndex] >>> 0) : U32_NULL;
+        metasU32[metaIndex + 10] = readingReverseIndex >= 0 ? (stringLengths[readingReverseIndex] >>> 0) : U32_NULL;
         metasI32[metaIndex + 11] = record.entryContentOffset | 0;
         metasI32[metaIndex + 12] = record.entryContentLength | 0;
-        metasU32[metaIndex + 13] = dictName.off >>> 0;
-        metasU32[metaIndex + 14] = dictName.len >>> 0;
+        metasU32[metaIndex + 13] = stringOffsets[dictNameIndex] >>> 0;
+        metasU32[metaIndex + 14] = stringLengths[dictNameIndex] >>> 0;
         metasI32[metaIndex + 15] = record.score | 0;
         metasI32[metaIndex + 16] = record.sequence ?? -1;
         ++recordIndex;
     }
 
-    const stringsBuffer = new Uint8Array(stringsTotal);
-    let stringsCursor = 0;
-    for (const chunk of stringChunks) {
-        stringsBuffer.set(chunk, stringsCursor);
-        stringsCursor += chunk.byteLength;
-    }
+    const stringsBuffer = buildStringsBuffer();
 
     wasm.wasm_reset_heap();
     const metasPtr = wasm.wasm_alloc(metasBuffer.byteLength);

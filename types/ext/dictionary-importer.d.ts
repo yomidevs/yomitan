@@ -62,34 +62,6 @@ export type ImportDetails = {
     mediaResolutionConcurrency?: number;
     debugImportLogging?: boolean;
     enableTermEntryContentDedup?: boolean;
-    adaptiveTermBulkAddBatchSize?: boolean;
-    glossaryMediaFastScan?: boolean;
-    lazyGlossaryDecodeForMedia?: boolean;
-    reuseExpressionReverseForReading?: boolean;
-    disableTermBankWasmFastPath?: boolean;
-    artifactFirstImport?: boolean;
-    wasmCanonicalRowsFastPath?: boolean;
-    wasmPassThroughTermContent?: boolean;
-    retryBeginImmediateTransaction?: boolean;
-    termBankWasmRowChunkSize?: number;
-    termBankWasmInitialMetaCapacityDivisor?: number;
-    termBankWasmInitialContentBytesPerRow?: number;
-    adaptiveTermBankWasmRowChunkSize?: boolean;
-    adaptiveTermBankWasmRowChunkSizeTiered?: boolean;
-    adaptiveTermBankWasmInitialCapacity?: boolean;
-    streamTermArtifactChunks?: boolean;
-    termArtifactRowChunkSize?: number;
-    wasmSkipUnusedTermContentEncoding?: boolean;
-    wasmReuseExpressionForReadingDecode?: boolean;
-    wasmPreallocateChunkRows?: boolean;
-    usePrecomputedContentForMediaRows?: boolean;
-    leanCanonicalTermEntryObjects?: boolean;
-    cacheReverseStrings?: boolean;
-    fastPrefixReverse?: boolean;
-    reverseStringCacheMaxEntries?: number;
-    skipIntraBatchContentDedup?: boolean;
-    termBulkAddStagingMaxRows?: number;
-    termRecordRowAppendFastPath?: boolean;
 };
 
 export type Summary = {

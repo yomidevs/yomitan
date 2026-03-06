@@ -17,6 +17,7 @@
 
 import {parseJson} from '../core/json.js';
 import {reportDiagnostics} from '../core/diagnostics-reporter.js';
+import {safePerformance} from '../core/safe-performance.js';
 import {encodeTermRecordsWithWasm} from './term-record-wasm-encoder.js';
 
 const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
@@ -318,17 +319,22 @@ export class TermRecordOpfsStore {
      * @param {number[]} contentOffsets
      * @param {number[]} contentLengths
      * @param {(string|null)[]} contentDictNames
-     * @returns {Promise<void>}
+     * @returns {Promise<{buildRecordsMs: number, encodeMs: number, appendWriteMs: number}>}
      */
     async appendBatchFromResolvedImportTermEntries(rows, start, count, contentOffsets, contentLengths, contentDictNames) {
-        if (count <= 0) { return; }
+        if (count <= 0) { return {buildRecordsMs: 0, encodeMs: 0, appendWriteMs: 0}; }
         if (contentOffsets.length < (start + count) || contentLengths.length < (start + count) || contentDictNames.length < (start + count)) {
             throw new Error('appendBatchFromResolvedImportTermEntries content refs length is smaller than row count');
         }
+        const tBuildStart = safePerformance.now();
+        let buildRecordsMs = 0;
+        let encodeMs = 0;
+        let appendWriteMs = 0;
         /** @type {Map<string, TermRecord[]>|null} */
         let recordsByDictionary = null;
         /** @type {TermRecord[]} */
-        const singleDictionaryRecords = [];
+        const singleDictionaryRecords = new Array(count);
+        let singleDictionaryRecordCount = 0;
         let singleDictionaryName = '';
         for (let i = start, ii = start + count; i < ii; ++i) {
             const row = /** @type {{dictionary: string, expression: string, reading: string, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[i]);
@@ -354,10 +360,10 @@ export class TermRecordOpfsStore {
             }
             if (recordsByDictionary === null) {
                 if (dictionary === singleDictionaryName) {
-                    singleDictionaryRecords.push(record);
+                    singleDictionaryRecords[singleDictionaryRecordCount++] = record;
                 } else {
                     recordsByDictionary = new Map();
-                    recordsByDictionary.set(singleDictionaryName, singleDictionaryRecords);
+                    recordsByDictionary.set(singleDictionaryName, singleDictionaryRecords.slice(0, singleDictionaryRecordCount));
                     recordsByDictionary.set(dictionary, [record]);
                 }
             } else {
@@ -378,18 +384,24 @@ export class TermRecordOpfsStore {
         if (this._deferIndexBuild) {
             this._indexDirty = true;
         }
+        buildRecordsMs = safePerformance.now() - tBuildStart;
         if (recordsByDictionary === null) {
             const state = await this._getOrCreateShardState(singleDictionaryName);
             if (state !== null) {
-                await this._appendEncodedChunk(state, await this._encodeRecords(singleDictionaryRecords));
+                const metrics = await this._encodeAndAppendChunkForState(state, singleDictionaryRecords);
+                encodeMs += metrics.encodeMs;
+                appendWriteMs += metrics.appendWriteMs;
             }
-            return;
+            return {buildRecordsMs, encodeMs, appendWriteMs};
         }
         for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
             const state = await this._getOrCreateShardState(dictionaryName);
             if (state === null) { continue; }
-            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords));
+            const metrics = await this._encodeAndAppendChunkForState(state, dictionaryRecords);
+            encodeMs += metrics.encodeMs;
+            appendWriteMs += metrics.appendWriteMs;
         }
+        return {buildRecordsMs, encodeMs, appendWriteMs};
     }
 
     /**
@@ -462,15 +474,123 @@ export class TermRecordOpfsStore {
         if (recordsByDictionary === null) {
             const state = await this._getOrCreateShardState(singleDictionaryName);
             if (state !== null) {
-                await this._appendEncodedChunk(state, await this._encodeRecords(singleDictionaryRecords));
+                await this._encodeAndAppendChunkForState(state, singleDictionaryRecords);
             }
             return;
         }
         for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
             const state = await this._getOrCreateShardState(dictionaryName);
             if (state === null) { continue; }
-            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords));
+            await this._encodeAndAppendChunkForState(state, dictionaryRecords);
         }
+    }
+
+    /**
+     * Fast-path append for importer DatabaseTermEntry arrays paired with raw content offset/length arrays.
+     * @param {unknown[]} rows
+     * @param {number} start
+     * @param {number} count
+     * @param {number[]} contentOffsets
+     * @param {number[]} contentLengths
+     * @param {string|null} [contentDictName='raw']
+     * @returns {Promise<{buildRecordsMs: number, encodeMs: number, appendWriteMs: number}>}
+     */
+    async appendBatchFromImportTermEntriesResolvedContent(rows, start, count, contentOffsets, contentLengths, contentDictName = 'raw') {
+        if (count <= 0) { return {buildRecordsMs: 0, encodeMs: 0, appendWriteMs: 0}; }
+        if (contentOffsets.length < count || contentLengths.length < count) {
+            throw new Error('appendBatchFromImportTermEntriesResolvedContent content arrays are smaller than row count');
+        }
+        const tBuildStart = safePerformance.now();
+        let buildRecordsMs = 0;
+        let encodeMs = 0;
+        let appendWriteMs = 0;
+        /** @type {Map<string, TermRecord[]>|null} */
+        let recordsByDictionary = null;
+        /** @type {TermRecord[]} */
+        const singleDictionaryRecords = new Array(count);
+        let singleDictionaryRecordCount = 0;
+        let firstDictionaryName = '';
+        for (let i = 0; i < count; ++i) {
+            const row = /** @type {{dictionary: string, expression: string, reading: string, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[start + i]);
+            const id = this._nextId++;
+            const dictionary = row.dictionary;
+            /** @type {TermRecord} */
+            const record = {
+                id,
+                dictionary,
+                expression: row.expression,
+                reading: row.reading,
+                expressionReverse: row.expressionReverse ?? null,
+                readingReverse: row.readingReverse ?? null,
+                entryContentOffset: contentOffsets[i],
+                entryContentLength: contentLengths[i],
+                entryContentDictName: contentDictName ?? 'raw',
+                score: row.score,
+                sequence: typeof row.sequence === 'number' ? row.sequence : null,
+            };
+            this._recordsById.set(id, record);
+            if (i === 0) {
+                firstDictionaryName = dictionary;
+            }
+            if (recordsByDictionary === null) {
+                if (dictionary === firstDictionaryName) {
+                    singleDictionaryRecords[singleDictionaryRecordCount++] = record;
+                } else {
+                    recordsByDictionary = new Map();
+                    recordsByDictionary.set(firstDictionaryName, singleDictionaryRecords.slice(0, singleDictionaryRecordCount));
+                    recordsByDictionary.set(dictionary, [record]);
+                }
+            } else {
+                let dictionaryRecords = recordsByDictionary.get(dictionary);
+                if (typeof dictionaryRecords === 'undefined') {
+                    dictionaryRecords = [];
+                    recordsByDictionary.set(dictionary, dictionaryRecords);
+                }
+                dictionaryRecords.push(record);
+            }
+            if (!this._deferIndexBuild) {
+                const existingIndex = this._indexByDictionary.get(dictionary);
+                if (typeof existingIndex !== 'undefined') {
+                    this._addRecordToDictionaryIndex(existingIndex, record);
+                }
+            }
+        }
+        if (this._deferIndexBuild) {
+            this._indexDirty = true;
+        }
+        buildRecordsMs = safePerformance.now() - tBuildStart;
+        if (recordsByDictionary === null) {
+            const state = await this._getOrCreateShardState(firstDictionaryName);
+            if (state !== null) {
+                const metrics = await this._encodeAndAppendChunkForState(state, singleDictionaryRecords);
+                encodeMs += metrics.encodeMs;
+                appendWriteMs += metrics.appendWriteMs;
+            }
+            return {buildRecordsMs, encodeMs, appendWriteMs};
+        }
+        for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
+            const state = await this._getOrCreateShardState(dictionaryName);
+            if (state === null) { continue; }
+            const metrics = await this._encodeAndAppendChunkForState(state, dictionaryRecords);
+            encodeMs += metrics.encodeMs;
+            appendWriteMs += metrics.appendWriteMs;
+        }
+        return {buildRecordsMs, encodeMs, appendWriteMs};
+    }
+
+    /**
+     * @param {TermRecordShardState} state
+     * @param {TermRecord[]} records
+     * @returns {Promise<{encodeMs: number, appendWriteMs: number}>}
+     */
+    async _encodeAndAppendChunkForState(state, records) {
+        const tEncodeStart = safePerformance.now();
+        const chunk = await this._encodeRecords(records);
+        const encodeMs = safePerformance.now() - tEncodeStart;
+        const tAppendStart = safePerformance.now();
+        await this._appendEncodedChunk(state, chunk);
+        const appendWriteMs = safePerformance.now() - tAppendStart;
+        return {encodeMs, appendWriteMs};
     }
 
     /**

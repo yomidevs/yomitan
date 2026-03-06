@@ -452,26 +452,13 @@ export class DictionaryDatabase {
         this._importDebugLogging = value;
     }
 
-    /**
-     * @param {{adaptiveTermBulkAddBatchSize?: boolean, retryBeginImmediateTransaction?: boolean, skipIntraBatchContentDedup?: boolean, termBulkAddStagingMaxRows?: number, termRecordRowAppendFastPath?: boolean}} value
-     */
-    setImportOptimizationFlags(value) {
-        if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-            this._adaptiveTermBulkAddBatchSize = true;
-            this._retryBeginImmediateTransaction = false;
-            this._skipIntraBatchContentDedup = false;
-            this._termBulkAddStagingMaxRows = this._computeDefaultTermBulkAddStagingMaxRows();
-            this._termRecordRowAppendFastPath = true;
-            return;
-        }
-        this._adaptiveTermBulkAddBatchSize = value.adaptiveTermBulkAddBatchSize !== false;
-        this._retryBeginImmediateTransaction = value.retryBeginImmediateTransaction === true;
-        this._skipIntraBatchContentDedup = value.skipIntraBatchContentDedup === true;
-        const termBulkAddStagingMaxRows = Number.isFinite(value.termBulkAddStagingMaxRows) ?
-            Math.trunc(/** @type {number} */ (value.termBulkAddStagingMaxRows)) :
-            this._computeDefaultTermBulkAddStagingMaxRows();
-        this._termBulkAddStagingMaxRows = Math.max(512, Math.min(20000, termBulkAddStagingMaxRows));
-        this._termRecordRowAppendFastPath = value.termRecordRowAppendFastPath !== false;
+    /** */
+    setImportOptimizationFlags() {
+        this._adaptiveTermBulkAddBatchSize = true;
+        this._retryBeginImmediateTransaction = false;
+        this._skipIntraBatchContentDedup = false;
+        this._termBulkAddStagingMaxRows = this._computeDefaultTermBulkAddStagingMaxRows();
+        this._termRecordRowAppendFastPath = true;
     }
 
     /**
@@ -2337,12 +2324,16 @@ export class DictionaryDatabase {
      * @param {(string|null)[]} contentDictNames
      * @param {number} start
      * @param {number} count
-     * @returns {Promise<{termRecordAppendMs: number, termsVtabInsertMs: number}>}
+     * @returns {Promise<{termRecordAppendMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number}>}
      */
     async _insertResolvedImportTermEntries(rows, contentOffsets, contentLengths, contentDictNames, start, count) {
         const tRecordAppendStart = safePerformance.now();
+        let termRecordEncodeMs = 0;
+        let termRecordWriteMs = 0;
         if (this._termRecordRowAppendFastPath) {
-            await this._termRecordStore.appendBatchFromResolvedImportTermEntries(rows, start, count, contentOffsets, contentLengths, contentDictNames);
+            const metrics = await this._termRecordStore.appendBatchFromResolvedImportTermEntries(rows, start, count, contentOffsets, contentLengths, contentDictNames);
+            termRecordEncodeMs = metrics.encodeMs;
+            termRecordWriteMs = metrics.appendWriteMs;
         } else {
             /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
             const records = [];
@@ -2373,7 +2364,7 @@ export class DictionaryDatabase {
             await this._insertTermRowsIntoVirtualTable(count);
             termsVtabInsertMs = safePerformance.now() - tVtabStart;
         }
-        return {termRecordAppendMs, termsVtabInsertMs};
+        return {termRecordAppendMs, termRecordEncodeMs, termRecordWriteMs, termsVtabInsertMs};
     }
 
     /**
@@ -2529,6 +2520,10 @@ export class DictionaryDatabase {
     async _bulkAddTermsWithoutContentDedup(items, start, count) {
         const useLocalTransaction = !this._bulkImportTransactionOpen;
         const batchSize = this._getTermBulkAddBatchSizeForCount(count);
+        let contentAppendMs = 0;
+        let termRecordBuildMs = 0;
+        let termRecordEncodeMs = 0;
+        let termRecordWriteMs = 0;
 
         if (useLocalTransaction) {
             await this._beginImmediateTransaction(this._requireDb());
@@ -2538,6 +2533,10 @@ export class DictionaryDatabase {
                 const chunkCount = Math.min(batchSize, ii - i);
                 /** @type {Uint8Array[]} */
                 const contentChunks = new Array(chunkCount);
+                /** @type {number[]} */
+                const contentOffsets = new Array(chunkCount);
+                /** @type {number[]} */
+                const contentLengths = new Array(chunkCount);
                 for (let j = 0; j < chunkCount; ++j) {
                     const row = /** @type {import('dictionary-database').DatabaseTermEntry} */ (items[i + j]);
                     const precomputedContentBytes = row.termEntryContentBytes;
@@ -2551,8 +2550,13 @@ export class DictionaryDatabase {
                     const contentJson = row.termEntryContentJson ?? this._serializeTermEntryContent(rules, definitionTags, termTags, row.glossary);
                     contentChunks[j] = this._textEncoder.encode(contentJson);
                 }
-                const spans = await this._termContentStore.appendBatch(contentChunks);
-                await this._termRecordStore.appendBatchFromImportTermEntries(items, i, chunkCount, spans);
+                const tContentAppendStart = safePerformance.now();
+                await this._termContentStore.appendBatchToArrays(contentChunks, contentOffsets, contentLengths);
+                contentAppendMs += safePerformance.now() - tContentAppendStart;
+                const metrics = await this._termRecordStore.appendBatchFromImportTermEntriesResolvedContent(items, i, chunkCount, contentOffsets, contentLengths);
+                termRecordBuildMs += metrics.buildRecordsMs;
+                termRecordEncodeMs += metrics.encodeMs;
+                termRecordWriteMs += metrics.appendWriteMs;
                 const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
                 if (deferVirtualTableWrite) {
                     this._termsVirtualTableDirty = true;
@@ -2562,6 +2566,14 @@ export class DictionaryDatabase {
             }
             if (useLocalTransaction) {
                 this._requireDb().exec('COMMIT');
+            }
+            if (this._importDebugLogging) {
+                log.log(
+                    `[manabitan-db-import] bulkAdd terms no-dedup contentAppend=${contentAppendMs.toFixed(1)}ms ` +
+                    `termRecordBuild=${termRecordBuildMs.toFixed(1)}ms ` +
+                    `termRecordEncode=${termRecordEncodeMs.toFixed(1)}ms ` +
+                    `termRecordWrite=${termRecordWriteMs.toFixed(1)}ms`,
+                );
             }
         } catch (e) {
             if (useLocalTransaction) {
