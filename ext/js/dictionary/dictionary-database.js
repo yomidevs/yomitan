@@ -159,6 +159,8 @@ export class DictionaryDatabase {
         this._termBulkAddStagingMaxRows = this._computeDefaultTermBulkAddStagingMaxRows();
         /** @type {boolean} */
         this._termRecordRowAppendFastPath = true;
+        /** @type {{contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number}|null} */
+        this._lastBulkAddTermsMetrics = null;
         /** @type {TermContentOpfsStore} */
         this._termContentStore = new TermContentOpfsStore();
         /** @type {TermRecordOpfsStore} */
@@ -360,11 +362,16 @@ export class DictionaryDatabase {
                     this._bulkImportTransactionOpen = false;
                 }
                 const tTermContentEndImportSessionStart = safePerformance.now();
-                await this._termContentStore.endImportSession();
-                termContentEndImportSessionMs = safePerformance.now() - tTermContentEndImportSessionStart;
+                const termContentEndImportSessionPromise = this._termContentStore.endImportSession()
+                    .then(() => {
+                        termContentEndImportSessionMs = safePerformance.now() - tTermContentEndImportSessionStart;
+                    });
                 const tTermRecordEndImportSessionStart = safePerformance.now();
-                await this._termRecordStore.endImportSession();
-                termRecordEndImportSessionMs = safePerformance.now() - tTermRecordEndImportSessionStart;
+                const termRecordEndImportSessionPromise = this._termRecordStore.endImportSession()
+                    .then(() => {
+                        termRecordEndImportSessionMs = safePerformance.now() - tTermRecordEndImportSessionStart;
+                    });
+                await Promise.all([termContentEndImportSessionPromise, termRecordEndImportSessionPromise]);
                 if (this._termsVirtualTableDirty) {
                     await this._beginImmediateTransaction(db);
                     try {
@@ -1724,6 +1731,7 @@ export class DictionaryDatabase {
         }
         if (count <= 0) { return; }
         if (objectStoreName === 'terms') {
+            this._lastBulkAddTermsMetrics = null;
             this._termEntryContentCache.clear();
             if (!this._bulkImportTransactionOpen) {
                 this._termEntryContentIdByHash.clear();
@@ -1756,6 +1764,13 @@ export class DictionaryDatabase {
             }
             throw e;
         }
+    }
+
+    /**
+     * @returns {{contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number}|null}
+     */
+    getLastBulkAddTermsMetrics() {
+        return this._lastBulkAddTermsMetrics;
     }
 
     /**
@@ -2524,6 +2539,7 @@ export class DictionaryDatabase {
         let termRecordBuildMs = 0;
         let termRecordEncodeMs = 0;
         let termRecordWriteMs = 0;
+        let termsVtabInsertMs = 0;
 
         if (useLocalTransaction) {
             await this._beginImmediateTransaction(this._requireDb());
@@ -2561,18 +2577,28 @@ export class DictionaryDatabase {
                 if (deferVirtualTableWrite) {
                     this._termsVirtualTableDirty = true;
                 } else {
+                    const tTermsVtabInsertStart = safePerformance.now();
                     await this._insertTermRowsIntoVirtualTable(chunkCount);
+                    termsVtabInsertMs += safePerformance.now() - tTermsVtabInsertStart;
                 }
             }
             if (useLocalTransaction) {
                 this._requireDb().exec('COMMIT');
             }
+            this._lastBulkAddTermsMetrics = {
+                contentAppendMs,
+                termRecordBuildMs,
+                termRecordEncodeMs,
+                termRecordWriteMs,
+                termsVtabInsertMs,
+            };
             if (this._importDebugLogging) {
                 log.log(
                     `[manabitan-db-import] bulkAdd terms no-dedup contentAppend=${contentAppendMs.toFixed(1)}ms ` +
                     `termRecordBuild=${termRecordBuildMs.toFixed(1)}ms ` +
                     `termRecordEncode=${termRecordEncodeMs.toFixed(1)}ms ` +
-                    `termRecordWrite=${termRecordWriteMs.toFixed(1)}ms`,
+                    `termRecordWrite=${termRecordWriteMs.toFixed(1)}ms ` +
+                    `termsVtabInsert=${termsVtabInsertMs.toFixed(1)}ms`,
                 );
             }
         } catch (e) {

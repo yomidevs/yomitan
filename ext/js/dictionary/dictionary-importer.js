@@ -302,7 +302,7 @@ export class DictionaryImporter {
         };
         /** @type {{parserProfile?: Record<string, string|number|boolean|null>|null, materializationMs?: number, chunkSinkMs?: number, chunkCount?: number, totalRows?: number}|null} */
         let lastFastTermBankReadProfile = null;
-        /** @type {{decodeRowsMs?: number, reverseRowsMs?: number, chunkSinkMs?: number, chunkCount?: number, totalRows?: number, rowChunkSize?: number}|null} */
+        /** @type {{readBytesMs?: number, decodeRowsMs?: number, reverseRowsMs?: number, chunkSinkMs?: number, chunkCount?: number, totalRows?: number, rowChunkSize?: number}|null} */
         let lastArtifactTermBankReadProfile = null;
 
         /**
@@ -494,9 +494,19 @@ export class DictionaryImporter {
              * @param {import('dictionary-importer').ImportRequirement[]|null} requirements
              * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}|null} streamedProgress
              * @param {number} streamedProgressStartIndex
+             * @returns {Promise<{mediaResolveMs: number, mediaWriteMs: number, serializationMs: number, bulkAddTermsMs: number, contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number}>}
              */
             const processTermChunk = async (termFile, termList, requirements, streamedProgress = null, streamedProgressStartIndex = 0) => {
                 const trackProgress = streamedProgress === null;
+                let mediaResolveMs = 0;
+                let mediaWriteMs = 0;
+                let serializationMs = 0;
+                let bulkAddTermsMs = 0;
+                let contentAppendMs = 0;
+                let termRecordBuildMs = 0;
+                let termRecordEncodeMs = 0;
+                let termRecordWriteMs = 0;
+                let termsVtabInsertMs = 0;
                 if (useMediaPipeline && requirements !== null && uniqueMediaPaths !== null) {
                     /** @type {import('dictionary-importer').ImportRequirement[]} */
                     const alreadyAddedRequirements = [];
@@ -533,7 +543,8 @@ export class DictionaryImporter {
                         ({media} = await this._resolveAsyncRequirements(notAddedRequirements, fileMap));
                     }
                     const tResolved = Date.now();
-                    step4TimingBreakdown.mediaResolveMs += Math.max(0, tResolved - tMediaResolveStart);
+                    mediaResolveMs += Math.max(0, tResolved - tMediaResolveStart);
+                    step4TimingBreakdown.mediaResolveMs += mediaResolveMs;
                     this._logImport(
                         `term file ${termFile.filename}: resolve existing=${alreadyAddedRequirements.length} ` +
                         `${tResolveNew - tResolveExisting}ms new=${notAddedRequirements.length} ` +
@@ -543,7 +554,8 @@ export class DictionaryImporter {
                     const tMediaWriteStart = Date.now();
                     await bulkAdd('media', media, {trackProgress});
                     const tMediaWriteEnd = Date.now();
-                    step4TimingBreakdown.mediaWriteMs += Math.max(0, tMediaWriteEnd - tMediaWriteStart);
+                    mediaWriteMs += Math.max(0, tMediaWriteEnd - tMediaWriteStart);
+                    step4TimingBreakdown.mediaWriteMs += mediaWriteMs;
                     counts.media.total += media.length;
                     this._logImport(`term file ${termFile.filename}: media write rows=${media.length} elapsed=${tMediaWriteEnd - tMediaWriteStart}ms`);
 
@@ -554,12 +566,24 @@ export class DictionaryImporter {
                 if (useMediaPipeline) {
                     const tSerializationStart = Date.now();
                     this._prepareTermImportSerialization(termList, enableTermEntryContentDedup);
-                    step4TimingBreakdown.termSerializationMs += Math.max(0, Date.now() - tSerializationStart);
+                    serializationMs += Math.max(0, Date.now() - tSerializationStart);
+                    step4TimingBreakdown.termSerializationMs += serializationMs;
                 }
                 const tTermsWriteStart = Date.now();
                 await bulkAdd('terms', termList, {trackProgress});
                 const tTermsWriteEnd = Date.now();
-                step4TimingBreakdown.bulkAddTermsMs += Math.max(0, tTermsWriteEnd - tTermsWriteStart);
+                bulkAddTermsMs += Math.max(0, tTermsWriteEnd - tTermsWriteStart);
+                const bulkAddTermsMetrics = dictionaryDatabase.getLastBulkAddTermsMetrics();
+                if (bulkAddTermsMetrics !== null) {
+                    ({
+                        contentAppendMs,
+                        termRecordBuildMs,
+                        termRecordEncodeMs,
+                        termRecordWriteMs,
+                        termsVtabInsertMs,
+                    } = bulkAddTermsMetrics);
+                }
+                step4TimingBreakdown.bulkAddTermsMs += bulkAddTermsMs;
                 counts.terms.total += termList.length;
                 this._logImport(`term file ${termFile.filename}: terms write rows=${termList.length} elapsed=${tTermsWriteEnd - tTermsWriteStart}ms`);
 
@@ -568,6 +592,17 @@ export class DictionaryImporter {
                 } else if (streamedProgress !== null) {
                     updateStreamedTermFileProgress(streamedProgressStartIndex, streamedProgress.processedRows, streamedProgress.totalRows);
                 }
+                return {
+                    mediaResolveMs,
+                    mediaWriteMs,
+                    serializationMs,
+                    bulkAddTermsMs,
+                    contentAppendMs,
+                    termRecordBuildMs,
+                    termRecordEncodeMs,
+                    termRecordWriteMs,
+                    termsVtabInsertMs,
+                };
             };
             for (let termFileIndex = 0; termFileIndex < activeTermFiles.length; ++termFileIndex) {
                 const termFile = activeTermFiles[termFileIndex];
@@ -576,6 +611,15 @@ export class DictionaryImporter {
                 let streamedImportCompleted = false;
                 let termParseAlreadyAccounted = false;
                 let streamChunkWorkMs = 0;
+                let artifactBulkAddTermsMs = 0;
+                let artifactSerializationMs = 0;
+                let artifactMediaResolveMs = 0;
+                let artifactMediaWriteMs = 0;
+                let artifactContentAppendMs = 0;
+                let artifactTermRecordBuildMs = 0;
+                let artifactTermRecordEncodeMs = 0;
+                let artifactTermRecordWriteMs = 0;
+                let artifactTermsVtabInsertMs = 0;
                 const tFastParseStart = Date.now();
                 if (useTermArtifactFiles && /\.mbtb$/i.test(termFile.filename)) {
                     const tArtifactParseStart = Date.now();
@@ -586,7 +630,16 @@ export class DictionaryImporter {
                             prefixWildcardsSupported,
                             async (termListChunk, requirementsChunk, streamProgress) => {
                                 const tChunkWorkStart = Date.now();
-                                await processTermChunk(termFile, termListChunk, requirementsChunk, streamProgress, streamedProgressStartIndex);
+                                const chunkMetrics = await processTermChunk(termFile, termListChunk, requirementsChunk, streamProgress, streamedProgressStartIndex);
+                                artifactBulkAddTermsMs += chunkMetrics.bulkAddTermsMs;
+                                artifactSerializationMs += chunkMetrics.serializationMs;
+                                artifactMediaResolveMs += chunkMetrics.mediaResolveMs;
+                                artifactMediaWriteMs += chunkMetrics.mediaWriteMs;
+                                artifactContentAppendMs += chunkMetrics.contentAppendMs;
+                                artifactTermRecordBuildMs += chunkMetrics.termRecordBuildMs;
+                                artifactTermRecordEncodeMs += chunkMetrics.termRecordEncodeMs;
+                                artifactTermRecordWriteMs += chunkMetrics.termRecordWriteMs;
+                                artifactTermsVtabInsertMs += chunkMetrics.termsVtabInsertMs;
                                 streamChunkWorkMs += Math.max(0, Date.now() - tChunkWorkStart);
                                 termListChunk.length = 0;
                             },
@@ -604,7 +657,16 @@ export class DictionaryImporter {
                         lastArtifactTermBankReadProfile = this._lastArtifactTermBankReadProfile ?? null;
                         step4TimingBreakdown.termParseMs += Math.max(0, Date.now() - tArtifactParseStart);
                         termParseAlreadyAccounted = true;
-                        await processTermChunk(termFile, termReadResult.termList, termReadResult.requirements);
+                        const chunkMetrics = await processTermChunk(termFile, termReadResult.termList, termReadResult.requirements);
+                        artifactBulkAddTermsMs += chunkMetrics.bulkAddTermsMs;
+                        artifactSerializationMs += chunkMetrics.serializationMs;
+                        artifactMediaResolveMs += chunkMetrics.mediaResolveMs;
+                        artifactMediaWriteMs += chunkMetrics.mediaWriteMs;
+                        artifactContentAppendMs += chunkMetrics.contentAppendMs;
+                        artifactTermRecordBuildMs += chunkMetrics.termRecordBuildMs;
+                        artifactTermRecordEncodeMs += chunkMetrics.termRecordEncodeMs;
+                        artifactTermRecordWriteMs += chunkMetrics.termRecordWriteMs;
+                        artifactTermsVtabInsertMs += chunkMetrics.termsVtabInsertMs;
                     }
                     streamedImportCompleted = true;
                 } else if (!this._disableTermBankWasmFastPath) {
@@ -659,12 +721,23 @@ export class DictionaryImporter {
                             parserMinimalDecode: parserProfile.minimalDecode ?? null,
                         });
                     } else if (lastArtifactTermBankReadProfile !== null) {
+                        const artifactReadBytesMs = lastArtifactTermBankReadProfile.readBytesMs ?? null;
                         recordPhaseTiming(`term-file-artifact-path:${termFile.filename}`, tFastParseStart, {
                             rows: lastArtifactTermBankReadProfile.totalRows ?? null,
                             chunkCount: lastArtifactTermBankReadProfile.chunkCount ?? null,
                             rowChunkSize: lastArtifactTermBankReadProfile.rowChunkSize ?? null,
+                            artifactReadBytesMs,
                             artifactDecodeRowsMs: lastArtifactTermBankReadProfile.decodeRowsMs ?? null,
                             artifactReverseRowsMs: lastArtifactTermBankReadProfile.reverseRowsMs ?? null,
+                            artifactBulkAddTermsMs,
+                            artifactContentAppendMs,
+                            artifactTermRecordBuildMs,
+                            artifactTermRecordEncodeMs,
+                            artifactTermRecordWriteMs,
+                            artifactTermsVtabInsertMs,
+                            artifactSerializationMs,
+                            artifactMediaResolveMs,
+                            artifactMediaWriteMs,
                             importerChunkSinkMs: lastArtifactTermBankReadProfile.chunkSinkMs ?? null,
                         });
                     }
@@ -2035,13 +2108,29 @@ export class DictionaryImporter {
      */
     async _readTermBankArtifactFile(termFile, dictionaryTitle, prefixWildcardsSupported, onChunk = void 0) {
         this._lastArtifactTermBankReadProfile = null;
+        const tReadBytesStart = Date.now();
         const bytes = await this._getData(termFile, new Uint8ArrayWriter());
+        const readBytesMs = Math.max(0, Date.now() - tReadBytesStart);
+        return await this._decodeTermBankArtifactBytes(bytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, onChunk, readBytesMs);
+    }
+
+    /**
+     * @param {Uint8Array} bytes
+     * @param {string} filename
+     * @param {string} dictionaryTitle
+     * @param {boolean} prefixWildcardsSupported
+     * @param {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} [onChunk]
+     * @param {number} readBytesMs
+     * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
+     */
+    async _decodeTermBankArtifactBytes(bytes, filename, dictionaryTitle, prefixWildcardsSupported, onChunk = void 0, readBytesMs = 0) {
+        const textDecoder = this._textDecoder;
         if (bytes.byteLength < (TERM_BANK_ARTIFACT_MAGIC_BYTES + 4)) {
-            throw new Error(`Invalid term artifact payload in '${termFile.filename}': too small`);
+            throw new Error(`Invalid term artifact payload in '${filename}': too small`);
         }
-        const magic = this._textDecoder.decode(bytes.subarray(0, TERM_BANK_ARTIFACT_MAGIC_BYTES));
+        const magic = textDecoder.decode(bytes.subarray(0, TERM_BANK_ARTIFACT_MAGIC_BYTES));
         if (magic !== TERM_BANK_ARTIFACT_MAGIC) {
-            throw new Error(`Invalid term artifact payload in '${termFile.filename}': bad magic`);
+            throw new Error(`Invalid term artifact payload in '${filename}': bad magic`);
         }
         const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
         let cursor = TERM_BANK_ARTIFACT_MAGIC_BYTES;
@@ -2053,26 +2142,26 @@ export class DictionaryImporter {
         const chunkSize = this._termArtifactRowChunkSize;
         const chunkCount = Math.max(1, Math.ceil(rowCount / Math.max(1, chunkSize)));
         let chunkIndex = 0;
+        const tDecodeRowsStart = Date.now();
         let decodeRowsMs = 0;
         let reverseRowsMs = 0;
         let importerChunkSinkMs = 0;
         for (let i = 0; i < rowCount; ++i) {
-            const tDecodeStart = Date.now();
             if ((cursor + 4) > bytes.byteLength) {
-                throw new Error(`Invalid term artifact payload in '${termFile.filename}': truncated expression length`);
+                throw new Error(`Invalid term artifact payload in '${filename}': truncated expression length`);
             }
             const expressionLength = view.getUint32(cursor, true);
             cursor += 4;
             if ((cursor + expressionLength + 4) > bytes.byteLength) {
-                throw new Error(`Invalid term artifact payload in '${termFile.filename}': truncated expression`);
+                throw new Error(`Invalid term artifact payload in '${filename}': truncated expression`);
             }
             const expressionStart = cursor;
-            const expression = this._textDecoder.decode(bytes.subarray(cursor, cursor + expressionLength));
+            const expression = textDecoder.decode(bytes.subarray(cursor, cursor + expressionLength));
             cursor += expressionLength;
             const readingLength = view.getUint32(cursor, true);
             cursor += 4;
             if ((cursor + readingLength + 20) > bytes.byteLength) {
-                throw new Error(`Invalid term artifact payload in '${termFile.filename}': truncated row payload`);
+                throw new Error(`Invalid term artifact payload in '${filename}': truncated row payload`);
             }
             const readingStart = cursor;
             const readingRaw = (
@@ -2081,7 +2170,7 @@ export class DictionaryImporter {
                 byteRangeEqual(bytes, expressionStart, readingStart, expressionLength)
             ) ?
                 expression :
-                this._textDecoder.decode(bytes.subarray(cursor, cursor + readingLength));
+                textDecoder.decode(bytes.subarray(cursor, cursor + readingLength));
             cursor += readingLength;
             const score = view.getInt32(cursor, true);
             cursor += 4;
@@ -2094,7 +2183,7 @@ export class DictionaryImporter {
             const contentLength = view.getUint32(cursor, true);
             cursor += 4;
             if ((cursor + contentLength) > bytes.byteLength) {
-                throw new Error(`Invalid term artifact payload in '${termFile.filename}': truncated content bytes`);
+                throw new Error(`Invalid term artifact payload in '${filename}': truncated content bytes`);
             }
             const contentStart = cursor;
             const contentEnd = contentStart + contentLength;
@@ -2102,7 +2191,6 @@ export class DictionaryImporter {
             const sequence = sequenceRaw >= 0 ? sequenceRaw : void 0;
             let expressionReverse;
             let readingReverse;
-            decodeRowsMs += Math.max(0, Date.now() - tDecodeStart);
             if (prefixWildcardsSupported) {
                 const tReverseStart = Date.now();
                 const reversedExpression = this._reverseString(expression);
@@ -2147,6 +2235,7 @@ export class DictionaryImporter {
                 termList[i] = entry;
             }
         }
+        decodeRowsMs = Math.max(0, Date.now() - tDecodeRowsStart - reverseRowsMs);
         if (streamToChunkHandler && termList.length > 0) {
             ++chunkIndex;
             const tChunkSinkStart = Date.now();
@@ -2160,6 +2249,7 @@ export class DictionaryImporter {
             termList.length = 0;
         }
         this._lastArtifactTermBankReadProfile = {
+            readBytesMs,
             decodeRowsMs,
             reverseRowsMs,
             chunkSinkMs: importerChunkSinkMs,

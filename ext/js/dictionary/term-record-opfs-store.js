@@ -30,6 +30,11 @@ const RECORD_HEADER_BYTES = 44;
 const U32_NULL = 0xffffffff;
 const DEFAULT_FLUSH_THRESHOLD_BYTES = 32 * 1024 * 1024;
 const LOW_MEMORY_FLUSH_THRESHOLD_BYTES = 16 * 1024 * 1024;
+const HIGH_MEMORY_FLUSH_THRESHOLD_BYTES = 64 * 1024 * 1024;
+const DEFAULT_WRITE_COALESCE_TARGET_BYTES = 4 * 1024 * 1024;
+const LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
+const HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES = 16 * 1024 * 1024;
+const WRITE_COALESCE_MAX_CHUNKS = 512;
 
 /**
  * @typedef {object} TermRecord
@@ -86,6 +91,8 @@ export class TermRecordOpfsStore {
         this._wasmEncoderUnavailable = false;
         /** @type {string[]} */
         this._invalidShardFileNames = [];
+        /** @type {number} */
+        this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
     }
 
     /**
@@ -1249,12 +1256,13 @@ export class TermRecordOpfsStore {
             const seekOffset = state.fileLength - state.pendingWriteBytes;
             await state.writable.seek(Math.max(0, seekOffset));
         }
-        for (const chunk of state.pendingWriteChunks) {
+        const chunks = this._coalescePendingChunks(state.pendingWriteChunks);
+        state.pendingWriteChunks = [];
+        state.pendingWriteBytes = 0;
+        for (const chunk of chunks) {
             if (chunk.byteLength <= 0) { continue; }
             await state.writable.write(chunk);
         }
-        state.pendingWriteChunks = [];
-        state.pendingWriteBytes = 0;
     }
 
     /**
@@ -1310,7 +1318,98 @@ export class TermRecordOpfsStore {
         } catch (_) {
             // NOP
         }
-        return memoryGiB !== null && memoryGiB <= 4 ? LOW_MEMORY_FLUSH_THRESHOLD_BYTES : DEFAULT_FLUSH_THRESHOLD_BYTES;
+        if (memoryGiB !== null) {
+            if (memoryGiB <= 4) {
+                return LOW_MEMORY_FLUSH_THRESHOLD_BYTES;
+            }
+            if (memoryGiB >= 8) {
+                return HIGH_MEMORY_FLUSH_THRESHOLD_BYTES;
+            }
+        }
+        return DEFAULT_FLUSH_THRESHOLD_BYTES;
+    }
+
+    /**
+     * @returns {number}
+     */
+    _computeWriteCoalesceTargetBytes() {
+        /** @type {number|null} */
+        let memoryGiB = null;
+        try {
+            const rawValue = /** @type {unknown} */ (Reflect.get(globalThis.navigator ?? {}, 'deviceMemory'));
+            if (typeof rawValue === 'number' && Number.isFinite(rawValue) && rawValue > 0) {
+                memoryGiB = rawValue;
+            }
+        } catch (_) {
+            // NOP
+        }
+        if (memoryGiB !== null) {
+            if (memoryGiB <= 4) {
+                return LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES;
+            }
+            if (memoryGiB >= 8) {
+                return HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES;
+            }
+        }
+        return DEFAULT_WRITE_COALESCE_TARGET_BYTES;
+    }
+
+    /**
+     * @param {Uint8Array[]} chunks
+     * @returns {Uint8Array[]}
+     */
+    _coalescePendingChunks(chunks) {
+        const targetBytes = this._writeCoalesceTargetBytes;
+        if (chunks.length <= 1 || targetBytes <= 0) {
+            return chunks;
+        }
+        /** @type {Uint8Array[]} */
+        const result = [];
+        /** @type {Uint8Array[]} */
+        let group = [];
+        let groupBytes = 0;
+        for (const chunk of chunks) {
+            const chunkBytes = chunk.byteLength;
+            if (chunkBytes <= 0) { continue; }
+            if (groupBytes > 0 && (groupBytes + chunkBytes > targetBytes || group.length >= WRITE_COALESCE_MAX_CHUNKS)) {
+                result.push(this._mergeChunks(group, groupBytes));
+                group = [];
+                groupBytes = 0;
+            }
+            if (chunkBytes >= targetBytes) {
+                if (groupBytes > 0) {
+                    result.push(this._mergeChunks(group, groupBytes));
+                    group = [];
+                    groupBytes = 0;
+                }
+                result.push(chunk);
+                continue;
+            }
+            group.push(chunk);
+            groupBytes += chunkBytes;
+        }
+        if (groupBytes > 0) {
+            result.push(this._mergeChunks(group, groupBytes));
+        }
+        return result;
+    }
+
+    /**
+     * @param {Uint8Array[]} chunks
+     * @param {number} totalBytes
+     * @returns {Uint8Array}
+     */
+    _mergeChunks(chunks, totalBytes) {
+        if (chunks.length === 1) {
+            return chunks[0];
+        }
+        const output = new Uint8Array(totalBytes);
+        let offset = 0;
+        for (const chunk of chunks) {
+            output.set(chunk, offset);
+            offset += chunk.byteLength;
+        }
+        return output;
     }
 
     /**

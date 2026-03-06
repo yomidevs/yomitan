@@ -79,7 +79,7 @@ function createStringInterner(textEncoder) {
         stringOffsets,
         stringLengths,
         internString,
-        buildStringsBuffer: () => stringsBuffer.slice(0, stringsTotal),
+        buildStringsBuffer: () => stringsBuffer.subarray(0, stringsTotal),
     };
 }
 
@@ -125,15 +125,24 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     const metasU32 = new Uint32Array(metasBuffer);
     const metasI32 = new Int32Array(metasBuffer);
     const {stringOffsets, stringLengths, internString, buildStringsBuffer} = createStringInterner(textEncoder);
+    const firstRecord = records[0];
+    const sharedDictionaryIndex = internString(firstRecord.dictionary);
+    const sharedDictNameIndex = internString(firstRecord.entryContentDictName);
 
     let recordIndex = 0;
     for (const record of records) {
-        const dictionaryIndex = internString(record.dictionary);
+        const dictionaryIndex = record.dictionary === firstRecord.dictionary ? sharedDictionaryIndex : internString(record.dictionary);
         const expressionIndex = internString(record.expression);
-        const readingIndex = internString(record.reading);
+        const readingIndex = record.reading === record.expression ? expressionIndex : internString(record.reading);
         const expressionReverseIndex = record.expressionReverse !== null ? internString(record.expressionReverse) : -1;
-        const readingReverseIndex = record.readingReverse !== null ? internString(record.readingReverse) : -1;
-        const dictNameIndex = internString(record.entryContentDictName);
+        const readingReverseIndex = (
+            record.readingReverse !== null &&
+            record.expressionReverse !== null &&
+            record.readingReverse === record.expressionReverse
+        ) ?
+            expressionReverseIndex :
+            (record.readingReverse !== null ? internString(record.readingReverse) : -1);
+        const dictNameIndex = record.entryContentDictName === firstRecord.entryContentDictName ? sharedDictNameIndex : internString(record.entryContentDictName);
         const metaIndex = recordIndex * META_U32_FIELDS;
         metasU32[metaIndex + 0] = record.id >>> 0;
         metasU32[metaIndex + 1] = stringOffsets[dictionaryIndex] >>> 0;
@@ -154,18 +163,16 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
         metasI32[metaIndex + 16] = record.sequence ?? -1;
         ++recordIndex;
     }
-
     const stringsBuffer = buildStringsBuffer();
-
     wasm.wasm_reset_heap();
     const metasPtr = wasm.wasm_alloc(metasBuffer.byteLength);
     const stringsPtr = wasm.wasm_alloc(stringsBuffer.byteLength);
     if (metasPtr === 0 || stringsPtr === 0) {
         return null;
     }
-    const wasmHeap = new Uint8Array(wasm.memory.buffer);
-    wasmHeap.set(new Uint8Array(metasBuffer), metasPtr);
-    wasmHeap.set(stringsBuffer, stringsPtr);
+    const wasmHeapAfterAlloc = new Uint8Array(wasm.memory.buffer);
+    wasmHeapAfterAlloc.set(new Uint8Array(metasBuffer), metasPtr);
+    wasmHeapAfterAlloc.set(stringsBuffer, stringsPtr);
 
     const encodedSize = wasm.calc_encoded_size(records.length, metasPtr);
     if (encodedSize <= 0) {

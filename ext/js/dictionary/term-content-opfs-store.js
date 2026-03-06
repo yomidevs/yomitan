@@ -24,11 +24,11 @@ const LOW_MEMORY_READ_PAGE_CACHE_MAX_PAGES = 48;
 const HIGH_MEMORY_READ_PAGE_CACHE_MAX_PAGES = 192;
 const DEFAULT_WRITE_COALESCE_TARGET_BYTES = 4 * 1024 * 1024;
 const LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
-const HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES = 8 * 1024 * 1024;
+const HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES = 16 * 1024 * 1024;
 const WRITE_COALESCE_MAX_CHUNKS = 512;
 const DEFAULT_WRITE_FLUSH_THRESHOLD_BYTES = 16 * 1024 * 1024;
 const LOW_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES = 8 * 1024 * 1024;
-const HIGH_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES = 64 * 1024 * 1024;
+const HIGH_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES = 128 * 1024 * 1024;
 
 export class TermContentOpfsStore {
     constructor() {
@@ -46,6 +46,8 @@ export class TermContentOpfsStore {
         this._pendingWriteBytes = 0;
         /** @type {Uint8Array[]} */
         this._pendingWriteChunks = [];
+        /** @type {Promise<void>|null} */
+        this._queuedWritePromise = null;
         /** @type {number} */
         this._flushThresholdBytes = this._computeWriteFlushThresholdBytes();
         /** @type {boolean} */
@@ -66,6 +68,7 @@ export class TermContentOpfsStore {
      * @returns {Promise<void>}
      */
     async prepare() {
+        await this._awaitQueuedWrites();
         await this._closeWritable();
         if (typeof navigator === 'undefined' || !('storage' in navigator) || !('getDirectory' in navigator.storage)) {
             return;
@@ -79,6 +82,7 @@ export class TermContentOpfsStore {
         this._invalidateReadState();
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
+        this._queuedWritePromise = null;
         this._importSessionActive = false;
     }
 
@@ -89,9 +93,11 @@ export class TermContentOpfsStore {
         if (this._importSessionActive) {
             return;
         }
+        await this._awaitQueuedWrites();
         this._importSessionActive = true;
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
+        this._queuedWritePromise = null;
         if (this._fileHandle === null) {
             return;
         }
@@ -108,6 +114,7 @@ export class TermContentOpfsStore {
         }
         this._importSessionActive = false;
         await this._flushPendingWrites();
+        await this._awaitQueuedWrites();
         await this._closeWritable();
     }
 
@@ -115,6 +122,7 @@ export class TermContentOpfsStore {
      * @returns {Promise<void>}
      */
     async reset() {
+        await this._awaitQueuedWrites();
         await this._closeWritable();
         if (this._fileHandle === null) {
             this._chunks = [];
@@ -122,6 +130,7 @@ export class TermContentOpfsStore {
             this._length = 0;
             this._pendingWriteBytes = 0;
             this._pendingWriteChunks = [];
+            this._queuedWritePromise = null;
             this._importSessionActive = false;
             this._invalidateReadState();
             return;
@@ -136,6 +145,7 @@ export class TermContentOpfsStore {
         this._loadedForRead = true;
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
+        this._queuedWritePromise = null;
         this._importSessionActive = false;
     }
 
@@ -208,14 +218,15 @@ export class TermContentOpfsStore {
             }
             if (totalBytes > 0) {
                 this._invalidateReadState();
-                for (const chunk of chunks) {
-                    if (chunk.byteLength <= 0) { continue; }
-                    this._pendingWriteChunks.push(chunk);
+                const pendingChunks = this._coalescePendingChunks(chunks);
+                for (const chunk of pendingChunks) {
                     this._pendingWriteBytes += chunk.byteLength;
+                    this._pendingWriteChunks.push(chunk);
                 }
                 if (!this._importSessionActive || this._pendingWriteBytes >= this._flushThresholdBytes) {
                     await this._flushPendingWrites();
                     if (!this._importSessionActive) {
+                        await this._awaitQueuedWrites();
                         await this._closeWritable();
                     }
                 }
@@ -228,6 +239,7 @@ export class TermContentOpfsStore {
      */
     async ensureLoadedForRead() {
         await this._flushPendingWrites();
+        await this._awaitQueuedWrites();
         await this._closeWritable();
         if (this._loadedForRead) { return; }
         if (this._fileHandle === null) {
@@ -266,9 +278,38 @@ export class TermContentOpfsStore {
             const seekOffset = this._length - this._pendingWriteBytes;
             await this._writable.seek(Math.max(0, seekOffset));
         }
-        await this._writePendingChunksCoalesced(this._pendingWriteChunks);
+        const chunks = this._pendingWriteChunks;
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
+        if (this._importSessionActive) {
+            this._queueWriteChunks(chunks);
+            return;
+        }
+        await this._writePendingChunksCoalesced(chunks);
+    }
+
+    /**
+     * @param {Uint8Array[]} chunks
+     * @returns {void}
+     */
+    _queueWriteChunks(chunks) {
+        if (chunks.length === 0) {
+            return;
+        }
+        const previous = this._queuedWritePromise ?? Promise.resolve();
+        this._queuedWritePromise = previous.then(() => this._writePendingChunksCoalesced(chunks));
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _awaitQueuedWrites() {
+        const promise = this._queuedWritePromise;
+        if (promise === null) {
+            return;
+        }
+        this._queuedWritePromise = null;
+        await promise;
     }
 
     /**
@@ -315,6 +356,55 @@ export class TermContentOpfsStore {
             }
         }
         await flushGroup();
+    }
+
+    /**
+     * @param {Uint8Array[]} chunks
+     * @returns {Uint8Array[]}
+     */
+    _coalescePendingChunks(chunks) {
+        /** @type {Uint8Array[]} */
+        const result = [];
+        /** @type {Uint8Array[]} */
+        let group = [];
+        let groupBytes = 0;
+        const flushGroup = () => {
+            if (groupBytes <= 0 || group.length === 0) {
+                group = [];
+                groupBytes = 0;
+                return;
+            }
+            if (group.length === 1) {
+                result.push(group[0]);
+                group = [];
+                groupBytes = 0;
+                return;
+            }
+            const merged = new Uint8Array(groupBytes);
+            let offset = 0;
+            for (const chunk of group) {
+                merged.set(chunk, offset);
+                offset += chunk.byteLength;
+            }
+            result.push(merged);
+            group = [];
+            groupBytes = 0;
+        };
+        for (const chunk of chunks) {
+            const chunkBytes = chunk.byteLength;
+            if (chunkBytes <= 0) { continue; }
+            const wouldOverflow = groupBytes > 0 && (groupBytes + chunkBytes) > this._writeCoalesceTargetBytes;
+            if (wouldOverflow) {
+                flushGroup();
+            }
+            group.push(chunk);
+            groupBytes += chunkBytes;
+            if (group.length >= WRITE_COALESCE_MAX_CHUNKS || groupBytes >= this._writeCoalesceTargetBytes) {
+                flushGroup();
+            }
+        }
+        flushGroup();
+        return result;
     }
 
     /**
