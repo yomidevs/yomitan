@@ -215,7 +215,7 @@ export class Mecab {
                 isNoun = (tok) => tok.pos1 === 'noun';
                 isCopula = (tok) => tok.inflection_type === 'aux|da' || tok.inflection_type === 'aux|desu';
                 isAuxVerb = (tok) => (tok.pos1 === 'aux' || tok.pos1 === 'aux-verb') && !isCopula(tok);
-                isContinuativeForm = (tok) => (tok.inflection_form.startsWith('continuative'));
+                isContinuativeForm = (tok) => (tok.inflection_form?.startsWith('continuative'));
                 isVerbSuffix = (tok) => tok.pos1 === 'suffix';
                 isTatteParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && (tok.lemma === 'たって');
                 isBaParticle = (tok) => tok.pos1 === 'particle' && tok.pos2 === 'conjunctive' && (tok.term === 'ば');
@@ -235,7 +235,7 @@ export class Mecab {
                 const isCopulaUnidic = (tok) => tok.inflection_type === '助動詞-ダ' || tok.inflection_type === '助動詞-デス';
                 isCopula = (tok) => isCopulaIpadic(tok) || isCopulaUnidic(tok);
                 isAuxVerb = (tok) => tok.pos1 === '助動詞' && !isCopula(tok);
-                isContinuativeForm = (tok) => (tok.inflection_form === '連用デ接続' || tok.inflection_form === '連用タ接続' || tok.inflection_form.startsWith('連用形')) && (tok.reading !== 'ない');
+                isContinuativeForm = (tok) => (tok.inflection_form === '連用デ接続' || tok.inflection_form === '連用タ接続' || tok.inflection_form?.startsWith('連用形')) && (tok.reading !== 'ない');
                 // 待ってるじゃないです : てる is 動詞,非自立,*,*,一段,基本形,てる,テル,テル
                 // やられる : れる is 動詞,接尾,*,*,一段,基本形,れる,レル,レル
                 const isVerbSuffixIpadic = (tok) => tok.pos1 === '動詞' && (tok.pos2 === '非自立' || tok.pos2 === '接尾');
@@ -251,8 +251,8 @@ export class Mecab {
                 const isNounSuffixIpadic = (tok) => tok.pos1 === '動詞' && tok.pos2 === '接尾';
                 const isNounSuffixUnidic = (tok) => tok.pos1 === '接尾辞' && tok.pos2 === '名詞的';
                 isNounSuffix = (tok) => isNounSuffixIpadic(tok) || isNounSuffixUnidic(tok);
-                isCounter = (tok) => tok.pos1 === '名詞' && tok.pos3.startsWith('助数詞');
-                isNumeral = (tok) => tok.pos1 === '名詞' && tok.pos2.startsWith('数');
+                isCounter = (tok) => tok.pos1 === '名詞' && tok.pos3?.startsWith('助数詞');
+                isNumeral = (tok) => tok.pos1 === '名詞' && tok.pos2?.startsWith('数');
             }
 
             /** @type {import('mecab').ParseFragment[][]} */
