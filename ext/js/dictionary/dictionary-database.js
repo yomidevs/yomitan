@@ -336,7 +336,7 @@ export class DictionaryDatabase {
 
     /**
      * @param {((index: number, count: number) => void)?} [onCheckpoint]
-     * @returns {Promise<{commitMs: number, termContentEndImportSessionMs: number, termRecordEndImportSessionMs: number, termsVirtualTableSyncMs: number, createIndexesMs: number, createIndexesCheckpointCount: number, cacheResetMs: number, runtimePragmasMs: number, totalMs: number}|null>}
+     * @returns {Promise<{commitMs: number, termContentEndImportSessionMs: number, termContentEndImportSessionFlushPendingWritesMs: number, termContentEndImportSessionAwaitQueuedWritesMs: number, termContentEndImportSessionCloseWritableMs: number, termRecordEndImportSessionMs: number, termsVirtualTableSyncMs: number, createIndexesMs: number, createIndexesCheckpointCount: number, cacheResetMs: number, runtimePragmasMs: number, totalMs: number}|null>}
      */
     async finishBulkImport(onCheckpoint = null) {
         if (this._bulkImportDepth <= 0) {
@@ -348,6 +348,9 @@ export class DictionaryDatabase {
             const tFinishBulkImportStart = safePerformance.now();
             let commitMs = 0;
             let termContentEndImportSessionMs = 0;
+            let termContentEndImportSessionFlushPendingWritesMs = 0;
+            let termContentEndImportSessionAwaitQueuedWritesMs = 0;
+            let termContentEndImportSessionCloseWritableMs = 0;
             let termRecordEndImportSessionMs = 0;
             let termsVirtualTableSyncMs = 0;
             let createIndexesMs = 0;
@@ -365,6 +368,12 @@ export class DictionaryDatabase {
                 const termContentEndImportSessionPromise = this._termContentStore.endImportSession()
                     .then(() => {
                         termContentEndImportSessionMs = safePerformance.now() - tTermContentEndImportSessionStart;
+                        const metrics = this._termContentStore.getLastEndImportSessionMetrics();
+                        if (metrics !== null) {
+                            termContentEndImportSessionFlushPendingWritesMs = metrics.flushPendingWritesMs;
+                            termContentEndImportSessionAwaitQueuedWritesMs = metrics.awaitQueuedWritesMs;
+                            termContentEndImportSessionCloseWritableMs = metrics.closeWritableMs;
+                        }
                     });
                 const tTermRecordEndImportSessionStart = safePerformance.now();
                 const termRecordEndImportSessionPromise = this._termRecordStore.endImportSession()
@@ -415,6 +424,9 @@ export class DictionaryDatabase {
                         `total=${totalMs.toFixed(1)}ms ` +
                         `commit=${commitMs.toFixed(1)}ms ` +
                         `termContentEnd=${termContentEndImportSessionMs.toFixed(1)}ms ` +
+                        `termContentFlush=${termContentEndImportSessionFlushPendingWritesMs.toFixed(1)}ms ` +
+                        `termContentAwait=${termContentEndImportSessionAwaitQueuedWritesMs.toFixed(1)}ms ` +
+                        `termContentClose=${termContentEndImportSessionCloseWritableMs.toFixed(1)}ms ` +
                         `termRecordEnd=${termRecordEndImportSessionMs.toFixed(1)}ms ` +
                         `termsVtabSync=${termsVirtualTableSyncMs.toFixed(1)}ms ` +
                         `createIndexes=${createIndexesMs.toFixed(1)}ms ` +
@@ -426,6 +438,9 @@ export class DictionaryDatabase {
                 return {
                     commitMs,
                     termContentEndImportSessionMs,
+                    termContentEndImportSessionFlushPendingWritesMs,
+                    termContentEndImportSessionAwaitQueuedWritesMs,
+                    termContentEndImportSessionCloseWritableMs,
                     termRecordEndImportSessionMs,
                     termsVirtualTableSyncMs,
                     createIndexesMs,

@@ -16,6 +16,7 @@
  */
 
 import {reportDiagnostics} from '../core/diagnostics-reporter.js';
+import {safePerformance} from '../core/safe-performance.js';
 
 const FILE_NAME = 'manabitan-term-content.bin';
 const READ_PAGE_SIZE_BYTES = 64 * 1024;
@@ -62,6 +63,8 @@ export class TermContentOpfsStore {
         this._readPageCacheMaxPages = this._computeReadPageCacheMaxPages();
         /** @type {number} */
         this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
+        /** @type {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number}|null} */
+        this._lastEndImportSessionMetrics = null;
     }
 
     /**
@@ -84,6 +87,7 @@ export class TermContentOpfsStore {
         this._pendingWriteChunks = [];
         this._queuedWritePromise = null;
         this._importSessionActive = false;
+        this._lastEndImportSessionMetrics = null;
     }
 
     /**
@@ -98,6 +102,7 @@ export class TermContentOpfsStore {
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
         this._queuedWritePromise = null;
+        this._lastEndImportSessionMetrics = null;
         if (this._fileHandle === null) {
             return;
         }
@@ -112,10 +117,30 @@ export class TermContentOpfsStore {
         if (!this._importSessionActive && this._writable === null) {
             return;
         }
+        const tStart = safePerformance.now();
         this._importSessionActive = false;
+        const tFlushPendingWritesStart = safePerformance.now();
         await this._flushPendingWrites();
+        const flushPendingWritesMs = safePerformance.now() - tFlushPendingWritesStart;
+        const tAwaitQueuedWritesStart = safePerformance.now();
         await this._awaitQueuedWrites();
+        const awaitQueuedWritesMs = safePerformance.now() - tAwaitQueuedWritesStart;
+        const tCloseWritableStart = safePerformance.now();
         await this._closeWritable();
+        const closeWritableMs = safePerformance.now() - tCloseWritableStart;
+        this._lastEndImportSessionMetrics = {
+            flushPendingWritesMs,
+            awaitQueuedWritesMs,
+            closeWritableMs,
+            totalMs: safePerformance.now() - tStart,
+        };
+    }
+
+    /**
+     * @returns {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number}|null}
+     */
+    getLastEndImportSessionMetrics() {
+        return this._lastEndImportSessionMetrics;
     }
 
     /**
@@ -132,6 +157,7 @@ export class TermContentOpfsStore {
             this._pendingWriteChunks = [];
             this._queuedWritePromise = null;
             this._importSessionActive = false;
+            this._lastEndImportSessionMetrics = null;
             this._invalidateReadState();
             return;
         }
@@ -147,6 +173,7 @@ export class TermContentOpfsStore {
         this._pendingWriteChunks = [];
         this._queuedWritePromise = null;
         this._importSessionActive = false;
+        this._lastEndImportSessionMetrics = null;
     }
 
     /**
@@ -282,6 +309,10 @@ export class TermContentOpfsStore {
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
         if (this._importSessionActive) {
+            this._queueWriteChunks(chunks);
+            return;
+        }
+        if (this._queuedWritePromise !== null) {
             this._queueWriteChunks(chunks);
             return;
         }

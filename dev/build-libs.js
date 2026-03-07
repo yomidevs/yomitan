@@ -22,6 +22,7 @@ import esbuild from 'esbuild';
 import fs from 'fs';
 import {createRequire} from 'module';
 import {execFileSync} from 'node:child_process';
+import os from 'os';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import {parseJson} from './json.js';
@@ -30,6 +31,68 @@ const require = createRequire(import.meta.url);
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const extDir = path.join(dirname, '..', 'ext');
+
+/**
+ * @param {string} compiler
+ * @returns {boolean}
+ */
+function canBuildWasmTarget(compiler) {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'manabitan-wasm-'));
+    const sourcePath = path.join(tempDir, 'probe.c');
+    const outputPath = path.join(tempDir, 'probe.wasm');
+    try {
+        fs.writeFileSync(sourcePath, 'void probe(void) {}\n', 'utf8');
+        execFileSync(
+            compiler,
+            [
+                '--target=wasm32',
+                '-nostdlib',
+                '-Wl,--no-entry',
+                '-Wl,--export=probe',
+                '-Wl,--strip-all',
+                '-o',
+                outputPath,
+                sourcePath,
+            ],
+            {stdio: 'ignore'},
+        );
+        return true;
+    } catch {
+        return false;
+    } finally {
+        fs.rmSync(tempDir, {recursive: true, force: true});
+    }
+}
+
+/**
+ * @returns {string}
+ * @throws {Error}
+ */
+function getWasmCapableClang() {
+    const candidates = /** @type {string[]} */ ([
+        process.env.MANABITAN_CLANG,
+        process.env.CLANG,
+        'clang',
+        'clang-18',
+        'clang-17',
+        '/opt/homebrew/opt/llvm/bin/clang',
+        '/usr/bin/clang',
+    ].filter((value) => typeof value === 'string' && value.length > 0));
+    for (const candidate of candidates) {
+        try {
+            execFileSync(candidate, ['--version'], {stdio: 'ignore'});
+        } catch {
+            continue;
+        }
+        if (canBuildWasmTarget(candidate)) {
+            return candidate;
+        }
+    }
+    throw new Error(
+        'Missing a wasm32-capable clang required to build dictionary wasm assets. ' +
+        'Set MANABITAN_CLANG or CLANG to a compiler that can link --target=wasm32.',
+    );
+}
 
 /**
  * @param {string} out
@@ -91,15 +154,7 @@ async function buildDictionaryWasm(out) {
         },
     ];
 
-    try {
-        execFileSync('clang', ['--version'], {stdio: 'ignore'});
-    } catch (e) {
-        throw new Error(
-            'Missing clang required to build dictionary wasm assets. ' +
-            'Install clang (e.g. Xcode command line tools on macOS or clang/llvm packages on Linux).',
-            {cause: e},
-        );
-    }
+    const clang = getWasmCapableClang();
 
     for (const target of wasmSources) {
         const args = [
@@ -112,7 +167,7 @@ async function buildDictionaryWasm(out) {
             args.push(`-Wl,--export=${exportName}`);
         }
         args.push('-Wl,--strip-all', '-o', target.outputPath, target.sourcePath);
-        execFileSync('clang', args, {stdio: 'inherit'});
+        execFileSync(clang, args, {stdio: 'inherit'});
     }
 }
 
