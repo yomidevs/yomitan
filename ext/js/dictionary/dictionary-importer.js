@@ -52,6 +52,9 @@ const ADAPTIVE_TERM_BANK_WASM_INITIAL_CONTENT_BYTES_PER_ROW = 128;
 const REVERSE_STRING_CACHE_MAX_ENTRIES = 4096;
 const TERM_BANK_ARTIFACT_MAGIC = 'MBTB0001';
 const TERM_BANK_ARTIFACT_MAGIC_BYTES = TERM_BANK_ARTIFACT_MAGIC.length;
+const TERM_BANK_ARTIFACT_MANIFEST_FILE = 'manabitan-import-artifact.json';
+const TERM_BANK_PACKED_ARTIFACT_FILE = 'manabitan-term-banks-packed.bin';
+const TERM_ARTIFACT_PRELOAD_CONCURRENCY = 4;
 const HEX_BYTE_TABLE = Array.from({length: 256}, (_, i) => i.toString(16).padStart(2, '0'));
 /** @type {import('dictionary-data').TermGlossary[]} */
 const EMPTY_TERM_GLOSSARY = [];
@@ -414,11 +417,44 @@ export class DictionaryImporter {
         ];
         const {termFiles, termArtifactFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
         const useTermArtifactFiles = termArtifactFiles.length > 0;
-        const activeTermFiles = useTermArtifactFiles ? termArtifactFiles : termFiles;
+        const termArtifactManifest = (useTermArtifactFiles || fileMap.has(TERM_BANK_ARTIFACT_MANIFEST_FILE)) ?
+            await this._readTermArtifactManifest(fileMap) :
+            null;
+        const packedTermArtifactEntry = (
+            termArtifactManifest !== null &&
+            typeof termArtifactManifest.packedFileName === 'string'
+        ) ?
+            fileMap.get(termArtifactManifest.packedFileName) :
+            fileMap.get(TERM_BANK_PACKED_ARTIFACT_FILE);
+        /** @type {Uint8Array|null} */
+        let packedTermArtifactBytes = null;
+        /** @type {Map<string, Uint8Array>|null} */
+        let preloadedTermArtifactBytes = null;
+        if (useTermArtifactFiles || typeof packedTermArtifactEntry !== 'undefined') {
+            if (typeof packedTermArtifactEntry !== 'undefined') {
+                const tPackedArtifactReadStart = Date.now();
+                packedTermArtifactBytes = await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedTermArtifactEntry), new Uint8ArrayWriter());
+                this._logImport(`packed term artifact preload ${Date.now() - tPackedArtifactReadStart}ms bytes=${packedTermArtifactBytes.byteLength}`);
+            } else if (termArtifactFiles.length > 1) {
+                const tPreloadArtifactStart = Date.now();
+                preloadedTermArtifactBytes = await this._preloadTermArtifactFiles(termArtifactFiles);
+                this._logImport(`term artifact preload ${Date.now() - tPreloadArtifactStart}ms files=${preloadedTermArtifactBytes.size}`);
+            }
+        }
+        const usePackedTermArtifact = (
+            packedTermArtifactBytes !== null &&
+            termArtifactManifest !== null &&
+            termArtifactManifest.termBanksByArtifact.size > 0
+        );
+        /** @type {Array<import('@zip.js/zip.js').Entry|{filename: string}>} */
+        const activeTermFiles = usePackedTermArtifact ?
+            this._createPackedTermArtifactFiles(termArtifactManifest.termBanksByArtifact) :
+            (useTermArtifactFiles ? termArtifactFiles : termFiles);
         this._logImport(
             `banks terms=${activeTermFiles.length} termArtifacts=${termArtifactFiles.length} ` +
             `termMeta=${termMetaFiles.length} kanji=${kanjiFiles.length} kanjiMeta=${kanjiMetaFiles.length} tags=${tagFiles.length} ` +
-            `useArtifactTerms=${String(useTermArtifactFiles)}`,
+            `useArtifactTerms=${String(useTermArtifactFiles || usePackedTermArtifact)} packedTermArtifact=${String(packedTermArtifactBytes !== null)} ` +
+            `preloadedTermArtifacts=${String(preloadedTermArtifactBytes !== null)}`,
         );
 
         // Load and import data
@@ -489,7 +525,7 @@ export class DictionaryImporter {
                 }
             };
             /**
-             * @param {import('@zip.js/zip.js').Entry} termFile
+             * @param {{filename: string}} termFile
              * @param {import('dictionary-database').DatabaseTermEntry[]} termList
              * @param {import('dictionary-importer').ImportRequirement[]|null} requirements
              * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}|null} streamedProgress
@@ -621,39 +657,85 @@ export class DictionaryImporter {
                 let artifactTermRecordWriteMs = 0;
                 let artifactTermsVtabInsertMs = 0;
                 const tFastParseStart = Date.now();
-                if (useTermArtifactFiles && /\.mbtb$/i.test(termFile.filename)) {
+                if ((useTermArtifactFiles || usePackedTermArtifact) && /\.mbtb$/i.test(termFile.filename)) {
+                    const termArtifactFileEntry = /** @type {import('@zip.js/zip.js').Entry|undefined} */ (
+                        termFile instanceof Object && 'getData' in termFile ? termFile : void 0
+                    );
                     const tArtifactParseStart = Date.now();
+                    const packedTermBankMeta = termArtifactManifest?.termBanksByArtifact.get(termFile.filename) ?? null;
                     if (this._streamTermArtifactChunks) {
-                        await this._readTermBankArtifactFile(
-                            termFile,
-                            dictionaryTitle,
-                            prefixWildcardsSupported,
-                            async (termListChunk, requirementsChunk, streamProgress) => {
-                                const tChunkWorkStart = Date.now();
-                                const chunkMetrics = await processTermChunk(termFile, termListChunk, requirementsChunk, streamProgress, streamedProgressStartIndex);
-                                artifactBulkAddTermsMs += chunkMetrics.bulkAddTermsMs;
-                                artifactSerializationMs += chunkMetrics.serializationMs;
-                                artifactMediaResolveMs += chunkMetrics.mediaResolveMs;
-                                artifactMediaWriteMs += chunkMetrics.mediaWriteMs;
-                                artifactContentAppendMs += chunkMetrics.contentAppendMs;
-                                artifactTermRecordBuildMs += chunkMetrics.termRecordBuildMs;
-                                artifactTermRecordEncodeMs += chunkMetrics.termRecordEncodeMs;
-                                artifactTermRecordWriteMs += chunkMetrics.termRecordWriteMs;
-                                artifactTermsVtabInsertMs += chunkMetrics.termsVtabInsertMs;
-                                streamChunkWorkMs += Math.max(0, Date.now() - tChunkWorkStart);
-                                termListChunk.length = 0;
-                            },
-                        );
+                        /**
+                         * @param {import('dictionary-database').DatabaseTermEntry[]} termListChunk
+                         * @param {import('dictionary-importer').ImportRequirement[]|null} requirementsChunk
+                         * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}} streamProgress
+                         * @returns {Promise<void>}
+                         */
+                        const onArtifactChunk = async (termListChunk, requirementsChunk, streamProgress) => {
+                            const tChunkWorkStart = Date.now();
+                            const chunkMetrics = await processTermChunk(termFile, termListChunk, requirementsChunk, streamProgress, streamedProgressStartIndex);
+                            artifactBulkAddTermsMs += chunkMetrics.bulkAddTermsMs;
+                            artifactSerializationMs += chunkMetrics.serializationMs;
+                            artifactMediaResolveMs += chunkMetrics.mediaResolveMs;
+                            artifactMediaWriteMs += chunkMetrics.mediaWriteMs;
+                            artifactContentAppendMs += chunkMetrics.contentAppendMs;
+                            artifactTermRecordBuildMs += chunkMetrics.termRecordBuildMs;
+                            artifactTermRecordEncodeMs += chunkMetrics.termRecordEncodeMs;
+                            artifactTermRecordWriteMs += chunkMetrics.termRecordWriteMs;
+                            artifactTermsVtabInsertMs += chunkMetrics.termsVtabInsertMs;
+                            streamChunkWorkMs += Math.max(0, Date.now() - tChunkWorkStart);
+                            termListChunk.length = 0;
+                        };
+                        if (packedTermArtifactBytes !== null && packedTermBankMeta !== null) {
+                            const packedSlice = packedTermArtifactBytes.subarray(
+                                packedTermBankMeta.packedOffset,
+                                packedTermBankMeta.packedOffset + packedTermBankMeta.packedLength,
+                            );
+                            await this._decodeTermBankArtifactBytes(packedSlice, termFile.filename, dictionaryTitle, prefixWildcardsSupported, onArtifactChunk, 0);
+                        } else if (preloadedTermArtifactBytes !== null) {
+                            const preloadedBytes = preloadedTermArtifactBytes.get(termFile.filename);
+                            if (typeof preloadedBytes === 'undefined') {
+                                throw new Error(`Missing preloaded term artifact bytes for '${termFile.filename}'`);
+                            }
+                            await this._decodeTermBankArtifactBytes(preloadedBytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, onArtifactChunk, 0);
+                        } else {
+                            if (typeof termArtifactFileEntry === 'undefined') {
+                                throw new Error(`Missing zip entry for term artifact '${termFile.filename}'`);
+                            }
+                            await this._readTermBankArtifactFile(
+                                termArtifactFileEntry,
+                                dictionaryTitle,
+                                prefixWildcardsSupported,
+                                onArtifactChunk,
+                            );
+                        }
                         const totalArtifactReadMs = Math.max(0, Date.now() - tArtifactParseStart);
                         lastArtifactTermBankReadProfile = this._lastArtifactTermBankReadProfile ?? null;
                         step4TimingBreakdown.termParseMs += Math.max(0, totalArtifactReadMs - streamChunkWorkMs);
                         termParseAlreadyAccounted = true;
                     } else {
-                        const termReadResult = await this._readTermBankArtifactFile(
-                            termFile,
-                            dictionaryTitle,
-                            prefixWildcardsSupported,
-                        );
+                        let termReadResult;
+                        if (packedTermArtifactBytes !== null && packedTermBankMeta !== null) {
+                            const packedSlice = packedTermArtifactBytes.subarray(
+                                packedTermBankMeta.packedOffset,
+                                packedTermBankMeta.packedOffset + packedTermBankMeta.packedLength,
+                            );
+                            termReadResult = await this._decodeTermBankArtifactBytes(packedSlice, termFile.filename, dictionaryTitle, prefixWildcardsSupported, void 0, 0);
+                        } else if (preloadedTermArtifactBytes !== null) {
+                            const preloadedBytes = preloadedTermArtifactBytes.get(termFile.filename);
+                            if (typeof preloadedBytes === 'undefined') {
+                                throw new Error(`Missing preloaded term artifact bytes for '${termFile.filename}'`);
+                            }
+                            termReadResult = await this._decodeTermBankArtifactBytes(preloadedBytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, void 0, 0);
+                        } else {
+                            if (typeof termArtifactFileEntry === 'undefined') {
+                                throw new Error(`Missing zip entry for term artifact '${termFile.filename}'`);
+                            }
+                            termReadResult = await this._readTermBankArtifactFile(
+                                termArtifactFileEntry,
+                                dictionaryTitle,
+                                prefixWildcardsSupported,
+                            );
+                        }
                         lastArtifactTermBankReadProfile = this._lastArtifactTermBankReadProfile ?? null;
                         step4TimingBreakdown.termParseMs += Math.max(0, Date.now() - tArtifactParseStart);
                         termParseAlreadyAccounted = true;
@@ -671,8 +753,9 @@ export class DictionaryImporter {
                     streamedImportCompleted = true;
                 } else if (!this._disableTermBankWasmFastPath) {
                     try {
+                        const termFileEntry = /** @type {import('@zip.js/zip.js').Entry} */ (termFile);
                         await this._readTermBankFileFast(
-                            termFile,
+                            termFileEntry,
                             version,
                             dictionaryTitle,
                             prefixWildcardsSupported,
@@ -744,8 +827,9 @@ export class DictionaryImporter {
                     updateStreamedTermFileProgress(streamedProgressStartIndex, 1, 1, true);
                 } else {
                     const tTermParseStart = Date.now();
+                    const termFileEntry = /** @type {import('@zip.js/zip.js').Entry} */ (termFile);
                     const termReadResult = await this._readTermBankFile(
-                        termFile,
+                        termFileEntry,
                         version,
                         dictionaryTitle,
                         prefixWildcardsSupported,
@@ -1753,6 +1837,84 @@ export class DictionaryImporter {
             }
         }
         return results;
+    }
+
+    /**
+     * @param {import('dictionary-importer').ArchiveFileMap} fileMap
+     * @returns {Promise<{termBanksByArtifact: Map<string, {packedOffset: number, packedLength: number, rows: number|null}>, packedFileName: string|null}|null>}
+     */
+    async _readTermArtifactManifest(fileMap) {
+        const manifestEntry = fileMap.get(TERM_BANK_ARTIFACT_MANIFEST_FILE);
+        if (typeof manifestEntry === 'undefined') {
+            return null;
+        }
+        let manifest;
+        try {
+            manifest = /** @type {{termBanks?: Array<{artifact?: unknown, packedOffset?: unknown, packedLength?: unknown, rows?: unknown}>, packedTermArtifact?: {file?: unknown}|null}|null} */ (
+                parseJson(await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (manifestEntry), new TextWriter()))
+            );
+        } catch (_) {
+            return null;
+        }
+        if (!(typeof manifest === 'object' && manifest !== null)) {
+            return null;
+        }
+        /** @type {Map<string, {packedOffset: number, packedLength: number, rows: number|null}>} */
+        const termBanksByArtifact = new Map();
+        const termBanks = Array.isArray(manifest.termBanks) ? manifest.termBanks : [];
+        for (const termBank of termBanks) {
+            if (!(typeof termBank === 'object' && termBank !== null)) { continue; }
+            const artifact = typeof termBank.artifact === 'string' ? termBank.artifact : null;
+            const packedOffset = Number.isInteger(termBank.packedOffset) ? /** @type {number} */ (termBank.packedOffset) : -1;
+            const packedLength = Number.isInteger(termBank.packedLength) ? /** @type {number} */ (termBank.packedLength) : -1;
+            const rows = Number.isInteger(termBank.rows) ? /** @type {number} */ (termBank.rows) : null;
+            if (artifact === null || packedOffset < 0 || packedLength <= 0) { continue; }
+            termBanksByArtifact.set(artifact, {packedOffset, packedLength, rows});
+        }
+        const packedFileName = (
+            typeof manifest.packedTermArtifact === 'object' &&
+            manifest.packedTermArtifact !== null &&
+            typeof manifest.packedTermArtifact.file === 'string'
+        ) ?
+            manifest.packedTermArtifact.file :
+            null;
+        return {termBanksByArtifact, packedFileName};
+    }
+
+    /**
+     * @param {import('@zip.js/zip.js').Entry[]} termArtifactFiles
+     * @returns {Promise<Map<string, Uint8Array>>}
+     */
+    async _preloadTermArtifactFiles(termArtifactFiles) {
+        /** @type {Map<string, Uint8Array>} */
+        const results = new Map();
+        for (let i = 0; i < termArtifactFiles.length; i += TERM_ARTIFACT_PRELOAD_CONCURRENCY) {
+            const batch = termArtifactFiles.slice(i, i + TERM_ARTIFACT_PRELOAD_CONCURRENCY);
+            const batchResults = await Promise.all(batch.map(async (termFile) => {
+                const bytes = await this._getData(termFile, new Uint8ArrayWriter());
+                return [termFile.filename, bytes];
+            }));
+            for (const [filename, bytes] of batchResults) {
+                results.set(/** @type {string} */ (filename), /** @type {Uint8Array} */ (bytes));
+            }
+        }
+        return results;
+    }
+
+    /**
+     * @param {Map<string, {packedOffset: number, packedLength: number, rows: number|null}>} termBanksByArtifact
+     * @returns {{filename: string}[]}
+     */
+    _createPackedTermArtifactFiles(termBanksByArtifact) {
+        return [...termBanksByArtifact.keys()]
+            .sort((a, b) => {
+                const aMatch = /term_bank_(\d+)\.mbtb$/i.exec(a);
+                const bMatch = /term_bank_(\d+)\.mbtb$/i.exec(b);
+                const aIndex = aMatch !== null ? Number.parseInt(aMatch[1], 10) : Number.MAX_SAFE_INTEGER;
+                const bIndex = bMatch !== null ? Number.parseInt(bMatch[1], 10) : Number.MAX_SAFE_INTEGER;
+                return aIndex - bIndex;
+            })
+            .map((filename) => ({filename}));
     }
 
     /**

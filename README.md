@@ -84,6 +84,7 @@ Install from the latest GitHub release page:
 - [ ] Yomitan export
 - [ ] Deletion
 - [ ] Lookups
+- [ ] 64KB chunking of glossaries for compression
 
 ## Contributing
 
