@@ -25,8 +25,8 @@
     <div class="sidebar"><div class="sidebar-inner scrollbar">
         <div class="sidebar-body">
             <a href="#profile"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="profile"></span></span><span class="outline-item-label">Profile</span></a>
-            <a href="#dictionaries"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div></span></span><span class="outline-item-label">Dictionaries</span></a>
             <a href="#general"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="cog"></span></span><span class="outline-item-label">General</span></a>
+            <a href="#dictionaries"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div></span></span><span class="outline-item-label">Dictionaries</span></a>
             <a href="#scanning"         class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="scanning"></span></span><span class="outline-item-label">Scanning</span></a>
             <a href="#popup"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup"></span></span><span class="outline-item-label">Popup Behavior</span></a>
             <a href="#appearance"       class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="palette"></span></span><span class="outline-item-label">Appearance</span></a>
@@ -1153,6 +1153,7 @@
                     >
                         <option value="split">No grouping</option>
                         <option value="group">Group term-reading pairs</option>
+                        <option value="term">Group by term</option>
                         <option value="merge">Group related terms</option>
                     </select>
                 </div>
@@ -1166,6 +1167,10 @@
                     <li>
                         <strong>Group term-reading pairs</strong> -
                         Definitions for the same term with the same reading will be grouped together.
+                    </li>
+                    <li>
+                        <strong>Group by term</strong> -
+                        Definitions for the same term will be grouped together, regardless of reading variations.
                     </li>
                     <li>
                         <p>

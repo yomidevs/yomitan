@@ -32,27 +32,29 @@ const re7 = new RegExp(`(?<!q)([ou])([aeoy])${TONE}(?!\\w)`, 'i');
 
 /**
  * This function is adapted from https://github.com/enricobarzetti/viet_text_tools/blob/master/viet_text_tools/__init__.py
- * @type {import('language').TextProcessor<'old'|'new'|'off'>}
+ * @param {string} str
+ * @param {'old'|'new'} style
+ * @returns {string}
  */
+function normalizeDiacriticsImpl(str, style) {
+    let result = str.normalize('NFD');
+    // Put the tone on the second vowel
+    result = result.replace(re1, '$2$1');
+    // Put the tone on the vowel with a diacritic
+    result = result.replace(re2, '$2$1');
+    // For vowels that are not oa, oe, uy put the tone on the penultimate vowel
+    result = result.replace(re3, '$2$1');
+    result = result.replace(re4, '$2$1');
+    result = result.replace(re5, '$1$3$2');
+    result = result.replace(re6, '$1$3$2');
+
+    if (style === 'old') { result = result.replace(re7, '$1$3$2'); }
+    return result.normalize('NFC');
+}
+
+/** @type {import('language').TextProcessor} */
 export const normalizeDiacritics = {
     name: 'Normalize Diacritics',
     description: 'Normalize diacritics and their placements (in either the old style or new style). NFC normalization is used.',
-    options: ['old', 'new', 'off'],
-    process: (str, setting) => {
-        if (setting === 'off') { return str; }
-
-        let result = str.normalize('NFD');
-        // Put the tone on the second vowel
-        result = result.replace(re1, '$2$1');
-        // Put the tone on the vowel with a diacritic
-        result = result.replace(re2, '$2$1');
-        // For vowels that are not oa, oe, uy put the tone on the penultimate vowel
-        result = result.replace(re3, '$2$1');
-        result = result.replace(re4, '$2$1');
-        result = result.replace(re5, '$1$3$2');
-        result = result.replace(re6, '$1$3$2');
-
-        if (setting === 'old') { result = result.replace(re7, '$1$3$2'); }
-        return result.normalize('NFC');
-    },
+    process: (str) => [str, normalizeDiacriticsImpl(str, 'old'), normalizeDiacriticsImpl(str, 'new')],
 };

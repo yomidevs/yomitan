@@ -32,7 +32,7 @@ export type ankiFieldsInput = {
 };
 
 export type tokenizeInput = {
-    text: string;
+    text: string | string[];
     scanLength: number;
 };
 

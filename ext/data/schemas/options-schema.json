@@ -143,7 +143,7 @@
                                     },
                                     "resultOutputMode": {
                                         "type": "string",
-                                        "enum": ["group", "merge", "split"],
+                                        "enum": ["group", "merge", "split", "term"],
                                         "default": "group"
                                     },
                                     "fontFamily": {
@@ -779,7 +779,7 @@
                                     "popupNestingMaxDepth": {
                                         "type": "integer",
                                         "minimum": 0,
-                                        "default": 0
+                                        "default": 10
                                     },
                                     "enablePopupSearch": {
                                         "type": "boolean",

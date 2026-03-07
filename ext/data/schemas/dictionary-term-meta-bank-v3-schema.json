@@ -120,7 +120,7 @@
                                                 },
                                                 {
                                                     "type": "string",
-                                                    "description": "Pitch level of each mora with H representing high and L representing low. For example: HHLL for a 4 mora word.",
+                                                    "description": "Pitch level of each mora with H representing high and L representing low. For example: HHLL for a 4 mora word. Add an additional pitch level at the end to explicitly define the suffix.",
                                                     "pattern": "^[HL]+$"
                                                 }
                                             ]

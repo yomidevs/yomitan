@@ -90,7 +90,7 @@ function createProfileOptionsTestData1() {
             length: 10,
             modifier: 'shift',
             deepDomScan: false,
-            popupNestingMaxDepth: 0,
+            popupNestingMaxDepth: 10,
             enablePopupSearch: false,
             enableOnPopupExpressions: false,
             enableOnSearchPage: true,
@@ -352,7 +352,7 @@ function createProfileOptionsUpdatedTestData1() {
             delay: 20,
             length: 10,
             deepDomScan: false,
-            popupNestingMaxDepth: 0,
+            popupNestingMaxDepth: 10,
             enablePopupSearch: false,
             enableOnPopupExpressions: false,
             enableOnSearchPage: true,
@@ -704,7 +704,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 73,
+        version: 74,
         global: {
             database: {
                 prefixWildcardsSupported: false,

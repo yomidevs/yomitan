@@ -1028,6 +1028,9 @@ button.action-button:active:not(:disabled) {
 :root[data-term-display-mode=term-and-reading] .headword-term-outer::after {
     display: none;
 }
+:root:not([data-language=ja]) {
+    --headword-separator: ', ';
+}
 :root[data-term-display-mode=ruby-and-reading] .headword-reading-outer,
 :root[data-term-display-mode=term-and-reading] .headword-reading-outer {
     display: inline-block;

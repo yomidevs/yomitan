@@ -28,45 +28,38 @@ const ligatures = [
     {lig: '\u05f0', split: '\u05d5' + '\u05d5'}, // װ -> וו
     {lig: '\u05f1', split: '\u05d5' + '\u05d9'}, // ױ -> וי
     {lig: '\u05f2', split: '\u05d9' + '\u05d9'}, // ײ -> יי
-    {lig: '\ufb1d', split: '\u05d9' + '\u05b4'}, // יִ -> יִ
-    {lig: '\ufb1f', split: '\u05d9' + '\u05d9' + '\u05b7'}, // ײַ -> ייַ
+    {lig: '\ufb1d', split: '\u05d9' + '\u05b4'}, // יִ -> יִ
+    {lig: '\ufb1f', split: '\u05d9' + '\u05d9' + '\u05b7'}, // ײַ -> ייַ
     {lig: '\ufb2e', split: '\u05d0' + '\u05b7'}, // Pasekh alef
     {lig: '\ufb2f', split: '\u05d0' + '\u05b8'}, // Komets alef
 ];
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const convertFinalLetters = {
     name: 'Convert to Final Letters',
     description: 'קויף → קויפֿ',
-    options: [true],
     process: (str) => {
         const len = str.length - 1;
         if ([...final_letter_map.keys()].includes(str.charAt(len))) {
             str = str.substring(0, len) + final_letter_map.get(str.substring(len));
         }
-        return str;
+        return [str];
     },
 };
 
-/** @type {import('language').BidirectionalConversionPreprocessor} */
+/** @type {import('language').TextProcessor} */
 export const convertYiddishLigatures = {
     name: 'Split Ligatures',
     description: 'וו → װ',
-    options: ['off', 'direct', 'inverse'],
-    process: (str, setting) => {
-        switch (setting) {
-            case 'off':
-                return str;
-            case 'direct':
-                for (const ligature of ligatures) {
-                    str = str.replace(ligature.lig, ligature.split);
-                }
-                return str;
-            case 'inverse':
-                for (const ligature of ligatures) {
-                    str = str.replace(ligature.split, ligature.lig);
-                }
-                return str;
+    process: (str) => {
+        let direct = str;
+        for (const ligature of ligatures) {
+            direct = direct.replace(ligature.lig, ligature.split);
         }
+        let inverse = str;
+        for (const ligature of ligatures) {
+            inverse = inverse.replace(ligature.split, ligature.lig);
+        }
+        return [str, direct, inverse];
     },
 };

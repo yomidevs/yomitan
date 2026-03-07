@@ -15,23 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @type {import('language').TextProcessorOptions<boolean>} */
-export const basicTextProcessorOptions = [false, true];
+export const MAX_PROCESS_VARIANTS = 4096;
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const decapitalize = {
     name: 'Decapitalize text',
     description: 'CAPITALIZED TEXT → capitalized text',
-    options: basicTextProcessorOptions,
-    process: (str, setting) => (setting ? str.toLowerCase() : str),
+    process: (str) => [str, str.toLowerCase()],
 };
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').TextProcessor} */
 export const capitalizeFirstLetter = {
     name: 'Capitalize first letter',
     description: 'lowercase text → Lowercase text',
-    options: basicTextProcessorOptions,
-    process: (str, setting) => (setting ? str.charAt(0).toUpperCase() + str.slice(1) : str),
+    process: (str) => [str, str.charAt(0).toUpperCase() + str.slice(1)],
 };
 
 /**
@@ -39,11 +36,10 @@ export const capitalizeFirstLetter = {
  *          as it can result in undesirable normalization:
  *            - '\u9038'.normalize('NFD') => '\u9038' (逸)
  *            - '\ufa67'.normalize('NFD') => '\u9038' (逸 => 逸)
- * @type {import('language').TextProcessor<boolean>}
+ * @type {import('language').TextProcessor}
  */
 export const removeAlphabeticDiacritics = {
     name: 'Remove Alphabetic Diacritics',
     description: 'ἄήé -> αηe',
-    options: basicTextProcessorOptions,
-    process: (str, setting) => (setting ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : str),
+    process: (str) => [str, str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')],
 };

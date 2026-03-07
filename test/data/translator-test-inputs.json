@@ -150,23 +150,30 @@
             "options": "default"
         },
         {
-            "name": "Search using different modes",
+            "name": "Search using different modes - simple",
             "func": "findTerms",
             "mode": "simple",
             "text": "打ち込む",
             "options": "default"
         },
         {
-            "name": "Search using different modes",
+            "name": "Search using different modes - group",
             "func": "findTerms",
             "mode": "group",
             "text": "打ち込む",
             "options": "default"
         },
         {
-            "name": "Search using different modes",
+            "name": "Search using different modes - merge",
             "func": "findTerms",
             "mode": "merge",
+            "text": "打ち込む",
+            "options": "default"
+        },
+        {
+            "name": "Search using different modes - term",
+            "func": "findTerms",
+            "mode": "term",
             "text": "打ち込む",
             "options": "default"
         },

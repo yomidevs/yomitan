@@ -8,6 +8,7 @@
         {"path": ".vscode/settings.json", "ignore": true},
         {"path": ".vscode/extensions.json", "ignore": true},
         {"path": ".vscode/launch.json", "ignore": true},
+        {"path": ".claude/settings.local.json", "ignore": true},
         {"path": ".github/actionlint-matcher.json", "ignore": true},
         {"path": "dev/jsconfig.json", "ignore": true},
         {"path": "ext/manifest.json", "ignore": true},

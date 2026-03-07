@@ -41,20 +41,17 @@ const testCasesNewStyle = [
 ];
 
 describe('diacritics normalization', () => {
-    const {options, process} = normalizeDiacritics;
-    for (const option of options) {
-        if (option === 'off') { return; }
-
-        describe(`${option} style`, () => {
-            if (option === 'new') {
-                test.each(testCasesNewStyle)('%s normalizes to %s', (input, expected) => {
-                    expect(process(input, option)).toStrictEqual(expected);
-                });
-            } else {
-                test.each(testCasesOldStyle)('%s normalizes to %s', (input, expected) => {
-                    expect(process(input, option)).toStrictEqual(expected);
-                });
-            }
+    describe('old style', () => {
+        test.each(testCasesOldStyle)('%s normalizes to %s', (input, expected) => {
+            // process returns [original, oldStyle, newStyle]
+            expect(normalizeDiacritics.process(input)[1]).toStrictEqual(expected);
         });
-    }
+    });
+
+    describe('new style', () => {
+        test.each(testCasesNewStyle)('%s normalizes to %s', (input, expected) => {
+            // process returns [original, oldStyle, newStyle]
+            expect(normalizeDiacritics.process(input)[2]).toStrictEqual(expected);
+        });
+    });
 });

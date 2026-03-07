@@ -15,23 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @type {import('language').TextProcessor} */
-export const removeDoubleAcuteAccents = {
-    name: 'Remove double acute accents',
-    description: 'πρόσωπό → πρόσωπο',
-    process: (str) => [str, removeDoubleAcuteAccentsImpl(str)],
-};
+import {describe, expect, test} from 'vitest';
+import {removeApostrophedWordsImpl} from '../../ext/js/language/it/italian-processors.js';
 
-/**
- * @param {string} word
- * @returns {string}
- */
-export function removeDoubleAcuteAccentsImpl(word) {
-    const ACUTE_ACCENT = '\u0301';
-    const decomposed = [...word.normalize('NFD')];
+const testCases = [
+    ['dell\'Italia', 'Italia'],
+    ['nell\'Italia', 'Italia'],
+    ['c\'erano', 'erano'],
+    ['c’erano', 'erano'],
+];
 
-    const firstIndex = decomposed.indexOf(ACUTE_ACCENT);
-    const updated = decomposed.filter((char, index) => char !== ACUTE_ACCENT || index === firstIndex);
-
-    return updated.join('').normalize('NFC');
-}
+describe('removing apostrophed words', () => {
+    test.each(testCases)('%s converts to %s', (input, expected) => {
+        expect(removeApostrophedWordsImpl(input)).toStrictEqual(expected);
+    });
+});

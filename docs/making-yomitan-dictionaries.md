@@ -47,31 +47,35 @@ A dictionary can contain various types of information within the zip file. After
 
 To validate schemas, configure [VSCode](https://code.visualstudio.com/docs/languages/json#_json-schemas-and-settings) to validate schemas or use a website such as [jsonschemavalidator](https://www.jsonschemavalidator.net/).
 
-For VSCode validation, use the following settings JSON:
+For VSCode validation, add the following to your User or Workspace `settings.json`:
 
 ```json
-  "json.schemas": [
+"json.schemas": [
     {
-      "fileMatch": ["kanji_bank_*.json"],
-      "url": "https://github.com/yomidevs/yomitan/raw/master/ext/data/schemas/dictionary-kanji-bank-v3-schema.json"
+        "fileMatch": ["index.json"],
+        "url": "https://raw.githubusercontent.com/yomidevs/yomitan/refs/heads/master/ext/data/schemas/dictionary-index-schema.json"
     },
     {
-      "fileMatch": ["kanji_meta_bank_*.json"],
-      "url": "https://github.com/yomidevs/yomitan/raw/master/ext/data/schemas/dictionary-kanji-meta-bank-v3-schema.json"
+        "fileMatch": ["kanji_bank_*.json"],
+        "url": "https://raw.githubusercontent.com/yomidevs/yomitan/refs/heads/master/ext/data/schemas/dictionary-kanji-bank-v3-schema.json"
     },
     {
-      "fileMatch": ["tag_bank_*.json"],
-      "url": "https://github.com/yomidevs/yomitan/raw/master/ext/data/schemas/dictionary-tag-bank-v3-schema.json"
+        "fileMatch": ["kanji_meta_bank_*.json"],
+        "url": "https://raw.githubusercontent.com/yomidevs/yomitan/refs/heads/master/ext/data/schemas/dictionary-kanji-meta-bank-v3-schema.json"
     },
     {
-      "fileMatch": ["term_bank_*.json"],
-      "url": "https://github.com/yomidevs/yomitan/raw/master/ext/data/schemas/dictionary-term-bank-v3-schema.json"
+        "fileMatch": ["tag_bank_*.json"],
+        "url": "https://raw.githubusercontent.com/yomidevs/yomitan/refs/heads/master/ext/data/schemas/dictionary-tag-bank-v3-schema.json"
     },
     {
-      "fileMatch": ["term_meta_bank_*.json"],
-      "url": "https://github.com/yomidevs/yomitan/raw/master/ext/data/schemas/dictionary-term-meta-bank-v3-schema.json"
+        "fileMatch": ["term_bank_*.json"],
+        "url": "https://raw.githubusercontent.com/yomidevs/yomitan/refs/heads/master/ext/data/schemas/dictionary-term-bank-v3-schema.json"
+    },
+    {
+        "fileMatch": ["term_meta_bank_*.json"],
+        "url": "https://raw.githubusercontent.com/yomidevs/yomitan/refs/heads/master/ext/data/schemas/dictionary-term-meta-bank-v3-schema.json"
     }
-  ],
+]
 ```
 
 ## Conjugation
@@ -92,7 +96,6 @@ The second item in the array of the tag bank schema determines the tag category,
 - partOfSpeech
 - search
 - pronunciation-dictionary
-- search
 
 You can view the tag colors [here](https://github.com/yomidevs/yomitan/blob/48f1d012ad5045319d4e492dfbefa39da92817b2/ext/css/display.css#L136-L149).
 

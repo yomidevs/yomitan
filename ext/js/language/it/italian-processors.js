@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025  Yomitan Authors
+ * Copyright (C) 2024-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 /** @type {import('language').TextProcessor} */
-export const removeDoubleAcuteAccents = {
-    name: 'Remove double acute accents',
-    description: 'πρόσωπό → πρόσωπο',
-    process: (str) => [str, removeDoubleAcuteAccentsImpl(str)],
+export const removeApostrophedWords = {
+    name: 'Remove common apostrophed words',
+    description: 'dell\'Italia > Italia, c\'erano > erano',
+    process: (str) => [
+        str,
+        removeApostrophedWordsImpl(str),
+    ],
 };
 
 /**
  * @param {string} word
  * @returns {string}
  */
-export function removeDoubleAcuteAccentsImpl(word) {
-    const ACUTE_ACCENT = '\u0301';
-    const decomposed = [...word.normalize('NFD')];
-
-    const firstIndex = decomposed.indexOf(ACUTE_ACCENT);
-    const updated = decomposed.filter((char, index) => char !== ACUTE_ACCENT || index === firstIndex);
-
-    return updated.join('').normalize('NFC');
+export function removeApostrophedWordsImpl(word) {
+    return word.replace(/(l|dell|all|dall|nell|sull|coll|un|quest|quell|c|n)['’]/g, '');
 }
