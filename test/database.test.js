@@ -221,7 +221,7 @@ function concatUint8Arrays(chunks) {
  * @param {DictionaryImporter} dictionaryImporter
  * @param {import('dictionary-data').IndexVersion} version
  * @param {string} dictionaryTitle
- * @param {import('dictionary-data').TermBank} rawEntries
+ * @param {import('dictionary-data').TermV1Array|import('dictionary-data').TermV3Array} rawEntries
  * @returns {Uint8Array}
  * @throws {Error}
  */
@@ -246,9 +246,7 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
     chunks.push(rowCountBytes);
     for (const rawEntry of rawEntries) {
         const entry = version === 1 ?
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             convertTermBankEntryV1(/** @type {import('dictionary-data').TermV1} */ (/** @type {unknown} */ (rawEntry)), dictionaryTitle) :
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             convertTermBankEntryV3(/** @type {import('dictionary-data').TermV3} */ (/** @type {unknown} */ (rawEntry)), dictionaryTitle);
         prepareTermEntrySerialization(entry, true);
         const expressionBytes = textEncoder.encode(entry.expression);
@@ -309,12 +307,16 @@ async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryNam
             if (!Array.isArray(rawEntriesJson)) {
                 throw new Error(`Expected term bank array in ${fileName}`);
             }
-            const rawEntries = /** @type {import('dictionary-data').TermBank} */ (rawEntriesJson);
+            const rawEntries = /** @type {import('dictionary-data').TermV1Array|import('dictionary-data').TermV3Array} */ (rawEntriesJson);
             const indexContent = readFileSync(join(dictionaryDirectory, 'index.json'), {encoding: 'utf8'});
             /** @type {import('dictionary-data').Index} */
             const index = parseJson(indexContent);
             const dictionaryTitle = typeof dictionaryName === 'string' ? dictionaryName : index.title;
-            const artifactPayload = createTermArtifactPayload(dictionaryImporter, index.version, dictionaryTitle, rawEntries);
+            const version = index.version ?? index.format;
+            if (typeof version === 'undefined') {
+                throw new Error(`Expected dictionary index version in ${dictionary}/index.json`);
+            }
+            const artifactPayload = createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries);
             const artifactName = fileName.replace(/\.json$/i, '.mbtb');
             await zipWriter.add(artifactName, new Blob([artifactPayload]).stream());
             continue;
@@ -703,6 +705,7 @@ describe('Database', () => {
             const dictionaryDatabase = new DictionaryDatabase();
             await dictionaryDatabase.prepare();
             const readTermBankArtifactFileSpy = vi.spyOn(DictionaryImporter.prototype, '_readTermBankArtifactFile');
+            const decodeTermBankArtifactBytesSpy = vi.spyOn(DictionaryImporter.prototype, '_decodeTermBankArtifactBytes');
             const readTermBankFileFastSpy = vi.spyOn(DictionaryImporter.prototype, '_readTermBankFileFast');
             try {
                 const dictionaryImporter = createDictionaryImporter(expect);
@@ -713,7 +716,9 @@ describe('Database', () => {
                 );
                 expect.soft(errors).toStrictEqual([]);
                 expect.soft(result).not.toBeNull();
-                expect.soft(readTermBankArtifactFileSpy).toHaveBeenCalled();
+                expect.soft(
+                    readTermBankArtifactFileSpy.mock.calls.length + decodeTermBankArtifactBytesSpy.mock.calls.length,
+                ).toBeGreaterThan(0);
                 expect.soft(readTermBankFileFastSpy).not.toHaveBeenCalled();
 
                 const info = await dictionaryDatabase.getDictionaryInfo();
@@ -722,6 +727,7 @@ describe('Database', () => {
                 expect.soft(info[0]?.importSuccess).toBe(true);
             } finally {
                 readTermBankArtifactFileSpy.mockRestore();
+                decodeTermBankArtifactBytesSpy.mockRestore();
                 readTermBankFileFastSpy.mockRestore();
                 await dictionaryDatabase.close();
             }
