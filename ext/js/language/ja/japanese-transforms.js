@@ -60,9 +60,7 @@ function irregularVerbSuffixInflections(suffix, conditionsIn, conditionsOut) {
  * @returns {import('language-transformer').Rule<Condition>[]}
  */
 function specialHonorificMasuInflections(conditionsIn, conditionsOut) {
-    return specialHonorificMasuVerbs.map((verb) =>
-        wholeWordInflection(`${verb.slice(0, -1)}います`, verb, conditionsIn, conditionsOut),
-    );
+    return specialHonorificMasuVerbs.map((verb) => wholeWordInflection(`${verb.slice(0, -1)}います`, verb, conditionsIn, conditionsOut));
 }
 
 const conditions = {
