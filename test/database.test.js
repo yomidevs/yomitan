@@ -26,6 +26,7 @@ import {createDictionaryArchiveData, getDictionaryArchiveIndex} from '../dev/dic
 import {parseJson} from '../dev/json.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
+import {TermRecordOpfsStore} from '../ext/js/dictionary/term-record-opfs-store.js';
 import {DictionaryWorkerHandler} from '../ext/js/dictionary/dictionary-worker-handler.js';
 import {chrome, fetch} from './mocks/common.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
@@ -900,6 +901,38 @@ describe('Database', () => {
             }
         });
 
+        test('Reads terms correctly when storing glossary content as raw bytes', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const dictionaryImporter = createDictionaryImporter(expect);
+            const {result, errors} = await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {
+                    prefixWildcardsSupported: true,
+                    yomitanVersion: '0.0.0.0',
+                    enableTermEntryContentDedup: true,
+                    termContentStorageMode: 'raw-bytes',
+                },
+            );
+            expect.soft(errors).toStrictEqual([]);
+            expect.soft(result).not.toBeNull();
+            const info = await dictionaryDatabase.getDictionaryInfo();
+            expect.soft(info.length).toBe(1);
+            expect.soft(info[0]?.counts?.terms.total).toBeGreaterThan(0);
+
+            const titles = new Map([
+                [testDictionaryIndex.title, {alias: testDictionaryIndex.title, allowSecondarySearches: false}],
+            ]);
+            const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
+            expect.soft(results.length).toBeGreaterThan(0);
+            expect.soft(countDictionaryDatabaseEntriesWithTerm(results, '打')).toBeGreaterThan(0);
+            await dictionaryDatabase.close();
+        });
+
         test('Exact lookup negative cache is scoped to enabled dictionary set', async ({expect}) => {
             const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
             const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
@@ -1138,6 +1171,50 @@ describe('Database', () => {
                     expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
                 } finally {
                     await reopenedDictionaryDatabase.close();
+                }
+            } finally {
+                restoreNavigator();
+            }
+        }, 15000);
+
+        test('Rebuilds stale empty direct term index from loaded term records', async ({expect}) => {
+            const opfsRootDirectoryHandle = createInMemoryOpfsDirectoryHandle();
+            const restoreNavigator = installInMemoryOpfsNavigator(opfsRootDirectoryHandle);
+
+            try {
+                const termRecordStore = new TermRecordOpfsStore();
+                await termRecordStore.prepare();
+                await termRecordStore.appendBatch([{
+                    dictionary: 'Test Dictionary',
+                    expression: '打つ',
+                    reading: 'うつ',
+                    expressionReverse: 'つ打',
+                    readingReverse: 'つう',
+                    entryContentOffset: 0,
+                    entryContentLength: 1,
+                    entryContentDictName: 'raw',
+                    score: 0,
+                    sequence: 1,
+                }]);
+
+                const reopenedTermRecordStore = new TermRecordOpfsStore();
+                await reopenedTermRecordStore.prepare();
+                try {
+                    // Simulate a stale empty cached index even though the records are loaded.
+                    // eslint-disable-next-line no-underscore-dangle
+                    reopenedTermRecordStore._indexByDictionary.set('Test Dictionary', {
+                        expression: new Map(),
+                        reading: new Map(),
+                        expressionReverse: new Map(),
+                        readingReverse: new Map(),
+                        pair: new Map(),
+                        sequence: new Map(),
+                    });
+                    const rebuilt = reopenedTermRecordStore.getDictionaryIndex('Test Dictionary');
+                    expect.soft(rebuilt.expression.get('打つ')?.length ?? 0).toBeGreaterThan(0);
+                    expect.soft(rebuilt.reading.get('うつ')?.length ?? 0).toBeGreaterThan(0);
+                } finally {
+                    await reopenedTermRecordStore.reset();
                 }
             } finally {
                 restoreNavigator();

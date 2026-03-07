@@ -1373,7 +1373,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes'}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1384,16 +1384,22 @@ export class DictionaryImportController {
                 mediaResolutionConcurrency: 8,
                 debugImportLogging: false,
                 enableTermEntryContentDedup: true,
+                termContentStorageMode: 'baseline',
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
         const mediaResolutionConcurrency = Number.isFinite(flagsRecord.mediaResolutionConcurrency) ? Math.trunc(/** @type {number} */ (flagsRecord.mediaResolutionConcurrency)) : 8;
+        const termContentStorageModeRaw = flagsRecord.termContentStorageMode;
+        const termContentStorageMode = (termContentStorageModeRaw === 'raw-bytes') ?
+            termContentStorageModeRaw :
+            'baseline';
         return {
             skipImageMetadata: flagsRecord.skipImageMetadata === true,
             skipMediaImport: flagsRecord.skipMediaImport === true,
             mediaResolutionConcurrency: Math.max(1, Math.min(32, mediaResolutionConcurrency)),
             debugImportLogging: flagsRecord.debugImportLogging === true,
             enableTermEntryContentDedup: flagsRecord.enableTermEntryContentDedup !== false,
+            termContentStorageMode,
         };
     }
 

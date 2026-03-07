@@ -28,6 +28,7 @@ import {parseJson} from '../core/json.js';
 import {toError} from '../core/to-error.js';
 import {stringReverse} from '../core/utilities.js';
 import {getFileExtensionFromImageMediaType, getImageMediaTypeFromFileName} from '../media/media-util.js';
+import {decodeRawTermContentBinary, encodeRawTermContentBinary} from './raw-term-content.js';
 import {compareRevisions} from './dictionary-data-util.js';
 import {consumeLastTermBankWasmParseProfile, parseTermBankWithWasmChunks} from './term-bank-wasm-parser.js';
 
@@ -211,6 +212,8 @@ export class DictionaryImporter {
         this._textDecoder = new TextDecoder();
         /** @type {Map<string, string>} */
         this._jsonQuotedStringCache = new Map();
+        /** @type {Map<string, Uint8Array>} */
+        this._utf8StringBytesCache = new Map();
         /** @type {number} */
         this._progressMinIntervalMs = 1000;
         /** @type {boolean} */
@@ -282,6 +285,9 @@ export class DictionaryImporter {
         const maxTransactionLength = 262144;
         const bulkAddProgressAllowance = 1000;
         const enableTermEntryContentDedup = details.enableTermEntryContentDedup !== false;
+        const termContentStorageMode = (details.termContentStorageMode === 'raw-bytes') ?
+            details.termContentStorageMode :
+            'baseline';
         this._skipImageMetadata = details.skipImageMetadata === true;
         this._skipMediaImport = details.skipMediaImport === true;
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
@@ -289,8 +295,9 @@ export class DictionaryImporter {
         this._pendingImageMediaByPath.clear();
         this._imageMetadataByPath.clear();
         this._jsonQuotedStringCache.clear();
+        this._utf8StringBytesCache.clear();
         this._reverseStringCache.clear();
-        dictionaryDatabase.setImportOptimizationFlags();
+        dictionaryDatabase.setImportOptimizationFlags({termContentStorageMode});
         const tImportStart = Date.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
         const phaseTimings = [];
@@ -690,13 +697,13 @@ export class DictionaryImporter {
                                 packedTermBankMeta.packedOffset,
                                 packedTermBankMeta.packedOffset + packedTermBankMeta.packedLength,
                             );
-                            await this._decodeTermBankArtifactBytes(packedSlice, termFile.filename, dictionaryTitle, prefixWildcardsSupported, onArtifactChunk, 0);
+                            await this._decodeTermBankArtifactBytes(packedSlice, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onArtifactChunk, 0);
                         } else if (preloadedTermArtifactBytes !== null) {
                             const preloadedBytes = preloadedTermArtifactBytes.get(termFile.filename);
                             if (typeof preloadedBytes === 'undefined') {
                                 throw new Error(`Missing preloaded term artifact bytes for '${termFile.filename}'`);
                             }
-                            await this._decodeTermBankArtifactBytes(preloadedBytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, onArtifactChunk, 0);
+                            await this._decodeTermBankArtifactBytes(preloadedBytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onArtifactChunk, 0);
                         } else {
                             if (typeof termArtifactFileEntry === 'undefined') {
                                 throw new Error(`Missing zip entry for term artifact '${termFile.filename}'`);
@@ -705,6 +712,7 @@ export class DictionaryImporter {
                                 termArtifactFileEntry,
                                 dictionaryTitle,
                                 prefixWildcardsSupported,
+                                termContentStorageMode,
                                 onArtifactChunk,
                             );
                         }
@@ -719,13 +727,13 @@ export class DictionaryImporter {
                                 packedTermBankMeta.packedOffset,
                                 packedTermBankMeta.packedOffset + packedTermBankMeta.packedLength,
                             );
-                            termReadResult = await this._decodeTermBankArtifactBytes(packedSlice, termFile.filename, dictionaryTitle, prefixWildcardsSupported, void 0, 0);
+                            termReadResult = await this._decodeTermBankArtifactBytes(packedSlice, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, void 0, 0);
                         } else if (preloadedTermArtifactBytes !== null) {
                             const preloadedBytes = preloadedTermArtifactBytes.get(termFile.filename);
                             if (typeof preloadedBytes === 'undefined') {
                                 throw new Error(`Missing preloaded term artifact bytes for '${termFile.filename}'`);
                             }
-                            termReadResult = await this._decodeTermBankArtifactBytes(preloadedBytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, void 0, 0);
+                            termReadResult = await this._decodeTermBankArtifactBytes(preloadedBytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, void 0, 0);
                         } else {
                             if (typeof termArtifactFileEntry === 'undefined') {
                                 throw new Error(`Missing zip entry for term artifact '${termFile.filename}'`);
@@ -734,6 +742,7 @@ export class DictionaryImporter {
                                 termArtifactFileEntry,
                                 dictionaryTitle,
                                 prefixWildcardsSupported,
+                                termContentStorageMode,
                             );
                         }
                         lastArtifactTermBankReadProfile = this._lastArtifactTermBankReadProfile ?? null;
@@ -761,6 +770,7 @@ export class DictionaryImporter {
                             prefixWildcardsSupported,
                             useMediaPipeline,
                             enableTermEntryContentDedup,
+                            termContentStorageMode,
                             async (termListChunk, requirementsChunk, streamProgress) => {
                                 const tChunkWorkStart = Date.now();
                                 await processTermChunk(termFile, termListChunk, requirementsChunk, streamProgress, streamedProgressStartIndex);
@@ -835,6 +845,7 @@ export class DictionaryImporter {
                         prefixWildcardsSupported,
                         useMediaPipeline,
                         enableTermEntryContentDedup,
+                        termContentStorageMode,
                     );
                     step4TimingBreakdown.termParseMs += Math.max(0, Date.now() - tTermParseStart);
                     await processTermChunk(termFile, termReadResult.termList, termReadResult.requirements);
@@ -1657,8 +1668,9 @@ export class DictionaryImporter {
     /**
      * @param {import('dictionary-database').DatabaseTermEntry} entry
      * @param {boolean} enableTermEntryContentDedup
+     * @param {Uint8Array|null} [glossaryJsonBytes]
      */
-    _prepareTermEntrySerialization(entry, enableTermEntryContentDedup) {
+    _prepareTermEntrySerialization(entry, enableTermEntryContentDedup, glossaryJsonBytes = null) {
         if (
             enableTermEntryContentDedup &&
             hasPrecomputedTermEntryContent(entry)
@@ -1677,12 +1689,25 @@ export class DictionaryImporter {
         }
         const definitionTags = entry.definitionTags ?? entry.tags ?? '';
         const termTags = entry.termTags ?? '';
-        const contentJson = this._createTermEntryContentJson(entry.rules, definitionTags, termTags, glossaryJson);
-        const [hash1, hash2] = this._hashEntryContentPair(contentJson);
+        let hash1;
+        let hash2;
+        if (
+            glossaryJsonBytes instanceof Uint8Array &&
+            glossaryJsonBytes.byteLength > 0
+        ) {
+            const contentBytes = encodeRawTermContentBinary(entry.rules, definitionTags, termTags, glossaryJsonBytes, this._textEncoder);
+            [hash1, hash2] = this._hashEntryContentBytesPair(contentBytes);
+            entry.termEntryContentBytes = contentBytes;
+            entry.termEntryContentRawGlossaryJsonBytes = void 0;
+        } else {
+            const contentBytes = this._textEncoder.encode(this._createTermEntryContentJson(entry.rules, definitionTags, termTags, glossaryJson));
+            [hash1, hash2] = this._hashEntryContentBytesPair(contentBytes);
+            entry.termEntryContentBytes = contentBytes;
+            entry.termEntryContentRawGlossaryJsonBytes = void 0;
+        }
         entry.termEntryContentHash1 = hash1;
         entry.termEntryContentHash2 = hash2;
         entry.termEntryContentHash = hashPairToHex(hash1, hash2);
-        entry.termEntryContentBytes = this._textEncoder.encode(contentJson);
     }
 
     /**
@@ -1720,6 +1745,28 @@ export class DictionaryImporter {
     }
 
     /**
+     * @param {string} value
+     * @returns {Uint8Array}
+     */
+    _getUtf8StringBytesCached(value) {
+        const cached = this._utf8StringBytesCache.get(value);
+        if (cached instanceof Uint8Array) {
+            this._utf8StringBytesCache.delete(value);
+            this._utf8StringBytesCache.set(value, cached);
+            return cached;
+        }
+        const bytes = this._textEncoder.encode(value);
+        if (this._utf8StringBytesCache.size >= JSON_QUOTED_STRING_CACHE_MAX_ENTRIES) {
+            const oldestKey = this._utf8StringBytesCache.keys().next().value;
+            if (typeof oldestKey === 'string') {
+                this._utf8StringBytesCache.delete(oldestKey);
+            }
+        }
+        this._utf8StringBytesCache.set(value, bytes);
+        return bytes;
+    }
+
+    /**
      * @param {string} contentJson
      * @returns {string}
      */
@@ -1733,9 +1780,16 @@ export class DictionaryImporter {
      * @returns {[number, number]}
      */
     _hashEntryContentPair(contentJson) {
+        return this._hashEntryContentBytesPair(this._textEncoder.encode(contentJson));
+    }
+
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {[number, number]}
+     */
+    _hashEntryContentBytesPair(bytes) {
         let h1 = 0x811c9dc5;
         let h2 = 0x9e3779b9;
-        const bytes = this._textEncoder.encode(contentJson);
         for (let i = 0, ii = bytes.length; i < ii; ++i) {
             const code = bytes[i];
             h1 = Math.imul((h1 ^ code) >>> 0, 0x01000193);
@@ -1956,6 +2010,7 @@ export class DictionaryImporter {
      * @param {boolean} prefixWildcardsSupported
      * @param {boolean} useMediaPipeline
      * @param {boolean} enableTermEntryContentDedup
+     * @param {'baseline'|'raw-bytes'} termContentStorageMode
      * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
      */
     async _readTermBankFile(
@@ -1965,6 +2020,7 @@ export class DictionaryImporter {
         prefixWildcardsSupported,
         useMediaPipeline,
         enableTermEntryContentDedup,
+        termContentStorageMode,
     ) {
         if (!this._disableTermBankWasmFastPath) {
             try {
@@ -1975,6 +2031,7 @@ export class DictionaryImporter {
                     prefixWildcardsSupported,
                     useMediaPipeline,
                     enableTermEntryContentDedup,
+                    termContentStorageMode,
                 );
             } catch (e) {
                 this._logImport(`term file ${termFile.filename}: wasm parse fallback (${/** @type {Error} */ (toError(e)).message})`);
@@ -2032,10 +2089,11 @@ export class DictionaryImporter {
      * @param {boolean} prefixWildcardsSupported
      * @param {boolean} useMediaPipeline
      * @param {boolean} enableTermEntryContentDedup
+     * @param {'baseline'|'raw-bytes'} termContentStorageMode
      * @param {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} [onChunk]
      * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
      */
-    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, useMediaPipeline, enableTermEntryContentDedup, onChunk = void 0) {
+    async _readTermBankFileFast(termFile, version, dictionaryTitle, prefixWildcardsSupported, useMediaPipeline, enableTermEntryContentDedup, termContentStorageMode, onChunk = void 0) {
         this._lastFastTermBankReadProfile = null;
         const bytes = await this._getData(termFile, new Uint8ArrayWriter());
         let wasmRowChunkSize = this._termBankWasmRowChunkSize;
@@ -2077,8 +2135,9 @@ export class DictionaryImporter {
         const termList = [];
         const minimalDecode = this._wasmCanonicalRowsFastPath && !useMediaPipeline;
         const usePrecomputedContentForMediaRows = useMediaPipeline && this._wasmPassThroughTermContent && this._usePrecomputedContentForMediaRows;
-        const includeContentMetadata = this._wasmPassThroughTermContent || !this._wasmSkipUnusedTermContentEncoding;
-        const useLazyGlossaryDecode = useMediaPipeline && (this._lazyGlossaryDecodeForMedia || this._glossaryMediaFastScan || usePrecomputedContentForMediaRows);
+        const useRawBytesDirectContent = (termContentStorageMode === 'raw-bytes' && !useMediaPipeline);
+        const includeContentMetadata = useRawBytesDirectContent ? false : (this._wasmPassThroughTermContent || !this._wasmSkipUnusedTermContentEncoding);
+        const useLazyGlossaryDecode = useRawBytesDirectContent || (useMediaPipeline && (this._lazyGlossaryDecodeForMedia || this._glossaryMediaFastScan || usePrecomputedContentForMediaRows));
         const useMediaHintFastScan = useMediaPipeline && (
             this._wasmPassThroughTermContent ||
             this._lazyGlossaryDecodeForMedia ||
@@ -2139,10 +2198,10 @@ export class DictionaryImporter {
                                 dictionary: dictionaryTitle,
                             };
                         if (requirementsForChunk === null) {
-                            if (typeof row.glossaryJson === 'string') {
+                            if (typeof row.glossaryJson === 'string' && row.glossaryJson.length > 0) {
                                 entry.glossaryJson = row.glossaryJson;
                             }
-                            usePrecomputedTermContent = true;
+                            usePrecomputedTermContent = !useRawBytesDirectContent;
                         } else {
                             const skipGlossaryParse = (
                                 typeof row.glossaryMayContainMedia === 'boolean' ?
@@ -2211,7 +2270,17 @@ export class DictionaryImporter {
                             ) {
                                 entry.glossaryJson = this._getFastRowGlossaryJson(row);
                             }
-                            this._prepareTermEntrySerialization(entry, enableTermEntryContentDedup);
+                            this._prepareTermEntrySerialization(
+                                entry,
+                                enableTermEntryContentDedup,
+                                (
+                                    useRawBytesDirectContent &&
+                                    requirementsForChunk === null &&
+                                    row.glossaryJsonBytes instanceof Uint8Array
+                                ) ?
+                                    row.glossaryJsonBytes :
+                                    null,
+                            );
                         }
                         termListChunk[i] = entry;
                     }
@@ -2265,15 +2334,16 @@ export class DictionaryImporter {
      * @param {import('@zip.js/zip.js').Entry} termFile
      * @param {string} dictionaryTitle
      * @param {boolean} prefixWildcardsSupported
+     * @param {'baseline'|'raw-bytes'} termContentStorageMode
      * @param {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} [onChunk]
      * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
      */
-    async _readTermBankArtifactFile(termFile, dictionaryTitle, prefixWildcardsSupported, onChunk = void 0) {
+    async _readTermBankArtifactFile(termFile, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onChunk = void 0) {
         this._lastArtifactTermBankReadProfile = null;
         const tReadBytesStart = Date.now();
         const bytes = await this._getData(termFile, new Uint8ArrayWriter());
         const readBytesMs = Math.max(0, Date.now() - tReadBytesStart);
-        return await this._decodeTermBankArtifactBytes(bytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, onChunk, readBytesMs);
+        return await this._decodeTermBankArtifactBytes(bytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onChunk, readBytesMs);
     }
 
     /**
@@ -2281,11 +2351,12 @@ export class DictionaryImporter {
      * @param {string} filename
      * @param {string} dictionaryTitle
      * @param {boolean} prefixWildcardsSupported
+     * @param {'baseline'|'raw-bytes'} termContentStorageMode
      * @param {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} [onChunk]
      * @param {number} readBytesMs
      * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
      */
-    async _decodeTermBankArtifactBytes(bytes, filename, dictionaryTitle, prefixWildcardsSupported, onChunk = void 0, readBytesMs = 0) {
+    async _decodeTermBankArtifactBytes(bytes, filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onChunk = void 0, readBytesMs = 0) {
         const textDecoder = this._textDecoder;
         if (bytes.byteLength < (TERM_BANK_ARTIFACT_MAGIC_BYTES + 4)) {
             throw new Error(`Invalid term artifact payload in '${filename}': too small`);
@@ -2378,6 +2449,7 @@ export class DictionaryImporter {
                 termEntryContentBytes: bytes.subarray(contentStart, contentEnd),
                 sequence,
             };
+            this._normalizeArtifactTermEntryContent(entry, termContentStorageMode);
             cursor = contentEnd;
             if (streamToChunkHandler) {
                 termList.push(entry);
@@ -2420,6 +2492,59 @@ export class DictionaryImporter {
             rowChunkSize: chunkSize,
         };
         return {termList: streamToChunkHandler ? [] : termList, requirements: null};
+    }
+
+    /**
+     * @param {import('dictionary-database').DatabaseTermEntry} entry
+     * @param {'baseline'|'raw-bytes'} termContentStorageMode
+     * @returns {void}
+     */
+    _normalizeArtifactTermEntryContent(entry, termContentStorageMode) {
+        if (termContentStorageMode !== 'raw-bytes') {
+            return;
+        }
+        const termEntryContentBytes = entry.termEntryContentBytes;
+        if (!(termEntryContentBytes instanceof Uint8Array) || termEntryContentBytes.byteLength === 0) {
+            return;
+        }
+        if (decodeRawTermContentBinary(termEntryContentBytes, this._textDecoder) !== null) {
+            return;
+        }
+        const parsedContent = decodeRawTermContentBinary(termEntryContentBytes, this._textDecoder) ?? (() => {
+            try {
+                const value = /** @type {{rules?: unknown, definitionTags?: unknown, termTags?: unknown, glossary?: unknown}} */ (
+                    parseJson(this._textDecoder.decode(termEntryContentBytes))
+                );
+                return {
+                    rules: typeof value.rules === 'string' ? value.rules : '',
+                    definitionTags: typeof value.definitionTags === 'string' ? value.definitionTags : '',
+                    termTags: typeof value.termTags === 'string' ? value.termTags : '',
+                    glossaryJson: JSON.stringify(Array.isArray(value.glossary) ? value.glossary : []),
+                };
+            } catch (_) {
+                return null;
+            }
+        })();
+        if (parsedContent === null) {
+            return;
+        }
+        const glossaryJsonBytes = this._textEncoder.encode(parsedContent.glossaryJson);
+        entry.rules = parsedContent.rules;
+        entry.definitionTags = parsedContent.definitionTags;
+        entry.termTags = parsedContent.termTags;
+        const rawBytes = encodeRawTermContentBinary(
+            parsedContent.rules,
+            parsedContent.definitionTags,
+            parsedContent.termTags,
+            glossaryJsonBytes,
+            this._textEncoder,
+        );
+        const [hash1, hash2] = this._hashEntryContentBytesPair(rawBytes);
+        entry.termEntryContentHash1 = hash1;
+        entry.termEntryContentHash2 = hash2;
+        entry.termEntryContentHash = hashPairToHex(hash1, hash2);
+        entry.termEntryContentBytes = rawBytes;
+        entry.termEntryContentRawGlossaryJsonBytes = void 0;
     }
 
     /**
@@ -2530,6 +2655,15 @@ export class DictionaryImporter {
         }
         const termEntryContentBytes = row.termEntryContentBytes;
         try {
+            const rawContent = decodeRawTermContentBinary(termEntryContentBytes, this._textDecoder);
+            if (rawContent !== null) {
+                return {
+                    rules: rawContent.rules,
+                    definitionTags: rawContent.definitionTags,
+                    termTags: rawContent.termTags,
+                    glossary: this._parseGlossaryJsonFromFastRow(rawContent.glossaryJson, fileName),
+                };
+            }
             const value = /** @type {{rules?: unknown, definitionTags?: unknown, termTags?: unknown, glossary?: unknown}} */ (
                 parseJson(this._textDecoder.decode(termEntryContentBytes))
             );

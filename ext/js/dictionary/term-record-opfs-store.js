@@ -649,7 +649,15 @@ export class TermRecordOpfsStore {
         this._ensureIndexesReady();
         const existing = this._indexByDictionary.get(dictionaryName);
         if (typeof existing !== 'undefined') {
-            return existing;
+            if (
+                existing.expression.size === 0 &&
+                existing.reading.size === 0 &&
+                this._hasRecordsForDictionary(dictionaryName)
+            ) {
+                this._indexByDictionary.delete(dictionaryName);
+            } else {
+                return existing;
+            }
         }
         const created = {
             expression: new Map(),
@@ -663,8 +671,32 @@ export class TermRecordOpfsStore {
             if (record.dictionary !== dictionaryName) { continue; }
             this._addRecordToDictionaryIndex(created, record);
         }
+        if (
+            created.expression.size === 0 &&
+            created.reading.size === 0 &&
+            this._hasRecordsForDictionary(dictionaryName)
+        ) {
+            this._rebuildIndexesFromRecords();
+            const rebuilt = this._indexByDictionary.get(dictionaryName);
+            if (typeof rebuilt !== 'undefined') {
+                return rebuilt;
+            }
+        }
         this._indexByDictionary.set(dictionaryName, created);
         return created;
+    }
+
+    /**
+     * @param {string} dictionaryName
+     * @returns {boolean}
+     */
+    _hasRecordsForDictionary(dictionaryName) {
+        for (const record of this._recordsById.values()) {
+            if (record.dictionary === dictionaryName) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

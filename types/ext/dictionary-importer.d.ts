@@ -62,6 +62,7 @@ export type ImportDetails = {
     mediaResolutionConcurrency?: number;
     debugImportLogging?: boolean;
     enableTermEntryContentDedup?: boolean;
+    termContentStorageMode?: 'baseline' | 'raw-bytes';
 };
 
 export type Summary = {

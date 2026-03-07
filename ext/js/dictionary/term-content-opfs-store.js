@@ -26,10 +26,12 @@ const HIGH_MEMORY_READ_PAGE_CACHE_MAX_PAGES = 192;
 const DEFAULT_WRITE_COALESCE_TARGET_BYTES = 4 * 1024 * 1024;
 const LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
 const HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES = 16 * 1024 * 1024;
+const RAW_BYTES_WRITE_COALESCE_TARGET_BYTES = 32 * 1024 * 1024;
 const WRITE_COALESCE_MAX_CHUNKS = 512;
 const DEFAULT_WRITE_FLUSH_THRESHOLD_BYTES = 16 * 1024 * 1024;
 const LOW_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES = 8 * 1024 * 1024;
 const HIGH_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES = 128 * 1024 * 1024;
+const RAW_BYTES_WRITE_FLUSH_THRESHOLD_BYTES = 256 * 1024 * 1024;
 
 export class TermContentOpfsStore {
     constructor() {
@@ -49,6 +51,8 @@ export class TermContentOpfsStore {
         this._pendingWriteChunks = [];
         /** @type {Promise<void>|null} */
         this._queuedWritePromise = null;
+        /** @type {Uint8Array[]} */
+        this._queuedWriteChunks = [];
         /** @type {number} */
         this._flushThresholdBytes = this._computeWriteFlushThresholdBytes();
         /** @type {boolean} */
@@ -59,12 +63,20 @@ export class TermContentOpfsStore {
         this._readFile = null;
         /** @type {Map<number, Uint8Array>} */
         this._readPageCache = new Map();
+        /** @type {string} */
+        this._lastSliceCacheKey = '';
+        /** @type {Uint8Array|null} */
+        this._lastSliceCacheValue = null;
+        /** @type {boolean} */
+        this._exactSliceCacheEnabled = true;
         /** @type {number} */
         this._readPageCacheMaxPages = this._computeReadPageCacheMaxPages();
         /** @type {number} */
         this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
         /** @type {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number}|null} */
         this._lastEndImportSessionMetrics = null;
+        /** @type {'baseline'|'raw-bytes'} */
+        this._importStorageMode = 'baseline';
     }
 
     /**
@@ -86,6 +98,7 @@ export class TermContentOpfsStore {
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
         this._queuedWritePromise = null;
+        this._queuedWriteChunks = [];
         this._importSessionActive = false;
         this._lastEndImportSessionMetrics = null;
     }
@@ -99,9 +112,12 @@ export class TermContentOpfsStore {
         }
         await this._awaitQueuedWrites();
         this._importSessionActive = true;
+        this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
+        this._flushThresholdBytes = this._computeWriteFlushThresholdBytes();
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
         this._queuedWritePromise = null;
+        this._queuedWriteChunks = [];
         this._lastEndImportSessionMetrics = null;
         if (this._fileHandle === null) {
             return;
@@ -144,6 +160,26 @@ export class TermContentOpfsStore {
     }
 
     /**
+     * @param {'baseline'|'raw-bytes'} mode
+     */
+    setImportStorageMode(mode) {
+        this._importStorageMode = mode === 'raw-bytes' ? 'raw-bytes' : 'baseline';
+        this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
+        this._flushThresholdBytes = this._computeWriteFlushThresholdBytes();
+    }
+
+    /**
+     * @param {boolean} value
+     */
+    setExactSliceCacheEnabled(value) {
+        this._exactSliceCacheEnabled = value;
+        if (!value) {
+            this._lastSliceCacheKey = '';
+            this._lastSliceCacheValue = null;
+        }
+    }
+
+    /**
      * @returns {Promise<void>}
      */
     async reset() {
@@ -156,6 +192,7 @@ export class TermContentOpfsStore {
             this._pendingWriteBytes = 0;
             this._pendingWriteChunks = [];
             this._queuedWritePromise = null;
+            this._queuedWriteChunks = [];
             this._importSessionActive = false;
             this._lastEndImportSessionMetrics = null;
             this._invalidateReadState();
@@ -172,6 +209,7 @@ export class TermContentOpfsStore {
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
         this._queuedWritePromise = null;
+        this._queuedWriteChunks = [];
         this._importSessionActive = false;
         this._lastEndImportSessionMetrics = null;
     }
@@ -327,8 +365,11 @@ export class TermContentOpfsStore {
         if (chunks.length === 0) {
             return;
         }
-        const previous = this._queuedWritePromise ?? Promise.resolve();
-        this._queuedWritePromise = previous.then(() => this._writePendingChunksCoalesced(chunks));
+        this._queuedWriteChunks.push(...chunks);
+        if (this._queuedWritePromise !== null) {
+            return;
+        }
+        this._queuedWritePromise = this._drainQueuedWrites();
     }
 
     /**
@@ -339,8 +380,25 @@ export class TermContentOpfsStore {
         if (promise === null) {
             return;
         }
-        this._queuedWritePromise = null;
         await promise;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _drainQueuedWrites() {
+        try {
+            while (this._queuedWriteChunks.length > 0) {
+                const chunks = this._queuedWriteChunks;
+                this._queuedWriteChunks = [];
+                await this._writePendingChunksCoalesced(chunks);
+            }
+        } finally {
+            this._queuedWritePromise = null;
+            if (this._queuedWriteChunks.length > 0) {
+                this._queuedWritePromise = this._drainQueuedWrites();
+            }
+        }
     }
 
     /**
@@ -461,14 +519,26 @@ export class TermContentOpfsStore {
         if (offset < 0 || length <= 0) { return null; }
         const end = offset + length;
         if (end > this._length) { return null; }
+        const cacheKey = `${offset}:${length}`;
+        if (this._exactSliceCacheEnabled && this._lastSliceCacheKey === cacheKey && this._lastSliceCacheValue instanceof Uint8Array) {
+            return this._lastSliceCacheValue;
+        }
+        /** @type {Uint8Array|null} */
+        let result;
         if (this._fileHandle === null) {
             if (this._chunks.length === 0) { return null; }
-            return this._readSliceFromMemory(offset, length);
+            result = this._readSliceFromMemory(offset, length);
+        } else {
+            if (!this._loadedForRead) {
+                await this.ensureLoadedForRead();
+            }
+            result = await this._readSliceFromFile(offset, length);
         }
-        if (!this._loadedForRead) {
-            await this.ensureLoadedForRead();
+        if (this._exactSliceCacheEnabled && result instanceof Uint8Array) {
+            this._lastSliceCacheKey = cacheKey;
+            this._lastSliceCacheValue = result;
         }
-        return await this._readSliceFromFile(offset, length);
+        return result;
     }
 
     /**
@@ -632,6 +702,8 @@ export class TermContentOpfsStore {
         this._loadedForRead = false;
         this._readFile = null;
         this._readPageCache.clear();
+        this._lastSliceCacheKey = '';
+        this._lastSliceCacheValue = null;
     }
 
     /**
@@ -751,6 +823,9 @@ export class TermContentOpfsStore {
      * @returns {number}
      */
     _computeWriteCoalesceTargetBytes() {
+        if (this._importStorageMode === 'raw-bytes') {
+            return RAW_BYTES_WRITE_COALESCE_TARGET_BYTES;
+        }
         const memoryGiB = this._getDeviceMemoryGiB();
         if (memoryGiB !== null && memoryGiB <= 4) {
             return LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES;
@@ -765,6 +840,9 @@ export class TermContentOpfsStore {
      * @returns {number}
      */
     _computeWriteFlushThresholdBytes() {
+        if (this._importStorageMode === 'raw-bytes') {
+            return RAW_BYTES_WRITE_FLUSH_THRESHOLD_BYTES;
+        }
         const memoryGiB = this._getDeviceMemoryGiB();
         if (memoryGiB !== null && memoryGiB <= 4) {
             return LOW_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES;

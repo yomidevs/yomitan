@@ -36,6 +36,7 @@ import {
     logTermContentZstdError,
     resolveTermContentZstdDictName,
 } from './zstd-term-content.js';
+import {decodeRawTermContentHeader, encodeRawTermContentBinary, getRawTermContentGlossaryJsonBytes, isRawTermContentBinary, RAW_TERM_CONTENT_DICT_NAME} from './raw-term-content.js';
 import {TermContentOpfsStore} from './term-content-opfs-store.js';
 import {TermRecordOpfsStore} from './term-record-opfs-store.js';
 
@@ -48,6 +49,8 @@ const LOW_MEMORY_TERM_EXACT_PRESENCE_CACHE_MAX_ENTRIES = 8000;
 const TERM_BULK_ADD_STAGING_MAX_ROWS = 3000;
 const DEFAULT_TERM_BULK_ADD_STAGING_MAX_ROWS = 4096;
 const HIGH_MEMORY_TERM_BULK_ADD_STAGING_MAX_ROWS = 10240;
+const TERM_CONTENT_STORAGE_MODE_BASELINE = 'baseline';
+const TERM_CONTENT_STORAGE_MODE_RAW_BYTES = 'raw-bytes';
 
 /**
  * @param {string} value
@@ -60,6 +63,7 @@ function parseContentHashHexPair(value) {
     if (!Number.isFinite(hash1) || !Number.isFinite(hash2)) { return null; }
     return [hash1 >>> 0, hash2 >>> 0];
 }
+
 
 /**
  * @typedef {object} InsertStatement
@@ -107,7 +111,7 @@ export class DictionaryDatabase {
         this._statementCache = new Map();
         /** @type {number} */
         this._statementCacheMaxEntries = this._computeStatementCacheMaxEntries();
-        /** @type {Map<string, {definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson: string, glossary?: import('dictionary-data').TermGlossary[]}>} */
+        /** @type {Map<string, {definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson?: string, glossary?: import('dictionary-data').TermGlossary[]}>} */
         this._termEntryContentCache = new Map();
         /** @type {number} */
         this._termEntryContentCacheMaxEntries = TERM_ENTRY_CONTENT_CACHE_MAX_ENTRIES;
@@ -117,6 +121,8 @@ export class DictionaryDatabase {
         this._textDecoder = new TextDecoder();
         /** @type {boolean} */
         this._termContentZstdInitialized = false;
+        /** @type {'baseline'|'raw-bytes'} */
+        this._termContentStorageMode = TERM_CONTENT_STORAGE_MODE_BASELINE;
         /** @type {Map<string, boolean>} */
         this._termExactPresenceCache = new Map();
         /** @type {number} */
@@ -474,13 +480,19 @@ export class DictionaryDatabase {
         this._importDebugLogging = value;
     }
 
-    /** */
-    setImportOptimizationFlags() {
+    /**
+     * @param {{termContentStorageMode?: 'baseline'|'raw-bytes'}} [options]
+     */
+    setImportOptimizationFlags(options = {}) {
         this._adaptiveTermBulkAddBatchSize = true;
         this._retryBeginImmediateTransaction = false;
         this._skipIntraBatchContentDedup = false;
         this._termBulkAddStagingMaxRows = this._computeDefaultTermBulkAddStagingMaxRows();
         this._termRecordRowAppendFastPath = true;
+        this._termContentStorageMode = (options.termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) ?
+            options.termContentStorageMode :
+            TERM_CONTENT_STORAGE_MODE_BASELINE;
+        this._termContentStore.setImportStorageMode(this._termContentStorageMode);
     }
 
     /**
@@ -2032,8 +2044,6 @@ export class DictionaryDatabase {
         let pendingContentHash2s = [];
         /** @type {Uint8Array[]} */
         let pendingContentBytes = [];
-        /** @type {(string|null)[]} */
-        let pendingContentDictNames = [];
         /** @type {Map<string, number>|null} */
         let pendingContentRowIndexByHash = shouldDedupWithinBatch ? new Map() : null;
         /** @type {Map<number, Map<number, number>>|null} */
@@ -2053,7 +2063,6 @@ export class DictionaryDatabase {
                     pendingContentHash1s = [];
                     pendingContentHash2s = [];
                     pendingContentBytes = [];
-                    pendingContentDictNames = [];
                     if (pendingContentRowIndexByHash !== null) {
                         pendingContentRowIndexByHash.clear();
                     }
@@ -2065,9 +2074,12 @@ export class DictionaryDatabase {
 
                 if (pendingContentBytes.length > 0) {
                     totalPendingContentUniqueCount += pendingContentBytes.length;
+                    const tCompressStart = safePerformance.now();
+                    const storageChunks = this._createTermContentStorageChunks(pendingContentBytes, compressionDictName);
+                    compressContentMs += safePerformance.now() - tCompressStart;
                     const tAppendStart = safePerformance.now();
-                    const spans = await this._termContentStore.appendBatch(pendingContentBytes);
-                    for (const chunk of pendingContentBytes) {
+                    const spans = await this._termContentStore.appendBatch(storageChunks.storedChunks);
+                    for (const chunk of storageChunks.storedChunks) {
                         appendedContentBytes += chunk.byteLength;
                     }
                     appendContentMs += safePerformance.now() - tAppendStart;
@@ -2075,22 +2087,22 @@ export class DictionaryDatabase {
                     for (let i = 0, ii = stagedRows.length; i < ii; ++i) {
                         const pendingIndex = stagedPendingContentIndexes[i];
                         if (pendingIndex < 0) { continue; }
-                        const span = spans[pendingIndex];
+                        const span = spans[storageChunks.entryToStoredChunkIndexes[pendingIndex]];
                         if (typeof span === 'undefined') {
                             throw new Error('Failed to resolve staged term entry content span for bulk term insert');
                         }
                         stagedPendingContentIndexes[i] = -1;
                         stagedContentOffsets[i] = span.offset;
                         stagedContentLengths[i] = span.length;
-                        stagedContentDictNames[i] = pendingContentDictNames[pendingIndex] ?? 'raw';
+                        stagedContentDictNames[i] = storageChunks.contentDictNames[pendingIndex] ?? 'raw';
                     }
 
                     for (let i = 0, ii = pendingContentBytes.length; i < ii; i += contentBatchSize) {
                         const chunkCount = Math.min(contentBatchSize, ii - i);
                         const tContentSqlStart = safePerformance.now();
                         for (let j = i, jj = i + chunkCount; j < jj; ++j) {
-                            const span = spans[j];
-                            const contentDictName = pendingContentDictNames[j];
+                            const span = spans[storageChunks.entryToStoredChunkIndexes[j]];
+                            const contentDictName = storageChunks.contentDictNames[j];
                             this._cacheTermEntryContentMeta(
                                 pendingContentHashes[j],
                                 span.offset,
@@ -2151,7 +2163,6 @@ export class DictionaryDatabase {
                 pendingContentHash1s = [];
                 pendingContentHash2s = [];
                 pendingContentBytes = [];
-                pendingContentDictNames = [];
                 pendingContentRowIndexByHash = shouldDedupWithinBatch ? new Map() : null;
                 pendingContentRowIndexByHashPair = shouldDedupWithinBatch ? new Map() : null;
             };
@@ -2164,7 +2175,7 @@ export class DictionaryDatabase {
                 const precomputedHash1 = Number.isInteger(row.termEntryContentHash1) ? (/** @type {number} */ (row.termEntryContentHash1) >>> 0) : -1;
                 const precomputedHash2 = Number.isInteger(row.termEntryContentHash2) ? (/** @type {number} */ (row.termEntryContentHash2) >>> 0) : -1;
                 const hasPrecomputedHashPair = precomputedHash1 >= 0 && precomputedHash2 >= 0;
-                const precomputedBytes = row.termEntryContentBytes instanceof Uint8Array ? row.termEntryContentBytes : null;
+                const precomputedBytes = row.termEntryContentBytes instanceof Uint8Array ? row.termEntryContentBytes : this._getRawTermContentBytesIfAvailable(row);
                 let contentHash = precomputedHash;
                 let contentHash1 = precomputedHash1;
                 let contentHash2 = precomputedHash2;
@@ -2219,15 +2230,6 @@ export class DictionaryDatabase {
                 }
                 if (pendingContentIndex < 0) {
                     const tCompressStart = safePerformance.now();
-                    let contentZstd = contentBytes;
-                    let effectiveDictName = 'raw';
-                    if (contentBytes.byteLength >= this._termContentCompressionMinBytes) {
-                        const compressed = compressTermContentZstd(contentBytes, compressionDictName);
-                        if (compressed.byteLength < contentBytes.byteLength) {
-                            contentZstd = compressed;
-                            effectiveDictName = compressionDictName ?? '';
-                        }
-                    }
                     compressContentMs += safePerformance.now() - tCompressStart;
                     pendingContentIndex = pendingContentBytes.length;
                     if (pendingContentRowIndexByHash !== null && contentHash !== null) {
@@ -2244,8 +2246,7 @@ export class DictionaryDatabase {
                     pendingContentHashes.push(contentHash);
                     pendingContentHash1s.push(contentHash1);
                     pendingContentHash2s.push(contentHash2);
-                    pendingContentBytes.push(contentZstd);
-                    pendingContentDictNames.push(effectiveDictName);
+                    pendingContentBytes.push(contentBytes);
                 }
 
                 stagedRows.push(row);
@@ -2570,7 +2571,7 @@ export class DictionaryDatabase {
                 const contentLengths = new Array(chunkCount);
                 for (let j = 0; j < chunkCount; ++j) {
                     const row = /** @type {import('dictionary-database').DatabaseTermEntry} */ (items[i + j]);
-                    const precomputedContentBytes = row.termEntryContentBytes;
+                    const precomputedContentBytes = row.termEntryContentBytes instanceof Uint8Array ? row.termEntryContentBytes : this._getRawTermContentBytesIfAvailable(row);
                     if (precomputedContentBytes instanceof Uint8Array) {
                         contentChunks[j] = precomputedContentBytes;
                         continue;
@@ -2584,7 +2585,13 @@ export class DictionaryDatabase {
                 const tContentAppendStart = safePerformance.now();
                 await this._termContentStore.appendBatchToArrays(contentChunks, contentOffsets, contentLengths);
                 contentAppendMs += safePerformance.now() - tContentAppendStart;
-                const metrics = await this._termRecordStore.appendBatchFromImportTermEntriesResolvedContent(items, i, chunkCount, contentOffsets, contentLengths);
+                const contentDictName = (
+                    this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
+                    contentChunks.every((contentBytes) => isRawTermContentBinary(contentBytes))
+                ) ?
+                    RAW_TERM_CONTENT_DICT_NAME :
+                    'raw';
+                const metrics = await this._termRecordStore.appendBatchFromImportTermEntriesResolvedContent(items, i, chunkCount, contentOffsets, contentLengths, contentDictName);
                 termRecordBuildMs += metrics.buildRecordsMs;
                 termRecordEncodeMs += metrics.encodeMs;
                 termRecordWriteMs += metrics.appendWriteMs;
@@ -3724,36 +3731,63 @@ export class DictionaryDatabase {
                 }
                 if (contentBytes !== null && contentBytes.length > 0) {
                     try {
-                        const contentJson = (contentDictName === 'raw') ?
-                            this._textDecoder.decode(contentBytes) :
-                            this._textDecoder.decode(decompressTermContentZstd(contentBytes, contentDictName.length > 0 ? contentDictName : null));
-                        const parsedHeader = this._parseSerializedTermEntryContentHeader(contentJson);
-                        if (parsedHeader !== null) {
-                            definitionTags = parsedHeader.definitionTags;
-                            termTags = parsedHeader.termTags;
-                            rules = parsedHeader.rules;
-                            glossary = [];
+                        const rawContentHeader = (
+                            contentDictName === RAW_TERM_CONTENT_DICT_NAME ||
+                            isRawTermContentBinary(contentBytes)
+                        ) ?
+                            decodeRawTermContentHeader(contentBytes, this._textDecoder) :
+                            null;
+                        if (rawContentHeader !== null) {
+                            definitionTags = this._asNullableString(rawContentHeader.definitionTags) ?? null;
+                            termTags = this._asNullableString(rawContentHeader.termTags);
+                            rules = this._asString(rawContentHeader.rules);
+                            const rawGlossaryJsonBytes = getRawTermContentGlossaryJsonBytes(
+                                contentBytes,
+                                rawContentHeader.glossaryJsonOffset,
+                                rawContentHeader.glossaryJsonLength,
+                            );
+                            const glossaryJson = this._textDecoder.decode(rawGlossaryJsonBytes);
+                            glossary = this._safeParseJson(glossaryJson, []);
                             cached = {
                                 definitionTags,
                                 termTags,
                                 rules,
-                                glossaryJson: parsedHeader.glossaryJson,
+                                glossaryJson,
+                                glossary: Array.isArray(glossary) ? glossary : [],
                             };
                         } else {
-                            const content = /** @type {{rules?: string, definitionTags?: string, termTags?: string, glossary?: import('dictionary-data').TermGlossary[]}} */ (
-                                this._safeParseJson(contentJson, {})
-                            );
-                            definitionTags = this._asNullableString(content.definitionTags) ?? null;
-                            termTags = this._asNullableString(content.termTags);
-                            rules = this._asString(content.rules);
-                            glossary = Array.isArray(content.glossary) ? content.glossary : [];
-                            cached = {
-                                definitionTags,
-                                termTags,
-                                rules,
-                                glossaryJson: JSON.stringify(glossary),
-                                glossary,
-                            };
+                            const contentJson = (contentDictName === 'raw') ?
+                                this._textDecoder.decode(contentBytes) :
+                                this._textDecoder.decode(decompressTermContentZstd(contentBytes, contentDictName.length > 0 ? contentDictName : null));
+                            const parsedHeader = this._parseSerializedTermEntryContentHeader(contentJson);
+                            if (parsedHeader !== null) {
+                                definitionTags = parsedHeader.definitionTags;
+                                termTags = parsedHeader.termTags;
+                                rules = parsedHeader.rules;
+                                glossary = this._safeParseJson(parsedHeader.glossaryJson, []);
+                                cached = {
+                                    definitionTags,
+                                    termTags,
+                                    rules,
+                                    glossaryJson: parsedHeader.glossaryJson,
+                                    glossary: Array.isArray(glossary) ? glossary : [],
+                                };
+                            } else {
+                                const content = /** @type {{rules?: string, definitionTags?: string, termTags?: string, glossary?: import('dictionary-data').TermGlossary[]}} */ (
+                                    this._safeParseJson(contentJson, {})
+                                );
+                                definitionTags = this._asNullableString(content.definitionTags) ?? null;
+                                termTags = this._asNullableString(content.termTags);
+                                rules = this._asString(content.rules);
+                                glossary = Array.isArray(content.glossary) ? content.glossary : [];
+                                cached = {
+                                    definitionTags,
+                                    termTags,
+                                    rules,
+                                    glossaryJson: JSON.stringify(glossary),
+                                    glossary,
+                                };
+                            }
                         }
                     } catch (e) {
                         logTermContentZstdError(e);
@@ -3787,8 +3821,12 @@ export class DictionaryDatabase {
             definitionTags = cached.definitionTags;
             termTags = cached.termTags;
             rules = cached.rules;
-            glossary = [];
-            glossaryResolver = () => this._resolveCachedTermEntryGlossary(cached);
+            if (Array.isArray(cached.glossary)) {
+                glossary = cached.glossary;
+            } else {
+                glossary = [];
+                glossaryResolver = () => this._resolveCachedTermEntryGlossary(cached);
+            }
         } else {
             definitionTags = this._asNullableString(row.definitionTags) ?? null;
             termTags = this._asNullableString(row.termTags);
@@ -3838,7 +3876,7 @@ export class DictionaryDatabase {
 
     /**
      * @param {string} cacheKey
-     * @returns {{definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson: string, glossary?: import('dictionary-data').TermGlossary[]}|undefined}
+     * @returns {{definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson?: string, glossary?: import('dictionary-data').TermGlossary[]}|undefined}
      */
     _getCachedTermEntryContent(cacheKey) {
         const cached = this._termEntryContentCache.get(cacheKey);
@@ -3853,7 +3891,7 @@ export class DictionaryDatabase {
 
     /**
      * @param {string} cacheKey
-     * @param {{definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson: string, glossary?: import('dictionary-data').TermGlossary[]}} value
+     * @param {{definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson?: string, glossary?: import('dictionary-data').TermGlossary[]}} value
      */
     _setCachedTermEntryContent(cacheKey, value) {
         if (this._termEntryContentCache.has(cacheKey)) {
@@ -3884,14 +3922,14 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {{glossaryJson: string, glossary?: import('dictionary-data').TermGlossary[]}} cached
+     * @param {{glossaryJson?: string, glossary?: import('dictionary-data').TermGlossary[], definitionTags: string|null, termTags: string|undefined, rules: string}} cached
      * @returns {import('dictionary-data').TermGlossary[]}
      */
     _resolveCachedTermEntryGlossary(cached) {
         if (Array.isArray(cached.glossary)) {
             return cached.glossary;
         }
-        const parsedGlossary = this._safeParseJson(cached.glossaryJson, []);
+        const parsedGlossary = this._safeParseJson(typeof cached.glossaryJson === 'string' ? cached.glossaryJson : '[]', []);
         cached.glossary = Array.isArray(parsedGlossary) ? parsedGlossary : [];
         return cached.glossary;
     }
@@ -4269,6 +4307,24 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {import('dictionary-database').DatabaseTermEntry} row
+     * @returns {Uint8Array|null}
+     */
+    _getRawTermContentBytesIfAvailable(row) {
+        const glossaryJsonBytes = row.termEntryContentRawGlossaryJsonBytes;
+        if (!(glossaryJsonBytes instanceof Uint8Array) || glossaryJsonBytes.byteLength === 0) {
+            return null;
+        }
+        const rules = row.rules ?? '';
+        const definitionTags = row.definitionTags ?? row.tags ?? '';
+        const termTags = row.termTags ?? '';
+        const contentBytes = encodeRawTermContentBinary(rules, definitionTags, termTags, glossaryJsonBytes, this._textEncoder);
+        row.termEntryContentBytes = contentBytes;
+        row.termEntryContentRawGlossaryJsonBytes = void 0;
+        return contentBytes;
+    }
+
+    /**
      * @param {string} contentJson
      * @returns {string}
      */
@@ -4286,6 +4342,45 @@ export class DictionaryDatabase {
             h1 = 1;
         }
         return `${(h1 >>> 0).toString(16).padStart(8, '0')}${(h2 >>> 0).toString(16).padStart(8, '0')}`;
+    }
+
+    /**
+     * @param {Uint8Array[]} contentBytesList
+     * @param {string|null} compressionDictName
+     * @returns {{storedChunks: Uint8Array[], contentDictNames: string[], entryToStoredChunkIndexes: number[]}}
+     */
+    _createTermContentStorageChunks(contentBytesList, compressionDictName) {
+        if (this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) {
+            return {
+                storedChunks: contentBytesList,
+                contentDictNames: contentBytesList.map((contentBytes) => (
+                    isRawTermContentBinary(contentBytes) ? RAW_TERM_CONTENT_DICT_NAME : 'raw'
+                )),
+                entryToStoredChunkIndexes: contentBytesList.map((_, index) => index),
+            };
+        }
+        /** @type {Uint8Array[]} */
+        const storedChunks = [];
+        /** @type {string[]} */
+        const contentDictNames = [];
+        for (const contentBytes of contentBytesList) {
+            let storedBytes = contentBytes;
+            let effectiveDictName = 'raw';
+            if (contentBytes.byteLength >= this._termContentCompressionMinBytes) {
+                const compressed = compressTermContentZstd(contentBytes, compressionDictName);
+                if (compressed.byteLength < contentBytes.byteLength) {
+                    storedBytes = compressed;
+                    effectiveDictName = compressionDictName ?? '';
+                }
+            }
+            storedChunks.push(storedBytes);
+            contentDictNames.push(effectiveDictName);
+        }
+        return {
+            storedChunks,
+            contentDictNames,
+            entryToStoredChunkIndexes: storedChunks.map((_, index) => index),
+        };
     }
 
     /**

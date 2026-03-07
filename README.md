@@ -85,6 +85,7 @@ Install from the latest GitHub release page:
 - [ ] Deletion
 - [ ] Lookups
 - [ ] 64KB chunking of glossaries for compression
+- [ ] Add the ManabiDictionaries custom zstd dictionaries
 
 ## Contributing
 
