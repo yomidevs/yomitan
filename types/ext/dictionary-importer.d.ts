@@ -66,6 +66,7 @@ export type ImportDetails = {
     termContentCompressionMinBytes?: number;
     rawTermContentPackInputSlabs?: boolean;
     rawTermContentPackTargetBytes?: number;
+    rawTermContentShareGlossaryBytes?: boolean;
 };
 
 export type Summary = {

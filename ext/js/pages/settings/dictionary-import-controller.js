@@ -1258,6 +1258,7 @@ export class DictionaryImportController {
                 termContentCompressionMinBytes,
                 rawTermContentPackInputSlabs,
                 rawTermContentPackTargetBytes,
+                rawTermContentShareGlossaryBytes,
             } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
@@ -1271,6 +1272,7 @@ export class DictionaryImportController {
                 termContentCompressionMinBytes,
                 rawTermContentPackInputSlabs,
                 rawTermContentPackTargetBytes,
+                rawTermContentShareGlossaryBytes,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -1381,7 +1383,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes', termContentCompressionMinBytes: number, rawTermContentPackInputSlabs: boolean, rawTermContentPackTargetBytes: number}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes', termContentCompressionMinBytes: number, rawTermContentPackInputSlabs: boolean, rawTermContentPackTargetBytes: number, rawTermContentShareGlossaryBytes: boolean}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1396,6 +1398,7 @@ export class DictionaryImportController {
                 termContentCompressionMinBytes: 1048576,
                 rawTermContentPackInputSlabs: false,
                 rawTermContentPackTargetBytes: 4 * 1024 * 1024,
+                rawTermContentShareGlossaryBytes: false,
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
@@ -1428,6 +1431,7 @@ export class DictionaryImportController {
             termContentCompressionMinBytes,
             rawTermContentPackInputSlabs: flagsRecord.rawTermContentPackInputSlabs === true,
             rawTermContentPackTargetBytes,
+            rawTermContentShareGlossaryBytes: flagsRecord.rawTermContentShareGlossaryBytes === true,
         };
     }
 

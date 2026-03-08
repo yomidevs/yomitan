@@ -17,8 +17,12 @@
 
 const RAW_TERM_CONTENT_MAGIC = new Uint8Array([0x4d, 0x42, 0x52, 0x31]);
 const RAW_TERM_CONTENT_HEADER_BYTES = 20;
+const RAW_TERM_CONTENT_SHARED_GLOSSARY_MAGIC = new Uint8Array([0x4d, 0x42, 0x52, 0x32]);
+const RAW_TERM_CONTENT_SHARED_GLOSSARY_HEADER_BYTES = 28;
 
 export const RAW_TERM_CONTENT_DICT_NAME = 'raw-v2';
+
+export const RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME = 'raw-v3';
 
 /**
  * @param {Uint8Array} bytes
@@ -73,6 +77,20 @@ export function isRawTermContentBinary(bytes) {
 }
 
 /**
+ * @param {Uint8Array} bytes
+ * @returns {boolean}
+ */
+export function isRawTermContentSharedGlossaryBinary(bytes) {
+    return (
+        bytes.byteLength >= RAW_TERM_CONTENT_SHARED_GLOSSARY_HEADER_BYTES &&
+        bytes[0] === RAW_TERM_CONTENT_SHARED_GLOSSARY_MAGIC[0] &&
+        bytes[1] === RAW_TERM_CONTENT_SHARED_GLOSSARY_MAGIC[1] &&
+        bytes[2] === RAW_TERM_CONTENT_SHARED_GLOSSARY_MAGIC[2] &&
+        bytes[3] === RAW_TERM_CONTENT_SHARED_GLOSSARY_MAGIC[3]
+    );
+}
+
+/**
  * @param {string} rules
  * @param {string} definitionTags
  * @param {string} termTags
@@ -107,6 +125,89 @@ export function encodeRawTermContentBinary(rules, definitionTags, termTags, glos
     offset += termTagsBytes.byteLength;
     bytes.set(glossaryJsonBytes, offset);
     return bytes;
+}
+
+/**
+ * @param {string} rules
+ * @param {string} definitionTags
+ * @param {string} termTags
+ * @param {number} glossaryOffset
+ * @param {number} glossaryLength
+ * @param {TextEncoder} textEncoder
+ * @returns {Uint8Array}
+ */
+export function encodeRawTermContentSharedGlossaryBinary(rules, definitionTags, termTags, glossaryOffset, glossaryLength, textEncoder) {
+    const rulesBytes = textEncoder.encode(rules);
+    const definitionTagsBytes = textEncoder.encode(definitionTags);
+    const termTagsBytes = textEncoder.encode(termTags);
+    const totalBytes = (
+        RAW_TERM_CONTENT_SHARED_GLOSSARY_HEADER_BYTES +
+        rulesBytes.byteLength +
+        definitionTagsBytes.byteLength +
+        termTagsBytes.byteLength
+    );
+    const bytes = new Uint8Array(totalBytes);
+    bytes.set(RAW_TERM_CONTENT_SHARED_GLOSSARY_MAGIC, 0);
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    view.setUint32(4, rulesBytes.byteLength, true);
+    view.setUint32(8, definitionTagsBytes.byteLength, true);
+    view.setUint32(12, termTagsBytes.byteLength, true);
+    view.setBigUint64(16, BigInt(glossaryOffset), true);
+    view.setUint32(24, glossaryLength, true);
+    let offset = RAW_TERM_CONTENT_SHARED_GLOSSARY_HEADER_BYTES;
+    bytes.set(rulesBytes, offset);
+    offset += rulesBytes.byteLength;
+    bytes.set(definitionTagsBytes, offset);
+    offset += definitionTagsBytes.byteLength;
+    bytes.set(termTagsBytes, offset);
+    return bytes;
+}
+
+/**
+ * @param {Uint8Array} bytes
+ * @param {number} baseOffset
+ * @returns {Uint8Array}
+ */
+export function rebaseRawTermContentSharedGlossaryBinary(bytes, baseOffset) {
+    if (!isRawTermContentSharedGlossaryBinary(bytes) || baseOffset === 0) {
+        return bytes;
+    }
+    const header = decodeRawTermContentSharedGlossaryHeader(bytes, new TextDecoder());
+    if (header === null) {
+        return bytes;
+    }
+    const rebasedBytes = Uint8Array.from(bytes);
+    const view = new DataView(rebasedBytes.buffer, rebasedBytes.byteOffset, rebasedBytes.byteLength);
+    view.setBigUint64(16, BigInt(header.glossaryOffset + baseOffset), true);
+    return rebasedBytes;
+}
+
+/**
+ * @param {Uint8Array} bytes
+ * @param {TextDecoder} textDecoder
+ * @returns {{rules: string, definitionTags: string, termTags: string, glossaryOffset: number, glossaryLength: number}|null}
+ */
+export function decodeRawTermContentSharedGlossaryHeader(bytes, textDecoder) {
+    if (!isRawTermContentSharedGlossaryBinary(bytes)) {
+        return null;
+    }
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const rulesLength = view.getUint32(4, true);
+    const definitionTagsLength = view.getUint32(8, true);
+    const termTagsLength = view.getUint32(12, true);
+    const glossaryOffset = Number(view.getBigUint64(16, true));
+    const glossaryLength = view.getUint32(24, true);
+    const totalLength = RAW_TERM_CONTENT_SHARED_GLOSSARY_HEADER_BYTES + rulesLength + definitionTagsLength + termTagsLength;
+    if (totalLength !== bytes.byteLength) {
+        return null;
+    }
+    let offset = RAW_TERM_CONTENT_SHARED_GLOSSARY_HEADER_BYTES;
+    const rules = textDecoder.decode(bytes.subarray(offset, offset + rulesLength));
+    offset += rulesLength;
+    const definitionTags = textDecoder.decode(bytes.subarray(offset, offset + definitionTagsLength));
+    offset += definitionTagsLength;
+    const termTags = textDecoder.decode(bytes.subarray(offset, offset + termTagsLength));
+    return {rules, definitionTags, termTags, glossaryOffset, glossaryLength};
 }
 
 /**

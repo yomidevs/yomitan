@@ -28,7 +28,12 @@ import {parseJson} from '../core/json.js';
 import {toError} from '../core/to-error.js';
 import {stringReverse} from '../core/utilities.js';
 import {getFileExtensionFromImageMediaType, getImageMediaTypeFromFileName} from '../media/media-util.js';
-import {decodeRawTermContentBinary, encodeRawTermContentBinary} from './raw-term-content.js';
+import {
+    decodeRawTermContentBinary,
+    encodeRawTermContentBinary,
+    isRawTermContentSharedGlossaryBinary,
+    rebaseRawTermContentSharedGlossaryBinary,
+} from './raw-term-content.js';
 import {compareRevisions} from './dictionary-data-util.js';
 import {consumeLastTermBankWasmParseProfile, parseTermBankWithWasmChunks} from './term-bank-wasm-parser.js';
 
@@ -55,6 +60,7 @@ const TERM_BANK_ARTIFACT_MAGIC = 'MBTB0001';
 const TERM_BANK_ARTIFACT_MAGIC_BYTES = TERM_BANK_ARTIFACT_MAGIC.length;
 const TERM_BANK_ARTIFACT_MANIFEST_FILE = 'manabitan-import-artifact.json';
 const TERM_BANK_PACKED_ARTIFACT_FILE = 'manabitan-term-banks-packed.bin';
+const TERM_BANK_SHARED_GLOSSARY_ARTIFACT_FILE = 'manabitan-term-glossary-shared.bin';
 const TERM_ARTIFACT_PRELOAD_CONCURRENCY = 4;
 const HEX_BYTE_TABLE = Array.from({length: 256}, (_, i) => i.toString(16).padStart(2, '0'));
 /** @type {import('dictionary-data').TermGlossary[]} */
@@ -314,11 +320,12 @@ export class DictionaryImporter {
             termContentCompressionMinBytes,
             rawTermContentPackInputSlabs: details.rawTermContentPackInputSlabs === true,
             rawTermContentPackTargetBytes,
+            rawTermContentShareGlossaryBytes: details.rawTermContentShareGlossaryBytes === true,
         });
         const tImportStart = Date.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
         const phaseTimings = [];
-        /** @type {{termParseMs: number, termSerializationMs: number, bulkAddTermsMs: number, bulkAddTagsMetaMs: number, mediaResolveMs: number, mediaWriteMs: number}} */
+        /** @type {{termParseMs: number, termSerializationMs: number, bulkAddTermsMs: number, bulkAddTagsMetaMs: number, mediaResolveMs: number, mediaWriteMs: number, sharedGlossaryEntryCount: number, sharedGlossaryUniqueCount: number, sharedGlossaryReusedCount: number, sharedGlossaryUniqueBytes: number, sharedGlossaryLogicalBytes: number, sharedGlossaryMetadataBytes: number}} */
         const step4TimingBreakdown = {
             termParseMs: 0,
             termSerializationMs: 0,
@@ -326,6 +333,12 @@ export class DictionaryImporter {
             bulkAddTagsMetaMs: 0,
             mediaResolveMs: 0,
             mediaWriteMs: 0,
+            sharedGlossaryEntryCount: 0,
+            sharedGlossaryUniqueCount: 0,
+            sharedGlossaryReusedCount: 0,
+            sharedGlossaryUniqueBytes: 0,
+            sharedGlossaryLogicalBytes: 0,
+            sharedGlossaryMetadataBytes: 0,
         };
         /** @type {{parserProfile?: Record<string, string|number|boolean|null>|null, materializationMs?: number, chunkSinkMs?: number, chunkCount?: number, totalRows?: number}|null} */
         let lastFastTermBankReadProfile = null;
@@ -450,8 +463,16 @@ export class DictionaryImporter {
         ) ?
             fileMap.get(termArtifactManifest.packedFileName) :
             fileMap.get(TERM_BANK_PACKED_ARTIFACT_FILE);
+        const sharedGlossaryArtifactEntry = (
+            termArtifactManifest !== null &&
+            typeof termArtifactManifest.sharedGlossaryFileName === 'string'
+        ) ?
+            fileMap.get(termArtifactManifest.sharedGlossaryFileName) :
+            fileMap.get(TERM_BANK_SHARED_GLOSSARY_ARTIFACT_FILE);
         /** @type {Uint8Array|null} */
         let packedTermArtifactBytes = null;
+        /** @type {Uint8Array|null} */
+        let sharedGlossaryArtifactBytes = null;
         /** @type {Map<string, Uint8Array>|null} */
         let preloadedTermArtifactBytes = null;
         if (useTermArtifactFiles || typeof packedTermArtifactEntry !== 'undefined') {
@@ -464,6 +485,11 @@ export class DictionaryImporter {
                 preloadedTermArtifactBytes = await this._preloadTermArtifactFiles(termArtifactFiles);
                 this._logImport(`term artifact preload ${Date.now() - tPreloadArtifactStart}ms files=${preloadedTermArtifactBytes.size}`);
             }
+        }
+        if (typeof sharedGlossaryArtifactEntry !== 'undefined') {
+            const tSharedGlossaryReadStart = Date.now();
+            sharedGlossaryArtifactBytes = await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (sharedGlossaryArtifactEntry), new Uint8ArrayWriter());
+            this._logImport(`shared glossary artifact preload ${Date.now() - tSharedGlossaryReadStart}ms bytes=${sharedGlossaryArtifactBytes.byteLength}`);
         }
         const usePackedTermArtifact = (
             packedTermArtifactBytes !== null &&
@@ -510,6 +536,11 @@ export class DictionaryImporter {
         const dictionarySummaryPrimaryKey = await dictionaryDatabase.addWithResult('dictionaries', summary);
         let styles = '';
         let importFailed = false;
+        let sharedGlossaryArtifactBaseOffset = 0;
+        if (sharedGlossaryArtifactBytes instanceof Uint8Array && sharedGlossaryArtifactBytes.byteLength > 0) {
+            const sharedGlossarySpan = await dictionaryDatabase.appendRawSharedGlossaryArtifact(sharedGlossaryArtifactBytes);
+            sharedGlossaryArtifactBaseOffset = sharedGlossarySpan.offset;
+        }
         const tImportBanksStart = Date.now();
 
         try {
@@ -554,7 +585,7 @@ export class DictionaryImporter {
              * @param {import('dictionary-importer').ImportRequirement[]|null} requirements
              * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}|null} streamedProgress
              * @param {number} streamedProgressStartIndex
-             * @returns {Promise<{mediaResolveMs: number, mediaWriteMs: number, serializationMs: number, bulkAddTermsMs: number, contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number}>}
+             * @returns {Promise<{mediaResolveMs: number, mediaWriteMs: number, serializationMs: number, bulkAddTermsMs: number, contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number, sharedGlossaryEntryCount: number, sharedGlossaryUniqueCount: number, sharedGlossaryReusedCount: number, sharedGlossaryUniqueBytes: number, sharedGlossaryLogicalBytes: number, sharedGlossaryMetadataBytes: number}>}
              */
             const processTermChunk = async (termFile, termList, requirements, streamedProgress = null, streamedProgressStartIndex = 0) => {
                 const trackProgress = streamedProgress === null;
@@ -567,6 +598,12 @@ export class DictionaryImporter {
                 let termRecordEncodeMs = 0;
                 let termRecordWriteMs = 0;
                 let termsVtabInsertMs = 0;
+                let sharedGlossaryEntryCount = 0;
+                let sharedGlossaryUniqueCount = 0;
+                let sharedGlossaryReusedCount = 0;
+                let sharedGlossaryUniqueBytes = 0;
+                let sharedGlossaryLogicalBytes = 0;
+                let sharedGlossaryMetadataBytes = 0;
                 if (useMediaPipeline && requirements !== null && uniqueMediaPaths !== null) {
                     /** @type {import('dictionary-importer').ImportRequirement[]} */
                     const alreadyAddedRequirements = [];
@@ -641,9 +678,21 @@ export class DictionaryImporter {
                         termRecordEncodeMs,
                         termRecordWriteMs,
                         termsVtabInsertMs,
+                        sharedGlossaryEntryCount = 0,
+                        sharedGlossaryUniqueCount = 0,
+                        sharedGlossaryReusedCount = 0,
+                        sharedGlossaryUniqueBytes = 0,
+                        sharedGlossaryLogicalBytes = 0,
+                        sharedGlossaryMetadataBytes = 0,
                     } = bulkAddTermsMetrics);
                 }
                 step4TimingBreakdown.bulkAddTermsMs += bulkAddTermsMs;
+                step4TimingBreakdown.sharedGlossaryEntryCount += sharedGlossaryEntryCount;
+                step4TimingBreakdown.sharedGlossaryUniqueCount += sharedGlossaryUniqueCount;
+                step4TimingBreakdown.sharedGlossaryReusedCount += sharedGlossaryReusedCount;
+                step4TimingBreakdown.sharedGlossaryUniqueBytes += sharedGlossaryUniqueBytes;
+                step4TimingBreakdown.sharedGlossaryLogicalBytes += sharedGlossaryLogicalBytes;
+                step4TimingBreakdown.sharedGlossaryMetadataBytes += sharedGlossaryMetadataBytes;
                 counts.terms.total += termList.length;
                 this._logImport(`term file ${termFile.filename}: terms write rows=${termList.length} elapsed=${tTermsWriteEnd - tTermsWriteStart}ms`);
 
@@ -662,6 +711,12 @@ export class DictionaryImporter {
                     termRecordEncodeMs,
                     termRecordWriteMs,
                     termsVtabInsertMs,
+                    sharedGlossaryEntryCount,
+                    sharedGlossaryUniqueCount,
+                    sharedGlossaryReusedCount,
+                    sharedGlossaryUniqueBytes,
+                    sharedGlossaryLogicalBytes,
+                    sharedGlossaryMetadataBytes,
                 };
             };
             for (let termFileIndex = 0; termFileIndex < activeTermFiles.length; ++termFileIndex) {
@@ -714,13 +769,13 @@ export class DictionaryImporter {
                                 packedTermBankMeta.packedOffset,
                                 packedTermBankMeta.packedOffset + packedTermBankMeta.packedLength,
                             );
-                            await this._decodeTermBankArtifactBytes(packedSlice, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onArtifactChunk, 0);
+                            await this._decodeTermBankArtifactBytes(packedSlice, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onArtifactChunk, 0, sharedGlossaryArtifactBaseOffset);
                         } else if (preloadedTermArtifactBytes !== null) {
                             const preloadedBytes = preloadedTermArtifactBytes.get(termFile.filename);
                             if (typeof preloadedBytes === 'undefined') {
                                 throw new Error(`Missing preloaded term artifact bytes for '${termFile.filename}'`);
                             }
-                            await this._decodeTermBankArtifactBytes(preloadedBytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onArtifactChunk, 0);
+                            await this._decodeTermBankArtifactBytes(preloadedBytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onArtifactChunk, 0, sharedGlossaryArtifactBaseOffset);
                         } else {
                             if (typeof termArtifactFileEntry === 'undefined') {
                                 throw new Error(`Missing zip entry for term artifact '${termFile.filename}'`);
@@ -731,6 +786,7 @@ export class DictionaryImporter {
                                 prefixWildcardsSupported,
                                 termContentStorageMode,
                                 onArtifactChunk,
+                                sharedGlossaryArtifactBaseOffset,
                             );
                         }
                         const totalArtifactReadMs = Math.max(0, Date.now() - tArtifactParseStart);
@@ -744,13 +800,13 @@ export class DictionaryImporter {
                                 packedTermBankMeta.packedOffset,
                                 packedTermBankMeta.packedOffset + packedTermBankMeta.packedLength,
                             );
-                            termReadResult = await this._decodeTermBankArtifactBytes(packedSlice, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, void 0, 0);
+                            termReadResult = await this._decodeTermBankArtifactBytes(packedSlice, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, void 0, 0, sharedGlossaryArtifactBaseOffset);
                         } else if (preloadedTermArtifactBytes !== null) {
                             const preloadedBytes = preloadedTermArtifactBytes.get(termFile.filename);
                             if (typeof preloadedBytes === 'undefined') {
                                 throw new Error(`Missing preloaded term artifact bytes for '${termFile.filename}'`);
                             }
-                            termReadResult = await this._decodeTermBankArtifactBytes(preloadedBytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, void 0, 0);
+                            termReadResult = await this._decodeTermBankArtifactBytes(preloadedBytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, void 0, 0, sharedGlossaryArtifactBaseOffset);
                         } else {
                             if (typeof termArtifactFileEntry === 'undefined') {
                                 throw new Error(`Missing zip entry for term artifact '${termFile.filename}'`);
@@ -760,6 +816,8 @@ export class DictionaryImporter {
                                 dictionaryTitle,
                                 prefixWildcardsSupported,
                                 termContentStorageMode,
+                                void 0,
+                                sharedGlossaryArtifactBaseOffset,
                             );
                         }
                         lastArtifactTermBankReadProfile = this._lastArtifactTermBankReadProfile ?? null;
@@ -973,6 +1031,12 @@ export class DictionaryImporter {
                 step4OtherMs: Math.max(0, importDataBanksElapsedMs - step4AccountedMs),
                 useMediaPipeline,
                 hasArchiveImageMediaFiles,
+                sharedGlossaryEntryCount: step4TimingBreakdown.sharedGlossaryEntryCount,
+                sharedGlossaryUniqueCount: step4TimingBreakdown.sharedGlossaryUniqueCount,
+                sharedGlossaryReusedCount: step4TimingBreakdown.sharedGlossaryReusedCount,
+                sharedGlossaryUniqueBytes: step4TimingBreakdown.sharedGlossaryUniqueBytes,
+                sharedGlossaryLogicalBytes: step4TimingBreakdown.sharedGlossaryLogicalBytes,
+                sharedGlossaryMetadataBytes: step4TimingBreakdown.sharedGlossaryMetadataBytes,
             });
 
             // Finalize dictionary descriptor
@@ -1912,7 +1976,7 @@ export class DictionaryImporter {
 
     /**
      * @param {import('dictionary-importer').ArchiveFileMap} fileMap
-     * @returns {Promise<{termBanksByArtifact: Map<string, {packedOffset: number, packedLength: number, rows: number|null}>, packedFileName: string|null}|null>}
+     * @returns {Promise<{termBanksByArtifact: Map<string, {packedOffset: number, packedLength: number, rows: number|null}>, packedFileName: string|null, sharedGlossaryFileName: string|null}|null>}
      */
     async _readTermArtifactManifest(fileMap) {
         const manifestEntry = fileMap.get(TERM_BANK_ARTIFACT_MANIFEST_FILE);
@@ -1921,7 +1985,7 @@ export class DictionaryImporter {
         }
         let manifest;
         try {
-            manifest = /** @type {{termBanks?: Array<{artifact?: unknown, packedOffset?: unknown, packedLength?: unknown, rows?: unknown}>, packedTermArtifact?: {file?: unknown}|null}|null} */ (
+            manifest = /** @type {{termBanks?: Array<{artifact?: unknown, packedOffset?: unknown, packedLength?: unknown, rows?: unknown}>, packedTermArtifact?: {file?: unknown}|null, sharedGlossaryArtifact?: {file?: unknown}|null}|null} */ (
                 parseJson(await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (manifestEntry), new TextWriter()))
             );
         } catch (_) {
@@ -1949,7 +2013,14 @@ export class DictionaryImporter {
         ) ?
             manifest.packedTermArtifact.file :
             null;
-        return {termBanksByArtifact, packedFileName};
+        const sharedGlossaryFileName = (
+            typeof manifest.sharedGlossaryArtifact === 'object' &&
+            manifest.sharedGlossaryArtifact !== null &&
+            typeof manifest.sharedGlossaryArtifact.file === 'string'
+        ) ?
+            manifest.sharedGlossaryArtifact.file :
+            null;
+        return {termBanksByArtifact, packedFileName, sharedGlossaryFileName};
     }
 
     /**
@@ -2353,14 +2424,15 @@ export class DictionaryImporter {
      * @param {boolean} prefixWildcardsSupported
      * @param {'baseline'|'raw-bytes'} termContentStorageMode
      * @param {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} [onChunk]
+     * @param {number} [sharedGlossaryBaseOffset]
      * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
      */
-    async _readTermBankArtifactFile(termFile, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onChunk = void 0) {
+    async _readTermBankArtifactFile(termFile, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onChunk = void 0, sharedGlossaryBaseOffset = 0) {
         this._lastArtifactTermBankReadProfile = null;
         const tReadBytesStart = Date.now();
         const bytes = await this._getData(termFile, new Uint8ArrayWriter());
         const readBytesMs = Math.max(0, Date.now() - tReadBytesStart);
-        return await this._decodeTermBankArtifactBytes(bytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onChunk, readBytesMs);
+        return await this._decodeTermBankArtifactBytes(bytes, termFile.filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onChunk, readBytesMs, sharedGlossaryBaseOffset);
     }
 
     /**
@@ -2371,9 +2443,10 @@ export class DictionaryImporter {
      * @param {'baseline'|'raw-bytes'} termContentStorageMode
      * @param {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} [onChunk]
      * @param {number} readBytesMs
+     * @param {number} [sharedGlossaryBaseOffset]
      * @returns {Promise<{termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null}>}
      */
-    async _decodeTermBankArtifactBytes(bytes, filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onChunk = void 0, readBytesMs = 0) {
+    async _decodeTermBankArtifactBytes(bytes, filename, dictionaryTitle, prefixWildcardsSupported, termContentStorageMode, onChunk = void 0, readBytesMs = 0, sharedGlossaryBaseOffset = 0) {
         const textDecoder = this._textDecoder;
         if (bytes.byteLength < (TERM_BANK_ARTIFACT_MAGIC_BYTES + 4)) {
             throw new Error(`Invalid term artifact payload in '${filename}': too small`);
@@ -2450,6 +2523,10 @@ export class DictionaryImporter {
                     this._reverseString(reading);
                 reverseRowsMs += Math.max(0, Date.now() - tReverseStart);
             }
+            let contentBytes = bytes.subarray(contentStart, contentEnd);
+            if (sharedGlossaryBaseOffset > 0 && isRawTermContentSharedGlossaryBinary(contentBytes)) {
+                contentBytes = rebaseRawTermContentSharedGlossaryBinary(contentBytes, sharedGlossaryBaseOffset);
+            }
             /** @type {import('dictionary-database').DatabaseTermEntry} */
             const entry = {
                 expression,
@@ -2463,7 +2540,7 @@ export class DictionaryImporter {
                 dictionary: dictionaryTitle,
                 termEntryContentHash1: hash1,
                 termEntryContentHash2: hash2,
-                termEntryContentBytes: bytes.subarray(contentStart, contentEnd),
+                termEntryContentBytes: contentBytes,
                 sequence,
             };
             this._normalizeArtifactTermEntryContent(entry, termContentStorageMode);
@@ -2524,7 +2601,10 @@ export class DictionaryImporter {
         if (!(termEntryContentBytes instanceof Uint8Array) || termEntryContentBytes.byteLength === 0) {
             return;
         }
-        if (decodeRawTermContentBinary(termEntryContentBytes, this._textDecoder) !== null) {
+        if (
+            decodeRawTermContentBinary(termEntryContentBytes, this._textDecoder) !== null ||
+            isRawTermContentSharedGlossaryBinary(termEntryContentBytes)
+        ) {
             return;
         }
         const parsedContent = decodeRawTermContentBinary(termEntryContentBytes, this._textDecoder) ?? (() => {

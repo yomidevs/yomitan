@@ -784,6 +784,44 @@ describe('Database', () => {
             }
         });
 
+        test('Imports raw-v2 term artifact files with shared glossary storage and preserves lookup/counts', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArtifactArchiveData('valid-dictionary1', 'Artifact Shared Glossary Dictionary', 'raw-v2');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {
+                        prefixWildcardsSupported: true,
+                        yomitanVersion: '0.0.0.0',
+                        termContentStorageMode: 'raw-bytes',
+                        rawTermContentShareGlossaryBytes: true,
+                    },
+                );
+                expect.soft(errors).toStrictEqual([]);
+                expect.soft(result).not.toBeNull();
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info.length).toBe(1);
+                expect.soft(info[0]?.title).toBe('Artifact Shared Glossary Dictionary');
+                expect.soft(info[0]?.importSuccess).toBe(true);
+
+                const counts = await dictionaryDatabase.getDictionaryCounts(['Artifact Shared Glossary Dictionary'], true);
+                expect.soft(counts.total.terms).toBeGreaterThan(0);
+
+                const titles = new Map([
+                    ['Artifact Shared Glossary Dictionary', {alias: 'Artifact Shared Glossary Dictionary', allowSecondarySearches: false}],
+                ]);
+                const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
+                expect.soft(results.length).toBeGreaterThan(0);
+                expect.soft(results.some((entry) => entry.dictionary === 'Artifact Shared Glossary Dictionary')).toBe(true);
+            } finally {
+                await dictionaryDatabase.close();
+            }
+        });
+
         test('Import data and test', async ({expect}) => {
             const fakeImportDate = testData.expectedSummary.importDate;
 
