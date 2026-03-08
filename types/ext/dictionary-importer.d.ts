@@ -63,6 +63,7 @@ export type ImportDetails = {
     debugImportLogging?: boolean;
     enableTermEntryContentDedup?: boolean;
     termContentStorageMode?: 'baseline' | 'raw-bytes';
+    termContentCompressionMinBytes?: number;
 };
 
 export type Summary = {

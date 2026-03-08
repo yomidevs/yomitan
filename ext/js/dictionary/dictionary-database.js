@@ -481,7 +481,7 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {{termContentStorageMode?: 'baseline'|'raw-bytes'}} [options]
+     * @param {{termContentStorageMode?: 'baseline'|'raw-bytes', termContentCompressionMinBytes?: number}} [options]
      */
     setImportOptimizationFlags(options = {}) {
         this._adaptiveTermBulkAddBatchSize = true;
@@ -492,6 +492,12 @@ export class DictionaryDatabase {
         this._termContentStorageMode = (options.termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) ?
             options.termContentStorageMode :
             TERM_CONTENT_STORAGE_MODE_BASELINE;
+        this._termContentCompressionMinBytes = (
+            typeof options.termContentCompressionMinBytes === 'number' &&
+            Number.isFinite(options.termContentCompressionMinBytes)
+        ) ?
+            Math.max(0, Math.trunc(options.termContentCompressionMinBytes)) :
+            1048576;
         this._termContentStore.setImportStorageMode(this._termContentStorageMode);
     }
 
