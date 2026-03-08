@@ -76,8 +76,10 @@ export class TermContentOpfsStore {
         this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
         /** @type {number} */
         this._writeCoalesceMaxChunks = this._computeWriteCoalesceMaxChunks();
-        /** @type {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number}|null} */
+        /** @type {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number, drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}|null} */
         this._lastEndImportSessionMetrics = null;
+        /** @type {{drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}} */
+        this._writeDrainMetrics = this._createEmptyWriteDrainMetrics();
         /** @type {'baseline'|'raw-bytes'} */
         this._importStorageMode = 'baseline';
     }
@@ -104,6 +106,7 @@ export class TermContentOpfsStore {
         this._queuedWriteChunks = [];
         this._importSessionActive = false;
         this._lastEndImportSessionMetrics = null;
+        this._writeDrainMetrics = this._createEmptyWriteDrainMetrics();
     }
 
     /**
@@ -123,6 +126,7 @@ export class TermContentOpfsStore {
         this._queuedWritePromise = null;
         this._queuedWriteChunks = [];
         this._lastEndImportSessionMetrics = null;
+        this._writeDrainMetrics = this._createEmptyWriteDrainMetrics();
         if (this._fileHandle === null) {
             return;
         }
@@ -153,11 +157,12 @@ export class TermContentOpfsStore {
             awaitQueuedWritesMs,
             closeWritableMs,
             totalMs: safePerformance.now() - tStart,
+            ...this._writeDrainMetrics,
         };
     }
 
     /**
-     * @returns {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number}|null}
+     * @returns {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number, drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}|null}
      */
     getLastEndImportSessionMetrics() {
         return this._lastEndImportSessionMetrics;
@@ -171,6 +176,7 @@ export class TermContentOpfsStore {
         this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
         this._writeCoalesceMaxChunks = this._computeWriteCoalesceMaxChunks();
         this._flushThresholdBytes = this._computeWriteFlushThresholdBytes();
+        this._writeDrainMetrics = this._createEmptyWriteDrainMetrics();
     }
 
     /**
@@ -200,6 +206,7 @@ export class TermContentOpfsStore {
             this._queuedWriteChunks = [];
             this._importSessionActive = false;
             this._lastEndImportSessionMetrics = null;
+            this._writeDrainMetrics = this._createEmptyWriteDrainMetrics();
             this._invalidateReadState();
             return;
         }
@@ -217,6 +224,7 @@ export class TermContentOpfsStore {
         this._queuedWriteChunks = [];
         this._importSessionActive = false;
         this._lastEndImportSessionMetrics = null;
+        this._writeDrainMetrics = this._createEmptyWriteDrainMetrics();
     }
 
     /**
@@ -395,6 +403,7 @@ export class TermContentOpfsStore {
      */
     async _drainQueuedWrites() {
         try {
+            ++this._writeDrainMetrics.drainCycleCount;
             while (this._queuedWriteChunks.length > 0) {
                 const chunks = this._queuedWriteChunks;
                 this._queuedWriteChunks = [];
@@ -417,18 +426,37 @@ export class TermContentOpfsStore {
         /** @type {Uint8Array[]} */
         let group = [];
         let groupBytes = 0;
-        const flushGroup = async () => {
+        const flushGroup = async (reason = 'final') => {
             if (group.length === 0 || this._writable === null) {
                 group = [];
                 groupBytes = 0;
                 return;
             }
+            if (reason === 'bytes') {
+                ++this._writeDrainMetrics.flushDueToBytesCount;
+            } else if (reason === 'chunks') {
+                ++this._writeDrainMetrics.flushDueToChunkCount;
+            } else {
+                ++this._writeDrainMetrics.flushFinalGroupCount;
+            }
+            ++this._writeDrainMetrics.writeCallCount;
+            this._writeDrainMetrics.totalWriteBytes += groupBytes;
+            if (groupBytes > this._writeDrainMetrics.maxWriteBytes) {
+                this._writeDrainMetrics.maxWriteBytes = groupBytes;
+            }
             if (group.length === 1) {
+                ++this._writeDrainMetrics.singleChunkWriteCount;
                 await this._writable.write(group[0]);
                 group = [];
                 groupBytes = 0;
                 return;
             }
+            ++this._writeDrainMetrics.mergedWriteCount;
+            this._writeDrainMetrics.mergedGroupChunkCount += group.length;
+            if (group.length > this._writeDrainMetrics.maxMergedGroupChunkCount) {
+                this._writeDrainMetrics.maxMergedGroupChunkCount = group.length;
+            }
+            this._writeDrainMetrics.mergedWriteBytes += groupBytes;
             const merged = new Uint8Array(groupBytes);
             let offset = 0;
             for (const chunk of group) {
@@ -443,12 +471,12 @@ export class TermContentOpfsStore {
             if (chunk.byteLength <= 0) { continue; }
             const wouldOverflow = groupBytes > 0 && (groupBytes + chunk.byteLength) > this._writeCoalesceTargetBytes;
             if (wouldOverflow) {
-                await flushGroup();
+                await flushGroup('bytes');
             }
             group.push(chunk);
             groupBytes += chunk.byteLength;
             if (group.length >= this._writeCoalesceMaxChunks || groupBytes >= this._writeCoalesceTargetBytes) {
-                await flushGroup();
+                await flushGroup(group.length >= this._writeCoalesceMaxChunks ? 'chunks' : 'bytes');
             }
         }
         await flushGroup();
@@ -816,6 +844,28 @@ export class TermContentOpfsStore {
      */
     _computeWriteCoalesceMaxChunks() {
         return this._importStorageMode === 'raw-bytes' ? RAW_BYTES_WRITE_COALESCE_MAX_CHUNKS : DEFAULT_WRITE_COALESCE_MAX_CHUNKS;
+    }
+
+    /**
+     * @returns {{drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}}
+     */
+    _createEmptyWriteDrainMetrics() {
+        return {
+            drainCycleCount: 0,
+            writeCallCount: 0,
+            singleChunkWriteCount: 0,
+            mergedWriteCount: 0,
+            totalWriteBytes: 0,
+            mergedWriteBytes: 0,
+            maxWriteBytes: 0,
+            mergedGroupChunkCount: 0,
+            maxMergedGroupChunkCount: 0,
+            flushDueToBytesCount: 0,
+            flushDueToChunkCount: 0,
+            flushFinalGroupCount: 0,
+            writeCoalesceTargetBytes: this._writeCoalesceTargetBytes,
+            writeCoalesceMaxChunks: this._writeCoalesceMaxChunks,
+        };
     }
 
     /**

@@ -294,6 +294,12 @@ export class DictionaryImporter {
         ) ?
             Math.max(0, Math.trunc(details.termContentCompressionMinBytes)) :
             1048576;
+        const rawTermContentPackTargetBytes = (
+            typeof details.rawTermContentPackTargetBytes === 'number' &&
+            Number.isFinite(details.rawTermContentPackTargetBytes)
+        ) ?
+            Math.max(64 * 1024, Math.trunc(details.rawTermContentPackTargetBytes)) :
+            4 * 1024 * 1024;
         this._skipImageMetadata = details.skipImageMetadata === true;
         this._skipMediaImport = details.skipMediaImport === true;
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
@@ -303,7 +309,12 @@ export class DictionaryImporter {
         this._jsonQuotedStringCache.clear();
         this._utf8StringBytesCache.clear();
         this._reverseStringCache.clear();
-        dictionaryDatabase.setImportOptimizationFlags({termContentStorageMode, termContentCompressionMinBytes});
+        dictionaryDatabase.setImportOptimizationFlags({
+            termContentStorageMode,
+            termContentCompressionMinBytes,
+            rawTermContentPackInputSlabs: details.rawTermContentPackInputSlabs === true,
+            rawTermContentPackTargetBytes,
+        });
         const tImportStart = Date.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
         const phaseTimings = [];

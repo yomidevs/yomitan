@@ -1254,6 +1254,10 @@ export class DictionaryImportController {
                 mediaResolutionConcurrency,
                 debugImportLogging,
                 enableTermEntryContentDedup,
+                termContentStorageMode,
+                termContentCompressionMinBytes,
+                rawTermContentPackInputSlabs,
+                rawTermContentPackTargetBytes,
             } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
@@ -1263,6 +1267,10 @@ export class DictionaryImportController {
                 mediaResolutionConcurrency,
                 debugImportLogging,
                 enableTermEntryContentDedup,
+                termContentStorageMode,
+                termContentCompressionMinBytes,
+                rawTermContentPackInputSlabs,
+                rawTermContentPackTargetBytes,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -1373,7 +1381,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes', termContentCompressionMinBytes: number}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes', termContentCompressionMinBytes: number, rawTermContentPackInputSlabs: boolean, rawTermContentPackTargetBytes: number}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1386,6 +1394,8 @@ export class DictionaryImportController {
                 enableTermEntryContentDedup: true,
                 termContentStorageMode: 'baseline',
                 termContentCompressionMinBytes: 1048576,
+                rawTermContentPackInputSlabs: false,
+                rawTermContentPackTargetBytes: 4 * 1024 * 1024,
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
@@ -1401,6 +1411,13 @@ export class DictionaryImportController {
         ) ?
             Math.max(0, Math.trunc(termContentCompressionMinBytesRaw)) :
             1048576;
+        const rawTermContentPackTargetBytesRaw = flagsRecord.rawTermContentPackTargetBytes;
+        const rawTermContentPackTargetBytes = (
+            typeof rawTermContentPackTargetBytesRaw === 'number' &&
+            Number.isFinite(rawTermContentPackTargetBytesRaw)
+        ) ?
+            Math.max(64 * 1024, Math.trunc(rawTermContentPackTargetBytesRaw)) :
+            4 * 1024 * 1024;
         return {
             skipImageMetadata: flagsRecord.skipImageMetadata === true,
             skipMediaImport: flagsRecord.skipMediaImport === true,
@@ -1409,6 +1426,8 @@ export class DictionaryImportController {
             enableTermEntryContentDedup: flagsRecord.enableTermEntryContentDedup !== false,
             termContentStorageMode,
             termContentCompressionMinBytes,
+            rawTermContentPackInputSlabs: flagsRecord.rawTermContentPackInputSlabs === true,
+            rawTermContentPackTargetBytes,
         };
     }
 

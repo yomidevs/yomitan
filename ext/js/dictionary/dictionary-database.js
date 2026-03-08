@@ -51,6 +51,7 @@ const DEFAULT_TERM_BULK_ADD_STAGING_MAX_ROWS = 4096;
 const HIGH_MEMORY_TERM_BULK_ADD_STAGING_MAX_ROWS = 10240;
 const TERM_CONTENT_STORAGE_MODE_BASELINE = 'baseline';
 const TERM_CONTENT_STORAGE_MODE_RAW_BYTES = 'raw-bytes';
+const DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES = 4 * 1024 * 1024;
 
 /**
  * @param {string} value
@@ -62,6 +63,53 @@ function parseContentHashHexPair(value) {
     const hash2 = Number.parseInt(value.slice(8, 16), 16);
     if (!Number.isFinite(hash1) || !Number.isFinite(hash2)) { return null; }
     return [hash1 >>> 0, hash2 >>> 0];
+}
+
+/**
+ * @param {Uint8Array[]} chunks
+ * @param {number} targetBytes
+ * @returns {{packedChunks: Uint8Array[], sourceChunkIndices: number[], sourceChunkLocalOffsets: number[]}}
+ */
+function packContentChunksIntoSlabs(chunks, targetBytes) {
+    /** @type {Uint8Array[]} */
+    const packedChunks = [];
+    /** @type {number[]} */
+    const sourceChunkIndices = new Array(chunks.length);
+    /** @type {number[]} */
+    const sourceChunkLocalOffsets = new Array(chunks.length);
+    let startIndex = 0;
+    while (startIndex < chunks.length) {
+        let totalBytes = 0;
+        let endIndex = startIndex;
+        while (endIndex < chunks.length) {
+            const nextBytes = chunks[endIndex].byteLength;
+            if (totalBytes > 0 && (totalBytes + nextBytes) > targetBytes) {
+                break;
+            }
+            totalBytes += nextBytes;
+            ++endIndex;
+        }
+        if (totalBytes <= 0) {
+            sourceChunkIndices[startIndex] = packedChunks.length;
+            sourceChunkLocalOffsets[startIndex] = 0;
+            packedChunks.push(chunks[startIndex]);
+            ++startIndex;
+            continue;
+        }
+        const packedIndex = packedChunks.length;
+        const packed = new Uint8Array(totalBytes);
+        let offset = 0;
+        for (let i = startIndex; i < endIndex; ++i) {
+            const chunk = chunks[i];
+            sourceChunkIndices[i] = packedIndex;
+            sourceChunkLocalOffsets[i] = offset;
+            packed.set(chunk, offset);
+            offset += chunk.byteLength;
+        }
+        packedChunks.push(packed);
+        startIndex = endIndex;
+    }
+    return {packedChunks, sourceChunkIndices, sourceChunkLocalOffsets};
 }
 
 
@@ -141,6 +189,10 @@ export class DictionaryDatabase {
         this._enableSqliteSecondaryIndexes = false;
         /** @type {number} */
         this._termContentCompressionMinBytes = 1048576;
+        /** @type {boolean} */
+        this._rawTermContentPackInputSlabs = false;
+        /** @type {number} */
+        this._rawTermContentPackTargetBytes = DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES;
         /** @type {boolean} */
         this._importDebugLogging = false;
         /** @type {number} */
@@ -342,7 +394,7 @@ export class DictionaryDatabase {
 
     /**
      * @param {((index: number, count: number) => void)?} [onCheckpoint]
-     * @returns {Promise<{commitMs: number, termContentEndImportSessionMs: number, termContentEndImportSessionFlushPendingWritesMs: number, termContentEndImportSessionAwaitQueuedWritesMs: number, termContentEndImportSessionCloseWritableMs: number, termRecordEndImportSessionMs: number, termsVirtualTableSyncMs: number, createIndexesMs: number, createIndexesCheckpointCount: number, cacheResetMs: number, runtimePragmasMs: number, totalMs: number}|null>}
+     * @returns {Promise<{commitMs: number, termContentEndImportSessionMs: number, termContentEndImportSessionFlushPendingWritesMs: number, termContentEndImportSessionAwaitQueuedWritesMs: number, termContentEndImportSessionCloseWritableMs: number, termContentDrainCycleCount: number, termContentWriteCallCount: number, termContentSingleChunkWriteCount: number, termContentMergedWriteCount: number, termContentTotalWriteBytes: number, termContentMergedWriteBytes: number, termContentMaxWriteBytes: number, termContentMergedGroupChunkCount: number, termContentMaxMergedGroupChunkCount: number, termContentFlushDueToBytesCount: number, termContentFlushDueToChunkCount: number, termContentFlushFinalGroupCount: number, termContentWriteCoalesceTargetBytes: number, termContentWriteCoalesceMaxChunks: number, termRecordEndImportSessionMs: number, termsVirtualTableSyncMs: number, createIndexesMs: number, createIndexesCheckpointCount: number, cacheResetMs: number, runtimePragmasMs: number, totalMs: number}|null>}
      */
     async finishBulkImport(onCheckpoint = null) {
         if (this._bulkImportDepth <= 0) {
@@ -357,6 +409,20 @@ export class DictionaryDatabase {
             let termContentEndImportSessionFlushPendingWritesMs = 0;
             let termContentEndImportSessionAwaitQueuedWritesMs = 0;
             let termContentEndImportSessionCloseWritableMs = 0;
+            let termContentDrainCycleCount = 0;
+            let termContentWriteCallCount = 0;
+            let termContentSingleChunkWriteCount = 0;
+            let termContentMergedWriteCount = 0;
+            let termContentTotalWriteBytes = 0;
+            let termContentMergedWriteBytes = 0;
+            let termContentMaxWriteBytes = 0;
+            let termContentMergedGroupChunkCount = 0;
+            let termContentMaxMergedGroupChunkCount = 0;
+            let termContentFlushDueToBytesCount = 0;
+            let termContentFlushDueToChunkCount = 0;
+            let termContentFlushFinalGroupCount = 0;
+            let termContentWriteCoalesceTargetBytes = 0;
+            let termContentWriteCoalesceMaxChunks = 0;
             let termRecordEndImportSessionMs = 0;
             let termsVirtualTableSyncMs = 0;
             let createIndexesMs = 0;
@@ -379,6 +445,20 @@ export class DictionaryDatabase {
                             termContentEndImportSessionFlushPendingWritesMs = metrics.flushPendingWritesMs;
                             termContentEndImportSessionAwaitQueuedWritesMs = metrics.awaitQueuedWritesMs;
                             termContentEndImportSessionCloseWritableMs = metrics.closeWritableMs;
+                            termContentDrainCycleCount = metrics.drainCycleCount;
+                            termContentWriteCallCount = metrics.writeCallCount;
+                            termContentSingleChunkWriteCount = metrics.singleChunkWriteCount;
+                            termContentMergedWriteCount = metrics.mergedWriteCount;
+                            termContentTotalWriteBytes = metrics.totalWriteBytes;
+                            termContentMergedWriteBytes = metrics.mergedWriteBytes;
+                            termContentMaxWriteBytes = metrics.maxWriteBytes;
+                            termContentMergedGroupChunkCount = metrics.mergedGroupChunkCount;
+                            termContentMaxMergedGroupChunkCount = metrics.maxMergedGroupChunkCount;
+                            termContentFlushDueToBytesCount = metrics.flushDueToBytesCount;
+                            termContentFlushDueToChunkCount = metrics.flushDueToChunkCount;
+                            termContentFlushFinalGroupCount = metrics.flushFinalGroupCount;
+                            termContentWriteCoalesceTargetBytes = metrics.writeCoalesceTargetBytes;
+                            termContentWriteCoalesceMaxChunks = metrics.writeCoalesceMaxChunks;
                         }
                     });
                 const tTermRecordEndImportSessionStart = safePerformance.now();
@@ -433,6 +513,20 @@ export class DictionaryDatabase {
                         `termContentFlush=${termContentEndImportSessionFlushPendingWritesMs.toFixed(1)}ms ` +
                         `termContentAwait=${termContentEndImportSessionAwaitQueuedWritesMs.toFixed(1)}ms ` +
                         `termContentClose=${termContentEndImportSessionCloseWritableMs.toFixed(1)}ms ` +
+                        `termContentDrainCycles=${termContentDrainCycleCount} ` +
+                        `termContentWrites=${termContentWriteCallCount} ` +
+                        `termContentSingleWrites=${termContentSingleChunkWriteCount} ` +
+                        `termContentMergedWrites=${termContentMergedWriteCount} ` +
+                        `termContentTotalWriteBytes=${termContentTotalWriteBytes} ` +
+                        `termContentMergedWriteBytes=${termContentMergedWriteBytes} ` +
+                        `termContentMaxWriteBytes=${termContentMaxWriteBytes} ` +
+                        `termContentMergedGroupChunks=${termContentMergedGroupChunkCount} ` +
+                        `termContentMaxMergedGroupChunks=${termContentMaxMergedGroupChunkCount} ` +
+                        `termContentFlushDueToBytes=${termContentFlushDueToBytesCount} ` +
+                        `termContentFlushDueToChunks=${termContentFlushDueToChunkCount} ` +
+                        `termContentFlushFinalGroups=${termContentFlushFinalGroupCount} ` +
+                        `termContentWriteCoalesceTargetBytes=${termContentWriteCoalesceTargetBytes} ` +
+                        `termContentWriteCoalesceMaxChunks=${termContentWriteCoalesceMaxChunks} ` +
                         `termRecordEnd=${termRecordEndImportSessionMs.toFixed(1)}ms ` +
                         `termsVtabSync=${termsVirtualTableSyncMs.toFixed(1)}ms ` +
                         `createIndexes=${createIndexesMs.toFixed(1)}ms ` +
@@ -447,6 +541,20 @@ export class DictionaryDatabase {
                     termContentEndImportSessionFlushPendingWritesMs,
                     termContentEndImportSessionAwaitQueuedWritesMs,
                     termContentEndImportSessionCloseWritableMs,
+                    termContentDrainCycleCount,
+                    termContentWriteCallCount,
+                    termContentSingleChunkWriteCount,
+                    termContentMergedWriteCount,
+                    termContentTotalWriteBytes,
+                    termContentMergedWriteBytes,
+                    termContentMaxWriteBytes,
+                    termContentMergedGroupChunkCount,
+                    termContentMaxMergedGroupChunkCount,
+                    termContentFlushDueToBytesCount,
+                    termContentFlushDueToChunkCount,
+                    termContentFlushFinalGroupCount,
+                    termContentWriteCoalesceTargetBytes,
+                    termContentWriteCoalesceMaxChunks,
                     termRecordEndImportSessionMs,
                     termsVirtualTableSyncMs,
                     createIndexesMs,
@@ -481,7 +589,7 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {{termContentStorageMode?: 'baseline'|'raw-bytes', termContentCompressionMinBytes?: number}} [options]
+     * @param {{termContentStorageMode?: 'baseline'|'raw-bytes', termContentCompressionMinBytes?: number, rawTermContentPackInputSlabs?: boolean, rawTermContentPackTargetBytes?: number}} [options]
      */
     setImportOptimizationFlags(options = {}) {
         this._adaptiveTermBulkAddBatchSize = true;
@@ -498,6 +606,13 @@ export class DictionaryDatabase {
         ) ?
             Math.max(0, Math.trunc(options.termContentCompressionMinBytes)) :
             1048576;
+        this._rawTermContentPackInputSlabs = options.rawTermContentPackInputSlabs === true;
+        this._rawTermContentPackTargetBytes = (
+            typeof options.rawTermContentPackTargetBytes === 'number' &&
+            Number.isFinite(options.rawTermContentPackTargetBytes)
+        ) ?
+            Math.max(64 * 1024, Math.trunc(options.rawTermContentPackTargetBytes)) :
+            DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES;
         this._termContentStore.setImportStorageMode(this._termContentStorageMode);
     }
 
@@ -2588,12 +2703,34 @@ export class DictionaryDatabase {
                     const contentJson = row.termEntryContentJson ?? this._serializeTermEntryContent(rules, definitionTags, termTags, row.glossary);
                     contentChunks[j] = this._textEncoder.encode(contentJson);
                 }
+                let chunksToAppend = contentChunks;
                 const tContentAppendStart = safePerformance.now();
-                await this._termContentStore.appendBatchToArrays(contentChunks, contentOffsets, contentLengths);
+                if (
+                    this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
+                    this._rawTermContentPackInputSlabs
+                ) {
+                    const {packedChunks, sourceChunkIndices, sourceChunkLocalOffsets} = packContentChunksIntoSlabs(
+                        contentChunks,
+                        this._rawTermContentPackTargetBytes,
+                    );
+                    chunksToAppend = packedChunks;
+                    /** @type {number[]} */
+                    const packedOffsets = new Array(packedChunks.length);
+                    /** @type {number[]} */
+                    const packedLengths = new Array(packedChunks.length);
+                    await this._termContentStore.appendBatchToArrays(packedChunks, packedOffsets, packedLengths);
+                    for (let j = 0; j < chunkCount; ++j) {
+                        const packedIndex = sourceChunkIndices[j];
+                        contentOffsets[j] = packedOffsets[packedIndex] + sourceChunkLocalOffsets[j];
+                        contentLengths[j] = contentChunks[j].byteLength;
+                    }
+                } else {
+                    await this._termContentStore.appendBatchToArrays(contentChunks, contentOffsets, contentLengths);
+                }
                 contentAppendMs += safePerformance.now() - tContentAppendStart;
                 const contentDictName = (
                     this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
-                    contentChunks.every((contentBytes) => isRawTermContentBinary(contentBytes))
+                    chunksToAppend.every((contentBytes) => isRawTermContentBinary(contentBytes))
                 ) ?
                     RAW_TERM_CONTENT_DICT_NAME :
                     'raw';
