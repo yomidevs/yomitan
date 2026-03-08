@@ -283,8 +283,8 @@ export class TermContentOpfsStore {
             }
             if (totalBytes > 0) {
                 this._invalidateReadState();
-                const pendingChunks = this._coalescePendingChunks(chunks);
-                for (const chunk of pendingChunks) {
+                for (const chunk of chunks) {
+                    if (chunk.byteLength <= 0) { continue; }
                     this._pendingWriteBytes += chunk.byteLength;
                     this._pendingWriteChunks.push(chunk);
                 }
@@ -365,7 +365,9 @@ export class TermContentOpfsStore {
         if (chunks.length === 0) {
             return;
         }
-        this._queuedWriteChunks.push(...chunks);
+        for (const chunk of chunks) {
+            this._queuedWriteChunks.push(chunk);
+        }
         if (this._queuedWritePromise !== null) {
             return;
         }
@@ -445,55 +447,6 @@ export class TermContentOpfsStore {
             }
         }
         await flushGroup();
-    }
-
-    /**
-     * @param {Uint8Array[]} chunks
-     * @returns {Uint8Array[]}
-     */
-    _coalescePendingChunks(chunks) {
-        /** @type {Uint8Array[]} */
-        const result = [];
-        /** @type {Uint8Array[]} */
-        let group = [];
-        let groupBytes = 0;
-        const flushGroup = () => {
-            if (groupBytes <= 0 || group.length === 0) {
-                group = [];
-                groupBytes = 0;
-                return;
-            }
-            if (group.length === 1) {
-                result.push(group[0]);
-                group = [];
-                groupBytes = 0;
-                return;
-            }
-            const merged = new Uint8Array(groupBytes);
-            let offset = 0;
-            for (const chunk of group) {
-                merged.set(chunk, offset);
-                offset += chunk.byteLength;
-            }
-            result.push(merged);
-            group = [];
-            groupBytes = 0;
-        };
-        for (const chunk of chunks) {
-            const chunkBytes = chunk.byteLength;
-            if (chunkBytes <= 0) { continue; }
-            const wouldOverflow = groupBytes > 0 && (groupBytes + chunkBytes) > this._writeCoalesceTargetBytes;
-            if (wouldOverflow) {
-                flushGroup();
-            }
-            group.push(chunk);
-            groupBytes += chunkBytes;
-            if (group.length >= WRITE_COALESCE_MAX_CHUNKS || groupBytes >= this._writeCoalesceTargetBytes) {
-                flushGroup();
-            }
-        }
-        flushGroup();
-        return result;
     }
 
     /**

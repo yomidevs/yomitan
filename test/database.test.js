@@ -26,6 +26,7 @@ import {createDictionaryArchiveData, getDictionaryArchiveIndex} from '../dev/dic
 import {parseJson} from '../dev/json.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
+import {encodeRawTermContentBinary} from '../ext/js/dictionary/raw-term-content.js';
 import {TermRecordOpfsStore} from '../ext/js/dictionary/term-record-opfs-store.js';
 import {DictionaryWorkerHandler} from '../ext/js/dictionary/dictionary-worker-handler.js';
 import {chrome, fetch} from './mocks/common.js';
@@ -223,10 +224,11 @@ function concatUint8Arrays(chunks) {
  * @param {import('dictionary-data').IndexVersion} version
  * @param {string} dictionaryTitle
  * @param {import('dictionary-data').TermV1Array|import('dictionary-data').TermV3Array} rawEntries
+ * @param {'legacy'|'raw-v2'} [termContentMode]
  * @returns {Uint8Array}
  * @throws {Error}
  */
-function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries) {
+function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries, termContentMode = 'legacy') {
     const textEncoder = new TextEncoder();
     if (!Array.isArray(rawEntries)) {
         throw new Error('Expected term bank entries array');
@@ -253,7 +255,15 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
         const expressionBytes = textEncoder.encode(entry.expression);
         const readingValue = entry.reading === entry.expression ? '' : entry.reading;
         const readingBytes = textEncoder.encode(readingValue);
-        const contentBytes = entry.termEntryContentBytes;
+        const contentBytes = termContentMode === 'raw-v2' ?
+            encodeRawTermContentBinary(
+                entry.rules,
+                entry.definitionTags,
+                entry.termTags,
+                textEncoder.encode(JSON.stringify(entry.glossary)),
+                textEncoder,
+            ) :
+            entry.termEntryContentBytes;
         if (!(contentBytes instanceof Uint8Array)) {
             throw new Error('Expected precomputed term entry content bytes');
         }
@@ -283,9 +293,10 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
 /**
  * @param {string} dictionary
  * @param {string} [dictionaryName]
+ * @param {'legacy'|'raw-v2'} [termContentMode]
  * @returns {Promise<ArrayBuffer>}
  */
-async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryName) {
+async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryName, termContentMode = 'legacy') {
     const dictionaryDirectory = join(dirname, 'data', 'dictionaries', dictionary);
     const fileNames = readdirSync(dictionaryDirectory);
     const zipFileWriter = new BlobWriter();
@@ -317,7 +328,7 @@ async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryNam
             if (typeof version === 'undefined') {
                 throw new Error(`Expected dictionary index version in ${dictionary}/index.json`);
             }
-            const artifactPayload = createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries);
+            const artifactPayload = createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries, termContentMode);
             const artifactName = fileName.replace(/\.json$/i, '.mbtb');
             await zipWriter.add(artifactName, new Blob([artifactPayload]).stream());
             continue;
@@ -328,6 +339,12 @@ async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryNam
             let json = parseJson(content);
             if (fileName === 'index.json' && typeof dictionaryName === 'string' && typeof json === 'object' && json !== null) {
                 json = {.../** @type {Record<string, unknown>} */(json), title: dictionaryName};
+            }
+            if (fileName === 'index.json' && typeof json === 'object' && json !== null) {
+                json = {
+                    .../** @type {Record<string, unknown>} */(json),
+                    termContentMode,
+                };
             }
             await zipWriter.add(fileName, new TextReader(JSON.stringify(json, null, 0)));
             continue;
@@ -730,6 +747,39 @@ describe('Database', () => {
                 readTermBankArtifactFileSpy.mockRestore();
                 decodeTermBankArtifactBytesSpy.mockRestore();
                 readTermBankFileFastSpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
+        });
+
+        test('Imports raw-v2 term artifact files and preserves lookup/counts', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArtifactArchiveData('valid-dictionary1', 'Artifact Raw Dictionary', 'raw-v2');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(errors).toStrictEqual([]);
+                expect.soft(result).not.toBeNull();
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info.length).toBe(1);
+                expect.soft(info[0]?.title).toBe('Artifact Raw Dictionary');
+                expect.soft(info[0]?.importSuccess).toBe(true);
+
+                const counts = await dictionaryDatabase.getDictionaryCounts(['Artifact Raw Dictionary'], true);
+                expect.soft(counts.total.terms).toBeGreaterThan(0);
+
+                const titles = new Map([
+                    ['Artifact Raw Dictionary', {alias: 'Artifact Raw Dictionary', allowSecondarySearches: false}],
+                ]);
+                const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
+                expect.soft(results.length).toBeGreaterThan(0);
+                expect.soft(results.some((entry) => entry.dictionary === 'Artifact Raw Dictionary')).toBe(true);
+            } finally {
                 await dictionaryDatabase.close();
             }
         });
