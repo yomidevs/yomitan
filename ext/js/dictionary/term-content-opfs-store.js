@@ -27,7 +27,8 @@ const DEFAULT_WRITE_COALESCE_TARGET_BYTES = 4 * 1024 * 1024;
 const LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
 const HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES = 16 * 1024 * 1024;
 const RAW_BYTES_WRITE_COALESCE_TARGET_BYTES = 32 * 1024 * 1024;
-const WRITE_COALESCE_MAX_CHUNKS = 512;
+const DEFAULT_WRITE_COALESCE_MAX_CHUNKS = 512;
+const RAW_BYTES_WRITE_COALESCE_MAX_CHUNKS = 8192;
 const DEFAULT_WRITE_FLUSH_THRESHOLD_BYTES = 16 * 1024 * 1024;
 const LOW_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES = 8 * 1024 * 1024;
 const HIGH_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES = 128 * 1024 * 1024;
@@ -73,6 +74,8 @@ export class TermContentOpfsStore {
         this._readPageCacheMaxPages = this._computeReadPageCacheMaxPages();
         /** @type {number} */
         this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
+        /** @type {number} */
+        this._writeCoalesceMaxChunks = this._computeWriteCoalesceMaxChunks();
         /** @type {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number}|null} */
         this._lastEndImportSessionMetrics = null;
         /** @type {'baseline'|'raw-bytes'} */
@@ -113,6 +116,7 @@ export class TermContentOpfsStore {
         await this._awaitQueuedWrites();
         this._importSessionActive = true;
         this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
+        this._writeCoalesceMaxChunks = this._computeWriteCoalesceMaxChunks();
         this._flushThresholdBytes = this._computeWriteFlushThresholdBytes();
         this._pendingWriteBytes = 0;
         this._pendingWriteChunks = [];
@@ -165,6 +169,7 @@ export class TermContentOpfsStore {
     setImportStorageMode(mode) {
         this._importStorageMode = mode === 'raw-bytes' ? 'raw-bytes' : 'baseline';
         this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
+        this._writeCoalesceMaxChunks = this._computeWriteCoalesceMaxChunks();
         this._flushThresholdBytes = this._computeWriteFlushThresholdBytes();
     }
 
@@ -442,7 +447,7 @@ export class TermContentOpfsStore {
             }
             group.push(chunk);
             groupBytes += chunk.byteLength;
-            if (group.length >= WRITE_COALESCE_MAX_CHUNKS || groupBytes >= this._writeCoalesceTargetBytes) {
+            if (group.length >= this._writeCoalesceMaxChunks || groupBytes >= this._writeCoalesceTargetBytes) {
                 await flushGroup();
             }
         }
@@ -804,6 +809,13 @@ export class TermContentOpfsStore {
             return HIGH_MEMORY_WRITE_FLUSH_THRESHOLD_BYTES;
         }
         return DEFAULT_WRITE_FLUSH_THRESHOLD_BYTES;
+    }
+
+    /**
+     * @returns {number}
+     */
+    _computeWriteCoalesceMaxChunks() {
+        return this._importStorageMode === 'raw-bytes' ? RAW_BYTES_WRITE_COALESCE_MAX_CHUNKS : DEFAULT_WRITE_COALESCE_MAX_CHUNKS;
     }
 
     /**
