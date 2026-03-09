@@ -52,6 +52,16 @@ export type DictionaryEntryNoteDetails = {
     ankiError: Error | null;
 };
 
+export type NoteDupeMappings = {
+    noteMap: Map<number, NoteDupeInfo>;
+};
+
+export type NoteDupeInfo = {
+    cardFormat: Settings.AnkiCardFormat;
+    noteIds: Anki.NoteId[] | null;
+    ankiError: Error | null;
+};
+
 export type CreateNoteResult = {
     note: Anki.Note;
     errors: Error[];
