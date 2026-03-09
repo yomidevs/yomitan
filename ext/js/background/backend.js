@@ -1787,7 +1787,7 @@ export class Backend {
                         const termPart = {text: text2, reading: reading2};
                         if (isFirstPart) {
                             termPart.lemma = lemma;
-                            termPart.lemma_reading = jpConvertKatakanaToHiragana(lemma_reading);
+                            termPart.lemmaReading = jpConvertKatakanaToHiragana(lemma_reading);
                             isFirstPart = false;
                         }
                         termParts.push(termPart);
