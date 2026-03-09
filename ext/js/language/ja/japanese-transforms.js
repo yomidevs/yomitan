@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {suffixInflection} from '../language-transforms.js';
+import {suffixInflection, wholeWordInflection} from '../language-transforms.js';
 
 const shimauEnglishDescription = '1. Shows a sense of regret/surprise when you did have volition in doing something, but it turned out to be bad to do.\n' +
 '2. Shows perfective/punctual achievement. This shows that an action has been completed.\n' +
@@ -26,6 +26,7 @@ const passiveEnglishDescription = '1. Indicates an action received from an actio
 
 const ikuVerbs = ['いく', '行く', '逝く', '往く'];
 const godanUSpecialVerbs = ['こう', 'とう', '請う', '乞う', '恋う', '問う', '訪う', '宣う', '曰う', '給う', '賜う', '揺蕩う'];
+const specialHonorificMasuVerbs = ['いらっしゃる', 'ござる', 'なさる', 'くださる', '下さる', 'おっしゃる', '仰る', '仰有る'];
 const fuVerbTeConjugations = [
     ['のたまう', 'のたもう'],
     ['たまう', 'たもう'],
@@ -51,6 +52,15 @@ function irregularVerbSuffixInflections(suffix, conditionsIn, conditionsOut) {
         inflections.push(suffixInflection(`${teRoot}${suffix}`, verb, conditionsIn, conditionsOut));
     }
     return inflections;
+}
+
+/**
+ * @param {Condition[]} conditionsIn
+ * @param {Condition[]} conditionsOut
+ * @returns {import('language-transformer').Rule<Condition>[]}
+ */
+function specialHonorificMasuInflections(conditionsIn, conditionsOut) {
+    return specialHonorificMasuVerbs.map((verb) => wholeWordInflection(`${verb.slice(0, -1)}います`, verb, conditionsIn, conditionsOut));
 }
 
 const conditions = {
@@ -1195,6 +1205,7 @@ export const japaneseTransforms = {
             ],
             rules: [
                 suffixInflection('ます', 'る', ['-ます'], ['v1']),
+                ...specialHonorificMasuInflections(['-ます'], ['v5d']),
                 suffixInflection('います', 'う', ['-ます'], ['v5d']),
                 suffixInflection('きます', 'く', ['-ます'], ['v5d']),
                 suffixInflection('ぎます', 'ぐ', ['-ます'], ['v5d']),

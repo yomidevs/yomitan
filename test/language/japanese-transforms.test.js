@@ -783,6 +783,21 @@ const tests = [
         ],
     },
     {
+        category: 'special honorific -ます verbs',
+        valid: true,
+        tests: [
+            {term: 'いらっしゃる', source: 'いらっしゃいます', rule: 'v5', reasons: ['-ます']},
+            {term: 'ござる', source: 'ございました', rule: 'v5', reasons: ['-ます', '-た']},
+            {term: 'なさる', source: 'なさいます', rule: 'v5', reasons: ['-ます']},
+            {term: 'くださる', source: 'くださいます', rule: 'v5', reasons: ['-ます']},
+            {term: '下さる', source: '下さいます', rule: 'v5', reasons: ['-ます']},
+            {term: 'おっしゃる', source: 'おっしゃいました', rule: 'v5', reasons: ['-ます', '-た']},
+            {term: '仰る', source: '仰いました', rule: 'v5', reasons: ['-ます', '-た']},
+            {term: '仰有る', source: '仰有いました', rule: 'v5', reasons: ['-ます', '-た']},
+            {term: 'いらっしゃる', source: 'いらっしゃいません', rule: 'v5', reasons: ['-ます', 'negative']},
+        ],
+    },
+    {
         category: 'irregular verbs',
         valid: true,
         tests: [

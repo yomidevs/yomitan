@@ -62,6 +62,8 @@ export type ParseTextResultItem = {
 export type ParseTextSegment = {
     text: string;
     reading: string;
+    lemma?: string;
+    lemmaReading?: string;
     headwords?: {
         term: string;
         reading: string;
