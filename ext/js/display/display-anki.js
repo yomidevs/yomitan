@@ -564,7 +564,6 @@ export class DisplayAnki {
         if (behavior === 'prevent') {
             button.disabled = true;
             button.title = 'Duplicate notes are disabled';
-
             return;
         }
 
@@ -1613,7 +1612,6 @@ class DisplayAnkiError extends Error {
     /** @type {?import('anki-note-builder').Requirement[]} */
     get requirements() { return this._requirements; }
     set requirements(value) { this._requirements = value; }
-    
     /** @type {?import('anki-note-builder').Requirement[]} */
     get outputRequirements() { return this._outputRequirements; }
     set outputRequirements(value) { this._outputRequirements = value; }
