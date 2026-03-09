@@ -1784,6 +1784,7 @@ export class Backend {
                         jpConvertKatakanaToHiragana(reading),
                         source,
                     )) {
+                        /** @type {import('api').ParseTextSegment} */
                         const termPart = {text: text2, reading: reading2};
                         if (isFirstPart) {
                             termPart.lemma = lemma;
