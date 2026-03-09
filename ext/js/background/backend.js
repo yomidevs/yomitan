@@ -1776,14 +1776,21 @@ export class Backend {
             /** @type {import('api').ParseTextLine[]} */
             const result = [];
             for (const line of lines) {
-                for (const {term, reading, source} of line) {
+                for (const {term, reading, source, lemma, lemma_reading} of line) {
                     const termParts = [];
+                    let isFirstPart = true;
                     for (const {text: text2, reading: reading2} of distributeFuriganaInflected(
                         term.length > 0 ? term : source,
                         jpConvertKatakanaToHiragana(reading),
                         source,
                     )) {
-                        termParts.push({text: text2, reading: reading2});
+                        const termPart = {text: text2, reading: reading2};
+                        if (isFirstPart) {
+                            termPart.lemma = lemma;
+                            termPart.lemma_reading = jpConvertKatakanaToHiragana(lemma_reading);
+                            isFirstPart = false;
+                        }
+                        termParts.push(termPart);
                     }
                     result.push(termParts);
                 }

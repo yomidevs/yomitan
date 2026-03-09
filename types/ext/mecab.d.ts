@@ -32,6 +32,7 @@ export type ParseResultTermRaw = {
     inflection_type?: string;
     inflection_form?: string;
     lemma?: string;
+    lemma_reading?: string;
 };
 
 /** The resulting data from an invocation of `parseText`. */

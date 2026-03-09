@@ -263,7 +263,7 @@ export class Mecab {
                 /** @type {import('mecab').ParseFragment[]} */
                 const line = [];
 
-                for (let {expression: term, reading, source, pos1, pos2, pos3, pos4, inflection_type, inflection_form, lemma} of rawLine) {
+                for (let {expression: term, reading, source, pos1, pos2, pos3, pos4, inflection_type, inflection_form, lemma, lemma_reading} of rawLine) {
                     if (typeof term !== 'string') { term = ''; }
                     if ((typeof reading !== 'string')) { reading = ''; }
                     if (typeof source !== 'string') { source = ''; }
@@ -273,8 +273,9 @@ export class Mecab {
                     if (typeof pos4 !== 'string') { pos4 = ''; }
                     if (typeof inflection_type !== 'string') { inflection_type = ''; }
                     if (typeof lemma !== 'string') { lemma = ''; }
+                    if (typeof lemma_reading !== 'string') { lemma_reading = ''; }
 
-                    const token = {term, reading, source, pos1, pos2, pos3, pos4, inflection_type, inflection_form, lemma};
+                    const token = {term, reading, source, pos1, pos2, pos3, pos4, inflection_type, inflection_form, lemma, lemma_reading};
 
                     if (ignoreReading(token)) {
                         token.reading = '';
