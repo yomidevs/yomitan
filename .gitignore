@@ -10,7 +10,9 @@ dictionaries/
 /playwright-report/
 /playwright/.cache/
 /test/playwright/__screenshots__/
+/.playwright-user-data/
 
 ext/manifest.json
 
 ext/lib/*
+actionlint
