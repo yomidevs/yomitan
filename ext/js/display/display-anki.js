@@ -562,6 +562,7 @@ export class DisplayAnki {
         if (behavior === 'prevent') {
             button.disabled = true;
             button.title = 'Duplicate notes are disabled';
+
             return;
         }
 
@@ -627,6 +628,8 @@ export class DisplayAnki {
                     if (ankiError && ankiError.message !== 'Anki not connected') {
                         log.error(ankiError);
                     }
+
+                    // If entry has noteIds, show the "add duplicate" button.
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
                         this._updateSaveButtonForDuplicateBehavior(button, noteIds);
                     }
