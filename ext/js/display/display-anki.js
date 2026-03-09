@@ -540,8 +540,7 @@ export class DisplayAnki {
                     log.error(error);
                 }
             }
-            const detailsPromise = this._getDictionaryEntryDetails(dictionaryEntries);
-            const dictionaryEntryDetails = await detailsPromise;
+            const dictionaryEntryDetails = await this._getDictionaryEntryDetails(dictionaryEntries);
             if (this._updateDictionaryEntryDetailsToken !== token) { return; }
             this._dictionaryEntryDetails = dictionaryEntryDetails;
             this._updateSaveButtons(dictionaryEntryDetails);
@@ -565,6 +564,7 @@ export class DisplayAnki {
         if (behavior === 'prevent') {
             button.disabled = true;
             button.title = 'Duplicate notes are disabled';
+
             return;
         }
 
@@ -619,7 +619,7 @@ export class DisplayAnki {
      * @param {import('display-anki').DictionaryEntryDetails[]} dictionaryEntryDetails
      */
     _updateSaveButtons(dictionaryEntryDetails) {
-        if (this._checkForDuplicates) { this._removeDupeIndicators(); }
+        if (this._checkForDuplicates && this._noteDupeCheckFirst) { this._removeDupeIndicators(); }
         const displayTagsAndFlags = this._displayTagsAndFlags;
         for (let entryIndex = 0, entryCount = dictionaryEntryDetails.length; entryIndex < entryCount; ++entryIndex) {
             for (const [cardFormatIndex, {canAdd, noteIds, noteInfos, ankiError}] of dictionaryEntryDetails[entryIndex].noteMap.entries()) {
@@ -1182,6 +1182,7 @@ export class DisplayAnki {
                 }
             }
         }
+
         /** @type {import('display-anki').DictionaryEntryDetails[]} */
         const results = new Array(dictionaryEntries.length).fill(null).map(() => ({noteMap: new Map()}));
 
@@ -1612,6 +1613,7 @@ class DisplayAnkiError extends Error {
     /** @type {?import('anki-note-builder').Requirement[]} */
     get requirements() { return this._requirements; }
     set requirements(value) { this._requirements = value; }
+    
     /** @type {?import('anki-note-builder').Requirement[]} */
     get outputRequirements() { return this._outputRequirements; }
     set outputRequirements(value) { this._outputRequirements = value; }
