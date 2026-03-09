@@ -314,6 +314,7 @@ export type AnkiOptions = {
     apiKey: string;
     downloadTimeout: number;
     forceSync: boolean;
+    noteDupeCheckFirst: boolean;
 };
 
 export type AnkiScreenshotOptions = {

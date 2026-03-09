@@ -114,6 +114,8 @@ export class DisplayAnki {
         this._onViewNotesButtonMenuCloseBind = this._onViewNotesButtonMenuClose.bind(this);
         /** @type {boolean} */
         this._forceSync = false;
+        /** @type {boolean} */
+        this.__noteDupeCheckFirst = false;
     }
 
     /** */
@@ -213,6 +215,7 @@ export class DisplayAnki {
                 screenshot: {format, quality},
                 downloadTimeout,
                 forceSync,
+                noteDupeCheckFirst,
             },
             scanning: {length: scanLength},
         } = options;
@@ -236,6 +239,7 @@ export class DisplayAnki {
         this._cardFormats = cardFormats;
         this._dictionaries = dictionaries;
         this._forceSync = forceSync;
+        this._noteDupeCheckFirst = noteDupeCheckFirst;
 
         void this._updateAnkiFieldTemplates(options);
     }
@@ -380,12 +384,15 @@ export class DisplayAnki {
 
     /**
      * Checks if Anki has existing notes of the dictionary entries being displayed using
-     * notes with only the first note field rendered. Displays whether they are duplicates
+     * notes with only the first note field. Displays whether they are duplicates
      * or not in the pop up while the actual anki cards are being created.
+     * --------------------------------------------------------------------
+     * Please note that it will call "_displayWhetherDupeOrNotAndLoading" and pass an array of type NoteDupeMappings[]
+     * in order to save on memory. Please see types\ext\display-anki.d.ts if you wish to edit this.
      * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
      */
     async _quickDupeCheck(dictionaryEntries) {
-        let isAnkiConnected = await this._display.application.api.isAnkiConnected();
+        const isAnkiConnected = await this._display.application.api.isAnkiConnected();
         let ankiError = null;
         if (!isAnkiConnected) {
             ankiError = new Error('Anki is not connected');
@@ -461,20 +468,13 @@ export class DisplayAnki {
             ankiError = new Error('Anki not connected');
             return;
         }
-        /** @type {import('display-anki').DictionaryEntryDetails[]} */
+        /** @type {import('display-anki').NoteDupeMappings[]} */
         const results = new Array(dictionaryEntries.length).fill(null).map(() => ({noteMap: new Map()}));
         const notesLength = notesToCheck.length;
         for (let i = 0, ii = notesLength; i < ii; ++i) {
-            const {note, errors, requirements} = notesToCheck[i];
-            const {canAdd, valid, noteIds, noteInfos} = infos[i];
+            const {noteIds} = infos[i];
             const {cardFormatIndex, cardFormat, index} = noteTargets[i];
-            results[index].noteMap.set(cardFormatIndex, {cardFormat, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
-        }
-
-        isAnkiConnected = await this._display.application.api.isAnkiConnected();
-        if (!isAnkiConnected) {
-            ankiError = new Error('Anki is not connected');
-            return;
+            results[index].noteMap.set(cardFormatIndex, {cardFormat, noteIds, ankiError});
         }
         this._displayWhetherDupeOrNotAndLoading(results);
         // eslint-disable-next-line no-underscore-dangle
@@ -484,12 +484,11 @@ export class DisplayAnki {
     /**
      * Where the add buttons and view note buttons are, put temporary indicators showing if there
      * is already an Anki note for the term or not
-     * @param {import('display-anki').DictionaryEntryDetails[]} dictionaryEntryDetails
+     * @param {import('display-anki').NoteDupeMappings[]} dictionaryEntryDetails
      */
     _displayWhetherDupeOrNotAndLoading(dictionaryEntryDetails) {
-        const displayTagsAndFlags = this._displayTagsAndFlags;
         for (let entryIndex = 0, entryCount = dictionaryEntryDetails.length; entryIndex < entryCount; ++entryIndex) {
-            for (const [cardFormatIndex, {noteIds, noteInfos, cardFormat}] of dictionaryEntryDetails[entryIndex].noteMap.entries()) {
+            for (const [cardFormatIndex, {noteIds, cardFormat}] of dictionaryEntryDetails[entryIndex].noteMap.entries()) {
                 const entry = this._getEntry(entryIndex);
                 if (entry === null) { continue; }
                 const container = entry.querySelector('.note-actions-container');
@@ -513,10 +512,6 @@ export class DisplayAnki {
                 }
                 button.append(imgSpan);
                 container.append(button);
-                if (displayTagsAndFlags !== 'never' && Array.isArray(noteInfos)) {
-                    this._setupTagsIndicator(entryIndex, cardFormatIndex, noteInfos);
-                    this._setupFlagsIndicator(entryIndex, cardFormatIndex, noteInfos);
-                }
             }
         }
     }
@@ -538,7 +533,7 @@ export class DisplayAnki {
         const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
         try {
             this._updateSaveButtonsPromise = promise;
-            if (this._checkForDuplicates === true) {
+            if (this._checkForDuplicates === true && this._noteDupeCheckFirst === true) {
                 try {
                     await this._quickDupeCheck(dictionaryEntries);
                 } catch (error) {
@@ -609,7 +604,9 @@ export class DisplayAnki {
     }
 
     /**
-     * Used to remove the temporary duplicate-indicator elements so the real ones take their place
+     * Used to remove the temporary duplicate-indicator elements
+     * from _displayWhetherDupeOrNotAndLoading
+     * so the real ones take their place
      */
     _removeDupeIndicators() {
         if (this._checkForDuplicates === false) { return; }
