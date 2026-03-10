@@ -1256,6 +1256,7 @@ export class DictionaryImportController {
                 enableTermEntryContentDedup,
                 termContentStorageMode,
                 termContentCompressionMinBytes,
+                termContentWriteCoalesceMaxChunks,
             } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
@@ -1267,6 +1268,7 @@ export class DictionaryImportController {
                 enableTermEntryContentDedup,
                 termContentStorageMode,
                 termContentCompressionMinBytes,
+                termContentWriteCoalesceMaxChunks,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -1377,7 +1379,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes', termContentCompressionMinBytes: number}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes', termContentCompressionMinBytes: number, termContentWriteCoalesceMaxChunks?: number}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1405,6 +1407,14 @@ export class DictionaryImportController {
         ) ?
             Math.max(0, Math.trunc(termContentCompressionMinBytesRaw)) :
             1048576;
+        const termContentWriteCoalesceMaxChunksRaw = flagsRecord.termContentWriteCoalesceMaxChunks;
+        const termContentWriteCoalesceMaxChunks = (
+            typeof termContentWriteCoalesceMaxChunksRaw === 'number' &&
+            Number.isFinite(termContentWriteCoalesceMaxChunksRaw) &&
+            termContentWriteCoalesceMaxChunksRaw > 0
+        ) ?
+            Math.max(1, Math.trunc(termContentWriteCoalesceMaxChunksRaw)) :
+            void 0;
         return {
             skipImageMetadata: flagsRecord.skipImageMetadata === true,
             skipMediaImport: flagsRecord.skipMediaImport === true,
@@ -1413,6 +1423,7 @@ export class DictionaryImportController {
             enableTermEntryContentDedup: flagsRecord.enableTermEntryContentDedup !== false,
             termContentStorageMode,
             termContentCompressionMinBytes,
+            termContentWriteCoalesceMaxChunks,
         };
     }
 

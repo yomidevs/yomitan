@@ -300,6 +300,13 @@ export class DictionaryImporter {
         ) ?
             Math.max(0, Math.trunc(details.termContentCompressionMinBytes)) :
             1048576;
+        const termContentWriteCoalesceMaxChunks = (
+            typeof details.termContentWriteCoalesceMaxChunks === 'number' &&
+            Number.isFinite(details.termContentWriteCoalesceMaxChunks) &&
+            details.termContentWriteCoalesceMaxChunks > 0
+        ) ?
+            Math.max(1, Math.trunc(details.termContentWriteCoalesceMaxChunks)) :
+            void 0;
         this._skipImageMetadata = details.skipImageMetadata === true;
         this._skipMediaImport = details.skipMediaImport === true;
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
@@ -312,11 +319,12 @@ export class DictionaryImporter {
         dictionaryDatabase.setImportOptimizationFlags({
             termContentStorageMode,
             termContentCompressionMinBytes,
+            termContentWriteCoalesceMaxChunks,
         });
         const tImportStart = Date.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
         const phaseTimings = [];
-        /** @type {{termParseMs: number, termSerializationMs: number, bulkAddTermsMs: number, bulkAddTagsMetaMs: number, mediaResolveMs: number, mediaWriteMs: number}} */
+        /** @type {{termParseMs: number, termSerializationMs: number, bulkAddTermsMs: number, bulkAddTagsMetaMs: number, mediaResolveMs: number, mediaWriteMs: number, termFileNonParseWriteMs: number, termMetaReadMs: number, kanjiReadMs: number, kanjiMetaReadMs: number, tagReadMs: number}} */
         const step4TimingBreakdown = {
             termParseMs: 0,
             termSerializationMs: 0,
@@ -324,6 +332,11 @@ export class DictionaryImporter {
             bulkAddTagsMetaMs: 0,
             mediaResolveMs: 0,
             mediaWriteMs: 0,
+            termFileNonParseWriteMs: 0,
+            termMetaReadMs: 0,
+            kanjiReadMs: 0,
+            kanjiMetaReadMs: 0,
+            tagReadMs: 0,
         };
         /** @type {{parserProfile?: Record<string, string|number|boolean|null>|null, materializationMs?: number, chunkSinkMs?: number, chunkCount?: number, totalRows?: number}|null} */
         let lastFastTermBankReadProfile = null;
@@ -887,12 +900,22 @@ export class DictionaryImporter {
                     await processTermChunk(termFile, termReadResult.termList, termReadResult.requirements);
                 }
 
-                this._logImport(`term file ${termFile.filename}: total elapsed=${Date.now() - tTermFile}ms`);
+                const termFileElapsedMs = Math.max(0, Date.now() - tTermFile);
+                const termFileAccountedMs = (
+                    artifactBulkAddTermsMs +
+                    artifactSerializationMs +
+                    artifactMediaResolveMs +
+                    artifactMediaWriteMs +
+                    streamChunkWorkMs
+                );
+                step4TimingBreakdown.termFileNonParseWriteMs += Math.max(0, termFileElapsedMs - termFileAccountedMs);
+                this._logImport(`term file ${termFile.filename}: total elapsed=${termFileElapsedMs}ms`);
             }
 
             for (const termMetaFile of termMetaFiles) {
                 const tTermMetaFile = Date.now();
                 let termMetaList = await this._readFileSequence([termMetaFile], this._convertTermMetaBankEntry.bind(this), dictionaryTitle);
+                step4TimingBreakdown.termMetaReadMs += Math.max(0, Date.now() - tTermMetaFile);
 
                 const tMetaWriteStart = Date.now();
                 await bulkAdd('termMeta', termMetaList);
@@ -918,6 +941,7 @@ export class DictionaryImporter {
                         this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV1.bind(this), dictionaryTitle) :
                         this._readFileSequence([kanjiFile], this._convertKanjiBankEntryV3.bind(this), dictionaryTitle)
                 );
+                step4TimingBreakdown.kanjiReadMs += Math.max(0, Date.now() - tKanjiFile);
 
                 const tKanjiWriteStart = Date.now();
                 await bulkAdd('kanji', kanjiList);
@@ -933,6 +957,7 @@ export class DictionaryImporter {
             for (const kanjiMetaFile of kanjiMetaFiles) {
                 const tKanjiMetaFile = Date.now();
                 let kanjiMetaList = await this._readFileSequence([kanjiMetaFile], this._convertKanjiMetaBankEntry.bind(this), dictionaryTitle);
+                step4TimingBreakdown.kanjiMetaReadMs += Math.max(0, Date.now() - tKanjiMetaFile);
 
                 const tKanjiMetaWriteStart = Date.now();
                 await bulkAdd('kanjiMeta', kanjiMetaList);
@@ -955,6 +980,7 @@ export class DictionaryImporter {
                 const tTagFile = Date.now();
                 let tagList = await this._readFileSequence([tagFile], this._convertTagBankEntry.bind(this), dictionaryTitle);
                 this._addOldIndexTags(index, tagList, dictionaryTitle);
+                step4TimingBreakdown.tagReadMs += Math.max(0, Date.now() - tTagFile);
 
                 const tTagWriteStart = Date.now();
                 await bulkAdd('tagMeta', tagList);
@@ -988,6 +1014,11 @@ export class DictionaryImporter {
                 step4BulkAddTagsMetaMs: Math.max(0, step4TimingBreakdown.bulkAddTagsMetaMs),
                 step4MediaResolveMs: Math.max(0, step4TimingBreakdown.mediaResolveMs),
                 step4MediaWriteMs: Math.max(0, step4TimingBreakdown.mediaWriteMs),
+                step4TermFileNonParseWriteMs: Math.max(0, step4TimingBreakdown.termFileNonParseWriteMs),
+                step4TermMetaReadMs: Math.max(0, step4TimingBreakdown.termMetaReadMs),
+                step4KanjiReadMs: Math.max(0, step4TimingBreakdown.kanjiReadMs),
+                step4KanjiMetaReadMs: Math.max(0, step4TimingBreakdown.kanjiMetaReadMs),
+                step4TagReadMs: Math.max(0, step4TimingBreakdown.tagReadMs),
                 step4AccountedMs: Math.max(0, step4AccountedMs),
                 step4OtherMs: Math.max(0, importDataBanksElapsedMs - step4AccountedMs),
                 useMediaPipeline,

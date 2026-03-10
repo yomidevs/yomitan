@@ -76,9 +76,11 @@ export class TermContentOpfsStore {
         this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
         /** @type {number} */
         this._writeCoalesceMaxChunks = this._computeWriteCoalesceMaxChunks();
-        /** @type {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number, drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}|null} */
+        /** @type {number|null} */
+        this._writeCoalesceMaxChunksOverride = null;
+        /** @type {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number, drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, minWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, minMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}|null} */
         this._lastEndImportSessionMetrics = null;
-        /** @type {{drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}} */
+        /** @type {{drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, minWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, minMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}} */
         this._writeDrainMetrics = this._createEmptyWriteDrainMetrics();
         /** @type {'baseline'|'raw-bytes'} */
         this._importStorageMode = 'baseline';
@@ -176,6 +178,17 @@ export class TermContentOpfsStore {
         this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
         this._writeCoalesceMaxChunks = this._computeWriteCoalesceMaxChunks();
         this._flushThresholdBytes = this._computeWriteFlushThresholdBytes();
+        this._writeDrainMetrics = this._createEmptyWriteDrainMetrics();
+    }
+
+    /**
+     * @param {number|null} value
+     */
+    setWriteCoalesceMaxChunksOverride(value) {
+        this._writeCoalesceMaxChunksOverride = (typeof value === 'number' && Number.isFinite(value) && value > 0) ?
+            Math.max(1, Math.trunc(value)) :
+            null;
+        this._writeCoalesceMaxChunks = this._computeWriteCoalesceMaxChunks();
         this._writeDrainMetrics = this._createEmptyWriteDrainMetrics();
     }
 
@@ -444,6 +457,9 @@ export class TermContentOpfsStore {
             if (groupBytes > this._writeDrainMetrics.maxWriteBytes) {
                 this._writeDrainMetrics.maxWriteBytes = groupBytes;
             }
+            if (this._writeDrainMetrics.minWriteBytes === 0 || groupBytes < this._writeDrainMetrics.minWriteBytes) {
+                this._writeDrainMetrics.minWriteBytes = groupBytes;
+            }
             if (group.length === 1) {
                 ++this._writeDrainMetrics.singleChunkWriteCount;
                 await this._writable.write(group[0]);
@@ -455,6 +471,12 @@ export class TermContentOpfsStore {
             this._writeDrainMetrics.mergedGroupChunkCount += group.length;
             if (group.length > this._writeDrainMetrics.maxMergedGroupChunkCount) {
                 this._writeDrainMetrics.maxMergedGroupChunkCount = group.length;
+            }
+            if (
+                this._writeDrainMetrics.minMergedGroupChunkCount === 0 ||
+                group.length < this._writeDrainMetrics.minMergedGroupChunkCount
+            ) {
+                this._writeDrainMetrics.minMergedGroupChunkCount = group.length;
             }
             this._writeDrainMetrics.mergedWriteBytes += groupBytes;
             const merged = new Uint8Array(groupBytes);
@@ -843,11 +865,14 @@ export class TermContentOpfsStore {
      * @returns {number}
      */
     _computeWriteCoalesceMaxChunks() {
+        if (this._writeCoalesceMaxChunksOverride !== null) {
+            return this._writeCoalesceMaxChunksOverride;
+        }
         return this._importStorageMode === 'raw-bytes' ? RAW_BYTES_WRITE_COALESCE_MAX_CHUNKS : DEFAULT_WRITE_COALESCE_MAX_CHUNKS;
     }
 
     /**
-     * @returns {{drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}}
+     * @returns {{drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, minWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, minMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}}
      */
     _createEmptyWriteDrainMetrics() {
         return {
@@ -858,8 +883,10 @@ export class TermContentOpfsStore {
             totalWriteBytes: 0,
             mergedWriteBytes: 0,
             maxWriteBytes: 0,
+            minWriteBytes: 0,
             mergedGroupChunkCount: 0,
             maxMergedGroupChunkCount: 0,
+            minMergedGroupChunkCount: 0,
             flushDueToBytesCount: 0,
             flushDueToChunkCount: 0,
             flushFinalGroupCount: 0,

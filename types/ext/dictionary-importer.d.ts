@@ -64,6 +64,7 @@ export type ImportDetails = {
     enableTermEntryContentDedup?: boolean;
     termContentStorageMode?: 'baseline' | 'raw-bytes';
     termContentCompressionMinBytes?: number;
+    termContentWriteCoalesceMaxChunks?: number;
 };
 
 export type Summary = {

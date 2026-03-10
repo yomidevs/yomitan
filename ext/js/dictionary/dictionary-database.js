@@ -596,7 +596,7 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {{termContentStorageMode?: 'baseline'|'raw-bytes', termContentCompressionMinBytes?: number}} [options]
+     * @param {{termContentStorageMode?: 'baseline'|'raw-bytes', termContentCompressionMinBytes?: number, termContentWriteCoalesceMaxChunks?: number}} [options]
      */
     setImportOptimizationFlags(options = {}) {
         this._adaptiveTermBulkAddBatchSize = true;
@@ -615,6 +615,13 @@ export class DictionaryDatabase {
             1048576;
         this._rawTermContentPackTargetBytes = DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES;
         this._termContentStore.setImportStorageMode(this._termContentStorageMode);
+        this._termContentStore.setWriteCoalesceMaxChunksOverride(
+            typeof options.termContentWriteCoalesceMaxChunks === 'number' &&
+            Number.isFinite(options.termContentWriteCoalesceMaxChunks) &&
+            options.termContentWriteCoalesceMaxChunks > 0 ?
+                Math.max(1, Math.trunc(options.termContentWriteCoalesceMaxChunks)) :
+                null,
+        );
     }
 
     /**
