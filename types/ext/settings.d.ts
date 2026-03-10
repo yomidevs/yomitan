@@ -294,6 +294,7 @@ export type ParsingOptions = {
     selectedParser: string | null;
     termSpacing: boolean;
     readingMode: ParsingReadingMode;
+    useAllFrequencyDictionaries: boolean;
 };
 
 export type AnkiOptions = {
