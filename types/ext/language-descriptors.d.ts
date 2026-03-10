@@ -82,6 +82,7 @@ type AllTextProcessors = {
             normalizeUnicode: TextProcessor;
             addHamzaTop: TextProcessor;
             addHamzaBottom: TextProcessor;
+            addMadd: TextProcessor;
             convertAlifMaqsuraToYaa: TextProcessor;
         };
     };
@@ -92,6 +93,7 @@ type AllTextProcessors = {
             normalizeUnicode: TextProcessor;
             addHamzaTop: TextProcessor;
             addHamzaBottom: TextProcessor;
+            addMadd: TextProcessor;
             convertAlifMaqsuraToYaa: TextProcessor;
             convertHaToTaMarbuta: TextProcessor;
         };
