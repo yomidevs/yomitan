@@ -143,5 +143,6 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         excludeDictionaryDefinitions: Array.isArray(excludeDictionaryDefinitions) ? new Set(excludeDictionaryDefinitions) : null,
         searchResolution: typeof searchResolution !== 'undefined' ? searchResolution : 'letter',
         language: typeof language !== 'undefined' ? language : 'ja',
+        useAllFrequencyDictionaries: false,
     };
 }

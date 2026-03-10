@@ -19,6 +19,8 @@ import type * as StructuredContent from './structured-content';
 
 export type IndexVersion = 1 | 2 | 3;
 
+export type FrequencyMode = 'occurrence-based' | 'rank-based';
+
 export type Index = {
     format?: IndexVersion;
     version?: IndexVersion;
@@ -35,7 +37,7 @@ export type Index = {
     attribution?: string;
     sourceLanguage?: string;
     targetLanguage?: string;
-    frequencyMode?: 'occurrence-based' | 'rank-based';
+    frequencyMode?: FrequencyMode;
     tagMeta?: IndexTagMeta;
 };
 

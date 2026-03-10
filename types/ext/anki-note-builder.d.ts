@@ -142,5 +142,6 @@ export type MinimalApi = {
         scanLength: Api.ApiParam<'parseText', 'scanLength'>,
         useInternalParser: Api.ApiParam<'parseText', 'useInternalParser'>,
         useMecabParser: Api.ApiParam<'parseText', 'useMecabParser'>,
+        useAllFrequencyDictionaries: Api.ApiParam<'parseText', 'useAllFrequencyDictionaries'>,
     ): Promise<Api.ApiReturn<'parseText'>>;
 };
