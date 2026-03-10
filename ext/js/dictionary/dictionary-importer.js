@@ -300,12 +300,6 @@ export class DictionaryImporter {
         ) ?
             Math.max(0, Math.trunc(details.termContentCompressionMinBytes)) :
             1048576;
-        const rawTermContentPackTargetBytes = (
-            typeof details.rawTermContentPackTargetBytes === 'number' &&
-            Number.isFinite(details.rawTermContentPackTargetBytes)
-        ) ?
-            Math.max(64 * 1024, Math.trunc(details.rawTermContentPackTargetBytes)) :
-            4 * 1024 * 1024;
         this._skipImageMetadata = details.skipImageMetadata === true;
         this._skipMediaImport = details.skipMediaImport === true;
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
@@ -318,14 +312,11 @@ export class DictionaryImporter {
         dictionaryDatabase.setImportOptimizationFlags({
             termContentStorageMode,
             termContentCompressionMinBytes,
-            rawTermContentPackInputSlabs: details.rawTermContentPackInputSlabs === true,
-            rawTermContentPackTargetBytes,
-            rawTermContentShareGlossaryBytes: details.rawTermContentShareGlossaryBytes === true,
         });
         const tImportStart = Date.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
         const phaseTimings = [];
-        /** @type {{termParseMs: number, termSerializationMs: number, bulkAddTermsMs: number, bulkAddTagsMetaMs: number, mediaResolveMs: number, mediaWriteMs: number, sharedGlossaryEntryCount: number, sharedGlossaryUniqueCount: number, sharedGlossaryReusedCount: number, sharedGlossaryUniqueBytes: number, sharedGlossaryLogicalBytes: number, sharedGlossaryMetadataBytes: number}} */
+        /** @type {{termParseMs: number, termSerializationMs: number, bulkAddTermsMs: number, bulkAddTagsMetaMs: number, mediaResolveMs: number, mediaWriteMs: number}} */
         const step4TimingBreakdown = {
             termParseMs: 0,
             termSerializationMs: 0,
@@ -333,12 +324,6 @@ export class DictionaryImporter {
             bulkAddTagsMetaMs: 0,
             mediaResolveMs: 0,
             mediaWriteMs: 0,
-            sharedGlossaryEntryCount: 0,
-            sharedGlossaryUniqueCount: 0,
-            sharedGlossaryReusedCount: 0,
-            sharedGlossaryUniqueBytes: 0,
-            sharedGlossaryLogicalBytes: 0,
-            sharedGlossaryMetadataBytes: 0,
         };
         /** @type {{parserProfile?: Record<string, string|number|boolean|null>|null, materializationMs?: number, chunkSinkMs?: number, chunkCount?: number, totalRows?: number}|null} */
         let lastFastTermBankReadProfile = null;
@@ -585,7 +570,7 @@ export class DictionaryImporter {
              * @param {import('dictionary-importer').ImportRequirement[]|null} requirements
              * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}|null} streamedProgress
              * @param {number} streamedProgressStartIndex
-             * @returns {Promise<{mediaResolveMs: number, mediaWriteMs: number, serializationMs: number, bulkAddTermsMs: number, contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number, sharedGlossaryEntryCount: number, sharedGlossaryUniqueCount: number, sharedGlossaryReusedCount: number, sharedGlossaryUniqueBytes: number, sharedGlossaryLogicalBytes: number, sharedGlossaryMetadataBytes: number}>}
+             * @returns {Promise<{mediaResolveMs: number, mediaWriteMs: number, serializationMs: number, bulkAddTermsMs: number, contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number}>}
              */
             const processTermChunk = async (termFile, termList, requirements, streamedProgress = null, streamedProgressStartIndex = 0) => {
                 const trackProgress = streamedProgress === null;
@@ -598,12 +583,6 @@ export class DictionaryImporter {
                 let termRecordEncodeMs = 0;
                 let termRecordWriteMs = 0;
                 let termsVtabInsertMs = 0;
-                let sharedGlossaryEntryCount = 0;
-                let sharedGlossaryUniqueCount = 0;
-                let sharedGlossaryReusedCount = 0;
-                let sharedGlossaryUniqueBytes = 0;
-                let sharedGlossaryLogicalBytes = 0;
-                let sharedGlossaryMetadataBytes = 0;
                 if (useMediaPipeline && requirements !== null && uniqueMediaPaths !== null) {
                     /** @type {import('dictionary-importer').ImportRequirement[]} */
                     const alreadyAddedRequirements = [];
@@ -678,21 +657,9 @@ export class DictionaryImporter {
                         termRecordEncodeMs,
                         termRecordWriteMs,
                         termsVtabInsertMs,
-                        sharedGlossaryEntryCount = 0,
-                        sharedGlossaryUniqueCount = 0,
-                        sharedGlossaryReusedCount = 0,
-                        sharedGlossaryUniqueBytes = 0,
-                        sharedGlossaryLogicalBytes = 0,
-                        sharedGlossaryMetadataBytes = 0,
                     } = bulkAddTermsMetrics);
                 }
                 step4TimingBreakdown.bulkAddTermsMs += bulkAddTermsMs;
-                step4TimingBreakdown.sharedGlossaryEntryCount += sharedGlossaryEntryCount;
-                step4TimingBreakdown.sharedGlossaryUniqueCount += sharedGlossaryUniqueCount;
-                step4TimingBreakdown.sharedGlossaryReusedCount += sharedGlossaryReusedCount;
-                step4TimingBreakdown.sharedGlossaryUniqueBytes += sharedGlossaryUniqueBytes;
-                step4TimingBreakdown.sharedGlossaryLogicalBytes += sharedGlossaryLogicalBytes;
-                step4TimingBreakdown.sharedGlossaryMetadataBytes += sharedGlossaryMetadataBytes;
                 counts.terms.total += termList.length;
                 this._logImport(`term file ${termFile.filename}: terms write rows=${termList.length} elapsed=${tTermsWriteEnd - tTermsWriteStart}ms`);
 
@@ -711,12 +678,6 @@ export class DictionaryImporter {
                     termRecordEncodeMs,
                     termRecordWriteMs,
                     termsVtabInsertMs,
-                    sharedGlossaryEntryCount,
-                    sharedGlossaryUniqueCount,
-                    sharedGlossaryReusedCount,
-                    sharedGlossaryUniqueBytes,
-                    sharedGlossaryLogicalBytes,
-                    sharedGlossaryMetadataBytes,
                 };
             };
             for (let termFileIndex = 0; termFileIndex < activeTermFiles.length; ++termFileIndex) {
@@ -1031,12 +992,6 @@ export class DictionaryImporter {
                 step4OtherMs: Math.max(0, importDataBanksElapsedMs - step4AccountedMs),
                 useMediaPipeline,
                 hasArchiveImageMediaFiles,
-                sharedGlossaryEntryCount: step4TimingBreakdown.sharedGlossaryEntryCount,
-                sharedGlossaryUniqueCount: step4TimingBreakdown.sharedGlossaryUniqueCount,
-                sharedGlossaryReusedCount: step4TimingBreakdown.sharedGlossaryReusedCount,
-                sharedGlossaryUniqueBytes: step4TimingBreakdown.sharedGlossaryUniqueBytes,
-                sharedGlossaryLogicalBytes: step4TimingBreakdown.sharedGlossaryLogicalBytes,
-                sharedGlossaryMetadataBytes: step4TimingBreakdown.sharedGlossaryMetadataBytes,
             });
 
             // Finalize dictionary descriptor

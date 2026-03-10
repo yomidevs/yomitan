@@ -26,7 +26,7 @@ import {createDictionaryArchiveData, getDictionaryArchiveIndex} from '../dev/dic
 import {parseJson} from '../dev/json.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
-import {encodeRawTermContentBinary} from '../ext/js/dictionary/raw-term-content.js';
+import {encodeRawTermContentSharedGlossaryBinary} from '../ext/js/dictionary/raw-term-content.js';
 import {TermRecordOpfsStore} from '../ext/js/dictionary/term-record-opfs-store.js';
 import {DictionaryWorkerHandler} from '../ext/js/dictionary/dictionary-worker-handler.js';
 import {chrome, fetch} from './mocks/common.js';
@@ -224,8 +224,8 @@ function concatUint8Arrays(chunks) {
  * @param {import('dictionary-data').IndexVersion} version
  * @param {string} dictionaryTitle
  * @param {import('dictionary-data').TermV1Array|import('dictionary-data').TermV3Array} rawEntries
- * @param {'legacy'|'raw-v2'} [termContentMode]
- * @returns {Uint8Array}
+ * @param {'legacy'|'raw-v3'} [termContentMode]
+ * @returns {{payload: Uint8Array, sharedGlossaryBytes: Uint8Array|null}}
  * @throws {Error}
  */
 function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries, termContentMode = 'legacy') {
@@ -244,6 +244,9 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
     );
     /** @type {Uint8Array[]} */
     const chunks = [textEncoder.encode('MBTB0001')];
+    const sharedGlossaryBytes = termContentMode === 'raw-v3' ? [] : null;
+    /** @type {Map<string, {offset: number, length: number}>|null} */
+    const sharedGlossarySpanByKey = termContentMode === 'raw-v3' ? new Map() : null;
     const rowCountBytes = new Uint8Array(4);
     new DataView(rowCountBytes.buffer).setUint32(0, rawEntries.length, true);
     chunks.push(rowCountBytes);
@@ -255,15 +258,28 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
         const expressionBytes = textEncoder.encode(entry.expression);
         const readingValue = entry.reading === entry.expression ? '' : entry.reading;
         const readingBytes = textEncoder.encode(readingValue);
-        const contentBytes = termContentMode === 'raw-v2' ?
-            encodeRawTermContentBinary(
+        const contentBytes = (() => {
+            if (termContentMode !== 'raw-v3') {
+                return entry.termEntryContentBytes;
+            }
+            const glossaryBytes = textEncoder.encode(JSON.stringify(entry.glossary));
+            const glossaryKey = JSON.stringify(entry.glossary);
+            let span = /** @type {{offset: number, length: number}|undefined} */ (sharedGlossarySpanByKey?.get(glossaryKey));
+            if (typeof span === 'undefined') {
+                const offset = sharedGlossaryBytes.reduce((sum, chunk) => (sum + chunk.byteLength), 0);
+                span = {offset, length: glossaryBytes.byteLength};
+                sharedGlossarySpanByKey?.set(glossaryKey, span);
+                sharedGlossaryBytes?.push(glossaryBytes);
+            }
+            return encodeRawTermContentSharedGlossaryBinary(
                 entry.rules,
                 entry.definitionTags,
                 entry.termTags,
-                textEncoder.encode(JSON.stringify(entry.glossary)),
+                span.offset,
+                span.length,
                 textEncoder,
-            ) :
-            entry.termEntryContentBytes;
+            );
+        })();
         if (!(contentBytes instanceof Uint8Array)) {
             throw new Error('Expected precomputed term entry content bytes');
         }
@@ -287,13 +303,16 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
             contentBytes,
         );
     }
-    return concatUint8Arrays(chunks);
+    return {
+        payload: concatUint8Arrays(chunks),
+        sharedGlossaryBytes: Array.isArray(sharedGlossaryBytes) ? concatUint8Arrays(sharedGlossaryBytes) : null,
+    };
 }
 
 /**
  * @param {string} dictionary
  * @param {string} [dictionaryName]
- * @param {'legacy'|'raw-v2'} [termContentMode]
+ * @param {'legacy'|'raw-v3'} [termContentMode]
  * @returns {Promise<ArrayBuffer>}
  */
 async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryName, termContentMode = 'legacy') {
@@ -312,6 +331,8 @@ async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryNam
             };
         },
     });
+    /** @type {Uint8Array[]} */
+    const sharedGlossaryChunks = [];
     for (const fileName of fileNames) {
         if (/^term_bank_\d+\.json$/i.test(fileName)) {
             const content = readFileSync(join(dictionaryDirectory, fileName), {encoding: 'utf8'});
@@ -328,9 +349,12 @@ async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryNam
             if (typeof version === 'undefined') {
                 throw new Error(`Expected dictionary index version in ${dictionary}/index.json`);
             }
-            const artifactPayload = createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries, termContentMode);
+            const {payload: artifactPayload, sharedGlossaryBytes} = createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries, termContentMode);
             const artifactName = fileName.replace(/\.json$/i, '.mbtb');
             await zipWriter.add(artifactName, new Blob([artifactPayload]).stream());
+            if (termContentMode === 'raw-v3' && sharedGlossaryBytes instanceof Uint8Array && sharedGlossaryBytes.byteLength > 0) {
+                sharedGlossaryChunks.push(sharedGlossaryBytes);
+            }
             continue;
         }
         if (/\.json$/i.test(fileName)) {
@@ -346,11 +370,22 @@ async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryNam
                     termContentMode,
                 };
             }
+            if (fileName === 'index.json' && termContentMode === 'raw-v3' && typeof json === 'object' && json !== null) {
+                json = {
+                    .../** @type {Record<string, unknown>} */(json),
+                    sharedGlossaryArtifact: {
+                        file: 'manabitan-term-glossary-shared.bin',
+                    },
+                };
+            }
             await zipWriter.add(fileName, new TextReader(JSON.stringify(json, null, 0)));
             continue;
         }
         const content = readFileSync(join(dictionaryDirectory, fileName), {encoding: null});
         await zipWriter.add(fileName, new Blob([content]).stream());
+    }
+    if (termContentMode === 'raw-v3' && sharedGlossaryChunks.length > 0) {
+        await zipWriter.add('manabitan-term-glossary-shared.bin', new Blob([concatUint8Arrays(sharedGlossaryChunks)]).stream());
     }
     const blob = await zipWriter.close();
     return await blob.arrayBuffer();
@@ -751,8 +786,8 @@ describe('Database', () => {
             }
         });
 
-        test('Imports raw-v2 term artifact files and preserves lookup/counts', async ({expect}) => {
-            const testDictionarySource = await createTestDictionaryArtifactArchiveData('valid-dictionary1', 'Artifact Raw Dictionary', 'raw-v2');
+        test('Imports raw-v3 term artifact files and preserves lookup/counts', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArtifactArchiveData('valid-dictionary1', 'Artifact Raw Dictionary', 'raw-v3');
             const dictionaryDatabase = new DictionaryDatabase();
             await dictionaryDatabase.prepare();
             try {
@@ -779,44 +814,6 @@ describe('Database', () => {
                 const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
                 expect.soft(results.length).toBeGreaterThan(0);
                 expect.soft(results.some((entry) => entry.dictionary === 'Artifact Raw Dictionary')).toBe(true);
-            } finally {
-                await dictionaryDatabase.close();
-            }
-        });
-
-        test('Imports raw-v2 term artifact files with shared glossary storage and preserves lookup/counts', async ({expect}) => {
-            const testDictionarySource = await createTestDictionaryArtifactArchiveData('valid-dictionary1', 'Artifact Shared Glossary Dictionary', 'raw-v2');
-            const dictionaryDatabase = new DictionaryDatabase();
-            await dictionaryDatabase.prepare();
-            try {
-                const dictionaryImporter = createDictionaryImporter(expect);
-                const {result, errors} = await dictionaryImporter.importDictionary(
-                    dictionaryDatabase,
-                    testDictionarySource,
-                    {
-                        prefixWildcardsSupported: true,
-                        yomitanVersion: '0.0.0.0',
-                        termContentStorageMode: 'raw-bytes',
-                        rawTermContentShareGlossaryBytes: true,
-                    },
-                );
-                expect.soft(errors).toStrictEqual([]);
-                expect.soft(result).not.toBeNull();
-
-                const info = await dictionaryDatabase.getDictionaryInfo();
-                expect.soft(info.length).toBe(1);
-                expect.soft(info[0]?.title).toBe('Artifact Shared Glossary Dictionary');
-                expect.soft(info[0]?.importSuccess).toBe(true);
-
-                const counts = await dictionaryDatabase.getDictionaryCounts(['Artifact Shared Glossary Dictionary'], true);
-                expect.soft(counts.total.terms).toBeGreaterThan(0);
-
-                const titles = new Map([
-                    ['Artifact Shared Glossary Dictionary', {alias: 'Artifact Shared Glossary Dictionary', allowSecondarySearches: false}],
-                ]);
-                const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
-                expect.soft(results.length).toBeGreaterThan(0);
-                expect.soft(results.some((entry) => entry.dictionary === 'Artifact Shared Glossary Dictionary')).toBe(true);
             } finally {
                 await dictionaryDatabase.close();
             }
@@ -1406,11 +1403,11 @@ describe('Database', () => {
             expect.soft(afterInfo).toStrictEqual([]);
             const counts = await dictionaryDatabase.getDictionaryCounts([], true);
             expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
-            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(2);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(3);
             await dictionaryDatabase.close();
         });
 
-        test('Schema migration v2 upgrades from v1 without wiping dictionary data', async ({expect}) => {
+        test('Schema migration v2 upgrades from v1 without wiping dictionary data, and v3 resets for raw-v3 schema', async ({expect}) => {
             const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
             const dictionaryDatabase = new DictionaryDatabase();
             await dictionaryDatabase.prepare();
@@ -1436,9 +1433,8 @@ describe('Database', () => {
             const v2Summary = await Promise.resolve(runSchemaMigrationToVersion.call(dictionaryDatabase, 2));
 
             const afterInfo = await dictionaryDatabase.getDictionaryInfo();
-            expect.soft(afterInfo.length).toBe(1);
-            expect.soft(afterInfo[0]?.importSuccess).toBe(true);
-            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(2);
+            expect.soft(afterInfo).toStrictEqual([]);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(3);
             expect.soft(v2Summary).toStrictEqual({migration: 'schema-v2-noop'});
             await dictionaryDatabase.close();
         });
@@ -1466,7 +1462,7 @@ describe('Database', () => {
             const info = await dictionaryDatabase.getDictionaryInfo();
             expect.soft(info.length).toBe(1);
             expect.soft(info[0]?.importSuccess).toBe(true);
-            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(2);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(3);
             await dictionaryDatabase.close();
         });
 
