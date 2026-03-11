@@ -117,6 +117,49 @@ describe('Japanese utility functions', () => {
         });
     });
 
+    describe('getKanaScriptType', () => {
+        /** @type {[character: string, expected: 'hiragana'|'katakana'|null][]} */
+        const data = [
+            ['か', 'hiragana'],
+            ['カ', 'katakana'],
+            ['ﾀ', 'katakana'],
+            ['々', null],
+            ['a', null],
+        ];
+
+        test.each(data)('%s -> %o', (character, expected) => {
+            expect(jp.getKanaScriptType(character)).toStrictEqual(expected);
+        });
+    });
+
+    describe('convertIterationMarksToExplicitKanji', () => {
+        /** @type {[string: string, expected: string][]} */
+        const data = [
+            ['瑞々しい', '瑞瑞しい'],
+            ['人々', '人人'],
+            ['人々々', '人人人'],
+            ['ここ', 'ここ'],
+        ];
+
+        test.each(data)('%s -> %o', (string, expected) => {
+            expect(jp.convertIterationMarksToExplicitKanji(string)).toStrictEqual(expected);
+        });
+    });
+
+    describe('convertExplicitKanjiDuplicationToIterationMarks', () => {
+        /** @type {[string: string, expected: string][]} */
+        const data = [
+            ['瑞瑞しい', '瑞々しい'],
+            ['人人', '人々'],
+            ['人人人', '人々々'],
+            ['ここ', 'ここ'],
+        ];
+
+        test.each(data)('%s -> %o', (string, expected) => {
+            expect(jp.convertExplicitKanjiDuplicationToIterationMarks(string)).toStrictEqual(expected);
+        });
+    });
+
     describe('convertKatakanaToHiragana', () => {
         /** @type {[string: string, expected: string, keepProlongedSoundMarks?: boolean][]} */
         const data = [

@@ -28,6 +28,8 @@ const KANA_PROLONGED_SOUND_MARK_CODE_POINT = 0x30fc;
 const HIRAGANA_RANGE = [0x3040, 0x309f];
 /** @type {import('CJK-util').CodepointRange} */
 const KATAKANA_RANGE = [0x30a0, 0x30ff];
+/** @type {import('CJK-util').CodepointRange} */
+const HALFWIDTH_KATAKANA_RANGE = [0xff66, 0xff9f];
 
 /** @type {import('CJK-util').CodepointRange} */
 const HIRAGANA_CONVERSION_RANGE = [0x3041, 0x3096];
@@ -47,7 +49,7 @@ const JAPANESE_RANGES = [
 
     ...CJK_IDEOGRAPH_RANGES,
 
-    [0xff66, 0xff9f], // Halfwidth katakana
+    HALFWIDTH_KATAKANA_RANGE,
 
     [0x30fb, 0x30fc], // Katakana punctuation
     [0xff61, 0xff65], // Kana punctuation
@@ -308,6 +310,20 @@ export function isCodePointJapanese(codePoint) {
     return isCodePointInRanges(codePoint, JAPANESE_RANGES);
 }
 
+/**
+ * @param {number} codePoint
+ * @returns {'hiragana'|'katakana'|null}
+ */
+function getKanaScriptTypeFromCodePoint(codePoint) {
+    if (isCodePointInRange(codePoint, HIRAGANA_RANGE)) {
+        return 'hiragana';
+    }
+    if (isCodePointInRange(codePoint, KATAKANA_RANGE) || isCodePointInRange(codePoint, HALFWIDTH_KATAKANA_RANGE)) {
+        return 'katakana';
+    }
+    return null;
+}
+
 
 // String testing functions
 
@@ -337,6 +353,56 @@ export function isStringPartiallyJapanese(str) {
         }
     }
     return false;
+}
+
+/**
+ * @param {string} character
+ * @returns {'hiragana'|'katakana'|null}
+ */
+export function getKanaScriptType(character) {
+    const codePoint = character.codePointAt(0);
+    return typeof codePoint === 'number' ? getKanaScriptTypeFromCodePoint(codePoint) : null;
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+export function convertIterationMarksToExplicitKanji(text) {
+    let result = '';
+    for (const character of text) {
+        if (character === '々') {
+            const previousCharacter = result.at(-1);
+            if (typeof previousCharacter === 'string' && isCodePointKanji(/** @type {number} */ (previousCharacter.codePointAt(0)))) {
+                result += previousCharacter;
+                continue;
+            }
+        }
+        result += character;
+    }
+    return result;
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+export function convertExplicitKanjiDuplicationToIterationMarks(text) {
+    let result = '';
+    let previousCharacter = null;
+    for (const character of text) {
+        if (
+            previousCharacter !== null &&
+            character === previousCharacter &&
+            isCodePointKanji(/** @type {number} */ (character.codePointAt(0)))
+        ) {
+            result += '々';
+        } else {
+            result += character;
+        }
+        previousCharacter = character;
+    }
+    return result;
 }
 
 
