@@ -15,38 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {RAW_TERM_CONTENT_DICT_NAME, RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME} from './raw-term-content.js';
-
-const META_U32_FIELDS = 10;
+const META_U32_FIELDS = 8;
 const META_BYTES = META_U32_FIELDS * 4;
-const U32_NULL = 0xffffffff;
 const U16_NULL = 0xffff;
-const ENTRY_CONTENT_DICT_NAME_CODE_RAW = 0;
-const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2 = 1;
-const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3 = 2;
-const ENTRY_CONTENT_DICT_NAME_CODE_JMDICT = 3;
-const ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM = 0xff;
-const ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION = 0x8000;
-
-/**
- * @param {string} value
- * @returns {{meta: number, requiresString: boolean}}
- */
-function encodeEntryContentDictNameMeta(value) {
-    switch (value) {
-        case '':
-        case 'raw':
-            return {meta: ENTRY_CONTENT_DICT_NAME_CODE_RAW, requiresString: false};
-        case RAW_TERM_CONTENT_DICT_NAME:
-            return {meta: ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2, requiresString: false};
-        case RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME:
-            return {meta: ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3, requiresString: false};
-        case 'jmdict':
-            return {meta: ENTRY_CONTENT_DICT_NAME_CODE_JMDICT, requiresString: false};
-        default:
-            return {meta: ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM, requiresString: true};
-    }
-}
+const READING_EQUALS_EXPRESSION_U16 = 0xffff;
 
 /** @type {Promise<{memory: WebAssembly.Memory, wasm_reset_heap: () => void, wasm_alloc: (size: number) => number, calc_encoded_size: (count: number, metasPtr: number) => number, encode_records: (count: number, metasPtr: number, stringsPtr: number, outPtr: number) => number}>|null} */
 let wasmPromise = null;
@@ -154,19 +126,11 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     const metasU32 = new Uint32Array(metasBuffer);
     const metasI32 = new Int32Array(metasBuffer);
     const {stringOffsets, stringLengths, internString, buildStringsBuffer} = createStringInterner(textEncoder);
-    const firstRecord = records[0];
-    const firstDictNameMeta = encodeEntryContentDictNameMeta(firstRecord.entryContentDictName);
-    const sharedDictNameIndex = firstDictNameMeta.requiresString ? internString(firstRecord.entryContentDictName) : -1;
-
     let recordIndex = 0;
     for (const record of records) {
         const expressionIndex = internString(record.expression);
         const readingEqualsExpression = record.reading === record.expression;
         const readingIndex = readingEqualsExpression ? expressionIndex : internString(record.reading);
-        const dictNameMetaInfo = encodeEntryContentDictNameMeta(record.entryContentDictName);
-        const dictNameIndex = dictNameMetaInfo.requiresString ?
-            (record.entryContentDictName === firstRecord.entryContentDictName ? sharedDictNameIndex : internString(record.entryContentDictName)) :
-            -1;
         if (
             stringLengths[expressionIndex] > U16_NULL ||
             stringLengths[readingIndex] > U16_NULL
@@ -174,24 +138,14 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
             return null;
         }
         const metaIndex = recordIndex * META_U32_FIELDS;
-        const dictNameFlags = (
-            (readingEqualsExpression ? ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION : 0)
-        ) >>> 0;
         metasU32[metaIndex + 0] = stringOffsets[expressionIndex] >>> 0;
         metasU32[metaIndex + 1] = stringLengths[expressionIndex] >>> 0;
         metasU32[metaIndex + 2] = stringOffsets[readingIndex] >>> 0;
-        metasU32[metaIndex + 3] = readingEqualsExpression ? 0 : (stringLengths[readingIndex] >>> 0);
+        metasU32[metaIndex + 3] = readingEqualsExpression ? READING_EQUALS_EXPRESSION_U16 : (stringLengths[readingIndex] >>> 0);
         metasI32[metaIndex + 4] = record.entryContentOffset | 0;
         metasI32[metaIndex + 5] = record.entryContentLength | 0;
-        if (dictNameMetaInfo.requiresString && dictNameIndex >= 0) {
-            metasU32[metaIndex + 6] = ((((stringLengths[dictNameIndex] >>> 0) << 8) | ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) | dictNameFlags) >>> 0;
-            metasU32[metaIndex + 7] = stringOffsets[dictNameIndex] >>> 0;
-        } else {
-            metasU32[metaIndex + 6] = (dictNameMetaInfo.meta | dictNameFlags) >>> 0;
-            metasU32[metaIndex + 7] = U32_NULL;
-        }
-        metasI32[metaIndex + 8] = record.score | 0;
-        metasI32[metaIndex + 9] = record.sequence ?? -1;
+        metasI32[metaIndex + 6] = record.score | 0;
+        metasI32[metaIndex + 7] = record.sequence ?? -1;
         ++recordIndex;
     }
     const stringsBuffer = buildStringsBuffer();
