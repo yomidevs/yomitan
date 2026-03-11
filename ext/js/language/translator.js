@@ -26,6 +26,14 @@ import {MultiLanguageTransformer} from './multi-language-transformer.js';
 import {isCodePointChinese} from './zh/chinese.js';
 
 /**
+ * @param {number} codePoint
+ * @returns {boolean}
+ */
+function isCodePointAsciiDigit(codePoint) {
+    return codePoint >= 0x30 && codePoint <= 0x39;
+}
+
+/**
  * Class which finds term and kanji dictionary entries for text.
  */
 export class Translator {
@@ -649,7 +657,12 @@ export class Translator {
         let length = 0;
         for (const c of text) {
             const codePoint = /** @type {number} */ (c.codePointAt(0));
-            if (!isCodePointJapanese(codePoint) && !isCodePointChinese(codePoint) && !isCodePointKorean(codePoint)) {
+            if (
+                !isCodePointJapanese(codePoint) &&
+                !isCodePointChinese(codePoint) &&
+                !isCodePointKorean(codePoint) &&
+                !isCodePointAsciiDigit(codePoint)
+            ) {
                 return text.substring(0, length);
             }
             length += c.length;
