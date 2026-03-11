@@ -29,6 +29,7 @@ import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
 import {encodeRawTermContentSharedGlossaryBinary} from '../ext/js/dictionary/raw-term-content.js';
 import {TermRecordOpfsStore} from '../ext/js/dictionary/term-record-opfs-store.js';
 import {DictionaryWorkerHandler} from '../ext/js/dictionary/dictionary-worker-handler.js';
+import {compress as zstdCompress, init as zstdInit} from '../ext/lib/zstd-wasm.js';
 import {chrome, fetch} from './mocks/common.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
 import {setupStubs} from './utilities/database.js';
@@ -219,12 +220,24 @@ function concatUint8Arrays(chunks) {
     return result;
 }
 
+let zstdInitialized = false;
+
+/**
+ * @returns {Promise<void>}
+ */
+async function ensureZstdInitialized() {
+    if (zstdInitialized) { return; }
+    const wasmPath = join(dirname, '..', 'ext', 'lib', 'zstd.wasm');
+    await zstdInit(new Uint8Array(readFileSync(wasmPath)));
+    zstdInitialized = true;
+}
+
 /**
  * @param {DictionaryImporter} dictionaryImporter
  * @param {import('dictionary-data').IndexVersion} version
  * @param {string} dictionaryTitle
  * @param {import('dictionary-data').TermV1Array|import('dictionary-data').TermV3Array} rawEntries
- * @param {'legacy'|'raw-v3'} [termContentMode]
+ * @param {'legacy'|'raw-v3'|'raw-v4'} [termContentMode]
  * @returns {{payload: Uint8Array, sharedGlossaryBytes: Uint8Array|null}}
  * @throws {Error}
  */
@@ -244,9 +257,9 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
     );
     /** @type {Uint8Array[]} */
     const chunks = [textEncoder.encode('MBTB0001')];
-    const sharedGlossaryBytes = termContentMode === 'raw-v3' ? [] : null;
+    const sharedGlossaryBytes = termContentMode === 'raw-v3' || termContentMode === 'raw-v4' ? [] : null;
     /** @type {Map<string, {offset: number, length: number}>|null} */
-    const sharedGlossarySpanByKey = termContentMode === 'raw-v3' ? new Map() : null;
+    const sharedGlossarySpanByKey = termContentMode === 'raw-v3' || termContentMode === 'raw-v4' ? new Map() : null;
     const rowCountBytes = new Uint8Array(4);
     new DataView(rowCountBytes.buffer).setUint32(0, rawEntries.length, true);
     chunks.push(rowCountBytes);
@@ -259,7 +272,7 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
         const readingValue = entry.reading === entry.expression ? '' : entry.reading;
         const readingBytes = textEncoder.encode(readingValue);
         const contentBytes = (() => {
-            if (termContentMode !== 'raw-v3') {
+            if (termContentMode !== 'raw-v3' && termContentMode !== 'raw-v4') {
                 return entry.termEntryContentBytes;
             }
             const glossaryBytes = textEncoder.encode(JSON.stringify(entry.glossary));
@@ -312,7 +325,7 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
 /**
  * @param {string} dictionary
  * @param {string} [dictionaryName]
- * @param {'legacy'|'raw-v3'} [termContentMode]
+ * @param {'legacy'|'raw-v3'|'raw-v4'} [termContentMode]
  * @returns {Promise<ArrayBuffer>}
  */
 async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryName, termContentMode = 'legacy') {
@@ -333,6 +346,8 @@ async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryNam
     });
     /** @type {Uint8Array[]} */
     const sharedGlossaryChunks = [];
+    /** @type {Record<string, unknown>|null} */
+    let rawIndex = null;
     for (const fileName of fileNames) {
         if (/^term_bank_\d+\.json$/i.test(fileName)) {
             const content = readFileSync(join(dictionaryDirectory, fileName), {encoding: 'utf8'});
@@ -352,7 +367,7 @@ async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryNam
             const {payload: artifactPayload, sharedGlossaryBytes} = createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries, termContentMode);
             const artifactName = fileName.replace(/\.json$/i, '.mbtb');
             await zipWriter.add(artifactName, new Blob([artifactPayload]).stream());
-            if (termContentMode === 'raw-v3' && sharedGlossaryBytes instanceof Uint8Array && sharedGlossaryBytes.byteLength > 0) {
+            if ((termContentMode === 'raw-v3' || termContentMode === 'raw-v4') && sharedGlossaryBytes instanceof Uint8Array && sharedGlossaryBytes.byteLength > 0) {
                 sharedGlossaryChunks.push(sharedGlossaryBytes);
             }
             continue;
@@ -365,18 +380,11 @@ async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryNam
                 json = {.../** @type {Record<string, unknown>} */(json), title: dictionaryName};
             }
             if (fileName === 'index.json' && typeof json === 'object' && json !== null) {
-                json = {
+                rawIndex = {
                     .../** @type {Record<string, unknown>} */(json),
                     termContentMode,
                 };
-            }
-            if (fileName === 'index.json' && termContentMode === 'raw-v3' && typeof json === 'object' && json !== null) {
-                json = {
-                    .../** @type {Record<string, unknown>} */(json),
-                    sharedGlossaryArtifact: {
-                        file: 'manabitan-term-glossary-shared.bin',
-                    },
-                };
+                continue;
             }
             await zipWriter.add(fileName, new TextReader(JSON.stringify(json, null, 0)));
             continue;
@@ -384,8 +392,26 @@ async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryNam
         const content = readFileSync(join(dictionaryDirectory, fileName), {encoding: null});
         await zipWriter.add(fileName, new Blob([content]).stream());
     }
-    if (termContentMode === 'raw-v3' && sharedGlossaryChunks.length > 0) {
-        await zipWriter.add('manabitan-term-glossary-shared.bin', new Blob([concatUint8Arrays(sharedGlossaryChunks)]).stream());
+    if ((termContentMode === 'raw-v3' || termContentMode === 'raw-v4') && sharedGlossaryChunks.length > 0) {
+        const sharedGlossaryBytes = concatUint8Arrays(sharedGlossaryChunks);
+        let artifactBytes = sharedGlossaryBytes;
+        if (termContentMode === 'raw-v4') {
+            await ensureZstdInitialized();
+            artifactBytes = zstdCompress(sharedGlossaryBytes, 1);
+        }
+        await zipWriter.add('manabitan-term-glossary-shared.bin', new Blob([artifactBytes]).stream());
+        if (rawIndex !== null) {
+            rawIndex = {
+                ...rawIndex,
+                sharedGlossaryArtifact: {
+                    file: 'manabitan-term-glossary-shared.bin',
+                    ...(termContentMode === 'raw-v4' ? {uncompressedLength: sharedGlossaryBytes.byteLength} : {}),
+                },
+            };
+        }
+    }
+    if (rawIndex !== null) {
+        await zipWriter.add('index.json', new TextReader(JSON.stringify(rawIndex, null, 0)));
     }
     const blob = await zipWriter.close();
     return await blob.arrayBuffer();
@@ -814,6 +840,39 @@ describe('Database', () => {
                 const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
                 expect.soft(results.length).toBeGreaterThan(0);
                 expect.soft(results.some((entry) => entry.dictionary === 'Artifact Raw Dictionary')).toBe(true);
+            } finally {
+                await dictionaryDatabase.close();
+            }
+        });
+
+        test('Imports raw-v4 term artifact files and preserves lookup/counts', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArtifactArchiveData('valid-dictionary1', 'Artifact Raw V4 Dictionary', 'raw-v4');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(errors).toStrictEqual([]);
+                expect.soft(result).not.toBeNull();
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info.length).toBe(1);
+                expect.soft(info[0]?.title).toBe('Artifact Raw V4 Dictionary');
+                expect.soft(info[0]?.importSuccess).toBe(true);
+
+                const counts = await dictionaryDatabase.getDictionaryCounts(['Artifact Raw V4 Dictionary'], true);
+                expect.soft(counts.total.terms).toBeGreaterThan(0);
+
+                const titles = new Map([
+                    ['Artifact Raw V4 Dictionary', {alias: 'Artifact Raw V4 Dictionary', allowSecondarySearches: false}],
+                ]);
+                const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
+                expect.soft(results.length).toBeGreaterThan(0);
+                expect.soft(results.some((entry) => entry.dictionary === 'Artifact Raw V4 Dictionary')).toBe(true);
             } finally {
                 await dictionaryDatabase.close();
             }

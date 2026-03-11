@@ -24,6 +24,8 @@ export const RAW_TERM_CONTENT_DICT_NAME = 'raw-v2';
 
 export const RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME = 'raw-v3';
 
+export const RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME = 'raw-v4';
+
 /**
  * @param {Uint8Array} bytes
  * @param {TextDecoder} textDecoder

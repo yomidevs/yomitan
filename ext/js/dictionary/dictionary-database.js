@@ -38,6 +38,7 @@ import {
 } from './zstd-term-content.js';
 import {
     decodeRawTermContentHeader,
+    RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME,
     decodeRawTermContentSharedGlossaryHeader,
     encodeRawTermContentBinary,
     getRawTermContentGlossaryJsonBytes,
@@ -46,10 +47,11 @@ import {
     RAW_TERM_CONTENT_DICT_NAME,
     RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME,
 } from './raw-term-content.js';
+import {decompress as zstdDecompress} from '../../lib/zstd-wasm.js';
 import {TermContentOpfsStore} from './term-content-opfs-store.js';
 import {TermRecordOpfsStore} from './term-record-opfs-store.js';
 
-const CURRENT_DICTIONARY_SCHEMA_VERSION = 3;
+const CURRENT_DICTIONARY_SCHEMA_VERSION = 4;
 const TERM_ENTRY_CONTENT_CACHE_MAX_ENTRIES = 4096;
 const DEFAULT_STATEMENT_CACHE_MAX_ENTRIES = 256;
 const LOW_MEMORY_STATEMENT_CACHE_MAX_ENTRIES = 128;
@@ -170,6 +172,10 @@ export class DictionaryDatabase {
         this._statementCacheMaxEntries = this._computeStatementCacheMaxEntries();
         /** @type {Map<string, {definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson?: string, glossary?: import('dictionary-data').TermGlossary[]}>} */
         this._termEntryContentCache = new Map();
+        /** @type {Map<string, {contentOffset: number, contentLength: number, contentDictName: string, uncompressedLength: number}>} */
+        this._sharedGlossaryArtifactMetaByDictionary = new Map();
+        /** @type {Map<string, Uint8Array>} */
+        this._sharedGlossaryArtifactInflatedByDictionary = new Map();
         /** @type {number} */
         this._termEntryContentCacheMaxEntries = TERM_ENTRY_CONTENT_CACHE_MAX_ENTRIES;
         /** @type {TextEncoder} */
@@ -1919,12 +1925,94 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {string} dictionary
+     * @returns {{contentOffset: number, contentLength: number, contentDictName: string, uncompressedLength: number}|null}
+     */
+    _getSharedGlossaryArtifactMeta(dictionary) {
+        const cached = this._sharedGlossaryArtifactMetaByDictionary.get(dictionary);
+        if (typeof cached !== 'undefined') {
+            return cached;
+        }
+        const db = this._requireDb();
+        const row = db.selectObject(
+            'SELECT contentOffset, contentLength, contentDictName, uncompressedLength FROM sharedGlossaryArtifacts WHERE dictionary = $dictionary LIMIT 1',
+            {$dictionary: dictionary},
+        );
+        if (typeof row === 'undefined') {
+            return null;
+        }
+        const meta = {
+            contentOffset: this._asNumber(row.contentOffset, -1),
+            contentLength: this._asNumber(row.contentLength, 0),
+            contentDictName: this._asString(row.contentDictName),
+            uncompressedLength: this._asNumber(row.uncompressedLength, 0),
+        };
+        this._sharedGlossaryArtifactMetaByDictionary.set(dictionary, meta);
+        return meta;
+    }
+
+    /**
+     * @param {string} dictionary
+     * @param {number} glossaryOffset
+     * @param {number} glossaryLength
+     * @returns {Promise<Uint8Array>}
+     */
+    async _readCompressedSharedGlossarySlice(dictionary, glossaryOffset, glossaryLength) {
+        const cached = this._sharedGlossaryArtifactInflatedByDictionary.get(dictionary);
+        if (cached instanceof Uint8Array) {
+            return cached.subarray(glossaryOffset, glossaryOffset + glossaryLength);
+        }
+        const meta = this._getSharedGlossaryArtifactMeta(dictionary);
+        if (meta === null || meta.contentOffset < 0 || meta.contentLength <= 0) {
+            return new Uint8Array(0);
+        }
+        const compressedBytes = await this._termContentStore.readSlice(meta.contentOffset, meta.contentLength);
+        let inflatedBytes = compressedBytes;
+        if (meta.contentDictName === RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME) {
+            const defaultHeapSize = meta.uncompressedLength > 0 ? meta.uncompressedLength : (compressedBytes.byteLength * 16);
+            inflatedBytes = zstdDecompress(compressedBytes, {defaultHeapSize});
+        }
+        this._sharedGlossaryArtifactInflatedByDictionary.set(dictionary, inflatedBytes);
+        return inflatedBytes.subarray(glossaryOffset, glossaryOffset + glossaryLength);
+    }
+
+    /**
+     * @param {string} dictionary
      * @param {Uint8Array} bytes
+     * @param {string} contentDictName
+     * @param {number} uncompressedLength
      * @returns {Promise<{offset: number, length: number}>}
      */
-    async appendRawSharedGlossaryArtifact(bytes) {
+    async appendRawSharedGlossaryArtifact(dictionary, bytes, contentDictName, uncompressedLength) {
         const spans = await this._termContentStore.appendBatch([bytes]);
-        return spans.length > 0 ? spans[0] : {offset: 0, length: 0};
+        const span = spans.length > 0 ? spans[0] : {offset: 0, length: 0};
+        const db = this._requireDb();
+        db.exec({
+            sql: `
+                INSERT INTO sharedGlossaryArtifacts(dictionary, contentOffset, contentLength, contentDictName, uncompressedLength)
+                VALUES($dictionary, $contentOffset, $contentLength, $contentDictName, $uncompressedLength)
+                ON CONFLICT(dictionary) DO UPDATE SET
+                    contentOffset = excluded.contentOffset,
+                    contentLength = excluded.contentLength,
+                    contentDictName = excluded.contentDictName,
+                    uncompressedLength = excluded.uncompressedLength
+            `,
+            bind: {
+                $dictionary: dictionary,
+                $contentOffset: span.offset,
+                $contentLength: span.length,
+                $contentDictName: contentDictName,
+                $uncompressedLength: Math.max(0, uncompressedLength),
+            },
+        });
+        this._sharedGlossaryArtifactMetaByDictionary.set(dictionary, {
+            contentOffset: span.offset,
+            contentLength: span.length,
+            contentDictName,
+            uncompressedLength: Math.max(0, uncompressedLength),
+        });
+        this._sharedGlossaryArtifactInflatedByDictionary.delete(dictionary);
+        return span;
     }
 
     /**
@@ -2202,7 +2290,14 @@ export class DictionaryDatabase {
                 if (pendingContentBytes.length > 0) {
                     totalPendingContentUniqueCount += pendingContentBytes.length;
                     const tCompressStart = safePerformance.now();
-                    const storageChunks = this._createTermContentStorageChunks(pendingContentBytes, compressionDictName);
+                    const storageChunks = this._createTermContentStorageChunks(
+                        pendingContentBytes,
+                        compressionDictName,
+                        stagedRows.map((row, index) => {
+                            const pendingIndex = stagedPendingContentIndexes[index];
+                            return pendingIndex >= 0 ? (row.termEntryContentDictName ?? null) : null;
+                        }),
+                    );
                     compressContentMs += safePerformance.now() - tCompressStart;
                     const tAppendStart = safePerformance.now();
                     const spans = await this._termContentStore.appendBatch(storageChunks.storedChunks);
@@ -2731,12 +2826,20 @@ export class DictionaryDatabase {
                     await this._termContentStore.appendBatchToArrays(contentChunks, contentOffsets, contentLengths);
                 }
                 contentAppendMs += safePerformance.now() - tContentAppendStart;
-                const contentDictName = (
+                const explicitContentDictName = chunkCount > 0 ? (items[i].termEntryContentDictName ?? null) : null;
+                let contentDictName = 'raw';
+                if (
+                    this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
+                    typeof explicitContentDictName === 'string' &&
+                    explicitContentDictName.length > 0
+                ) {
+                    contentDictName = explicitContentDictName;
+                } else if (
                     this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
                     chunksToAppend.every((contentBytes) => isRawTermContentBinary(contentBytes))
-                ) ?
-                    RAW_TERM_CONTENT_DICT_NAME :
-                    'raw';
+                ) {
+                    contentDictName = RAW_TERM_CONTENT_DICT_NAME;
+                }
                 const metrics = await this._termRecordStore.appendBatchFromImportTermEntriesResolvedContent(items, i, chunkCount, contentOffsets, contentLengths, contentDictName);
                 termRecordBuildMs += metrics.buildRecordsMs;
                 termRecordEncodeMs += metrics.encodeMs;
@@ -2994,6 +3097,14 @@ export class DictionaryDatabase {
                 height INTEGER NOT NULL,
                 content BLOB NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS sharedGlossaryArtifacts (
+                dictionary TEXT PRIMARY KEY,
+                contentOffset INTEGER NOT NULL,
+                contentLength INTEGER NOT NULL,
+                contentDictName TEXT NOT NULL,
+                uncompressedLength INTEGER NOT NULL
+            );
         `);
         await this._ensureTermsVirtualTable();
         await this._migrateTermsContentSchema();
@@ -3054,6 +3165,8 @@ export class DictionaryDatabase {
                 return await this._migrateSchemaVersion2();
             case 3:
                 return await this._wipeDictionaryDataForSchemaMigration('reset-dictionary-data-for-raw-v3');
+            case 4:
+                return await this._wipeDictionaryDataForSchemaMigration('reset-dictionary-data-for-raw-v4');
             default:
                 throw new Error(`Unhandled dictionary schema migration target version: ${version}`);
         }
@@ -3073,6 +3186,7 @@ export class DictionaryDatabase {
         const tagMetaBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM tagMeta'), 0);
         const mediaBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM media'), 0);
         const termContentBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM termEntryContent'), 0);
+        const sharedGlossaryArtifactsBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM sharedGlossaryArtifacts'), 0);
         const termRecordsBefore = this._termRecordStore.size;
 
         await this._termContentStore.reset();
@@ -3085,6 +3199,7 @@ export class DictionaryDatabase {
             db.exec('DELETE FROM kanji');
             db.exec('DELETE FROM termMeta');
             db.exec('DELETE FROM termEntryContent');
+            db.exec('DELETE FROM sharedGlossaryArtifacts');
             db.exec('DELETE FROM dictionaries');
             db.exec('COMMIT');
         } catch (e) {
@@ -3099,6 +3214,8 @@ export class DictionaryDatabase {
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
         this._termEntryContentIdByKey.clear();
+        this._sharedGlossaryArtifactMetaByDictionary.clear();
+        this._sharedGlossaryArtifactInflatedByDictionary.clear();
         this._termsVirtualTableDirty = false;
         this._deferTermsVirtualTableSync = false;
 
@@ -3112,6 +3229,7 @@ export class DictionaryDatabase {
             kanjiMetaBefore,
             tagMetaBefore,
             mediaBefore,
+            sharedGlossaryArtifactsBefore,
         };
     }
 
@@ -3890,10 +4008,16 @@ export class DictionaryDatabase {
                             definitionTags = this._asNullableString(rawSharedGlossaryHeader.definitionTags) ?? null;
                             termTags = this._asNullableString(rawSharedGlossaryHeader.termTags);
                             rules = this._asString(rawSharedGlossaryHeader.rules);
-                            const rawGlossaryJsonBytes = await this._termContentStore.readSlice(
-                                rawSharedGlossaryHeader.glossaryOffset,
-                                rawSharedGlossaryHeader.glossaryLength,
-                            );
+                            const rawGlossaryJsonBytes = contentDictName === RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME ?
+                                await this._readCompressedSharedGlossarySlice(
+                                    this._asString(row.dictionary),
+                                    rawSharedGlossaryHeader.glossaryOffset,
+                                    rawSharedGlossaryHeader.glossaryLength,
+                                ) :
+                                await this._termContentStore.readSlice(
+                                    rawSharedGlossaryHeader.glossaryOffset,
+                                    rawSharedGlossaryHeader.glossaryLength,
+                                );
                             const glossaryJson = this._textDecoder.decode(rawGlossaryJsonBytes);
                             glossary = this._safeParseJson(glossaryJson, []);
                             cached = {
@@ -4521,17 +4645,22 @@ export class DictionaryDatabase {
     /**
      * @param {Uint8Array[]} contentBytesList
      * @param {string|null} compressionDictName
+     * @param {(string|null)[]} [contentDictNameOverrides]
      * @returns {{storedChunks: Uint8Array[], contentDictNames: string[], entryToStoredChunkIndexes: number[]}}
      */
-    _createTermContentStorageChunks(contentBytesList, compressionDictName) {
+    _createTermContentStorageChunks(contentBytesList, compressionDictName, contentDictNameOverrides = []) {
         if (this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) {
             return {
                 storedChunks: contentBytesList,
-                contentDictNames: contentBytesList.map((contentBytes) => (
-                    isRawTermContentBinary(contentBytes) ?
+                contentDictNames: contentBytesList.map((contentBytes, index) => {
+                    const override = contentDictNameOverrides[index];
+                    if (typeof override === 'string' && override.length > 0) {
+                        return override;
+                    }
+                    return isRawTermContentBinary(contentBytes) ?
                         RAW_TERM_CONTENT_DICT_NAME :
-                        (isRawTermContentSharedGlossaryBinary(contentBytes) ? RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME : 'raw')
-                )),
+                        (isRawTermContentSharedGlossaryBinary(contentBytes) ? RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME : 'raw');
+                }),
                 entryToStoredChunkIndexes: contentBytesList.map((_, index) => index),
             };
         }

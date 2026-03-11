@@ -65,6 +65,8 @@ export type DatabaseTermEntry = {
     termEntryContentHash2?: number;
     /** Pre-encoded dedupe payload bytes for import fast-path. */
     termEntryContentBytes?: Uint8Array;
+    /** Explicit raw term-content storage dict name for import fast-path. */
+    termEntryContentDictName?: string;
     /** Raw glossary JSON bytes retained for lazy raw-content encoding. */
     termEntryContentRawGlossaryJsonBytes?: Uint8Array;
     sequence?: number;

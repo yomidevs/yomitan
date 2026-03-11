@@ -31,6 +31,7 @@ import {getFileExtensionFromImageMediaType, getImageMediaTypeFromFileName} from 
 import {
     decodeRawTermContentBinary,
     encodeRawTermContentBinary,
+    RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME,
     RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME,
     isRawTermContentSharedGlossaryBinary,
     rebaseRawTermContentSharedGlossaryBinary,
@@ -522,7 +523,12 @@ export class DictionaryImporter {
             sharedGlossaryArtifactPreloadMs = Math.max(0, Date.now() - tSharedGlossaryReadStart);
             this._logImport(`shared glossary artifact preload ${sharedGlossaryArtifactPreloadMs}ms bytes=${sharedGlossaryArtifactBytes.byteLength}`);
         }
-        if (sharedGlossaryArtifactBytes instanceof Uint8Array && sharedGlossaryCompression === 'zstd') {
+        const useCompressedSharedGlossaryArtifact = termArtifactManifest?.termContentMode === RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME;
+        if (
+            sharedGlossaryArtifactBytes instanceof Uint8Array &&
+            sharedGlossaryCompression === 'zstd' &&
+            !useCompressedSharedGlossaryArtifact
+        ) {
             try {
                 await initializeTermContentZstd();
                 const defaultHeapSize = (
@@ -590,8 +596,15 @@ export class DictionaryImporter {
             await dictionaryDatabase.startBulkImport();
             if (sharedGlossaryArtifactBytes instanceof Uint8Array && sharedGlossaryArtifactBytes.byteLength > 0) {
                 const tSharedGlossaryAppendStart = Date.now();
-                const sharedGlossarySpan = await dictionaryDatabase.appendRawSharedGlossaryArtifact(sharedGlossaryArtifactBytes);
-                sharedGlossaryArtifactBaseOffset = sharedGlossarySpan.offset;
+                const sharedGlossarySpan = await dictionaryDatabase.appendRawSharedGlossaryArtifact(
+                    dictionaryTitle,
+                    sharedGlossaryArtifactBytes,
+                    useCompressedSharedGlossaryArtifact ? RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME : RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME,
+                    Number.isInteger(sharedGlossaryUncompressedLength) ? /** @type {number} */ (sharedGlossaryUncompressedLength) : sharedGlossaryArtifactBytes.byteLength,
+                );
+                if (!useCompressedSharedGlossaryArtifact) {
+                    sharedGlossaryArtifactBaseOffset = sharedGlossarySpan.offset;
+                }
                 sharedGlossaryArtifactAppendMs = Math.max(0, Date.now() - tSharedGlossaryAppendStart);
             }
             const hasArchiveImageMediaFiles = this._archiveHasImageMediaFiles(fileMap);
@@ -2651,6 +2664,11 @@ export class DictionaryImporter {
                 termEntryContentBytes: contentBytes,
                 sequence,
             };
+            if (termContentStorageMode === 'raw-bytes' && isRawTermContentSharedGlossaryBinary(contentBytes)) {
+                entry.termEntryContentDictName = sharedGlossaryBaseOffset > 0 ?
+                    RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME :
+                    RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME;
+            }
             this._normalizeArtifactTermEntryContent(entry, termContentStorageMode);
             cursor = contentEnd;
             if (streamToChunkHandler) {
