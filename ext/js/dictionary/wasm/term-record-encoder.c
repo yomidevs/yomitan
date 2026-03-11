@@ -17,7 +17,7 @@
 
 #include <stdint.h>
 
-#define RECORD_HEADER_BYTES 44u
+#define RECORD_HEADER_BYTES 40u
 #define U32_NULL 0xffffffffu
 #define WASM_PAGE_SIZE 65536u
 
@@ -27,8 +27,6 @@ static uint32_t heap_ptr = 0u;
 
 struct RecordMeta {
     uint32_t id;
-    uint32_t dictionary_off;
-    uint32_t dictionary_len;
     uint32_t expression_off;
     uint32_t expression_len;
     uint32_t reading_off;
@@ -109,7 +107,6 @@ uint32_t calc_encoded_size(uint32_t record_count, uint32_t metas_ptr) {
     for (uint32_t i = 0u; i < record_count; ++i) {
         const struct RecordMeta* m = &metas[i];
         uint32_t variable =
-            m->dictionary_len +
             m->expression_len +
             m->reading_len +
             (m->expression_reverse_len == U32_NULL ? 0u : m->expression_reverse_len) +
@@ -130,7 +127,6 @@ uint32_t encode_records(uint32_t record_count, uint32_t metas_ptr, uint32_t stri
     for (uint32_t i = 0u; i < record_count; ++i) {
         const struct RecordMeta* m = &metas[i];
         write_u32(out, &cursor, m->id);
-        write_u32(out, &cursor, m->dictionary_len);
         write_u32(out, &cursor, m->expression_len);
         write_u32(out, &cursor, m->reading_len);
         write_i32(out, &cursor, m->expression_reverse_len == U32_NULL ? -1 : (int32_t)m->expression_reverse_len);
@@ -141,7 +137,6 @@ uint32_t encode_records(uint32_t record_count, uint32_t metas_ptr, uint32_t stri
         write_i32(out, &cursor, m->score);
         write_i32(out, &cursor, m->sequence);
 
-        copy_bytes(out, &cursor, strings + m->dictionary_off, m->dictionary_len);
         copy_bytes(out, &cursor, strings + m->expression_off, m->expression_len);
         copy_bytes(out, &cursor, strings + m->reading_off, m->reading_len);
         if (m->expression_reverse_len != U32_NULL) {

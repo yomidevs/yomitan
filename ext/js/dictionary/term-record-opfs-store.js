@@ -24,9 +24,11 @@ const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
 const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
 const SHARD_FILE_PREFIX = 'dict-';
 const SHARD_FILE_SUFFIX = '.mbtr';
-const BINARY_MAGIC_TEXT = 'MBTRREC1';
+const BINARY_MAGIC_TEXT = 'MBTRREC2';
+const LEGACY_BINARY_MAGIC_TEXT = 'MBTRREC1';
 const BINARY_MAGIC_BYTES = 8;
-const RECORD_HEADER_BYTES = 44;
+const RECORD_HEADER_BYTES = 40;
+const LEGACY_RECORD_HEADER_BYTES = 44;
 const U32_NULL = 0xffffffff;
 const DEFAULT_FLUSH_THRESHOLD_BYTES = 32 * 1024 * 1024;
 const LOW_MEMORY_FLUSH_THRESHOLD_BYTES = 16 * 1024 * 1024;
@@ -816,18 +818,22 @@ export class TermRecordOpfsStore {
             return false;
         }
         const magic = this._textDecoder.decode(content.subarray(0, BINARY_MAGIC_BYTES));
-        return magic === BINARY_MAGIC_TEXT;
+        return magic === BINARY_MAGIC_TEXT || magic === LEGACY_BINARY_MAGIC_TEXT;
     }
 
     /**
      * @param {Uint8Array} content
+     * @param {string|null} shardDictionaryName
      */
-    _loadBinary(content) {
+    _loadBinary(content, shardDictionaryName = null) {
         const view = new DataView(content.buffer, content.byteOffset, content.byteLength);
+        const magic = this._textDecoder.decode(content.subarray(0, BINARY_MAGIC_BYTES));
+        const isLegacy = magic === LEGACY_BINARY_MAGIC_TEXT;
+        const recordHeaderBytes = isLegacy ? LEGACY_RECORD_HEADER_BYTES : RECORD_HEADER_BYTES;
         let cursor = BINARY_MAGIC_BYTES;
-        while ((cursor + RECORD_HEADER_BYTES) <= content.byteLength) {
+        while ((cursor + recordHeaderBytes) <= content.byteLength) {
             const id = view.getUint32(cursor, true); cursor += 4;
-            const dictionaryLength = view.getUint32(cursor, true); cursor += 4;
+            const dictionaryLength = isLegacy ? view.getUint32(cursor, true) : 0; cursor += isLegacy ? 4 : 0;
             const expressionLength = view.getUint32(cursor, true); cursor += 4;
             const readingLength = view.getUint32(cursor, true); cursor += 4;
             const expressionReverseLength = view.getInt32(cursor, true); cursor += 4;
@@ -849,7 +855,9 @@ export class TermRecordOpfsStore {
                 break;
             }
 
-            const dictionary = this._decodeString(content, cursor, dictionaryLength); cursor += dictionaryLength;
+            const dictionary = isLegacy ? this._decodeString(content, cursor, dictionaryLength) : shardDictionaryName;
+            if (isLegacy) { cursor += dictionaryLength; }
+            if (dictionary === null) { break; }
             const expression = this._decodeString(content, cursor, expressionLength); cursor += expressionLength;
             const reading = this._decodeString(content, cursor, readingLength); cursor += readingLength;
             const expressionReverse = expressionReverseLength >= 0 ? this._decodeString(content, cursor, expressionReverseLength) : null;
@@ -945,11 +953,10 @@ export class TermRecordOpfsStore {
                 this._wasmEncoderUnavailable = true;
             }
         }
-        /** @type {Array<{record: TermRecord, dictionaryBytes: Uint8Array, expressionBytes: Uint8Array, readingBytes: Uint8Array, expressionReverseBytes: Uint8Array|null, readingReverseBytes: Uint8Array|null, entryContentDictNameBytes: Uint8Array}>} */
+        /** @type {Array<{record: TermRecord, expressionBytes: Uint8Array, readingBytes: Uint8Array, expressionReverseBytes: Uint8Array|null, readingReverseBytes: Uint8Array|null, entryContentDictNameBytes: Uint8Array}>} */
         const encodedRows = [];
         let totalBytes = 0;
         for (const record of records) {
-            const dictionaryBytes = this._textEncoder.encode(record.dictionary);
             const expressionBytes = this._textEncoder.encode(record.expression);
             const readingBytes = this._textEncoder.encode(record.reading);
             const expressionReverseBytes = record.expressionReverse !== null ? this._textEncoder.encode(record.expressionReverse) : null;
@@ -957,7 +964,6 @@ export class TermRecordOpfsStore {
             const entryContentDictNameBytes = this._textEncoder.encode(record.entryContentDictName);
             totalBytes +=
                 RECORD_HEADER_BYTES +
-                dictionaryBytes.byteLength +
                 expressionBytes.byteLength +
                 readingBytes.byteLength +
                 (expressionReverseBytes?.byteLength ?? 0) +
@@ -965,7 +971,6 @@ export class TermRecordOpfsStore {
                 entryContentDictNameBytes.byteLength;
             encodedRows.push({
                 record,
-                dictionaryBytes,
                 expressionBytes,
                 readingBytes,
                 expressionReverseBytes,
@@ -978,9 +983,8 @@ export class TermRecordOpfsStore {
         const view = new DataView(output.buffer, output.byteOffset, output.byteLength);
         let cursor = 0;
         for (const row of encodedRows) {
-            const {record, dictionaryBytes, expressionBytes, readingBytes, expressionReverseBytes, readingReverseBytes, entryContentDictNameBytes} = row;
+            const {record, expressionBytes, readingBytes, expressionReverseBytes, readingReverseBytes, entryContentDictNameBytes} = row;
             view.setUint32(cursor, record.id, true); cursor += 4;
-            view.setUint32(cursor, dictionaryBytes.byteLength, true); cursor += 4;
             view.setUint32(cursor, expressionBytes.byteLength, true); cursor += 4;
             view.setUint32(cursor, readingBytes.byteLength, true); cursor += 4;
             view.setInt32(cursor, expressionReverseBytes?.byteLength ?? -1, true); cursor += 4;
@@ -991,7 +995,6 @@ export class TermRecordOpfsStore {
             view.setInt32(cursor, record.score, true); cursor += 4;
             view.setInt32(cursor, record.sequence ?? -1, true); cursor += 4;
 
-            output.set(dictionaryBytes, cursor); cursor += dictionaryBytes.byteLength;
             output.set(expressionBytes, cursor); cursor += expressionBytes.byteLength;
             output.set(readingBytes, cursor); cursor += readingBytes.byteLength;
             if (expressionReverseBytes !== null) {
@@ -1159,7 +1162,7 @@ export class TermRecordOpfsStore {
             const arrayBuffer = await file.arrayBuffer();
             const content = new Uint8Array(arrayBuffer);
             if (this._isBinaryFormat(content)) {
-                this._loadBinary(content);
+                this._loadBinary(content, this._decodeDictionaryNameFromShardFileName(name));
                 continue;
             }
             // Invalid shard payloads are discarded so they cannot poison future reads.

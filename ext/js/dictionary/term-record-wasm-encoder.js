@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const META_U32_FIELDS = 17;
+const META_U32_FIELDS = 15;
 const META_BYTES = META_U32_FIELDS * 4;
 const U32_NULL = 0xffffffff;
 
@@ -126,12 +126,10 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     const metasI32 = new Int32Array(metasBuffer);
     const {stringOffsets, stringLengths, internString, buildStringsBuffer} = createStringInterner(textEncoder);
     const firstRecord = records[0];
-    const sharedDictionaryIndex = internString(firstRecord.dictionary);
     const sharedDictNameIndex = internString(firstRecord.entryContentDictName);
 
     let recordIndex = 0;
     for (const record of records) {
-        const dictionaryIndex = record.dictionary === firstRecord.dictionary ? sharedDictionaryIndex : internString(record.dictionary);
         const expressionIndex = internString(record.expression);
         const readingIndex = record.reading === record.expression ? expressionIndex : internString(record.reading);
         const expressionReverseIndex = record.expressionReverse !== null ? internString(record.expressionReverse) : -1;
@@ -145,22 +143,20 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
         const dictNameIndex = record.entryContentDictName === firstRecord.entryContentDictName ? sharedDictNameIndex : internString(record.entryContentDictName);
         const metaIndex = recordIndex * META_U32_FIELDS;
         metasU32[metaIndex + 0] = record.id >>> 0;
-        metasU32[metaIndex + 1] = stringOffsets[dictionaryIndex] >>> 0;
-        metasU32[metaIndex + 2] = stringLengths[dictionaryIndex] >>> 0;
-        metasU32[metaIndex + 3] = stringOffsets[expressionIndex] >>> 0;
-        metasU32[metaIndex + 4] = stringLengths[expressionIndex] >>> 0;
-        metasU32[metaIndex + 5] = stringOffsets[readingIndex] >>> 0;
-        metasU32[metaIndex + 6] = stringLengths[readingIndex] >>> 0;
-        metasU32[metaIndex + 7] = expressionReverseIndex >= 0 ? (stringOffsets[expressionReverseIndex] >>> 0) : U32_NULL;
-        metasU32[metaIndex + 8] = expressionReverseIndex >= 0 ? (stringLengths[expressionReverseIndex] >>> 0) : U32_NULL;
-        metasU32[metaIndex + 9] = readingReverseIndex >= 0 ? (stringOffsets[readingReverseIndex] >>> 0) : U32_NULL;
-        metasU32[metaIndex + 10] = readingReverseIndex >= 0 ? (stringLengths[readingReverseIndex] >>> 0) : U32_NULL;
-        metasI32[metaIndex + 11] = record.entryContentOffset | 0;
-        metasI32[metaIndex + 12] = record.entryContentLength | 0;
-        metasU32[metaIndex + 13] = stringOffsets[dictNameIndex] >>> 0;
-        metasU32[metaIndex + 14] = stringLengths[dictNameIndex] >>> 0;
-        metasI32[metaIndex + 15] = record.score | 0;
-        metasI32[metaIndex + 16] = record.sequence ?? -1;
+        metasU32[metaIndex + 1] = stringOffsets[expressionIndex] >>> 0;
+        metasU32[metaIndex + 2] = stringLengths[expressionIndex] >>> 0;
+        metasU32[metaIndex + 3] = stringOffsets[readingIndex] >>> 0;
+        metasU32[metaIndex + 4] = stringLengths[readingIndex] >>> 0;
+        metasU32[metaIndex + 5] = expressionReverseIndex >= 0 ? (stringOffsets[expressionReverseIndex] >>> 0) : U32_NULL;
+        metasU32[metaIndex + 6] = expressionReverseIndex >= 0 ? (stringLengths[expressionReverseIndex] >>> 0) : U32_NULL;
+        metasU32[metaIndex + 7] = readingReverseIndex >= 0 ? (stringOffsets[readingReverseIndex] >>> 0) : U32_NULL;
+        metasU32[metaIndex + 8] = readingReverseIndex >= 0 ? (stringLengths[readingReverseIndex] >>> 0) : U32_NULL;
+        metasI32[metaIndex + 9] = record.entryContentOffset | 0;
+        metasI32[metaIndex + 10] = record.entryContentLength | 0;
+        metasU32[metaIndex + 11] = stringOffsets[dictNameIndex] >>> 0;
+        metasU32[metaIndex + 12] = stringLengths[dictNameIndex] >>> 0;
+        metasI32[metaIndex + 13] = record.score | 0;
+        metasI32[metaIndex + 14] = record.sequence ?? -1;
         ++recordIndex;
     }
     const stringsBuffer = buildStringsBuffer();
