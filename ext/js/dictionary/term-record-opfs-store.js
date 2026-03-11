@@ -25,13 +25,16 @@ const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
 const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
 const SHARD_FILE_PREFIX = 'dict-';
 const SHARD_FILE_SUFFIX = '.mbtr';
-const BINARY_MAGIC_TEXT = 'MBTRREC3';
-const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC2';
+const BINARY_MAGIC_TEXT = 'MBTRREC4';
+const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC3';
+const PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC2';
 const LEGACY_BINARY_MAGIC_TEXT = 'MBTRREC1';
 const BINARY_MAGIC_BYTES = 8;
-const RECORD_HEADER_BYTES = 40;
+const RECORD_HEADER_BYTES = 32;
+const PREVIOUS_RECORD_HEADER_BYTES = 40;
 const LEGACY_RECORD_HEADER_BYTES = 44;
 const U32_NULL = 0xffffffff;
+const U16_NULL = 0xffff;
 const DEFAULT_FLUSH_THRESHOLD_BYTES = 32 * 1024 * 1024;
 const LOW_MEMORY_FLUSH_THRESHOLD_BYTES = 16 * 1024 * 1024;
 const HIGH_MEMORY_FLUSH_THRESHOLD_BYTES = 64 * 1024 * 1024;
@@ -825,7 +828,12 @@ export class TermRecordOpfsStore {
             return false;
         }
         const magic = this._textDecoder.decode(content.subarray(0, BINARY_MAGIC_BYTES));
-        return magic === BINARY_MAGIC_TEXT || magic === PREVIOUS_BINARY_MAGIC_TEXT || magic === LEGACY_BINARY_MAGIC_TEXT;
+        return (
+            magic === BINARY_MAGIC_TEXT ||
+            magic === PREVIOUS_BINARY_MAGIC_TEXT ||
+            magic === PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
+            magic === LEGACY_BINARY_MAGIC_TEXT
+        );
     }
 
     /**
@@ -836,16 +844,32 @@ export class TermRecordOpfsStore {
         const view = new DataView(content.buffer, content.byteOffset, content.byteLength);
         const magic = this._textDecoder.decode(content.subarray(0, BINARY_MAGIC_BYTES));
         const isLegacy = magic === LEGACY_BINARY_MAGIC_TEXT;
+        const isCurrent = magic === BINARY_MAGIC_TEXT;
         const isPrevious = magic === PREVIOUS_BINARY_MAGIC_TEXT;
-        const recordHeaderBytes = isLegacy ? LEGACY_RECORD_HEADER_BYTES : RECORD_HEADER_BYTES;
+        const isPreviousPrevious = magic === PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
+        const recordHeaderBytes = (
+            isLegacy ?
+                LEGACY_RECORD_HEADER_BYTES :
+                (isCurrent ? RECORD_HEADER_BYTES : PREVIOUS_RECORD_HEADER_BYTES)
+        );
         let cursor = BINARY_MAGIC_BYTES;
         while ((cursor + recordHeaderBytes) <= content.byteLength) {
             const id = view.getUint32(cursor, true); cursor += 4;
             const dictionaryLength = isLegacy ? view.getUint32(cursor, true) : 0; cursor += isLegacy ? 4 : 0;
-            const expressionLength = view.getUint32(cursor, true); cursor += 4;
-            const readingLength = view.getUint32(cursor, true); cursor += 4;
-            const expressionReverseLength = view.getInt32(cursor, true); cursor += 4;
-            const readingReverseLength = view.getInt32(cursor, true); cursor += 4;
+            const expressionLength = isCurrent ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += isCurrent ? 2 : 4;
+            const readingLength = isCurrent ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += isCurrent ? 2 : 4;
+            const rawExpressionReverseLength = isCurrent ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += isCurrent ? 2 : 4;
+            const rawReadingReverseLength = isCurrent ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += isCurrent ? 2 : 4;
+            const expressionReverseLength = (
+                isCurrent ?
+                    (rawExpressionReverseLength === U16_NULL ? -1 : rawExpressionReverseLength) :
+                    (rawExpressionReverseLength === U32_NULL ? -1 : /** @type {number} */ (rawExpressionReverseLength))
+            );
+            const readingReverseLength = (
+                isCurrent ?
+                    (rawReadingReverseLength === U16_NULL ? -1 : rawReadingReverseLength) :
+                    (rawReadingReverseLength === U32_NULL ? -1 : /** @type {number} */ (rawReadingReverseLength))
+            );
             const rawEntryContentOffset = view.getUint32(cursor, true); cursor += 4;
             const rawEntryContentLength = view.getUint32(cursor, true); cursor += 4;
             const entryContentDictNameMeta = view.getUint32(cursor, true); cursor += 4;
@@ -878,7 +902,7 @@ export class TermRecordOpfsStore {
             if (expressionReverseLength >= 0) { cursor += expressionReverseLength; }
             const readingReverse = readingReverseLength >= 0 ? this._decodeString(content, cursor, readingReverseLength) : null;
             if (readingReverseLength >= 0) { cursor += readingReverseLength; }
-            const entryContentDictName = (isLegacy || isPrevious) ?
+            const entryContentDictName = (isLegacy || isPrevious || isPreviousPrevious) ?
                 this._decodeString(content, cursor, entryContentDictNameLength) :
                 this._decodeEntryContentDictName(entryContentDictNameMeta, content, cursor, entryContentDictNameLength);
             cursor += entryContentDictNameLength;
@@ -1049,10 +1073,10 @@ export class TermRecordOpfsStore {
         for (const row of encodedRows) {
             const {record, expressionBytes, readingBytes, expressionReverseBytes, readingReverseBytes, entryContentDictNameMeta, entryContentDictNameBytes} = row;
             view.setUint32(cursor, record.id, true); cursor += 4;
-            view.setUint32(cursor, expressionBytes.byteLength, true); cursor += 4;
-            view.setUint32(cursor, readingBytes.byteLength, true); cursor += 4;
-            view.setInt32(cursor, expressionReverseBytes?.byteLength ?? -1, true); cursor += 4;
-            view.setInt32(cursor, readingReverseBytes?.byteLength ?? -1, true); cursor += 4;
+            view.setUint16(cursor, expressionBytes.byteLength, true); cursor += 2;
+            view.setUint16(cursor, readingBytes.byteLength, true); cursor += 2;
+            view.setUint16(cursor, expressionReverseBytes?.byteLength ?? U16_NULL, true); cursor += 2;
+            view.setUint16(cursor, readingReverseBytes?.byteLength ?? U16_NULL, true); cursor += 2;
             view.setUint32(cursor, record.entryContentOffset >= 0 ? record.entryContentOffset : U32_NULL, true); cursor += 4;
             view.setUint32(cursor, record.entryContentLength >= 0 ? record.entryContentLength : U32_NULL, true); cursor += 4;
             view.setUint32(cursor, entryContentDictNameMeta, true); cursor += 4;

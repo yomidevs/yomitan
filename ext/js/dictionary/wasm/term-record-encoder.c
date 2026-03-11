@@ -17,8 +17,9 @@
 
 #include <stdint.h>
 
-#define RECORD_HEADER_BYTES 40u
+#define RECORD_HEADER_BYTES 32u
 #define U32_NULL 0xffffffffu
+#define U16_NULL 0xffffu
 #define WASM_PAGE_SIZE 65536u
 #define ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM 0xffu
 
@@ -80,6 +81,13 @@ uint32_t wasm_alloc(uint32_t size) {
     return start;
 }
 
+static inline void write_u16(uint8_t* out, uint32_t* cursor, uint32_t value) {
+    uint32_t c = *cursor;
+    out[c + 0u] = (uint8_t)(value & 0xffu);
+    out[c + 1u] = (uint8_t)((value >> 8u) & 0xffu);
+    *cursor = c + 2u;
+}
+
 static inline void write_u32(uint8_t* out, uint32_t* cursor, uint32_t value) {
     uint32_t c = *cursor;
     out[c + 0u] = (uint8_t)(value & 0xffu);
@@ -130,10 +138,10 @@ uint32_t encode_records(uint32_t record_count, uint32_t metas_ptr, uint32_t stri
     for (uint32_t i = 0u; i < record_count; ++i) {
         const struct RecordMeta* m = &metas[i];
         write_u32(out, &cursor, m->id);
-        write_u32(out, &cursor, m->expression_len);
-        write_u32(out, &cursor, m->reading_len);
-        write_i32(out, &cursor, m->expression_reverse_len == U32_NULL ? -1 : (int32_t)m->expression_reverse_len);
-        write_i32(out, &cursor, m->reading_reverse_len == U32_NULL ? -1 : (int32_t)m->reading_reverse_len);
+        write_u16(out, &cursor, m->expression_len > U16_NULL ? U16_NULL : m->expression_len);
+        write_u16(out, &cursor, m->reading_len > U16_NULL ? U16_NULL : m->reading_len);
+        write_u16(out, &cursor, m->expression_reverse_len == U32_NULL ? U16_NULL : m->expression_reverse_len);
+        write_u16(out, &cursor, m->reading_reverse_len == U32_NULL ? U16_NULL : m->reading_reverse_len);
         write_u32(out, &cursor, m->entry_content_offset >= 0 ? (uint32_t)m->entry_content_offset : U32_NULL);
         write_u32(out, &cursor, m->entry_content_length >= 0 ? (uint32_t)m->entry_content_length : U32_NULL);
         write_u32(out, &cursor, m->dict_name_meta);

@@ -20,6 +20,7 @@ import {RAW_TERM_CONTENT_DICT_NAME, RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME} 
 const META_U32_FIELDS = 15;
 const META_BYTES = META_U32_FIELDS * 4;
 const U32_NULL = 0xffffffff;
+const U16_NULL = 0xffff;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW = 0;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2 = 1;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3 = 2;
@@ -172,6 +173,14 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
         const dictNameIndex = dictNameMetaInfo.requiresString ?
             (record.entryContentDictName === firstRecord.entryContentDictName ? sharedDictNameIndex : internString(record.entryContentDictName)) :
             -1;
+        if (
+            stringLengths[expressionIndex] > U16_NULL ||
+            stringLengths[readingIndex] > U16_NULL ||
+            (expressionReverseIndex >= 0 && stringLengths[expressionReverseIndex] > U16_NULL) ||
+            (readingReverseIndex >= 0 && stringLengths[readingReverseIndex] > U16_NULL)
+        ) {
+            return null;
+        }
         const metaIndex = recordIndex * META_U32_FIELDS;
         metasU32[metaIndex + 0] = record.id >>> 0;
         metasU32[metaIndex + 1] = stringOffsets[expressionIndex] >>> 0;
