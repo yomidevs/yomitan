@@ -1332,8 +1332,8 @@ describe('Database', () => {
                     dictionary: 'Test Dictionary',
                     expression: '打つ',
                     reading: 'うつ',
-                    expressionReverse: 'つ打',
-                    readingReverse: 'つう',
+                    expressionReverse: null,
+                    readingReverse: null,
                     entryContentOffset: 0,
                     entryContentLength: 1,
                     entryContentDictName: 'raw',
@@ -1357,6 +1357,8 @@ describe('Database', () => {
                     const rebuilt = reopenedTermRecordStore.getDictionaryIndex('Test Dictionary');
                     expect.soft(rebuilt.expression.get('打つ')?.length ?? 0).toBeGreaterThan(0);
                     expect.soft(rebuilt.reading.get('うつ')?.length ?? 0).toBeGreaterThan(0);
+                    expect.soft(rebuilt.expressionReverse.get('つ打')?.length ?? 0).toBeGreaterThan(0);
+                    expect.soft(rebuilt.readingReverse.get('つう')?.length ?? 0).toBeGreaterThan(0);
                 } finally {
                     await reopenedTermRecordStore.reset();
                 }

@@ -17,7 +17,7 @@
 
 import {RAW_TERM_CONTENT_DICT_NAME, RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME} from './raw-term-content.js';
 
-const META_U32_FIELDS = 15;
+const META_U32_FIELDS = 11;
 const META_BYTES = META_U32_FIELDS * 4;
 const U32_NULL = 0xffffffff;
 const U16_NULL = 0xffff;
@@ -27,7 +27,6 @@ const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3 = 2;
 const ENTRY_CONTENT_DICT_NAME_CODE_JMDICT = 3;
 const ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM = 0xff;
 const ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION = 0x80000000;
-const ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE = 0x40000000;
 
 /**
  * @param {string} value
@@ -164,58 +163,36 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
         const expressionIndex = internString(record.expression);
         const readingEqualsExpression = record.reading === record.expression;
         const readingIndex = readingEqualsExpression ? expressionIndex : internString(record.reading);
-        const expressionReverseIndex = record.expressionReverse !== null ? internString(record.expressionReverse) : -1;
-        const readingReverseEqualsExpressionReverse = (
-            record.readingReverse !== null &&
-            record.expressionReverse !== null &&
-            record.readingReverse === record.expressionReverse
-        );
-        const readingReverseIndex = (
-            readingReverseEqualsExpressionReverse
-        ) ?
-            expressionReverseIndex :
-            (record.readingReverse !== null ? internString(record.readingReverse) : -1);
         const dictNameMetaInfo = encodeEntryContentDictNameMeta(record.entryContentDictName);
         const dictNameIndex = dictNameMetaInfo.requiresString ?
             (record.entryContentDictName === firstRecord.entryContentDictName ? sharedDictNameIndex : internString(record.entryContentDictName)) :
             -1;
         if (
             stringLengths[expressionIndex] > U16_NULL ||
-            stringLengths[readingIndex] > U16_NULL ||
-            (expressionReverseIndex >= 0 && stringLengths[expressionReverseIndex] > U16_NULL) ||
-            (readingReverseIndex >= 0 && stringLengths[readingReverseIndex] > U16_NULL)
+            stringLengths[readingIndex] > U16_NULL
         ) {
             return null;
         }
         const metaIndex = recordIndex * META_U32_FIELDS;
         const dictNameFlags = (
-            (readingEqualsExpression ? ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION : 0) |
-            (readingReverseEqualsExpressionReverse ? ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE : 0)
+            (readingEqualsExpression ? ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION : 0)
         ) >>> 0;
         metasU32[metaIndex + 0] = record.id >>> 0;
         metasU32[metaIndex + 1] = stringOffsets[expressionIndex] >>> 0;
         metasU32[metaIndex + 2] = stringLengths[expressionIndex] >>> 0;
         metasU32[metaIndex + 3] = stringOffsets[readingIndex] >>> 0;
         metasU32[metaIndex + 4] = readingEqualsExpression ? 0 : (stringLengths[readingIndex] >>> 0);
-        metasU32[metaIndex + 5] = expressionReverseIndex >= 0 ? (stringOffsets[expressionReverseIndex] >>> 0) : U32_NULL;
-        metasU32[metaIndex + 6] = expressionReverseIndex >= 0 ? (stringLengths[expressionReverseIndex] >>> 0) : U32_NULL;
-        metasU32[metaIndex + 7] = readingReverseIndex >= 0 ? (stringOffsets[readingReverseIndex] >>> 0) : U32_NULL;
-        metasU32[metaIndex + 8] = (
-            readingReverseIndex >= 0 ?
-                (readingReverseEqualsExpressionReverse ? 0 : (stringLengths[readingReverseIndex] >>> 0)) :
-                U32_NULL
-        );
-        metasI32[metaIndex + 9] = record.entryContentOffset | 0;
-        metasI32[metaIndex + 10] = record.entryContentLength | 0;
+        metasI32[metaIndex + 5] = record.entryContentOffset | 0;
+        metasI32[metaIndex + 6] = record.entryContentLength | 0;
         if (dictNameMetaInfo.requiresString && dictNameIndex >= 0) {
-            metasU32[metaIndex + 11] = ((((stringLengths[dictNameIndex] >>> 0) << 8) | ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) | dictNameFlags) >>> 0;
-            metasU32[metaIndex + 12] = stringOffsets[dictNameIndex] >>> 0;
+            metasU32[metaIndex + 7] = ((((stringLengths[dictNameIndex] >>> 0) << 8) | ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) | dictNameFlags) >>> 0;
+            metasU32[metaIndex + 8] = stringOffsets[dictNameIndex] >>> 0;
         } else {
-            metasU32[metaIndex + 11] = (dictNameMetaInfo.meta | dictNameFlags) >>> 0;
-            metasU32[metaIndex + 12] = U32_NULL;
+            metasU32[metaIndex + 7] = (dictNameMetaInfo.meta | dictNameFlags) >>> 0;
+            metasU32[metaIndex + 8] = U32_NULL;
         }
-        metasI32[metaIndex + 13] = record.score | 0;
-        metasI32[metaIndex + 14] = record.sequence ?? -1;
+        metasI32[metaIndex + 9] = record.score | 0;
+        metasI32[metaIndex + 10] = record.sequence ?? -1;
         ++recordIndex;
     }
     const stringsBuffer = buildStringsBuffer();

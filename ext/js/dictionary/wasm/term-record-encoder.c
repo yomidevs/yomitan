@@ -17,13 +17,12 @@
 
 #include <stdint.h>
 
-#define RECORD_HEADER_BYTES 32u
+#define RECORD_HEADER_BYTES 28u
 #define U32_NULL 0xffffffffu
 #define U16_NULL 0xffffu
 #define WASM_PAGE_SIZE 65536u
 #define ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM 0xffu
 #define ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION 0x80000000u
-#define ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE 0x40000000u
 #define ENTRY_CONTENT_DICT_NAME_FLAGS_MASK 0xc0000000u
 
 extern unsigned char __heap_base;
@@ -36,10 +35,6 @@ struct RecordMeta {
     uint32_t expression_len;
     uint32_t reading_off;
     uint32_t reading_len;
-    uint32_t expression_reverse_off;
-    uint32_t expression_reverse_len;
-    uint32_t reading_reverse_off;
-    uint32_t reading_reverse_len;
     int32_t entry_content_offset;
     int32_t entry_content_length;
     uint32_t dict_name_meta;
@@ -120,14 +115,7 @@ uint32_t calc_encoded_size(uint32_t record_count, uint32_t metas_ptr) {
         const struct RecordMeta* m = &metas[i];
         uint32_t variable =
             m->expression_len +
-            ((m->dict_name_meta & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) != 0u ? 0u : m->reading_len) +
-            (m->expression_reverse_len == U32_NULL ? 0u : m->expression_reverse_len) +
-            (
-                m->reading_reverse_len == U32_NULL ||
-                (m->dict_name_meta & ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE) != 0u ?
-                    0u :
-                    m->reading_reverse_len
-            );
+            ((m->dict_name_meta & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) != 0u ? 0u : m->reading_len);
         if ((m->dict_name_meta & 0xffu) == ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) {
             variable += ((m->dict_name_meta & ~ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) >> 8u);
         }
@@ -148,8 +136,6 @@ uint32_t encode_records(uint32_t record_count, uint32_t metas_ptr, uint32_t stri
         write_u32(out, &cursor, m->id);
         write_u16(out, &cursor, m->expression_len > U16_NULL ? U16_NULL : m->expression_len);
         write_u16(out, &cursor, m->reading_len > U16_NULL ? U16_NULL : m->reading_len);
-        write_u16(out, &cursor, m->expression_reverse_len == U32_NULL ? U16_NULL : m->expression_reverse_len);
-        write_u16(out, &cursor, m->reading_reverse_len == U32_NULL ? U16_NULL : m->reading_reverse_len);
         write_u32(out, &cursor, m->entry_content_offset >= 0 ? (uint32_t)m->entry_content_offset : U32_NULL);
         write_u32(out, &cursor, m->entry_content_length >= 0 ? (uint32_t)m->entry_content_length : U32_NULL);
         write_u32(out, &cursor, m->dict_name_meta);
@@ -159,15 +145,6 @@ uint32_t encode_records(uint32_t record_count, uint32_t metas_ptr, uint32_t stri
         copy_bytes(out, &cursor, strings + m->expression_off, m->expression_len);
         if ((m->dict_name_meta & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) == 0u) {
             copy_bytes(out, &cursor, strings + m->reading_off, m->reading_len);
-        }
-        if (m->expression_reverse_len != U32_NULL) {
-            copy_bytes(out, &cursor, strings + m->expression_reverse_off, m->expression_reverse_len);
-        }
-        if (
-            m->reading_reverse_len != U32_NULL &&
-            (m->dict_name_meta & ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE) == 0u
-        ) {
-            copy_bytes(out, &cursor, strings + m->reading_reverse_off, m->reading_reverse_len);
         }
         if ((m->dict_name_meta & 0xffu) == ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) {
             copy_bytes(out, &cursor, strings + m->dict_name_off, (m->dict_name_meta & ~ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) >> 8u);
