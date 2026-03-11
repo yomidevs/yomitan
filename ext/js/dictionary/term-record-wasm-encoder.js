@@ -17,7 +17,7 @@
 
 import {RAW_TERM_CONTENT_DICT_NAME, RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME} from './raw-term-content.js';
 
-const META_U32_FIELDS = 11;
+const META_U32_FIELDS = 10;
 const META_BYTES = META_U32_FIELDS * 4;
 const U32_NULL = 0xffffffff;
 const U16_NULL = 0xffff;
@@ -177,22 +177,21 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
         const dictNameFlags = (
             (readingEqualsExpression ? ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION : 0)
         ) >>> 0;
-        metasU32[metaIndex + 0] = record.id >>> 0;
-        metasU32[metaIndex + 1] = stringOffsets[expressionIndex] >>> 0;
-        metasU32[metaIndex + 2] = stringLengths[expressionIndex] >>> 0;
-        metasU32[metaIndex + 3] = stringOffsets[readingIndex] >>> 0;
-        metasU32[metaIndex + 4] = readingEqualsExpression ? 0 : (stringLengths[readingIndex] >>> 0);
-        metasI32[metaIndex + 5] = record.entryContentOffset | 0;
-        metasI32[metaIndex + 6] = record.entryContentLength | 0;
+        metasU32[metaIndex + 0] = stringOffsets[expressionIndex] >>> 0;
+        metasU32[metaIndex + 1] = stringLengths[expressionIndex] >>> 0;
+        metasU32[metaIndex + 2] = stringOffsets[readingIndex] >>> 0;
+        metasU32[metaIndex + 3] = readingEqualsExpression ? 0 : (stringLengths[readingIndex] >>> 0);
+        metasI32[metaIndex + 4] = record.entryContentOffset | 0;
+        metasI32[metaIndex + 5] = record.entryContentLength | 0;
         if (dictNameMetaInfo.requiresString && dictNameIndex >= 0) {
-            metasU32[metaIndex + 7] = ((((stringLengths[dictNameIndex] >>> 0) << 8) | ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) | dictNameFlags) >>> 0;
-            metasU32[metaIndex + 8] = stringOffsets[dictNameIndex] >>> 0;
+            metasU32[metaIndex + 6] = ((((stringLengths[dictNameIndex] >>> 0) << 8) | ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) | dictNameFlags) >>> 0;
+            metasU32[metaIndex + 7] = stringOffsets[dictNameIndex] >>> 0;
         } else {
-            metasU32[metaIndex + 7] = (dictNameMetaInfo.meta | dictNameFlags) >>> 0;
-            metasU32[metaIndex + 8] = U32_NULL;
+            metasU32[metaIndex + 6] = (dictNameMetaInfo.meta | dictNameFlags) >>> 0;
+            metasU32[metaIndex + 7] = U32_NULL;
         }
-        metasI32[metaIndex + 9] = record.score | 0;
-        metasI32[metaIndex + 10] = record.sequence ?? -1;
+        metasI32[metaIndex + 8] = record.score | 0;
+        metasI32[metaIndex + 9] = record.sequence ?? -1;
         ++recordIndex;
     }
     const stringsBuffer = buildStringsBuffer();

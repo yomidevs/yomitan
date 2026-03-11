@@ -25,16 +25,19 @@ const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
 const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
 const SHARD_FILE_PREFIX = 'dict-';
 const SHARD_FILE_SUFFIX = '.mbtr';
-const BINARY_MAGIC_TEXT = 'MBTRREC6';
-const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC5';
-const PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC4';
-const PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC3';
-const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC2';
+const BINARY_MAGIC_TEXT = 'MBTRREC7';
+const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC6';
+const PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC5';
+const PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC4';
+const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC3';
+const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC2';
 const LEGACY_BINARY_MAGIC_TEXT = 'MBTRREC1';
 const BINARY_MAGIC_BYTES = 8;
-const RECORD_HEADER_BYTES = 28;
-const PREVIOUS_RECORD_HEADER_BYTES = 32;
-const PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES = 40;
+const CHUNK_HEADER_BYTES = 8;
+const RECORD_HEADER_BYTES = 24;
+const PREVIOUS_RECORD_HEADER_BYTES = 28;
+const PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES = 32;
+const PREVIOUS_PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES = 40;
 const LEGACY_RECORD_HEADER_BYTES = 44;
 const U32_NULL = 0xffffffff;
 const U16_NULL = 0xffff;
@@ -257,7 +260,7 @@ export class TermRecordOpfsStore {
         for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
             const state = await this._getOrCreateShardState(dictionaryName);
             if (state === null) { continue; }
-            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords));
+            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords), dictionaryRecords[0]?.id ?? 0, dictionaryRecords.length);
         }
     }
 
@@ -326,14 +329,14 @@ export class TermRecordOpfsStore {
         if (recordsByDictionary === null) {
             const state = await this._getOrCreateShardState(singleDictionaryName);
             if (state !== null) {
-                await this._appendEncodedChunk(state, await this._encodeRecords(singleDictionaryRecords));
+                await this._appendEncodedChunk(state, await this._encodeRecords(singleDictionaryRecords), singleDictionaryRecords[0]?.id ?? 0, singleDictionaryRecords.length);
             }
             return;
         }
         for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
             const state = await this._getOrCreateShardState(dictionaryName);
             if (state === null) { continue; }
-            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords));
+            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords), dictionaryRecords[0]?.id ?? 0, dictionaryRecords.length);
         }
     }
 
@@ -614,7 +617,7 @@ export class TermRecordOpfsStore {
         const chunk = await this._encodeRecords(records);
         const encodeMs = safePerformance.now() - tEncodeStart;
         const tAppendStart = safePerformance.now();
-        await this._appendEncodedChunk(state, chunk);
+        await this._appendEncodedChunk(state, chunk, records[0]?.id ?? 0, records.length);
         const appendWriteMs = safePerformance.now() - tAppendStart;
         return {encodeMs, appendWriteMs};
     }
@@ -841,6 +844,7 @@ export class TermRecordOpfsStore {
             magic === PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
             magic === PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
             magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
+            magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
             magic === LEGACY_BINARY_MAGIC_TEXT
         );
     }
@@ -858,6 +862,7 @@ export class TermRecordOpfsStore {
         const isPreviousPrevious = magic === PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
         const isPreviousPreviousPrevious = magic === PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
         const isPreviousPreviousPreviousPrevious = magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
+        const isPreviousPreviousPreviousPreviousPrevious = magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
         let recordHeaderBytes;
         if (isLegacy) {
             recordHeaderBytes = LEGACY_RECORD_HEADER_BYTES;
@@ -865,57 +870,73 @@ export class TermRecordOpfsStore {
             recordHeaderBytes = RECORD_HEADER_BYTES;
         } else if (isPrevious) {
             recordHeaderBytes = PREVIOUS_RECORD_HEADER_BYTES;
-        } else {
+        } else if (isPreviousPrevious) {
             recordHeaderBytes = PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES;
+        } else {
+            recordHeaderBytes = PREVIOUS_PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES;
         }
         let cursor = BINARY_MAGIC_BYTES;
-        while ((cursor + recordHeaderBytes) <= content.byteLength) {
-            const id = view.getUint32(cursor, true); cursor += 4;
-            const dictionaryLength = isLegacy ? view.getUint32(cursor, true) : 0; cursor += isLegacy ? 4 : 0;
-            const expressionLength = isCurrent ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += isCurrent ? 2 : 4;
-            const readingLength = isCurrent ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += isCurrent ? 2 : 4;
-            const rawExpressionReverseLength = (
-                isCurrent ?
-                    U16_NULL :
-                    (isPrevious ? view.getUint16(cursor, true) : view.getUint32(cursor, true))
-            );
-            if (!isCurrent) { cursor += isPrevious ? 2 : 4; }
-            const rawReadingReverseLength = (
-                isCurrent ?
-                    U16_NULL :
-                    (isPrevious ? view.getUint16(cursor, true) : view.getUint32(cursor, true))
-            );
-            if (!isCurrent) { cursor += isPrevious ? 2 : 4; }
-            const expressionReverseLength = (
+        while (true) {
+            let chunkBaseId = 0;
+            let chunkCount = 0;
+            if (isCurrent) {
+                if ((cursor + CHUNK_HEADER_BYTES) > content.byteLength) { break; }
+                chunkBaseId = view.getUint32(cursor, true); cursor += 4;
+                chunkCount = view.getUint32(cursor, true); cursor += 4;
+                if (chunkBaseId <= 0 || chunkCount === 0) { break; }
+            } else {
+                if ((cursor + recordHeaderBytes) > content.byteLength) { break; }
+                chunkCount = 1;
+            }
+            for (let chunkIndex = 0; chunkIndex < chunkCount; ++chunkIndex) {
+                if ((cursor + recordHeaderBytes) > content.byteLength) { return; }
+                const id = isCurrent ? (chunkBaseId + chunkIndex) : view.getUint32(cursor, true);
+                if (!isCurrent) { cursor += 4; }
+                const dictionaryLength = isLegacy ? view.getUint32(cursor, true) : 0; cursor += isLegacy ? 4 : 0;
+                const expressionLength = (isCurrent || isPrevious) ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += (isCurrent || isPrevious) ? 2 : 4;
+                const readingLength = (isCurrent || isPrevious) ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += (isCurrent || isPrevious) ? 2 : 4;
+                const rawExpressionReverseLength = (
                 (isCurrent || isPrevious) ?
+                    U16_NULL :
+                    ((isPreviousPrevious || isPreviousPreviousPrevious) ? view.getUint16(cursor, true) : view.getUint32(cursor, true))
+                );
+                if (!(isCurrent || isPrevious)) { cursor += (isPreviousPrevious || isPreviousPreviousPrevious) ? 2 : 4; }
+                const rawReadingReverseLength = (
+                (isCurrent || isPrevious) ?
+                    U16_NULL :
+                    ((isPreviousPrevious || isPreviousPreviousPrevious) ? view.getUint16(cursor, true) : view.getUint32(cursor, true))
+                );
+                if (!(isCurrent || isPrevious)) { cursor += (isPreviousPrevious || isPreviousPreviousPrevious) ? 2 : 4; }
+                const expressionReverseLength = (
+                (isCurrent || isPrevious || isPreviousPrevious || isPreviousPreviousPrevious) ?
                     (rawExpressionReverseLength === U16_NULL ? -1 : rawExpressionReverseLength) :
                     (rawExpressionReverseLength === U32_NULL ? -1 : /** @type {number} */ (rawExpressionReverseLength))
-            );
-            const readingReverseLength = (
-                (isCurrent || isPrevious) ?
+                );
+                const readingReverseLength = (
+                (isCurrent || isPrevious || isPreviousPrevious || isPreviousPreviousPrevious) ?
                     (rawReadingReverseLength === U16_NULL ? -1 : rawReadingReverseLength) :
                     (rawReadingReverseLength === U32_NULL ? -1 : /** @type {number} */ (rawReadingReverseLength))
-            );
-            const rawEntryContentOffset = view.getUint32(cursor, true); cursor += 4;
-            const rawEntryContentLength = view.getUint32(cursor, true); cursor += 4;
-            const entryContentDictNameMeta = view.getUint32(cursor, true); cursor += 4;
-            const entryContentDictNameFlags = isCurrent ? (entryContentDictNameMeta & ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) : 0;
-            const entryContentDictNameValue = isCurrent ? (entryContentDictNameMeta & ENTRY_CONTENT_DICT_NAME_VALUE_MASK) : entryContentDictNameMeta;
-            const score = view.getInt32(cursor, true); cursor += 4;
-            const rawSequence = view.getInt32(cursor, true); cursor += 4;
-            let entryContentDictNameLength = 0;
-            if (isLegacy || isPrevious || isPreviousPrevious || isPreviousPreviousPrevious) {
-                entryContentDictNameLength = entryContentDictNameMeta;
-            } else if ((entryContentDictNameValue & 0xff) === ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) {
-                entryContentDictNameLength = entryContentDictNameValue >>> 8;
-            }
+                );
+                const rawEntryContentOffset = view.getUint32(cursor, true); cursor += 4;
+                const rawEntryContentLength = view.getUint32(cursor, true); cursor += 4;
+                const entryContentDictNameMeta = view.getUint32(cursor, true); cursor += 4;
+                const entryContentDictNameFlags = (isCurrent || isPrevious) ? (entryContentDictNameMeta & ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) : 0;
+                const entryContentDictNameValue = (isCurrent || isPrevious) ? (entryContentDictNameMeta & ENTRY_CONTENT_DICT_NAME_VALUE_MASK) : entryContentDictNameMeta;
+                const score = view.getInt32(cursor, true); cursor += 4;
+                const rawSequence = view.getInt32(cursor, true); cursor += 4;
+                let entryContentDictNameLength = 0;
+                if (isLegacy || isPrevious || isPreviousPrevious || isPreviousPreviousPrevious || isPreviousPreviousPreviousPrevious || isPreviousPreviousPreviousPreviousPrevious) {
+                    entryContentDictNameLength = entryContentDictNameMeta;
+                } else if ((entryContentDictNameValue & 0xff) === ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) {
+                    entryContentDictNameLength = entryContentDictNameValue >>> 8;
+                }
 
-            const requiredBytes =
+                const requiredBytes =
                 dictionaryLength +
                 expressionLength +
                 readingLength +
                 (
-                    isCurrent ?
+                    (isCurrent || isPrevious) ?
                         0 :
                         (
                             Math.max(0, expressionReverseLength) +
@@ -923,64 +944,65 @@ export class TermRecordOpfsStore {
                         )
                 ) +
                 entryContentDictNameLength;
-            if ((cursor + requiredBytes) > content.byteLength || id <= 0) {
-                break;
-            }
+                if ((cursor + requiredBytes) > content.byteLength || id <= 0) {
+                    return;
+                }
 
-            const dictionary = isLegacy ? this._decodeString(content, cursor, dictionaryLength) : shardDictionaryName;
-            if (isLegacy) { cursor += dictionaryLength; }
-            if (dictionary === null) { break; }
-            const expression = this._decodeString(content, cursor, expressionLength); cursor += expressionLength;
-            const reading = (
-                isCurrent && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) !== 0 ?
+                const dictionary = isLegacy ? this._decodeString(content, cursor, dictionaryLength) : shardDictionaryName;
+                if (isLegacy) { cursor += dictionaryLength; }
+                if (dictionary === null) { return; }
+                const expression = this._decodeString(content, cursor, expressionLength); cursor += expressionLength;
+                const reading = (
+                (isCurrent || isPrevious) && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) !== 0 ?
                     expression :
                     this._decodeString(content, cursor, readingLength)
-            );
-            if (!(isCurrent && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) !== 0)) {
-                cursor += readingLength;
-            }
-            let expressionReverse;
-            let readingReverse;
-            if (isCurrent) {
-                expressionReverse = this._reverseString(expression);
-                readingReverse = reading === expression ? expressionReverse : this._reverseString(reading);
-            } else {
-                expressionReverse = expressionReverseLength >= 0 ? this._decodeString(content, cursor, expressionReverseLength) : null;
-                if (expressionReverseLength >= 0) { cursor += expressionReverseLength; }
-                readingReverse = (
+                );
+                if (!((isCurrent || isPrevious) && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) !== 0)) {
+                    cursor += readingLength;
+                }
+                let expressionReverse;
+                let readingReverse;
+                if (isCurrent || isPrevious) {
+                    expressionReverse = this._reverseString(expression);
+                    readingReverse = reading === expression ? expressionReverse : this._reverseString(reading);
+                } else {
+                    expressionReverse = expressionReverseLength >= 0 ? this._decodeString(content, cursor, expressionReverseLength) : null;
+                    if (expressionReverseLength >= 0) { cursor += expressionReverseLength; }
+                    readingReverse = (
                     readingReverseLength >= 0 ?
                         (
-                            isPrevious && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE) !== 0 ?
+                            isPreviousPrevious && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE) !== 0 ?
                                 expressionReverse :
                                 this._decodeString(content, cursor, readingReverseLength)
                         ) :
                         null
-                );
-                if (readingReverseLength >= 0 && !(isPrevious && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE) !== 0)) {
-                    cursor += readingReverseLength;
+                    );
+                    if (readingReverseLength >= 0 && !(isPreviousPrevious && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE) !== 0)) {
+                        cursor += readingReverseLength;
+                    }
                 }
-            }
-            const entryContentDictName = (isLegacy || isPrevious || isPreviousPrevious || isPreviousPreviousPrevious || isPreviousPreviousPreviousPrevious) ?
+                const entryContentDictName = (isLegacy || isPrevious || isPreviousPrevious || isPreviousPreviousPrevious || isPreviousPreviousPreviousPrevious || isPreviousPreviousPreviousPreviousPrevious) ?
                 this._decodeString(content, cursor, entryContentDictNameLength) :
                 this._decodeEntryContentDictName(entryContentDictNameValue, content, cursor, entryContentDictNameLength);
-            cursor += entryContentDictNameLength;
+                cursor += entryContentDictNameLength;
 
-            const record = {
-                id,
-                dictionary,
-                expression,
-                reading,
-                expressionReverse,
-                readingReverse,
-                entryContentOffset: rawEntryContentOffset === U32_NULL ? -1 : rawEntryContentOffset,
-                entryContentLength: rawEntryContentLength === U32_NULL ? -1 : rawEntryContentLength,
-                entryContentDictName,
-                score,
-                sequence: rawSequence >= 0 ? rawSequence : null,
-            };
-            this._recordsById.set(id, record);
-            if (id >= this._nextId) {
-                this._nextId = id + 1;
+                const record = {
+                    id,
+                    dictionary,
+                    expression,
+                    reading,
+                    expressionReverse,
+                    readingReverse,
+                    entryContentOffset: rawEntryContentOffset === U32_NULL ? -1 : rawEntryContentOffset,
+                    entryContentLength: rawEntryContentLength === U32_NULL ? -1 : rawEntryContentLength,
+                    entryContentDictName,
+                    score,
+                    sequence: rawSequence >= 0 ? rawSequence : null,
+                };
+                this._recordsById.set(id, record);
+                if (id >= this._nextId) {
+                    this._nextId = id + 1;
+                }
             }
         }
     }
@@ -1148,7 +1170,6 @@ export class TermRecordOpfsStore {
         let cursor = 0;
         for (const row of encodedRows) {
             const {record, expressionBytes, readingBytes, entryContentDictNameMeta, entryContentDictNameBytes} = row;
-            view.setUint32(cursor, record.id, true); cursor += 4;
             view.setUint16(cursor, expressionBytes.byteLength, true); cursor += 2;
             view.setUint16(cursor, readingBytes.byteLength, true); cursor += 2;
             view.setUint32(cursor, record.entryContentOffset >= 0 ? record.entryContentOffset : U32_NULL, true); cursor += 4;
@@ -1170,12 +1191,16 @@ export class TermRecordOpfsStore {
     /**
      * @param {TermRecordShardState} state
      * @param {Uint8Array} chunk
+     * @param {number} firstId
+     * @param {number} count
      * @returns {Promise<void>}
      */
-    async _appendEncodedChunk(state, chunk) {
+    async _appendEncodedChunk(state, chunk, firstId, count) {
         if (chunk.byteLength <= 0) { return; }
 
-        const withHeader = state.fileLength === 0 ? this._withBinaryHeader(chunk) : chunk;
+        const withHeader = state.fileLength === 0 ?
+            this._withBinaryHeader(this._withChunkHeader(chunk, firstId, count)) :
+            this._withChunkHeader(chunk, firstId, count);
         state.pendingWriteChunks.push(withHeader);
         state.pendingWriteBytes += withHeader.byteLength;
         state.fileLength += withHeader.byteLength;
@@ -1197,6 +1222,21 @@ export class TermRecordOpfsStore {
         const output = new Uint8Array(header.byteLength + payload.byteLength);
         output.set(header, 0);
         output.set(payload, header.byteLength);
+        return output;
+    }
+
+    /**
+     * @param {Uint8Array} payload
+     * @param {number} firstId
+     * @param {number} count
+     * @returns {Uint8Array}
+     */
+    _withChunkHeader(payload, firstId, count) {
+        const output = new Uint8Array(CHUNK_HEADER_BYTES + payload.byteLength);
+        const view = new DataView(output.buffer, output.byteOffset, output.byteLength);
+        view.setUint32(0, firstId >>> 0, true);
+        view.setUint32(4, count >>> 0, true);
+        output.set(payload, CHUNK_HEADER_BYTES);
         return output;
     }
 

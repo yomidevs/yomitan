@@ -17,7 +17,7 @@
 
 #include <stdint.h>
 
-#define RECORD_HEADER_BYTES 28u
+#define RECORD_HEADER_BYTES 24u
 #define U32_NULL 0xffffffffu
 #define U16_NULL 0xffffu
 #define WASM_PAGE_SIZE 65536u
@@ -30,7 +30,6 @@ extern unsigned char __heap_base;
 static uint32_t heap_ptr = 0u;
 
 struct RecordMeta {
-    uint32_t id;
     uint32_t expression_off;
     uint32_t expression_len;
     uint32_t reading_off;
@@ -133,7 +132,6 @@ uint32_t encode_records(uint32_t record_count, uint32_t metas_ptr, uint32_t stri
 
     for (uint32_t i = 0u; i < record_count; ++i) {
         const struct RecordMeta* m = &metas[i];
-        write_u32(out, &cursor, m->id);
         write_u16(out, &cursor, m->expression_len > U16_NULL ? U16_NULL : m->expression_len);
         write_u16(out, &cursor, m->reading_len > U16_NULL ? U16_NULL : m->reading_len);
         write_u32(out, &cursor, m->entry_content_offset >= 0 ? (uint32_t)m->entry_content_offset : U32_NULL);
