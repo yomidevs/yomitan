@@ -25,24 +25,27 @@ const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
 const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
 const SHARD_FILE_PREFIX = 'dict-';
 const SHARD_FILE_SUFFIX = '.mbtr';
-const BINARY_MAGIC_TEXT = 'MBTRR10B';
-const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC9';
-const PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC8';
-const PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC5';
-const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC4';
-const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC3';
-const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC2';
+const BINARY_MAGIC_TEXT = 'MBTRR11B';
+const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRR10B';
+const PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC9';
+const PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC8';
+const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC5';
+const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC4';
+const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC3';
+const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC2';
 const LEGACY_BINARY_MAGIC_TEXT = 'MBTRREC1';
 const BINARY_MAGIC_BYTES = 8;
 const CHUNK_HEADER_BYTES = 8;
-const RECORD_HEADER_BYTES = 18;
-const PREVIOUS_RECORD_HEADER_BYTES = 22;
-const PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES = 32;
-const PREVIOUS_PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES = 40;
+const STRING_TABLE_HEADER_BYTES = 8;
+const RECORD_HEADER_BYTES = 22;
+const PREVIOUS_RECORD_HEADER_BYTES = 18;
+const PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES = 22;
+const PREVIOUS_PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES = 32;
+const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES = 40;
 const LEGACY_RECORD_HEADER_BYTES = 44;
 const U32_NULL = 0xffffffff;
 const U16_NULL = 0xffff;
-const READING_EQUALS_EXPRESSION_U16 = 0xffff;
+const READING_EQUALS_EXPRESSION_U32 = 0xffffffff;
 const DEFAULT_FLUSH_THRESHOLD_BYTES = 32 * 1024 * 1024;
 const LOW_MEMORY_FLUSH_THRESHOLD_BYTES = 16 * 1024 * 1024;
 const HIGH_MEMORY_FLUSH_THRESHOLD_BYTES = 64 * 1024 * 1024;
@@ -68,6 +71,8 @@ const ENTRY_CONTENT_DICT_NAME_VALUE_MASK = 0x7fff;
  * @property {string} dictionary
  * @property {string} expression
  * @property {string} reading
+ * @property {Uint8Array} [expressionBytes]
+ * @property {Uint8Array} [readingBytes]
  * @property {string|null} expressionReverse
  * @property {string|null} readingReverse
  * @property {number} entryContentOffset
@@ -457,7 +462,7 @@ export class TermRecordOpfsStore {
         const singleDictionaryRecords = [];
         let singleDictionaryName = '';
         for (let i = 0; i < count; ++i) {
-            const row = /** @type {{dictionary: string, expression: string, reading: string, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[start + i]);
+            const row = /** @type {{dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[start + i]);
             const span = spans[i];
             const id = this._nextId++;
             const dictionary = row.dictionary;
@@ -467,6 +472,8 @@ export class TermRecordOpfsStore {
                 dictionary,
                 expression: row.expression,
                 reading: row.reading,
+                expressionBytes: row.expressionBytes instanceof Uint8Array ? row.expressionBytes : void 0,
+                readingBytes: row.readingBytes instanceof Uint8Array ? row.readingBytes : void 0,
                 expressionReverse: row.expressionReverse ?? null,
                 readingReverse: row.readingReverse ?? null,
                 entryContentOffset: span.offset,
@@ -851,6 +858,7 @@ export class TermRecordOpfsStore {
             magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
             magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
             magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
+            magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
             magic === LEGACY_BINARY_MAGIC_TEXT
         );
     }
@@ -870,6 +878,7 @@ export class TermRecordOpfsStore {
         const isPreviousPreviousPreviousPrevious = magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
         const isPreviousPreviousPreviousPreviousPrevious = magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
         const isPreviousPreviousPreviousPreviousPreviousPrevious = magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
+        const isPreviousPreviousPreviousPreviousPreviousPreviousPrevious = magic === PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
         let recordHeaderBytes;
         if (isLegacy) {
             recordHeaderBytes = LEGACY_RECORD_HEADER_BYTES;
@@ -879,8 +888,10 @@ export class TermRecordOpfsStore {
             recordHeaderBytes = PREVIOUS_RECORD_HEADER_BYTES;
         } else if (isPreviousPrevious) {
             recordHeaderBytes = PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES;
-        } else {
+        } else if (isPreviousPreviousPrevious || isPreviousPreviousPreviousPrevious) {
             recordHeaderBytes = PREVIOUS_PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES;
+        } else {
+            recordHeaderBytes = PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES;
         }
         let cursor = BINARY_MAGIC_BYTES;
         /** @type {string|null} */
@@ -913,14 +924,39 @@ export class TermRecordOpfsStore {
                 if ((cursor + recordHeaderBytes) > content.byteLength) { break; }
                 chunkCount = 1;
             }
+            /** @type {string[]|null} */
+            let chunkStrings = null;
+            /** @type {string[]|null} */
+            let chunkStringReverses = null;
+            if (isCurrent) {
+                if ((cursor + STRING_TABLE_HEADER_BYTES) > content.byteLength) { return; }
+                const stringCount = view.getUint32(cursor, true); cursor += 4;
+                const stringBytesLength = view.getUint32(cursor, true); cursor += 4;
+                const stringLengthsBytes = stringCount * 2;
+                if ((cursor + stringLengthsBytes + stringBytesLength) > content.byteLength) { return; }
+                chunkStrings = new Array(stringCount);
+                chunkStringReverses = new Array(stringCount);
+                let stringsCursor = cursor + stringLengthsBytes;
+                for (let i = 0; i < stringCount; ++i) {
+                    const stringLength = view.getUint16(cursor, true); cursor += 2;
+                    if ((stringsCursor + stringLength) > content.byteLength) { return; }
+                    const value = this._decodeString(content, stringsCursor, stringLength);
+                    stringsCursor += stringLength;
+                    chunkStrings[i] = value;
+                    chunkStringReverses[i] = this._reverseString(value);
+                }
+                cursor = stringsCursor;
+            }
             for (let chunkIndex = 0; chunkIndex < chunkCount; ++chunkIndex) {
                 if ((cursor + recordHeaderBytes) > content.byteLength) { return; }
                 const id = isCurrent ? (chunkBaseId + chunkIndex) : view.getUint32(cursor, true);
                 if (!isCurrent) { cursor += 4; }
                 const dictionaryLength = isLegacy ? view.getUint32(cursor, true) : 0; cursor += isLegacy ? 4 : 0;
-                const expressionLength = (isCurrent || isPrevious) ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += (isCurrent || isPrevious) ? 2 : 4;
-                const rawReadingLength = (isCurrent || isPrevious) ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += (isCurrent || isPrevious) ? 2 : 4;
-                const readingEqualsExpression = isCurrent ? (rawReadingLength === READING_EQUALS_EXPRESSION_U16) : false;
+                const expressionLength = (isCurrent || isPrevious) ? (isCurrent ? 0 : view.getUint16(cursor, true)) : view.getUint32(cursor, true); cursor += (isCurrent || isPrevious) ? (isCurrent ? 0 : 2) : 4;
+                const rawReadingLength = (isCurrent || isPrevious) ? (isCurrent ? 0 : view.getUint16(cursor, true)) : view.getUint32(cursor, true); cursor += (isCurrent || isPrevious) ? (isCurrent ? 0 : 2) : 4;
+                const expressionIndex = isCurrent ? view.getUint32(cursor, true) : 0; cursor += isCurrent ? 4 : 0;
+                const readingIndexRaw = isCurrent ? view.getUint32(cursor, true) : 0; cursor += isCurrent ? 4 : 0;
+                const readingEqualsExpression = isCurrent ? (readingIndexRaw === READING_EQUALS_EXPRESSION_U32) : false;
                 const readingLength = readingEqualsExpression ? 0 : rawReadingLength;
                 const rawExpressionReverseLength = (
                 (isCurrent || isPrevious) ?
@@ -979,8 +1015,8 @@ export class TermRecordOpfsStore {
 
                 const requiredBytes =
                 dictionaryLength +
-                expressionLength +
-                readingLength +
+                (isCurrent ? 0 : expressionLength) +
+                (isCurrent ? 0 : readingLength) +
                 (
                     (isCurrent || isPrevious) ?
                         0 :
@@ -997,24 +1033,36 @@ export class TermRecordOpfsStore {
                 const dictionary = isLegacy ? this._decodeString(content, cursor, dictionaryLength) : shardDictionaryName;
                 if (isLegacy) { cursor += dictionaryLength; }
                 if (dictionary === null) { return; }
-                const expression = this._decodeString(content, cursor, expressionLength); cursor += expressionLength;
-                const reading = (
-                isCurrent && readingEqualsExpression ?
-                    expression :
-                    (
-                        isPrevious && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) !== 0 ?
-                            expression :
-                            this._decodeString(content, cursor, readingLength)
-                    )
-                );
-                if (!(isCurrent && readingEqualsExpression) && !(isPrevious && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) !== 0)) {
+                const expression = isCurrent ?
+                    (chunkStrings !== null && expressionIndex < chunkStrings.length ? chunkStrings[expressionIndex] : '') :
+                    this._decodeString(content, cursor, expressionLength);
+                if (!isCurrent) { cursor += expressionLength; }
+                if (expression.length === 0 && isCurrent) { return; }
+                let reading;
+                if (isCurrent && readingEqualsExpression) {
+                    reading = expression;
+                } else if (isPrevious && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) !== 0) {
+                    reading = expression;
+                } else if (isCurrent) {
+                    reading = (chunkStrings !== null && readingIndexRaw < chunkStrings.length) ? chunkStrings[readingIndexRaw] : '';
+                } else {
+                    reading = this._decodeString(content, cursor, readingLength);
+                }
+                if (!(isCurrent && readingEqualsExpression) && !(isPrevious && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) !== 0) && !isCurrent) {
                     cursor += readingLength;
                 }
                 let expressionReverse;
                 let readingReverse;
                 if (isCurrent || isPrevious) {
-                    expressionReverse = this._reverseString(expression);
-                    readingReverse = reading === expression ? expressionReverse : this._reverseString(reading);
+                    if (isCurrent) {
+                        expressionReverse = chunkStringReverses !== null ? chunkStringReverses[expressionIndex] : this._reverseString(expression);
+                        readingReverse = reading === expression ?
+                            expressionReverse :
+                            (chunkStringReverses !== null ? chunkStringReverses[readingIndexRaw] : this._reverseString(reading));
+                    } else {
+                        expressionReverse = this._reverseString(expression);
+                        readingReverse = reading === expression ? expressionReverse : this._reverseString(reading);
+                    }
                 } else {
                     expressionReverse = expressionReverseLength >= 0 ? this._decodeString(content, cursor, expressionReverseLength) : null;
                     if (expressionReverseLength >= 0) { cursor += expressionReverseLength; }
@@ -1034,7 +1082,7 @@ export class TermRecordOpfsStore {
                 const entryContentDictName = isCurrent ?
                     (sharedEntryContentDictName ?? 'raw') :
                     (
-                        (isLegacy || isPrevious || isPreviousPrevious || isPreviousPreviousPrevious || isPreviousPreviousPreviousPrevious || isPreviousPreviousPreviousPreviousPrevious || isPreviousPreviousPreviousPreviousPreviousPrevious) ?
+                        (isLegacy || isPrevious || isPreviousPrevious || isPreviousPreviousPrevious || isPreviousPreviousPreviousPrevious || isPreviousPreviousPreviousPreviousPrevious || isPreviousPreviousPreviousPreviousPreviousPrevious || isPreviousPreviousPreviousPreviousPreviousPreviousPrevious) ?
                             this._decodeString(content, cursor, entryContentDictNameLength) :
                             this._decodeEntryContentDictName(entryContentDictNameValue, content, cursor, entryContentDictNameLength)
                     );
@@ -1200,31 +1248,66 @@ export class TermRecordOpfsStore {
                 this._wasmEncoderUnavailable = true;
             }
         }
-        /** @type {Array<{record: TermRecord, expressionBytes: Uint8Array, readingBytes: Uint8Array}>} */
+        /** @type {Array<{record: TermRecord, expressionIndex: number, readingIndex: number}>} */
         const encodedRows = [];
-        let totalBytes = 0;
+        /** @type {Map<string, number>} */
+        const stringIndexByValue = new Map();
+        /** @type {Uint8Array[]} */
+        const stringBytesList = [];
+        /** @type {number[]} */
+        const stringLengths = [];
+        let stringsByteLength = 0;
+        let totalBytes = STRING_TABLE_HEADER_BYTES;
+        /**
+         * @param {string} value
+         * @param {Uint8Array} bytes
+         * @returns {number}
+         */
+        const internStringBytes = (value, bytes) => {
+            /** @type {number|undefined} */
+            const cached = stringIndexByValue.get(value);
+            if (typeof cached === 'number') { return cached; }
+            const index = stringBytesList.length;
+            stringIndexByValue.set(value, index);
+            stringBytesList.push(bytes);
+            stringLengths.push(bytes.byteLength);
+            stringsByteLength += bytes.byteLength;
+            return index;
+        };
         for (const record of records) {
-            const expressionBytes = this._textEncoder.encode(record.expression);
-            const readingBytes = this._textEncoder.encode(record.reading);
+            const expressionBytes = record.expressionBytes instanceof Uint8Array ? record.expressionBytes : this._textEncoder.encode(record.expression);
+            const readingBytes = record.readingBytes instanceof Uint8Array ? record.readingBytes : this._textEncoder.encode(record.reading);
+            const expressionIndex = internStringBytes(record.expression, expressionBytes);
+            const readingIndex = record.reading === record.expression ?
+                READING_EQUALS_EXPRESSION_U32 :
+                internStringBytes(record.reading, readingBytes);
             totalBytes +=
                 RECORD_HEADER_BYTES +
-                expressionBytes.byteLength +
-                readingBytes.byteLength +
                 ((record.entryContentLength >= 0 && record.entryContentLength > 0xfffd) ? 4 : 0);
             encodedRows.push({
                 record,
-                expressionBytes,
-                readingBytes,
+                expressionIndex,
+                readingIndex,
             });
         }
+        totalBytes += (stringLengths.length * 2) + stringsByteLength;
 
         const output = new Uint8Array(totalBytes);
         const view = new DataView(output.buffer, output.byteOffset, output.byteLength);
         let cursor = 0;
+        view.setUint32(cursor, stringLengths.length, true); cursor += 4;
+        view.setUint32(cursor, stringsByteLength, true); cursor += 4;
+        for (const stringLength of stringLengths) {
+            view.setUint16(cursor, stringLength, true); cursor += 2;
+        }
+        for (const bytes of stringBytesList) {
+            output.set(bytes, cursor);
+            cursor += bytes.byteLength;
+        }
         for (const row of encodedRows) {
-            const {record, expressionBytes, readingBytes} = row;
-            view.setUint16(cursor, expressionBytes.byteLength, true); cursor += 2;
-            view.setUint16(cursor, record.reading === record.expression ? READING_EQUALS_EXPRESSION_U16 : readingBytes.byteLength, true); cursor += 2;
+            const {record, expressionIndex, readingIndex} = row;
+            view.setUint32(cursor, expressionIndex, true); cursor += 4;
+            view.setUint32(cursor, readingIndex, true); cursor += 4;
             view.setUint32(cursor, record.entryContentOffset >= 0 ? record.entryContentOffset : U32_NULL, true); cursor += 4;
             if (record.entryContentLength < 0) {
                 view.setUint16(cursor, ENTRY_CONTENT_LENGTH_U16_NULL, true); cursor += 2;
@@ -1236,11 +1319,6 @@ export class TermRecordOpfsStore {
             }
             view.setInt32(cursor, record.score, true); cursor += 4;
             view.setInt32(cursor, record.sequence ?? -1, true); cursor += 4;
-
-            output.set(expressionBytes, cursor); cursor += expressionBytes.byteLength;
-            if (record.reading !== record.expression) {
-                output.set(readingBytes, cursor); cursor += readingBytes.byteLength;
-            }
         }
         return output;
     }

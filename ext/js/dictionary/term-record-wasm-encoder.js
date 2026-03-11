@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const META_U32_FIELDS = 8;
+const META_U32_FIELDS = 6;
 const META_BYTES = META_U32_FIELDS * 4;
 const U16_NULL = 0xffff;
-const READING_EQUALS_EXPRESSION_U16 = 0xffff;
+const READING_EQUALS_EXPRESSION_U32 = 0xffffffff;
 
-/** @type {Promise<{memory: WebAssembly.Memory, wasm_reset_heap: () => void, wasm_alloc: (size: number) => number, calc_encoded_size: (count: number, metasPtr: number) => number, encode_records: (count: number, metasPtr: number, stringsPtr: number, outPtr: number) => number}>|null} */
+/** @type {Promise<{memory: WebAssembly.Memory, wasm_reset_heap: () => void, wasm_alloc: (size: number) => number, calc_encoded_size: (count: number, stringCount: number, lengthsPtr: number, stringsByteLength: number, metasPtr: number) => number, encode_records: (count: number, stringCount: number, lengthsPtr: number, stringsPtr: number, stringsByteLength: number, metasPtr: number, outPtr: number) => number}>|null} */
 let wasmPromise = null;
 
 /**
  * @param {TextEncoder} textEncoder
- * @returns {{stringOffsets: number[], stringLengths: number[], internString: (value: string) => number, buildStringsBuffer: () => Uint8Array}}
+ * @returns {{stringOffsets: number[], stringLengths: number[], internString: (value: string) => number, internStringBytes: (value: string, bytes: Uint8Array) => number, buildStringsBuffer: () => Uint8Array}}
  */
 function createStringInterner(textEncoder) {
     let stringsTotal = 0;
@@ -76,16 +76,38 @@ function createStringInterner(textEncoder) {
         return index;
     };
 
+    /**
+     * @param {string} value
+     * @param {Uint8Array} bytes
+     * @returns {number}
+     */
+    const internStringBytes = (value, bytes) => {
+        const cachedIndex = encodedStringIndexByValue.get(value);
+        if (typeof cachedIndex === 'number') {
+            return cachedIndex;
+        }
+        const index = stringOffsets.length;
+        const offset = stringsTotal;
+        ensureCapacity(offset + bytes.byteLength);
+        stringsBuffer.set(bytes, offset);
+        stringOffsets.push(stringsTotal);
+        stringLengths.push(bytes.byteLength);
+        stringsTotal += bytes.byteLength;
+        encodedStringIndexByValue.set(value, index);
+        return index;
+    };
+
     return {
         stringOffsets,
         stringLengths,
         internString,
+        internStringBytes,
         buildStringsBuffer: () => stringsBuffer.subarray(0, stringsTotal),
     };
 }
 
 /**
- * @returns {Promise<{memory: WebAssembly.Memory, wasm_reset_heap: () => void, wasm_alloc: (size: number) => number, calc_encoded_size: (count: number, metasPtr: number) => number, encode_records: (count: number, metasPtr: number, stringsPtr: number, outPtr: number) => number}>}
+ * @returns {Promise<{memory: WebAssembly.Memory, wasm_reset_heap: () => void, wasm_alloc: (size: number) => number, calc_encoded_size: (count: number, stringCount: number, lengthsPtr: number, stringsByteLength: number, metasPtr: number) => number, encode_records: (count: number, stringCount: number, lengthsPtr: number, stringsPtr: number, stringsByteLength: number, metasPtr: number, outPtr: number) => number}>}
  */
 async function getWasm() {
     if (wasmPromise !== null) {
@@ -112,7 +134,7 @@ async function getWasm() {
 }
 
 /**
- * @param {{id: number, dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
+ * @param {{id: number, dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
  * @param {TextEncoder} textEncoder
  * @returns {Promise<Uint8Array|null>}
  */
@@ -125,12 +147,20 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     const metasBuffer = new ArrayBuffer(records.length * META_BYTES);
     const metasU32 = new Uint32Array(metasBuffer);
     const metasI32 = new Int32Array(metasBuffer);
-    const {stringOffsets, stringLengths, internString, buildStringsBuffer} = createStringInterner(textEncoder);
+    const {stringLengths, internString, internStringBytes, buildStringsBuffer} = createStringInterner(textEncoder);
     let recordIndex = 0;
     for (const record of records) {
-        const expressionIndex = internString(record.expression);
+        const expressionIndex = record.expressionBytes instanceof Uint8Array ?
+            internStringBytes(record.expression, record.expressionBytes) :
+            internString(record.expression);
         const readingEqualsExpression = record.reading === record.expression;
-        const readingIndex = readingEqualsExpression ? expressionIndex : internString(record.reading);
+        const readingIndex = readingEqualsExpression ?
+            expressionIndex :
+            (
+                record.readingBytes instanceof Uint8Array ?
+                    internStringBytes(record.reading, record.readingBytes) :
+                    internString(record.reading)
+            );
         if (
             stringLengths[expressionIndex] > U16_NULL ||
             stringLengths[readingIndex] > U16_NULL
@@ -138,28 +168,33 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
             return null;
         }
         const metaIndex = recordIndex * META_U32_FIELDS;
-        metasU32[metaIndex + 0] = stringOffsets[expressionIndex] >>> 0;
-        metasU32[metaIndex + 1] = stringLengths[expressionIndex] >>> 0;
-        metasU32[metaIndex + 2] = stringOffsets[readingIndex] >>> 0;
-        metasU32[metaIndex + 3] = readingEqualsExpression ? READING_EQUALS_EXPRESSION_U16 : (stringLengths[readingIndex] >>> 0);
-        metasI32[metaIndex + 4] = record.entryContentOffset | 0;
-        metasI32[metaIndex + 5] = record.entryContentLength | 0;
-        metasI32[metaIndex + 6] = record.score | 0;
-        metasI32[metaIndex + 7] = record.sequence ?? -1;
+        metasU32[metaIndex + 0] = expressionIndex >>> 0;
+        metasU32[metaIndex + 1] = readingEqualsExpression ? READING_EQUALS_EXPRESSION_U32 : (readingIndex >>> 0);
+        metasI32[metaIndex + 2] = record.entryContentOffset | 0;
+        metasI32[metaIndex + 3] = record.entryContentLength | 0;
+        metasI32[metaIndex + 4] = record.score | 0;
+        metasI32[metaIndex + 5] = record.sequence ?? -1;
         ++recordIndex;
+    }
+    const stringLengthsBuffer = new ArrayBuffer(stringLengths.length * 2);
+    const stringLengthsU16 = new Uint16Array(stringLengthsBuffer);
+    for (let i = 0; i < stringLengths.length; ++i) {
+        stringLengthsU16[i] = stringLengths[i];
     }
     const stringsBuffer = buildStringsBuffer();
     wasm.wasm_reset_heap();
     const metasPtr = wasm.wasm_alloc(metasBuffer.byteLength);
+    const stringLengthsPtr = wasm.wasm_alloc(stringLengthsBuffer.byteLength);
     const stringsPtr = wasm.wasm_alloc(stringsBuffer.byteLength);
-    if (metasPtr === 0 || stringsPtr === 0) {
+    if (metasPtr === 0 || stringLengthsPtr === 0 || stringsPtr === 0) {
         return null;
     }
     const wasmHeapAfterAlloc = new Uint8Array(wasm.memory.buffer);
     wasmHeapAfterAlloc.set(new Uint8Array(metasBuffer), metasPtr);
+    wasmHeapAfterAlloc.set(new Uint8Array(stringLengthsBuffer), stringLengthsPtr);
     wasmHeapAfterAlloc.set(stringsBuffer, stringsPtr);
 
-    const encodedSize = wasm.calc_encoded_size(records.length, metasPtr);
+    const encodedSize = wasm.calc_encoded_size(records.length, stringLengths.length, stringLengthsPtr, stringsBuffer.byteLength, metasPtr);
     if (encodedSize <= 0) {
         return new Uint8Array(0);
     }
@@ -167,7 +202,7 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     if (outPtr === 0) {
         return null;
     }
-    const written = wasm.encode_records(records.length, metasPtr, stringsPtr, outPtr);
+    const written = wasm.encode_records(records.length, stringLengths.length, stringLengthsPtr, stringsPtr, stringsBuffer.byteLength, metasPtr, outPtr);
     if (written <= 0) {
         return new Uint8Array(0);
     }

@@ -17,10 +17,11 @@
 
 #include <stdint.h>
 
-#define RECORD_HEADER_BYTES 18u
+#define STRING_TABLE_HEADER_BYTES 8u
+#define RECORD_HEADER_BYTES 22u
 #define U32_NULL 0xffffffffu
+#define READING_EQUALS_EXPRESSION_U32 0xffffffffu
 #define U16_NULL 0xffffu
-#define READING_EQUALS_EXPRESSION_U16 0xffffu
 #define ENTRY_CONTENT_LENGTH_EXTENDED_U16 0xfffeu
 #define WASM_PAGE_SIZE 65536u
 
@@ -29,10 +30,8 @@ extern unsigned char __heap_base;
 static uint32_t heap_ptr = 0u;
 
 struct RecordMeta {
-    uint32_t expression_off;
-    uint32_t expression_len;
-    uint32_t reading_off;
-    uint32_t reading_len;
+    uint32_t expression_index;
+    uint32_t reading_index;
     int32_t entry_content_offset;
     int32_t entry_content_length;
     int32_t score;
@@ -104,15 +103,13 @@ static inline void copy_bytes(uint8_t* out, uint32_t* cursor, const uint8_t* src
 }
 
 __attribute__((visibility("default")))
-uint32_t calc_encoded_size(uint32_t record_count, uint32_t metas_ptr) {
+uint32_t calc_encoded_size(uint32_t record_count, uint32_t string_count, uint32_t lengths_ptr, uint32_t strings_byte_length, uint32_t metas_ptr) {
     const struct RecordMeta* metas = (const struct RecordMeta*)(uintptr_t)metas_ptr;
-    uint32_t total = 0u;
+    (void)lengths_ptr;
+    uint32_t total = STRING_TABLE_HEADER_BYTES + (string_count * 2u) + strings_byte_length;
     for (uint32_t i = 0u; i < record_count; ++i) {
         const struct RecordMeta* m = &metas[i];
-        uint32_t variable =
-            m->expression_len +
-            (m->reading_len == READING_EQUALS_EXPRESSION_U16 ? 0u : m->reading_len);
-        total += RECORD_HEADER_BYTES + variable;
+        total += RECORD_HEADER_BYTES;
         if ((uint32_t)m->entry_content_length > 0xfffdu) {
             total += 4u;
         }
@@ -121,16 +118,24 @@ uint32_t calc_encoded_size(uint32_t record_count, uint32_t metas_ptr) {
 }
 
 __attribute__((visibility("default")))
-uint32_t encode_records(uint32_t record_count, uint32_t metas_ptr, uint32_t strings_ptr, uint32_t out_ptr) {
+uint32_t encode_records(uint32_t record_count, uint32_t string_count, uint32_t lengths_ptr, uint32_t strings_ptr, uint32_t strings_byte_length, uint32_t metas_ptr, uint32_t out_ptr) {
     const struct RecordMeta* metas = (const struct RecordMeta*)(uintptr_t)metas_ptr;
+    const uint16_t* lengths = (const uint16_t*)(uintptr_t)lengths_ptr;
     const uint8_t* strings = (const uint8_t*)(uintptr_t)strings_ptr;
     uint8_t* out = (uint8_t*)(uintptr_t)out_ptr;
     uint32_t cursor = 0u;
 
+    write_u32(out, &cursor, string_count);
+    write_u32(out, &cursor, strings_byte_length);
+    for (uint32_t i = 0u; i < string_count; ++i) {
+        write_u16(out, &cursor, lengths[i]);
+    }
+    copy_bytes(out, &cursor, strings, strings_byte_length);
+
     for (uint32_t i = 0u; i < record_count; ++i) {
         const struct RecordMeta* m = &metas[i];
-        write_u16(out, &cursor, m->expression_len > U16_NULL ? U16_NULL : m->expression_len);
-        write_u16(out, &cursor, m->reading_len == READING_EQUALS_EXPRESSION_U16 ? READING_EQUALS_EXPRESSION_U16 : (m->reading_len > U16_NULL ? U16_NULL : m->reading_len));
+        write_u32(out, &cursor, m->expression_index);
+        write_u32(out, &cursor, m->reading_index);
         write_u32(out, &cursor, m->entry_content_offset >= 0 ? (uint32_t)m->entry_content_offset : U32_NULL);
         if (m->entry_content_length < 0) {
             write_u16(out, &cursor, U16_NULL);
@@ -142,11 +147,6 @@ uint32_t encode_records(uint32_t record_count, uint32_t metas_ptr, uint32_t stri
         }
         write_i32(out, &cursor, m->score);
         write_i32(out, &cursor, m->sequence);
-
-        copy_bytes(out, &cursor, strings + m->expression_off, m->expression_len);
-        if (m->reading_len != READING_EQUALS_EXPRESSION_U16) {
-            copy_bytes(out, &cursor, strings + m->reading_off, m->reading_len);
-        }
     }
     return cursor;
 }

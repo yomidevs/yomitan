@@ -2599,6 +2599,7 @@ export class DictionaryImporter {
             }
             const expressionStart = cursor;
             const expression = textDecoder.decode(bytes.subarray(cursor, cursor + expressionLength));
+            const expressionBytes = bytes.subarray(cursor, cursor + expressionLength);
             cursor += expressionLength;
             const readingLength = view.getUint32(cursor, true);
             cursor += 4;
@@ -2606,13 +2607,17 @@ export class DictionaryImporter {
                 throw new Error(`Invalid term artifact payload in '${filename}': truncated row payload`);
             }
             const readingStart = cursor;
-            const readingRaw = (
+            const readingMatchesExpression = (
                 readingLength > 0 &&
                 readingLength === expressionLength &&
                 byteRangeEqual(bytes, expressionStart, readingStart, expressionLength)
-            ) ?
+            );
+            const readingRaw = readingMatchesExpression ?
                 expression :
                 textDecoder.decode(bytes.subarray(cursor, cursor + readingLength));
+            const readingBytes = readingMatchesExpression ?
+                expressionBytes :
+                bytes.subarray(cursor, cursor + readingLength);
             cursor += readingLength;
             const score = view.getInt32(cursor, true);
             cursor += 4;
@@ -2652,6 +2657,8 @@ export class DictionaryImporter {
             const entry = {
                 expression,
                 reading,
+                expressionBytes,
+                readingBytes,
                 expressionReverse,
                 readingReverse,
                 definitionTags: null,
