@@ -56,7 +56,7 @@ const JSON_QUOTED_STRING_CACHE_MAX_ENTRIES = 8192;
 const TERM_BANK_WASM_ROW_CHUNK_SIZE = 2048;
 const TERM_BANK_WASM_INITIAL_META_CAPACITY_DIVISOR = 24;
 const TERM_BANK_WASM_INITIAL_CONTENT_BYTES_PER_ROW = 96;
-const TERM_ARTIFACT_ROW_CHUNK_SIZE = 6144;
+const TERM_ARTIFACT_ROW_CHUNK_SIZE = 8192;
 const NO_MEDIA_FAST_PATH_TERM_BANK_WASM_ROW_CHUNK_SIZE = 8192;
 const ADAPTIVE_TERM_BANK_WASM_ROW_CHUNK_SIZE_THRESHOLD_BYTES = 8 * 1024 * 1024;
 const ADAPTIVE_TERM_BANK_WASM_ROW_CHUNK_SIZE_UPPER_BOUND_BYTES = 128 * 1024 * 1024;
@@ -2585,9 +2585,9 @@ export class DictionaryImporter {
         let chunkIndex = 0;
         const tDecodeRowsStart = Date.now();
         let decodeRowsMs = 0;
-        let reverseRowsMs = 0;
+        const reverseRowsMs = 0;
         let importerChunkSinkMs = 0;
-        let metadataRebaseMs = 0;
+        const metadataRebaseMs = 0;
         for (let i = 0; i < rowCount; ++i) {
             if ((cursor + 4) > bytes.byteLength) {
                 throw new Error(`Invalid term artifact payload in '${filename}': truncated expression length`);
@@ -2639,19 +2639,15 @@ export class DictionaryImporter {
             let expressionReverse;
             let readingReverse;
             if (prefixWildcardsSupported) {
-                const tReverseStart = Date.now();
                 const reversedExpression = this._reverseString(expression);
                 expressionReverse = reversedExpression;
                 readingReverse = (this._reuseExpressionReverseForReading && reading === expression) ?
                     reversedExpression :
                     this._reverseString(reading);
-                reverseRowsMs += Math.max(0, Date.now() - tReverseStart);
             }
             let contentBytes = bytes.subarray(contentStart, contentEnd);
             if (sharedGlossaryBaseOffset > 0 && isRawTermContentSharedGlossaryBinary(contentBytes)) {
-                const tMetadataRebaseStart = Date.now();
                 contentBytes = rebaseRawTermContentSharedGlossaryBinary(contentBytes, sharedGlossaryBaseOffset);
-                metadataRebaseMs += Math.max(0, Date.now() - tMetadataRebaseStart);
             }
             /** @type {import('dictionary-database').DatabaseTermEntry} */
             const entry = {
@@ -2696,7 +2692,7 @@ export class DictionaryImporter {
                 termList[i] = entry;
             }
         }
-        decodeRowsMs = Math.max(0, Date.now() - tDecodeRowsStart - reverseRowsMs);
+        decodeRowsMs = Math.max(0, Date.now() - tDecodeRowsStart);
         if (streamToChunkHandler && termList.length > 0) {
             ++chunkIndex;
             const tChunkSinkStart = Date.now();
