@@ -2324,16 +2324,23 @@ export class Backend {
                 token = await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
             }
 
-            return await new Promise((resolve, reject) => {
-                chrome.tabs.captureVisibleTab(windowId, {format, quality}, (result) => {
-                    const e = chrome.runtime.lastError;
-                    if (e) {
-                        reject(new Error(e.message));
-                    } else {
-                        resolve(result);
-                    }
+            try {
+                return await new Promise((resolve, reject) => {
+                    chrome.tabs.captureVisibleTab(windowId, {format, quality}, (result) => {
+                        const e = chrome.runtime.lastError;
+                        if (e) {
+                            reject(new Error(e.message));
+                        } else {
+                            resolve(result);
+                        }
+                    });
                 });
-            });
+            } catch (e) {
+                log.log(e);
+            }
+
+            // Fallback for some Firefox. Usually `chrome.tabs.captureVisibleTab` works but occasionally it doesn't
+            return await browser.tabs.captureVisibleTab(windowId, {format, quality});
         } finally {
             if (token !== null) {
                 const action = 'frontendClearAllVisibleOverride';
