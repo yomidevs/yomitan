@@ -39,7 +39,7 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {CacheMap} from '../general/cache-map.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
-import {distributeFuriganaInflected, isCodePointJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
+import {distributeFuriganaInflected, getKanaScriptType, isCodePointJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
 import {getLanguageSummaries, isTextLookupWorthy} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
@@ -50,6 +50,21 @@ import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
 
 const STARTUP_DIAGNOSTICS_STORAGE_KEY = 'manabitanStartupDiagnostics';
+
+/**
+ * @param {string} previousText
+ * @param {string} character
+ * @returns {boolean}
+ */
+function canAppendUngroupedParserCharacter(previousText, character) {
+    const previousCharacter = previousText.at(-1);
+    if (typeof previousCharacter !== 'string') {
+        return true;
+    }
+    const previousKanaScript = getKanaScriptType(previousCharacter);
+    const currentKanaScript = getKanaScriptType(character);
+    return previousKanaScript === null || currentKanaScript === null || previousKanaScript === currentKanaScript;
+}
 
 /**
  * This class controls the core logic of the extension, including API calls
@@ -1942,7 +1957,10 @@ export class Backend {
                 results.push(textSegments);
                 i += originalTextLength;
             } else {
-                if (previousUngroupedSegment === null) {
+                if (
+                    previousUngroupedSegment === null ||
+                    !canAppendUngroupedParserCharacter(previousUngroupedSegment.text, character)
+                ) {
                     previousUngroupedSegment = {text: character, reading: ''};
                     results.push([previousUngroupedSegment]);
                 } else {
