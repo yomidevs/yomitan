@@ -15,9 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {RAW_TERM_CONTENT_DICT_NAME, RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME} from './raw-term-content.js';
+
 const META_U32_FIELDS = 15;
 const META_BYTES = META_U32_FIELDS * 4;
 const U32_NULL = 0xffffffff;
+const ENTRY_CONTENT_DICT_NAME_CODE_RAW = 0;
+const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2 = 1;
+const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3 = 2;
+const ENTRY_CONTENT_DICT_NAME_CODE_JMDICT = 3;
+const ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM = 0xff;
+
+/**
+ * @param {string} value
+ * @returns {{meta: number, requiresString: boolean}}
+ */
+function encodeEntryContentDictNameMeta(value) {
+    switch (value) {
+        case '':
+        case 'raw':
+            return {meta: ENTRY_CONTENT_DICT_NAME_CODE_RAW, requiresString: false};
+        case RAW_TERM_CONTENT_DICT_NAME:
+            return {meta: ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2, requiresString: false};
+        case RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME:
+            return {meta: ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3, requiresString: false};
+        case 'jmdict':
+            return {meta: ENTRY_CONTENT_DICT_NAME_CODE_JMDICT, requiresString: false};
+        default:
+            return {meta: ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM, requiresString: true};
+    }
+}
 
 /** @type {Promise<{memory: WebAssembly.Memory, wasm_reset_heap: () => void, wasm_alloc: (size: number) => number, calc_encoded_size: (count: number, metasPtr: number) => number, encode_records: (count: number, metasPtr: number, stringsPtr: number, outPtr: number) => number}>|null} */
 let wasmPromise = null;
@@ -126,7 +153,8 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     const metasI32 = new Int32Array(metasBuffer);
     const {stringOffsets, stringLengths, internString, buildStringsBuffer} = createStringInterner(textEncoder);
     const firstRecord = records[0];
-    const sharedDictNameIndex = internString(firstRecord.entryContentDictName);
+    const firstDictNameMeta = encodeEntryContentDictNameMeta(firstRecord.entryContentDictName);
+    const sharedDictNameIndex = firstDictNameMeta.requiresString ? internString(firstRecord.entryContentDictName) : -1;
 
     let recordIndex = 0;
     for (const record of records) {
@@ -140,7 +168,10 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
         ) ?
             expressionReverseIndex :
             (record.readingReverse !== null ? internString(record.readingReverse) : -1);
-        const dictNameIndex = record.entryContentDictName === firstRecord.entryContentDictName ? sharedDictNameIndex : internString(record.entryContentDictName);
+        const dictNameMetaInfo = encodeEntryContentDictNameMeta(record.entryContentDictName);
+        const dictNameIndex = dictNameMetaInfo.requiresString ?
+            (record.entryContentDictName === firstRecord.entryContentDictName ? sharedDictNameIndex : internString(record.entryContentDictName)) :
+            -1;
         const metaIndex = recordIndex * META_U32_FIELDS;
         metasU32[metaIndex + 0] = record.id >>> 0;
         metasU32[metaIndex + 1] = stringOffsets[expressionIndex] >>> 0;
@@ -153,8 +184,13 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
         metasU32[metaIndex + 8] = readingReverseIndex >= 0 ? (stringLengths[readingReverseIndex] >>> 0) : U32_NULL;
         metasI32[metaIndex + 9] = record.entryContentOffset | 0;
         metasI32[metaIndex + 10] = record.entryContentLength | 0;
-        metasU32[metaIndex + 11] = stringOffsets[dictNameIndex] >>> 0;
-        metasU32[metaIndex + 12] = stringLengths[dictNameIndex] >>> 0;
+        if (dictNameMetaInfo.requiresString && dictNameIndex >= 0) {
+            metasU32[metaIndex + 11] = (((stringLengths[dictNameIndex] >>> 0) << 8) | ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) >>> 0;
+            metasU32[metaIndex + 12] = stringOffsets[dictNameIndex] >>> 0;
+        } else {
+            metasU32[metaIndex + 11] = dictNameMetaInfo.meta >>> 0;
+            metasU32[metaIndex + 12] = U32_NULL;
+        }
         metasI32[metaIndex + 13] = record.score | 0;
         metasI32[metaIndex + 14] = record.sequence ?? -1;
         ++recordIndex;
