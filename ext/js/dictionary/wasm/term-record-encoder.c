@@ -22,6 +22,9 @@
 #define U16_NULL 0xffffu
 #define WASM_PAGE_SIZE 65536u
 #define ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM 0xffu
+#define ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION 0x80000000u
+#define ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE 0x40000000u
+#define ENTRY_CONTENT_DICT_NAME_FLAGS_MASK 0xc0000000u
 
 extern unsigned char __heap_base;
 
@@ -117,11 +120,16 @@ uint32_t calc_encoded_size(uint32_t record_count, uint32_t metas_ptr) {
         const struct RecordMeta* m = &metas[i];
         uint32_t variable =
             m->expression_len +
-            m->reading_len +
+            ((m->dict_name_meta & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) != 0u ? 0u : m->reading_len) +
             (m->expression_reverse_len == U32_NULL ? 0u : m->expression_reverse_len) +
-            (m->reading_reverse_len == U32_NULL ? 0u : m->reading_reverse_len);
+            (
+                m->reading_reverse_len == U32_NULL ||
+                (m->dict_name_meta & ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE) != 0u ?
+                    0u :
+                    m->reading_reverse_len
+            );
         if ((m->dict_name_meta & 0xffu) == ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) {
-            variable += (m->dict_name_meta >> 8u);
+            variable += ((m->dict_name_meta & ~ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) >> 8u);
         }
         total += RECORD_HEADER_BYTES + variable;
     }
@@ -149,15 +157,20 @@ uint32_t encode_records(uint32_t record_count, uint32_t metas_ptr, uint32_t stri
         write_i32(out, &cursor, m->sequence);
 
         copy_bytes(out, &cursor, strings + m->expression_off, m->expression_len);
-        copy_bytes(out, &cursor, strings + m->reading_off, m->reading_len);
+        if ((m->dict_name_meta & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) == 0u) {
+            copy_bytes(out, &cursor, strings + m->reading_off, m->reading_len);
+        }
         if (m->expression_reverse_len != U32_NULL) {
             copy_bytes(out, &cursor, strings + m->expression_reverse_off, m->expression_reverse_len);
         }
-        if (m->reading_reverse_len != U32_NULL) {
+        if (
+            m->reading_reverse_len != U32_NULL &&
+            (m->dict_name_meta & ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE) == 0u
+        ) {
             copy_bytes(out, &cursor, strings + m->reading_reverse_off, m->reading_reverse_len);
         }
         if ((m->dict_name_meta & 0xffu) == ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) {
-            copy_bytes(out, &cursor, strings + m->dict_name_off, m->dict_name_meta >> 8u);
+            copy_bytes(out, &cursor, strings + m->dict_name_off, (m->dict_name_meta & ~ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) >> 8u);
         }
     }
     return cursor;

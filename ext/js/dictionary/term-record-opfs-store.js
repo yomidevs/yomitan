@@ -25,9 +25,10 @@ const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
 const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
 const SHARD_FILE_PREFIX = 'dict-';
 const SHARD_FILE_SUFFIX = '.mbtr';
-const BINARY_MAGIC_TEXT = 'MBTRREC4';
-const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC3';
-const PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC2';
+const BINARY_MAGIC_TEXT = 'MBTRREC5';
+const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC4';
+const PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC3';
+const PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC2';
 const LEGACY_BINARY_MAGIC_TEXT = 'MBTRREC1';
 const BINARY_MAGIC_BYTES = 8;
 const RECORD_HEADER_BYTES = 32;
@@ -47,6 +48,10 @@ const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2 = 1;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3 = 2;
 const ENTRY_CONTENT_DICT_NAME_CODE_JMDICT = 3;
 const ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM = 0xff;
+const ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION = 0x80000000;
+const ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE = 0x40000000;
+const ENTRY_CONTENT_DICT_NAME_FLAGS_MASK = 0xc0000000;
+const ENTRY_CONTENT_DICT_NAME_VALUE_MASK = 0x3fffffff;
 
 /**
  * @typedef {object} TermRecord
@@ -832,6 +837,7 @@ export class TermRecordOpfsStore {
             magic === BINARY_MAGIC_TEXT ||
             magic === PREVIOUS_BINARY_MAGIC_TEXT ||
             magic === PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
+            magic === PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT ||
             magic === LEGACY_BINARY_MAGIC_TEXT
         );
     }
@@ -847,6 +853,7 @@ export class TermRecordOpfsStore {
         const isCurrent = magic === BINARY_MAGIC_TEXT;
         const isPrevious = magic === PREVIOUS_BINARY_MAGIC_TEXT;
         const isPreviousPrevious = magic === PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
+        const isPreviousPreviousPrevious = magic === PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT;
         const recordHeaderBytes = (
             isLegacy ?
                 LEGACY_RECORD_HEADER_BYTES :
@@ -873,13 +880,15 @@ export class TermRecordOpfsStore {
             const rawEntryContentOffset = view.getUint32(cursor, true); cursor += 4;
             const rawEntryContentLength = view.getUint32(cursor, true); cursor += 4;
             const entryContentDictNameMeta = view.getUint32(cursor, true); cursor += 4;
+            const entryContentDictNameFlags = isCurrent ? (entryContentDictNameMeta & ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) : 0;
+            const entryContentDictNameValue = isCurrent ? (entryContentDictNameMeta & ENTRY_CONTENT_DICT_NAME_VALUE_MASK) : entryContentDictNameMeta;
             const score = view.getInt32(cursor, true); cursor += 4;
             const rawSequence = view.getInt32(cursor, true); cursor += 4;
             let entryContentDictNameLength = 0;
-            if (isLegacy || isPrevious) {
+            if (isLegacy || isPrevious || isPreviousPrevious || isPreviousPreviousPrevious) {
                 entryContentDictNameLength = entryContentDictNameMeta;
-            } else if ((entryContentDictNameMeta & 0xff) === ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) {
-                entryContentDictNameLength = entryContentDictNameMeta >>> 8;
+            } else if ((entryContentDictNameValue & 0xff) === ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM) {
+                entryContentDictNameLength = entryContentDictNameValue >>> 8;
             }
 
             const requiredBytes =
@@ -897,14 +906,31 @@ export class TermRecordOpfsStore {
             if (isLegacy) { cursor += dictionaryLength; }
             if (dictionary === null) { break; }
             const expression = this._decodeString(content, cursor, expressionLength); cursor += expressionLength;
-            const reading = this._decodeString(content, cursor, readingLength); cursor += readingLength;
+            const reading = (
+                isCurrent && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) !== 0 ?
+                    expression :
+                    this._decodeString(content, cursor, readingLength)
+            );
+            if (!(isCurrent && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION) !== 0)) {
+                cursor += readingLength;
+            }
             const expressionReverse = expressionReverseLength >= 0 ? this._decodeString(content, cursor, expressionReverseLength) : null;
             if (expressionReverseLength >= 0) { cursor += expressionReverseLength; }
-            const readingReverse = readingReverseLength >= 0 ? this._decodeString(content, cursor, readingReverseLength) : null;
-            if (readingReverseLength >= 0) { cursor += readingReverseLength; }
-            const entryContentDictName = (isLegacy || isPrevious || isPreviousPrevious) ?
+            const readingReverse = (
+                readingReverseLength >= 0 ?
+                    (
+                        isCurrent && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE) !== 0 ?
+                            expressionReverse :
+                            this._decodeString(content, cursor, readingReverseLength)
+                    ) :
+                    null
+            );
+            if (readingReverseLength >= 0 && !(isCurrent && (entryContentDictNameFlags & ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE) !== 0)) {
+                cursor += readingReverseLength;
+            }
+            const entryContentDictName = (isLegacy || isPrevious || isPreviousPrevious || isPreviousPreviousPrevious) ?
                 this._decodeString(content, cursor, entryContentDictNameLength) :
-                this._decodeEntryContentDictName(entryContentDictNameMeta, content, cursor, entryContentDictNameLength);
+                this._decodeEntryContentDictName(entryContentDictNameValue, content, cursor, entryContentDictNameLength);
             cursor += entryContentDictNameLength;
 
             const record = {
