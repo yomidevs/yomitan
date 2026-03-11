@@ -154,6 +154,16 @@ export class SortFrequencyDictionaryController {
      */
     async _getFrequencyOrder(dictionary) {
         const dictionaryInfo = await this._settingsController.application.api.getDictionaryInfo();
+        const dictionaryFrequencyMode = dictionaryInfo.find(({title}) => title === dictionary)?.frequencyMode ?? '';
+        switch (dictionaryFrequencyMode) {
+            case 'occurrence-based': {
+                return 1;
+            }
+            case 'rank-based': {
+                return 0;
+            }
+        }
+
         const dictionaryLang = dictionaryInfo.find(({title}) => title === dictionary)?.sourceLanguage ?? '';
 
         /** @type {Record<string, string[]>} */
