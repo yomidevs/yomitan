@@ -2317,6 +2317,7 @@ export class Backend {
         const {windowId} = tab;
 
         let token = null;
+        const errors = [];
         try {
             if (typeof tabId === 'number' && typeof frameId === 'number') {
                 const action = 'frontendSetAllVisibleOverride';
@@ -2336,11 +2337,17 @@ export class Backend {
                     });
                 });
             } catch (e) {
-                log.log(e);
+                errors.push(e);
             }
 
             // Fallback for some Firefox. Usually `chrome.tabs.captureVisibleTab` works but occasionally it doesn't
-            return await browser.tabs.captureVisibleTab(windowId, {format, quality});
+            try {
+                return await browser.tabs.captureVisibleTab(windowId, {format, quality});
+            } catch (e) {
+                errors.push(e);
+            }
+
+            throw new Error('Failed to screenshot, errors: [' + errors.join(', ') + ']');
         } finally {
             if (token !== null) {
                 const action = 'frontendClearAllVisibleOverride';
