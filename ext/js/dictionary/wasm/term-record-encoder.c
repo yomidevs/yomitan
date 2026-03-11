@@ -17,9 +17,10 @@
 
 #include <stdint.h>
 
-#define RECORD_HEADER_BYTES 22u
+#define RECORD_HEADER_BYTES 20u
 #define U32_NULL 0xffffffffu
 #define U16_NULL 0xffffu
+#define ENTRY_CONTENT_LENGTH_EXTENDED_U16 0xfffeu
 #define WASM_PAGE_SIZE 65536u
 #define ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM 0xffu
 #define ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION 0x8000u
@@ -119,6 +120,9 @@ uint32_t calc_encoded_size(uint32_t record_count, uint32_t metas_ptr) {
             variable += ((m->dict_name_meta & ~ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) >> 8u);
         }
         total += RECORD_HEADER_BYTES + variable;
+        if ((uint32_t)m->entry_content_length > 0xfffdu) {
+            total += 4u;
+        }
         if ((m->dict_name_meta & ~ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) > 0x7fffu) {
             total += 4u;
         }
@@ -138,7 +142,14 @@ uint32_t encode_records(uint32_t record_count, uint32_t metas_ptr, uint32_t stri
         write_u16(out, &cursor, m->expression_len > U16_NULL ? U16_NULL : m->expression_len);
         write_u16(out, &cursor, m->reading_len > U16_NULL ? U16_NULL : m->reading_len);
         write_u32(out, &cursor, m->entry_content_offset >= 0 ? (uint32_t)m->entry_content_offset : U32_NULL);
-        write_u32(out, &cursor, m->entry_content_length >= 0 ? (uint32_t)m->entry_content_length : U32_NULL);
+        if (m->entry_content_length < 0) {
+            write_u16(out, &cursor, U16_NULL);
+        } else if ((uint32_t)m->entry_content_length <= 0xfffdu) {
+            write_u16(out, &cursor, (uint32_t)m->entry_content_length);
+        } else {
+            write_u16(out, &cursor, ENTRY_CONTENT_LENGTH_EXTENDED_U16);
+            write_u32(out, &cursor, (uint32_t)m->entry_content_length);
+        }
         if ((m->dict_name_meta & ~ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) <= 0x7fffu) {
             write_u16(out, &cursor, m->dict_name_meta);
         } else {

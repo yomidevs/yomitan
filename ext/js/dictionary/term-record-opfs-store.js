@@ -25,8 +25,8 @@ const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
 const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
 const SHARD_FILE_PREFIX = 'dict-';
 const SHARD_FILE_SUFFIX = '.mbtr';
-const BINARY_MAGIC_TEXT = 'MBTRREC8';
-const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC7';
+const BINARY_MAGIC_TEXT = 'MBTRREC9';
+const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC8';
 const PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC5';
 const PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC4';
 const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC3';
@@ -34,8 +34,8 @@ const PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC2
 const LEGACY_BINARY_MAGIC_TEXT = 'MBTRREC1';
 const BINARY_MAGIC_BYTES = 8;
 const CHUNK_HEADER_BYTES = 8;
-const RECORD_HEADER_BYTES = 22;
-const PREVIOUS_RECORD_HEADER_BYTES = 24;
+const RECORD_HEADER_BYTES = 20;
+const PREVIOUS_RECORD_HEADER_BYTES = 22;
 const PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES = 32;
 const PREVIOUS_PREVIOUS_PREVIOUS_RECORD_HEADER_BYTES = 40;
 const LEGACY_RECORD_HEADER_BYTES = 44;
@@ -53,6 +53,8 @@ const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2 = 1;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3 = 2;
 const ENTRY_CONTENT_DICT_NAME_CODE_JMDICT = 3;
 const ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM = 0xff;
+const ENTRY_CONTENT_LENGTH_U16_NULL = 0xffff;
+const ENTRY_CONTENT_LENGTH_EXTENDED_U16 = 0xfffe;
 const ENTRY_CONTENT_DICT_NAME_FLAG_READING_EQUALS_EXPRESSION = 0x8000;
 const ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE = 0x40000000;
 const ENTRY_CONTENT_DICT_NAME_FLAGS_MASK = 0x8000;
@@ -918,7 +920,19 @@ export class TermRecordOpfsStore {
                     (rawReadingReverseLength === U32_NULL ? -1 : /** @type {number} */ (rawReadingReverseLength))
                 );
                 const rawEntryContentOffset = view.getUint32(cursor, true); cursor += 4;
-                const rawEntryContentLength = view.getUint32(cursor, true); cursor += 4;
+                let rawEntryContentLength;
+                if (isCurrent) {
+                    const compactEntryContentLength = view.getUint16(cursor, true); cursor += 2;
+                    if (compactEntryContentLength === ENTRY_CONTENT_LENGTH_U16_NULL) {
+                        rawEntryContentLength = U32_NULL;
+                    } else if (compactEntryContentLength === ENTRY_CONTENT_LENGTH_EXTENDED_U16) {
+                        rawEntryContentLength = view.getUint32(cursor, true); cursor += 4;
+                    } else {
+                        rawEntryContentLength = compactEntryContentLength;
+                    }
+                } else {
+                    rawEntryContentLength = view.getUint32(cursor, true); cursor += 4;
+                }
                 const entryContentDictNameMeta16 = isCurrent ? view.getUint16(cursor, true) : view.getUint32(cursor, true); cursor += isCurrent ? 2 : 4;
                 const entryContentDictNameMeta = (isCurrent && entryContentDictNameMeta16 === U16_NULL) ? view.getUint32(cursor, true) : entryContentDictNameMeta16;
                 if (isCurrent && entryContentDictNameMeta16 === U16_NULL) { cursor += 4; }
@@ -1158,7 +1172,8 @@ export class TermRecordOpfsStore {
                 expressionBytes.byteLength +
                 readingBytes.byteLength +
                 (entryContentDictNameBytes?.byteLength ?? 0) +
-                (((entryContentDictNameMeta & ~ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) <= ENTRY_CONTENT_DICT_NAME_VALUE_MASK) ? 0 : 4);
+                (((entryContentDictNameMeta & ~ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) <= ENTRY_CONTENT_DICT_NAME_VALUE_MASK) ? 0 : 4) +
+                ((record.entryContentLength >= 0 && record.entryContentLength > 0xfffd) ? 4 : 0);
             encodedRows.push({
                 record,
                 expressionBytes,
@@ -1176,7 +1191,14 @@ export class TermRecordOpfsStore {
             view.setUint16(cursor, expressionBytes.byteLength, true); cursor += 2;
             view.setUint16(cursor, readingBytes.byteLength, true); cursor += 2;
             view.setUint32(cursor, record.entryContentOffset >= 0 ? record.entryContentOffset : U32_NULL, true); cursor += 4;
-            view.setUint32(cursor, record.entryContentLength >= 0 ? record.entryContentLength : U32_NULL, true); cursor += 4;
+            if (record.entryContentLength < 0) {
+                view.setUint16(cursor, ENTRY_CONTENT_LENGTH_U16_NULL, true); cursor += 2;
+            } else if (record.entryContentLength <= 0xfffd) {
+                view.setUint16(cursor, record.entryContentLength, true); cursor += 2;
+            } else {
+                view.setUint16(cursor, ENTRY_CONTENT_LENGTH_EXTENDED_U16, true); cursor += 2;
+                view.setUint32(cursor, record.entryContentLength, true); cursor += 4;
+            }
             if ((entryContentDictNameMeta & ~ENTRY_CONTENT_DICT_NAME_FLAGS_MASK) <= ENTRY_CONTENT_DICT_NAME_VALUE_MASK) {
                 view.setUint16(cursor, entryContentDictNameMeta, true); cursor += 2;
             } else {
