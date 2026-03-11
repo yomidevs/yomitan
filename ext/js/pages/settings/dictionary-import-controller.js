@@ -1255,8 +1255,6 @@ export class DictionaryImportController {
                 debugImportLogging,
                 enableTermEntryContentDedup,
                 termContentStorageMode,
-                termContentCompressionMinBytes,
-                termContentWriteCoalesceMaxChunks,
             } = this._getImportPerformanceFlags();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
@@ -1267,8 +1265,6 @@ export class DictionaryImportController {
                 debugImportLogging,
                 enableTermEntryContentDedup,
                 termContentStorageMode,
-                termContentCompressionMinBytes,
-                termContentWriteCoalesceMaxChunks,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -1379,7 +1375,7 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes', termContentCompressionMinBytes: number, termContentWriteCoalesceMaxChunks?: number}}
+     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes'}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
@@ -1391,7 +1387,6 @@ export class DictionaryImportController {
                 debugImportLogging: false,
                 enableTermEntryContentDedup: true,
                 termContentStorageMode: 'baseline',
-                termContentCompressionMinBytes: 1048576,
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
@@ -1400,21 +1395,6 @@ export class DictionaryImportController {
         const termContentStorageMode = (termContentStorageModeRaw === 'raw-bytes') ?
             termContentStorageModeRaw :
             'baseline';
-        const termContentCompressionMinBytesRaw = flagsRecord.termContentCompressionMinBytes;
-        const termContentCompressionMinBytes = (
-            typeof termContentCompressionMinBytesRaw === 'number' &&
-            Number.isFinite(termContentCompressionMinBytesRaw)
-        ) ?
-            Math.max(0, Math.trunc(termContentCompressionMinBytesRaw)) :
-            1048576;
-        const termContentWriteCoalesceMaxChunksRaw = flagsRecord.termContentWriteCoalesceMaxChunks;
-        const termContentWriteCoalesceMaxChunks = (
-            typeof termContentWriteCoalesceMaxChunksRaw === 'number' &&
-            Number.isFinite(termContentWriteCoalesceMaxChunksRaw) &&
-            termContentWriteCoalesceMaxChunksRaw > 0
-        ) ?
-            Math.max(1, Math.trunc(termContentWriteCoalesceMaxChunksRaw)) :
-            void 0;
         return {
             skipImageMetadata: flagsRecord.skipImageMetadata === true,
             skipMediaImport: flagsRecord.skipMediaImport === true,
@@ -1422,8 +1402,6 @@ export class DictionaryImportController {
             debugImportLogging: flagsRecord.debugImportLogging === true,
             enableTermEntryContentDedup: flagsRecord.enableTermEntryContentDedup !== false,
             termContentStorageMode,
-            termContentCompressionMinBytes,
-            termContentWriteCoalesceMaxChunks,
         };
     }
 

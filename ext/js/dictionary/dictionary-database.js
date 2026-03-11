@@ -596,7 +596,7 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {{termContentStorageMode?: 'baseline'|'raw-bytes', termContentCompressionMinBytes?: number, termContentWriteCoalesceMaxChunks?: number}} [options]
+     * @param {{termContentStorageMode?: 'baseline'|'raw-bytes'}} [options]
      */
     setImportOptimizationFlags(options = {}) {
         this._adaptiveTermBulkAddBatchSize = true;
@@ -607,21 +607,10 @@ export class DictionaryDatabase {
         this._termContentStorageMode = (options.termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) ?
             options.termContentStorageMode :
             TERM_CONTENT_STORAGE_MODE_BASELINE;
-        this._termContentCompressionMinBytes = (
-            typeof options.termContentCompressionMinBytes === 'number' &&
-            Number.isFinite(options.termContentCompressionMinBytes)
-        ) ?
-            Math.max(0, Math.trunc(options.termContentCompressionMinBytes)) :
-            1048576;
+        this._termContentCompressionMinBytes = 1048576;
         this._rawTermContentPackTargetBytes = DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES;
         this._termContentStore.setImportStorageMode(this._termContentStorageMode);
-        this._termContentStore.setWriteCoalesceMaxChunksOverride(
-            typeof options.termContentWriteCoalesceMaxChunks === 'number' &&
-            Number.isFinite(options.termContentWriteCoalesceMaxChunks) &&
-            options.termContentWriteCoalesceMaxChunks > 0 ?
-                Math.max(1, Math.trunc(options.termContentWriteCoalesceMaxChunks)) :
-                null,
-        );
+        this._termContentStore.setWriteCoalesceMaxChunksOverride(null);
     }
 
     /**

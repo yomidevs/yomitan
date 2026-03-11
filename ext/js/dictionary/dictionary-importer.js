@@ -295,19 +295,6 @@ export class DictionaryImporter {
         const termContentStorageMode = (details.termContentStorageMode === 'raw-bytes') ?
             details.termContentStorageMode :
             'baseline';
-        const termContentCompressionMinBytes = (
-            typeof details.termContentCompressionMinBytes === 'number' &&
-            Number.isFinite(details.termContentCompressionMinBytes)
-        ) ?
-            Math.max(0, Math.trunc(details.termContentCompressionMinBytes)) :
-            1048576;
-        const termContentWriteCoalesceMaxChunks = (
-            typeof details.termContentWriteCoalesceMaxChunks === 'number' &&
-            Number.isFinite(details.termContentWriteCoalesceMaxChunks) &&
-            details.termContentWriteCoalesceMaxChunks > 0
-        ) ?
-            Math.max(1, Math.trunc(details.termContentWriteCoalesceMaxChunks)) :
-            void 0;
         this._skipImageMetadata = details.skipImageMetadata === true;
         this._skipMediaImport = details.skipMediaImport === true;
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
@@ -319,8 +306,6 @@ export class DictionaryImporter {
         this._reverseStringCache.clear();
         dictionaryDatabase.setImportOptimizationFlags({
             termContentStorageMode,
-            termContentCompressionMinBytes,
-            termContentWriteCoalesceMaxChunks,
         });
         const tImportStart = Date.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
@@ -465,8 +450,6 @@ export class DictionaryImporter {
         if (effectiveTermContentStorageMode !== termContentStorageMode) {
             dictionaryDatabase.setImportOptimizationFlags({
                 termContentStorageMode: effectiveTermContentStorageMode,
-                termContentCompressionMinBytes,
-                termContentWriteCoalesceMaxChunks,
             });
         }
         const packedTermArtifactEntry = (
