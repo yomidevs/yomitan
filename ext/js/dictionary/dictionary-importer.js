@@ -35,6 +35,11 @@ import {
     isRawTermContentSharedGlossaryBinary,
     rebaseRawTermContentSharedGlossaryBinary,
 } from './raw-term-content.js';
+import {
+    initializeTermContentZstd,
+    logTermContentZstdError,
+} from './zstd-term-content.js';
+import {decompress as zstdDecompress} from '../../lib/zstd-wasm.js';
 import {compareRevisions} from './dictionary-data-util.js';
 import {consumeLastTermBankWasmParseProfile, parseTermBankWithWasmChunks} from './term-bank-wasm-parser.js';
 
@@ -443,7 +448,10 @@ export class DictionaryImporter {
             null;
         const effectiveTermContentStorageMode = (
             termArtifactManifest !== null &&
-            termArtifactManifest.termContentMode === RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME
+            (
+                termArtifactManifest.termContentMode === RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME ||
+                termArtifactManifest.termContentMode === 'raw-v4'
+            )
         ) ?
             'raw-bytes' :
             termContentStorageMode;
@@ -466,6 +474,8 @@ export class DictionaryImporter {
             fileMap.get(TERM_BANK_SHARED_GLOSSARY_ARTIFACT_FILE);
         const sharedGlossaryPackedOffset = termArtifactManifest?.sharedGlossaryPackedOffset ?? null;
         const sharedGlossaryPackedLength = termArtifactManifest?.sharedGlossaryPackedLength ?? null;
+        const sharedGlossaryCompression = termArtifactManifest?.sharedGlossaryCompression ?? null;
+        const sharedGlossaryUncompressedLength = termArtifactManifest?.sharedGlossaryUncompressedLength ?? null;
         /** @type {Uint8Array|null} */
         let packedTermArtifactBytes = null;
         /** @type {Uint8Array|null} */
@@ -511,6 +521,21 @@ export class DictionaryImporter {
             sharedGlossaryArtifactBytes = await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (sharedGlossaryArtifactEntry), new Uint8ArrayWriter());
             sharedGlossaryArtifactPreloadMs = Math.max(0, Date.now() - tSharedGlossaryReadStart);
             this._logImport(`shared glossary artifact preload ${sharedGlossaryArtifactPreloadMs}ms bytes=${sharedGlossaryArtifactBytes.byteLength}`);
+        }
+        if (sharedGlossaryArtifactBytes instanceof Uint8Array && sharedGlossaryCompression === 'zstd') {
+            try {
+                await initializeTermContentZstd();
+                const defaultHeapSize = (
+                    Number.isInteger(sharedGlossaryUncompressedLength) &&
+                    /** @type {number} */ (sharedGlossaryUncompressedLength) > 0
+                ) ?
+                    /** @type {number} */ (sharedGlossaryUncompressedLength) :
+                    (sharedGlossaryArtifactBytes.byteLength * 16);
+                sharedGlossaryArtifactBytes = zstdDecompress(sharedGlossaryArtifactBytes, {defaultHeapSize});
+            } catch (e) {
+                logTermContentZstdError(e);
+                throw e;
+            }
         }
         const usePackedTermArtifact = (
             packedTermArtifactBytes !== null &&
@@ -2017,7 +2042,7 @@ export class DictionaryImporter {
 
     /**
      * @param {import('dictionary-importer').ArchiveFileMap} fileMap
-     * @returns {Promise<{termBanksByArtifact: Map<string, {packedOffset: number, packedLength: number, rows: number|null}>, packedFileName: string|null, sharedGlossaryFileName: string|null, sharedGlossaryPackedOffset: number|null, sharedGlossaryPackedLength: number|null, termContentMode: string|null}|null>}
+     * @returns {Promise<{termBanksByArtifact: Map<string, {packedOffset: number, packedLength: number, rows: number|null}>, packedFileName: string|null, sharedGlossaryFileName: string|null, sharedGlossaryPackedOffset: number|null, sharedGlossaryPackedLength: number|null, sharedGlossaryCompression: string|null, sharedGlossaryUncompressedLength: number|null, termContentMode: string|null}|null>}
      */
     async _readTermArtifactManifest(fileMap) {
         const manifestEntry = fileMap.get(TERM_BANK_ARTIFACT_MANIFEST_FILE);
@@ -2026,7 +2051,7 @@ export class DictionaryImporter {
         }
         let manifest;
         try {
-            manifest = /** @type {{termBanks?: Array<{artifact?: unknown, packedOffset?: unknown, packedLength?: unknown, rows?: unknown}>, packedTermArtifact?: {file?: unknown}|null, sharedGlossaryArtifact?: {file?: unknown, packedOffset?: unknown, packedLength?: unknown}|null, termContentMode?: unknown}|null} */ (
+            manifest = /** @type {{termBanks?: Array<{artifact?: unknown, packedOffset?: unknown, packedLength?: unknown, rows?: unknown}>, packedTermArtifact?: {file?: unknown}|null, sharedGlossaryArtifact?: {file?: unknown, packedOffset?: unknown, packedLength?: unknown, compression?: unknown, uncompressedBytes?: unknown}|null, termContentMode?: unknown}|null} */ (
                 parseJson(await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (manifestEntry), new TextWriter()))
             );
         } catch (_) {
@@ -2075,9 +2100,32 @@ export class DictionaryImporter {
         ) ?
             /** @type {number} */ (manifest.sharedGlossaryArtifact.packedLength) :
             null;
+        const sharedGlossaryCompression = (
+            typeof manifest.sharedGlossaryArtifact === 'object' &&
+            manifest.sharedGlossaryArtifact !== null &&
+            typeof manifest.sharedGlossaryArtifact.compression === 'string'
+        ) ?
+            manifest.sharedGlossaryArtifact.compression :
+            null;
+        const sharedGlossaryUncompressedLength = (
+            typeof manifest.sharedGlossaryArtifact === 'object' &&
+            manifest.sharedGlossaryArtifact !== null &&
+            Number.isInteger(manifest.sharedGlossaryArtifact.uncompressedBytes)
+        ) ?
+            /** @type {number} */ (manifest.sharedGlossaryArtifact.uncompressedBytes) :
+            null;
         const termContentModeValue = manifest.termContentMode;
         const termContentMode = typeof termContentModeValue === 'string' ? termContentModeValue : null;
-        return {termBanksByArtifact, packedFileName, sharedGlossaryFileName, sharedGlossaryPackedOffset, sharedGlossaryPackedLength, termContentMode};
+        return {
+            termBanksByArtifact,
+            packedFileName,
+            sharedGlossaryFileName,
+            sharedGlossaryPackedOffset,
+            sharedGlossaryPackedLength,
+            sharedGlossaryCompression,
+            sharedGlossaryUncompressedLength,
+            termContentMode,
+        };
     }
 
     /**
