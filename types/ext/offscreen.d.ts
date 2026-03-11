@@ -19,6 +19,7 @@ import type * as Dictionary from './dictionary';
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
+import type * as Core from './core';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
 import type {
@@ -61,6 +62,17 @@ type ApiSurface = {
             getTotal: boolean;
         };
         return: DictionaryDatabase.DictionaryCounts;
+    };
+    importDictionaryArchiveOffscreen: {
+        params: {
+            archiveContent: ArrayBuffer;
+            importDetails: DictionaryImporter.ImportDetails;
+        };
+        return: {
+            result: DictionaryImporter.Summary | null;
+            errors: Core.SerializedError[];
+            debug?: import('./dictionary-worker').ImportDebug | null;
+        };
     };
     databasePurgeOffscreen: {
         params: void;

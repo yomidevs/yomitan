@@ -302,6 +302,18 @@ type ApiSurface = {
         };
         return: DictionaryDatabase.DictionaryCounts;
     };
+    checkDictionaryUpdates: {
+        params: {
+            dictionaryTitles?: string[];
+        };
+        return: Backend.DictionaryUpdateCheckResult[];
+    };
+    updateDictionaryByTitle: {
+        params: {
+            dictionaryTitle: string;
+        };
+        return: Backend.DictionaryUpdateResult;
+    };
     setDictionaryImportMode: {
         params: {
             active: boolean;

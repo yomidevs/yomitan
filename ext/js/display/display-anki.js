@@ -637,8 +637,6 @@ export class DisplayAnki {
         const details = dictionaryEntryDetails[dictionaryEntryIndex].noteMap.get(cardFormatIndex);
         if (typeof details === 'undefined') { return; }
 
-        const {requirements} = details;
-
         const button = this._saveButtonFind(dictionaryEntryIndex, cardFormatIndex);
         if (button === null || button.disabled) { return; }
 
@@ -657,6 +655,7 @@ export class DisplayAnki {
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
         try {
+            const {requirements} = await this._createNote(dictionaryEntry, cardFormatIndex, []);
             const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, cardFormatIndex, requirements);
             allErrors.push(...errors);
 
@@ -664,7 +663,11 @@ export class DisplayAnki {
             if (error !== null) { allErrors.push(error); }
             if (button.dataset.overwrite) {
                 const overwrittenNote = await this._getOverwrittenNote(note, dictionaryEntryIndex, cardFormatIndex);
-                await this._updateAnkiNote(overwrittenNote, allErrors);
+                if (overwrittenNote === null) {
+                    allErrors.push(new Error('Could not determine which duplicate note to overwrite'));
+                } else {
+                    await this._updateAnkiNote(overwrittenNote, allErrors);
+                }
             } else {
                 await this._addNewAnkiNote(note, allErrors, button, dictionaryEntryIndex);
             }
@@ -703,8 +706,10 @@ export class DisplayAnki {
      * @returns {Promise<import('anki').NoteWithId | null>}
      */
     async _getOverwrittenNote(note, dictionaryEntryIndex, cardFormatIndex) {
-        const dictionaryEntries = this._display.dictionaryEntries;
-        const allEntryDetails = await this._getDictionaryEntryDetails(dictionaryEntries);
+        const allEntryDetails = this._dictionaryEntryDetails;
+        if (!(allEntryDetails !== null && dictionaryEntryIndex >= 0 && dictionaryEntryIndex < allEntryDetails.length)) {
+            return null;
+        }
         const relevantEntryDetails = allEntryDetails[dictionaryEntryIndex];
         const relevantNoteDetails = relevantEntryDetails.noteMap.get(cardFormatIndex);
         if (typeof relevantNoteDetails === 'undefined') { return null; }
@@ -971,18 +976,17 @@ export class DisplayAnki {
             const {type} = dictionaryEntry;
             for (const [cardFormatIndex, cardFormat] of this._cardFormats.entries()) {
                 if (cardFormat.type !== type) { continue; }
-                const notePromise = this._createNote(dictionaryEntry, cardFormatIndex, []);
+                const notePromise = this._createDuplicateCheckNote(dictionaryEntry, cardFormatIndex);
                 notePromises.push(notePromise);
                 noteTargets.push({index: i, cardFormatIndex, cardFormat});
             }
         }
 
-        const noteInfoList = (await Promise.all(notePromises));
+        const notes = (await Promise.all(notePromises));
         const validNotes = [];
         /** @type {(import('anki').NoteInfoWrapper?)[]} */
         const invalidAndPlaceholderNotes = [];
-        for (const noteInfo of noteInfoList) {
-            const note = noteInfo.note;
+        for (const note of notes) {
             if (note.deckName.length > 0 && note.modelName.length > 0) {
                 validNotes.push(note);
                 invalidAndPlaceholderNotes.push(null);
@@ -1028,11 +1032,10 @@ export class DisplayAnki {
         /** @type {import('display-anki').DictionaryEntryDetails[]} */
         const results = new Array(dictionaryEntries.length).fill(null).map(() => ({noteMap: new Map()}));
 
-        for (let i = 0, ii = noteInfoList.length; i < ii; ++i) {
-            const {note, errors, requirements} = noteInfoList[i];
+        for (let i = 0, ii = notes.length; i < ii; ++i) {
             const {canAdd, valid, noteIds, noteInfos} = notesDupechecked[i];
             const {cardFormatIndex, cardFormat, index} = noteTargets[i];
-            results[index].noteMap.set(cardFormatIndex, {cardFormat, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
+            results[index].noteMap.set(cardFormatIndex, {cardFormat, canAdd, valid, noteIds, noteInfos, ankiError});
         }
         return results;
     }
@@ -1052,12 +1055,15 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
      * @param {number} cardFormatIndex
-     * @param {import('anki-note-builder').Requirement[]} requirements
-     * @returns {Promise<import('display-anki').CreateNoteResult>}
+     * @returns {Promise<{
+     *  context: import('anki-templates-internal').Context,
+     *  cardFormat: import('settings').AnkiCardFormat,
+     *  template: string,
+     *  dictionaryStylesMap: Map<string, string>,
+     * }>}
      */
-    async _createNote(dictionaryEntry, cardFormatIndex, requirements) {
+    async _getCommonNoteBuildData(cardFormatIndex) {
         const context = this._noteContext;
         if (context === null) { throw new Error('Note context not initialized'); }
         const cardFormat = this._cardFormats?.[cardFormatIndex];
@@ -1070,11 +1076,44 @@ export class DisplayAnki {
         }
         const template = this._ankiFieldTemplates;
         if (typeof template !== 'string') { throw new Error('Invalid template'); }
+        const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(this._dictionaries);
+        return {context, cardFormat, template, dictionaryStylesMap};
+    }
+
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {number} cardFormatIndex
+     * @returns {Promise<import('anki').Note>}
+     */
+    async _createDuplicateCheckNote(dictionaryEntry, cardFormatIndex) {
+        const {context, cardFormat, template, dictionaryStylesMap} = await this._getCommonNoteBuildData(cardFormatIndex);
+        return await this._ankiNoteBuilder.createDuplicateCheckNote({
+            dictionaryEntry,
+            cardFormat,
+            context,
+            template,
+            tags: this._noteTags,
+            duplicateScope: this._duplicateScope,
+            duplicateScopeCheckAllModels: this._duplicateScopeCheckAllModels,
+            resultOutputMode: this._resultOutputMode,
+            glossaryLayoutMode: this._glossaryLayoutMode,
+            compactTags: this._compactTags,
+            dictionaryStylesMap,
+        });
+    }
+
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {number} cardFormatIndex
+     * @param {import('anki-note-builder').Requirement[]} requirements
+     * @returns {Promise<import('display-anki').CreateNoteResult>}
+     */
+    async _createNote(dictionaryEntry, cardFormatIndex, requirements) {
+        const {context, cardFormat, template, dictionaryStylesMap} = await this._getCommonNoteBuildData(cardFormatIndex);
         const contentOrigin = this._display.getContentOrigin();
         const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntry);
         const audioDetails = this._getAnkiNoteMediaAudioDetails(details);
         const optionsContext = this._display.getOptionsContext();
-        const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(this._dictionaries);
 
         const {note, errors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
             dictionaryEntry,

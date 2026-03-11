@@ -266,6 +266,22 @@ export class API {
     }
 
     /**
+     * @param {import('api').ApiParam<'checkDictionaryUpdates', 'dictionaryTitles'>} [dictionaryTitles]
+     * @returns {Promise<import('api').ApiReturn<'checkDictionaryUpdates'>>}
+     */
+    checkDictionaryUpdates(dictionaryTitles) {
+        return this._invoke('checkDictionaryUpdates', typeof dictionaryTitles === 'undefined' ? {} : {dictionaryTitles});
+    }
+
+    /**
+     * @param {import('api').ApiParam<'updateDictionaryByTitle', 'dictionaryTitle'>} dictionaryTitle
+     * @returns {Promise<import('api').ApiReturn<'updateDictionaryByTitle'>>}
+     */
+    updateDictionaryByTitle(dictionaryTitle) {
+        return this._invoke('updateDictionaryByTitle', {dictionaryTitle});
+    }
+
+    /**
      * @param {import('api').ApiParam<'setDictionaryImportMode', 'active'>} active
      * @returns {Promise<import('api').ApiReturn<'setDictionaryImportMode'>>}
      */

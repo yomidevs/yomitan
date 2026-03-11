@@ -42,6 +42,20 @@ export type CreateNoteDetails = {
     dictionaryStylesMap: Map<string, string>;
 };
 
+export type CreateDuplicateCheckNoteDetails = {
+    dictionaryEntry: Dictionary.DictionaryEntry;
+    cardFormat: Settings.AnkiCardFormat;
+    context: AnkiTemplatesInternal.Context;
+    template: string;
+    tags?: string[];
+    duplicateScope?: Settings.AnkiDuplicateScope;
+    duplicateScopeCheckAllModels?: boolean;
+    resultOutputMode?: Settings.ResultOutputMode;
+    glossaryLayoutMode?: Settings.GlossaryLayoutMode;
+    compactTags?: boolean;
+    dictionaryStylesMap?: Map<string, string>;
+};
+
 export type Field = [
     name: string,
     {

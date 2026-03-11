@@ -59,16 +59,7 @@ export class AnkiNoteBuilder {
         mediaOptions = null,
         dictionaryStylesMap = new Map(),
     }) {
-        const {deck: deckName, model: modelName, fields: fieldsSettings} = cardFormat;
-        const fields = Object.entries(fieldsSettings);
-        let duplicateScopeDeckName = null;
-        let duplicateScopeCheckChildren = false;
-        if (duplicateScope === 'deck-root') {
-            duplicateScope = 'deck';
-            duplicateScopeDeckName = getRootDeckName(deckName);
-            duplicateScopeCheckChildren = true;
-        }
-
+        const fields = this._getCardFormatFields(cardFormat);
         /** @type {Error[]} */
         const allErrors = [];
         let media;
@@ -80,17 +71,8 @@ export class AnkiNoteBuilder {
             }
         }
 
-        // Make URL field blank if URL source is Yomitan
-        try {
-            const url = new URL(context.url);
-            if (url.protocol === new URL(import.meta.url).protocol) {
-                context.url = '';
-            }
-        } catch (e) {
-            // Ignore
-        }
-
-        const commonData = this._createData(dictionaryEntry, cardFormat, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
+        const normalizedContext = this._normalizeContext(context);
+        const commonData = this._createData(dictionaryEntry, cardFormat, normalizedContext, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
         const formattedFieldValuePromises = [];
         for (const [, {value: fieldValue}] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template);
@@ -114,23 +96,50 @@ export class AnkiNoteBuilder {
             }
         }
 
-        /** @type {import('anki').Note} */
-        const note = {
-            fields: noteFields,
-            tags,
-            deckName,
-            modelName,
-            options: {
-                allowDuplicate: true,
-                duplicateScope,
-                duplicateScopeOptions: {
-                    deckName: duplicateScopeDeckName,
-                    checkChildren: duplicateScopeCheckChildren,
-                    checkAllModels: duplicateScopeCheckAllModels,
-                },
-            },
-        };
+        const note = this._createBaseNote(cardFormat, tags, duplicateScope, duplicateScopeCheckAllModels, noteFields);
         return {note, errors: allErrors, requirements: [...uniqueRequirements.values()]};
+    }
+
+    /**
+     * Creates a minimal note for duplicate checks using only the first configured field.
+     * @param {import('anki-note-builder').CreateDuplicateCheckNoteDetails} details
+     * @returns {Promise<import('anki').Note>}
+     */
+    async createDuplicateCheckNote({
+        dictionaryEntry,
+        cardFormat,
+        context,
+        template,
+        tags = [],
+        duplicateScope = 'collection',
+        duplicateScopeCheckAllModels = false,
+        resultOutputMode = 'split',
+        glossaryLayoutMode = 'default',
+        compactTags = false,
+        dictionaryStylesMap = new Map(),
+    }) {
+        const fields = this._getCardFormatFields(cardFormat);
+        /** @type {import('anki').NoteFields} */
+        const noteFields = {};
+
+        if (fields.length > 0) {
+            const normalizedContext = this._normalizeContext(context);
+            const commonData = this._createData(
+                dictionaryEntry,
+                cardFormat,
+                normalizedContext,
+                resultOutputMode,
+                glossaryLayoutMode,
+                compactTags,
+                void 0,
+                dictionaryStylesMap,
+            );
+            const [fieldName, {value: fieldValue}] = fields[0];
+            const {value} = await this._formatField(fieldValue, commonData, template);
+            noteFields[fieldName] = value;
+        }
+
+        return this._createBaseNote(cardFormat, tags, duplicateScope, duplicateScopeCheckAllModels, noteFields);
     }
 
     /**
@@ -198,6 +207,66 @@ export class AnkiNoteBuilder {
     }
 
     // Private
+
+    /**
+     * @param {import('settings').AnkiCardFormat} cardFormat
+     * @returns {import('anki-note-builder').Field[]}
+     */
+    _getCardFormatFields(cardFormat) {
+        return Object.entries(cardFormat.fields);
+    }
+
+    /**
+     * @param {import('anki-templates-internal').Context} context
+     * @returns {import('anki-templates-internal').Context}
+     */
+    _normalizeContext(context) {
+        const normalizedContext = {...context};
+        try {
+            const url = new URL(normalizedContext.url);
+            if (url.protocol === new URL(import.meta.url).protocol) {
+                normalizedContext.url = '';
+            }
+        } catch (e) {
+            // Ignore
+        }
+        return normalizedContext;
+    }
+
+    /**
+     * @param {import('settings').AnkiCardFormat} cardFormat
+     * @param {string[]} tags
+     * @param {import('settings').AnkiDuplicateScope} duplicateScope
+     * @param {boolean} duplicateScopeCheckAllModels
+     * @param {import('anki').NoteFields} fields
+     * @returns {import('anki').Note}
+     */
+    _createBaseNote(cardFormat, tags, duplicateScope, duplicateScopeCheckAllModels, fields) {
+        const {deck: deckName, model: modelName} = cardFormat;
+        let duplicateScopeDeckName = null;
+        let duplicateScopeCheckChildren = false;
+        if (duplicateScope === 'deck-root') {
+            duplicateScope = 'deck';
+            duplicateScopeDeckName = getRootDeckName(deckName);
+            duplicateScopeCheckChildren = true;
+        }
+
+        return {
+            fields,
+            tags,
+            deckName,
+            modelName,
+            options: {
+                allowDuplicate: true,
+                duplicateScope,
+                duplicateScopeOptions: {
+                    deckName: duplicateScopeDeckName,
+                    checkChildren: duplicateScopeCheckChildren,
+                    checkAllModels: duplicateScopeCheckAllModels,
+                },
+            },
+        };
+    }
 
     /**
      * @param {import('dictionary').DictionaryEntry} dictionaryEntry

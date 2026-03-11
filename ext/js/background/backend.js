@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import * as ajvSchemas0 from '../../lib/validate-schemas.js';
 import {AccessibilityController} from '../accessibility/accessibility-controller.js';
 import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
@@ -32,10 +33,13 @@ import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {safePerformance} from '../core/safe-performance.js';
 import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
 import {generateAnkiNoteMediaFileName, INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
+import {getKebabCase} from '../data/anki-template-util.js';
 import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
+import {compareRevisions} from '../dictionary/dictionary-data-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {DictionaryWorker} from '../dictionary/dictionary-worker.js';
 import {Environment} from '../extension/environment.js';
 import {CacheMap} from '../general/cache-map.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
@@ -50,6 +54,10 @@ import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
 
 const STARTUP_DIAGNOSTICS_STORAGE_KEY = 'manabitanStartupDiagnostics';
+const DICTIONARY_AUTO_UPDATE_STATE_STORAGE_KEY = 'manabitanDictionaryAutoUpdateState';
+const DICTIONARY_AUTO_UPDATE_ALARM_NAME = 'manabitanDictionaryAutoUpdateHourly';
+const DICTIONARY_AUTO_UPDATE_INTERVAL_MS = 60 * 60 * 1000;
+const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 
 /**
  * @param {string} previousText
@@ -145,6 +153,12 @@ export class Backend {
         this._dictionaryRefreshPromise = null;
         /** @type {?Promise<void>} */
         this._dictionaryDatabasePreparePromise = null;
+        /** @type {Promise<void>|null} */
+        this._dictionaryMutationPromise = null;
+        /** @type {boolean} */
+        this._dictionaryMutationActive = false;
+        /** @type {Promise<void>|null} */
+        this._dictionaryAutoUpdatePassPromise = null;
 
         /** @type {boolean} */
         this._isPrepared = false;
@@ -204,6 +218,8 @@ export class Backend {
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
             ['deleteDictionaryByTitle',      this._onApiDeleteDictionaryByTitle.bind(this)],
             ['getDictionaryCounts',          this._onApiGetDictionaryCounts.bind(this)],
+            ['checkDictionaryUpdates',       this._onApiCheckDictionaryUpdates.bind(this)],
+            ['updateDictionaryByTitle',      this._onApiUpdateDictionaryByTitle.bind(this)],
             ['setDictionaryImportMode',      this._onApiSetDictionaryImportMode.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
             ['exportDictionaryDatabase',     this._onApiExportDictionaryDatabase.bind(this)],
@@ -310,6 +326,13 @@ export class Backend {
             chrome.permissions.onRemoved.addListener(onPermissionsChanged);
         }
 
+        if (isObjectNotArray(chrome.alarms) && isObjectNotArray(chrome.alarms.onAlarm)) {
+            const onAlarm = this._onWebExtensionEventWrapper(this._onAlarm.bind(this));
+            chrome.alarms.onAlarm.addListener(onAlarm);
+        }
+
+        const onStartup = this._onWebExtensionEventWrapper(this._onStartup.bind(this));
+        chrome.runtime.onStartup.addListener(onStartup);
         chrome.runtime.onInstalled.addListener(this._onInstalled.bind(this));
     }
 
@@ -440,6 +463,9 @@ export class Backend {
             const dictionaryOptionsPruneSummary = await measureAsyncPhase('pruneStaleProfileDictionaryOptions', async () => (
                 await this._pruneStaleProfileDictionaryOptions()
             ));
+            await measureAsyncPhase('pruneStaleDictionaryAutoUpdates', async () => {
+                await this._pruneStaleDictionaryAutoUpdates();
+            });
             await measureAsyncPhase('captureStartupCleanupDiagnostics', async () => {
                 await this._captureStartupCleanupDiagnostics(dictionaryOptionsPruneSummary);
             });
@@ -458,6 +484,11 @@ export class Backend {
                 this._attachOmniboxListener();
                 recordPhase('attachOmniboxListener', startedAt);
             }
+
+            await measureAsyncPhase('ensureDictionaryAutoUpdateAlarm', async () => {
+                await this._ensureDictionaryAutoUpdateAlarm();
+            });
+            void this._runDictionaryAutoUpdatePass('prepare');
 
             const optionsStartedAt = safePerformance.now();
             const options = this._getProfileOptions({current: true}, false);
@@ -656,8 +687,25 @@ export class Backend {
      * @param {chrome.runtime.InstalledDetails} event
      */
     _onInstalled({reason}) {
-        if (reason !== 'install') { return; }
-        void this._requestPersistentStorage();
+        if (reason === 'install') {
+            void this._requestPersistentStorage();
+        }
+        void this._ensureDictionaryAutoUpdateAlarm();
+        void this._runDictionaryAutoUpdatePass('install');
+    }
+
+    /** */
+    _onStartup() {
+        void this._ensureDictionaryAutoUpdateAlarm();
+        void this._runDictionaryAutoUpdatePass('startup');
+    }
+
+    /**
+     * @param {chrome.alarms.Alarm} alarm
+     */
+    _onAlarm(alarm) {
+        if (alarm.name !== DICTIONARY_AUTO_UPDATE_ALARM_NAME) { return; }
+        void this._runDictionaryAutoUpdatePass('alarm');
     }
 
     // Message handlers
@@ -1106,14 +1154,26 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'deleteDictionaryByTitle'>} */
     async _onApiDeleteDictionaryByTitle({dictionaryTitle}) {
-        await this._ensureDictionaryDatabaseReady();
-        await this._dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, () => {});
+        await this._runWithDictionaryMutationLock(async () => {
+            await this._ensureDictionaryDatabaseReady();
+            await this._dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, () => {});
+        });
     }
 
     /** @type {import('api').ApiHandler<'getDictionaryCounts'>} */
     async _onApiGetDictionaryCounts({dictionaryNames, getTotal}) {
         await this._ensureDictionaryDatabaseReady();
         return await this._dictionaryDatabase.getDictionaryCounts(dictionaryNames, getTotal);
+    }
+
+    /** @type {import('api').ApiHandler<'checkDictionaryUpdates'>} */
+    async _onApiCheckDictionaryUpdates({dictionaryTitles = []}) {
+        return await this._checkDictionaryUpdates(dictionaryTitles);
+    }
+
+    /** @type {import('api').ApiHandler<'updateDictionaryByTitle'>} */
+    async _onApiUpdateDictionaryByTitle({dictionaryTitle}) {
+        return await this._updateDictionaryByTitle(dictionaryTitle, true);
     }
 
     /** @type {import('api').ApiHandler<'setDictionaryImportMode'>} */
@@ -1123,9 +1183,11 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'purgeDatabase'>} */
     async _onApiPurgeDatabase() {
-        await this._ensureDictionaryDatabaseReady();
-        await this._dictionaryDatabase.purge();
-        this._triggerDatabaseUpdated('dictionary', 'purge');
+        await this._runWithDictionaryMutationLock(async () => {
+            await this._ensureDictionaryDatabaseReady();
+            await this._dictionaryDatabase.purge();
+            this._triggerDatabaseUpdated('dictionary', 'purge');
+        });
     }
 
     /** @type {import('api').ApiHandler<'exportDictionaryDatabase'>} */
@@ -1137,9 +1199,11 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'importDictionaryDatabase'>} */
     async _onApiImportDictionaryDatabase({content}) {
-        await this._ensureDictionaryDatabaseReady();
-        await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
-        this._triggerDatabaseUpdated('dictionary', 'import');
+        await this._runWithDictionaryMutationLock(async () => {
+            await this._ensureDictionaryDatabaseReady();
+            await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
+            this._triggerDatabaseUpdated('dictionary', 'import');
+        });
     }
 
     /** @type {import('api').ApiHandler<'getMedia'>} */
@@ -2929,6 +2993,688 @@ export class Backend {
         } finally {
             this._dictionaryRefreshPromise = null;
         }
+    }
+
+    /**
+     * @template T
+     * @param {() => Promise<T>} callback
+     * @param {{wait?: boolean}} [options]
+     * @returns {Promise<T|undefined>}
+     */
+    async _runWithDictionaryMutationLock(callback, {wait = true} = {}) {
+        while (this._dictionaryMutationPromise !== null) {
+            if (!wait) {
+                return void 0;
+            }
+            await this._dictionaryMutationPromise;
+        }
+
+        /** @type {() => void} */
+        let resolveDone = () => {};
+        this._dictionaryMutationPromise = new Promise((resolve) => {
+            resolveDone = resolve;
+        });
+        this._dictionaryMutationActive = true;
+        try {
+            return await callback();
+        } finally {
+            this._dictionaryMutationActive = false;
+            this._dictionaryMutationPromise = null;
+            resolveDone();
+        }
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _ensureDictionaryAutoUpdateAlarm() {
+        const alarms = chrome.alarms;
+        if (!isObjectNotArray(alarms) || typeof alarms.get !== 'function' || typeof alarms.create !== 'function') {
+            return;
+        }
+        const alarm = await new Promise((resolve, reject) => {
+            alarms.get(DICTIONARY_AUTO_UPDATE_ALARM_NAME, (result) => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || 'alarms.get failed'));
+                    return;
+                }
+                resolve(result);
+            });
+        });
+        if (alarm !== null) {
+            return;
+        }
+        alarms.create(DICTIONARY_AUTO_UPDATE_ALARM_NAME, {periodInMinutes: 60});
+    }
+
+    /**
+     * @param {'prepare'|'install'|'startup'|'alarm'} reason
+     * @returns {Promise<void>}
+     */
+    async _runDictionaryAutoUpdatePass(reason) {
+        if (this._dictionaryAutoUpdatePassPromise !== null) {
+            await this._dictionaryAutoUpdatePassPromise;
+            return;
+        }
+        this._dictionaryAutoUpdatePassPromise = (async () => {
+            if (this._dictionaryImportModeActive) {
+                return;
+            }
+            const options = this._options;
+            if (options === null) {
+                return;
+            }
+            const enabledIndexUrls = new Set(options.global.dictionaryAutoUpdates);
+            if (enabledIndexUrls.size === 0) {
+                return;
+            }
+
+            await this._ensureDictionaryDatabaseReady();
+            const dictionaries = await this._dictionaryDatabase.getDictionaryInfo();
+            const state = await this._getDictionaryAutoUpdateState();
+            const now = Date.now();
+            const dueDictionaries = dictionaries
+                .filter((dictionary) => {
+                    const indexUrl = dictionary.indexUrl;
+                    if (
+                        dictionary.isUpdatable !== true ||
+                        typeof indexUrl !== 'string' ||
+                        indexUrl.length === 0 ||
+                        !enabledIndexUrls.has(indexUrl)
+                    ) {
+                        return false;
+                    }
+                    const lastAttemptAt = state[indexUrl]?.lastAttemptAt ?? 0;
+                    return (now - lastAttemptAt) >= DICTIONARY_AUTO_UPDATE_INTERVAL_MS;
+                })
+                .sort((a, b) => a.title.localeCompare(b.title));
+
+            reportDiagnostics('dictionary-auto-update-pass-begin', {
+                reason,
+                enabledCount: enabledIndexUrls.size,
+                dueCount: dueDictionaries.length,
+            });
+
+            for (const dictionary of dueDictionaries) {
+                if (this._dictionaryImportModeActive) {
+                    break;
+                }
+                const [checkResult] = await this._checkDictionaryUpdates([dictionary.title]);
+                if (typeof checkResult === 'undefined' || !checkResult.hasUpdate) {
+                    continue;
+                }
+                await this._updateDictionaryByTitle(dictionary.title, false, checkResult);
+            }
+        })();
+        try {
+            await this._dictionaryAutoUpdatePassPromise;
+        } finally {
+            this._dictionaryAutoUpdatePassPromise = null;
+        }
+    }
+
+    /**
+     * @param {string[]} dictionaryTitles
+     * @returns {Promise<import('backend').DictionaryUpdateCheckResult[]>}
+     */
+    async _checkDictionaryUpdates(dictionaryTitles) {
+        await this._ensureDictionaryDatabaseReady();
+        const dictionaries = await this._dictionaryDatabase.getDictionaryInfo();
+        const titleFilter = new Set(dictionaryTitles);
+        const state = await this._getDictionaryAutoUpdateState();
+        /** @type {import('backend').DictionaryUpdateCheckResult[]} */
+        const results = [];
+        for (const dictionary of dictionaries) {
+            if (titleFilter.size > 0 && !titleFilter.has(dictionary.title)) {
+                continue;
+            }
+            results.push(await this._checkDictionaryUpdate(dictionary, state));
+        }
+        await this._setDictionaryAutoUpdateState(state);
+        return results;
+    }
+
+    /**
+     * @param {import('dictionary-importer').Summary} dictionary
+     * @param {Record<string, {lastAttemptAt?: number, lastSuccessfulCheckAt?: number, lastSuccessfulUpdateAt?: number, lastSeenRevision?: string, etag?: string|null, lastModified?: string|null, lastError?: string|null}>} state
+     * @returns {Promise<import('backend').DictionaryUpdateCheckResult>}
+     */
+    async _checkDictionaryUpdate(dictionary, state) {
+        const result = {
+            dictionaryTitle: dictionary.title,
+            hasUpdate: false,
+            currentRevision: typeof dictionary.revision === 'string' ? dictionary.revision : null,
+            latestRevision: null,
+            downloadUrl: typeof dictionary.downloadUrl === 'string' ? dictionary.downloadUrl : null,
+            error: null,
+        };
+        const {isUpdatable, indexUrl} = dictionary;
+        if (isUpdatable !== true || typeof indexUrl !== 'string' || typeof dictionary.downloadUrl !== 'string') {
+            return result;
+        }
+
+        const entry = state[indexUrl] ?? {};
+        state[indexUrl] = entry;
+        entry.lastAttemptAt = Date.now();
+
+        /** @type {HeadersInit} */
+        const validatorHeaders = {};
+        if (typeof entry.etag === 'string' && entry.etag.length > 0) {
+            validatorHeaders['If-None-Match'] = entry.etag;
+        }
+        if (typeof entry.lastModified === 'string' && entry.lastModified.length > 0) {
+            validatorHeaders['If-Modified-Since'] = entry.lastModified;
+        }
+
+        /**
+         * @param {Response} response
+         * @returns {void}
+         */
+        const updateValidatorsFromResponse = (response) => {
+            const etag = response.headers.get('ETag');
+            const lastModified = response.headers.get('Last-Modified');
+            entry.etag = etag;
+            entry.lastModified = lastModified;
+        };
+
+        try {
+            let headResponse = null;
+            try {
+                headResponse = await this._requestBuilder.fetchAnonymous(indexUrl, {
+                    method: 'HEAD',
+                    headers: validatorHeaders,
+                    cache: 'no-store',
+                    credentials: 'omit',
+                    redirect: 'follow',
+                    referrerPolicy: 'no-referrer',
+                });
+                if (headResponse.status === 304) {
+                    updateValidatorsFromResponse(headResponse);
+                    entry.lastSuccessfulCheckAt = Date.now();
+                    entry.lastSeenRevision = dictionary.revision;
+                    entry.lastError = null;
+                    return result;
+                }
+                if (!headResponse.ok) {
+                    throw new Error(`HTTP ${String(headResponse.status)}`);
+                }
+                updateValidatorsFromResponse(headResponse);
+            } catch (_) {
+                headResponse = null;
+            }
+
+            const getResponse = await this._requestBuilder.fetchAnonymous(indexUrl, {
+                method: 'GET',
+                headers: (headResponse === null ? validatorHeaders : {}),
+                cache: 'no-store',
+                credentials: 'omit',
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+            });
+            if (getResponse.status === 304) {
+                updateValidatorsFromResponse(getResponse);
+                entry.lastSuccessfulCheckAt = Date.now();
+                entry.lastSeenRevision = dictionary.revision;
+                entry.lastError = null;
+                return result;
+            }
+            if (!getResponse.ok) {
+                throw new Error(`HTTP ${String(getResponse.status)}`);
+            }
+            updateValidatorsFromResponse(getResponse);
+
+            const index = /** @type {unknown} */ (await readResponseJson(getResponse));
+            if (!ajvSchemas.dictionaryIndex(index)) {
+                throw new Error('Invalid dictionary index');
+            }
+            const validIndex = /** @type {import('dictionary-data').Index} */ (index);
+            const latestRevision = validIndex.revision;
+            const downloadUrl = typeof validIndex.downloadUrl === 'string' ? validIndex.downloadUrl : dictionary.downloadUrl;
+            entry.lastSuccessfulCheckAt = Date.now();
+            entry.lastSeenRevision = latestRevision;
+            entry.lastError = null;
+            result.latestRevision = latestRevision;
+            result.downloadUrl = typeof downloadUrl === 'string' ? downloadUrl : null;
+            result.hasUpdate = compareRevisions(dictionary.revision, latestRevision);
+        } catch (e) {
+            const error = e instanceof Error ? e : new Error(String(e));
+            entry.lastError = error.message;
+            result.error = error.message;
+        }
+
+        return result;
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     * @param {boolean} waitForLock
+     * @param {import('backend').DictionaryUpdateCheckResult} [precomputedCheckResult]
+     * @returns {Promise<import('backend').DictionaryUpdateResult>}
+     */
+    async _updateDictionaryByTitle(dictionaryTitle, waitForLock, precomputedCheckResult = void 0) {
+        await this._ensureDictionaryDatabaseReady();
+        const dictionaries = await this._dictionaryDatabase.getDictionaryInfo();
+        const currentDictionary = dictionaries.find((dictionary) => dictionary.title === dictionaryTitle);
+        if (
+            typeof currentDictionary === 'undefined' ||
+            currentDictionary.isUpdatable !== true ||
+            typeof currentDictionary.indexUrl !== 'string' ||
+            typeof currentDictionary.downloadUrl !== 'string'
+        ) {
+            return {dictionaryTitle, status: 'not-updatable', latestRevision: null, error: null};
+        }
+
+        const checkResult = precomputedCheckResult ?? (await this._checkDictionaryUpdates([dictionaryTitle]))[0];
+        if (
+            typeof checkResult === 'undefined' ||
+            !checkResult.hasUpdate ||
+            typeof checkResult.downloadUrl !== 'string'
+        ) {
+            return {
+                dictionaryTitle,
+                status: (checkResult?.error !== null && typeof checkResult?.error === 'string') ? 'skipped' : 'no-update',
+                latestRevision: checkResult?.latestRevision ?? null,
+                error: checkResult?.error ?? null,
+            };
+        }
+
+        const archiveResponse = await this._requestBuilder.fetchAnonymous(checkResult.downloadUrl, {
+            method: 'GET',
+            cache: 'no-store',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+        });
+        if (!archiveResponse.ok) {
+            const error = `Failed to download dictionary archive: HTTP ${String(archiveResponse.status)}`;
+            await this._setDictionaryAutoUpdateError(currentDictionary.indexUrl, error);
+            return {dictionaryTitle, status: 'skipped', latestRevision: checkResult.latestRevision, error};
+        }
+        const archiveContent = RequestBuilder.readFetchResponseArrayBuffer(archiveResponse, null);
+
+        const updateResult = await this._runWithDictionaryMutationLock(async () => {
+            await this._ensureDictionaryDatabaseReady();
+            const latestDictionaries = await this._dictionaryDatabase.getDictionaryInfo();
+            const latestDictionary = latestDictionaries.find((dictionary) => dictionary.title === dictionaryTitle);
+            if (
+                typeof latestDictionary === 'undefined' ||
+                latestDictionary.isUpdatable !== true ||
+                typeof latestDictionary.indexUrl !== 'string' ||
+                typeof latestDictionary.downloadUrl !== 'string'
+            ) {
+                return {dictionaryTitle, status: 'not-updatable', latestRevision: checkResult.latestRevision, error: null};
+            }
+            if (latestDictionary.revision !== currentDictionary.revision) {
+                return {dictionaryTitle, status: 'skipped', latestRevision: checkResult.latestRevision, error: null};
+            }
+            if (!waitForLock) {
+                const enabledIndexUrls = new Set(this._options?.global.dictionaryAutoUpdates ?? []);
+                if (!enabledIndexUrls.has(latestDictionary.indexUrl)) {
+                    return {dictionaryTitle, status: 'skipped', latestRevision: checkResult.latestRevision, error: null};
+                }
+            }
+            return await this._performDictionaryUpdate(latestDictionary, await archiveContent, checkResult.latestRevision);
+        }, {wait: waitForLock});
+
+        return updateResult ?? {dictionaryTitle, status: 'skipped', latestRevision: checkResult.latestRevision, error: null};
+    }
+
+    /**
+     * @param {import('dictionary-importer').Summary} dictionary
+     * @param {Uint8Array} archiveContent
+     * @param {string|null} latestRevision
+     * @returns {Promise<import('backend').DictionaryUpdateResult>}
+     */
+    async _performDictionaryUpdate(dictionary, archiveContent, latestRevision) {
+        const updateContext = this._captureDictionaryUpdateSettings(dictionary.title);
+        let importModeEnabled = false;
+        /** @type {string|null} */
+        let failureMessage = null;
+        try {
+            await this._dictionaryDatabase.deleteDictionary(dictionary.title, 1000, () => {});
+            await this._setDictionaryImportMode(true);
+            importModeEnabled = true;
+
+            const importResult = await this._importDictionaryArchiveHeadless(
+                archiveContent.buffer.slice(archiveContent.byteOffset, archiveContent.byteOffset + archiveContent.byteLength),
+                this._createDictionaryImportDetails(),
+            );
+            const importedSummary = importResult.result;
+            if (importedSummary === null) {
+                const message = importResult.errors.map((error) => error.message).join('; ') || 'Dictionary import failed';
+                throw new Error(message);
+            }
+
+            await this._applyImportedDictionarySettings(dictionary, importedSummary, updateContext);
+            await this._updateDictionaryAutoUpdateStateAfterSuccess(dictionary, importedSummary);
+            this._triggerDatabaseUpdated('dictionary', 'import');
+            return {dictionaryTitle: dictionary.title, status: 'updated', latestRevision, error: null};
+        } catch (e) {
+            const error = e instanceof Error ? e : new Error(String(e));
+            await this._setDictionaryAutoUpdateError(dictionary.indexUrl ?? '', error.message);
+            failureMessage = error.message;
+        } finally {
+            if (importModeEnabled) {
+                try {
+                    await this._setDictionaryImportMode(false);
+                } catch (e) {
+                    log.error(e);
+                }
+            }
+        }
+        if (failureMessage !== null) {
+            await this._pruneStaleProfileDictionaryOptions();
+            await this._pruneStaleDictionaryAutoUpdates();
+        }
+        return {dictionaryTitle: dictionary.title, status: 'skipped', latestRevision, error: failureMessage};
+    }
+
+    /**
+     * @param {ArrayBuffer} archiveContent
+     * @param {import('dictionary-importer').ImportDetails} importDetails
+     * @returns {Promise<{result: import('dictionary-importer').Summary | null, errors: Error[], debug?: import('dictionary-worker').ImportDebug | null}>}
+     */
+    async _importDictionaryArchiveHeadless(archiveContent, importDetails) {
+        if (this._offscreen !== null) {
+            return await this._offscreen.importDictionaryArchive(archiveContent, importDetails);
+        }
+        const dictionaryWorker = new DictionaryWorker({reuseWorker: false});
+        try {
+            return await dictionaryWorker.importDictionary(archiveContent, importDetails, null);
+        } finally {
+            dictionaryWorker.destroy();
+        }
+    }
+
+    /**
+     * @returns {import('dictionary-importer').ImportDetails}
+     */
+    _createDictionaryImportDetails() {
+        const options = this._options;
+        return {
+            prefixWildcardsSupported: options?.global.database.prefixWildcardsSupported === true,
+            yomitanVersion: chrome.runtime.getManifest().version,
+        };
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     * @returns {{
+     *   profilesDictionarySettings: import('settings-controller').ProfilesDictionarySettings,
+     *   mainDictionaryProfileIds: Set<string>,
+     *   sortFrequencyDictionaryProfileIds: Set<string>
+     * }}
+     */
+    _captureDictionaryUpdateSettings(dictionaryTitle) {
+        /** @type {import('settings-controller').ProfilesDictionarySettings} */
+        const profilesDictionarySettings = {};
+        /** @type {Set<string>} */
+        const mainDictionaryProfileIds = new Set();
+        /** @type {Set<string>} */
+        const sortFrequencyDictionaryProfileIds = new Set();
+        const options = this._options;
+        if (options === null) {
+            return {profilesDictionarySettings: null, mainDictionaryProfileIds, sortFrequencyDictionaryProfileIds};
+        }
+
+        for (const profile of options.profiles) {
+            if (profile.options.general.mainDictionary === dictionaryTitle) {
+                mainDictionaryProfileIds.add(profile.id);
+            }
+            if (profile.options.general.sortFrequencyDictionary === dictionaryTitle) {
+                sortFrequencyDictionaryProfileIds.add(profile.id);
+            }
+            const dictionaries = profile.options.dictionaries;
+            for (let i = 0; i < dictionaries.length; ++i) {
+                if (dictionaries[i].name === dictionaryTitle) {
+                    profilesDictionarySettings[profile.id] = {...dictionaries[i], index: i};
+                    break;
+                }
+            }
+        }
+
+        return {profilesDictionarySettings, mainDictionaryProfileIds, sortFrequencyDictionaryProfileIds};
+    }
+
+    /**
+     * @param {import('dictionary-importer').Summary} previousSummary
+     * @param {import('dictionary-importer').Summary} importedSummary
+     * @param {{
+     *   profilesDictionarySettings: import('settings-controller').ProfilesDictionarySettings,
+     *   mainDictionaryProfileIds: Set<string>,
+     *   sortFrequencyDictionaryProfileIds: Set<string>
+     * }} updateContext
+     * @returns {Promise<void>}
+     */
+    async _applyImportedDictionarySettings(previousSummary, importedSummary, updateContext) {
+        const options = this._options;
+        if (options === null) {
+            return;
+        }
+        const {profilesDictionarySettings, mainDictionaryProfileIds, sortFrequencyDictionaryProfileIds} = updateContext;
+        for (let i = 0; i < options.profiles.length; ++i) {
+            const profile = options.profiles[i];
+            const dictionaries = profile.options.dictionaries.filter(({name}) => (
+                name !== previousSummary.title &&
+                name !== importedSummary.title
+            ));
+            const profileSettings = profilesDictionarySettings?.[profile.id];
+            if (typeof profileSettings === 'undefined') {
+                dictionaries.push(this._createDefaultDictionarySettings(importedSummary.title, i === options.profileCurrent, importedSummary.styles));
+            } else {
+                const {index, alias, name, ...currentSettings} = profileSettings;
+                const newAlias = alias === name ? importedSummary.title : alias;
+                const insertIndex = Math.max(0, Math.min(index, dictionaries.length));
+                dictionaries.splice(insertIndex, 0, {
+                    ...currentSettings,
+                    styles: importedSummary.styles,
+                    name: importedSummary.title,
+                    alias: newAlias,
+                });
+            }
+            profile.options.dictionaries = dictionaries;
+
+            if (mainDictionaryProfileIds.has(profile.id)) {
+                profile.options.general.mainDictionary = importedSummary.title;
+            } else if (importedSummary.sequenced && profile.options.general.mainDictionary === '') {
+                profile.options.general.mainDictionary = importedSummary.title;
+            } else if (profile.options.general.mainDictionary === previousSummary.title) {
+                profile.options.general.mainDictionary = importedSummary.title;
+            }
+
+            if (sortFrequencyDictionaryProfileIds.has(profile.id) || profile.options.general.sortFrequencyDictionary === previousSummary.title) {
+                profile.options.general.sortFrequencyDictionary = importedSummary.title;
+            }
+
+            if (typeof profileSettings === 'undefined') {
+                continue;
+            }
+            const oldFieldSegmentRegex = new RegExp(getKebabCase(profileSettings.name), 'g');
+            const newFieldSegment = getKebabCase(importedSummary.title);
+            for (const cardFormat of profile.options.anki.cardFormats) {
+                const ankiTermFields = cardFormat.fields;
+                for (const key of Object.keys(ankiTermFields)) {
+                    ankiTermFields[key].value = ankiTermFields[key].value.replace(oldFieldSegmentRegex, newFieldSegment);
+                }
+            }
+        }
+
+        const oldIndexUrl = previousSummary.indexUrl;
+        const newIndexUrl = importedSummary.indexUrl;
+        if (typeof oldIndexUrl === 'string') {
+            const enabledIndexUrls = new Set(options.global.dictionaryAutoUpdates);
+            if (enabledIndexUrls.delete(oldIndexUrl) && typeof newIndexUrl === 'string' && importedSummary.isUpdatable === true) {
+                enabledIndexUrls.add(newIndexUrl);
+            }
+            options.global.dictionaryAutoUpdates = [...enabledIndexUrls];
+        }
+
+        await this._saveOptions('background');
+    }
+
+    /**
+     * @param {string} name
+     * @param {boolean} enabled
+     * @param {string} styles
+     * @returns {import('settings').DictionaryOptions}
+     */
+    _createDefaultDictionarySettings(name, enabled, styles) {
+        return {
+            name,
+            alias: name,
+            enabled,
+            allowSecondarySearches: false,
+            definitionsCollapsible: 'not-collapsible',
+            partsOfSpeechFilter: true,
+            useDeinflections: true,
+            styles: styles ?? '',
+        };
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _pruneStaleDictionaryAutoUpdates() {
+        const options = this._options;
+        if (options === null) {
+            return;
+        }
+        await this._ensureDictionaryDatabaseReady();
+        const dictionaries = await this._dictionaryDatabase.getDictionaryInfo();
+        const validIndexUrls = new Set(
+            dictionaries
+                .filter((dictionary) => dictionary.isUpdatable === true && typeof dictionary.indexUrl === 'string')
+                .map((dictionary) => /** @type {string} */ (dictionary.indexUrl)),
+        );
+        const nextIndexUrls = options.global.dictionaryAutoUpdates.filter((indexUrl) => validIndexUrls.has(indexUrl));
+        if (nextIndexUrls.length !== options.global.dictionaryAutoUpdates.length) {
+            options.global.dictionaryAutoUpdates = nextIndexUrls;
+            await this._saveOptions('background');
+        }
+
+        const state = await this._getDictionaryAutoUpdateState();
+        let stateChanged = false;
+        for (const indexUrl of Object.keys(state)) {
+            if (validIndexUrls.has(indexUrl)) {
+                continue;
+            }
+            delete state[indexUrl];
+            stateChanged = true;
+        }
+        if (stateChanged) {
+            await this._setDictionaryAutoUpdateState(state);
+        }
+    }
+
+    /**
+     * @returns {Promise<Record<string, {lastAttemptAt?: number, lastSuccessfulCheckAt?: number, lastSuccessfulUpdateAt?: number, lastSeenRevision?: string, etag?: string|null, lastModified?: string|null, lastError?: string|null}>>}
+     */
+    async _getDictionaryAutoUpdateState() {
+        const value = await this._getLocalStorageRecord(DICTIONARY_AUTO_UPDATE_STATE_STORAGE_KEY);
+        if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+            return {};
+        }
+        return /** @type {Record<string, {lastAttemptAt?: number, lastSuccessfulCheckAt?: number, lastSuccessfulUpdateAt?: number, lastSeenRevision?: string, etag?: string|null, lastModified?: string|null, lastError?: string|null}>} */ (value);
+    }
+
+    /**
+     * @param {Record<string, unknown>} state
+     * @returns {Promise<void>}
+     */
+    async _setDictionaryAutoUpdateState(state) {
+        await this._setLocalStorageRecord(DICTIONARY_AUTO_UPDATE_STATE_STORAGE_KEY, state);
+    }
+
+    /**
+     * @param {import('dictionary-importer').Summary} previousSummary
+     * @param {import('dictionary-importer').Summary} importedSummary
+     * @returns {Promise<void>}
+     */
+    async _updateDictionaryAutoUpdateStateAfterSuccess(previousSummary, importedSummary) {
+        const previousIndexUrl = previousSummary.indexUrl;
+        if (typeof previousIndexUrl !== 'string') {
+            return;
+        }
+        const state = await this._getDictionaryAutoUpdateState();
+        const previousState = state[previousIndexUrl] ?? {};
+        if (!(importedSummary.isUpdatable === true && typeof importedSummary.indexUrl === 'string')) {
+            delete state[previousIndexUrl];
+            await this._setDictionaryAutoUpdateState(state);
+            return;
+        }
+        const nextIndexUrl = importedSummary.indexUrl;
+        state[nextIndexUrl] = {
+            ...previousState,
+            lastSuccessfulUpdateAt: Date.now(),
+            lastSeenRevision: importedSummary.revision,
+            lastError: null,
+            etag: nextIndexUrl === previousIndexUrl ? previousState.etag ?? null : null,
+            lastModified: nextIndexUrl === previousIndexUrl ? previousState.lastModified ?? null : null,
+        };
+        if (nextIndexUrl !== previousIndexUrl) {
+            delete state[previousIndexUrl];
+        }
+        await this._setDictionaryAutoUpdateState(state);
+    }
+
+    /**
+     * @param {string} indexUrl
+     * @param {string} message
+     * @returns {Promise<void>}
+     */
+    async _setDictionaryAutoUpdateError(indexUrl, message) {
+        if (typeof indexUrl !== 'string' || indexUrl.length === 0) {
+            return;
+        }
+        const state = await this._getDictionaryAutoUpdateState();
+        const entry = state[indexUrl] ?? {};
+        entry.lastError = message;
+        state[indexUrl] = entry;
+        await this._setDictionaryAutoUpdateState(state);
+    }
+
+    /**
+     * @param {string} key
+     * @returns {Promise<unknown>}
+     */
+    async _getLocalStorageRecord(key) {
+        const localStorageArea = chrome.storage?.local;
+        if (!isObjectNotArray(localStorageArea) || typeof localStorageArea.get !== 'function') {
+            return void 0;
+        }
+        return await new Promise((resolve, reject) => {
+            localStorageArea.get([key], (items) => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || 'storage.local.get failed'));
+                    return;
+                }
+                resolve(Reflect.get(items, key));
+            });
+        });
+    }
+
+    /**
+     * @param {string} key
+     * @param {unknown} value
+     * @returns {Promise<void>}
+     */
+    async _setLocalStorageRecord(key, value) {
+        const localStorageArea = chrome.storage?.local;
+        if (!isObjectNotArray(localStorageArea) || typeof localStorageArea.set !== 'function') {
+            return;
+        }
+        await new Promise((resolve, reject) => {
+            localStorageArea.set({[key]: value}, () => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || 'storage.local.set failed'));
+                    return;
+                }
+                resolve(void 0);
+            });
+        });
     }
 
     /**

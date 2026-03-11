@@ -1388,7 +1388,8 @@
             "type": "object",
             "required": [
                 "database",
-                "dataTransmissionConsentShown"
+                "dataTransmissionConsentShown",
+                "dictionaryAutoUpdates"
             ],
             "properties": {
                 "database": {
@@ -1406,6 +1407,13 @@
                 "dataTransmissionConsentShown": {
                     "type": "boolean",
                     "default": false
+                },
+                "dictionaryAutoUpdates": {
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         }

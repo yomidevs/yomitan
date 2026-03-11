@@ -23,6 +23,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {sanitizeCSS} from '../core/utilities.js';
+import {DictionaryWorker} from '../dictionary/dictionary-worker.js';
 import {getSqlite3} from '../dictionary/sqlite-wasm.js';
 import {WebExtension} from '../extension/web-extension.js';
 
@@ -54,6 +55,7 @@ export class Offscreen {
             ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
             ['deleteDictionaryOffscreen',      this._deleteDictionaryHandler.bind(this)],
             ['getDictionaryCountsOffscreen',   this._getDictionaryCountsHandler.bind(this)],
+            ['importDictionaryArchiveOffscreen', this._importDictionaryArchiveHandler.bind(this)],
             ['databasePurgeOffscreen',         this._purgeDatabaseHandler.bind(this)],
             ['databaseGetMediaOffscreen',      this._getMediaHandler.bind(this)],
             ['databaseExportOffscreen',        this._exportDatabaseHandler.bind(this)],
@@ -253,6 +255,20 @@ export class Offscreen {
     /** @type {import('offscreen').ApiHandler<'getDictionaryCountsOffscreen'>} */
     async _getDictionaryCountsHandler({dictionaryNames, getTotal}) {
         return await this._invokeDictionaryWorker('getDictionaryCountsOffscreen', {dictionaryNames, getTotal});
+    }
+
+    /** @type {import('offscreen').ApiHandler<'importDictionaryArchiveOffscreen'>} */
+    async _importDictionaryArchiveHandler({archiveContent, importDetails}) {
+        const dictionaryWorker = new DictionaryWorker({reuseWorker: false});
+        try {
+            const result = await dictionaryWorker.importDictionary(archiveContent, importDetails, null);
+            return {
+                ...result,
+                errors: result.errors.map((error) => ExtensionError.serialize(error)),
+            };
+        } finally {
+            dictionaryWorker.destroy();
+        }
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseGetMediaOffscreen'>} */

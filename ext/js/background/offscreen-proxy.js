@@ -225,6 +225,21 @@ export class DictionaryDatabaseProxy {
     }
 
     /**
+     * @param {ArrayBuffer} archiveContent
+     * @param {import('dictionary-importer').ImportDetails} importDetails
+     * @returns {Promise<{result: import('dictionary-importer').Summary | null, errors: Error[], debug?: import('dictionary-worker').ImportDebug | null}>}
+     */
+    async importDictionaryArchive(archiveContent, importDetails) {
+        const result = /** @type {{result: import('dictionary-importer').Summary | null, errors: import('core').SerializedError[], debug?: import('dictionary-worker').ImportDebug | null}} */ (
+            await this._offscreen.sendMessagePromise({action: 'importDictionaryArchiveOffscreen', params: {archiveContent, importDetails}})
+        );
+        return {
+            ...result,
+            errors: result.errors.map((error) => ExtensionError.deserialize(error)),
+        };
+    }
+
+    /**
      * @returns {Promise<boolean>}
      */
     async purge() {

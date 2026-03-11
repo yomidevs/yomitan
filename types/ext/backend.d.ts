@@ -21,6 +21,22 @@ export type DatabaseUpdateType = 'dictionary';
 
 export type DatabaseUpdateCause = 'purge' | 'delete' | 'import';
 
+export type DictionaryUpdateCheckResult = {
+    dictionaryTitle: string;
+    hasUpdate: boolean;
+    currentRevision: string | null;
+    latestRevision: string | null;
+    downloadUrl: string | null;
+    error: string | null;
+};
+
+export type DictionaryUpdateResult = {
+    dictionaryTitle: string;
+    status: 'updated' | 'no-update' | 'not-updatable' | 'skipped';
+    latestRevision: string | null;
+    error: string | null;
+};
+
 export type MecabParseResults = [
     dictionary: string,
     content: Api.ParseTextLine[],
