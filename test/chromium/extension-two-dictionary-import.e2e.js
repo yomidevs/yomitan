@@ -3412,8 +3412,8 @@ async function main() {
                     },
                 };
                 await installRecommendedDictionariesMock(page, mockRecommendedDictionaries);
-                if (await welcomeHasRecommendedDictionariesButton(page)) {
-                    throw new Error('Welcome page still exposes a manual recommended-dictionaries button');
+                if (!(await welcomeHasRecommendedDictionariesButton(page))) {
+                    throw new Error('Welcome page is missing the manual recommended-dictionaries button');
                 }
 
                 await setWelcomeLanguage(page, 'ja');

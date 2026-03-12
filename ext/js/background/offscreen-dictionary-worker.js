@@ -20,6 +20,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {getSqlite3} from '../dictionary/sqlite-wasm.js';
 import {Translator} from '../language/translator.js';
 
 /**
@@ -122,6 +123,8 @@ class OffscreenDictionaryWorkerHandler {
             case 'databasePrepareOffscreen':
                 await this._ensureDatabasePrepared();
                 return;
+            case 'getOpfsRuntimeDiagnosticsOffscreen':
+                return await this._getOpfsRuntimeDiagnostics();
             case 'databaseSetSuspendedOffscreen': {
                 const suspended = params.suspended === true;
                 if (suspended) {
@@ -251,6 +254,88 @@ class OffscreenDictionaryWorkerHandler {
             default:
                 throw new Error(`Unknown action: ${action}`);
         }
+    }
+
+    /**
+     * @returns {Promise<{context: Record<string, unknown>, sqlite: Record<string, unknown>}>}
+     */
+    async _getOpfsRuntimeDiagnostics() {
+        const locationValue = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'location') ?? {}));
+        const navigatorValue = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'navigator') ?? {}));
+        const storageValue = /** @type {Record<string, unknown>} */ (Reflect.get(navigatorValue, 'storage') ?? {});
+        const crossOriginIsolatedValue = Reflect.get(globalThis, 'crossOriginIsolated');
+        const sqlite3 = await getSqlite3();
+        /**
+         * @param {unknown} pointer
+         * @returns {string|number|null}
+         */
+        const serializePointer = (pointer) => {
+            if (typeof pointer === 'bigint') {
+                return pointer.toString();
+            }
+            if (typeof pointer === 'number') {
+                return pointer;
+            }
+            return null;
+        };
+        /**
+         * @param {unknown} pointer
+         * @returns {boolean}
+         */
+        const isNonZeroPointer = (pointer) => {
+            if (typeof pointer === 'bigint') {
+                return pointer !== 0n;
+            }
+            if (typeof pointer === 'number') {
+                return pointer !== 0;
+            }
+            return false;
+        };
+        const findVfs = sqlite3?.capi?.sqlite3_vfs_find;
+        const opfsVfsRaw = typeof findVfs === 'function' ? findVfs('opfs') : null;
+        const opfsSahpoolVfsRaw = typeof findVfs === 'function' ? findVfs('opfs-sahpool') : null;
+        let wasmfsDir = null;
+        if (typeof sqlite3?.capi?.sqlite3_wasmfs_opfs_dir === 'function') {
+            try {
+                wasmfsDir = String(sqlite3.capi.sqlite3_wasmfs_opfs_dir() ?? '');
+            } catch (_) {
+                wasmfsDir = null;
+            }
+        }
+        return {
+            context: {
+                href: typeof locationValue.href === 'string' ? locationValue.href : null,
+                origin: typeof locationValue.origin === 'string' ? locationValue.origin : null,
+                crossOriginIsolated: typeof crossOriginIsolatedValue === 'boolean' ? crossOriginIsolatedValue : null,
+                hasSharedArrayBuffer: typeof Reflect.get(globalThis, 'SharedArrayBuffer') === 'function',
+                hasAtomics: typeof Reflect.get(globalThis, 'Atomics') === 'object' && Reflect.get(globalThis, 'Atomics') !== null,
+                hasNavigatorStorage: typeof storageValue === 'object' && storageValue !== null,
+                hasStorageGetDirectory: typeof storageValue.getDirectory === 'function',
+                hasFileSystemHandle: typeof Reflect.get(globalThis, 'FileSystemHandle') === 'function',
+                hasFileSystemDirectoryHandle: typeof Reflect.get(globalThis, 'FileSystemDirectoryHandle') === 'function',
+                hasFileSystemFileHandle: typeof Reflect.get(globalThis, 'FileSystemFileHandle') === 'function',
+                hasCreateSyncAccessHandle: (
+                    typeof Reflect.get(globalThis, 'FileSystemFileHandle') === 'function' &&
+                    typeof Reflect.get(
+                        /** @type {{prototype?: Record<string, unknown>}} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'FileSystemFileHandle'))).prototype ?? {},
+                        'createSyncAccessHandle',
+                    ) === 'function'
+                ),
+                userAgent: typeof navigatorValue.userAgent === 'string' ? navigatorValue.userAgent : null,
+            },
+            sqlite: {
+                sqliteVersion: sqlite3?.version?.libVersion ?? null,
+                hasOpfsDbCtor: typeof sqlite3.oo1?.OpfsDb === 'function',
+                hasInstallOpfsSAHPoolVfs: typeof Reflect.get(sqlite3, 'installOpfsSAHPoolVfs') === 'function',
+                hasOpfsImportDb: typeof /** @type {{opfs?: {importDb?: unknown}}} */ (/** @type {unknown} */ (sqlite3)).opfs?.importDb === 'function',
+                hasWasmfsDir: typeof wasmfsDir === 'string' && wasmfsDir.length > 0,
+                wasmfsDir,
+                hasOpfsVfs: opfsVfsRaw !== null && isNonZeroPointer(opfsVfsRaw),
+                hasOpfsSahpoolVfs: opfsSahpoolVfsRaw !== null && isNonZeroPointer(opfsSahpoolVfsRaw),
+                opfsVfsPtr: serializePointer(opfsVfsRaw),
+                opfsSahpoolVfsPtr: serializePointer(opfsSahpoolVfsRaw),
+            },
+        };
     }
 }
 

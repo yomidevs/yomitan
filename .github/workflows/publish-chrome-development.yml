@@ -13,6 +13,9 @@ on:
       upload_url:
         description: "The upload_url from the release created by create-prerelease-on-tag.yml"
         required: true
+      tag:
+        description: "Release tag containing the build artifacts"
+        required: true
 permissions:
   contents: read
 jobs:
@@ -43,7 +46,7 @@ jobs:
 
       - uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # pin@v1.12
         with:
-          tag: ${{ github.ref_name }}
+          tag: ${{ inputs.tag }}
           fileName: "*"
 
       - name: Fetch Google API access token
@@ -109,7 +112,7 @@ jobs:
     steps:
       - uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # pin@v1.12
         with:
-          tag: ${{ github.ref_name }}
+          tag: ${{ inputs.tag }}
           fileName: "*"
 
       - name: Sign Chrome crx for offline distribution

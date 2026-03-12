@@ -68,7 +68,7 @@ jobs:
           workflow: publish-chrome-development
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: false
-          inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}" }'
+          inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}", "tag": "${{ steps.releaseVersion.outputs.version }}" }'
 
       - name: Dispatch publish-firefox-development
         uses: aurelien-baudet/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7 # pin@v2
@@ -76,7 +76,7 @@ jobs:
           workflow: publish-firefox-development
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: false
-          inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}" }'
+          inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}", "tag": "${{ steps.releaseVersion.outputs.version }}" }'
 
   provenance:
     needs: [build]

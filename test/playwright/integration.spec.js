@@ -15,20 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import path from 'path';
 import {deferPromise} from '../../ext/js/core/utilities.js';
+import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
 import {createDictionaryDatabaseBase64} from '../e2e/minimal-dictionary-database.js';
 import {
     expect,
     getExpectedAddNoteBody,
     getMockModelFields,
     mockAnkiRouteHandler,
+    root,
     test,
     writeToClipboardFromPage,
 } from './playwright-util.js';
 
 const testDictionaryTitle = 'valid-dictionary1';
+const japaneseLookupTerm = '読む';
+const japaneseLookupReading = 'よむ';
+const japaneseLookupGlossary = 'to read';
+const importValidationDictionaryTitles = ['playwright-japanese-reader-a', 'playwright-japanese-reader-b'];
+const dictionaryFixtureDirectory = path.join(root, 'test', 'data', 'dictionaries', 'valid-dictionary1');
 /** @type {Promise<string>|null} */
 let testDictionaryDatabaseBase64Promise = null;
+/** @type {Promise<Array<{title: string, file: {name: string, mimeType: string, buffer: Buffer}}>>|null} */
+let importValidationDictionaryArchivesPromise = null;
 
 /**
  * @template [T=unknown]
@@ -68,11 +78,29 @@ async function getTestDictionaryDatabaseBase64() {
     testDictionaryDatabaseBase64Promise = createDictionaryDatabaseBase64({
         title: testDictionaryTitle,
         revision: 'test',
-        expression: '読む',
-        reading: 'よむ',
-        glossary: ['to read'],
+        expression: japaneseLookupTerm,
+        reading: japaneseLookupReading,
+        glossary: [japaneseLookupGlossary],
     });
     return await testDictionaryDatabaseBase64Promise;
+}
+
+/**
+ * @returns {Promise<Array<{title: string, file: {name: string, mimeType: string, buffer: Buffer}}>>}
+ */
+async function getImportValidationDictionaryArchives() {
+    if (importValidationDictionaryArchivesPromise !== null) {
+        return await importValidationDictionaryArchivesPromise;
+    }
+    importValidationDictionaryArchivesPromise = Promise.all(importValidationDictionaryTitles.map(async (title) => ({
+        title,
+        file: {
+            name: `${title}.zip`,
+            mimeType: 'application/x-zip',
+            buffer: Buffer.from(await createDictionaryArchiveData(dictionaryFixtureDirectory, title)),
+        },
+    })));
+    return await importValidationDictionaryArchivesPromise;
 }
 
 /**
@@ -140,6 +168,80 @@ async function waitForSettingsPageReady(page) {
     await expect(page.locator('id=dictionaries')).toBeVisible({timeout: 30_000});
 }
 
+/**
+ * @param {import('@playwright/test').Page} page
+ * @returns {Promise<string[]>}
+ */
+async function importValidationDictionariesFromSettings(page) {
+    const dictionaries = await getImportValidationDictionaryArchives();
+    const expectedTitles = dictionaries.map(({title}) => title).sort();
+
+    await invokeRuntimeApi(page, 'purgeDatabase');
+    await page.reload();
+    await waitForSettingsPageReady(page);
+    await page.locator('#dictionary-import-file-input').setInputFiles(dictionaries.map(({file}) => file));
+    await expect(async () => {
+        const info = /** @type {import('dictionary-importer').Summary[]} */ (await invokeRuntimeApi(page, 'getDictionaryInfo'));
+        const titles = info.map(({title}) => title).sort();
+        expect(titles).toStrictEqual(expectedTitles);
+    }).toPass({timeout: 2 * 60 * 1000});
+    const optionsFull = /** @type {import('settings').Options} */ (await invokeRuntimeApi(page, 'optionsGetFull'));
+    for (const profile of optionsFull.profiles) {
+        const configuredDictionaries = profile.options.dictionaries;
+        for (const dictionaryTitle of expectedTitles) {
+            let dictionary = configuredDictionaries.find(({name}) => name === dictionaryTitle);
+            if (typeof dictionary === 'undefined') {
+                dictionary = {
+                    name: dictionaryTitle,
+                    alias: dictionaryTitle,
+                    enabled: true,
+                    allowSecondarySearches: false,
+                    definitionsCollapsible: 'not-collapsible',
+                    partsOfSpeechFilter: true,
+                    useDeinflections: true,
+                    styles: '',
+                };
+                configuredDictionaries.push(dictionary);
+            }
+            dictionary.alias = dictionary.alias || dictionaryTitle;
+            dictionary.enabled = true;
+        }
+        if (profile.options.general.mainDictionary === '') {
+            profile.options.general.mainDictionary = expectedTitles[0];
+        }
+    }
+    await invokeRuntimeApi(page, 'setAllSettings', {value: optionsFull, source: 'playwright-dictionary-import'});
+    await invokeRuntimeApi(page, 'triggerDatabaseUpdated', {type: 'dictionary', cause: 'import'});
+    await page.reload();
+    await waitForSettingsPageReady(page);
+    await expect(page.locator('id=dictionaries')).toHaveText(
+        `Dictionaries (${dictionaries.length} installed, ${dictionaries.length} enabled)`,
+        {timeout: 2 * 60 * 1000},
+    );
+    await expect(async () => {
+        const info = /** @type {import('dictionary-importer').Summary[]} */ (await invokeRuntimeApi(page, 'getDictionaryInfo'));
+        const titles = info.map(({title}) => title).sort();
+        expect(titles).toStrictEqual(expectedTitles);
+    }).toPass({timeout: 60_000});
+
+    return expectedTitles;
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @returns {Promise<string[]>}
+ */
+async function getVisibleResultDictionaryNames(page) {
+    return await page.evaluate(() => {
+        return [...new Set(
+            Array.from(
+                document.querySelectorAll('#dictionary-entries .definition-item[data-dictionary], #dictionary-entries .entry [data-dictionary]'),
+                (node) => (node instanceof HTMLElement ? (node.dataset.dictionary || '').trim() : ''),
+            ).filter((dictionary) => dictionary.length > 0),
+        )];
+    });
+}
+
 test('search clipboard', async ({page, extensionId}) => {
     await page.goto(`chrome-extension://${extensionId}/search.html`);
     await page.locator('#search-option-clipboard-monitor-container > label').click();
@@ -172,6 +274,28 @@ test('dictionary db export and restore', async ({page, extensionId}) => {
         expect(info.length).toBe(1);
         expect(info[0].title).toBe(testDictionaryTitle);
     }).toPass({timeout: 10_000});
+});
+
+test('imported dictionaries are used for Japanese lookups', async ({page, extensionId}) => {
+    const extensionBaseUrl = `chrome-extension://${extensionId}`;
+    await page.goto(`${extensionBaseUrl}/settings.html`);
+    await waitForSettingsPageReady(page);
+
+    const importedTitles = await importValidationDictionariesFromSettings(page);
+
+    await page.goto(`${extensionBaseUrl}/search.html`);
+    await expect(page.locator('#search-textbox')).toBeVisible({timeout: 30_000});
+    await page.locator('#search-textbox').fill(japaneseLookupTerm);
+    await page.keyboard.press('Enter');
+
+    await expect(page.locator('#search-textbox')).toHaveValue(japaneseLookupTerm);
+    await expect(page.locator('#dictionary-entries .entry')).toBeVisible({timeout: 30_000});
+    await expect(page.locator('#dictionary-entries .headword-reading').first()).toHaveText(new RegExp(japaneseLookupReading));
+    await expect(page.locator('#dictionary-entries')).toContainText(japaneseLookupGlossary);
+    await expect(async () => {
+        const dictionaryNames = await getVisibleResultDictionaryNames(page);
+        expect(dictionaryNames).toEqual(expect.arrayContaining(importedTitles));
+    }).toPass({timeout: 30_000});
 });
 
 test('anki add', async ({context, page, extensionId}) => {

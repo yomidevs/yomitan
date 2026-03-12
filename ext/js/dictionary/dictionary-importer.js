@@ -2509,7 +2509,9 @@ export class DictionaryImporter {
                 },
                 wasmRowChunkSize,
                 {
-                    copyContentBytes: this._wasmPassThroughTermContent && !streamToChunkHandler,
+                    // Streamed imports queue OPFS writes asynchronously, so pass-through content
+                    // must be copied out of the wasm heap before the next term-bank parse resets it.
+                    copyContentBytes: this._wasmPassThroughTermContent,
                     includeContentMetadata,
                     initialMetaCapacityDivisor: wasmInitialMetaCapacityDivisor,
                     initialContentBytesPerRow: wasmInitialContentBytesPerRow,

@@ -24,7 +24,6 @@ import {log} from '../core/log.js';
 import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {sanitizeCSS} from '../core/utilities.js';
 import {DictionaryWorker} from '../dictionary/dictionary-worker.js';
-import {getSqlite3} from '../dictionary/sqlite-wasm.js';
 import {WebExtension} from '../extension/web-extension.js';
 
 /**
@@ -134,56 +133,21 @@ export class Offscreen {
             },
         };
         try {
-            const sqlite3 = await getSqlite3();
-            /**
-             * @param {unknown} pointer
-             * @returns {string|number|null}
-             */
-            const serializePointer = (pointer) => {
-                if (typeof pointer === 'bigint') {
-                    return pointer.toString();
-                }
-                if (typeof pointer === 'number') {
-                    return pointer;
-                }
-                return null;
-            };
-            /**
-             * @param {unknown} pointer
-             * @returns {boolean}
-             */
-            const isNonZeroPointer = (pointer) => {
-                if (typeof pointer === 'bigint') {
-                    return pointer !== 0n;
-                }
-                if (typeof pointer === 'number') {
-                    return pointer !== 0;
-                }
-                return false;
-            };
-            const findVfs = sqlite3?.capi?.sqlite3_vfs_find;
-            const opfsVfsRaw = typeof findVfs === 'function' ? findVfs('opfs') : null;
-            const opfsSahpoolVfsRaw = typeof findVfs === 'function' ? findVfs('opfs-sahpool') : null;
-            let wasmfsDir = null;
-            if (typeof sqlite3?.capi?.sqlite3_wasmfs_opfs_dir === 'function') {
-                try {
-                    wasmfsDir = String(sqlite3.capi.sqlite3_wasmfs_opfs_dir() ?? '');
-                } catch (_) {
-                    wasmfsDir = null;
-                }
+            const workerDiagnostics = /** @type {unknown} */ (
+                await this._invokeDictionaryWorker('getOpfsRuntimeDiagnosticsOffscreen', {})
+            );
+            if (!(typeof workerDiagnostics === 'object' && workerDiagnostics !== null && !Array.isArray(workerDiagnostics))) {
+                throw new Error('Offscreen dictionary worker returned invalid OPFS diagnostics payload');
             }
-            payload.sqlite = {
-                sqliteVersion: sqlite3?.version?.libVersion ?? null,
-                hasOpfsDbCtor: typeof sqlite3.oo1?.OpfsDb === 'function',
-                hasInstallOpfsSAHPoolVfs: typeof Reflect.get(sqlite3, 'installOpfsSAHPoolVfs') === 'function',
-                hasOpfsImportDb: typeof /** @type {{opfs?: {importDb?: unknown}}} */ (/** @type {unknown} */ (sqlite3)).opfs?.importDb === 'function',
-                hasWasmfsDir: typeof wasmfsDir === 'string' && wasmfsDir.length > 0,
-                wasmfsDir,
-                hasOpfsVfs: opfsVfsRaw !== null && isNonZeroPointer(opfsVfsRaw),
-                hasOpfsSahpoolVfs: opfsSahpoolVfsRaw !== null && isNonZeroPointer(opfsSahpoolVfsRaw),
-                opfsVfsPtr: serializePointer(opfsVfsRaw),
-                opfsSahpoolVfsPtr: serializePointer(opfsSahpoolVfsRaw),
-            };
+            const sqlite = /** @type {unknown} */ (Reflect.get(workerDiagnostics, 'sqlite'));
+            const sqliteRuntimeContext = /** @type {unknown} */ (Reflect.get(workerDiagnostics, 'context'));
+            payload.sqliteProbeSource = 'offscreen-dictionary-worker';
+            if (typeof sqlite === 'object' && sqlite !== null && !Array.isArray(sqlite)) {
+                payload.sqlite = sqlite;
+            }
+            if (typeof sqliteRuntimeContext === 'object' && sqliteRuntimeContext !== null && !Array.isArray(sqliteRuntimeContext)) {
+                payload.sqliteRuntimeContext = sqliteRuntimeContext;
+            }
         } catch (e) {
             payload.sqliteInitError = (e instanceof Error) ? e.message : String(e);
         }

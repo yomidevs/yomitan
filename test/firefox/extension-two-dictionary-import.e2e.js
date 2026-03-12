@@ -2697,8 +2697,8 @@ async function main() {
                 },
             };
             await installRecommendedDictionariesMock(driver, mockRecommendedDictionaries);
-            if (await welcomeHasRecommendedDictionariesButton(driver)) {
-                throw new Error('Welcome page still exposes a manual recommended-dictionaries button');
+            if (!(await welcomeHasRecommendedDictionariesButton(driver))) {
+                throw new Error('Welcome page is missing the manual recommended-dictionaries button');
             }
 
             await setWelcomeLanguage(driver, 'en');

@@ -27,6 +27,7 @@ import {parseJson} from '../dev/json.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
 import {encodeRawTermContentSharedGlossaryBinary} from '../ext/js/dictionary/raw-term-content.js';
+import {Translator} from '../ext/js/language/translator.js';
 import {TermRecordOpfsStore} from '../ext/js/dictionary/term-record-opfs-store.js';
 import {DictionaryWorkerHandler} from '../ext/js/dictionary/dictionary-worker-handler.js';
 import {compress as zstdCompress, init as zstdInit} from '../ext/lib/zstd-wasm.js';
@@ -42,15 +43,18 @@ vi.stubGlobal('fetch', fetch);
 vi.stubGlobal('chrome', chrome);
 
 /**
+ * @param {{writeDelay?: ((fileName: string, chunk: Uint8Array) => Promise<void>|void)}|undefined} [config]
  * @returns {{
  *   kind: 'directory',
  *   getDirectoryHandle: (name: string, options?: {create?: boolean}) => Promise<unknown>,
  *   getFileHandle: (name: string, options?: {create?: boolean}) => Promise<unknown>,
- *   removeEntry: (name: string) => Promise<void>,
- *   entries: () => AsyncGenerator<[string, unknown], void, unknown>
+  *   removeEntry: (name: string) => Promise<void>,
+ *   entries: () => AsyncGenerator<[string, unknown], void, unknown>,
+ *   values: () => AsyncGenerator<unknown, void, unknown>
  * }}
  */
-function createInMemoryOpfsDirectoryHandle() {
+function createInMemoryOpfsDirectoryHandle(config = void 0) {
+    const writeDelay = config?.writeDelay;
     /** @type {Map<string, ReturnType<typeof createInMemoryOpfsDirectoryHandle>>} */
     const directories = new Map();
     /** @type {Map<string, Uint8Array>} */
@@ -60,7 +64,7 @@ function createInMemoryOpfsDirectoryHandle() {
      * @param {string} fileName
      * @returns {{
      *   kind: 'file',
-     *   getFile: () => Promise<{size: number, arrayBuffer: () => Promise<ArrayBuffer>}>,
+     *   getFile: () => Promise<{size: number, arrayBuffer: () => Promise<ArrayBuffer>, slice: (start?: number, end?: number) => {arrayBuffer: () => Promise<ArrayBuffer>}}>,
      *   createWritable: (options?: {keepExistingData?: boolean}) => Promise<{
      *     seek: (offset: number) => Promise<void>,
      *     truncate: (size: number) => Promise<void>,
@@ -76,6 +80,14 @@ function createInMemoryOpfsDirectoryHandle() {
             return {
                 size: bytes.byteLength,
                 arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+                slice(start = 0, end = bytes.byteLength) {
+                    const normalizedStart = Math.max(0, Math.trunc(start));
+                    const normalizedEnd = Math.max(normalizedStart, Math.min(bytes.byteLength, Math.trunc(end)));
+                    const sliceBytes = bytes.subarray(normalizedStart, normalizedEnd);
+                    return {
+                        arrayBuffer: async () => sliceBytes.buffer.slice(sliceBytes.byteOffset, sliceBytes.byteOffset + sliceBytes.byteLength),
+                    };
+                },
             };
         },
         async createWritable(options = {}) {
@@ -113,6 +125,9 @@ function createInMemoryOpfsDirectoryHandle() {
                 },
                 write: async (chunk) => {
                     const source = chunk instanceof Uint8Array ? chunk : new Uint8Array(chunk);
+                    if (typeof writeDelay === 'function') {
+                        await writeDelay(fileName, source);
+                    }
                     const end = position + source.byteLength;
                     ensureCapacity(end);
                     bytes.set(source, position);
@@ -135,7 +150,7 @@ function createInMemoryOpfsDirectoryHandle() {
             if (options.create !== true) {
                 throw new Error(`NotFoundError: directory '${name}'`);
             }
-            const created = createInMemoryOpfsDirectoryHandle();
+            const created = createInMemoryOpfsDirectoryHandle(config);
             directories.set(name, created);
             return created;
         },
@@ -160,6 +175,14 @@ function createInMemoryOpfsDirectoryHandle() {
             }
             for (const [name] of files) {
                 yield [name, createFileHandle(name)];
+            }
+        },
+        async *values() {
+            for (const [, directoryHandle] of directories) {
+                yield directoryHandle;
+            }
+            for (const [name] of files) {
+                yield createFileHandle(name);
             }
         },
     };
@@ -203,6 +226,32 @@ function installInMemoryOpfsNavigator(rootDirectoryHandle) {
 async function createTestDictionaryArchiveData(dictionary, dictionaryName) {
     const dictionaryDirectory = join(dirname, 'data', 'dictionaries', dictionary);
     return await createDictionaryArchiveData(dictionaryDirectory, dictionaryName);
+}
+
+/**
+ * @param {string} [dictionaryName]
+ * @returns {Promise<ArrayBuffer>}
+ */
+async function createStreamedFastParserRegressionArchiveData(dictionaryName = 'Fast Parser Regression') {
+    const zipFileWriter = new BlobWriter();
+    const zipWriter = new ZipWriter(zipFileWriter, {level: 0});
+    const index = {
+        title: dictionaryName,
+        format: 3,
+        revision: 'test',
+        sequenced: true,
+    };
+    const readTermBank = [
+        ['読む', 'よむ', '', 'v5', 10, ['to read'], 1, ''],
+    ];
+    const overwriteTermBank = [
+        ['食べる', 'たべる', '', 'v1', 5, [`to eat ${'x'.repeat(4096)}`], 2, ''],
+    ];
+    await zipWriter.add('index.json', new TextReader(JSON.stringify(index, null, 0)));
+    await zipWriter.add('term_bank_1.json', new TextReader(JSON.stringify(readTermBank, null, 0)));
+    await zipWriter.add('term_bank_2.json', new TextReader(JSON.stringify(overwriteTermBank, null, 0)));
+    const blob = await zipWriter.close();
+    return await blob.arrayBuffer();
 }
 
 /**
@@ -433,6 +482,29 @@ function createDictionaryImporter(testExpect, onProgress) {
             onProgress(...args);
         }
     });
+}
+
+/**
+ * @param {string} dictionaryName
+ * @returns {import('translation').FindTermsOptions}
+ */
+function createSimpleFindTermsOptions(dictionaryName) {
+    return {
+        matchType: 'exact',
+        deinflect: true,
+        mainDictionary: dictionaryName,
+        sortFrequencyDictionary: null,
+        sortFrequencyDictionaryOrder: 'ascending',
+        removeNonJapaneseCharacters: false,
+        primaryReading: '',
+        textReplacements: [],
+        enabledDictionaryMap: new Map([
+            [dictionaryName, {index: 0, priority: 0, allowSecondarySearches: false}],
+        ]),
+        excludeDictionaryDefinitions: null,
+        searchResolution: 'letter',
+        language: 'ja',
+    };
 }
 
 /**
@@ -780,6 +852,93 @@ describe('Database', () => {
             } finally {
                 readTermBankFileFastSpy.mockRestore();
                 await dictionaryDatabase.close();
+            }
+        });
+
+        test('Preserves exact term content for streamed fast-path imports across term banks', async ({expect}) => {
+            const testDictionarySource = await createStreamedFastParserRegressionArchiveData();
+            const opfsRootDirectoryHandle = createInMemoryOpfsDirectoryHandle({
+                writeDelay: async () => {
+                    await new Promise((resolve) => { setTimeout(resolve, 0); });
+                },
+            });
+            const restoreNavigator = installInMemoryOpfsNavigator(opfsRootDirectoryHandle);
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            const readTermBankFileFastSpy = vi.spyOn(DictionaryImporter.prototype, '_readTermBankFileFast');
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                dictionaryImporter._disableTermBankWasmFastPath = false;
+                dictionaryImporter._wasmCanonicalRowsFastPath = true;
+                dictionaryImporter._wasmPassThroughTermContent = true;
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(errors).toStrictEqual([]);
+                expect.soft(result).not.toBeNull();
+                expect.soft(readTermBankFileFastSpy).toHaveBeenCalled();
+
+                const dictionaryName = result?.title ?? 'Fast Parser Regression';
+                const titles = new Map([
+                    [dictionaryName, {alias: dictionaryName, allowSecondarySearches: false}],
+                ]);
+                const exact = await dictionaryDatabase.findTermsBulk(['読む'], titles, 'exact');
+                expect.soft(exact.length).toBeGreaterThan(0);
+                expect.soft(exact[0]?.rules).toStrictEqual(['v5']);
+                expect.soft(exact[0]?.definitions.length ?? 0).toBeGreaterThan(0);
+            } finally {
+                readTermBankFileFastSpy.mockRestore();
+                if (dictionaryDatabase.isPrepared()) {
+                    await dictionaryDatabase.close();
+                }
+                restoreNavigator();
+            }
+        });
+
+        test('Resolves 読め after streamed fast-path import', async ({expect}) => {
+            const testDictionarySource = await createStreamedFastParserRegressionArchiveData();
+            const opfsRootDirectoryHandle = createInMemoryOpfsDirectoryHandle({
+                writeDelay: async () => {
+                    await new Promise((resolve) => { setTimeout(resolve, 0); });
+                },
+            });
+            const restoreNavigator = installInMemoryOpfsNavigator(opfsRootDirectoryHandle);
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                dictionaryImporter._disableTermBankWasmFastPath = false;
+                dictionaryImporter._wasmCanonicalRowsFastPath = true;
+                dictionaryImporter._wasmPassThroughTermContent = true;
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(errors).toStrictEqual([]);
+                expect.soft(result).not.toBeNull();
+
+                const dictionaryName = result?.title ?? 'Fast Parser Regression';
+                const translator = new Translator(dictionaryDatabase);
+                translator.prepare();
+                const {dictionaryEntries, originalTextLength} = await translator.findTerms(
+                    'simple',
+                    '読め',
+                    createSimpleFindTermsOptions(dictionaryName),
+                );
+                expect.soft(originalTextLength).toBe(2);
+                expect.soft(dictionaryEntries.length).toBeGreaterThan(0);
+                expect.soft(dictionaryEntries.some((dictionaryEntry) => dictionaryEntry.headwords.some((headword) => (
+                    headword.term === '読む' &&
+                    headword.reading === 'よむ'
+                )))).toBe(true);
+            } finally {
+                if (dictionaryDatabase.isPrepared()) {
+                    await dictionaryDatabase.close();
+                }
+                restoreNavigator();
             }
         });
 
