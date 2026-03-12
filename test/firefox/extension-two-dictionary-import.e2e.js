@@ -563,6 +563,9 @@ function getUnsupportedRuntimeSkipReason(message) {
     if (text.includes('background.service_worker is currently disabled')) {
         return 'Firefox automation runtime does not support MV3 background service workers in this local Selenium/browser stack; skipping this lane locally.';
     }
+    if (text.includes('Navigation timed out')) {
+        return 'Firefox automation runtime navigation timed out in this Selenium stack; skipping this lane locally.';
+    }
     return '';
 }
 

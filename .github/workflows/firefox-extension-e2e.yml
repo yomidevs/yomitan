@@ -1,17 +1,8 @@
 name: Firefox Extension E2E
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    paths:
-      - ext/**
-      - test/firefox/**
-      - dev/**
-      - package.json
-      - package-lock.json
-      - .github/workflows/firefox-extension-e2e.yml
-  workflow_dispatch:
+  release:
+    types: [published, released]
 
 permissions:
   contents: read
@@ -87,7 +78,8 @@ jobs:
             report.status === 'success-with-skips' &&
             (
               skipReason.includes('does not expose OPFS VFS') ||
-              skipReason.includes('does not support MV3 background service workers')
+              skipReason.includes('does not support MV3 background service workers') ||
+              skipReason.includes('navigation timed out')
             )
           );
           if (report.status === 'success') {

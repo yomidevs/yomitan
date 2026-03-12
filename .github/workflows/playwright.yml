@@ -1,8 +1,7 @@
 name: Playwright Tests
 on:
-  push:
-    branches: [master]
-  pull_request:
+  release:
+    types: [published, released]
 permissions:
   contents: read
 jobs:

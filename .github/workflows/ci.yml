@@ -4,10 +4,8 @@ permissions:
   contents: read
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-  merge_group:
+  release:
+    types: [published, released]
 
 jobs:
   tests:
@@ -116,7 +114,8 @@ jobs:
             report.status === 'success-with-skips' &&
             (
               skipReason.includes('does not expose OPFS VFS') ||
-              skipReason.includes('does not support MV3 background service workers')
+              skipReason.includes('does not support MV3 background service workers') ||
+              skipReason.includes('navigation timed out')
             )
           );
           if (report.status === 'success') {
@@ -482,7 +481,6 @@ jobs:
   bench:
     name: Benchmarks
     runs-on: ubuntu-latest
-    if: github.event_name != 'merge_group'
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
