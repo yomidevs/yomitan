@@ -186,6 +186,7 @@ type ApiSurface = {
         params: {
             notes: Anki.Note[];
             fetchAdditionalInfo: boolean;
+            fetchDuplicateNoteIds: boolean;
         };
         return: Anki.NoteInfoWrapper[];
     };

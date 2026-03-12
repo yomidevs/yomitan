@@ -122,6 +122,21 @@ export class OffscreenProxy {
     }
 
     /**
+     * @param {ArrayBuffer} archiveContent
+     * @param {import('dictionary-importer').ImportDetails} importDetails
+     * @returns {Promise<{result: import('dictionary-importer').Summary | null, errors: Error[], debug?: unknown}>}
+     */
+    async importDictionaryArchive(archiveContent, importDetails) {
+        const result = /** @type {{result: import('dictionary-importer').Summary | null, errors: import('core').SerializedError[], debug?: unknown}} */ (
+            await this.sendMessagePromise({action: 'importDictionaryArchiveOffscreen', params: {archiveContent, importDetails}})
+        );
+        return {
+            ...result,
+            errors: result.errors.map((error) => ExtensionError.deserialize(error)),
+        };
+    }
+
+    /**
      * @template [TReturn=unknown]
      * @param {import('core').Response<TReturn>} response
      * @returns {TReturn}
@@ -206,6 +221,13 @@ export class DictionaryDatabaseProxy {
     }
 
     /**
+     * @returns {Promise<number>}
+     */
+    async getMaxHeadwordLength() {
+        return await this._offscreen.sendMessagePromise({action: 'getMaxHeadwordLengthOffscreen'});
+    }
+
+    /**
      * @param {string} dictionaryTitle
      * @param {number} [_progressRate]
      * @param {import('dictionary-database').DeleteDictionaryProgressCallback} [_onProgress]
@@ -222,21 +244,6 @@ export class DictionaryDatabaseProxy {
      */
     async getDictionaryCounts(dictionaryNames, getTotal) {
         return await this._offscreen.sendMessagePromise({action: 'getDictionaryCountsOffscreen', params: {dictionaryNames, getTotal}});
-    }
-
-    /**
-     * @param {ArrayBuffer} archiveContent
-     * @param {import('dictionary-importer').ImportDetails} importDetails
-     * @returns {Promise<{result: import('dictionary-importer').Summary | null, errors: Error[], debug?: import('dictionary-worker').ImportDebug | null}>}
-     */
-    async importDictionaryArchive(archiveContent, importDetails) {
-        const result = /** @type {{result: import('dictionary-importer').Summary | null, errors: import('core').SerializedError[], debug?: import('dictionary-worker').ImportDebug | null}} */ (
-            await this._offscreen.sendMessagePromise({action: 'importDictionaryArchiveOffscreen', params: {archiveContent, importDetails}})
-        );
-        return {
-            ...result,
-            errors: result.errors.map((error) => ExtensionError.deserialize(error)),
-        };
     }
 
     /**

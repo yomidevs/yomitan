@@ -393,12 +393,20 @@ export class DisplayAnki {
         const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
         try {
             this._updateSaveButtonsPromise = promise;
-            const dictionaryEntryDetails = await this._getDictionaryEntryDetails(dictionaryEntries);
+            const fetchAdditionalInfo = this._isAdditionalInfoEnabled();
+            const lazyFetchDuplicateNoteIds = this._shouldFetchDuplicateNoteIdsLazily(fetchAdditionalInfo);
+            const dictionaryEntryDetails = await this._getDictionaryEntryDetails(
+                dictionaryEntries,
+                (lazyFetchDuplicateNoteIds ? false : this._isDuplicateNoteIdLookupEnabled(fetchAdditionalInfo)),
+            );
             if (this._updateDictionaryEntryDetailsToken !== token) { return; }
             this._dictionaryEntryDetails = dictionaryEntryDetails;
             this._updateSaveButtons(dictionaryEntryDetails);
             // eslint-disable-next-line no-underscore-dangle
             this._display._hotkeyHelpController.setupNode(document.documentElement);
+            if (lazyFetchDuplicateNoteIds) {
+                void this._populateLazyDuplicateNoteIds(dictionaryEntries, token);
+            }
         } finally {
             resolve();
             if (this._updateSaveButtonsPromise === promise) {
@@ -462,7 +470,7 @@ export class DisplayAnki {
     _updateSaveButtons(dictionaryEntryDetails) {
         const displayTagsAndFlags = this._displayTagsAndFlags;
         for (let entryIndex = 0, entryCount = dictionaryEntryDetails.length; entryIndex < entryCount; ++entryIndex) {
-            for (const [cardFormatIndex, {canAdd, noteIds, noteInfos, ankiError}] of dictionaryEntryDetails[entryIndex].noteMap.entries()) {
+            for (const [cardFormatIndex, {canAdd, isDuplicate, noteIds, noteInfos, ankiError}] of dictionaryEntryDetails[entryIndex].noteMap.entries()) {
                 const button = this._createSaveButtons(entryIndex, cardFormatIndex);
                 if (button !== null) {
                     button.disabled = !canAdd;
@@ -474,6 +482,8 @@ export class DisplayAnki {
                     // If entry has noteIds, show the "add duplicate" button.
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
                         this._updateSaveButtonForDuplicateBehavior(button, noteIds);
+                    } else if (isDuplicate && this._duplicateBehavior === 'prevent') {
+                        this._updateSaveButtonForDuplicateBehavior(button, [INVALID_NOTE_ID]);
                     }
                 }
 
@@ -965,45 +975,100 @@ export class DisplayAnki {
     }
 
     /**
+     * Checks whether duplicate note IDs are required for the current UI state.
+     * @param {boolean} fetchAdditionalInfo
+     * @returns {boolean}
+     */
+    _isDuplicateNoteIdLookupEnabled(fetchAdditionalInfo) {
+        return fetchAdditionalInfo || this._duplicateBehavior !== 'prevent';
+    }
+
+    /**
+     * Checks whether duplicate note IDs should be fetched after the initial duplicate-status preload.
+     * @param {boolean} fetchAdditionalInfo
+     * @returns {boolean}
+     */
+    _shouldFetchDuplicateNoteIdsLazily(fetchAdditionalInfo) {
+        return this._checkForDuplicates && !fetchAdditionalInfo && this._duplicateBehavior === 'new';
+    }
+
+    /**
      * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
+     * @param {boolean} [fetchDuplicateNoteIds]
+     * @param {((
+     *  dictionaryEntryIndex: number,
+     *  cardFormatIndex: number,
+     *  dictionaryEntry: import('dictionary').DictionaryEntry,
+     *  cardFormat: import('settings').AnkiCardFormat,
+     * ) => boolean)|null} [filter]
      * @returns {Promise<import('display-anki').DictionaryEntryDetails[]>}
      */
-    async _getDictionaryEntryDetails(dictionaryEntries) {
+    async _getDictionaryEntryDetails(dictionaryEntries, fetchDuplicateNoteIds = true, filter = null) {
         const notePromises = [];
         const noteTargets = [];
+        const commonNoteBuildDataPromises = new Map();
+        const getCommonNoteBuildData = (cardFormatIndex) => {
+            let promise = commonNoteBuildDataPromises.get(cardFormatIndex);
+            if (typeof promise === 'undefined') {
+                promise = this._getCommonNoteBuildData(cardFormatIndex);
+                commonNoteBuildDataPromises.set(cardFormatIndex, promise);
+            }
+            return promise;
+        };
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
             const dictionaryEntry = dictionaryEntries[i];
             const {type} = dictionaryEntry;
             for (const [cardFormatIndex, cardFormat] of this._cardFormats.entries()) {
                 if (cardFormat.type !== type) { continue; }
-                const notePromise = this._createDuplicateCheckNote(dictionaryEntry, cardFormatIndex);
+                if (typeof filter === 'function' && !filter(i, cardFormatIndex, dictionaryEntry, cardFormat)) { continue; }
+                const fastNote = this._tryCreateDuplicateCheckNoteFast(dictionaryEntry, cardFormat);
+                const notePromise = (
+                    fastNote !== null ?
+                        Promise.resolve(fastNote) :
+                        (async () => this._createDuplicateCheckNoteWithCommonBuildData(dictionaryEntry, await getCommonNoteBuildData(cardFormatIndex)))()
+                );
                 notePromises.push(notePromise);
                 noteTargets.push({index: i, cardFormatIndex, cardFormat});
             }
         }
 
+        /** @type {import('display-anki').DictionaryEntryDetails[]} */
+        const results = new Array(dictionaryEntries.length).fill(null).map(() => ({noteMap: new Map()}));
+        if (notePromises.length === 0) {
+            return results;
+        }
+
         const notes = (await Promise.all(notePromises));
         const validNotes = [];
-        /** @type {(import('anki').NoteInfoWrapper?)[]} */
-        const invalidAndPlaceholderNotes = [];
-        for (const note of notes) {
+        const validNoteIndices = [];
+        for (let i = 0, ii = notes.length; i < ii; ++i) {
+            const note = notes[i];
             if (note.deckName.length > 0 && note.modelName.length > 0) {
                 validNotes.push(note);
-                invalidAndPlaceholderNotes.push(null);
+                validNoteIndices.push(i);
             } else {
-                invalidAndPlaceholderNotes.push({
+                const {cardFormatIndex, cardFormat, index} = noteTargets[i];
+                results[index].noteMap.set(cardFormatIndex, {
+                    cardFormat,
                     canAdd: false,
                     valid: false,
+                    isDuplicate: false,
                     noteIds: null,
+                    ankiError: null,
                 });
             }
         }
 
         let infos;
         let ankiError = null;
+        const fetchAdditionalInfo = this._isAdditionalInfoEnabled();
         try {
             if (this._checkForDuplicates) {
-                infos = await this._display.application.api.getAnkiNoteInfo(validNotes, this._isAdditionalInfoEnabled());
+                infos = await this._display.application.api.getAnkiNoteInfo(
+                    validNotes,
+                    fetchAdditionalInfo,
+                    fetchDuplicateNoteIds,
+                );
             } else {
                 const isAnkiConnected = await this._display.application.api.isAnkiConnected();
                 infos = this._getAnkiNoteInfoForceValueIfValid(validNotes, isAnkiConnected);
@@ -1016,28 +1081,65 @@ export class DisplayAnki {
                 toError(e);
         }
 
-        /** @type {(import('anki').NoteInfoWrapper)[]} */
-        const notesDupechecked = [];
-        for (const invalidAndPlaceholderNote of invalidAndPlaceholderNotes) {
-            if (invalidAndPlaceholderNote !== null) {
-                notesDupechecked.push(invalidAndPlaceholderNote);
-            } else {
-                const info = infos.shift();
-                if (typeof info !== 'undefined') {
-                    notesDupechecked.push(info);
+        for (let infoIndex = 0, ii = validNoteIndices.length; infoIndex < ii; ++infoIndex) {
+            const noteIndex = validNoteIndices[infoIndex];
+            const {
+                canAdd,
+                valid,
+                isDuplicate,
+                noteIds,
+                noteInfos,
+            } = infos[infoIndex] ?? {canAdd: false, valid: false, isDuplicate: false, noteIds: null, noteInfos: []};
+            const {cardFormatIndex, cardFormat, index} = noteTargets[noteIndex];
+            results[index].noteMap.set(cardFormatIndex, {cardFormat, canAdd, valid, isDuplicate, noteIds, noteInfos, ankiError});
+        }
+        return results;
+    }
+
+    /**
+     * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
+     * @param {import('core').TokenObject} token
+     * @returns {Promise<void>}
+     */
+    async _populateLazyDuplicateNoteIds(dictionaryEntries, token) {
+        const currentDetails = this._dictionaryEntryDetails;
+        if (currentDetails === null) { return; }
+
+        const duplicateDetails = await this._getDictionaryEntryDetails(
+            dictionaryEntries,
+            true,
+            (dictionaryEntryIndex, cardFormatIndex) => currentDetails[dictionaryEntryIndex]?.noteMap.get(cardFormatIndex)?.isDuplicate === true,
+        );
+        if (this._updateDictionaryEntryDetailsToken !== token || this._dictionaryEntryDetails === null) { return; }
+
+        let hasUpdates = false;
+        for (let dictionaryEntryIndex = 0; dictionaryEntryIndex < duplicateDetails.length; ++dictionaryEntryIndex) {
+            for (const [cardFormatIndex, updatedDetails] of duplicateDetails[dictionaryEntryIndex].noteMap.entries()) {
+                if (!Array.isArray(updatedDetails.noteIds) || updatedDetails.noteIds.length === 0) { continue; }
+                const existingDetails = this._dictionaryEntryDetails[dictionaryEntryIndex].noteMap.get(cardFormatIndex);
+                if (typeof existingDetails === 'undefined') { continue; }
+
+                existingDetails.noteIds = updatedDetails.noteIds;
+                if (Array.isArray(updatedDetails.noteInfos)) {
+                    existingDetails.noteInfos = updatedDetails.noteInfos;
                 }
+
+                const saveButton = this._saveButtonFind(dictionaryEntryIndex, cardFormatIndex);
+                if (saveButton !== null) {
+                    this._updateSaveButtonForDuplicateBehavior(saveButton, updatedDetails.noteIds);
+                }
+                const validNoteIds = updatedDetails.noteIds.filter((id) => id !== INVALID_NOTE_ID);
+                if (validNoteIds.length > 0) {
+                    this._updateViewNoteButton(dictionaryEntryIndex, cardFormatIndex, validNoteIds);
+                }
+                hasUpdates = true;
             }
         }
 
-        /** @type {import('display-anki').DictionaryEntryDetails[]} */
-        const results = new Array(dictionaryEntries.length).fill(null).map(() => ({noteMap: new Map()}));
-
-        for (let i = 0, ii = notes.length; i < ii; ++i) {
-            const {canAdd, valid, noteIds, noteInfos} = notesDupechecked[i];
-            const {cardFormatIndex, cardFormat, index} = noteTargets[i];
-            results[index].noteMap.set(cardFormatIndex, {cardFormat, canAdd, valid, noteIds, noteInfos, ankiError});
+        if (hasUpdates) {
+            // eslint-disable-next-line no-underscore-dangle
+            this._display._hotkeyHelpController.setupNode(document.documentElement);
         }
-        return results;
     }
 
     /**
@@ -1049,7 +1151,7 @@ export class DisplayAnki {
         const results = [];
         for (const note of notes) {
             const valid = isNoteDataValid(note);
-            results.push({canAdd: (valid ? canAdd : valid), valid, noteIds: null});
+            results.push({canAdd: (valid ? canAdd : valid), valid, isDuplicate: false, noteIds: null});
         }
         return results;
     }
@@ -1086,7 +1188,20 @@ export class DisplayAnki {
      * @returns {Promise<import('anki').Note>}
      */
     async _createDuplicateCheckNote(dictionaryEntry, cardFormatIndex) {
-        const {context, cardFormat, template, dictionaryStylesMap} = await this._getCommonNoteBuildData(cardFormatIndex);
+        return await this._createDuplicateCheckNoteWithCommonBuildData(dictionaryEntry, await this._getCommonNoteBuildData(cardFormatIndex));
+    }
+
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {{
+     *  context: import('anki-templates-internal').Context,
+     *  cardFormat: import('settings').AnkiCardFormat,
+     *  template: string,
+     *  dictionaryStylesMap: Map<string, string>,
+     * }} commonNoteBuildData
+     * @returns {Promise<import('anki').Note>}
+     */
+    async _createDuplicateCheckNoteWithCommonBuildData(dictionaryEntry, {context, cardFormat, template, dictionaryStylesMap}) {
         return await this._ankiNoteBuilder.createDuplicateCheckNote({
             dictionaryEntry,
             cardFormat,
@@ -1099,6 +1214,22 @@ export class DisplayAnki {
             glossaryLayoutMode: this._glossaryLayoutMode,
             compactTags: this._compactTags,
             dictionaryStylesMap,
+        });
+    }
+
+    /**
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {import('settings').AnkiCardFormat} cardFormat
+     * @returns {import('anki').Note|null}
+     */
+    _tryCreateDuplicateCheckNoteFast(dictionaryEntry, cardFormat) {
+        return this._ankiNoteBuilder.createDuplicateCheckNoteFast({
+            dictionaryEntry,
+            cardFormat,
+            tags: this._noteTags,
+            duplicateScope: this._duplicateScope,
+            duplicateScopeCheckAllModels: this._duplicateScopeCheckAllModels,
+            resultOutputMode: this._resultOutputMode,
         });
     }
 

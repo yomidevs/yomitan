@@ -69,6 +69,7 @@ export type GlobalOptions = {
 
 export type GlobalDatabaseOptions = {
     prefixWildcardsSupported: boolean;
+    maxHeadwordLength: number;
 };
 
 export type Profile = {

@@ -1395,12 +1395,18 @@
                 "database": {
                     "type": "object",
                     "required": [
-                        "prefixWildcardsSupported"
+                        "prefixWildcardsSupported",
+                        "maxHeadwordLength"
                     ],
                     "properties": {
                         "prefixWildcardsSupported": {
                             "type": "boolean",
                             "default": false
+                        },
+                        "maxHeadwordLength": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "default": 0
                         }
                     }
                 },

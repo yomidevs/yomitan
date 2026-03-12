@@ -252,6 +252,7 @@ function createOptionsTestData1() {
         global: {
             database: {
                 prefixWildcardsSupported: false,
+                maxHeadwordLength: 0,
             },
         },
     };
@@ -704,12 +705,14 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 74,
+        version: 76,
         global: {
             database: {
                 prefixWildcardsSupported: false,
+                maxHeadwordLength: 0,
             },
             dataTransmissionConsentShown: false,
+            dictionaryAutoUpdates: [],
         },
     };
 }
@@ -757,6 +760,21 @@ describe('OptionsUtil', () => {
         const partialsExpected = getHandlebarsPartials(defaultAnkiFieldTemplates);
 
         expect(partialsUpdated).toStrictEqual(partialsExpected);
+    });
+
+    test('Version75And76MigrationsAddDictionaryOptions', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = /** @type {import('core').SafeAny} */ (createOptionsUpdatedTestData1());
+        options.version = 74;
+        delete options.global.dictionaryAutoUpdates;
+        delete options.global.database.maxHeadwordLength;
+
+        const optionsUpdated = structuredClone(await optionsUtil.update(options));
+        expect(optionsUpdated.version).toBe(76);
+        expect(optionsUpdated.global.dictionaryAutoUpdates).toStrictEqual([]);
+        expect(optionsUpdated.global.database.maxHeadwordLength).toBe(0);
     });
 
     describe('Default', () => {

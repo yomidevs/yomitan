@@ -50,6 +50,10 @@ type ApiSurface = {
         params: void;
         return: DictionaryImporter.Summary[];
     };
+    getMaxHeadwordLengthOffscreen: {
+        params: void;
+        return: number;
+    };
     deleteDictionaryOffscreen: {
         params: {
             dictionaryTitle: string;
@@ -71,7 +75,7 @@ type ApiSurface = {
         return: {
             result: DictionaryImporter.Summary | null;
             errors: Core.SerializedError[];
-            debug?: import('./dictionary-worker').ImportDebug | null;
+            debug?: unknown;
         };
     };
     databasePurgeOffscreen: {

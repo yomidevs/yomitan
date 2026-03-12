@@ -41,6 +41,7 @@ export type DictionaryEntryNoteDetails = {
     cardFormat: Settings.AnkiCardFormat;
     canAdd: boolean;
     valid: boolean;
+    isDuplicate: boolean;
     /**
      * Anki IDs of duplicate notes. May contain INVALID_NOTE_ID for notes whose ID could not be found.
      */

@@ -92,6 +92,27 @@ function createCardFormat(type) {
     };
 }
 
+/**
+ * @param {import('dictionary').DictionaryEntryType} type
+ * @param {string} frontValue
+ * @returns {import('settings').AnkiCardFormat}
+ */
+function createSingleFieldCardFormat(type, frontValue) {
+    return {
+        type,
+        name: 'Test',
+        deck: 'Deck::Child',
+        model: 'Model',
+        fields: {
+            Front: {
+                value: frontValue,
+                overwriteMode: 'overwrite',
+            },
+        },
+        icon: 'big-circle',
+    };
+}
+
 function createContext() {
     return {
         url: 'chrome-extension://test/search.html',
@@ -187,5 +208,128 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
         expect(note.fields).toStrictEqual({Front: 'front-[first]'});
         expect(templateRenderer.markers).toStrictEqual(['first']);
         expect(api.injectAnkiNoteMedia).not.toHaveBeenCalled();
+    });
+
+    test('uses a fast path for standard term expression duplicate probes', async () => {
+        const api = {
+            injectAnkiNoteMedia: vi.fn(async () => {
+                throw new Error('injectAnkiNoteMedia should not be called');
+            }),
+            parseText: vi.fn(async () => []),
+        };
+        const templateRenderer = new MockTemplateRenderer();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, templateRenderer);
+
+        const note = await ankiNoteBuilder.createDuplicateCheckNote({
+            dictionaryEntry: {
+                type: 'term',
+                headwords: [
+                    {
+                        term: '<term>&',
+                        reading: 'reading',
+                        sources: [{originalText: '<term>&', deinflectedText: '<term>&'}],
+                    },
+                ],
+            },
+            cardFormat: createSingleFieldCardFormat('term', '{expression}'),
+            context: createContext(),
+            template: 'unused',
+            tags: ['tag'],
+            duplicateScope: 'collection',
+            duplicateScopeCheckAllModels: false,
+            resultOutputMode: 'split',
+            glossaryLayoutMode: 'default',
+            compactTags: false,
+            dictionaryStylesMap: new Map(),
+        });
+
+        expect(note.fields).toStrictEqual({Front: '&lt;term&gt;&amp;'});
+        expect(templateRenderer.markers).toStrictEqual([]);
+    });
+
+    test('uses a fast path for merged term expression duplicate probes', async () => {
+        const api = {
+            injectAnkiNoteMedia: vi.fn(async () => {
+                throw new Error('injectAnkiNoteMedia should not be called');
+            }),
+            parseText: vi.fn(async () => []),
+        };
+        const templateRenderer = new MockTemplateRenderer();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, templateRenderer);
+
+        const note = await ankiNoteBuilder.createDuplicateCheckNote({
+            dictionaryEntry: {
+                type: 'term',
+                headwords: [
+                    {term: '打ち込む', reading: 'うちこむ', sources: [{originalText: '打ち込む', deinflectedText: '打ち込む'}]},
+                    {term: '撃ち込む', reading: 'うちこむ', sources: [{originalText: '撃ち込む', deinflectedText: '撃ち込む'}]},
+                    {term: '打ち込む', reading: 'うちこむ', sources: [{originalText: '打ち込む', deinflectedText: '打ち込む'}]},
+                ],
+            },
+            cardFormat: createSingleFieldCardFormat('term', '{expression}'),
+            context: createContext(),
+            template: 'unused',
+            tags: ['tag'],
+            duplicateScope: 'collection',
+            duplicateScopeCheckAllModels: false,
+            resultOutputMode: 'merge',
+            glossaryLayoutMode: 'default',
+            compactTags: false,
+            dictionaryStylesMap: new Map(),
+        });
+
+        expect(note.fields).toStrictEqual({Front: '打ち込む、撃ち込む'});
+        expect(templateRenderer.markers).toStrictEqual([]);
+    });
+
+    test('uses a fast path for standard kanji duplicate probes', async () => {
+        const api = {
+            injectAnkiNoteMedia: vi.fn(async () => {
+                throw new Error('injectAnkiNoteMedia should not be called');
+            }),
+            parseText: vi.fn(async () => []),
+        };
+        const templateRenderer = new MockTemplateRenderer();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, templateRenderer);
+
+        const note = await ankiNoteBuilder.createDuplicateCheckNote({
+            dictionaryEntry: createKanjiEntry(),
+            cardFormat: createSingleFieldCardFormat('kanji', '{character}'),
+            context: createContext(),
+            template: 'unused',
+            tags: ['tag'],
+            duplicateScope: 'collection',
+            duplicateScopeCheckAllModels: false,
+            resultOutputMode: 'split',
+            glossaryLayoutMode: 'default',
+            compactTags: false,
+            dictionaryStylesMap: new Map(),
+        });
+
+        expect(note.fields).toStrictEqual({Front: '字'});
+        expect(templateRenderer.markers).toStrictEqual([]);
+    });
+
+    test('createDuplicateCheckNoteFast handles literal first fields without template rendering', () => {
+        const api = {
+            injectAnkiNoteMedia: vi.fn(async () => {
+                throw new Error('injectAnkiNoteMedia should not be called');
+            }),
+            parseText: vi.fn(async () => []),
+        };
+        const templateRenderer = new MockTemplateRenderer();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, templateRenderer);
+
+        const note = ankiNoteBuilder.createDuplicateCheckNoteFast({
+            dictionaryEntry: createTermEntry(),
+            cardFormat: createSingleFieldCardFormat('term', 'literal-front'),
+            tags: ['tag'],
+            duplicateScope: 'collection',
+            duplicateScopeCheckAllModels: false,
+            resultOutputMode: 'split',
+        });
+
+        expect(note?.fields).toStrictEqual({Front: 'literal-front'});
+        expect(templateRenderer.markers).toStrictEqual([]);
     });
 });

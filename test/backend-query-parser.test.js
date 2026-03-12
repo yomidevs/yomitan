@@ -16,7 +16,12 @@
  */
 
 import {describe, expect, test, vi} from 'vitest';
-import {Backend} from '../ext/js/background/backend.js';
+
+vi.mock('../ext/lib/kanji-processor.js', () => ({
+    convertVariants: (text) => text,
+}));
+
+const {Backend} = await import('../ext/js/background/backend.js');
 
 /**
  * @returns {(this: unknown, text: string, scanLength: number, optionsContext: import('settings').OptionsContext) => Promise<import('api').ParseTextLine[]>}
@@ -59,5 +64,41 @@ describe('Backend query parser segmentation', () => {
         const actual = await textParseScanning.call(context, text, text.length, {});
 
         expect(actual).toStrictEqual(expected);
+    });
+
+    test('matches text that only fits within the derived +8 scan-length buffer', async () => {
+        const baseHeadwordLength = 4;
+        const derivedScanLength = baseHeadwordLength + 8;
+        const source = 'abcdefghij';
+        const context = createBackendContext();
+        context._translator.findTerms = vi.fn(async (_mode, substring) => {
+            if (substring.startsWith(source) && substring.length >= source.length) {
+                return {
+                    dictionaryEntries: [{
+                        headwords: [{
+                            term: source,
+                            reading: '',
+                            sources: [{originalText: source, isPrimary: true, matchType: 'exact'}],
+                        }],
+                    }],
+                    originalTextLength: source.length,
+                };
+            }
+            return {dictionaryEntries: [], originalTextLength: 0};
+        });
+
+        const actual = await textParseScanning.call(context, source, derivedScanLength, {});
+
+        expect(actual).toStrictEqual([[
+            {
+                text: source,
+                reading: '',
+                headwords: [[{
+                    term: source,
+                    reading: '',
+                    sources: [{originalText: source, isPrimary: true, matchType: 'exact'}],
+                }]],
+            },
+        ]]);
     });
 });

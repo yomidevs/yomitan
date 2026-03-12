@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import * as ajvSchemas0 from '../../lib/validate-schemas.js';
 import {AccessibilityController} from '../accessibility/accessibility-controller.js';
 import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
@@ -24,7 +23,7 @@ import {Mecab} from '../comm/mecab.js';
 import {YomitanApi} from '../comm/yomitan-api.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {fetchText} from '../core/fetch-utilities.js';
+import {fetchJson, fetchText} from '../core/fetch-utilities.js';
 import {readResponseJson} from '../core/json.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
@@ -35,6 +34,7 @@ import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
 import {generateAnkiNoteMediaFileName, INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
 import {getKebabCase} from '../data/anki-template-util.js';
 import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
+import {JsonSchema} from '../data/json-schema.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
 import {compareRevisions} from '../dictionary/dictionary-data-util.js';
@@ -57,7 +57,7 @@ const STARTUP_DIAGNOSTICS_STORAGE_KEY = 'manabitanStartupDiagnostics';
 const DICTIONARY_AUTO_UPDATE_STATE_STORAGE_KEY = 'manabitanDictionaryAutoUpdateState';
 const DICTIONARY_AUTO_UPDATE_ALARM_NAME = 'manabitanDictionaryAutoUpdateHourly';
 const DICTIONARY_AUTO_UPDATE_INTERVAL_MS = 60 * 60 * 1000;
-const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
+const SCAN_LENGTH_INFLECTION_BUFFER = 8;
 
 /**
  * @param {string} previousText
@@ -130,6 +130,8 @@ export class Backend {
         this._options = null;
         /** @type {import('../data/json-schema.js').JsonSchema[]} */
         this._profileConditionsSchemaCache = [];
+        /** @type {?JsonSchema} */
+        this._dictionaryIndexSchema = null;
         /** @type {?string} */
         this._ankiClipboardImageFilenameCache = null;
         /** @type {?string} */
@@ -743,8 +745,8 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'optionsGet'>} */
-    _onApiOptionsGet({optionsContext}) {
-        return this._getProfileOptions(optionsContext, false);
+    async _onApiOptionsGet({optionsContext}) {
+        return await this._createEffectiveProfileOptions(optionsContext);
     }
 
     /** @type {import('api').ApiHandler<'optionsGetFull'>} */
@@ -852,12 +854,22 @@ export class Backend {
      * @returns {import('anki').Note[]}
      */
     _stripNotesArray(notes) {
-        const newNotes = structuredClone(notes);
-        for (let i = 0; i < newNotes.length; i++) {
-            if (Object.keys(newNotes[i].fields).length === 0) { continue; }
-            const [firstField, firstFieldValue] = Object.entries(newNotes[i].fields)[0];
-            newNotes[i].fields = {};
-            newNotes[i].fields[firstField] = firstFieldValue;
+        const newNotes = [];
+        for (const note of notes) {
+            /** @type {import('anki').NoteFields} */
+            const fields = {};
+            const fieldNames = Object.keys(note.fields);
+            if (fieldNames.length > 0) {
+                const firstField = fieldNames[0];
+                fields[firstField] = note.fields[firstField];
+            }
+            newNotes.push({
+                fields,
+                tags: note.tags,
+                deckName: note.deckName,
+                modelName: note.modelName,
+                options: {...note.options},
+            });
         }
         return newNotes;
     }
@@ -897,70 +909,104 @@ export class Backend {
 
     /**
      * @param {import('anki').Note[]} notes
-     * @returns {Promise<import('backend').CanAddResults>}
+     * @returns {Promise<{canAddArray: import('backend').CanAddResults, strippedNotes: import('anki').Note[]}>}
      */
     async partitionAddibleNotes(notes) {
         // strip all fields except the first from notes before dupe checking
         // minimizes the amount of data being sent and reduce network latency and AnkiConnect latency
         const strippedNotes = this._stripNotesArray(notes);
+        for (const note of strippedNotes) {
+            // `allowDuplicate` is on for all notes by default, so we temporarily set it to false
+            // to check which notes are duplicates.
+            note.options.allowDuplicate = false;
+        }
 
-        // `allowDuplicate` is on for all notes by default, so we temporarily set it to false
-        // to check which notes are duplicates.
-        const notesNoDuplicatesAllowed = strippedNotes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
-
+        let canAddArray;
         try {
-            return await this._findDuplicates(notes, notesNoDuplicatesAllowed);
+            canAddArray = await this._findDuplicates(notes, strippedNotes);
         } catch (e) {
             // User has older anki-connect that does not support canAddNotesWithErrorDetail
             if (e instanceof ExtensionError && e.message.includes('Anki error: unsupported action')) {
-                return await this._findDuplicatesFallback(notes, notesNoDuplicatesAllowed, strippedNotes);
+                const strippedNotesAllowDuplicates = strippedNotes.map((note) => ({
+                    ...note,
+                    options: {...note.options, allowDuplicate: true},
+                }));
+                canAddArray = await this._findDuplicatesFallback(notes, strippedNotes, strippedNotesAllowDuplicates);
+            } else {
+                throw e;
             }
-
-            throw e;
         }
+        return {canAddArray, strippedNotes};
     }
 
     /** @type {import('api').ApiHandler<'getAnkiNoteInfo'>} */
-    async _onApiGetAnkiNoteInfo({notes, fetchAdditionalInfo}) {
-        const canAddArray = await this.partitionAddibleNotes(notes);
+    async _onApiGetAnkiNoteInfo({notes, fetchAdditionalInfo, fetchDuplicateNoteIds = true}) {
+        const {canAddArray, strippedNotes} = await this.partitionAddibleNotes(notes);
+        const shouldFetchDuplicateNoteIds = fetchAdditionalInfo || fetchDuplicateNoteIds;
 
-        /** @type {import('anki').NoteInfoWrapper[]} */
-        const results = [];
+        /** @type {(number[]|null)[]} */
+        const duplicateNoteIdsByIndex = new Array(canAddArray.length).fill(null);
+        if (shouldFetchDuplicateNoteIds) {
+            /** @type {import('anki').Note[]} */
+            const duplicateNotes = [];
+            const duplicateNoteIndices = [];
 
-        /** @type {import('anki').Note[]} */
-        const duplicateNotes = [];
+            for (let i = 0; i < canAddArray.length; i++) {
+                if (canAddArray[i].isDuplicate) {
+                    duplicateNotes.push(strippedNotes[i]);
+                    duplicateNoteIndices.push(i);
+                }
+            }
 
-        /** @type {number[]} */
-        const originalIndices = [];
+            const duplicateNoteIdResults =
+                duplicateNotes.length > 0 ?
+                    await this._anki.findNoteIds(duplicateNotes) :
+                    [];
 
-        for (let i = 0; i < canAddArray.length; i++) {
-            if (canAddArray[i].isDuplicate) {
-                duplicateNotes.push(canAddArray[i].note);
-                // Keep original indices to locate duplicate inside `duplicateNoteIds`
-                originalIndices.push(i);
+            for (let i = 0; i < duplicateNoteIndices.length; ++i) {
+                let noteIds = duplicateNoteIdResults[i] ?? [];
+                if (noteIds.length === 0) {
+                    noteIds = [INVALID_NOTE_ID];
+                }
+                duplicateNoteIdsByIndex[duplicateNoteIndices[i]] = noteIds;
             }
         }
 
-        const duplicateNoteIds =
-            duplicateNotes.length > 0 ?
-                await this._anki.findNoteIds(duplicateNotes) :
-                [];
+        /** @type {number[][]} */
+        const additionalInfoNoteIds = [];
+        /** @type {number[]} */
+        const additionalInfoIndices = [];
+        if (fetchAdditionalInfo) {
+            for (let i = 0; i < duplicateNoteIdsByIndex.length; ++i) {
+                const noteIds = duplicateNoteIdsByIndex[i];
+                if (noteIds !== null && noteIds.length > 0) {
+                    additionalInfoNoteIds.push(noteIds);
+                    additionalInfoIndices.push(i);
+                }
+            }
+        }
 
+        /** @type {((?import('anki').NoteInfo)[]|null)[]} */
+        const noteInfosByIndex = new Array(canAddArray.length).fill(null);
+        if (additionalInfoNoteIds.length > 0) {
+            const noteInfosList = await this._notesCardsInfoBatched(additionalInfoNoteIds);
+            for (let i = 0; i < noteInfosList.length; ++i) {
+                noteInfosByIndex[additionalInfoIndices[i]] = noteInfosList[i];
+            }
+        }
+
+        /** @type {import('anki').NoteInfoWrapper[]} */
+        const results = [];
         for (let i = 0; i < canAddArray.length; ++i) {
             const {note, isDuplicate} = canAddArray[i];
-
             const valid = isNoteDataValid(note);
-
-            if (isDuplicate && duplicateNoteIds[originalIndices.indexOf(i)].length === 0) {
-                duplicateNoteIds[originalIndices.indexOf(i)] = [INVALID_NOTE_ID];
-            }
-
-            const noteIds = isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null;
-            const noteInfos = (fetchAdditionalInfo && noteIds !== null && noteIds.length > 0) ? await this._notesCardsInfo(noteIds) : [];
+            const noteIds = (isDuplicate && shouldFetchDuplicateNoteIds) ? (duplicateNoteIdsByIndex[i] ?? [INVALID_NOTE_ID]) : null;
+            const noteInfos = noteInfosByIndex[i] ?? [];
 
             const info = {
                 canAdd: valid,
                 valid,
+                isDuplicate,
                 noteIds: noteIds,
                 noteInfos: noteInfos,
             };
@@ -972,24 +1018,66 @@ export class Backend {
     }
 
     /**
-     * @param {number[]} noteIds
-     * @returns {Promise<(?import('anki').NoteInfo)[]>}
+     * @param {number[][]} noteIdsList
+     * @returns {Promise<(?import('anki').NoteInfo)[][]>}
      */
-    async _notesCardsInfo(noteIds) {
-        const notesInfo = await this._anki.notesInfo(noteIds);
+    async _notesCardsInfoBatched(noteIdsList) {
+        /** @type {(?import('anki').NoteInfo)[][]} */
+        const results = noteIdsList.map(() => []);
+        /** @type {number[]} */
+        const allNoteIds = [];
+        /** @type {((?import('anki').NoteInfo)[])[]} */
+        const resultTargets = [];
+
+        for (let i = 0; i < noteIdsList.length; ++i) {
+            const noteIds = noteIdsList[i];
+            const result = results[i];
+            for (const noteId of noteIds) {
+                allNoteIds.push(noteId);
+                resultTargets.push(result);
+            }
+        }
+
+        if (allNoteIds.length === 0) {
+            return results;
+        }
+
+        const notesInfo = await this._anki.notesInfo(allNoteIds);
         /** @type {number[]} */
         // @ts-expect-error - ts is not smart enough to realize that filtering !!x removes null and undefined
         const cardIds = notesInfo.flatMap((x) => x?.cards).filter((x) => !!x);
         const cardsInfo = await this._anki.cardsInfo(cardIds);
-        for (let i = 0; i < notesInfo.length; i++) {
-            if (notesInfo[i] !== null) {
-                const cardInfo = cardsInfo.find((x) => x?.noteId === notesInfo[i]?.noteId);
-                if (cardInfo) {
-                    notesInfo[i]?.cardsInfo.push(cardInfo);
+        const firstCardInfoByNoteId = new Map();
+        for (const cardInfo of cardsInfo) {
+            if (cardInfo === null || firstCardInfoByNoteId.has(cardInfo.noteId)) { continue; }
+            firstCardInfoByNoteId.set(cardInfo.noteId, cardInfo);
+        }
+
+        for (let i = 0, ii = Math.min(notesInfo.length, resultTargets.length); i < ii; ++i) {
+            const noteInfo = notesInfo[i];
+            if (noteInfo !== null) {
+                const cardInfo = firstCardInfoByNoteId.get(noteInfo.noteId);
+                if (typeof cardInfo !== 'undefined') {
+                    noteInfo.cardsInfo.push(cardInfo);
                 }
             }
+            resultTargets[i].push(noteInfo ?? null);
         }
-        return notesInfo;
+
+        for (let i = notesInfo.length; i < resultTargets.length; ++i) {
+            resultTargets[i].push(null);
+        }
+
+        return results;
+    }
+
+    /**
+     * @param {number[]} noteIds
+     * @returns {Promise<(?import('anki').NoteInfo)[]>}
+     */
+    async _notesCardsInfo(noteIds) {
+        const [result = []] = await this._notesCardsInfoBatched([noteIds]);
+        return result;
     }
 
     /** @type {import('api').ApiHandler<'injectAnkiNoteMedia'>} */
@@ -1186,7 +1274,7 @@ export class Backend {
         await this._runWithDictionaryMutationLock(async () => {
             await this._ensureDictionaryDatabaseReady();
             await this._dictionaryDatabase.purge();
-            this._triggerDatabaseUpdated('dictionary', 'purge');
+            await this._handleDatabaseUpdated('dictionary', 'purge');
         });
     }
 
@@ -1202,7 +1290,7 @@ export class Backend {
         await this._runWithDictionaryMutationLock(async () => {
             await this._ensureDictionaryDatabaseReady();
             await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
-            this._triggerDatabaseUpdated('dictionary', 'import');
+            await this._handleDatabaseUpdated('dictionary', 'import');
         });
     }
 
@@ -1273,8 +1361,8 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'triggerDatabaseUpdated'>} */
-    _onApiTriggerDatabaseUpdated({type, cause}) {
-        this._triggerDatabaseUpdated(type, cause);
+    async _onApiTriggerDatabaseUpdated({type, cause}) {
+        await this._handleDatabaseUpdated(type, cause);
     }
 
     /** @type {import('api').ApiHandler<'testMecab'>} */
@@ -1848,6 +1936,117 @@ export class Backend {
      */
     _getProfileOptions(optionsContext, useSchema) {
         return this._getProfile(optionsContext, useSchema).options;
+    }
+
+    /**
+     * @param {import('settings').OptionsContext} optionsContext
+     * @returns {Promise<import('settings').ProfileOptions>}
+     */
+    async _createEffectiveProfileOptions(optionsContext) {
+        const options = clone(this._getProfileOptions(optionsContext, false));
+        options.scanning.length = await this._getEffectiveScanLength(options.scanning.length);
+        return options;
+    }
+
+    /**
+     * @returns {number}
+     */
+    _getStoredGlobalMaxHeadwordLength() {
+        const value = this._options?.global.database.maxHeadwordLength;
+        if (!(typeof value === 'number' && Number.isFinite(value))) {
+            return 0;
+        }
+        return Math.max(0, Math.trunc(value));
+    }
+
+    /**
+     * @param {number} maxHeadwordLength
+     * @param {string} source
+     * @returns {Promise<boolean>}
+     */
+    async _setGlobalMaxHeadwordLength(maxHeadwordLength, source) {
+        const options = this._options;
+        if (options === null) { return false; }
+        const nextValue = Math.max(0, Math.trunc(maxHeadwordLength));
+        if (options.global.database.maxHeadwordLength === nextValue) {
+            return false;
+        }
+        options.global.database.maxHeadwordLength = nextValue;
+        await this._saveOptions(source);
+        return true;
+    }
+
+    /**
+     * @returns {Promise<number|null>}
+     */
+    async _computeMaxHeadwordLengthFromDatabase() {
+        if (this._dictionaryImportModeActive) {
+            return null;
+        }
+        try {
+            await this._ensureDictionaryDatabaseReady();
+        } catch (_) {
+            return null;
+        }
+
+        const getMaxHeadwordLength = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'getMaxHeadwordLength'));
+        if (typeof getMaxHeadwordLength !== 'function') {
+            return null;
+        }
+
+        try {
+            const value = await /** @type {() => Promise<number>} */ (getMaxHeadwordLength).call(this._dictionaryDatabase);
+            if (!(typeof value === 'number' && Number.isFinite(value))) {
+                return 0;
+            }
+            return Math.max(0, Math.trunc(value));
+        } catch (_) {
+            return null;
+        }
+    }
+
+    /**
+     * @param {number} legacyScanLength
+     * @returns {Promise<number>}
+     */
+    async _getEffectiveScanLength(legacyScanLength) {
+        const cached = this._getStoredGlobalMaxHeadwordLength();
+        if (cached > 0) {
+            return cached + SCAN_LENGTH_INFLECTION_BUFFER;
+        }
+
+        const computed = await this._computeMaxHeadwordLengthFromDatabase();
+        if (computed === null || computed <= 0) {
+            return legacyScanLength;
+        }
+
+        await this._setGlobalMaxHeadwordLength(computed, 'background');
+        return computed + SCAN_LENGTH_INFLECTION_BUFFER;
+    }
+
+    /**
+     * @param {string} source
+     * @returns {Promise<number>}
+     */
+    async _refreshCachedMaxHeadwordLength(source) {
+        const computed = await this._computeMaxHeadwordLengthFromDatabase();
+        if (computed === null) {
+            return this._getStoredGlobalMaxHeadwordLength();
+        }
+        await this._setGlobalMaxHeadwordLength(computed, source);
+        return computed;
+    }
+
+    /**
+     * @param {import('backend').DatabaseUpdateType} type
+     * @param {import('backend').DatabaseUpdateCause} cause
+     * @returns {Promise<void>}
+     */
+    async _handleDatabaseUpdated(type, cause) {
+        if (type === 'dictionary') {
+            await this._refreshCachedMaxHeadwordLength('background');
+        }
+        this._triggerDatabaseUpdated(type, cause);
     }
 
     /**
@@ -3049,6 +3248,18 @@ export class Backend {
     }
 
     /**
+     * @returns {Promise<JsonSchema>}
+     */
+    async _getDictionaryIndexSchema() {
+        if (this._dictionaryIndexSchema !== null) {
+            return this._dictionaryIndexSchema;
+        }
+        const schema = await fetchJson('/data/schemas/dictionary-index-schema.json');
+        this._dictionaryIndexSchema = new JsonSchema(/** @type {import('ext/json-schema').Schema} */ (schema));
+        return this._dictionaryIndexSchema;
+    }
+
+    /**
      * @param {'prepare'|'install'|'startup'|'alarm'} reason
      * @returns {Promise<void>}
      */
@@ -3141,6 +3352,7 @@ export class Backend {
      * @returns {Promise<import('backend').DictionaryUpdateCheckResult>}
      */
     async _checkDictionaryUpdate(dictionary, state) {
+        /** @type {import('backend').DictionaryUpdateCheckResult} */
         const result = {
             dictionaryTitle: dictionary.title,
             hasUpdate: false,
@@ -3225,7 +3437,8 @@ export class Backend {
             updateValidatorsFromResponse(getResponse);
 
             const index = /** @type {unknown} */ (await readResponseJson(getResponse));
-            if (!ajvSchemas.dictionaryIndex(index)) {
+            const dictionaryIndexSchema = await this._getDictionaryIndexSchema();
+            if (!dictionaryIndexSchema.isValid(index)) {
                 throw new Error('Invalid dictionary index');
             }
             const validIndex = /** @type {import('dictionary-data').Index} */ (index);
@@ -3293,6 +3506,7 @@ export class Backend {
         }
         const archiveContent = RequestBuilder.readFetchResponseArrayBuffer(archiveResponse, null);
 
+        /** @type {import('backend').DictionaryUpdateResult|void} */
         const updateResult = await this._runWithDictionaryMutationLock(async () => {
             await this._ensureDictionaryDatabaseReady();
             const latestDictionaries = await this._dictionaryDatabase.getDictionaryInfo();
@@ -3303,21 +3517,26 @@ export class Backend {
                 typeof latestDictionary.indexUrl !== 'string' ||
                 typeof latestDictionary.downloadUrl !== 'string'
             ) {
-                return {dictionaryTitle, status: 'not-updatable', latestRevision: checkResult.latestRevision, error: null};
+                return /** @type {import('backend').DictionaryUpdateResult} */ ({dictionaryTitle, status: 'not-updatable', latestRevision: checkResult.latestRevision, error: null});
             }
             if (latestDictionary.revision !== currentDictionary.revision) {
-                return {dictionaryTitle, status: 'skipped', latestRevision: checkResult.latestRevision, error: null};
+                return /** @type {import('backend').DictionaryUpdateResult} */ ({dictionaryTitle, status: 'skipped', latestRevision: checkResult.latestRevision, error: null});
             }
             if (!waitForLock) {
                 const enabledIndexUrls = new Set(this._options?.global.dictionaryAutoUpdates ?? []);
                 if (!enabledIndexUrls.has(latestDictionary.indexUrl)) {
-                    return {dictionaryTitle, status: 'skipped', latestRevision: checkResult.latestRevision, error: null};
+                    return /** @type {import('backend').DictionaryUpdateResult} */ ({dictionaryTitle, status: 'skipped', latestRevision: checkResult.latestRevision, error: null});
                 }
             }
             return await this._performDictionaryUpdate(latestDictionary, await archiveContent, checkResult.latestRevision);
         }, {wait: waitForLock});
 
-        return updateResult ?? {dictionaryTitle, status: 'skipped', latestRevision: checkResult.latestRevision, error: null};
+        return updateResult ?? /** @type {import('backend').DictionaryUpdateResult} */ ({
+            dictionaryTitle,
+            status: 'skipped',
+            latestRevision: checkResult.latestRevision,
+            error: null,
+        });
     }
 
     /**
@@ -3329,6 +3548,7 @@ export class Backend {
     async _performDictionaryUpdate(dictionary, archiveContent, latestRevision) {
         const updateContext = this._captureDictionaryUpdateSettings(dictionary.title);
         let importModeEnabled = false;
+        let updateSucceeded = false;
         /** @type {string|null} */
         let failureMessage = null;
         try {
@@ -3348,8 +3568,7 @@ export class Backend {
 
             await this._applyImportedDictionarySettings(dictionary, importedSummary, updateContext);
             await this._updateDictionaryAutoUpdateStateAfterSuccess(dictionary, importedSummary);
-            this._triggerDatabaseUpdated('dictionary', 'import');
-            return {dictionaryTitle: dictionary.title, status: 'updated', latestRevision, error: null};
+            updateSucceeded = true;
         } catch (e) {
             const error = e instanceof Error ? e : new Error(String(e));
             await this._setDictionaryAutoUpdateError(dictionary.indexUrl ?? '', error.message);
@@ -3363,6 +3582,10 @@ export class Backend {
                 }
             }
         }
+        if (updateSucceeded) {
+            await this._handleDatabaseUpdated('dictionary', 'import');
+            return {dictionaryTitle: dictionary.title, status: 'updated', latestRevision, error: null};
+        }
         if (failureMessage !== null) {
             await this._pruneStaleProfileDictionaryOptions();
             await this._pruneStaleDictionaryAutoUpdates();
@@ -3373,7 +3596,7 @@ export class Backend {
     /**
      * @param {ArrayBuffer} archiveContent
      * @param {import('dictionary-importer').ImportDetails} importDetails
-     * @returns {Promise<{result: import('dictionary-importer').Summary | null, errors: Error[], debug?: import('dictionary-worker').ImportDebug | null}>}
+     * @returns {Promise<{result: import('dictionary-importer').Summary | null, errors: Error[], debug?: unknown}>}
      */
     async _importDictionaryArchiveHeadless(archiveContent, importDetails) {
         if (this._offscreen !== null) {
@@ -3507,7 +3730,7 @@ export class Backend {
             if (enabledIndexUrls.delete(oldIndexUrl) && typeof newIndexUrl === 'string' && importedSummary.isUpdatable === true) {
                 enabledIndexUrls.add(newIndexUrl);
             }
-            options.global.dictionaryAutoUpdates = [...enabledIndexUrls];
+            options.global.dictionaryAutoUpdates = [...enabledIndexUrls].sort((a, b) => a.localeCompare(b));
         }
 
         await this._saveOptions('background');

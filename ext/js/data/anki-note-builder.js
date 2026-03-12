@@ -19,7 +19,19 @@
 import {ExtensionError} from '../core/extension-error.js';
 import {deferPromise, sanitizeCSS} from '../core/utilities.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {cloneFieldMarkerPattern, getRootDeckName} from './anki-util.js';
+import {cloneFieldMarkerPattern, getRootDeckName, stringContainsAnyFieldMarker} from './anki-util.js';
+
+const exactFieldMarkerPattern = /^\{([\p{Letter}\p{Number}_-]+)\}$/u;
+const htmlEscapePattern = /[&<>"'`=]/g;
+const htmlEscapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    '\'': '&#x27;',
+    '`': '&#x60;',
+    '=': '&#x3D;',
+};
 
 export class AnkiNoteBuilder {
     /**
@@ -118,11 +130,24 @@ export class AnkiNoteBuilder {
         compactTags = false,
         dictionaryStylesMap = new Map(),
     }) {
+        const fastNote = this.createDuplicateCheckNoteFast({
+            dictionaryEntry,
+            cardFormat,
+            tags,
+            duplicateScope,
+            duplicateScopeCheckAllModels,
+            resultOutputMode,
+        });
+        if (fastNote !== null) {
+            return fastNote;
+        }
+
         const fields = this._getCardFormatFields(cardFormat);
         /** @type {import('anki').NoteFields} */
         const noteFields = {};
 
         if (fields.length > 0) {
+            const [fieldName, {value: fieldValue}] = fields[0];
             const normalizedContext = this._normalizeContext(context);
             const commonData = this._createData(
                 dictionaryEntry,
@@ -134,9 +159,46 @@ export class AnkiNoteBuilder {
                 void 0,
                 dictionaryStylesMap,
             );
-            const [fieldName, {value: fieldValue}] = fields[0];
             const {value} = await this._formatField(fieldValue, commonData, template);
             noteFields[fieldName] = value;
+        }
+
+        return this._createBaseNote(cardFormat, tags, duplicateScope, duplicateScopeCheckAllModels, noteFields);
+    }
+
+    /**
+     * Attempts to create a duplicate-check note without template rendering.
+     * Returns `null` when the first field requires template evaluation.
+     * @param {object} details
+     * @param {import('dictionary').DictionaryEntry} details.dictionaryEntry
+     * @param {import('settings').AnkiCardFormat} details.cardFormat
+     * @param {string[]} [details.tags]
+     * @param {import('settings').AnkiDuplicateScope} [details.duplicateScope]
+     * @param {boolean} [details.duplicateScopeCheckAllModels]
+     * @param {import('settings').ResultOutputMode} [details.resultOutputMode]
+     * @returns {import('anki').Note|null}
+     */
+    createDuplicateCheckNoteFast({
+        dictionaryEntry,
+        cardFormat,
+        tags = [],
+        duplicateScope = 'collection',
+        duplicateScopeCheckAllModels = false,
+        resultOutputMode = 'split',
+    }) {
+        const fields = this._getCardFormatFields(cardFormat);
+        /** @type {import('anki').NoteFields} */
+        const noteFields = {};
+        if (fields.length > 0) {
+            const [fieldName, {value: fieldValue}] = fields[0];
+            const fastValue = this._getFastDuplicateCheckFieldValue(fieldValue, dictionaryEntry, resultOutputMode);
+            if (typeof fastValue === 'string') {
+                noteFields[fieldName] = fastValue;
+            } else if (!stringContainsAnyFieldMarker(fieldValue)) {
+                noteFields[fieldName] = fieldValue;
+            } else {
+                return null;
+            }
         }
 
         return this._createBaseNote(cardFormat, tags, duplicateScope, duplicateScopeCheckAllModels, noteFields);
@@ -214,6 +276,48 @@ export class AnkiNoteBuilder {
      */
     _getCardFormatFields(cardFormat) {
         return Object.entries(cardFormat.fields);
+    }
+
+    /**
+     * @param {string} fieldValue
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {import('settings').ResultOutputMode} resultOutputMode
+     * @returns {string|undefined}
+     */
+    _getFastDuplicateCheckFieldValue(fieldValue, dictionaryEntry, resultOutputMode) {
+        const match = exactFieldMarkerPattern.exec(fieldValue);
+        if (match === null) { return void 0; }
+
+        const marker = match[1];
+        switch (marker) {
+            case 'character':
+                return dictionaryEntry.type === 'kanji' ? escapeAnkiFieldValue(dictionaryEntry.character) : void 0;
+            case 'expression':
+                return dictionaryEntry.type === 'term' ? this._getFastTermExpressionFieldValue(dictionaryEntry, resultOutputMode) : void 0;
+            default:
+                return void 0;
+        }
+    }
+
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('settings').ResultOutputMode} resultOutputMode
+     * @returns {string}
+     */
+    _getFastTermExpressionFieldValue(dictionaryEntry, resultOutputMode) {
+        const uniqueTerms = [];
+        const termSet = new Set();
+        for (const {term} of dictionaryEntry.headwords) {
+            if (termSet.has(term)) { continue; }
+            termSet.add(term);
+            uniqueTerms.push(term);
+        }
+
+        return escapeAnkiFieldValue(
+            resultOutputMode === 'merge' ?
+                uniqueTerms.join('、') :
+                (uniqueTerms[0] ?? ''),
+        );
     }
 
     /**
@@ -671,4 +775,12 @@ function convertReading(reading, readingMode) {
 function getReading(text, reading, readingMode, readingOverride) {
     const shouldOverride = readingOverride?.type === 'term' && readingOverride.term === text && readingOverride.reading.length > 0;
     return convertReading(shouldOverride ? readingOverride.reading : reading, readingMode);
+}
+
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+function escapeAnkiFieldValue(value) {
+    return value.replace(htmlEscapePattern, (character) => htmlEscapeMap[character]);
 }

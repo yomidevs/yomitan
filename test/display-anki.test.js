@@ -54,6 +54,25 @@ function createCardFormat() {
 }
 
 /**
+ * @returns {import('settings').AnkiCardFormat}
+ */
+function createFastProbeCardFormat() {
+    return {
+        type: 'term',
+        name: 'Expression',
+        deck: 'Deck',
+        model: 'Model',
+        fields: {
+            Front: {
+                value: '{expression}',
+                overwriteMode: 'overwrite',
+            },
+        },
+        icon: 'big-circle',
+    };
+}
+
+/**
  * @param {Document} document
  * @returns {void}
  */
@@ -185,7 +204,30 @@ describe('DisplayAnki preload and save flow', () => {
     test('preload uses duplicate-check notes instead of full note creation', async ({window}) => {
         setupDocument(window.document);
         const dictionaryEntries = [createTermEntry()];
-        const probeNote = {
+        const {display, api} = createDisplay(window.document, dictionaryEntries, {
+            getAnkiNoteInfo: vi.fn(async () => [{
+                canAdd: true,
+                valid: true,
+                isDuplicate: true,
+                noteIds: [123],
+                noteInfos: [createNoteInfo(123, 'existing')],
+            }]),
+        });
+        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
+        displayAnki._checkForDuplicates = true;
+        displayAnki._duplicateBehavior = 'overwrite';
+        displayAnki._displayTagsAndFlags = 'never';
+        displayAnki._cardFormats = [createFastProbeCardFormat()];
+        displayAnki._dictionaryEntryDetails = null;
+
+        const createDuplicateCheckNoteFastSpy = vi.spyOn(displayAnki, '_tryCreateDuplicateCheckNoteFast');
+        const createNoteSpy = vi.spyOn(displayAnki, '_createNote');
+
+        await displayAnki._updateDictionaryEntryDetails();
+
+        expect(createDuplicateCheckNoteFastSpy).toHaveBeenCalledTimes(1);
+        expect(createNoteSpy).not.toHaveBeenCalled();
+        expect(api.getAnkiNoteInfo).toHaveBeenCalledWith([{
             fields: {Front: 'term'},
             tags: [],
             deckName: 'Deck',
@@ -199,35 +241,54 @@ describe('DisplayAnki preload and save flow', () => {
                     checkAllModels: false,
                 },
             },
-        };
-        const {display, api} = createDisplay(window.document, dictionaryEntries, {
-            getAnkiNoteInfo: vi.fn(async () => [{
-                canAdd: true,
-                valid: true,
-                noteIds: [123],
-                noteInfos: [createNoteInfo(123, 'existing')],
-            }]),
-        });
-        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
-        displayAnki._checkForDuplicates = true;
-        displayAnki._duplicateBehavior = 'overwrite';
-        displayAnki._displayTagsAndFlags = 'never';
-        displayAnki._cardFormats = [createCardFormat()];
-        displayAnki._dictionaryEntryDetails = null;
-
-        const createDuplicateCheckNoteSpy = vi.spyOn(displayAnki, '_createDuplicateCheckNote').mockResolvedValue(probeNote);
-        const createNoteSpy = vi.spyOn(displayAnki, '_createNote');
-
-        await displayAnki._updateDictionaryEntryDetails();
-
-        expect(createDuplicateCheckNoteSpy).toHaveBeenCalledTimes(1);
-        expect(createNoteSpy).not.toHaveBeenCalled();
-        expect(api.getAnkiNoteInfo).toHaveBeenCalledWith([probeNote], true);
+        }], true, true);
 
         const saveButton = display.dictionaryEntryNodes[0].querySelector('.action-button[data-action="save-note"]');
         const viewNoteButton = display.dictionaryEntryNodes[0].querySelector('.action-button[data-action="view-note"]');
         expect(saveButton?.dataset.overwrite).toBe('true');
         expect(viewNoteButton?.dataset.noteIds).toBe('123');
+    });
+
+    test('preload fast path skips template fetching for standard duplicate probes', async ({window}) => {
+        setupDocument(window.document);
+        const dictionaryEntries = [createTermEntry()];
+        const {display, api} = createDisplay(window.document, dictionaryEntries, {
+            getAnkiNoteInfo: vi.fn(async () => [{
+                canAdd: true,
+                valid: true,
+                isDuplicate: false,
+                noteIds: null,
+                noteInfos: [],
+            }]),
+        });
+        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
+        displayAnki._checkForDuplicates = true;
+        displayAnki._duplicateBehavior = 'prevent';
+        displayAnki._displayTagsAndFlags = 'never';
+        displayAnki._cardFormats = [createFastProbeCardFormat()];
+        displayAnki._dictionaryEntryDetails = null;
+
+        await displayAnki._updateDictionaryEntryDetails();
+
+        expect(api.getDefaultAnkiFieldTemplates).not.toHaveBeenCalled();
+        expect(api.getDictionaryInfo).not.toHaveBeenCalled();
+        expect(api.getAnkiNoteInfo).toHaveBeenCalledWith([
+            {
+                fields: {Front: 'term'},
+                tags: [],
+                deckName: 'Deck',
+                modelName: 'Model',
+                options: {
+                    allowDuplicate: true,
+                    duplicateScope: 'collection',
+                    duplicateScopeOptions: {
+                        deckName: null,
+                        checkChildren: false,
+                        checkAllModels: false,
+                    },
+                },
+            },
+        ], false, false);
     });
 
     test('cold save performs the two-pass note build before adding a note', async ({window}) => {
@@ -270,6 +331,112 @@ describe('DisplayAnki preload and save flow', () => {
         expect(api.addAnkiNote).toHaveBeenCalledWith(finalNote);
     });
 
+    test('prevent duplicate mode disables save without fetching duplicate note ids', async ({window}) => {
+        setupDocument(window.document);
+        const dictionaryEntries = [createTermEntry()];
+        const {display, api} = createDisplay(window.document, dictionaryEntries, {
+            getAnkiNoteInfo: vi.fn(async () => [{
+                canAdd: true,
+                valid: true,
+                isDuplicate: true,
+                noteIds: null,
+                noteInfos: [],
+            }]),
+        });
+        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
+        displayAnki._checkForDuplicates = true;
+        displayAnki._duplicateBehavior = 'prevent';
+        displayAnki._displayTagsAndFlags = 'never';
+        displayAnki._cardFormats = [createFastProbeCardFormat()];
+        displayAnki._dictionaryEntryDetails = null;
+
+        await displayAnki._updateDictionaryEntryDetails();
+
+        expect(api.getAnkiNoteInfo).toHaveBeenCalledWith([{
+            fields: {Front: 'term'},
+            tags: [],
+            deckName: 'Deck',
+            modelName: 'Model',
+            options: {
+                allowDuplicate: true,
+                duplicateScope: 'collection',
+                duplicateScopeOptions: {
+                    deckName: null,
+                    checkChildren: false,
+                    checkAllModels: false,
+                },
+            },
+        }], false, false);
+        const saveButton = display.dictionaryEntryNodes[0].querySelector('.action-button[data-action="save-note"]');
+        expect(saveButton?.disabled).toBe(true);
+    });
+
+    test('new duplicate mode fetches duplicate note ids lazily after the initial status check', async ({window}) => {
+        setupDocument(window.document);
+        const dictionaryEntries = [createTermEntry()];
+        const getAnkiNoteInfo = vi.fn()
+            .mockResolvedValueOnce([{
+                canAdd: true,
+                valid: true,
+                isDuplicate: true,
+                noteIds: null,
+                noteInfos: [],
+            }])
+            .mockResolvedValueOnce([{
+                canAdd: true,
+                valid: true,
+                isDuplicate: true,
+                noteIds: [123],
+                noteInfos: [],
+            }]);
+        const {display} = createDisplay(window.document, dictionaryEntries, {getAnkiNoteInfo});
+        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
+        displayAnki._checkForDuplicates = true;
+        displayAnki._duplicateBehavior = 'new';
+        displayAnki._displayTagsAndFlags = 'never';
+        displayAnki._cardFormats = [createFastProbeCardFormat()];
+        displayAnki._dictionaryEntryDetails = null;
+
+        await displayAnki._updateDictionaryEntryDetails();
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(getAnkiNoteInfo).toHaveBeenNthCalledWith(1, [{
+            fields: {Front: 'term'},
+            tags: [],
+            deckName: 'Deck',
+            modelName: 'Model',
+            options: {
+                allowDuplicate: true,
+                duplicateScope: 'collection',
+                duplicateScopeOptions: {
+                    deckName: null,
+                    checkChildren: false,
+                    checkAllModels: false,
+                },
+            },
+        }], false, false);
+        expect(getAnkiNoteInfo).toHaveBeenNthCalledWith(2, [{
+            fields: {Front: 'term'},
+            tags: [],
+            deckName: 'Deck',
+            modelName: 'Model',
+            options: {
+                allowDuplicate: true,
+                duplicateScope: 'collection',
+                duplicateScopeOptions: {
+                    deckName: null,
+                    checkChildren: false,
+                    checkAllModels: false,
+                },
+            },
+        }], false, true);
+
+        const saveButton = display.dictionaryEntryNodes[0].querySelector('.action-button[data-action="save-note"]');
+        const viewNoteButton = display.dictionaryEntryNodes[0].querySelector('.action-button[data-action="view-note"]');
+        expect(saveButton?.title).toBe('Add duplicate Expression note');
+        expect(viewNoteButton?.dataset.noteIds).toBe('123');
+    });
+
     test('overwrite uses cached duplicate metadata without recomputing popup details', async ({window}) => {
         setupDocument(window.document);
         const dictionaryEntries = [createTermEntry()];
@@ -283,6 +450,7 @@ describe('DisplayAnki preload and save flow', () => {
                 cardFormat,
                 canAdd: true,
                 valid: true,
+                isDuplicate: true,
                 noteIds: [123],
                 noteInfos: [createNoteInfo(123, 'existing value')],
                 ankiError: null,

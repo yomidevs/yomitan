@@ -18,7 +18,12 @@
 import Ajv from 'ajv';
 import {IDBKeyRange} from 'fake-indexeddb';
 import {describe, expect, test, vi} from 'vitest';
-import {Backend} from '../ext/js/background/backend.js';
+
+vi.mock('../ext/lib/kanji-processor.js', () => ({
+    convertVariants: (text) => text,
+}));
+
+const {Backend} = await import('../ext/js/background/backend.js');
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {chrome, fetch} from './mocks/common.js';
 import {setupStubs} from './utilities/database.js';

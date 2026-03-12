@@ -192,6 +192,8 @@ export class DictionaryDatabase {
         this._termExactPresenceCacheMaxEntries = this._computeTermExactPresenceCacheMaxEntries();
         /** @type {Map<string, boolean>} */
         this._termPrefixNegativeCache = new Map();
+        /** @type {number|null} */
+        this._maxHeadwordLengthCache = null;
         /** @type {Map<string, {expression: Map<string, number[]>, reading: Map<string, number[]>, expressionReverse: Map<string, number[]>, readingReverse: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}>} */
         this._directTermIndexByDictionary = new Map();
         /** @type {import('@sqlite.org/sqlite-wasm').sqlite3_module|null} */
@@ -310,6 +312,7 @@ export class DictionaryDatabase {
         this._termEntryContentIdByHash.clear();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
+        this._invalidateMaxHeadwordLengthCache();
         this._directTermIndexByDictionary.clear();
         this._clearTermsVtabCursorState();
         this._termsVtabModuleRegistered = false;
@@ -627,6 +630,8 @@ export class DictionaryDatabase {
             throw new Error('Cannot purge database while opening');
         }
 
+        this._invalidateMaxHeadwordLengthCache();
+
         if (this._db !== null) {
             if (this._bulkImportTransactionOpen) {
                 try {
@@ -748,6 +753,7 @@ export class DictionaryDatabase {
 
         this._sqlite3 = sqlite3;
         await this._openConnection();
+        this._invalidateMaxHeadwordLengthCache();
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
         this._clearTermEntryContentMetaCaches();
@@ -823,6 +829,7 @@ export class DictionaryDatabase {
         }
 
         onProgress(progressData);
+        this._invalidateMaxHeadwordLengthCache();
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
         this._clearTermEntryContentMetaCaches();
@@ -876,6 +883,11 @@ export class DictionaryDatabase {
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
+    }
+
+    /** */
+    _invalidateMaxHeadwordLengthCache() {
+        this._maxHeadwordLengthCache = null;
     }
 
     /**
@@ -1627,6 +1639,30 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @returns {Promise<number>}
+     */
+    async getMaxHeadwordLength() {
+        const cached = this._maxHeadwordLengthCache;
+        if (typeof cached === 'number') {
+            return cached;
+        }
+
+        const db = this._requireDb();
+        const value = db.selectValue(`
+            SELECT MAX(
+                CASE
+                    WHEN LENGTH(COALESCE(reading, '')) > LENGTH(COALESCE(expression, '')) THEN LENGTH(COALESCE(reading, ''))
+                    ELSE LENGTH(COALESCE(expression, ''))
+                END
+            )
+            FROM terms
+        `);
+        const maxHeadwordLength = Math.max(0, this._asNumber(value, 0));
+        this._maxHeadwordLengthCache = maxHeadwordLength;
+        return maxHeadwordLength;
+    }
+
+    /**
      * @returns {Promise<{
      *   scannedCount: number,
      *   removedCount: number,
@@ -1882,6 +1918,7 @@ export class DictionaryDatabase {
         }
         if (count <= 0) { return; }
         if (objectStoreName === 'terms') {
+            this._invalidateMaxHeadwordLengthCache();
             this._lastBulkAddTermsMetrics = null;
             this._termEntryContentCache.clear();
             if (!this._bulkImportTransactionOpen) {

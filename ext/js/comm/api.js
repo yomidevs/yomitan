@@ -115,10 +115,11 @@ export class API {
     /**
      * @param {import('api').ApiParam<'getAnkiNoteInfo', 'notes'>} notes
      * @param {import('api').ApiParam<'getAnkiNoteInfo', 'fetchAdditionalInfo'>} fetchAdditionalInfo
+     * @param {import('api').ApiParam<'getAnkiNoteInfo', 'fetchDuplicateNoteIds'>} fetchDuplicateNoteIds
      * @returns {Promise<import('api').ApiReturn<'getAnkiNoteInfo'>>}
      */
-    getAnkiNoteInfo(notes, fetchAdditionalInfo) {
-        return this._invoke('getAnkiNoteInfo', {notes, fetchAdditionalInfo});
+    getAnkiNoteInfo(notes, fetchAdditionalInfo, fetchDuplicateNoteIds = true) {
+        return this._invoke('getAnkiNoteInfo', {notes, fetchAdditionalInfo, fetchDuplicateNoteIds});
     }
 
     /**

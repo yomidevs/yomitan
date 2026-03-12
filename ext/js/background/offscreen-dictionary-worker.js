@@ -141,6 +141,10 @@ class OffscreenDictionaryWorkerHandler {
                 this._assertDatabaseAvailable(action);
                 await this._ensureDatabasePrepared();
                 return await this._dictionaryDatabase.getDictionaryInfo();
+            case 'getMaxHeadwordLengthOffscreen':
+                this._assertDatabaseAvailable(action);
+                await this._ensureDatabasePrepared();
+                return await this._dictionaryDatabase.getMaxHeadwordLength();
             case 'deleteDictionaryOffscreen':
                 this._assertDatabaseAvailable(action);
                 await this._ensureDatabasePrepared();

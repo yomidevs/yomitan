@@ -587,6 +587,7 @@ export class OptionsUtil {
             this._updateVersion73,
             this._updateVersion74,
             this._updateVersion75,
+            this._updateVersion76,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1838,6 +1839,20 @@ export class OptionsUtil {
      */
     async _updateVersion75(options) {
         options.global.dictionaryAutoUpdates = [];
+    }
+
+    /**
+     *  - Added global.database.maxHeadwordLength
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion76(options) {
+        if (!isObjectNotArray(options.global)) {
+            options.global = {};
+        }
+        if (!isObjectNotArray(options.global.database)) {
+            options.global.database = {};
+        }
+        options.global.database.maxHeadwordLength = 0;
     }
 
     /**

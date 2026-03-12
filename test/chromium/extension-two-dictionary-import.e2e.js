@@ -30,6 +30,10 @@ import {access, copyFile, mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs
 import {chromium} from '@playwright/test';
 import {parseJson} from '../../ext/js/core/json.js';
 import {safePerformance} from '../../ext/js/core/safe-performance.js';
+import {
+    autoUpdateDictionaryFixtureSettings,
+    createAutoUpdateDictionaryFixture,
+} from '../e2e/dictionary-auto-update-fixture.js';
 import {writeCombinedTabbedReport} from '../e2e/report-tabs.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -43,6 +47,8 @@ const browserFlavor = (browserFlavorRaw === 'edge' || browserFlavorRaw === 'msed
 const e2eLogTag = `[${browserFlavor}-e2e]`;
 const browserChannel = browserFlavor === 'edge' ? 'msedge' : null;
 const expectedLookupDictionaries = ['Jitendex', 'JMdict'];
+const autoUpdateStateStorageKey = 'manabitanDictionaryAutoUpdateState';
+const autoUpdateAlarmName = 'manabitanDictionaryAutoUpdateHourly';
 const overlapLookupCandidates = [
     '日本',
     '名前',
@@ -660,12 +666,69 @@ async function startE2ELocalServer(paths) {
     const wagahaiHtml = await readFile(wagahaiHtmlPath);
     const jitendexZip = await readFile(paths.jitendexPath);
     const jmdictZip = await readFile(paths.jmdictPath);
+    /** @type {null|Awaited<ReturnType<typeof createAutoUpdateDictionaryFixture>>} */
+    let autoUpdateFixture = null;
+    /** @type {'v1'|'v2'} */
+    let autoUpdateVersion = 'v1';
+    let autoUpdateConditional304 = false;
+    /** @type {Array<{method: string, path: string, headers: Record<string, string|string[]|undefined>}>} */
+    let autoUpdateRequests = [];
     const server = createServer((request, response) => {
         const requestUrl = request.url || '/';
-        const headers = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS'};
+        const headers = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS'};
         if (request.method === 'OPTIONS') {
             response.writeHead(204, headers);
             response.end();
+            return;
+        }
+        if (autoUpdateFixture !== null && (
+            requestUrl === autoUpdateFixture.oldIndexPath ||
+            requestUrl === autoUpdateFixture.newIndexPath ||
+            requestUrl === autoUpdateFixture.oldArchivePath ||
+            requestUrl === autoUpdateFixture.newArchivePath
+        )) {
+            autoUpdateRequests.push({
+                method: String(request.method || 'GET').toUpperCase(),
+                path: requestUrl,
+                headers: {...request.headers},
+            });
+            const getVersionHeaders = (versionKey) => ({
+                ETag: versionKey === 'v2' ? autoUpdateFixture.newEtag : autoUpdateFixture.oldEtag,
+                'Last-Modified': versionKey === 'v2' ? autoUpdateFixture.newLastModified : autoUpdateFixture.oldLastModified,
+            });
+            const validatorMatches = (versionHeaders) => (
+                request.headers['if-none-match'] === versionHeaders.ETag &&
+                request.headers['if-modified-since'] === versionHeaders['Last-Modified']
+            );
+            if (requestUrl === autoUpdateFixture.oldArchivePath) {
+                response.writeHead(200, {...headers, 'Content-Type': 'application/zip', 'Content-Length': String(autoUpdateFixture.versions.v1.archiveBuffer.byteLength)});
+                response.end(autoUpdateFixture.versions.v1.archiveBuffer);
+                return;
+            }
+            if (requestUrl === autoUpdateFixture.newArchivePath) {
+                response.writeHead(200, {...headers, 'Content-Type': 'application/zip', 'Content-Length': String(autoUpdateFixture.versions.v2.archiveBuffer.byteLength)});
+                response.end(autoUpdateFixture.versions.v2.archiveBuffer);
+                return;
+            }
+            const versionKey = requestUrl === autoUpdateFixture.newIndexPath ? 'v2' : autoUpdateVersion;
+            const versionHeaders = getVersionHeaders(versionKey);
+            if (autoUpdateConditional304 && validatorMatches(versionHeaders)) {
+                response.writeHead(304, {...headers, ...versionHeaders});
+                response.end();
+                return;
+            }
+            const body = JSON.stringify(autoUpdateFixture.versions[versionKey].indexContent);
+            response.writeHead(200, {
+                ...headers,
+                ...versionHeaders,
+                'Content-Type': 'application/json; charset=utf-8',
+                'Content-Length': String(Buffer.byteLength(body)),
+            });
+            if (request.method === 'HEAD') {
+                response.end();
+                return;
+            }
+            response.end(body);
             return;
         }
         if (requestUrl === '/dictionaries/jitendex.zip') {
@@ -695,6 +758,28 @@ async function startE2ELocalServer(paths) {
     }
     return {
         baseUrl: `http://127.0.0.1:${String(address.port)}`,
+        setAutoUpdateFixture(fixture) {
+            autoUpdateFixture = fixture;
+            autoUpdateVersion = 'v1';
+            autoUpdateConditional304 = false;
+            autoUpdateRequests = [];
+        },
+        setAutoUpdateVersion(version) {
+            autoUpdateVersion = version;
+        },
+        setAutoUpdateConditional304(enabled) {
+            autoUpdateConditional304 = enabled;
+        },
+        clearAutoUpdateRequests() {
+            autoUpdateRequests = [];
+        },
+        getAutoUpdateRequests() {
+            return autoUpdateRequests.map((requestInfo) => ({
+                method: requestInfo.method,
+                path: requestInfo.path,
+                headers: {...requestInfo.headers},
+            }));
+        },
         close: async () => {
             await new Promise((resolve, reject) => {
                 server.close((error) => {
@@ -760,6 +845,132 @@ async function discoverExtensionId(context) {
         fail('Unable to discover Chromium extension ID');
     }
     return id;
+}
+
+async function sendRuntimeMessage(page, action, params = void 0) {
+    return await page.evaluate(async ({action, params}) => {
+        return await new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({action, params}, (response) => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || String(runtimeError)));
+                    return;
+                }
+                if (response && typeof response === 'object' && 'error' in response) {
+                    reject(new Error(JSON.stringify(response.error)));
+                    return;
+                }
+                resolve(response && typeof response === 'object' ? response.result : response);
+            });
+        });
+    }, {action, params});
+}
+
+async function getOptionsFullRuntime(page) {
+    return await sendRuntimeMessage(page, 'optionsGetFull', void 0);
+}
+
+async function getDictionaryInfoRuntime(page) {
+    return await sendRuntimeMessage(page, 'getDictionaryInfo', void 0);
+}
+
+async function installRecommendedDictionariesMock(page, recommendedDictionaries) {
+    await page.evaluate((data) => {
+        const recommendedData = structuredClone(data);
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = async (input, init) => {
+            const url = String(typeof input === 'string' ? input : input?.url || '');
+            if (url.includes('recommended-dictionaries.json')) {
+                return new Response(JSON.stringify(recommendedData), {
+                    status: 200,
+                    headers: {'Content-Type': 'application/json'},
+                });
+            }
+            return originalFetch(input, init);
+        };
+    }, recommendedDictionaries);
+}
+
+async function setWelcomeLanguage(page, language) {
+    const result = await page.evaluate((nextLanguage) => {
+        const select = document.querySelector('#language-select');
+        if (!(select instanceof HTMLSelectElement)) {
+            return {ok: false, error: 'Language selector not found'};
+        }
+        const hasOption = Array.from(select.options).some((option) => option.value === nextLanguage);
+        if (!hasOption) {
+            return {ok: false, error: `Language option not found: ${nextLanguage}`};
+        }
+        select.value = nextLanguage;
+        select.dispatchEvent(new Event('change', {bubbles: true}));
+        return {ok: true};
+    }, language);
+    if (!(result && result.ok === true)) {
+        throw new Error(`Unable to set welcome language: ${String(result?.error || 'unknown error')}`);
+    }
+}
+
+async function getWelcomeAutoImportStatusText(page) {
+    return await page.evaluate(() => {
+        const node = document.querySelector('#welcome-language-auto-import-status');
+        if (!(node instanceof HTMLElement) || node.hidden) { return ''; }
+        return (node.textContent || '').trim();
+    });
+}
+
+async function waitForWelcomeAutoImportStatus(page, expectedText, timeoutMs = 30000) {
+    const deadline = safePerformance.now() + timeoutMs;
+    let lastText = '';
+    while (safePerformance.now() < deadline) {
+        lastText = await getWelcomeAutoImportStatusText(page);
+        if (lastText.includes(expectedText)) {
+            return lastText;
+        }
+        await page.waitForTimeout(250);
+    }
+    fail(`Timed out waiting for welcome auto-import status containing "${expectedText}". lastText="${lastText}"`);
+}
+
+async function welcomeHasRecommendedDictionariesButton(page) {
+    return await page.evaluate(() => {
+        const node = document.querySelector('[data-modal-action="show,recommended-dictionaries"]');
+        if (!(node instanceof HTMLElement)) { return false; }
+        return !node.hidden;
+    });
+}
+
+async function setAllSettingsRuntime(page, value, source) {
+    await sendRuntimeMessage(page, 'setAllSettings', {value, source});
+}
+
+async function getStorageLocalRecord(page, key) {
+    return await page.evaluate(async (storageKey) => {
+        return await new Promise((resolve, reject) => {
+            chrome.storage.local.get([storageKey], (result) => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || String(runtimeError)));
+                    return;
+                }
+                resolve(result?.[storageKey] ?? null);
+            });
+        });
+    }, key);
+}
+
+async function setStorageLocalRecord(page, key, value) {
+    await page.evaluate(async ({storageKey, storageValue}) => {
+        await new Promise((resolve, reject) => {
+            chrome.storage.local.set({[storageKey]: storageValue}, () => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || String(runtimeError)));
+                    return;
+                }
+                resolve();
+            });
+        });
+    }, {storageKey: key, storageValue: value});
 }
 
 async function evalSendMessage(page, expression, arg = null) {
@@ -1775,6 +1986,406 @@ async function loadDictionaryProbeTermsFromArchive(zipPath, maxTerms = 80) {
     return terms;
 }
 
+async function openDictionaryDetailsModal(page, dictionaryName) {
+    await page.evaluate((targetName) => {
+        const aliases = Array.from(document.querySelectorAll('#dictionary-list .dictionary-alias'));
+        const targetIndex = aliases.findIndex((aliasNode) => {
+            const text = (aliasNode.textContent || '').trim();
+            return text.length > 0 && text !== 'All' && text !== 'Unassociated Data' && (
+                text === targetName ||
+                text.startsWith(`${targetName} `) ||
+                text.startsWith(`${targetName}.`) ||
+                text.includes(targetName)
+            );
+        });
+        if (targetIndex < 0) {
+            throw new Error(`Unable to find installed dictionary row for "${targetName}"`);
+        }
+        const menuButtons = Array.from(document.querySelectorAll('#dictionary-list .dictionary-menu-button'));
+        const menuButton = menuButtons[targetIndex];
+        if (!(menuButton instanceof HTMLElement)) {
+            throw new Error(`Unable to find dictionary menu button for "${targetName}" at row index ${String(targetIndex)}`);
+        }
+        menuButton.click();
+    }, dictionaryName);
+    await page.waitForFunction(() => {
+        const menus = Array.from(document.querySelectorAll('.popup-menu-container'));
+        return menus.some((menuNode) => (
+            menuNode instanceof HTMLElement &&
+            !menuNode.hidden &&
+            menuNode.querySelector('.popup-menu-item[data-menu-action="showDetails"]') !== null
+        ));
+    }, {timeout: 30000});
+    await page.evaluate(() => {
+        const menu = Array.from(document.querySelectorAll('.popup-menu-container')).find((menuNode) => (
+            menuNode instanceof HTMLElement &&
+            !menuNode.hidden &&
+            menuNode.querySelector('.popup-menu-item[data-menu-action="showDetails"]') !== null
+        ));
+        if (!(menu instanceof HTMLElement)) {
+            throw new Error('Dictionary action menu did not become visible');
+        }
+        const detailsButton = menu.querySelector('.popup-menu-item[data-menu-action="showDetails"]');
+        if (!(detailsButton instanceof HTMLElement)) {
+            throw new Error('Dictionary action menu is missing showDetails button');
+        }
+        detailsButton.click();
+    });
+    await page.waitForSelector('#dictionary-details-modal:not([hidden])', {timeout: 30000});
+    await page.waitForFunction((targetName) => {
+        const modal = document.querySelector('#dictionary-details-modal');
+        const titleNode = modal?.querySelector('.dictionary-title');
+        const text = (titleNode?.textContent || '').trim();
+        return text === targetName || text.startsWith(`${targetName} `) || text.startsWith(`${targetName}.`) || text.includes(targetName);
+    }, dictionaryName, {timeout: 30000});
+}
+
+async function closeDictionaryDetailsModal(page) {
+    await page.evaluate(() => {
+        const modal = document.querySelector('#dictionary-details-modal');
+        if (!(modal instanceof HTMLElement) || modal.hidden) { return; }
+        const closeButton = modal.querySelector('[data-modal-action="hide"]');
+        if (!(closeButton instanceof HTMLElement)) {
+            throw new Error('Dictionary details close button missing');
+        }
+        closeButton.click();
+    });
+    await page.waitForSelector('#dictionary-details-modal[hidden]', {timeout: 30000});
+}
+
+async function setDictionaryAutoUpdateEnabled(page, dictionaryName, enabled) {
+    await openDictionaryDetailsModal(page, dictionaryName);
+    const indexUrl = await page.evaluate((nextEnabled) => {
+        const modal = document.querySelector('#dictionary-details-modal');
+        if (!(modal instanceof HTMLElement)) {
+            throw new Error('Dictionary details modal missing');
+        }
+        const setting = modal.querySelector('.dictionary-auto-update-setting');
+        if (!(setting instanceof HTMLElement) || setting.hidden) {
+            throw new Error('Dictionary auto-update setting is hidden');
+        }
+        const toggle = setting.querySelector('.dictionary-auto-update-toggle');
+        if (!(toggle instanceof HTMLInputElement)) {
+            throw new Error('Dictionary auto-update toggle missing');
+        }
+        const currentIndexUrl = String(toggle.dataset.indexUrl || '');
+        if (currentIndexUrl.length === 0) {
+            throw new Error('Dictionary auto-update toggle is missing data-index-url');
+        }
+        if (toggle.checked !== nextEnabled) {
+            toggle.click();
+        }
+        return currentIndexUrl;
+    }, enabled);
+    const deadline = safePerformance.now() + 30_000;
+    while (safePerformance.now() < deadline) {
+        const optionsFull = await getOptionsFullRuntime(page);
+        const enabledIndexUrls = Array.isArray(optionsFull?.global?.dictionaryAutoUpdates) ? optionsFull.global.dictionaryAutoUpdates.map(String) : [];
+        if (enabledIndexUrls.includes(indexUrl) === enabled) {
+            break;
+        }
+        await page.waitForTimeout(250);
+    }
+    await closeDictionaryDetailsModal(page);
+    return indexUrl;
+}
+
+async function configureAutoUpdateDictionaryProfile(page, dictionaryName) {
+    const optionsFull = structuredClone(await getOptionsFullRuntime(page));
+    const profiles = Array.isArray(optionsFull?.profiles) ? optionsFull.profiles : [];
+    for (const profile of profiles) {
+        if (!(profile?.options && Array.isArray(profile.options.dictionaries))) {
+            continue;
+        }
+        let dictionary = profile.options.dictionaries.find((current) => String(current?.name || '') === dictionaryName);
+        if (!(dictionary && typeof dictionary === 'object')) {
+            dictionary = {
+                name: dictionaryName,
+                alias: dictionaryName,
+                enabled: true,
+                allowSecondarySearches: false,
+                definitionsCollapsible: 'not-collapsible',
+                partsOfSpeechFilter: true,
+                useDeinflections: true,
+                styles: '',
+            };
+            profile.options.dictionaries.push(dictionary);
+        }
+        dictionary.alias = autoUpdateDictionaryFixtureSettings.alias;
+        dictionary.enabled = true;
+        dictionary.partsOfSpeechFilter = false;
+        dictionary.useDeinflections = false;
+        profile.options.general.mainDictionary = dictionaryName;
+        profile.options.general.sortFrequencyDictionary = dictionaryName;
+        const expressionField = profile.options?.anki?.cardFormats?.[0]?.fields?.expression;
+        if (expressionField && typeof expressionField === 'object') {
+            expressionField.value = autoUpdateDictionaryFixtureSettings.ankiFieldValue;
+        }
+    }
+    await setAllSettingsRuntime(page, optionsFull, 'chromium-e2e-auto-update-configure');
+}
+
+async function backdateAutoUpdateLastAttempt(page, indexUrl) {
+    const state = await getStorageLocalRecord(page, autoUpdateStateStorageKey);
+    const nextState = (typeof state === 'object' && state !== null && !Array.isArray(state)) ? structuredClone(state) : {};
+    const entry = (typeof nextState[indexUrl] === 'object' && nextState[indexUrl] !== null && !Array.isArray(nextState[indexUrl])) ? nextState[indexUrl] : {};
+    entry.lastAttemptAt = 0;
+    nextState[indexUrl] = entry;
+    await setStorageLocalRecord(page, autoUpdateStateStorageKey, nextState);
+    return entry;
+}
+
+async function triggerAutoUpdateAlarm(page) {
+    await page.evaluate((alarmName) => {
+        chrome.alarms.create(alarmName, {when: Date.now() + 100});
+    }, autoUpdateAlarmName);
+}
+
+async function waitForAutoUpdateCheck(page, indexUrl, previousCheckAt, timeoutMs = 60000) {
+    const deadline = safePerformance.now() + timeoutMs;
+    while (safePerformance.now() < deadline) {
+        const state = await getStorageLocalRecord(page, autoUpdateStateStorageKey);
+        if (typeof state === 'object' && state !== null && !Array.isArray(state)) {
+            const entry = state[indexUrl];
+            if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+                const lastError = typeof entry.lastError === 'string' ? entry.lastError : null;
+                if (lastError && lastError.length > 0) {
+                    fail(`Auto-update check failed for ${indexUrl}: ${lastError}`);
+                }
+                const lastSuccessfulCheckAt = Number(entry.lastSuccessfulCheckAt || 0);
+                if (lastSuccessfulCheckAt > previousCheckAt) {
+                    return /** @type {Record<string, unknown>} */ (entry);
+                }
+            }
+        }
+        await page.waitForTimeout(250);
+    }
+    fail(`Timed out waiting for auto-update check completion for ${indexUrl}`);
+}
+
+async function waitForUpdatedDictionaryState(page, expectedTitle, expectedRevision, expectedIndexUrl, timeoutMs = 120000) {
+    const deadline = safePerformance.now() + timeoutMs;
+    while (safePerformance.now() < deadline) {
+        const dictionaryInfo = await getDictionaryInfoRuntime(page);
+        const titles = Array.isArray(dictionaryInfo) ? dictionaryInfo : [];
+        const match = titles.find((dictionary) => (
+            String(dictionary?.title || '') === expectedTitle &&
+            String(dictionary?.revision || '') === expectedRevision &&
+            String(dictionary?.indexUrl || '') === expectedIndexUrl
+        ));
+        if (match) {
+            return dictionaryInfo;
+        }
+        await page.waitForTimeout(500);
+    }
+    fail(`Timed out waiting for updated dictionary ${expectedTitle} revision ${expectedRevision}`);
+}
+
+function ensureAutoUpdateRequest(condition, message, requests) {
+    if (!condition) {
+        fail(`${message}; requests=${JSON.stringify(requests)}`);
+    }
+}
+
+async function runAutoUpdateScenario(page, extensionBaseUrl, localServer, report, cdpSession, processSampler) {
+    const fixture = await createAutoUpdateDictionaryFixture(localServer.baseUrl);
+    localServer.setAutoUpdateFixture(fixture);
+    try {
+        await page.goto(`${extensionBaseUrl}/settings.html?popup-preview=false`);
+        await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30000});
+
+        const importStart = safePerformance.now();
+        const importProfile = await runPhaseProfile(cdpSession, async () => {
+            await page.setInputFiles('#dictionary-import-file-input', [fixture.importZipPath]);
+            await waitForImportCompletion(page, fixture.initialTitle, 240000);
+            return await getDictionaryInfoRuntime(page);
+        });
+        const importEnd = safePerformance.now();
+        ensureAutoUpdateRequest(
+            Array.isArray(importProfile.result) && importProfile.result.some((dictionary) => (
+                String(dictionary?.title || '') === fixture.initialTitle &&
+                String(dictionary?.revision || '') === '1'
+            )),
+            'Initial auto-update dictionary import did not complete with revision 1',
+            importProfile.result,
+        );
+        await addReportPhase(
+            report,
+            page,
+            'Auto-update import v1 dictionary',
+            `Imported local updatable dictionary archive ${fixture.importZipPath}`,
+            importStart,
+            importEnd,
+            importProfile,
+            processSampler,
+        );
+
+        const enableToggleStart = safePerformance.now();
+        const enableToggleProfile = await runPhaseProfile(cdpSession, async () => {
+            const enabledIndexUrl = await setDictionaryAutoUpdateEnabled(page, fixture.initialTitle, true);
+            await configureAutoUpdateDictionaryProfile(page, fixture.initialTitle);
+            const optionsFull = await getOptionsFullRuntime(page);
+            return {enabledIndexUrl, optionsFull};
+        });
+        const enableToggleEnd = safePerformance.now();
+        ensureAutoUpdateRequest(
+            String(enableToggleProfile.result?.enabledIndexUrl || '') === fixture.oldIndexUrl,
+            'Auto-update toggle did not bind to the expected initial index URL',
+            enableToggleProfile.result,
+        );
+        await addReportPhase(
+            report,
+            page,
+            'Enable hourly auto-updates',
+            `Enabled automatic hourly updates for ${fixture.initialTitle} using index URL ${fixture.oldIndexUrl}`,
+            enableToggleStart,
+            enableToggleEnd,
+            enableToggleProfile,
+            processSampler,
+        );
+
+        localServer.clearAutoUpdateRequests();
+        localServer.setAutoUpdateVersion('v1');
+        localServer.setAutoUpdateConditional304(false);
+        const initialState = await getStorageLocalRecord(page, autoUpdateStateStorageKey);
+        const initialCheckAt = Number(initialState?.[fixture.oldIndexUrl]?.lastSuccessfulCheckAt || 0);
+        const firstPassStart = safePerformance.now();
+        const firstPassProfile = await runPhaseProfile(cdpSession, async () => {
+            await triggerAutoUpdateAlarm(page);
+            const stateEntry = await waitForAutoUpdateCheck(page, fixture.oldIndexUrl, initialCheckAt);
+            return {stateEntry, requests: localServer.getAutoUpdateRequests()};
+        });
+        const firstPassEnd = safePerformance.now();
+        const firstPassRequests = Array.isArray(firstPassProfile.result?.requests) ? firstPassProfile.result.requests : [];
+        ensureAutoUpdateRequest(firstPassRequests.length === 2, 'Initial hourly auto-update pass should issue exactly two requests', firstPassRequests);
+        ensureAutoUpdateRequest(firstPassRequests[0]?.method === 'HEAD' && firstPassRequests[0]?.path === fixture.oldIndexPath, 'Initial hourly auto-update pass should begin with HEAD on the original index URL', firstPassRequests);
+        ensureAutoUpdateRequest(firstPassRequests[1]?.method === 'GET' && firstPassRequests[1]?.path === fixture.oldIndexPath, 'Initial hourly auto-update pass should fetch the index JSON after HEAD', firstPassRequests);
+        ensureAutoUpdateRequest(!firstPassRequests.some((requestInfo) => requestInfo.path === fixture.oldArchivePath || requestInfo.path === fixture.newArchivePath), 'Initial hourly auto-update pass should not download an archive when no update exists', firstPassRequests);
+        await addReportPhase(
+            report,
+            page,
+            'Hourly auto-update pass (HEAD + GET no-op)',
+            `Recorded requests for first due pass: ${JSON.stringify(firstPassRequests)}`,
+            firstPassStart,
+            firstPassEnd,
+            firstPassProfile,
+            processSampler,
+        );
+
+        localServer.clearAutoUpdateRequests();
+        localServer.setAutoUpdateVersion('v1');
+        localServer.setAutoUpdateConditional304(true);
+        await backdateAutoUpdateLastAttempt(page, fixture.oldIndexUrl);
+        const firstSuccessfulCheckAt = Number(firstPassProfile.result?.stateEntry?.lastSuccessfulCheckAt || 0);
+        const secondPassStart = safePerformance.now();
+        const secondPassProfile = await runPhaseProfile(cdpSession, async () => {
+            await triggerAutoUpdateAlarm(page);
+            const stateEntry = await waitForAutoUpdateCheck(page, fixture.oldIndexUrl, firstSuccessfulCheckAt);
+            return {stateEntry, requests: localServer.getAutoUpdateRequests()};
+        });
+        const secondPassEnd = safePerformance.now();
+        const secondPassRequests = Array.isArray(secondPassProfile.result?.requests) ? secondPassProfile.result.requests : [];
+        ensureAutoUpdateRequest(secondPassRequests.length === 1, 'Conditional 304 auto-update pass should only issue one request', secondPassRequests);
+        ensureAutoUpdateRequest(secondPassRequests[0]?.method === 'HEAD' && secondPassRequests[0]?.path === fixture.oldIndexPath, 'Conditional 304 auto-update pass should use HEAD on the original index URL', secondPassRequests);
+        ensureAutoUpdateRequest(
+            secondPassRequests[0]?.headers?.['if-none-match'] === fixture.oldEtag &&
+            secondPassRequests[0]?.headers?.['if-modified-since'] === fixture.oldLastModified,
+            'Conditional 304 auto-update pass should send both cache validators',
+            secondPassRequests,
+        );
+        await addReportPhase(
+            report,
+            page,
+            'Hourly auto-update pass (HEAD 304)',
+            `Recorded requests for conditional 304 pass: ${JSON.stringify(secondPassRequests)}`,
+            secondPassStart,
+            secondPassEnd,
+            secondPassProfile,
+            processSampler,
+        );
+
+        localServer.clearAutoUpdateRequests();
+        localServer.setAutoUpdateConditional304(false);
+        localServer.setAutoUpdateVersion('v2');
+        await backdateAutoUpdateLastAttempt(page, fixture.oldIndexUrl);
+        const updatePassStart = safePerformance.now();
+        const updatePassProfile = await runPhaseProfile(cdpSession, async () => {
+            await triggerAutoUpdateAlarm(page);
+            await waitForUpdatedDictionaryState(page, fixture.updatedTitle, '2', fixture.newIndexUrl, 120000);
+            const optionsFull = await getOptionsFullRuntime(page);
+            const storageState = await getStorageLocalRecord(page, autoUpdateStateStorageKey);
+            return {
+                optionsFull,
+                storageState,
+                requests: localServer.getAutoUpdateRequests(),
+                dictionaryInfo: await getDictionaryInfoRuntime(page),
+            };
+        });
+        const updatePassEnd = safePerformance.now();
+        const updateRequests = Array.isArray(updatePassProfile.result?.requests) ? updatePassProfile.result.requests : [];
+        ensureAutoUpdateRequest(updateRequests.length === 3, 'Update pass should issue HEAD, GET, and archive download requests', updateRequests);
+        ensureAutoUpdateRequest(updateRequests[0]?.method === 'HEAD' && updateRequests[0]?.path === fixture.oldIndexPath, 'Update pass should start with HEAD on the old index URL', updateRequests);
+        ensureAutoUpdateRequest(updateRequests[1]?.method === 'GET' && updateRequests[1]?.path === fixture.oldIndexPath, 'Update pass should fetch the old index URL after HEAD', updateRequests);
+        ensureAutoUpdateRequest(updateRequests[2]?.method === 'GET' && updateRequests[2]?.path === fixture.newArchivePath, 'Update pass should download the new archive after detecting a newer revision', updateRequests);
+        const updatedOptions = updatePassProfile.result?.optionsFull;
+        const profile0 = Array.isArray(updatedOptions?.profiles) ? updatedOptions.profiles[0] : null;
+        const updatedDictionarySettings = Array.isArray(profile0?.options?.dictionaries) ?
+            profile0.options.dictionaries.find((dictionary) => String(dictionary?.name || '') === fixture.updatedTitle) :
+            null;
+        ensureAutoUpdateRequest(
+            updatedDictionarySettings?.alias === autoUpdateDictionaryFixtureSettings.alias &&
+            updatedDictionarySettings?.enabled === true &&
+            updatedDictionarySettings?.partsOfSpeechFilter === false &&
+            updatedDictionarySettings?.useDeinflections === false,
+            'Updated dictionary settings were not preserved after automatic re-import',
+            updatedDictionarySettings,
+        );
+        ensureAutoUpdateRequest(
+            String(profile0?.options?.general?.mainDictionary || '') === fixture.updatedTitle &&
+            String(profile0?.options?.general?.sortFrequencyDictionary || '') === fixture.updatedTitle,
+            'Main or sort-frequency dictionary selection did not migrate to the updated title',
+            profile0?.options?.general,
+        );
+        ensureAutoUpdateRequest(
+            String(profile0?.options?.anki?.cardFormats?.[0]?.fields?.expression?.value || '') === autoUpdateDictionaryFixtureSettings.updatedAnkiFieldValue,
+            'Anki dictionary-title field migration did not preserve the expected updated kebab-case value',
+            profile0?.options?.anki?.cardFormats?.[0]?.fields?.expression,
+        );
+        const globalAutoUpdates = Array.isArray(updatedOptions?.global?.dictionaryAutoUpdates) ? updatedOptions.global.dictionaryAutoUpdates.map(String) : [];
+        ensureAutoUpdateRequest(
+            globalAutoUpdates.length === 1 && globalAutoUpdates[0] === fixture.newIndexUrl,
+            'Global auto-update settings did not migrate from the old index URL to the new one',
+            globalAutoUpdates,
+        );
+        const updatedStorageState = (typeof updatePassProfile.result?.storageState === 'object' && updatePassProfile.result.storageState !== null && !Array.isArray(updatePassProfile.result.storageState)) ?
+            updatePassProfile.result.storageState :
+            {};
+        ensureAutoUpdateRequest(
+            !(fixture.oldIndexUrl in updatedStorageState) &&
+            typeof updatedStorageState?.[fixture.newIndexUrl]?.lastSuccessfulUpdateAt === 'number',
+            'Runtime auto-update state did not migrate to the new index URL after update',
+            updatedStorageState,
+        );
+        await addReportPhase(
+            report,
+            page,
+            'Hourly auto-update pass (v1 -> v2 install)',
+            `Recorded requests for update pass: ${JSON.stringify(updateRequests)}. Updated options snapshot: ${JSON.stringify({
+                globalAutoUpdates,
+                updatedDictionarySettings,
+                general: profile0?.options?.general ?? null,
+                ankiField: profile0?.options?.anki?.cardFormats?.[0]?.fields?.expression?.value ?? null,
+            })}`,
+            updatePassStart,
+            updatePassEnd,
+            updatePassProfile,
+            processSampler,
+        );
+    } finally {
+        await fixture.cleanup();
+    }
+}
+
 async function ensureFreshChromeDevBuild(zipPath) {
     const skipBuild = (process.env.MANABITAN_E2E_SKIP_BUILD ?? '0').trim() === '1';
     if (skipBuild) {
@@ -2730,6 +3341,108 @@ async function main() {
             postDeleteDiagnosticsStart,
             postDeleteDiagnosticsEnd,
             postDeleteDiagnosticsProfile,
+            processSampler,
+        );
+
+        const autoUpdateStart = safePerformance.now();
+        let autoUpdateProfile = null;
+        let autoUpdateError = '';
+        try {
+            autoUpdateProfile = await runPhaseProfile(cdpSession, async () => {
+                if (localServer === null) {
+                    throw new Error('Local E2E server is unavailable for auto-update verification');
+                }
+                await runAutoUpdateScenario(page, extensionBaseUrl, localServer, report, cdpSession, processSampler);
+                return {ok: true};
+            });
+        } catch (e) {
+            autoUpdateError = errorMessage(e);
+            verificationErrors.push(`Auto-update end-to-end verification failed: ${autoUpdateError}`);
+        }
+        const autoUpdateEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            'Auto-update end-to-end verification',
+            autoUpdateError.length > 0 ?
+                `Auto-update verification failed: ${autoUpdateError}` :
+                'Verified hourly auto-update end to end, including HEAD/GET no-op checks, validator-backed 304 handling, and automatic v1 -> v2 replacement with preserved settings.',
+            autoUpdateStart,
+            autoUpdateEnd,
+            autoUpdateProfile,
+            processSampler,
+        );
+
+        const welcomeAutoImportStart = safePerformance.now();
+        let welcomeAutoImportProfile = null;
+        let welcomeAutoImportError = '';
+        try {
+            welcomeAutoImportProfile = await runPhaseProfile(cdpSession, async () => {
+                await page.goto(`${extensionBaseUrl}/welcome.html`);
+                await page.waitForSelector('#language-select', {state: 'attached', timeout: 30000});
+                if (!(await waitForBodyVisible(page, 30000))) {
+                    throw new Error('Welcome page body remained hidden');
+                }
+                if (localServer === null) {
+                    throw new Error('Local E2E server is unavailable for welcome auto-import verification');
+                }
+
+                const mockRecommendedDictionaries = {
+                    ja: {
+                        terms: [
+                            {
+                                name: 'Jitendex',
+                                description: 'Real Jitendex from recommended dictionaries',
+                                homepage: '',
+                                downloadUrl: `${localServer.baseUrl}/dictionaries/jitendex.zip`,
+                            },
+                        ],
+                        kanji: [],
+                        frequency: [],
+                        grammar: [],
+                        pronunciation: [],
+                    },
+                };
+                await installRecommendedDictionariesMock(page, mockRecommendedDictionaries);
+                if (await welcomeHasRecommendedDictionariesButton(page)) {
+                    throw new Error('Welcome page still exposes a manual recommended-dictionaries button');
+                }
+
+                await setWelcomeLanguage(page, 'ja');
+                await waitForWelcomeAutoImportStatus(page, 'Downloading 1 recommended dictionaries for "ja"', 30000);
+                await waitForImportCompletion(page, 'Welcome auto-import (Jitendex)', 300000);
+
+                const dictionaryInfo = await getDictionaryInfoRuntime(page);
+                const installedTitles = (Array.isArray(dictionaryInfo) ? dictionaryInfo : [])
+                    .map((entry) => String(entry?.title || '').trim())
+                    .filter((value) => value.length > 0);
+                if (!installedTitles.some((title) => matchesDictionaryName(title, 'Jitendex'))) {
+                    throw new Error(`Welcome auto-import did not install Jitendex. installedTitles=${JSON.stringify(installedTitles)}`);
+                }
+
+                await setWelcomeLanguage(page, 'en');
+                await waitForWelcomeAutoImportStatus(page, 'No recommended dictionaries are currently available for "en".', 30000);
+
+                return {
+                    installedTitles,
+                    welcomeStatus: await getWelcomeAutoImportStatusText(page),
+                };
+            });
+        } catch (e) {
+            welcomeAutoImportError = errorMessage(e);
+            verificationErrors.push(`Welcome auto-import verification failed: ${welcomeAutoImportError}`);
+        }
+        const welcomeAutoImportEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            'Welcome auto-import verification',
+            welcomeAutoImportError.length > 0 ?
+                `Welcome auto-import verification failed: ${welcomeAutoImportError}` :
+                `Verified welcome language-change auto-import and inline status messaging. details=${JSON.stringify(welcomeAutoImportProfile?.result ?? null)}`,
+            welcomeAutoImportStart,
+            welcomeAutoImportEnd,
+            welcomeAutoImportProfile,
             processSampler,
         );
 

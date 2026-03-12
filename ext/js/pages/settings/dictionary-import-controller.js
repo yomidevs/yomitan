@@ -28,6 +28,7 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryController} from './dictionary-controller.js';
 
 const OPFS_REQUIRED_USER_MESSAGE = 'Manabitan requires OPFS storage support. Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension.';
+const RECOMMENDED_DICTIONARY_CATEGORIES = ['terms', 'kanji', 'frequency', 'grammar', 'pronunciation'];
 
 /**
  * @param {number} valueMs
@@ -263,6 +264,12 @@ export class DictionaryImportController {
         this._recommendedDiagnosticsContainer = document.querySelector('#recommended-dictionaries-diagnostics');
         /** @type {HTMLElement|null} */
         this._recommendedErrorContainer = document.querySelector('#recommended-dictionaries-error');
+        /** @type {HTMLElement|null} */
+        this._welcomeLanguageAutoImportStatusContainer = document.querySelector('#welcome-language-auto-import-status');
+        /** @type {HTMLSelectElement|null} */
+        this._languageSelect = document.querySelector('#language-select');
+        /** @type {boolean} */
+        this._welcomeLanguageAutoImportEnabled = this._isWelcomePage();
         /** @type {boolean} */
         this._showRecommendedDiagnosticsInUi = (Reflect.get(globalThis, 'manabitanShowRecommendedDiagnosticsInUi') === true);
         /** @type {[originalMessage: string, newMessage: string][]} */
@@ -300,6 +307,8 @@ export class DictionaryImportController {
         this._onModalVisibilityChangedEventBind = this._onModalVisibilityChangedEvent.bind(this);
         /** @type {(details: {visible: boolean}) => void} */
         this._onRecommendedDictionariesModalVisibilityChangedBind = this._onRecommendedDictionariesModalVisibilityChanged.bind(this);
+        /** @type {(event: Event) => void} */
+        this._onWelcomeLanguageSelectChangedBind = this._onWelcomeLanguageSelectChanged.bind(this);
         reportDiagnostics('dictionary-import-controller-constructed', {
             href: globalThis.location?.href ?? null,
         });
@@ -331,6 +340,9 @@ export class DictionaryImportController {
         document.addEventListener('click', this._onDocumentClickCaptureBind, true);
         globalThis.addEventListener('manabitan:modal-visibility-changed', this._onModalVisibilityChangedEventBind, false);
         this._recommendedDictionariesModal?.on('visibilityChanged', this._onRecommendedDictionariesModalVisibilityChangedBind);
+        if (this._welcomeLanguageAutoImportEnabled && this._languageSelect instanceof HTMLSelectElement) {
+            this._languageSelect.addEventListener('change', this._onWelcomeLanguageSelectChangedBind, false);
+        }
         globalThis.addEventListener('beforeunload', this._onBeforeUnload.bind(this), {once: true});
         reportDiagnostics('dictionary-import-controller-prepare-complete', {
             hasRecommendedModal: this._recommendedDictionariesModal !== null,
@@ -374,10 +386,21 @@ export class DictionaryImportController {
         document.removeEventListener('click', this._onDocumentClickCaptureBind, true);
         globalThis.removeEventListener('manabitan:modal-visibility-changed', this._onModalVisibilityChangedEventBind, false);
         this._recommendedDictionariesModal?.off('visibilityChanged', this._onRecommendedDictionariesModalVisibilityChangedBind);
+        if (this._welcomeLanguageAutoImportEnabled && this._languageSelect instanceof HTMLSelectElement) {
+            this._languageSelect.removeEventListener('change', this._onWelcomeLanguageSelectChangedBind, false);
+        }
         if (this._sessionDictionaryWorker !== null) {
             this._sessionDictionaryWorker.destroy();
             this._sessionDictionaryWorker = null;
         }
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    _isWelcomePage() {
+        const pathname = String(globalThis.location?.pathname ?? '');
+        return pathname.endsWith('/welcome.html');
     }
 
     /**
@@ -428,6 +451,79 @@ export class DictionaryImportController {
         });
         this._recommendedDictionariesRenderPending = true;
         void this._onRecommendedDictionariesOpen();
+    }
+
+    /**
+     * @param {Event} event
+     */
+    async _onWelcomeLanguageSelectChanged(event) {
+        if (!this._welcomeLanguageAutoImportEnabled) { return; }
+        const target = event.currentTarget;
+        if (!(target instanceof HTMLSelectElement)) { return; }
+        const requestedLanguage = target.value.trim();
+        if (requestedLanguage.length === 0) { return; }
+
+        this._setWelcomeLanguageAutoImportStatus('', false);
+        if (this._modifying) {
+            reportDiagnostics('recommended-dictionaries-welcome-auto-import-skipped-busy', {
+                requestedLanguage,
+            });
+            return;
+        }
+
+        const {recommendedDictionaries} = await this._loadRecommendedDictionaries();
+        /** @type {import('dictionary-importer').Summary[]} */
+        let installedDictionaries = [];
+        try {
+            installedDictionaries = await this._settingsController.getDictionaryInfo();
+        } catch (error) {
+            const e = toError(error);
+            if (isOpfsUnavailableMessage(e.message)) {
+                const opfsError = new Error(OPFS_REQUIRED_USER_MESSAGE);
+                this._showErrors([opfsError]);
+                this._setWelcomeLanguageAutoImportStatus(OPFS_REQUIRED_USER_MESSAGE, true);
+                reportDiagnostics('recommended-dictionaries-welcome-auto-import-skipped-error', {
+                    requestedLanguage,
+                    message: e.message,
+                });
+                return;
+            }
+            log.warn(`[recommended-dictionaries] getDictionaryInfo failed before welcome auto import; continuing with empty installed set. ${e.message}`);
+            reportDiagnostics('recommended-dictionaries-welcome-auto-import-installed-query-failed', {
+                requestedLanguage,
+                message: e.message,
+            });
+        }
+
+        const decision = this._getWelcomeAutoImportDecision(requestedLanguage, recommendedDictionaries, installedDictionaries);
+        switch (decision.status) {
+            case 'no-match':
+                this._setWelcomeLanguageAutoImportStatus(`No recommended dictionaries are currently available for "${requestedLanguage}".`, false);
+                reportDiagnostics('recommended-dictionaries-welcome-auto-import-skip-no-match', {
+                    requestedLanguage,
+                });
+                return;
+            case 'already-installed':
+                this._setWelcomeLanguageAutoImportStatus(`All recommended dictionaries for "${requestedLanguage}" are already installed.`, false);
+                reportDiagnostics('recommended-dictionaries-welcome-auto-import-skip-already-installed', {
+                    requestedLanguage,
+                    resolvedLanguage: decision.resolvedLanguage,
+                });
+                return;
+            case 'ready':
+                this._setWelcomeLanguageAutoImportStatus(`Downloading ${String(decision.urls.length)} recommended dictionaries for "${requestedLanguage}"...`, false);
+                reportDiagnostics('recommended-dictionaries-welcome-auto-import-start', {
+                    requestedLanguage,
+                    resolvedLanguage: decision.resolvedLanguage,
+                });
+                reportDiagnostics('recommended-dictionaries-welcome-auto-import-queued', {
+                    requestedLanguage,
+                    resolvedLanguage: decision.resolvedLanguage,
+                    queuedUrlCount: decision.urls.length,
+                });
+                await this.importFilesFromURLs(decision.urls.join('\n'), null, null);
+                return;
+        }
     }
 
     /**
@@ -579,36 +675,10 @@ export class DictionaryImportController {
 
     /** */
     async _renderRecommendedDictionaries() {
-        const url = '../../data/recommended-dictionaries.json';
         /** @type {string[]} */
         const diagnostics = [];
-        diagnostics.push(`source=${url}`);
-        /** @type {import('dictionary-recommended.js').RecommendedDictionaries|null} */
-        let recommendedDictionaries = null;
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                mode: 'no-cors',
-                cache: 'default',
-                credentials: 'omit',
-                redirect: 'follow',
-                referrerPolicy: 'no-referrer',
-            });
-            if (!response.ok) {
-                throw new Error(`Failed to fetch ${url}: ${response.status}`);
-            }
-            recommendedDictionaries = (await readResponseJson(response));
-            diagnostics.push('fetch=ok');
-        } catch (error) {
-            log.warn(`Using fallback recommended dictionaries due to fetch/parse error: ${toError(error).message}`);
-            diagnostics.push(`fetch=failed:${toError(error).message}`);
-        }
-        if (!(recommendedDictionaries && typeof recommendedDictionaries === 'object' && !Array.isArray(recommendedDictionaries))) {
-            recommendedDictionaries = this._getFallbackRecommendedDictionaries();
-            diagnostics.push('feed=fallback');
-        } else {
-            diagnostics.push('feed=extension-data');
-        }
+        const {recommendedDictionaries, source, url} = await this._loadRecommendedDictionaries();
+        diagnostics.push(`source=${url}`, `feed=${source}`);
 
         /** @type {import('dictionary-recommended.js').RecommendedDictionaryElementMap[]} */
         const recommendedDictionaryCategories = [
@@ -620,29 +690,7 @@ export class DictionaryImportController {
         ];
 
         const language = String((await this._settingsController.getOptions()).general.language || '').trim();
-        const languageCandidates = [];
-        if (language.length > 0) {
-            languageCandidates.push(language);
-            const baseLanguage = language.split('-')[0];
-            if (baseLanguage.length > 0 && baseLanguage !== language) {
-                languageCandidates.push(baseLanguage);
-            }
-        }
-        if (!languageCandidates.includes('ja')) {
-            languageCandidates.push('ja');
-        }
-        const categories = ['terms', 'kanji', 'frequency', 'grammar', 'pronunciation'];
-        let resolvedLanguage = languageCandidates.find((candidate) => candidate in recommendedDictionaries);
-        if (typeof resolvedLanguage === 'string') {
-            const languageConfig = /** @type {Record<string, unknown>} */ (recommendedDictionaries[resolvedLanguage]);
-            const hasAnyRecommendedEntries = categories.some((category) => {
-                const values = Reflect.get(languageConfig, category);
-                return Array.isArray(values) && values.length > 0;
-            });
-            if (!hasAnyRecommendedEntries && resolvedLanguage !== 'ja' && ('ja' in recommendedDictionaries)) {
-                resolvedLanguage = 'ja';
-            }
-        }
+        const resolvedLanguage = this._resolveRecommendedLanguage(language, recommendedDictionaries, true);
 
         if (typeof resolvedLanguage !== 'string') {
             diagnostics.push(`requestedLanguage="${language}" resolvedLanguage=none`);
@@ -669,25 +717,7 @@ export class DictionaryImportController {
             log.warn(`[recommended-dictionaries] getDictionaryInfo failed; continuing with empty installed set. ${e.message}`);
             diagnostics.push(`installedQuery=failed:${e.message}`);
         }
-        /** @type {Set<string>} */
-        const installedDictionaryNames = new Set();
-        /** @type {Set<string>} */
-        const installedDictionaryDownloadUrls = new Set();
-        for (const dictionary of installedDictionaries) {
-            if (!(typeof dictionary === 'object' && dictionary !== null && !Array.isArray(dictionary))) {
-                continue;
-            }
-            const titleValue = /** @type {unknown} */ (Reflect.get(dictionary, 'title'));
-            const downloadUrlValue = /** @type {unknown} */ (Reflect.get(dictionary, 'downloadUrl'));
-            const title = typeof titleValue === 'string' ? titleValue : '';
-            const downloadUrl = typeof downloadUrlValue === 'string' ? downloadUrlValue : '';
-            if (title.length > 0) {
-                installedDictionaryNames.add(title);
-            }
-            if (downloadUrl.length > 0) {
-                installedDictionaryDownloadUrls.add(downloadUrl);
-            }
-        }
+        const {installedDictionaryNames, installedDictionaryDownloadUrls} = this._getInstalledDictionaryLookupSets(installedDictionaries);
 
         /** @type {number} */
         let renderedRecommendationCount = 0;
@@ -698,19 +728,7 @@ export class DictionaryImportController {
             renderedRecommendationCount += dictionariesForCategory.length;
             this._renderRecommendedDictionaryGroup(dictionariesForCategory, element, installedDictionaryNames, installedDictionaryDownloadUrls);
         }
-
-        if (renderedRecommendationCount === 0 && resolvedLanguage !== 'ja' && ('ja' in recommendedDictionaries)) {
-            log.warn(`[recommended-dictionaries] zero entries for "${resolvedLanguage}", falling back to "ja"`);
-            for (const {property, element} of recommendedDictionaryCategories) {
-                const jaConfig = /** @type {Record<string, unknown>} */ (recommendedDictionaries.ja);
-                const values = Reflect.get(jaConfig, property);
-                const dictionariesForCategory = /** @type {import('dictionary-recommended.js').RecommendedDictionary[]} */ (Array.isArray(values) ? values : []);
-                this._renderRecommendedDictionaryGroup(dictionariesForCategory, element, installedDictionaryNames, installedDictionaryDownloadUrls);
-            }
-            diagnostics.push('renderedFrom=ja-fallback');
-        } else {
-            diagnostics.push(`renderedFrom=${resolvedLanguage}`);
-        }
+        diagnostics.push(`renderedFrom=${resolvedLanguage}`);
         log.log(`[recommended-dictionaries] resolvedLanguage="${resolvedLanguage}" renderedCount=${String(renderedRecommendationCount)}`);
         diagnostics.push(
             `requestedLanguage="${language}" resolvedLanguage="${resolvedLanguage}"`,
@@ -762,6 +780,192 @@ export class DictionaryImportController {
         if (!(container instanceof HTMLElement)) { return; }
         container.textContent = '';
         container.hidden = true;
+    }
+
+    /**
+     * @param {string} text
+     * @param {boolean} isError
+     */
+    _setWelcomeLanguageAutoImportStatus(text, isError) {
+        const container = this._welcomeLanguageAutoImportStatusContainer;
+        if (!(container instanceof HTMLElement)) { return; }
+        const message = text.trim();
+        container.hidden = message.length === 0;
+        container.textContent = message;
+        container.classList.toggle('danger-text', isError);
+    }
+
+    /**
+     * @returns {Promise<{recommendedDictionaries: import('dictionary-recommended.js').RecommendedDictionaries, source: 'extension-data'|'fallback', url: string}>}
+     */
+    async _loadRecommendedDictionaries() {
+        const url = '../../data/recommended-dictionaries.json';
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                mode: 'no-cors',
+                cache: 'default',
+                credentials: 'omit',
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ${url}: ${response.status}`);
+            }
+            const recommendedDictionaries = await readResponseJson(response);
+            if (recommendedDictionaries && typeof recommendedDictionaries === 'object' && !Array.isArray(recommendedDictionaries)) {
+                return {
+                    recommendedDictionaries: /** @type {import('dictionary-recommended.js').RecommendedDictionaries} */ (recommendedDictionaries),
+                    source: 'extension-data',
+                    url,
+                };
+            }
+            throw new Error('Invalid recommended dictionary feed format');
+        } catch (error) {
+            log.warn(`Using fallback recommended dictionaries due to fetch/parse error: ${toError(error).message}`);
+            return {
+                recommendedDictionaries: this._getFallbackRecommendedDictionaries(),
+                source: 'fallback',
+                url,
+            };
+        }
+    }
+
+    /**
+     * @param {string} requestedLanguage
+     * @param {import('dictionary-recommended.js').RecommendedDictionaries} recommendedDictionaries
+     * @param {boolean} allowJapaneseFallback
+     * @returns {string|null}
+     */
+    _resolveRecommendedLanguage(requestedLanguage, recommendedDictionaries, allowJapaneseFallback) {
+        const languageCandidates = [];
+        const language = requestedLanguage.trim();
+        if (language.length > 0) {
+            languageCandidates.push(language);
+            const baseLanguage = language.split('-')[0];
+            if (baseLanguage.length > 0 && baseLanguage !== language) {
+                languageCandidates.push(baseLanguage);
+            }
+        }
+        if (allowJapaneseFallback && !languageCandidates.includes('ja')) {
+            languageCandidates.push('ja');
+        }
+
+        let resolvedLanguage = languageCandidates.find((candidate) => candidate in recommendedDictionaries);
+        if (
+            allowJapaneseFallback &&
+            typeof resolvedLanguage === 'string' &&
+            resolvedLanguage !== 'ja' &&
+            this._getRecommendedDictionaryEntriesForLanguage(recommendedDictionaries, resolvedLanguage).length === 0 &&
+            ('ja' in recommendedDictionaries)
+        ) {
+            resolvedLanguage = 'ja';
+        }
+        return typeof resolvedLanguage === 'string' ? resolvedLanguage : null;
+    }
+
+    /**
+     * @param {import('dictionary-recommended.js').RecommendedDictionaries} recommendedDictionaries
+     * @param {string} resolvedLanguage
+     * @returns {import('dictionary-recommended.js').RecommendedDictionary[]}
+     */
+    _getRecommendedDictionaryEntriesForLanguage(recommendedDictionaries, resolvedLanguage) {
+        const languageConfig = /** @type {Record<string, unknown>} */ (recommendedDictionaries[resolvedLanguage]);
+        if (!(typeof languageConfig === 'object' && languageConfig !== null && !Array.isArray(languageConfig))) {
+            return [];
+        }
+        /** @type {import('dictionary-recommended.js').RecommendedDictionary[]} */
+        const results = [];
+        for (const category of RECOMMENDED_DICTIONARY_CATEGORIES) {
+            const valuesRaw = /** @type {unknown} */ (Reflect.get(languageConfig, category));
+            if (!Array.isArray(valuesRaw)) { continue; }
+            const values = /** @type {unknown[]} */ (valuesRaw);
+            for (const value of values) {
+                if (!(typeof value === 'object' && value !== null && !Array.isArray(value))) { continue; }
+                const dictionary = /** @type {Record<string, unknown>} */ (value);
+                const name = Reflect.get(dictionary, 'name');
+                const downloadUrl = Reflect.get(dictionary, 'downloadUrl');
+                const description = Reflect.get(dictionary, 'description');
+                const homepage = Reflect.get(dictionary, 'homepage');
+                if (!(typeof name === 'string' && typeof downloadUrl === 'string' && typeof description === 'string')) {
+                    continue;
+                }
+                results.push({
+                    name,
+                    downloadUrl,
+                    description,
+                    ...(typeof homepage === 'string' ? {homepage} : {}),
+                });
+            }
+        }
+        return results;
+    }
+
+    /**
+     * @param {import('dictionary-importer').Summary[]} installedDictionaries
+     * @returns {{installedDictionaryNames: Set<string>, installedDictionaryDownloadUrls: Set<string>}}
+     */
+    _getInstalledDictionaryLookupSets(installedDictionaries) {
+        /** @type {Set<string>} */
+        const installedDictionaryNames = new Set();
+        /** @type {Set<string>} */
+        const installedDictionaryDownloadUrls = new Set();
+        for (const dictionary of installedDictionaries) {
+            if (!(typeof dictionary === 'object' && dictionary !== null && !Array.isArray(dictionary))) {
+                continue;
+            }
+            const titleValue = /** @type {unknown} */ (Reflect.get(dictionary, 'title'));
+            const downloadUrlValue = /** @type {unknown} */ (Reflect.get(dictionary, 'downloadUrl'));
+            const title = typeof titleValue === 'string' ? titleValue : '';
+            const downloadUrl = typeof downloadUrlValue === 'string' ? downloadUrlValue : '';
+            if (title.length > 0) {
+                installedDictionaryNames.add(title);
+            }
+            if (downloadUrl.length > 0) {
+                installedDictionaryDownloadUrls.add(downloadUrl);
+            }
+        }
+        return {installedDictionaryNames, installedDictionaryDownloadUrls};
+    }
+
+    /**
+     * @param {string} requestedLanguage
+     * @param {import('dictionary-recommended.js').RecommendedDictionaries} recommendedDictionaries
+     * @param {import('dictionary-importer').Summary[]} installedDictionaries
+     * @returns {{status: 'ready', resolvedLanguage: string, urls: string[]}|{status: 'no-match', resolvedLanguage: null, urls: []}|{status: 'already-installed', resolvedLanguage: string, urls: []}}
+     */
+    _getWelcomeAutoImportDecision(requestedLanguage, recommendedDictionaries, installedDictionaries) {
+        const resolvedLanguage = this._resolveRecommendedLanguage(requestedLanguage, recommendedDictionaries, false);
+        if (resolvedLanguage === null) {
+            return {status: 'no-match', resolvedLanguage: null, urls: []};
+        }
+
+        const recommendations = this._getRecommendedDictionaryEntriesForLanguage(recommendedDictionaries, resolvedLanguage);
+        if (recommendations.length === 0) {
+            return {status: 'no-match', resolvedLanguage: null, urls: []};
+        }
+
+        const {installedDictionaryNames, installedDictionaryDownloadUrls} = this._getInstalledDictionaryLookupSets(installedDictionaries);
+        /** @type {Set<string>} */
+        const seenDownloadUrls = new Set();
+        /** @type {string[]} */
+        const urls = [];
+        for (const recommendation of recommendations) {
+            const downloadUrl = typeof recommendation.downloadUrl === 'string' ? recommendation.downloadUrl.trim() : '';
+            if (downloadUrl.length === 0 || seenDownloadUrls.has(downloadUrl)) { continue; }
+            seenDownloadUrls.add(downloadUrl);
+
+            const dictionaryName = typeof recommendation.name === 'string' ? recommendation.name : '';
+            if (installedDictionaryNames.has(dictionaryName) || installedDictionaryDownloadUrls.has(downloadUrl)) {
+                continue;
+            }
+            urls.push(downloadUrl);
+        }
+
+        if (urls.length === 0) {
+            return {status: 'already-installed', resolvedLanguage, urls: []};
+        }
+        return {status: 'ready', resolvedLanguage, urls};
     }
 
     /**
