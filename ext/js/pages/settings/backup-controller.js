@@ -17,6 +17,7 @@
  */
 
 import {ThemeController} from '../../app/theme-controller.js';
+import {clearDiagnosticsLogSnapshot, getDiagnosticsLogSnapshot} from '../../core/diagnostics-reporter.js';
 import {parseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {isObjectNotArray} from '../../core/object-utilities.js';
@@ -26,6 +27,8 @@ import {OptionsUtil} from '../../data/options-util.js';
 import {getAllPermissions} from '../../data/permissions-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryController} from './dictionary-controller.js';
+
+const STARTUP_DIAGNOSTICS_STORAGE_KEY = 'manabitanStartupDiagnostics';
 
 export class BackupController {
     /**
@@ -88,6 +91,9 @@ export class BackupController {
         this._addNodeEventListener('#settings-export-db-button', 'click', this._onSettingsExportDatabaseClick.bind(this), false);
         this._addNodeEventListener('#settings-import-db-button', 'click', this._onSettingsImportDatabaseClick.bind(this), false);
         this._addNodeEventListener('#settings-import-db', 'change', this._onSettingsImportDatabaseChange.bind(this), false);
+        this._addNodeEventListener('#diagnostics-copy-button', 'click', this._onDiagnosticsCopyClick.bind(this), false);
+        this._addNodeEventListener('#diagnostics-download-button', 'click', this._onDiagnosticsDownloadClick.bind(this), false);
+        this._addNodeEventListener('#diagnostics-clear-button', 'click', this._onDiagnosticsClearClick.bind(this), false);
     }
 
     // Private
@@ -191,6 +197,140 @@ export class BackupController {
 
         a.dispatchEvent(new MouseEvent('click'));
         setTimeout(revoke, 60000);
+    }
+
+    /**
+     * @param {string} message
+     * @param {boolean} [isError]
+     */
+    _setDiagnosticsExportStatus(message, isError = false) {
+        const node = document.querySelector('#diagnostics-export-status');
+        if (!(node instanceof HTMLElement)) { return; }
+        node.textContent = message;
+        node.style.color = isError ? '#8B0000' : '';
+    }
+
+    /**
+     * @param {string[]|string} keys
+     * @returns {Promise<Record<string, unknown>>}
+     */
+    async _storageLocalGet(keys) {
+        const localStorageArea = chrome.storage?.local;
+        if (!isObjectNotArray(localStorageArea) || typeof localStorageArea.get !== 'function') {
+            return {};
+        }
+        return await new Promise((resolve, reject) => {
+            localStorageArea.get(keys, (result) => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || 'storage.local.get failed'));
+                    return;
+                }
+                resolve(/** @type {Record<string, unknown>} */ (result || {}));
+            });
+        });
+    }
+
+    /**
+     * @param {Date} date
+     * @returns {Promise<Record<string, unknown>>}
+     */
+    async _getDiagnosticsExportData(date) {
+        let environment = null;
+        try {
+            environment = await this._settingsController.application.api.getEnvironmentInfo();
+        } catch (e) {
+            environment = {error: toError(e).message};
+        }
+
+        let dictionaryInfo = null;
+        try {
+            dictionaryInfo = await this._settingsController.application.api.getDictionaryInfo();
+        } catch (e) {
+            dictionaryInfo = {error: toError(e).message};
+        }
+
+        const storageSnapshot = await this._storageLocalGet([STARTUP_DIAGNOSTICS_STORAGE_KEY]);
+        const startupDiagnostics = Reflect.get(storageSnapshot, STARTUP_DIAGNOSTICS_STORAGE_KEY) ?? null;
+        const diagnosticsLogSnapshot = await getDiagnosticsLogSnapshot();
+
+        return {
+            schemaVersion: 1,
+            date: this._getSettingsExportDateString(date, '-', ' ', ':', 6),
+            url: chrome.runtime.getURL('/'),
+            manifest: chrome.runtime.getManifest(),
+            userAgent: navigator.userAgent,
+            environment,
+            dictionaryInfo,
+            startupDiagnostics,
+            diagnostics: diagnosticsLogSnapshot,
+        };
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _onDiagnosticsCopyClick() {
+        const date = new Date(Date.now());
+        try {
+            const data = await this._getDiagnosticsExportData(date);
+            const content = JSON.stringify(data, null, 2);
+            if (!isObjectNotArray(navigator) || !isObjectNotArray(navigator.clipboard) || typeof navigator.clipboard.writeText !== 'function') {
+                throw new Error('Clipboard API unavailable; use Download Diagnostics instead.');
+            }
+            await navigator.clipboard.writeText(content);
+            const entryCount = (
+                typeof data.diagnostics === 'object' &&
+                data.diagnostics !== null &&
+                typeof Reflect.get(data.diagnostics, 'entryCount') === 'number'
+            ) ?
+                /** @type {number} */ (Reflect.get(data.diagnostics, 'entryCount')) :
+                0;
+            this._setDiagnosticsExportStatus(`Copied diagnostics JSON to clipboard (${String(entryCount)} log entries).`);
+        } catch (e) {
+            const message = toError(e).message;
+            log.error(e);
+            this._setDiagnosticsExportStatus(`Copy failed: ${message}`, true);
+        }
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _onDiagnosticsDownloadClick() {
+        const date = new Date(Date.now());
+        try {
+            const data = await this._getDiagnosticsExportData(date);
+            const fileName = `manabitan-diagnostics-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            this._saveBlob(blob, fileName);
+            const entryCount = (
+                typeof data.diagnostics === 'object' &&
+                data.diagnostics !== null &&
+                typeof Reflect.get(data.diagnostics, 'entryCount') === 'number'
+            ) ?
+                /** @type {number} */ (Reflect.get(data.diagnostics, 'entryCount')) :
+                0;
+            this._setDiagnosticsExportStatus(`Downloaded ${fileName} (${String(entryCount)} log entries).`);
+        } catch (e) {
+            const message = toError(e).message;
+            log.error(e);
+            this._setDiagnosticsExportStatus(`Download failed: ${message}`, true);
+        }
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _onDiagnosticsClearClick() {
+        try {
+            await clearDiagnosticsLogSnapshot();
+            this._setDiagnosticsExportStatus('Cleared local diagnostics log history.');
+        } catch (e) {
+            const message = toError(e).message;
+            log.error(e);
+            this._setDiagnosticsExportStatus(`Clear failed: ${message}`, true);
+        }
     }
 
     /** */

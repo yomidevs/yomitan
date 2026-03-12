@@ -115,10 +115,11 @@ export class API {
     /**
      * @param {import('api').ApiParam<'getAnkiNoteInfo', 'notes'>} notes
      * @param {import('api').ApiParam<'getAnkiNoteInfo', 'fetchAdditionalInfo'>} fetchAdditionalInfo
+     * @param {import('api').ApiParam<'getAnkiNoteInfo', 'fetchDuplicateNoteIds'>} fetchDuplicateNoteIds
      * @returns {Promise<import('api').ApiReturn<'getAnkiNoteInfo'>>}
      */
-    getAnkiNoteInfo(notes, fetchAdditionalInfo) {
-        return this._invoke('getAnkiNoteInfo', {notes, fetchAdditionalInfo});
+    getAnkiNoteInfo(notes, fetchAdditionalInfo, fetchDuplicateNoteIds = true) {
+        return this._invoke('getAnkiNoteInfo', {notes, fetchAdditionalInfo, fetchDuplicateNoteIds});
     }
 
     /**
@@ -246,6 +247,47 @@ export class API {
      */
     getDictionaryInfo() {
         return this._invoke('getDictionaryInfo', void 0);
+    }
+
+    /**
+     * @param {import('api').ApiParam<'deleteDictionaryByTitle', 'dictionaryTitle'>} dictionaryTitle
+     * @returns {Promise<import('api').ApiReturn<'deleteDictionaryByTitle'>>}
+     */
+    deleteDictionaryByTitle(dictionaryTitle) {
+        return this._invoke('deleteDictionaryByTitle', {dictionaryTitle});
+    }
+
+    /**
+     * @param {import('api').ApiParam<'getDictionaryCounts', 'dictionaryNames'>} dictionaryNames
+     * @param {import('api').ApiParam<'getDictionaryCounts', 'getTotal'>} getTotal
+     * @returns {Promise<import('api').ApiReturn<'getDictionaryCounts'>>}
+     */
+    getDictionaryCounts(dictionaryNames, getTotal) {
+        return this._invoke('getDictionaryCounts', {dictionaryNames, getTotal});
+    }
+
+    /**
+     * @param {import('api').ApiParam<'checkDictionaryUpdates', 'dictionaryTitles'>} [dictionaryTitles]
+     * @returns {Promise<import('api').ApiReturn<'checkDictionaryUpdates'>>}
+     */
+    checkDictionaryUpdates(dictionaryTitles) {
+        return this._invoke('checkDictionaryUpdates', typeof dictionaryTitles === 'undefined' ? {} : {dictionaryTitles});
+    }
+
+    /**
+     * @param {import('api').ApiParam<'updateDictionaryByTitle', 'dictionaryTitle'>} dictionaryTitle
+     * @returns {Promise<import('api').ApiReturn<'updateDictionaryByTitle'>>}
+     */
+    updateDictionaryByTitle(dictionaryTitle) {
+        return this._invoke('updateDictionaryByTitle', {dictionaryTitle});
+    }
+
+    /**
+     * @param {import('api').ApiParam<'setDictionaryImportMode', 'active'>} active
+     * @returns {Promise<import('api').ApiReturn<'setDictionaryImportMode'>>}
+     */
+    setDictionaryImportMode(active) {
+        return this._invoke('setDictionaryImportMode', {active});
     }
 
     /**

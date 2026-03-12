@@ -16,11 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {afterAll, describe, expect, test} from 'vitest';
+import {afterAll, describe, expect, test, vi} from 'vitest';
 import {DictionaryImportController, ImportProgressTracker} from '../ext/js/pages/settings/dictionary-import-controller.js';
 import {setupDomTest} from './fixtures/dom-test.js';
 
 const testEnv = await setupDomTest();
+afterAll(async () => {
+    await testEnv.teardown(global);
+});
 
 /**
  * @param {Document} document
@@ -69,12 +72,58 @@ function getUrlImportSteps() {
     return getUrlImportStepsMethod.call(context);
 }
 
-describe('Dictionary import progress steps', () => {
-    const {window, teardown} = testEnv;
+/**
+ * @param {Partial<import('dictionary-recommended.js').LanguageRecommendedDictionaries>} [overrides]
+ * @returns {import('dictionary-recommended.js').LanguageRecommendedDictionaries}
+ */
+function createLanguageRecommendations(overrides = {}) {
+    return {
+        terms: [],
+        kanji: [],
+        frequency: [],
+        grammar: [],
+        pronunciation: [],
+        ...overrides,
+    };
+}
 
-    afterAll(async () => {
-        await teardown(global);
-    });
+/**
+ * @returns {DictionaryImportController}
+ */
+function createControllerForInternalTests() {
+    return /** @type {DictionaryImportController} */ (Object.create(DictionaryImportController.prototype));
+}
+
+/**
+ * @param {Document} document
+ * @param {string} value
+ * @returns {HTMLSelectElement}
+ */
+function createLanguageSelect(document, value) {
+    const select = document.createElement('select');
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = value;
+    select.appendChild(option);
+    select.value = value;
+    return select;
+}
+
+/**
+ * @param {string} name
+ * @returns {Function}
+ * @throws {Error}
+ */
+function getDictionaryImportControllerMethod(name) {
+    const method = /** @type {unknown} */ (Reflect.get(DictionaryImportController.prototype, name));
+    if (typeof method !== 'function') {
+        throw new Error(`Expected DictionaryImportController.${name} to be a function`);
+    }
+    return method;
+}
+
+describe('Dictionary import progress steps', () => {
+    const {window} = testEnv;
 
     test('File and URL import steps exclude validation phase', () => {
         const fileImportSteps = getFileImportSteps();
@@ -122,5 +171,131 @@ describe('Dictionary import progress steps', () => {
 
         tracker.onProgress({nextStep: true, index: 0, count: 0});
         expect(infoLabel.textContent).toBe('Importing dictionary - Step 5 of 5: Finalizing import...');
+    });
+});
+
+describe('Welcome recommended dictionary auto import', () => {
+    const {window} = testEnv;
+    const resolveRecommendedLanguage = /** @type {(requestedLanguage: string, recommendedDictionaries: import('dictionary-recommended.js').RecommendedDictionaries, allowJapaneseFallback: boolean) => string | null} */ (getDictionaryImportControllerMethod('_resolveRecommendedLanguage'));
+    const getWelcomeAutoImportDecision = /** @type {(requestedLanguage: string, recommendedDictionaries: import('dictionary-recommended.js').RecommendedDictionaries, installedDictionaries: import('dictionary-importer').Summary[]) => {status: string, resolvedLanguage: string | null, urls: string[]}} */ (getDictionaryImportControllerMethod('_getWelcomeAutoImportDecision'));
+    const onWelcomeLanguageSelectChanged = /** @type {(event: Event) => Promise<void>} */ (getDictionaryImportControllerMethod('_onWelcomeLanguageSelectChanged'));
+
+    test('resolves exact and base language without Japanese fallback', () => {
+        const controller = createControllerForInternalTests();
+        const recommended = {
+            en: createLanguageRecommendations({terms: [{name: 'A', downloadUrl: 'https://example.invalid/a.zip', description: 'A'}]}),
+            ja: createLanguageRecommendations({terms: [{name: 'J', downloadUrl: 'https://example.invalid/j.zip', description: 'J'}]}),
+        };
+
+        const exact = resolveRecommendedLanguage.call(controller, 'en', recommended, false);
+        const base = resolveRecommendedLanguage.call(controller, 'en-US', recommended, false);
+        const none = resolveRecommendedLanguage.call(controller, 'fr-CA', recommended, false);
+
+        expect(exact).toBe('en');
+        expect(base).toBe('en');
+        expect(none).toBeNull();
+    });
+
+    test('does not fallback to Japanese for welcome auto import', () => {
+        const controller = createControllerForInternalTests();
+        const recommended = {
+            ja: createLanguageRecommendations({terms: [{name: 'Jitendex', downloadUrl: 'https://example.invalid/jitendex.zip', description: 'J'}]}),
+        };
+        const decision = getWelcomeAutoImportDecision.call(controller, 'fr', recommended, []);
+        expect(decision.status).toBe('no-match');
+    });
+
+    test('flattens categories, de-duplicates URLs, and skips installed dictionaries', () => {
+        const controller = createControllerForInternalTests();
+        const recommended = {
+            en: createLanguageRecommendations({
+                terms: [
+                    {name: 'A', downloadUrl: 'https://example.invalid/a.zip', description: 'A'},
+                    {name: 'B', downloadUrl: 'https://example.invalid/b.zip', description: 'B'},
+                ],
+                kanji: [
+                    {name: 'B-duplicate', downloadUrl: 'https://example.invalid/b.zip', description: 'B2'},
+                ],
+                frequency: [
+                    {name: 'F', downloadUrl: 'https://example.invalid/f.zip', description: 'F'},
+                ],
+                pronunciation: [
+                    {name: 'P', downloadUrl: 'https://example.invalid/p.zip', description: 'P'},
+                ],
+            }),
+        };
+        const installed = /** @type {import('dictionary-importer').Summary[]} */ (/** @type {unknown} */ ([
+            {title: 'B', downloadUrl: 'https://example.invalid/b.zip'},
+            {title: 'already-url', downloadUrl: 'https://example.invalid/p.zip'},
+        ]));
+
+        const decision = getWelcomeAutoImportDecision.call(controller, 'en-US', recommended, installed);
+        expect(decision.status).toBe('ready');
+        if (decision.status !== 'ready') {
+            throw new Error(`Expected ready status, got ${decision.status}`);
+        }
+        expect(decision.resolvedLanguage).toBe('en');
+        expect(decision.urls).toStrictEqual([
+            'https://example.invalid/a.zip',
+            'https://example.invalid/f.zip',
+        ]);
+    });
+
+    test('returns already-installed when all recommendations are already present', () => {
+        const controller = createControllerForInternalTests();
+        const recommended = {
+            en: createLanguageRecommendations({
+                terms: [
+                    {name: 'A', downloadUrl: 'https://example.invalid/a.zip', description: 'A'},
+                ],
+            }),
+        };
+        const installed = /** @type {import('dictionary-importer').Summary[]} */ (/** @type {unknown} */ ([
+            {title: 'A', downloadUrl: 'https://example.invalid/a.zip'},
+        ]));
+        const decision = getWelcomeAutoImportDecision.call(controller, 'en', recommended, installed);
+        expect(decision.status).toBe('already-installed');
+    });
+
+    test('change handler does not auto-import outside welcome page', async () => {
+        const controller = createControllerForInternalTests();
+        Reflect.set(controller, '_welcomeLanguageAutoImportEnabled', false);
+        const importFilesFromURLs = vi.fn().mockResolvedValue(void 0);
+        Reflect.set(controller, 'importFilesFromURLs', importFilesFromURLs);
+
+        const select = createLanguageSelect(window.document, 'en');
+        await onWelcomeLanguageSelectChanged.call(controller, /** @type {Event} */ (/** @type {unknown} */ ({currentTarget: select})));
+
+        expect(importFilesFromURLs).not.toHaveBeenCalled();
+    });
+
+    test('change handler shows no-match status and does not import', async () => {
+        const controller = createControllerForInternalTests();
+        Reflect.set(controller, '_welcomeLanguageAutoImportEnabled', true);
+        Reflect.set(controller, '_modifying', false);
+        Reflect.set(controller, '_settingsController', {
+            getDictionaryInfo: vi.fn().mockResolvedValue([]),
+        });
+        Reflect.set(controller, '_loadRecommendedDictionaries', vi.fn().mockResolvedValue({
+            recommendedDictionaries: {
+                ja: createLanguageRecommendations({
+                    terms: [{name: 'Jitendex', downloadUrl: 'https://example.invalid/jitendex.zip', description: 'J'}],
+                }),
+            },
+            source: 'extension-data',
+            url: '../../data/recommended-dictionaries.json',
+        }));
+        const setWelcomeLanguageAutoImportStatus = vi.fn();
+        Reflect.set(controller, '_setWelcomeLanguageAutoImportStatus', setWelcomeLanguageAutoImportStatus);
+        const importFilesFromURLs = vi.fn().mockResolvedValue(void 0);
+        Reflect.set(controller, 'importFilesFromURLs', importFilesFromURLs);
+
+        const select = createLanguageSelect(window.document, 'de');
+        await onWelcomeLanguageSelectChanged.call(controller, /** @type {Event} */ (/** @type {unknown} */ ({currentTarget: select})));
+
+        expect(importFilesFromURLs).not.toHaveBeenCalled();
+        const lastCall = setWelcomeLanguageAutoImportStatus.mock.calls.at(-1);
+        expect(lastCall?.[0]).toContain('No recommended dictionaries are currently available');
+        expect(lastCall?.[0]).toContain('"de"');
     });
 });

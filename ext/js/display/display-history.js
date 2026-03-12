@@ -20,6 +20,9 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
 import {generateId} from '../core/utilities.js';
 
+const DISPLAY_HISTORY_MAX_ENTRIES = 32;
+const DISPLAY_HISTORY_MAX_CONTENT_ENTRIES = 2;
+
 /**
  * @augments EventDispatcher<import('display-history').Events>
  */
@@ -36,6 +39,10 @@ export class DisplayHistory extends EventDispatcher {
         this._useBrowserHistory = useBrowserHistory;
         /** @type {Map<string, import('display-history').Entry>} */
         this._historyMap = new Map();
+        /** @type {number} */
+        this._maxEntries = DISPLAY_HISTORY_MAX_ENTRIES;
+        /** @type {number} */
+        this._maxContentEntries = DISPLAY_HISTORY_MAX_CONTENT_ENTRIES;
 
         /** @type {unknown} */
         const historyState = history.state;
@@ -123,6 +130,7 @@ export class DisplayHistory extends EventDispatcher {
         const entry = this._createHistoryEntry(null, url, state, content, this._current);
         this._current.next = entry;
         this._current = entry;
+        this._pruneHistory();
         this._updateHistoryFromCurrent(!this._useBrowserHistory);
     }
 
@@ -137,6 +145,7 @@ export class DisplayHistory extends EventDispatcher {
         this._current.url = url;
         this._current.state = state;
         this._current.content = content;
+        this._pruneHistoryContent();
         this._updateHistoryFromCurrent(true);
     }
 
@@ -250,5 +259,54 @@ export class DisplayHistory extends EventDispatcher {
         this._historyMap.set(this._current.id, this._current);
         this._current.next = null;
         this._current.previous = null;
+    }
+
+    /** */
+    _pruneHistory() {
+        let depth = 1;
+        /** @type {import('display-history').Entry|null} */
+        let entry = this._current;
+        while (entry !== null) {
+            if (depth >= this._maxEntries) {
+                const dropHead = entry.previous;
+                if (dropHead !== null) {
+                    entry.previous = null;
+                    /** @type {import('display-history').Entry|null} */
+                    let node = dropHead;
+                    while (node !== null) {
+                        this._historyMap.delete(node.id);
+                        /** @type {import('display-history').Entry|null} */
+                        const previous = node.previous;
+                        node.previous = null;
+                        node.next = null;
+                        node = previous;
+                    }
+                }
+                break;
+            }
+            entry = entry.previous;
+            ++depth;
+        }
+        this._pruneHistoryContent();
+    }
+
+    /** */
+    _pruneHistoryContent() {
+        let depth = 1;
+        /** @type {import('display-history').Entry|null} */
+        let entry = this._current;
+        while (entry !== null) {
+            if (depth > this._maxContentEntries && isObjectNotArray(entry.content)) {
+                const content = /** @type {Record<string, unknown>} */ (entry.content);
+                if (Array.isArray(content.dictionaryEntries)) {
+                    entry.content = {
+                        ...content,
+                        dictionaryEntries: void 0,
+                    };
+                }
+            }
+            entry = entry.previous;
+            ++depth;
+        }
     }
 }

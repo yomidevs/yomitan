@@ -19,7 +19,19 @@
 import {ExtensionError} from '../core/extension-error.js';
 import {deferPromise, sanitizeCSS} from '../core/utilities.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {cloneFieldMarkerPattern, getRootDeckName} from './anki-util.js';
+import {cloneFieldMarkerPattern, getRootDeckName, stringContainsAnyFieldMarker} from './anki-util.js';
+
+const exactFieldMarkerPattern = /^\{([\p{Letter}\p{Number}_-]+)\}$/u;
+const htmlEscapePattern = /[&<>"'`=]/g;
+const htmlEscapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    '\'': '&#x27;',
+    '`': '&#x60;',
+    '=': '&#x3D;',
+};
 
 export class AnkiNoteBuilder {
     /**
@@ -59,16 +71,7 @@ export class AnkiNoteBuilder {
         mediaOptions = null,
         dictionaryStylesMap = new Map(),
     }) {
-        const {deck: deckName, model: modelName, fields: fieldsSettings} = cardFormat;
-        const fields = Object.entries(fieldsSettings);
-        let duplicateScopeDeckName = null;
-        let duplicateScopeCheckChildren = false;
-        if (duplicateScope === 'deck-root') {
-            duplicateScope = 'deck';
-            duplicateScopeDeckName = getRootDeckName(deckName);
-            duplicateScopeCheckChildren = true;
-        }
-
+        const fields = this._getCardFormatFields(cardFormat);
         /** @type {Error[]} */
         const allErrors = [];
         let media;
@@ -80,17 +83,8 @@ export class AnkiNoteBuilder {
             }
         }
 
-        // Make URL field blank if URL source is Yomitan
-        try {
-            const url = new URL(context.url);
-            if (url.protocol === new URL(import.meta.url).protocol) {
-                context.url = '';
-            }
-        } catch (e) {
-            // Ignore
-        }
-
-        const commonData = this._createData(dictionaryEntry, cardFormat, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
+        const normalizedContext = this._normalizeContext(context);
+        const commonData = this._createData(dictionaryEntry, cardFormat, normalizedContext, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
         const formattedFieldValuePromises = [];
         for (const [, {value: fieldValue}] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template);
@@ -114,23 +108,100 @@ export class AnkiNoteBuilder {
             }
         }
 
-        /** @type {import('anki').Note} */
-        const note = {
-            fields: noteFields,
-            tags,
-            deckName,
-            modelName,
-            options: {
-                allowDuplicate: true,
-                duplicateScope,
-                duplicateScopeOptions: {
-                    deckName: duplicateScopeDeckName,
-                    checkChildren: duplicateScopeCheckChildren,
-                    checkAllModels: duplicateScopeCheckAllModels,
-                },
-            },
-        };
+        const note = this._createBaseNote(cardFormat, tags, duplicateScope, duplicateScopeCheckAllModels, noteFields);
         return {note, errors: allErrors, requirements: [...uniqueRequirements.values()]};
+    }
+
+    /**
+     * Creates a minimal note for duplicate checks using only the first configured field.
+     * @param {import('anki-note-builder').CreateDuplicateCheckNoteDetails} details
+     * @returns {Promise<import('anki').Note>}
+     */
+    async createDuplicateCheckNote({
+        dictionaryEntry,
+        cardFormat,
+        context,
+        template,
+        tags = [],
+        duplicateScope = 'collection',
+        duplicateScopeCheckAllModels = false,
+        resultOutputMode = 'split',
+        glossaryLayoutMode = 'default',
+        compactTags = false,
+        dictionaryStylesMap = new Map(),
+    }) {
+        const fastNote = this.createDuplicateCheckNoteFast({
+            dictionaryEntry,
+            cardFormat,
+            tags,
+            duplicateScope,
+            duplicateScopeCheckAllModels,
+            resultOutputMode,
+        });
+        if (fastNote !== null) {
+            return fastNote;
+        }
+
+        const fields = this._getCardFormatFields(cardFormat);
+        /** @type {import('anki').NoteFields} */
+        const noteFields = {};
+
+        if (fields.length > 0) {
+            const [fieldName, {value: fieldValue}] = fields[0];
+            const normalizedContext = this._normalizeContext(context);
+            const commonData = this._createData(
+                dictionaryEntry,
+                cardFormat,
+                normalizedContext,
+                resultOutputMode,
+                glossaryLayoutMode,
+                compactTags,
+                void 0,
+                dictionaryStylesMap,
+            );
+            const {value} = await this._formatField(fieldValue, commonData, template);
+            noteFields[fieldName] = value;
+        }
+
+        return this._createBaseNote(cardFormat, tags, duplicateScope, duplicateScopeCheckAllModels, noteFields);
+    }
+
+    /**
+     * Attempts to create a duplicate-check note without template rendering.
+     * Returns `null` when the first field requires template evaluation.
+     * @param {object} details
+     * @param {import('dictionary').DictionaryEntry} details.dictionaryEntry
+     * @param {import('settings').AnkiCardFormat} details.cardFormat
+     * @param {string[]} [details.tags]
+     * @param {import('settings').AnkiDuplicateScope} [details.duplicateScope]
+     * @param {boolean} [details.duplicateScopeCheckAllModels]
+     * @param {import('settings').ResultOutputMode} [details.resultOutputMode]
+     * @returns {import('anki').Note|null}
+     */
+    createDuplicateCheckNoteFast({
+        dictionaryEntry,
+        cardFormat,
+        tags = [],
+        duplicateScope = 'collection',
+        duplicateScopeCheckAllModels = false,
+        resultOutputMode = 'split',
+    }) {
+        const fields = this._getCardFormatFields(cardFormat);
+        /** @type {import('anki').NoteFields} */
+        const noteFields = {};
+        if (fields.length > 0) {
+            const [fieldName, {value: fieldValue}] = fields[0];
+            const fastValue = this._getFastDuplicateCheckFieldValue(fieldValue, dictionaryEntry, resultOutputMode);
+            if (typeof fastValue === 'string') {
+                noteFields[fieldName] = fastValue;
+            } else if (!stringContainsAnyFieldMarker(fieldValue)) {
+                noteFields[fieldName] = fieldValue;
+            } else {
+                return null;
+            }
+        }
+
+        return this._createBaseNote(cardFormat, tags, duplicateScope, duplicateScopeCheckAllModels, noteFields);
     }
 
     /**
@@ -198,6 +269,108 @@ export class AnkiNoteBuilder {
     }
 
     // Private
+
+    /**
+     * @param {import('settings').AnkiCardFormat} cardFormat
+     * @returns {import('anki-note-builder').Field[]}
+     */
+    _getCardFormatFields(cardFormat) {
+        return Object.entries(cardFormat.fields);
+    }
+
+    /**
+     * @param {string} fieldValue
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+     * @param {import('settings').ResultOutputMode} resultOutputMode
+     * @returns {string|undefined}
+     */
+    _getFastDuplicateCheckFieldValue(fieldValue, dictionaryEntry, resultOutputMode) {
+        const match = exactFieldMarkerPattern.exec(fieldValue);
+        if (match === null) { return void 0; }
+
+        const marker = match[1];
+        switch (marker) {
+            case 'character':
+                return dictionaryEntry.type === 'kanji' ? escapeAnkiFieldValue(dictionaryEntry.character) : void 0;
+            case 'expression':
+                return dictionaryEntry.type === 'term' ? this._getFastTermExpressionFieldValue(dictionaryEntry, resultOutputMode) : void 0;
+            default:
+                return void 0;
+        }
+    }
+
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('settings').ResultOutputMode} resultOutputMode
+     * @returns {string}
+     */
+    _getFastTermExpressionFieldValue(dictionaryEntry, resultOutputMode) {
+        const uniqueTerms = [];
+        const termSet = new Set();
+        for (const {term} of dictionaryEntry.headwords) {
+            if (termSet.has(term)) { continue; }
+            termSet.add(term);
+            uniqueTerms.push(term);
+        }
+
+        return escapeAnkiFieldValue(
+            resultOutputMode === 'merge' ?
+                uniqueTerms.join('、') :
+                (uniqueTerms[0] ?? ''),
+        );
+    }
+
+    /**
+     * @param {import('anki-templates-internal').Context} context
+     * @returns {import('anki-templates-internal').Context}
+     */
+    _normalizeContext(context) {
+        const normalizedContext = {...context};
+        try {
+            const url = new URL(normalizedContext.url);
+            if (url.protocol === new URL(import.meta.url).protocol) {
+                normalizedContext.url = '';
+            }
+        } catch (e) {
+            // Ignore
+        }
+        return normalizedContext;
+    }
+
+    /**
+     * @param {import('settings').AnkiCardFormat} cardFormat
+     * @param {string[]} tags
+     * @param {import('settings').AnkiDuplicateScope} duplicateScope
+     * @param {boolean} duplicateScopeCheckAllModels
+     * @param {import('anki').NoteFields} fields
+     * @returns {import('anki').Note}
+     */
+    _createBaseNote(cardFormat, tags, duplicateScope, duplicateScopeCheckAllModels, fields) {
+        const {deck: deckName, model: modelName} = cardFormat;
+        let duplicateScopeDeckName = null;
+        let duplicateScopeCheckChildren = false;
+        if (duplicateScope === 'deck-root') {
+            duplicateScope = 'deck';
+            duplicateScopeDeckName = getRootDeckName(deckName);
+            duplicateScopeCheckChildren = true;
+        }
+
+        return {
+            fields,
+            tags,
+            deckName,
+            modelName,
+            options: {
+                allowDuplicate: true,
+                duplicateScope,
+                duplicateScopeOptions: {
+                    deckName: duplicateScopeDeckName,
+                    checkChildren: duplicateScopeCheckChildren,
+                    checkAllModels: duplicateScopeCheckAllModels,
+                },
+            },
+        };
+    }
 
     /**
      * @param {import('dictionary').DictionaryEntry} dictionaryEntry
@@ -602,4 +775,15 @@ function convertReading(reading, readingMode) {
 function getReading(text, reading, readingMode, readingOverride) {
     const shouldOverride = readingOverride?.type === 'term' && readingOverride.term === text && readingOverride.reading.length > 0;
     return convertReading(shouldOverride ? readingOverride.reading : reading, readingMode);
+}
+
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+function escapeAnkiFieldValue(value) {
+    return value.replace(
+        htmlEscapePattern,
+        (character) => htmlEscapeMap[/** @type {keyof typeof htmlEscapeMap} */ (character)],
+    );
 }

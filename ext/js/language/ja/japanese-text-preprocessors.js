@@ -21,8 +21,10 @@ import {
     collapseEmphaticSequences as collapseEmphaticSequencesFunction,
     convertAlphanumericToFullWidth,
     convertFullWidthAlphanumericToNormal,
+    convertExplicitKanjiDuplicationToIterationMarks as convertExplicitKanjiDuplicationToIterationMarksFunction,
     convertHalfWidthKanaToFullWidth,
     convertHiraganaToKatakana as convertHiraganaToKatakanaFunction,
+    convertIterationMarksToExplicitKanji as convertIterationMarksToExplicitKanjiFunction,
     convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
     normalizeCJKCompatibilityCharacters as normalizeCJKCompatibilityCharactersFunction,
     normalizeCombiningCharacters as normalizeCombiningCharactersFunction,
@@ -75,6 +77,23 @@ export const convertHiraganaToKatakana = {
                 return convertHiraganaToKatakanaFunction(str);
             case 'inverse':
                 return convertKatakanaToHiraganaFunction(str);
+        }
+    },
+};
+
+/** @type {import('language').BidirectionalConversionPreprocessor} */
+export const convertIterationMarksToKanjiDuplication = {
+    name: 'Convert iteration marks to explicit kanji duplication',
+    description: '瑞々しい → 瑞瑞しい and vice versa',
+    options: ['off', 'direct', 'inverse'],
+    process: (str, setting) => {
+        switch (setting) {
+            case 'off':
+                return str;
+            case 'direct':
+                return convertIterationMarksToExplicitKanjiFunction(str);
+            case 'inverse':
+                return convertExplicitKanjiDuplicationToIterationMarksFunction(str);
         }
     },
 };

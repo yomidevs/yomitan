@@ -26,6 +26,14 @@ import {MultiLanguageTransformer} from './multi-language-transformer.js';
 import {isCodePointChinese} from './zh/chinese.js';
 
 /**
+ * @param {number} codePoint
+ * @returns {boolean}
+ */
+function isCodePointAsciiDigit(codePoint) {
+    return codePoint >= 0x30 && codePoint <= 0x39;
+}
+
+/**
  * Class which finds term and kanji dictionary entries for text.
  */
 export class Translator {
@@ -39,6 +47,10 @@ export class Translator {
         this._multiLanguageTransformer = new MultiLanguageTransformer();
         /** @type {import('translator').DictionaryTagCache} */
         this._tagCache = new Map();
+        /** @type {number} */
+        this._tagCacheMaxDictionaries = 32;
+        /** @type {number} */
+        this._tagCacheMaxEntriesPerDictionary = 512;
         /** @type {Intl.Collator} */
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
         /** @type {RegExp} */
@@ -645,7 +657,12 @@ export class Translator {
         let length = 0;
         for (const c of text) {
             const codePoint = /** @type {number} */ (c.codePointAt(0));
-            if (!isCodePointJapanese(codePoint) && !isCodePointChinese(codePoint) && !isCodePointKorean(codePoint)) {
+            if (
+                !isCodePointJapanese(codePoint) &&
+                !isCodePointChinese(codePoint) &&
+                !isCodePointKorean(codePoint) &&
+                !isCodePointAsciiDigit(codePoint)
+            ) {
                 return text.substring(0, length);
             }
             length += c.length;
@@ -1067,16 +1084,15 @@ export class Translator {
         }
 
         const nonCachedItems = [];
-        const tagCache = this._tagCache;
         for (const [dictionary, dictionaryItems] of targetMap.entries()) {
-            let cache = tagCache.get(dictionary);
-            if (typeof cache === 'undefined') {
-                cache = new Map();
-                tagCache.set(dictionary, cache);
-            }
+            const cache = this._getOrCreateTagDictionaryCache(dictionary);
             for (const item of dictionaryItems.values()) {
-                const databaseTag = cache.get(item.query);
+                const {query} = item;
+                const databaseTag = cache.get(query);
                 if (typeof databaseTag !== 'undefined') {
+                    // Maintain LRU order for dictionary-local cache.
+                    cache.delete(query);
+                    cache.set(query, databaseTag);
                     item.databaseTag = databaseTag;
                 } else {
                     item.cache = cache;
@@ -1094,7 +1110,7 @@ export class Translator {
                 const databaseTag2 = typeof databaseTag !== 'undefined' ? databaseTag : null;
                 item.databaseTag = databaseTag2;
                 if (item.cache !== null) {
-                    item.cache.set(item.query, databaseTag2);
+                    this._setTagDictionaryCacheEntry(item.cache, item.query, databaseTag2);
                 }
             }
         }
@@ -1464,6 +1480,60 @@ export class Translator {
     _getNameBase(name) {
         const pos = name.indexOf(':');
         return (pos >= 0 ? name.substring(0, pos) : name);
+    }
+
+    /**
+     * @param {string} dictionary
+     * @returns {import('translator').TagCache}
+     */
+    _getOrCreateTagDictionaryCache(dictionary) {
+        const tagCache = this._tagCache;
+        let cache = tagCache.get(dictionary);
+        if (typeof cache !== 'undefined') {
+            // Maintain LRU order for dictionary-level cache.
+            tagCache.delete(dictionary);
+            tagCache.set(dictionary, cache);
+            return cache;
+        }
+        cache = new Map();
+        tagCache.set(dictionary, cache);
+        this._evictTagDictionaryCaches();
+        return cache;
+    }
+
+    /**
+     * @param {import('translator').TagCache} cache
+     * @param {string} query
+     * @param {?import('dictionary-database').Tag} value
+     */
+    _setTagDictionaryCacheEntry(cache, query, value) {
+        if (cache.has(query)) {
+            cache.delete(query);
+        }
+        cache.set(query, value);
+        this._evictTagDictionaryCacheEntries(cache);
+    }
+
+    /** */
+    _evictTagDictionaryCaches() {
+        const maxDictionaries = Math.max(1, Math.trunc(this._tagCacheMaxDictionaries));
+        while (this._tagCache.size > maxDictionaries) {
+            const oldestDictionary = this._tagCache.keys().next();
+            if (oldestDictionary.done) { break; }
+            this._tagCache.delete(oldestDictionary.value);
+        }
+    }
+
+    /**
+     * @param {import('translator').TagCache} cache
+     */
+    _evictTagDictionaryCacheEntries(cache) {
+        const maxEntries = Math.max(1, Math.trunc(this._tagCacheMaxEntriesPerDictionary));
+        while (cache.size > maxEntries) {
+            const oldestQuery = cache.keys().next();
+            if (oldestQuery.done) { break; }
+            cache.delete(oldestQuery.value);
+        }
     }
 
     /**

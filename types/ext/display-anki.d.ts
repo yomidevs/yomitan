@@ -39,11 +39,9 @@ export type DictionaryEntryDetails = {
 
 export type DictionaryEntryNoteDetails = {
     cardFormat: Settings.AnkiCardFormat;
-    note: Anki.Note;
-    errors: Error[];
-    requirements: AnkiNoteBuilder.Requirement[];
     canAdd: boolean;
     valid: boolean;
+    isDuplicate: boolean;
     /**
      * Anki IDs of duplicate notes. May contain INVALID_NOTE_ID for notes whose ID could not be found.
      */

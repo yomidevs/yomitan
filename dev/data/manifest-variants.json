@@ -69,6 +69,7 @@
         },
         "permissions": [
             "storage",
+            "alarms",
             "clipboardWrite",
             "unlimitedStorage",
             "declarativeNetRequest",

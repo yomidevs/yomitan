@@ -28,6 +28,10 @@ import {Builder, Browser, By, Key, until} from 'selenium-webdriver';
 import * as firefox from 'selenium-webdriver/firefox.js';
 import {parseJson} from '../../ext/js/core/json.js';
 import {safePerformance} from '../../ext/js/core/safe-performance.js';
+import {
+    autoUpdateDictionaryFixtureSettings,
+    createAutoUpdateDictionaryFixture,
+} from '../e2e/dictionary-auto-update-fixture.js';
 import {writeCombinedTabbedReport} from '../e2e/report-tabs.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,6 +40,8 @@ const dictionaryCacheDir = path.join(root, 'builds', 'e2e-dictionary-cache');
 const wagahaiHtmlPath = path.join(root, 'test', 'firefox', 'data', 'wagahai-neko.html');
 const fallbackJmdictUrl = 'https://github.com/yomidevs/jmdict-yomitan/releases/latest/download/JMdict_english.zip';
 const execFileAsync = promisify(execFile);
+const autoUpdateStateStorageKey = 'manabitanDictionaryAutoUpdateState';
+const autoUpdateAlarmName = 'manabitanDictionaryAutoUpdateHourly';
 
 /**
  * @param {number} value
@@ -131,9 +137,8 @@ function startFirefoxResourceSampler(firefoxPid) {
  */
 async function getFirefoxProcessId(driver) {
     try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const capabilities = await driver.getCapabilities();
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const rawPid = capabilities.get('moz:processID');
         const processId = Number(rawPid);
         if (Number.isFinite(processId) && processId > 0) {
@@ -209,7 +214,7 @@ async function beginPageProfilePhase(driver) {
  */
 async function endPageProfilePhase(driver) {
     // Selenium executeScript return value is untyped (`any`).
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const summary = await driver.executeScript(`
         const state = globalThis.__manabitanE2EPageProfiler;
         if (!state || typeof state !== 'object') {
@@ -244,7 +249,6 @@ async function endPageProfilePhase(driver) {
         return {longTaskCount, longTaskTotalMs, longTaskPeakMs, topMeasures, topLongTasks};
     `);
     if (typeof summary === 'object' && summary !== null && !Array.isArray(summary)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const normalized = /** @type {Record<string, unknown>} */ (summary);
         const normalizeTopMeasureEntries = (entries) => {
             if (!Array.isArray(entries)) { return []; }
@@ -352,15 +356,81 @@ async function startE2ELocalServer(paths) {
     const wagahaiHtml = await readFile(wagahaiHtmlPath);
     const jitendexZip = await readFile(paths.jitendexPath);
     const jmdictZip = await readFile(paths.jmdictPath);
+    /** @type {null|Awaited<ReturnType<typeof createAutoUpdateDictionaryFixture>>} */
+    let autoUpdateFixture = null;
+    /** @type {'v1'|'v2'} */
+    let autoUpdateVersion = 'v1';
+    let autoUpdateConditional304 = false;
+    /** @type {Array<{method: string, path: string, headers: Record<string, string|string[]|undefined>}>} */
+    let autoUpdateRequests = [];
     const server = createServer((request, response) => {
         const requestUrl = request.url || '/';
+        const method = String(request.method || 'GET').toUpperCase();
         const headers = {
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, OPTIONS',
+            'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
         };
-        if (request.method === 'OPTIONS') {
+        if (method === 'OPTIONS') {
             response.writeHead(204, headers);
             response.end();
+            return;
+        }
+        if (autoUpdateFixture !== null && (
+            requestUrl === autoUpdateFixture.oldIndexPath ||
+            requestUrl === autoUpdateFixture.newIndexPath ||
+            requestUrl === autoUpdateFixture.oldArchivePath ||
+            requestUrl === autoUpdateFixture.newArchivePath
+        )) {
+            autoUpdateRequests.push({
+                method,
+                path: requestUrl,
+                headers: {...request.headers},
+            });
+            const getVersionHeaders = (versionKey) => ({
+                ETag: versionKey === 'v2' ? autoUpdateFixture.newEtag : autoUpdateFixture.oldEtag,
+                'Last-Modified': versionKey === 'v2' ? autoUpdateFixture.newLastModified : autoUpdateFixture.oldLastModified,
+            });
+            const validatorMatches = (versionHeaders) => (
+                request.headers['if-none-match'] === versionHeaders.ETag &&
+                request.headers['if-modified-since'] === versionHeaders['Last-Modified']
+            );
+            if (requestUrl === autoUpdateFixture.oldArchivePath) {
+                response.writeHead(200, {
+                    ...headers,
+                    'Content-Type': 'application/zip',
+                    'Content-Length': String(autoUpdateFixture.versions.v1.archiveBuffer.byteLength),
+                });
+                response.end(autoUpdateFixture.versions.v1.archiveBuffer);
+                return;
+            }
+            if (requestUrl === autoUpdateFixture.newArchivePath) {
+                response.writeHead(200, {
+                    ...headers,
+                    'Content-Type': 'application/zip',
+                    'Content-Length': String(autoUpdateFixture.versions.v2.archiveBuffer.byteLength),
+                });
+                response.end(autoUpdateFixture.versions.v2.archiveBuffer);
+                return;
+            }
+            const versionKey = requestUrl === autoUpdateFixture.newIndexPath ? 'v2' : autoUpdateVersion;
+            const versionHeaders = getVersionHeaders(versionKey);
+            if (autoUpdateConditional304 && validatorMatches(versionHeaders)) {
+                response.writeHead(304, {...headers, ...versionHeaders});
+                response.end();
+                return;
+            }
+            const body = JSON.stringify(autoUpdateFixture.versions[versionKey].indexContent);
+            response.writeHead(200, {
+                ...headers,
+                ...versionHeaders,
+                'Content-Type': 'application/json; charset=utf-8',
+                'Content-Length': String(Buffer.byteLength(body)),
+            });
+            if (method === 'HEAD') {
+                response.end();
+                return;
+            }
+            response.end(body);
             return;
         }
         if (requestUrl === '/dictionaries/jitendex.zip') {
@@ -405,6 +475,28 @@ async function startE2ELocalServer(paths) {
     }
     return {
         baseUrl: `http://127.0.0.1:${String(address.port)}`,
+        setAutoUpdateFixture(fixture) {
+            autoUpdateFixture = fixture;
+            autoUpdateVersion = 'v1';
+            autoUpdateConditional304 = false;
+            autoUpdateRequests = [];
+        },
+        setAutoUpdateVersion(version) {
+            autoUpdateVersion = version;
+        },
+        setAutoUpdateConditional304(enabled) {
+            autoUpdateConditional304 = enabled;
+        },
+        clearAutoUpdateRequests() {
+            autoUpdateRequests = [];
+        },
+        getAutoUpdateRequests() {
+            return autoUpdateRequests.map((requestInfo) => ({
+                method: requestInfo.method,
+                path: requestInfo.path,
+                headers: {...requestInfo.headers},
+            }));
+        },
         close: async () => {
             await new Promise((resolve, reject) => {
                 server.close((error) => {
@@ -467,6 +559,9 @@ function getUnsupportedRuntimeSkipReason(message) {
     const text = String(message);
     if (text.includes('OPFS is required but unavailable') || text.includes('no such vfs: opfs')) {
         return 'Firefox automation runtime does not expose OPFS VFS in this local Selenium stack; skipping this lane locally without enabling any OPFS fallback.';
+    }
+    if (text.includes('background.service_worker is currently disabled')) {
+        return 'Firefox automation runtime does not support MV3 background service workers in this local Selenium/browser stack; skipping this lane locally.';
     }
     return '';
 }
@@ -668,7 +763,7 @@ function renderReportHtml(report) {
  */
 async function getImportProgressLabel(driver) {
     // Selenium executeScript return value is untyped (`any`).
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const value = await driver.executeScript(`
         const selectors = [
             '#recommended-dictionaries-modal .dictionary-import-progress',
@@ -703,7 +798,7 @@ async function getDictionaryCountsText(driver) {
  */
 async function getDictionaryErrorText(driver) {
     // Selenium executeScript return value is untyped (`any`).
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const value = await driver.executeScript(`
         const node = document.querySelector('#dictionary-error');
         if (!(node instanceof HTMLElement) || node.hidden) { return ''; }
@@ -718,7 +813,7 @@ async function getDictionaryErrorText(driver) {
  */
 async function getLastImportDebug(driver) {
     // Selenium executeScript return value is untyped (`any`).
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const value = await driver.executeScript('return globalThis.__manabitanLastImportDebug ?? null;');
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         return /** @type {Record<string, unknown>} */ (value);
@@ -732,7 +827,7 @@ async function getLastImportDebug(driver) {
  */
 async function getMockSeenUrls(driver) {
     // Selenium executeScript return value is untyped (`any`).
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const value = await driver.executeScript('return Array.isArray(globalThis.__manabitanMockSeenUrls) ? globalThis.__manabitanMockSeenUrls.slice(-8) : [];');
     return Array.isArray(value) ? value.map(String) : [];
 }
@@ -851,7 +946,7 @@ async function waitForExtensionBaseUrl(driver) {
  */
 async function clickWithScroll(driver, selector) {
     // Selenium's JS-only API surfaces `any` for located elements.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const element = await driver.findElement(By.css(selector));
     await driver.executeScript(`
         const element = arguments[0];
@@ -873,7 +968,7 @@ async function installRecommendedDictionary(driver, dictionaryName) {
     await driver.wait(until.elementLocated(By.css('#recommended-dictionaries-modal')), 30_000);
     await driver.wait(async () => {
         // Selenium's executeScript return value is untyped (`any`).
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const names = await driver.executeScript(`
             return Array.from(document.querySelectorAll('#recommended-dictionaries-modal .settings-item-label'))
                 .map((node) => (node.textContent || '').trim());
@@ -881,7 +976,7 @@ async function installRecommendedDictionary(driver, dictionaryName) {
         return Array.isArray(names) && names.includes(dictionaryName);
     }, 30_000, `Expected recommended dictionary to render: ${dictionaryName}`);
     // Selenium executeScript return value is untyped (`any`).
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const importUrl = await driver.executeScript(`
         const dictionaryName = arguments[0];
         const items = Array.from(document.querySelectorAll('#recommended-dictionaries-modal .settings-item'));
@@ -922,7 +1017,7 @@ async function closeModalIfOpen(driver, modalSelector) {
     `, modalSelector);
     await driver.wait(async () => {
         // Selenium executeScript return value is untyped (`any`).
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const hidden = await driver.executeScript(`
             const modal = document.querySelector(arguments[0]);
             return (modal instanceof HTMLElement) ? modal.hidden : true;
@@ -937,7 +1032,7 @@ async function closeModalIfOpen(driver, modalSelector) {
  */
 async function openInstalledDictionariesModal(driver) {
     // Selenium executeScript return value is untyped (`any`).
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const triggerDescription = await driver.executeScript(`
         const isHidden = (element) => {
             if (!(element instanceof HTMLElement)) { return true; }
@@ -967,7 +1062,7 @@ async function openInstalledDictionariesModal(driver) {
     `);
     await driver.wait(async () => {
         // Selenium executeScript return value is untyped (`any`).
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const open = await driver.executeScript(`
             const dictionariesModal = document.querySelector('#dictionaries-modal');
             const recommendedModal = document.querySelector('#recommended-dictionaries-modal');
@@ -997,7 +1092,7 @@ async function openSearchPageViaActionPopup(driver, extensionBaseUrl) {
     await driver.get(`${extensionBaseUrl}/action-popup.html`);
     await driver.wait(async () => {
         // Selenium executeScript return value is untyped (`any`).
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const loaded = await driver.executeScript('return document.body?.dataset?.loaded === "true";');
         return loaded === true;
     }, 30_000, 'Expected action popup to finish loading');
@@ -1028,36 +1123,42 @@ async function openSearchPageViaActionPopup(driver, extensionBaseUrl) {
  * @param {string} term
  * @param {string[]} expectedDictionaryNames
  * @param {number} [timeoutMs]
+ * @param {'enter'|'button'} [submitMode]
  * @returns {Promise<Record<string, number>>}
  */
-async function searchTermAndGetDictionaryHitCounts(driver, term, expectedDictionaryNames, timeoutMs = 60_000) {
+async function searchTermAndGetDictionaryHitCounts(driver, term, expectedDictionaryNames, timeoutMs = 60_000, submitMode = 'enter') {
     await driver.wait(async () => {
         // Selenium executeScript return value is untyped (`any`).
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const submitted = await driver.executeScript(`
             const textbox = document.querySelector('#search-textbox');
             const searchButton = document.querySelector('#search-button');
+            const submitMode = String(arguments[1] || 'enter');
             if (!(textbox instanceof HTMLTextAreaElement)) { return false; }
             textbox.value = '';
             textbox.dispatchEvent(new Event('input', {bubbles: true, cancelable: true}));
             textbox.value = String(arguments[0] || '');
             textbox.dispatchEvent(new Event('input', {bubbles: true, cancelable: true}));
-            textbox.dispatchEvent(new KeyboardEvent('keydown', {
-                bubbles: true,
-                cancelable: true,
-                key: 'Enter',
-                code: 'Enter',
-            }));
-            if (searchButton instanceof HTMLElement) {
+            if (submitMode === 'button') {
+                if (!(searchButton instanceof HTMLElement)) { return false; }
                 searchButton.dispatchEvent(new MouseEvent('click', {
                     bubbles: true,
                     cancelable: true,
                     composed: true,
                     button: 0,
                 }));
+            } else if (submitMode === 'enter') {
+                textbox.dispatchEvent(new KeyboardEvent('keydown', {
+                    bubbles: true,
+                    cancelable: true,
+                    key: 'Enter',
+                    code: 'Enter',
+                }));
+            } else {
+                return false;
             }
             return true;
-        `, term);
+        `, term, submitMode);
         return submitted === true;
     }, 30_000, 'Expected search textbox and button to be available on search page');
 
@@ -1066,7 +1167,7 @@ async function searchTermAndGetDictionaryHitCounts(driver, term, expectedDiction
     let lastCounts = Object.fromEntries(expectedDictionaryNames.map((name) => [name, 0]));
     while (safePerformance.now() < deadline) {
         // Selenium executeScript return value is untyped (`any`).
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const counts = await driver.executeScript(`
             const dictionaryEntries = document.querySelector('#dictionary-entries');
             if (!(dictionaryEntries instanceof HTMLElement)) {
@@ -1092,7 +1193,7 @@ async function searchTermAndGetDictionaryHitCounts(driver, term, expectedDiction
         `, expectedDictionaryNames);
         if (typeof counts === 'object' && counts !== null) {
             // Selenium executeScript return value is untyped (`any`).
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
             const countRecord = /** @type {Record<string, unknown>} */ (counts);
             const normalizedCounts = /** @type {Record<string, number>} */ ({});
             for (const [key, value] of Object.entries(countRecord)) {
@@ -1115,7 +1216,7 @@ async function searchTermAndGetDictionaryHitCounts(driver, term, expectedDiction
  */
 async function getSearchPageDiagnostics(driver) {
     // Selenium executeScript return value is untyped (`any`).
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const diagnostics = await driver.executeScript(`
         const noResults = document.querySelector('#no-results');
         const noDictionaries = document.querySelector('#no-dictionaries');
@@ -1147,7 +1248,7 @@ async function getSearchPageDiagnostics(driver) {
  */
 async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictionaryNames) {
     await driver.get(pageUrl);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const targetElement = /** @type {import('selenium-webdriver').WebElement} */ (await driver.wait(until.elementLocated(By.css(targetSelector)), 30_000));
     await driver.executeScript(`
         const target = arguments[0];
@@ -1155,7 +1256,6 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
             target.scrollIntoView({block: 'center', inline: 'center'});
         }
     `, targetElement);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const moveOrigin = /** @type {import('selenium-webdriver').WebElement} */ (targetElement);
     /** @type {Array<string|null>} */
     const modifierCandidates = [Key.SHIFT, Key.ALT, Key.CONTROL, null];
@@ -1165,16 +1265,13 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
             await driver.actions({async: true}).keyDown(modifier).perform();
         }
         try {
-            /* eslint-disable @typescript-eslint/no-unsafe-assignment */
             await driver.actions({async: true}).move({origin: moveOrigin, x: -12, y: -8}).perform();
             await driver.actions({async: true})
                 .move({origin: moveOrigin, x: 2, y: 2})
                 .move({origin: moveOrigin, x: 10, y: 2, duration: 220})
                 .perform();
-            /* eslint-enable @typescript-eslint/no-unsafe-assignment */
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
             const visibleWithModifier = await driver.wait(async () => {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const frames = /** @type {import('selenium-webdriver').WebElement[]} */ (await driver.findElements(By.css('iframe.yomitan-popup')));
                 for (const frame of frames) {
                     if (await frame.isDisplayed()) { return true; }
@@ -1193,13 +1290,10 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
         fail('Expected yomitan popup iframe to appear after hover scan');
     }
     try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const frames = /** @type {import('selenium-webdriver').WebElement[]} */ (await driver.findElements(By.css('iframe.yomitan-popup')));
-        /** @type {import('selenium-webdriver').WebElement|null} */
         let popupFrame = null;
         for (const frame of frames) {
             if (await frame.isDisplayed()) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 popupFrame = frame;
                 break;
             }
@@ -1227,7 +1321,7 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
  */
 async function getBackendLookupDiagnostics(driver, term) {
     // Selenium executeAsyncScript return value is untyped (`any`).
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const diagnostics = await driver.executeAsyncScript(`
         const done = arguments[arguments.length - 1];
         const send = (action, params) => new Promise((resolve, reject) => {
@@ -1349,82 +1443,15 @@ function summarizeDictionaryInfoHealth(dictionaryInfoEntries) {
 
 /**
  * @param {import('selenium-webdriver').ThenableWebDriver} driver
- * @returns {Promise<void>}
- */
-async function purgeDictionaryDatabase(driver) {
-    await driver.executeAsyncScript(`
-        const done = arguments[arguments.length - 1];
-        const send = (action, params) => new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({action, params}, (response) => {
-                const runtimeError = chrome.runtime.lastError;
-                if (runtimeError) {
-                    reject(new Error(runtimeError.message || String(runtimeError)));
-                    return;
-                }
-                if (response && typeof response === 'object' && 'error' in response) {
-                    reject(new Error(JSON.stringify(response.error)));
-                    return;
-                }
-                resolve(response && typeof response === 'object' ? response.result : response);
-            });
-        });
-        (async () => {
-            await send('purgeDatabase', undefined);
-            const optionsFull = await send('optionsGetFull', undefined);
-            if (!(optionsFull && typeof optionsFull === 'object' && Array.isArray(optionsFull.profiles))) {
-                throw new Error('optionsGetFull returned unexpected payload');
-            }
-            const nextOptions = structuredClone(optionsFull);
-            for (const profile of nextOptions.profiles) {
-                if (!profile || typeof profile !== 'object') { continue; }
-                if (!profile.options || typeof profile.options !== 'object') { continue; }
-                profile.options.dictionaries = [];
-                if (profile.options.general && typeof profile.options.general === 'object') {
-                    profile.options.general.enable = true;
-                }
-                if (profile.options.scanning && typeof profile.options.scanning === 'object') {
-                    profile.options.scanning.enableOnSearchPage = true;
-                    profile.options.scanning.scanWithoutMousemove = true;
-                    const inputs = Array.isArray(profile.options.scanning.inputs) ? profile.options.scanning.inputs : [];
-                    if (inputs.length > 0 && inputs[0] && typeof inputs[0] === 'object') {
-                        inputs[0].include = 'shift';
-                        inputs[0].exclude = 'mouse0';
-                        if (inputs[0].options && typeof inputs[0].options === 'object') {
-                            inputs[0].options.searchTerms = true;
-                            inputs[0].options.searchKanji = true;
-                        }
-                    }
-                }
-            }
-            await send('setAllSettings', {value: nextOptions, source: 'firefox-e2e'});
-            done({ok: true});
-        })().catch((e) => {
-            done({error: String(e && e.message ? e.message : e)});
-        });
-    `).then((result) => {
-        if (!(typeof result === 'object' && result !== null && !Array.isArray(result) && result.ok === true)) {
-            fail(`purgeDatabase failed: ${JSON.stringify(result)}`);
-        }
-    });
-}
-
-/**
- * @param {import('selenium-webdriver').ThenableWebDriver} driver
  * @param {Record<string, unknown>} recommendedDictionaries
  * @returns {Promise<void>}
  */
 async function installRecommendedDictionariesMock(driver, recommendedDictionaries) {
     await driver.executeScript(`
         const data = structuredClone(arguments[0]);
-        const archiveContentBase64ByToken = arguments[1] || {};
-        localStorage.setItem('manabitanE2eArchiveMap', JSON.stringify(archiveContentBase64ByToken));
-        const existingFlags = Reflect.get(globalThis, 'manabitanImportPerformanceFlags');
-        const normalizedFlags = (typeof existingFlags === 'object' && existingFlags !== null && !Array.isArray(existingFlags)) ? existingFlags : {};
-        Reflect.set(globalThis, 'manabitanImportPerformanceFlags', {
-            ...normalizedFlags,
-            debugImportLogging: true,
-        });
-        Reflect.set(globalThis, 'manabitanImportUseSession', false);
+        // Force per-dictionary imports for Firefox E2E to avoid session-final export failures
+        // that can leave settings populated while term data is missing.
+        globalThis.manabitanImportUseSession = false;
 
         const originalFetch = window.fetch.bind(window);
         globalThis.__manabitanMockSeenUrls = [];
@@ -1445,6 +1472,627 @@ async function installRecommendedDictionariesMock(driver, recommendedDictionarie
             return originalFetch(input, init);
         };
     `, recommendedDictionaries);
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string} language
+ * @returns {Promise<void>}
+ */
+async function setWelcomeLanguage(driver, language) {
+    // Selenium executeScript return value is untyped (`any`).
+
+    const result = await driver.executeScript(`
+        const nextLanguage = String(arguments[0] || '');
+        const select = document.querySelector('#language-select');
+        if (!(select instanceof HTMLSelectElement)) {
+            return {ok: false, error: 'Language selector not found'};
+        }
+        const hasOption = Array.from(select.options).some((option) => option.value === nextLanguage);
+        if (!hasOption) {
+            return {ok: false, error: \`Language option not found: \${nextLanguage}\`};
+        }
+        select.value = nextLanguage;
+        select.dispatchEvent(new Event('change', {bubbles: true}));
+        return {ok: true};
+    `, language);
+    if (!(result && typeof result === 'object' && !Array.isArray(result) && result.ok === true)) {
+        throw new Error(`Unable to set welcome language: ${String(result?.error || 'unknown error')}`);
+    }
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @returns {Promise<string>}
+ */
+async function getWelcomeAutoImportStatusText(driver) {
+    // Selenium executeScript return value is untyped (`any`).
+
+    const value = await driver.executeScript(`
+        const node = document.querySelector('#welcome-language-auto-import-status');
+        if (!(node instanceof HTMLElement) || node.hidden) { return ''; }
+        return (node.textContent || '').trim();
+    `);
+    return typeof value === 'string' ? value : '';
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string} expectedText
+ * @param {number} timeoutMs
+ * @returns {Promise<string>}
+ */
+async function waitForWelcomeAutoImportStatus(driver, expectedText, timeoutMs = 30000) {
+    const deadline = safePerformance.now() + timeoutMs;
+    let lastText = '';
+    while (safePerformance.now() < deadline) {
+        lastText = await getWelcomeAutoImportStatusText(driver);
+        if (lastText.includes(expectedText)) {
+            return lastText;
+        }
+        await driver.sleep(250);
+    }
+    fail(`Timed out waiting for welcome auto-import status containing "${expectedText}". lastText="${lastText}"`);
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @returns {Promise<boolean>}
+ */
+async function welcomeHasRecommendedDictionariesButton(driver) {
+    // Selenium executeScript return value is untyped (`any`).
+
+    const value = await driver.executeScript(`
+        const node = document.querySelector('[data-modal-action="show,recommended-dictionaries"]');
+        return node instanceof HTMLElement && !node.hidden;
+    `);
+    return value === true;
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @returns {Promise<{ok: boolean, dictionaryCount: number|null, error: string|null}>}
+ */
+async function checkBackendApiAvailability(driver) {
+    // Selenium executeAsyncScript return value is untyped (`any`).
+
+    const result = await driver.executeAsyncScript(`
+        const done = arguments[arguments.length - 1];
+        const send = (action, params) => new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({action, params}, (response) => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || String(runtimeError)));
+                    return;
+                }
+                if (response && typeof response === 'object' && 'error' in response) {
+                    reject(new Error(JSON.stringify(response.error)));
+                    return;
+                }
+                resolve(response && typeof response === 'object' ? response.result : response);
+            });
+        });
+        (async () => {
+            const dictionaryInfo = await send('getDictionaryInfo', undefined);
+            done({
+                ok: true,
+                dictionaryCount: Array.isArray(dictionaryInfo) ? dictionaryInfo.length : null,
+                error: null,
+            });
+        })().catch((e) => {
+            done({
+                ok: false,
+                dictionaryCount: null,
+                error: String(e && e.message ? e.message : e),
+            });
+        });
+    `);
+    if (!(typeof result === 'object' && result !== null && !Array.isArray(result))) {
+        return {ok: false, dictionaryCount: null, error: `Unexpected backend preflight payload: ${String(result)}`};
+    }
+    // Selenium executeAsyncScript return value is untyped (`any`).
+
+    const resultRecord = /** @type {Record<string, unknown>} */ (result);
+    const dictionaryCountValue = resultRecord.dictionaryCount;
+    const errorValue = resultRecord.error;
+    return {
+        ok: resultRecord.ok === true,
+        dictionaryCount: Number.isFinite(Number(dictionaryCountValue)) ? Number(dictionaryCountValue) : null,
+        error: typeof errorValue === 'string' ? errorValue : null,
+    };
+}
+
+async function sendRuntimeMessage(driver, action, params = void 0) {
+    return await driver.executeAsyncScript(`
+        const [action, params, done] = arguments;
+        chrome.runtime.sendMessage({action, params}, (response) => {
+            const runtimeError = chrome.runtime.lastError;
+            if (runtimeError) {
+                done({ok: false, error: runtimeError.message || String(runtimeError)});
+                return;
+            }
+            if (response && typeof response === 'object' && 'error' in response) {
+                done({ok: false, error: JSON.stringify(response.error)});
+                return;
+            }
+            done({
+                ok: true,
+                result: response && typeof response === 'object' ? response.result : response,
+            });
+        });
+    `, action, params).then((payload) => {
+        if (!(payload && typeof payload === 'object' && !Array.isArray(payload))) {
+            throw new Error(`Unexpected runtime message payload: ${String(payload)}`);
+        }
+        if (payload.ok !== true) {
+            throw new Error(String(payload.error || 'Unknown runtime message error'));
+        }
+        return payload.result;
+    });
+}
+
+async function getOptionsFullRuntime(driver) {
+    return await sendRuntimeMessage(driver, 'optionsGetFull', void 0);
+}
+
+async function getDictionaryInfoRuntime(driver) {
+    return await sendRuntimeMessage(driver, 'getDictionaryInfo', void 0);
+}
+
+async function setAllSettingsRuntime(driver, value, source) {
+    await sendRuntimeMessage(driver, 'setAllSettings', {value, source});
+}
+
+async function getStorageLocalRecord(driver, key) {
+    return await driver.executeAsyncScript(`
+        const [storageKey, done] = arguments;
+        chrome.storage.local.get([storageKey], (result) => {
+            const runtimeError = chrome.runtime.lastError;
+            if (runtimeError) {
+                done({ok: false, error: runtimeError.message || String(runtimeError)});
+                return;
+            }
+            done({ok: true, result: result?.[storageKey] ?? null});
+        });
+    `, key).then((payload) => {
+        if (!(payload && typeof payload === 'object' && !Array.isArray(payload))) {
+            throw new Error(`Unexpected storage payload: ${String(payload)}`);
+        }
+        if (payload.ok !== true) {
+            throw new Error(String(payload.error || 'Unknown storage error'));
+        }
+        return payload.result;
+    });
+}
+
+async function setStorageLocalRecord(driver, key, value) {
+    await driver.executeAsyncScript(`
+        const [storageKey, storageValue, done] = arguments;
+        chrome.storage.local.set({[storageKey]: storageValue}, () => {
+            const runtimeError = chrome.runtime.lastError;
+            if (runtimeError) {
+                done({ok: false, error: runtimeError.message || String(runtimeError)});
+                return;
+            }
+            done({ok: true});
+        });
+    `, key, value).then((payload) => {
+        if (!(payload && typeof payload === 'object' && !Array.isArray(payload))) {
+            throw new Error(`Unexpected storage-set payload: ${String(payload)}`);
+        }
+        if (payload.ok !== true) {
+            throw new Error(String(payload.error || 'Unknown storage set error'));
+        }
+    });
+}
+
+async function waitForImportCompletionBasic(driver, dictionaryName, timeoutMs = 300000) {
+    const deadline = safePerformance.now() + timeoutMs;
+    let sawStepText = false;
+    let emptySince = null;
+    while (safePerformance.now() < deadline) {
+        const errorText = await getDictionaryErrorText(driver);
+        if (errorText.length > 0) {
+            fail(`${dictionaryName} import reported error before completion: ${errorText}`);
+        }
+        const label = await getImportProgressLabel(driver);
+        if (label.includes('Step ')) {
+            sawStepText = true;
+            emptySince = null;
+        }
+        if (sawStepText && label.length === 0) {
+            emptySince ??= safePerformance.now();
+            if ((safePerformance.now() - emptySince) >= 2000) {
+                return;
+            }
+        }
+        await driver.sleep(250);
+    }
+    fail(`Timed out waiting for ${dictionaryName} import completion`);
+}
+
+async function openDictionaryDetailsModal(driver, dictionaryName) {
+    await driver.executeScript(`
+        const targetName = arguments[0];
+        const aliases = Array.from(document.querySelectorAll('#dictionary-list .dictionary-alias'));
+        const targetIndex = aliases.findIndex((aliasNode) => {
+            const text = (aliasNode.textContent || '').trim();
+            return text.length > 0 && text !== 'All' && text !== 'Unassociated Data' && (
+                text === targetName ||
+                text.startsWith(\`\${targetName} \`) ||
+                text.startsWith(\`\${targetName}.\`) ||
+                text.includes(targetName)
+            );
+        });
+        if (targetIndex < 0) {
+            throw new Error(\`Unable to find installed dictionary row for "\${targetName}"\`);
+        }
+        const menuButtons = Array.from(document.querySelectorAll('#dictionary-list .dictionary-menu-button'));
+        const menuButton = menuButtons[targetIndex];
+        if (!(menuButton instanceof HTMLElement)) {
+            throw new Error(\`Unable to find dictionary menu button for "\${targetName}"\`);
+        }
+        menuButton.click();
+    `, dictionaryName);
+    await driver.wait(async () => {
+        const visible = await driver.executeScript(`
+            const menus = Array.from(document.querySelectorAll('.popup-menu-container'));
+            return menus.some((menuNode) => (
+                menuNode instanceof HTMLElement &&
+                !menuNode.hidden &&
+                menuNode.querySelector('.popup-menu-item[data-menu-action="showDetails"]') !== null
+            ));
+        `);
+        return visible === true;
+    }, 30_000, 'Expected dictionary action menu to be visible');
+    await driver.executeScript(`
+        const menu = Array.from(document.querySelectorAll('.popup-menu-container')).find((menuNode) => (
+            menuNode instanceof HTMLElement &&
+            !menuNode.hidden &&
+            menuNode.querySelector('.popup-menu-item[data-menu-action="showDetails"]') !== null
+        ));
+        if (!(menu instanceof HTMLElement)) {
+            throw new Error('Dictionary action menu did not become visible');
+        }
+        const detailsButton = menu.querySelector('.popup-menu-item[data-menu-action="showDetails"]');
+        if (!(detailsButton instanceof HTMLElement)) {
+            throw new Error('Dictionary action menu is missing showDetails button');
+        }
+        detailsButton.click();
+    `);
+    await driver.wait(until.elementLocated(By.css('#dictionary-details-modal')), 30_000);
+    await driver.wait(async () => {
+        const visible = await driver.executeScript(`
+            const modal = document.querySelector('#dictionary-details-modal');
+            const titleNode = modal?.querySelector('.dictionary-title');
+            const text = (titleNode?.textContent || '').trim();
+            return modal instanceof HTMLElement && !modal.hidden && (
+                text === arguments[0] ||
+                text.startsWith(\`\${arguments[0]} \`) ||
+                text.startsWith(\`\${arguments[0]}.\`) ||
+                text.includes(arguments[0])
+            );
+        `, dictionaryName);
+        return visible === true;
+    }, 30_000, `Expected dictionary details modal for ${dictionaryName}`);
+}
+
+async function closeDictionaryDetailsModal(driver) {
+    await driver.executeScript(`
+        const modal = document.querySelector('#dictionary-details-modal');
+        if (!(modal instanceof HTMLElement) || modal.hidden) { return; }
+        const closeButton = modal.querySelector('[data-modal-action="hide"]');
+        if (!(closeButton instanceof HTMLElement)) {
+            throw new Error('Dictionary details close button missing');
+        }
+        closeButton.click();
+    `);
+    await driver.wait(async () => {
+        const hidden = await driver.executeScript(`
+            const modal = document.querySelector('#dictionary-details-modal');
+            return !(modal instanceof HTMLElement) || modal.hidden;
+        `);
+        return hidden === true;
+    }, 30_000, 'Expected dictionary details modal to be hidden');
+}
+
+async function setDictionaryAutoUpdateEnabled(driver, dictionaryName, enabled) {
+    await openDictionaryDetailsModal(driver, dictionaryName);
+    const indexUrl = String(await driver.executeScript(`
+        const modal = document.querySelector('#dictionary-details-modal');
+        if (!(modal instanceof HTMLElement)) {
+            throw new Error('Dictionary details modal missing');
+        }
+        const setting = modal.querySelector('.dictionary-auto-update-setting');
+        if (!(setting instanceof HTMLElement) || setting.hidden) {
+            throw new Error('Dictionary auto-update setting is hidden');
+        }
+        const toggle = setting.querySelector('.dictionary-auto-update-toggle');
+        if (!(toggle instanceof HTMLInputElement)) {
+            throw new Error('Dictionary auto-update toggle missing');
+        }
+        const currentIndexUrl = String(toggle.dataset.indexUrl || '');
+        if (currentIndexUrl.length === 0) {
+            throw new Error('Dictionary auto-update toggle is missing data-index-url');
+        }
+        if (toggle.checked !== arguments[0]) {
+            toggle.click();
+        }
+        return currentIndexUrl;
+    `, enabled));
+    const deadline = safePerformance.now() + 30_000;
+    while (safePerformance.now() < deadline) {
+        const optionsFull = await getOptionsFullRuntime(driver);
+        const enabledIndexUrls = Array.isArray(optionsFull?.global?.dictionaryAutoUpdates) ? optionsFull.global.dictionaryAutoUpdates.map(String) : [];
+        if (enabledIndexUrls.includes(indexUrl) === enabled) {
+            break;
+        }
+        await driver.sleep(250);
+    }
+    await closeDictionaryDetailsModal(driver);
+    return indexUrl;
+}
+
+async function configureAutoUpdateDictionaryProfile(driver, dictionaryName) {
+    const optionsFull = structuredClone(await getOptionsFullRuntime(driver));
+    const profiles = Array.isArray(optionsFull?.profiles) ? optionsFull.profiles : [];
+    for (const profile of profiles) {
+        if (!(profile?.options && Array.isArray(profile.options.dictionaries))) {
+            continue;
+        }
+        let dictionary = profile.options.dictionaries.find((current) => String(current?.name || '') === dictionaryName);
+        if (!(dictionary && typeof dictionary === 'object')) {
+            dictionary = {
+                name: dictionaryName,
+                alias: dictionaryName,
+                enabled: true,
+                allowSecondarySearches: false,
+                definitionsCollapsible: 'not-collapsible',
+                partsOfSpeechFilter: true,
+                useDeinflections: true,
+                styles: '',
+            };
+            profile.options.dictionaries.push(dictionary);
+        }
+        dictionary.alias = autoUpdateDictionaryFixtureSettings.alias;
+        dictionary.enabled = true;
+        dictionary.partsOfSpeechFilter = false;
+        dictionary.useDeinflections = false;
+        profile.options.general.mainDictionary = dictionaryName;
+        profile.options.general.sortFrequencyDictionary = dictionaryName;
+        const expressionField = profile.options?.anki?.cardFormats?.[0]?.fields?.expression;
+        if (expressionField && typeof expressionField === 'object') {
+            expressionField.value = autoUpdateDictionaryFixtureSettings.ankiFieldValue;
+        }
+    }
+    await setAllSettingsRuntime(driver, optionsFull, 'firefox-e2e-auto-update-configure');
+}
+
+async function backdateAutoUpdateLastAttempt(driver, indexUrl) {
+    const state = await getStorageLocalRecord(driver, autoUpdateStateStorageKey);
+    const nextState = (typeof state === 'object' && state !== null && !Array.isArray(state)) ? structuredClone(state) : {};
+    const entry = (typeof nextState[indexUrl] === 'object' && nextState[indexUrl] !== null && !Array.isArray(nextState[indexUrl])) ? nextState[indexUrl] : {};
+    entry.lastAttemptAt = 0;
+    nextState[indexUrl] = entry;
+    await setStorageLocalRecord(driver, autoUpdateStateStorageKey, nextState);
+    return entry;
+}
+
+async function triggerAutoUpdateAlarm(driver) {
+    await driver.executeScript(`
+        chrome.alarms.create(arguments[0], {when: Date.now() + 100});
+    `, autoUpdateAlarmName);
+}
+
+async function waitForAutoUpdateCheck(driver, indexUrl, previousCheckAt, timeoutMs = 60000) {
+    const deadline = safePerformance.now() + timeoutMs;
+    while (safePerformance.now() < deadline) {
+        const state = await getStorageLocalRecord(driver, autoUpdateStateStorageKey);
+        if (typeof state === 'object' && state !== null && !Array.isArray(state)) {
+            const entry = state[indexUrl];
+            if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+                const lastError = typeof entry.lastError === 'string' ? entry.lastError : null;
+                if (lastError && lastError.length > 0) {
+                    fail(`Auto-update check failed for ${indexUrl}: ${lastError}`);
+                }
+                const lastSuccessfulCheckAt = Number(entry.lastSuccessfulCheckAt || 0);
+                if (lastSuccessfulCheckAt > previousCheckAt) {
+                    return /** @type {Record<string, unknown>} */ (entry);
+                }
+            }
+        }
+        await driver.sleep(250);
+    }
+    fail(`Timed out waiting for auto-update check completion for ${indexUrl}`);
+}
+
+async function waitForUpdatedDictionaryState(driver, expectedTitle, expectedRevision, expectedIndexUrl, timeoutMs = 120000) {
+    const deadline = safePerformance.now() + timeoutMs;
+    while (safePerformance.now() < deadline) {
+        const dictionaryInfo = await getDictionaryInfoRuntime(driver);
+        const titles = Array.isArray(dictionaryInfo) ? dictionaryInfo : [];
+        const match = titles.find((dictionary) => (
+            String(dictionary?.title || '') === expectedTitle &&
+            String(dictionary?.revision || '') === expectedRevision &&
+            String(dictionary?.indexUrl || '') === expectedIndexUrl
+        ));
+        if (match) {
+            return dictionaryInfo;
+        }
+        await driver.sleep(500);
+    }
+    fail(`Timed out waiting for updated dictionary ${expectedTitle} revision ${expectedRevision}`);
+}
+
+function ensureAutoUpdateRequest(condition, message, requests) {
+    if (!condition) {
+        fail(`${message}; requests=${JSON.stringify(requests)}`);
+    }
+}
+
+async function runAutoUpdateScenario(driver, extensionBaseUrl, localServer, report) {
+    const fixture = await createAutoUpdateDictionaryFixture(localServer.baseUrl);
+    localServer.setAutoUpdateFixture(fixture);
+    try {
+        await driver.get(`${extensionBaseUrl}/settings.html`);
+        await driver.wait(until.elementLocated(By.css('#dictionary-import-file-input')), 30_000);
+
+        const importStart = safePerformance.now();
+        const fileInput = await driver.findElement(By.css('#dictionary-import-file-input'));
+        await fileInput.sendKeys(fixture.importZipPath);
+        await waitForImportCompletionBasic(driver, fixture.initialTitle, 240000);
+        const importedDictionaryInfo = await getDictionaryInfoRuntime(driver);
+        const importEnd = safePerformance.now();
+        ensureAutoUpdateRequest(
+            Array.isArray(importedDictionaryInfo) && importedDictionaryInfo.some((dictionary) => (
+                String(dictionary?.title || '') === fixture.initialTitle &&
+                String(dictionary?.revision || '') === '1'
+            )),
+            'Initial auto-update dictionary import did not complete with revision 1',
+            importedDictionaryInfo,
+        );
+        await addReportPhase(
+            report,
+            driver,
+            'Auto-update import v1 dictionary',
+            `Imported local updatable dictionary archive ${fixture.importZipPath}`,
+            importStart,
+            importEnd,
+        );
+
+        const enableToggleStart = safePerformance.now();
+        const enabledIndexUrl = await setDictionaryAutoUpdateEnabled(driver, fixture.initialTitle, true);
+        await configureAutoUpdateDictionaryProfile(driver, fixture.initialTitle);
+        const enableToggleEnd = safePerformance.now();
+        ensureAutoUpdateRequest(
+            enabledIndexUrl === fixture.oldIndexUrl,
+            'Auto-update toggle did not bind to the expected initial index URL',
+            enabledIndexUrl,
+        );
+        await addReportPhase(
+            report,
+            driver,
+            'Enable hourly auto-updates',
+            `Enabled automatic hourly updates for ${fixture.initialTitle} using index URL ${fixture.oldIndexUrl}`,
+            enableToggleStart,
+            enableToggleEnd,
+        );
+
+        localServer.clearAutoUpdateRequests();
+        localServer.setAutoUpdateVersion('v1');
+        localServer.setAutoUpdateConditional304(false);
+        const initialState = await getStorageLocalRecord(driver, autoUpdateStateStorageKey);
+        const initialCheckAt = Number(initialState?.[fixture.oldIndexUrl]?.lastSuccessfulCheckAt || 0);
+        const firstPassStart = safePerformance.now();
+        await triggerAutoUpdateAlarm(driver);
+        const firstStateEntry = await waitForAutoUpdateCheck(driver, fixture.oldIndexUrl, initialCheckAt);
+        const firstPassRequests = localServer.getAutoUpdateRequests();
+        const firstPassEnd = safePerformance.now();
+        ensureAutoUpdateRequest(firstPassRequests.length === 2, 'Initial hourly auto-update pass should issue exactly two requests', firstPassRequests);
+        ensureAutoUpdateRequest(firstPassRequests[0]?.method === 'HEAD' && firstPassRequests[0]?.path === fixture.oldIndexPath, 'Initial hourly auto-update pass should begin with HEAD on the original index URL', firstPassRequests);
+        ensureAutoUpdateRequest(firstPassRequests[1]?.method === 'GET' && firstPassRequests[1]?.path === fixture.oldIndexPath, 'Initial hourly auto-update pass should fetch the index JSON after HEAD', firstPassRequests);
+        ensureAutoUpdateRequest(!firstPassRequests.some((requestInfo) => requestInfo.path === fixture.oldArchivePath || requestInfo.path === fixture.newArchivePath), 'Initial hourly auto-update pass should not download an archive when no update exists', firstPassRequests);
+        await addReportPhase(
+            report,
+            driver,
+            'Hourly auto-update pass (HEAD + GET no-op)',
+            `Recorded requests for first due pass: ${JSON.stringify(firstPassRequests)} state=${JSON.stringify(firstStateEntry)}`,
+            firstPassStart,
+            firstPassEnd,
+        );
+
+        localServer.clearAutoUpdateRequests();
+        localServer.setAutoUpdateVersion('v1');
+        localServer.setAutoUpdateConditional304(true);
+        await backdateAutoUpdateLastAttempt(driver, fixture.oldIndexUrl);
+        const secondPassStart = safePerformance.now();
+        await triggerAutoUpdateAlarm(driver);
+        const secondStateEntry = await waitForAutoUpdateCheck(driver, fixture.oldIndexUrl, Number(firstStateEntry.lastSuccessfulCheckAt || 0));
+        const secondPassRequests = localServer.getAutoUpdateRequests();
+        const secondPassEnd = safePerformance.now();
+        ensureAutoUpdateRequest(secondPassRequests.length === 1, 'Conditional 304 auto-update pass should only issue one request', secondPassRequests);
+        ensureAutoUpdateRequest(secondPassRequests[0]?.method === 'HEAD' && secondPassRequests[0]?.path === fixture.oldIndexPath, 'Conditional 304 auto-update pass should use HEAD on the original index URL', secondPassRequests);
+        ensureAutoUpdateRequest(
+            secondPassRequests[0]?.headers?.['if-none-match'] === fixture.oldEtag &&
+            secondPassRequests[0]?.headers?.['if-modified-since'] === fixture.oldLastModified,
+            'Conditional 304 auto-update pass should send both cache validators',
+            secondPassRequests,
+        );
+        await addReportPhase(
+            report,
+            driver,
+            'Hourly auto-update pass (HEAD 304)',
+            `Recorded requests for conditional 304 pass: ${JSON.stringify(secondPassRequests)} state=${JSON.stringify(secondStateEntry)}`,
+            secondPassStart,
+            secondPassEnd,
+        );
+
+        localServer.clearAutoUpdateRequests();
+        localServer.setAutoUpdateConditional304(false);
+        localServer.setAutoUpdateVersion('v2');
+        await backdateAutoUpdateLastAttempt(driver, fixture.oldIndexUrl);
+        const updatePassStart = safePerformance.now();
+        await triggerAutoUpdateAlarm(driver);
+        await waitForUpdatedDictionaryState(driver, fixture.updatedTitle, '2', fixture.newIndexUrl, 120000);
+        const updatedOptions = await getOptionsFullRuntime(driver);
+        const updatedStorageState = await getStorageLocalRecord(driver, autoUpdateStateStorageKey);
+        const updateRequests = localServer.getAutoUpdateRequests();
+        const updatePassEnd = safePerformance.now();
+        ensureAutoUpdateRequest(updateRequests.length === 3, 'Update pass should issue HEAD, GET, and archive download requests', updateRequests);
+        ensureAutoUpdateRequest(updateRequests[0]?.method === 'HEAD' && updateRequests[0]?.path === fixture.oldIndexPath, 'Update pass should start with HEAD on the old index URL', updateRequests);
+        ensureAutoUpdateRequest(updateRequests[1]?.method === 'GET' && updateRequests[1]?.path === fixture.oldIndexPath, 'Update pass should fetch the old index URL after HEAD', updateRequests);
+        ensureAutoUpdateRequest(updateRequests[2]?.method === 'GET' && updateRequests[2]?.path === fixture.newArchivePath, 'Update pass should download the new archive after detecting a newer revision', updateRequests);
+        const profile0 = Array.isArray(updatedOptions?.profiles) ? updatedOptions.profiles[0] : null;
+        const updatedDictionarySettings = Array.isArray(profile0?.options?.dictionaries) ?
+            profile0.options.dictionaries.find((dictionary) => String(dictionary?.name || '') === fixture.updatedTitle) :
+            null;
+        ensureAutoUpdateRequest(
+            updatedDictionarySettings?.alias === autoUpdateDictionaryFixtureSettings.alias &&
+            updatedDictionarySettings?.enabled === true &&
+            updatedDictionarySettings?.partsOfSpeechFilter === false &&
+            updatedDictionarySettings?.useDeinflections === false,
+            'Updated dictionary settings were not preserved after automatic re-import',
+            updatedDictionarySettings,
+        );
+        ensureAutoUpdateRequest(
+            String(profile0?.options?.general?.mainDictionary || '') === fixture.updatedTitle &&
+            String(profile0?.options?.general?.sortFrequencyDictionary || '') === fixture.updatedTitle,
+            'Main or sort-frequency dictionary selection did not migrate to the updated title',
+            profile0?.options?.general,
+        );
+        ensureAutoUpdateRequest(
+            String(profile0?.options?.anki?.cardFormats?.[0]?.fields?.expression?.value || '') === autoUpdateDictionaryFixtureSettings.updatedAnkiFieldValue,
+            'Anki dictionary-title field migration did not preserve the expected updated kebab-case value',
+            profile0?.options?.anki?.cardFormats?.[0]?.fields?.expression,
+        );
+        const globalAutoUpdates = Array.isArray(updatedOptions?.global?.dictionaryAutoUpdates) ? updatedOptions.global.dictionaryAutoUpdates.map(String) : [];
+        ensureAutoUpdateRequest(
+            globalAutoUpdates.length === 1 && globalAutoUpdates[0] === fixture.newIndexUrl,
+            'Global auto-update settings did not migrate from the old index URL to the new one',
+            globalAutoUpdates,
+        );
+        ensureAutoUpdateRequest(
+            !(fixture.oldIndexUrl in updatedStorageState) &&
+            typeof updatedStorageState?.[fixture.newIndexUrl]?.lastSuccessfulUpdateAt === 'number',
+            'Runtime auto-update state did not migrate to the new index URL after update',
+            updatedStorageState,
+        );
+        await addReportPhase(
+            report,
+            driver,
+            'Hourly auto-update pass (v1 -> v2 install)',
+            `Recorded requests for update pass: ${JSON.stringify(updateRequests)}. Updated options snapshot: ${JSON.stringify({
+                globalAutoUpdates,
+                updatedDictionarySettings,
+                general: profile0?.options?.general ?? null,
+                ankiField: profile0?.options?.anki?.cardFormats?.[0]?.fields?.expression?.value ?? null,
+            })}`,
+            updatePassStart,
+            updatePassEnd,
+        );
+    } finally {
+        await fixture.cleanup();
+    }
 }
 
 /**
@@ -1489,7 +2137,6 @@ async function main() {
         candidates.sort((a, b) => b.mtimeMs - a.mtimeMs);
         xpiPath = candidates[0].path;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const firefoxOptions = new firefox.Options();
     const headlessEnv = (process.env.MANABITAN_FIREFOX_HEADLESS ?? '1').trim().toLowerCase();
     const headless = !(headlessEnv === '0' || headlessEnv === 'false' || headlessEnv === 'no');
@@ -1497,20 +2144,31 @@ async function main() {
         firefoxOptions.addArguments('-headless');
     }
     firefoxOptions.setPreference('xpinstall.signatures.required', false);
+    firefoxOptions.setPreference('extensions.manifestV3.enabled', true);
+    firefoxOptions.setPreference('extensions.backgroundServiceWorker.enabled', true);
     // Selenium Firefox profiles can start with stricter defaults that keep
     // SharedArrayBuffer unavailable even when extension pages set COOP/COEP.
     // Ensure test runtime exposes the required shared-memory primitives for OPFS.
     firefoxOptions.setPreference('javascript.options.shared_memory', true);
     firefoxOptions.setPreference('dom.postMessage.sharedArrayBuffer.withCOOP_COEP', true);
     firefoxOptions.setPreference('dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled', true);
-    const firefoxDeveloperEditionPath = '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox';
-    try {
-        await access(firefoxDeveloperEditionPath);
-        firefoxOptions.setBinary(firefoxDeveloperEditionPath);
-    } catch (_) {
-        // Use default Firefox binary when Developer Edition is unavailable.
+    const configuredFirefoxBinary = String(process.env.MANABITAN_FIREFOX_BINARY || '').trim();
+    if (configuredFirefoxBinary.length > 0) {
+        try {
+            await access(configuredFirefoxBinary);
+        } catch (_) {
+            fail(`Configured Firefox binary not found: ${configuredFirefoxBinary}`);
+        }
+        firefoxOptions.setBinary(configuredFirefoxBinary);
+    } else {
+        const firefoxDeveloperEditionPath = '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox';
+        try {
+            await access(firefoxDeveloperEditionPath);
+            firefoxOptions.setBinary(firefoxDeveloperEditionPath);
+        } catch (_) {
+            // Use default Firefox binary when Developer Edition is unavailable.
+        }
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const driver = /** @type {import('selenium-webdriver').ThenableWebDriver} */ (
         new Builder()
             .forBrowser(Browser.FIREFOX)
@@ -1528,7 +2186,8 @@ async function main() {
         });
         const cacheWarmupEnd = safePerformance.now();
 
-        await driver.installAddon(xpiPath, true);
+        const temporaryAddonInstall = parseBooleanEnv(process.env.MANABITAN_FIREFOX_TEMPORARY_ADDON, true);
+        await driver.installAddon(xpiPath, temporaryAddonInstall);
         const firefoxPid = await getFirefoxProcessId(driver);
 
         const baseUrlStart = safePerformance.now();
@@ -1545,12 +2204,10 @@ async function main() {
         await ensurePageProfiler(driver);
         const settingsOpenEnd = safePerformance.now();
         await addReportPhase(report, driver, 'Open settings page', 'Settings loaded and dictionary import controls visible', settingsOpenStart, settingsOpenEnd);
-        const purgeStart = safePerformance.now();
-        await purgeDictionaryDatabase(driver);
-        const purgeEnd = safePerformance.now();
-        await addReportPhase(report, driver, 'Purge dictionary database', 'Cleared persisted dictionaries to avoid stale state from prior runs', purgeStart, purgeEnd);
+        // Selenium launches Firefox with a fresh profile for this run, so there is
+        // no prior dictionary DB state to purge here.
         // Selenium executeScript return value is untyped (`any`).
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const runtimeDiagnostics = await driver.executeAsyncScript(`
             const done = arguments[0];
             (async () => {
@@ -1587,6 +2244,22 @@ async function main() {
             diagnosticsStart,
             diagnosticsEnd,
         );
+        const backendPreflightStart = safePerformance.now();
+        const backendPreflight = await checkBackendApiAvailability(driver);
+        const backendPreflightEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Backend API preflight',
+            backendPreflight.ok ?
+                `Runtime message API reachable; dictionaryInfo count=${String(backendPreflight.dictionaryCount)}` :
+                `Runtime message API failed: ${String(backendPreflight.error || 'unknown error')}`,
+            backendPreflightStart,
+            backendPreflightEnd,
+        );
+        if (!backendPreflight.ok) {
+            fail(`Backend preflight failed: ${String(backendPreflight.error || 'unknown error')}`);
+        }
 
         await addReportPhase(
             report,
@@ -1748,7 +2421,7 @@ async function main() {
         let lastModalText = '';
         while (safePerformance.now() < verifyDeadline) {
             // Selenium's executeScript return value is untyped (`any`).
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
             const modalText = await driver.executeScript(`
                 const dictionariesModal = document.querySelector('#dictionaries-modal');
                 const recommendedModal = document.querySelector('#recommended-dictionaries-modal');
@@ -1768,9 +2441,11 @@ async function main() {
         }
         if (!(lastModalText.includes('Jitendex') && lastModalText.includes('JMdict'))) {
             const dictionaryErrorText = await getDictionaryErrorText(driver);
-            if (!profileHasBothDictionaries) {
-                fail(`Expected installed dictionary modal text to contain Jitendex and JMdict; saw "${lastModalText.slice(0, 240)}"; dictionary-error="${dictionaryErrorText}"`);
-            }
+            fail(
+                'Expected installed dictionary modal text to contain Jitendex and JMdict; ' +
+                `saw "${lastModalText.slice(0, 240)}"; dictionary-error="${dictionaryErrorText}" ` +
+                `profileHasBothDictionaries=${String(profileHasBothDictionaries)}`,
+            );
         }
         const verifyEnd = safePerformance.now();
         await addReportPhase(
@@ -1778,9 +2453,7 @@ async function main() {
             driver,
             'Verify installed dictionaries list',
             (
-                (lastModalText.includes('Jitendex') && lastModalText.includes('JMdict')) ?
-                `Opened dictionaries modal via ${dictionariesModalTrigger} and confirmed dictionary list text includes Jitendex + JMdict` :
-                `Modal text did not show both dictionaries (text="${lastModalText.slice(0, 240)}"), but backend profile dictionaries contained both names`
+                `Opened dictionaries modal via ${dictionariesModalTrigger} and confirmed dictionary list text includes Jitendex + JMdict`
             ),
             verifyStart,
             verifyEnd,
@@ -1806,12 +2479,12 @@ async function main() {
 
         const searchVerifyStart = safePerformance.now();
         const searchTerm = '暗記';
-        let dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, ['Jitendex', 'JMdict'], 10_000);
+        let dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, ['Jitendex', 'JMdict'], 20_000);
         if ((dictionaryHitCounts.Jitendex ?? 0) < 1 || (dictionaryHitCounts.JMdict ?? 0) < 1) {
             // Retry once after a hard refresh: Firefox extension search page can be flaky in CI.
             await driver.navigate().refresh();
             await driver.wait(until.elementLocated(By.css('#search-textbox')), 30_000);
-            dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, ['Jitendex', 'JMdict'], 10_000);
+            dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, ['Jitendex', 'JMdict'], 20_000);
         }
         if ((dictionaryHitCounts.Jitendex ?? 0) < 1 || (dictionaryHitCounts.JMdict ?? 0) < 1) {
             const searchDiagnostics = await getSearchPageDiagnostics(driver);
@@ -1819,12 +2492,12 @@ async function main() {
             await addReportPhase(
                 report,
                 driver,
-                'Verify search results include both dictionaries (non-blocking warning)',
+                'Verify search results include both dictionaries (failed)',
                 `UI search returned incomplete results. Counts=${JSON.stringify(dictionaryHitCounts)} backend=${JSON.stringify(backendDiagnostics)} diagnostics=${JSON.stringify(searchDiagnostics)}`,
                 searchVerifyStart,
                 searchVerifyEnd,
             );
-            console.warn(`[firefox-e2e] warning: UI search page did not show both dictionaries for ${searchTerm}. Continuing to hover-popup verification.`);
+            fail(`Expected search results for ${searchTerm} to include both Jitendex and JMdict; saw counts ${JSON.stringify(dictionaryHitCounts)} diagnostics=${JSON.stringify(searchDiagnostics)} backend=${JSON.stringify(backendDiagnostics)}`);
         } else {
             const searchVerifyEnd = safePerformance.now();
             await addReportPhase(report, driver, 'Verify search results include both dictionaries', `Searched ${searchTerm} and observed dictionary hit counts: ${JSON.stringify(dictionaryHitCounts)}`, searchVerifyStart, searchVerifyEnd);
@@ -1879,37 +2552,167 @@ async function main() {
         );
 
         const hoverLookupStart = safePerformance.now();
-        const hoverTerm = '暗記';
+        const hoverTargets = ['#target-word', '#target-cat', '#target-name', '#target-kotoba', '#target-born', '#target-mitou'];
+        /** @type {Array<{iteration: number, selector: string, popupTextPreview: string}>} */
+        const hoverIterationSummaries = [];
         try {
-            const popupText = await hoverLookupOnPage(
-                driver,
-                `${localServer.baseUrl}/wagahai-neko.html`,
-                '#target-word',
-                ['Jitendex', 'JMdict'],
-            );
+            for (let i = 0; i < 12; ++i) {
+                const selector = hoverTargets[i % hoverTargets.length];
+                const popupText = await hoverLookupOnPage(
+                    driver,
+                    `${localServer.baseUrl}/wagahai-neko.html`,
+                    selector,
+                    ['Jitendex', 'JMdict'],
+                );
+                hoverIterationSummaries.push({
+                    iteration: i + 1,
+                    selector,
+                    popupTextPreview: popupText.slice(0, 140),
+                });
+            }
             const hoverLookupEnd = safePerformance.now();
             await addReportPhase(
                 report,
                 driver,
-                'Verify hover lookup on Wagahai page',
-                `Opened local Wagahai page, hovered ${hoverTerm}, and confirmed popup includes both dictionaries. Popup text preview: ${popupText.slice(0, 240)}`,
+                'Verify repeated hover lookup on Wagahai page',
+                `Ran 12 hover-scan iterations across selectors ${JSON.stringify(hoverTargets)} and confirmed popup includes both dictionaries each time. iterations=${JSON.stringify(hoverIterationSummaries)}`,
                 hoverLookupStart,
                 hoverLookupEnd,
             );
         } catch (hoverError) {
-            const hoverDiagnostics = await getBackendLookupDiagnostics(driver, hoverTerm);
-            const dictionaryNames = Array.isArray(hoverDiagnostics.termDictionaryNames) ? hoverDiagnostics.termDictionaryNames.map(String) : [];
-            const hasBothViaBackend = dictionaryNames.includes('Jitendex') && dictionaryNames.includes('JMdict');
+            const hoverDiagnostics = await getBackendLookupDiagnostics(driver, '暗記');
             const hoverLookupEnd = safePerformance.now();
             await addReportPhase(
                 report,
                 driver,
-                'Verify hover lookup on Wagahai page (warning)',
-                `Hover popup did not appear in this run. Backend dictionary names for ${hoverTerm}: ${JSON.stringify(dictionaryNames)} (hasBoth=${String(hasBothViaBackend)}). Original hover error: ${errorMessage(hoverError)}`,
+                'Verify repeated hover lookup on Wagahai page (failed)',
+                `Hover popup verification failed during repeated run. backend=${JSON.stringify(hoverDiagnostics)} error=${errorMessage(hoverError)} completedIterations=${JSON.stringify(hoverIterationSummaries)}`,
                 hoverLookupStart,
                 hoverLookupEnd,
             );
-            console.warn(`[firefox-e2e] warning: hover popup not visible on this run; backend dictionary names for ${hoverTerm}: ${JSON.stringify(dictionaryNames)}.`);
+            fail(`Expected repeated hover popup lookups to include both dictionaries. backend=${JSON.stringify(hoverDiagnostics)} error=${errorMessage(hoverError)} completedIterations=${JSON.stringify(hoverIterationSummaries)}`);
+        }
+
+        const postHoverSearchStart = safePerformance.now();
+        const postHoverSearchTerm = '暗記';
+        let postHoverHitCounts = /** @type {Record<string, number>} */ ({});
+        let postHoverSearchError = '';
+        try {
+            await driver.get(`${extensionBaseUrl}/search.html?query=${encodeURIComponent(postHoverSearchTerm)}&type=terms&wildcards=off`);
+            await driver.wait(until.elementLocated(By.css('#search-textbox')), 30_000);
+            postHoverHitCounts = await searchTermAndGetDictionaryHitCounts(driver, postHoverSearchTerm, ['Jitendex', 'JMdict'], 20_000, 'button');
+            if ((postHoverHitCounts.Jitendex ?? 0) < 1 || (postHoverHitCounts.JMdict ?? 0) < 1) {
+                const searchDiagnostics = await getSearchPageDiagnostics(driver);
+                throw new Error(`Counts=${JSON.stringify(postHoverHitCounts)} diagnostics=${JSON.stringify(searchDiagnostics)}`);
+            }
+        } catch (postHoverError) {
+            postHoverSearchError = errorMessage(postHoverError);
+            fail(`Expected search button flow to include both dictionaries after hover stress. ${postHoverSearchError}`);
+        } finally {
+            const postHoverSearchEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                driver,
+                'Verify search remains responsive after hover stress',
+                postHoverSearchError.length > 0 ?
+                    `Search button verification failed after hover stress: ${postHoverSearchError}` :
+                    `Search button verification after hover stress succeeded for ${postHoverSearchTerm}. counts=${JSON.stringify(postHoverHitCounts)}`,
+                postHoverSearchStart,
+                postHoverSearchEnd,
+            );
+        }
+
+        const autoUpdateStart = safePerformance.now();
+        let autoUpdateError = '';
+        try {
+            if (localServer === null) {
+                throw new Error('Local E2E server is unavailable for auto-update verification');
+            }
+            await runAutoUpdateScenario(driver, extensionBaseUrl, localServer, report);
+        } catch (autoUpdateFailure) {
+            autoUpdateError = errorMessage(autoUpdateFailure);
+            fail(`Expected hourly auto-update verification to pass. ${autoUpdateError}`);
+        } finally {
+            const autoUpdateEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                driver,
+                'Auto-update end-to-end verification',
+                autoUpdateError.length > 0 ?
+                    `Auto-update verification failed: ${autoUpdateError}` :
+                    'Verified hourly auto-update end to end, including HEAD/GET no-op checks, validator-backed 304 handling, and automatic v1 -> v2 replacement with preserved settings.',
+                autoUpdateStart,
+                autoUpdateEnd,
+            );
+        }
+
+        const welcomeAutoImportStart = safePerformance.now();
+        let welcomeAutoImportError = '';
+        /** @type {{dictionaryCountBefore: number, dictionaryCountAfter: number, noMatchStatus: string, alreadyInstalledStatus: string}|null} */
+        let welcomeAutoImportDetails = null;
+        try {
+            if (localServer === null) {
+                throw new Error('Local E2E server is unavailable for welcome auto-import verification');
+            }
+            const dictionaryInfoBefore = await getDictionaryInfoRuntime(driver);
+            const dictionaryCountBefore = Array.isArray(dictionaryInfoBefore) ? dictionaryInfoBefore.length : 0;
+
+            await driver.get(`${extensionBaseUrl}/welcome.html`);
+            await driver.wait(until.elementLocated(By.css('#language-select')), 30_000);
+
+            const mockRecommendedDictionaries = {
+                ja: {
+                    terms: [
+                        {
+                            name: 'Jitendex',
+                            description: 'Real Jitendex from recommended dictionaries',
+                            homepage: '',
+                            downloadUrl: `${localServer.baseUrl}/dictionaries/jitendex.zip`,
+                        },
+                    ],
+                    kanji: [],
+                    frequency: [],
+                    grammar: [],
+                    pronunciation: [],
+                },
+            };
+            await installRecommendedDictionariesMock(driver, mockRecommendedDictionaries);
+            if (await welcomeHasRecommendedDictionariesButton(driver)) {
+                throw new Error('Welcome page still exposes a manual recommended-dictionaries button');
+            }
+
+            await setWelcomeLanguage(driver, 'en');
+            const noMatchStatus = await waitForWelcomeAutoImportStatus(driver, 'No recommended dictionaries are currently available for "en".', 30_000);
+
+            await setWelcomeLanguage(driver, 'ja');
+            const alreadyInstalledStatus = await waitForWelcomeAutoImportStatus(driver, 'All recommended dictionaries for "ja" are already installed.', 30_000);
+
+            const dictionaryInfoAfter = await getDictionaryInfoRuntime(driver);
+            const dictionaryCountAfter = Array.isArray(dictionaryInfoAfter) ? dictionaryInfoAfter.length : 0;
+            if (dictionaryCountAfter !== dictionaryCountBefore) {
+                throw new Error(`Welcome status-only checks unexpectedly changed dictionary count. before=${String(dictionaryCountBefore)} after=${String(dictionaryCountAfter)}`);
+            }
+            welcomeAutoImportDetails = {
+                dictionaryCountBefore,
+                dictionaryCountAfter,
+                noMatchStatus,
+                alreadyInstalledStatus,
+            };
+        } catch (welcomeAutoImportFailure) {
+            welcomeAutoImportError = errorMessage(welcomeAutoImportFailure);
+            fail(`Expected welcome auto-import behavior verification to pass. ${welcomeAutoImportError}`);
+        } finally {
+            const welcomeAutoImportEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                driver,
+                'Welcome auto-import behavior verification',
+                welcomeAutoImportError.length > 0 ?
+                    `Welcome auto-import verification failed: ${welcomeAutoImportError}` :
+                    `Verified welcome flow has no manual recommended button and shows no-match/already-installed auto-import messages. details=${JSON.stringify(welcomeAutoImportDetails)}`,
+                welcomeAutoImportStart,
+                welcomeAutoImportEnd,
+            );
         }
 
         report.status = 'success';

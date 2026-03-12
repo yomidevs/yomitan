@@ -37,6 +37,8 @@ export class CssStyleApplier {
         this._styleData = [];
         /** @type {Map<string, import('css-style-applier').CssRule[]>} */
         this._cachedRules = new Map();
+        /** @type {number} */
+        this._cachedRulesMaxSize = 256;
         /** @type {RegExp} */
         this._patternHtmlWhitespace = /[\t\r\n\f ]+/g;
         /** @type {RegExp} */
@@ -134,10 +136,16 @@ export class CssStyleApplier {
      */
     _getCandidateCssRulesForClass(className) {
         let rules = this._cachedRules.get(className);
-        if (typeof rules !== 'undefined') { return rules; }
+        if (typeof rules !== 'undefined') {
+            // Maintain LRU order using insertion order of Map.
+            this._cachedRules.delete(className);
+            this._cachedRules.set(className, rules);
+            return rules;
+        }
 
         rules = [];
         this._cachedRules.set(className, rules);
+        this._evictCachedRules();
 
         const classList = this._getTokens(className);
         for (const {selectors, styles} of this._styleData) {
@@ -146,6 +154,16 @@ export class CssStyleApplier {
         }
 
         return rules;
+    }
+
+    /** */
+    _evictCachedRules() {
+        const cachedRulesMaxSize = Math.max(1, Math.trunc(this._cachedRulesMaxSize));
+        while (this._cachedRules.size > cachedRulesMaxSize) {
+            const oldestKey = this._cachedRules.keys().next();
+            if (oldestKey.done) { break; }
+            this._cachedRules.delete(oldestKey.value);
+        }
     }
 
     /**

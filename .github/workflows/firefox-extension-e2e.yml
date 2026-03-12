@@ -18,7 +18,6 @@ permissions:
 
 jobs:
   firefox-e2e:
-    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -51,6 +50,13 @@ jobs:
       - name: Install Selenium driver dependency
         run: npm install --no-save selenium-webdriver@4.38.0
 
+      - name: Install Firefox Developer Edition
+        run: |
+          curl -fsSL "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -o /tmp/firefox-devedition.tar.bz2
+          mkdir -p "$HOME/firefox-devedition"
+          tar -xf /tmp/firefox-devedition.tar.bz2 -C "$HOME/firefox-devedition"
+          echo "MANABITAN_FIREFOX_BINARY=$HOME/firefox-devedition/firefox/firefox" >> "$GITHUB_ENV"
+
       - name: Restore Firefox E2E dictionary cache
         uses: actions/cache@v4
         with:
@@ -59,11 +65,41 @@ jobs:
 
       - name: Run Firefox extension E2E
         id: firefoxE2E
-        continue-on-error: true
         env:
           MANABITAN_FIREFOX_XPI: ${{ github.workspace }}/builds/manabitan-firefox-dev.xpi
-          MANABITAN_E2E_STRICT_RUNTIME: '1'
-        run: npm run test:e2e:firefox-extension
+          MANABITAN_FIREFOX_HEADLESS: '0'
+          MANABITAN_E2E_STRICT_RUNTIME: '0'
+        run: xvfb-run -a npm run test:e2e:firefox-extension
+
+      - name: Enforce Firefox extension E2E success
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = 'builds/firefox-e2e-import-report.json';
+          if (!fs.existsSync(path)) {
+            console.error('Firefox extension E2E report JSON not found.');
+            process.exit(1);
+          }
+          const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const skipReason = String(report.skipReason || '');
+          const isKnownUnsupportedSkip = (
+            report.status === 'success-with-skips' &&
+            (
+              skipReason.includes('does not expose OPFS VFS') ||
+              skipReason.includes('does not support MV3 background service workers')
+            )
+          );
+          if (report.status === 'success') {
+            process.exit(0);
+          }
+          if (isKnownUnsupportedSkip) {
+            console.log(`Firefox extension E2E skipped in unsupported runtime: ${skipReason}`);
+            process.exit(0);
+          }
+          console.error(`Firefox extension E2E status is not success: ${String(report.status)} skipReason=${skipReason}`);
+          process.exit(1);
+          NODE
 
       - name: Summarize Firefox extension E2E
         if: always()
@@ -110,8 +146,3 @@ jobs:
             builds/firefox-e2e-import-report.json
             builds/extension-e2e-report.html
           if-no-files-found: ignore
-
-      - name: Report Firefox extension E2E failure without blocking main CI
-        if: steps.firefoxE2E.outcome == 'failure'
-        run: |
-          echo "::warning::Firefox Extension E2E failed (non-blocking). See this workflow run for logs."

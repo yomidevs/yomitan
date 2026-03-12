@@ -18,7 +18,16 @@
 import Ajv from 'ajv';
 import {IDBKeyRange} from 'fake-indexeddb';
 import {describe, expect, test, vi} from 'vitest';
-import {Backend} from '../ext/js/background/backend.js';
+
+vi.mock('../ext/lib/kanji-processor.js', () => ({
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
+    convertVariants: (text) => text,
+}));
+
+const {Backend} = await import('../ext/js/background/backend.js');
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {chrome, fetch} from './mocks/common.js';
 import {setupStubs} from './utilities/database.js';
@@ -113,6 +122,7 @@ describe('Diagnostics payload schema', () => {
             _dictionaryDatabase: {
                 getDictionaryInfo: async () => [{title: 'A'}, {title: 'Shared'}],
             },
+            _ensureDictionaryDatabaseReady: async () => {},
             _optionsUtil: {save: async () => {}},
             _clearProfileConditionsSchemaCache: () => {},
         };
@@ -135,6 +145,9 @@ describe('Diagnostics payload schema', () => {
                 getDictionaryInfo: async () => {
                     throw new Error('dictionary info unavailable');
                 },
+            },
+            _ensureDictionaryDatabaseReady: async () => {
+                throw new Error('dictionary info unavailable');
             },
             _optionsUtil: {save: async () => {}},
             _clearProfileConditionsSchemaCache: () => {},

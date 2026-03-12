@@ -1418,15 +1418,18 @@ export class Display extends EventDispatcher {
         }
 
         let {dictionaryEntries} = content;
+        if (lookup && Array.isArray(dictionaryEntries)) {
+            dictionaryEntries = void 0;
+            content.dictionaryEntries = void 0;
+            changeHistory = true;
+        }
         if (!Array.isArray(dictionaryEntries)) {
             safePerformance.mark('display:findDictionaryEntries:start');
             dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, primaryReading, wildcardsEnabled, optionsContext) : [];
             safePerformance.mark('display:findDictionaryEntries:end');
             safePerformance.measure('display:findDictionaryEntries', 'display:findDictionaryEntries:start', 'display:findDictionaryEntries:end');
             if (this._setContentToken !== token) { return; }
-            if (lookup) {
-                content.dictionaryEntries = dictionaryEntries;
-            }
+            content.dictionaryEntries = void 0;
             changeHistory = true;
         }
 

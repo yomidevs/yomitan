@@ -46,6 +46,7 @@ header.rules.header.meta.schema = false;
 
 const manabitanHeaderFiles = [
     'ext/js/dictionary/sqlite-wasm.js',
+    'ext/js/dictionary/raw-term-content.js',
     'dev/bin/run-playwright.js',
     'dev/lib/zstd-wasm.js',
     'ext/js/dictionary/zstd-term-content.js',
@@ -85,7 +86,7 @@ async function getDependencies(scriptPaths) {
  */
 export default [
     {
-        ignores: ['ext/lib/', 'dev/lib/handlebars/', '**/node_modules/', '**/builds/', 'test-results/'],
+        ignores: ['.tmp-*', 'ext/lib/', 'dev/lib/handlebars/', '**/node_modules/', '**/builds/', 'test-results/', 'playwright/.cache/'],
     },
     ...compat.extends(
         'eslint:recommended',
@@ -865,6 +866,40 @@ export default [
         ...vitest.configs.recommended,
         rules: {
             'vitest/prefer-to-be': 'off',
+        },
+    },
+    ...compat.extends('plugin:@typescript-eslint/disable-type-checked').map((config) => ({
+        ...config,
+        files: [
+            'benches/**/*.js',
+            'test/**/*.js',
+        ],
+    })),
+    {
+        files: [
+            'benches/**/*.js',
+            'test/**/*.js',
+        ],
+
+        rules: {
+            'header/header': 'off',
+            'no-restricted-syntax': 'off',
+            'no-shadow': 'off',
+            'no-underscore-dangle': 'off',
+            'no-undefined': 'off',
+            '@stylistic/eol-last': 'off',
+            '@stylistic/padding-line-between-statements': 'off',
+            '@stylistic/quote-props': 'off',
+            '@typescript-eslint/no-shadow': 'off',
+            '@typescript-eslint/no-unused-vars': 'off',
+            'jsdoc/no-undefined-types': 'off',
+            'jsdoc/require-jsdoc': 'off',
+            'jsdoc/require-returns-check': 'off',
+            'jsdoc/require-throws': 'off',
+            'sonarjs/no-duplicated-branches': 'off',
+            'unicorn/catch-error-name': 'off',
+            'unicorn/prefer-export-from': 'off',
+            'unicorn/prefer-native-coercion-functions': 'off',
         },
     },
     ...compat.extends('plugin:@typescript-eslint/disable-type-checked').map((config) => ({

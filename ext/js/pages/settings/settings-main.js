@@ -349,11 +349,31 @@ await Application.main(true, async (application) => {
     })());
 
     const recommendedSettingsController = new RecommendedSettingsController(settingsController);
-    preparePromises.push((async () => {
+    let recommendedSettingsPrepared = false;
+    /** @type {Promise<void>|null} */
+    let recommendedSettingsPreparePromise = null;
+    const prepareRecommendedSettingsOnDemand = () => {
+        if (recommendedSettingsPrepared) { return; }
+        if (recommendedSettingsPreparePromise !== null) { return; }
         const startedAt = getNowMs();
-        await recommendedSettingsController.prepare();
-        recordPhase(startupPhases, 'recommendedSettingsController.prepare', startedAt);
-    })());
+        recommendedSettingsPreparePromise = recommendedSettingsController.prepare().then(() => {
+            recommendedSettingsPrepared = true;
+            recordPhase(startupPhases, 'recommendedSettingsController.prepare', startedAt);
+        }, (error) => {
+            recommendedSettingsPreparePromise = null;
+            reportDiagnostics('recommendedSettingsController.prepare-failed', {
+                message: error instanceof Error ? error.message : String(error),
+            });
+        });
+    };
+    globalThis.addEventListener('manabitan:modal-visibility-changed', (event) => {
+        if (!(event instanceof CustomEvent)) { return; }
+        const detail = /** @type {unknown} */ (event.detail);
+        if (!(typeof detail === 'object' && detail !== null)) { return; }
+        if (Reflect.get(detail, 'modalId') !== 'recommended-settings') { return; }
+        if (Reflect.get(detail, 'visible') !== true) { return; }
+        prepareRecommendedSettingsOnDemand();
+    }, false);
 
     await Promise.all(preparePromises);
     const totalElapsedMs = Math.max(0, getNowMs() - startupStartedAt);

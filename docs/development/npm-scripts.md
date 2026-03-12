@@ -88,12 +88,20 @@ Scripts can be executed by running `npm run <name>`.
 - `test:unit`
   Runs all of the unit tests in the project using [vitest](https://vitest.dev/).
 
+- `test:unit:coverage`
+  Runs unit tests with coverage enabled and writes coverage artifacts to `builds/coverage`.
+  Includes a console text summary and a `coverage-summary.json` artifact for scripted monitoring.
+
 - `test:unit:write`
   Overwrites the expected test output data for some of the larger tests.
   This usually only needs to be run when something modifies the format of dictionary entries or Anki data.
 
 - `test:unit:options`
   Runs unit tests related to the extension's options and their upgrade process.
+
+- `test:coverage`
+  Runs `test:unit:coverage` and then prints a coverage monitor report with overall totals plus the lowest-covered files.
+  Optional thresholds can be passed to the monitor script, e.g. `--fail-under=80`.
 
 - `test:playwright`
   Runs Playwright tests.
@@ -110,6 +118,68 @@ Scripts can be executed by running `npm run <name>`.
   - Node.js 22
   - `selenium-webdriver` installed (`npm install --no-save selenium-webdriver@4.38.0`)
   - a built Firefox `.xpi` at `builds/manabitan-firefox-dev.xpi` (or set `MANABITAN_FIREFOX_XPI` to override)
+
+- `test:e2e:chromium-anki-dedupe`
+  Runs the dedicated Chromium Anki deduplication matrix using Playwright and a deterministic local mocked AnkiConnect endpoint.
+  Mock-mode behavior:
+
+  - No desktop Anki instance is required.
+  - The suite starts a local HTTP mock AnkiConnect server and forces deterministic Anki settings through `optionsGetFull` + `setAllSettings`.
+  - The suite imports a minimal deterministic dictionary fixture through runtime API and exercises the full dedupe matrix from the search UI.
+
+  Prerequisites:
+
+  - Chromium available for Playwright extension launch.
+  - Node.js 22.
+  - `sqlite3` on `PATH` (used to build the deterministic dictionary database fixture).
+
+  Reports:
+
+  - `builds/chromium-e2e-anki-dedupe-report.html` (+ `.json`)
+  - `builds/extension-e2e-anki-dedupe-report.html` (combined desktop tabs)
+
+- `test:e2e:firefox-anki-dedupe`
+  Runs the dedicated Firefox Anki deduplication matrix using Selenium plus the same deterministic mocked AnkiConnect endpoint and expected-result matrix as Chromium.
+  Mock-mode behavior:
+
+  - No desktop Anki instance is required.
+  - The suite points extension Anki settings at the local mock endpoint and validates save-button/UI dedupe affordances plus backend write actions.
+
+  Prerequisites:
+
+  - Firefox installed.
+  - `geckodriver` on `PATH`.
+  - Node.js 22.
+  - `selenium-webdriver` installed (`npm install --no-save selenium-webdriver@4.38.0`).
+  - built Firefox extension package (`builds/manabitan-firefox-dev.zip` or `.xpi`, or set `MANABITAN_FIREFOX_XPI`).
+  - `sqlite3` on `PATH` (used to build the deterministic dictionary database fixture).
+
+  Reports:
+
+  - `builds/firefox-e2e-anki-dedupe-report.html` (+ `.json`)
+  - `builds/extension-e2e-anki-dedupe-report.html` (combined desktop tabs)
+
+- `test:e2e:firefox-android-anki-dedupe`
+  Runs Firefox Android validation as `web-ext` device smoke plus the same maximal dedupe matrix executed as protocol-level contract checks using the shared mock/state model.
+  This lane does not drive Android UI interactions for dedupe; it verifies contract behavior and expected write decisions.
+
+  Prerequisites:
+
+  - `adb` installed and a connected device/emulator.
+  - `web-ext` available through `npx web-ext`.
+  - Firefox for Android installed on device (or set `MANABITAN_ANDROID_AUTO_INSTALL_FIREFOX=1`).
+  - built Firefox Android extension output (`builds/*-firefox-android`), or set `MANABITAN_ANDROID_SOURCE_DIR`.
+
+  Reports:
+
+  - `builds/firefox-android-e2e-anki-dedupe-report.html` (+ `.json`)
+
+- `test:e2e:anki-dedupe`
+  Nightly-grade aggregate launcher for the full dedupe coverage lanes:
+
+  - Chromium UI matrix (`test:e2e:chromium-anki-dedupe`)
+  - Firefox UI matrix (`test:e2e:firefox-anki-dedupe`)
+  - Firefox Android smoke + protocol contract matrix (`test:e2e:firefox-android-anki-dedupe`)
 
 - `test:build`
   Performs a dry run of the build process without generating any files.

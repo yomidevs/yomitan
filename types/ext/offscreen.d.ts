@@ -19,6 +19,7 @@ import type * as Dictionary from './dictionary';
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
+import type * as Core from './core';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
 import type {
@@ -35,9 +36,47 @@ type ApiSurface = {
         params: void;
         return: void;
     };
+    databaseRefreshOffscreen: {
+        params: void;
+        return: void;
+    };
+    databaseSetSuspendedOffscreen: {
+        params: {
+            suspended: boolean;
+        };
+        return: void;
+    };
     getDictionaryInfoOffscreen: {
         params: void;
         return: DictionaryImporter.Summary[];
+    };
+    getMaxHeadwordLengthOffscreen: {
+        params: void;
+        return: number;
+    };
+    deleteDictionaryOffscreen: {
+        params: {
+            dictionaryTitle: string;
+        };
+        return: void;
+    };
+    getDictionaryCountsOffscreen: {
+        params: {
+            dictionaryNames: string[];
+            getTotal: boolean;
+        };
+        return: DictionaryDatabase.DictionaryCounts;
+    };
+    importDictionaryArchiveOffscreen: {
+        params: {
+            archiveContent: ArrayBuffer;
+            importDetails: DictionaryImporter.ImportDetails;
+        };
+        return: {
+            result: DictionaryImporter.Summary | null;
+            errors: Core.SerializedError[];
+            debug?: unknown;
+        };
     };
     databasePurgeOffscreen: {
         params: void;

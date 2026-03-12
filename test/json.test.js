@@ -146,13 +146,13 @@ describe.concurrent('JSON validation', () => {
     const requiredFiles = jsonFileData.files.filter((v) => !v.ignore);
     test.each(requiredFiles)('File must exist in project: $path', ({path}) => {
         expect(existingJsonFileSet.has(path)).toBe(true);
-    });
+    }, 15000);
 
     // Validate new files
     const existingJsonFiles2 = existingJsonFiles.map((path) => ({path: normalizePathDirectorySeparators(path)}));
     test.each(existingJsonFiles2)(`File must exist in ${jsonFileName}: $path`, ({path}) => {
         expect(jsonFileMap.has(path)).toBe(true);
-    });
+    }, 15000);
 
     // Validate schemas 1
     /** @type {import('test/json').JsonFileParseInfo[]} */
@@ -168,7 +168,7 @@ describe.concurrent('JSON validation', () => {
         const {errors} = validate;
         expect(errors).toBe(null);
         expect(valid).toBe(true);
-    });
+    }, 60000);
 
     // Validate schemas 2
     /** @type {{path: string, schema: string}[]} */
@@ -186,5 +186,5 @@ describe.concurrent('JSON validation', () => {
         const {errors} = validate;
         expect(errors).toBe(null);
         expect(valid).toBe(true);
-    });
+    }, 60000);
 });

@@ -36,16 +36,99 @@ import {
     logTermContentZstdError,
     resolveTermContentZstdDictName,
 } from './zstd-term-content.js';
+import {
+    decodeRawTermContentHeader,
+    RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME,
+    decodeRawTermContentSharedGlossaryHeader,
+    encodeRawTermContentBinary,
+    getRawTermContentGlossaryJsonBytes,
+    isRawTermContentBinary,
+    isRawTermContentSharedGlossaryBinary,
+    RAW_TERM_CONTENT_DICT_NAME,
+    RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME,
+} from './raw-term-content.js';
+import {decompress as zstdDecompress} from '../../lib/zstd-wasm.js';
 import {TermContentOpfsStore} from './term-content-opfs-store.js';
 import {TermRecordOpfsStore} from './term-record-opfs-store.js';
+
+const CURRENT_DICTIONARY_SCHEMA_VERSION = 4;
+const TERM_ENTRY_CONTENT_CACHE_MAX_ENTRIES = 4096;
+const DEFAULT_STATEMENT_CACHE_MAX_ENTRIES = 256;
+const LOW_MEMORY_STATEMENT_CACHE_MAX_ENTRIES = 128;
+const DEFAULT_TERM_EXACT_PRESENCE_CACHE_MAX_ENTRIES = 25000;
+const LOW_MEMORY_TERM_EXACT_PRESENCE_CACHE_MAX_ENTRIES = 8000;
+const TERM_BULK_ADD_STAGING_MAX_ROWS = 3000;
+const DEFAULT_TERM_BULK_ADD_STAGING_MAX_ROWS = 4096;
+const HIGH_MEMORY_TERM_BULK_ADD_STAGING_MAX_ROWS = 10240;
+const TERM_CONTENT_STORAGE_MODE_BASELINE = 'baseline';
+const TERM_CONTENT_STORAGE_MODE_RAW_BYTES = 'raw-bytes';
+const DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES = 4 * 1024 * 1024;
+
+/**
+ * @param {string} value
+ * @returns {[number, number]|null}
+ */
+function parseContentHashHexPair(value) {
+    if (value.length !== 16) { return null; }
+    const hash1 = Number.parseInt(value.slice(0, 8), 16);
+    const hash2 = Number.parseInt(value.slice(8, 16), 16);
+    if (!Number.isFinite(hash1) || !Number.isFinite(hash2)) { return null; }
+    return [hash1 >>> 0, hash2 >>> 0];
+}
+
+/**
+ * @param {Uint8Array[]} chunks
+ * @param {number} targetBytes
+ * @returns {{packedChunks: Uint8Array[], sourceChunkIndices: number[], sourceChunkLocalOffsets: number[]}}
+ */
+function packContentChunksIntoSlabs(chunks, targetBytes) {
+    /** @type {Uint8Array[]} */
+    const packedChunks = [];
+    /** @type {number[]} */
+    const sourceChunkIndices = new Array(chunks.length);
+    /** @type {number[]} */
+    const sourceChunkLocalOffsets = new Array(chunks.length);
+    let startIndex = 0;
+    while (startIndex < chunks.length) {
+        let totalBytes = 0;
+        let endIndex = startIndex;
+        while (endIndex < chunks.length) {
+            const nextBytes = chunks[endIndex].byteLength;
+            if (totalBytes > 0 && (totalBytes + nextBytes) > targetBytes) {
+                break;
+            }
+            totalBytes += nextBytes;
+            ++endIndex;
+        }
+        if (totalBytes <= 0) {
+            sourceChunkIndices[startIndex] = packedChunks.length;
+            sourceChunkLocalOffsets[startIndex] = 0;
+            packedChunks.push(chunks[startIndex]);
+            ++startIndex;
+            continue;
+        }
+        const packedIndex = packedChunks.length;
+        const packed = new Uint8Array(totalBytes);
+        let offset = 0;
+        for (let i = startIndex; i < endIndex; ++i) {
+            const chunk = chunks[i];
+            sourceChunkIndices[i] = packedIndex;
+            sourceChunkLocalOffsets[i] = offset;
+            packed.set(chunk, offset);
+            offset += chunk.byteLength;
+        }
+        packedChunks.push(packed);
+        startIndex = endIndex;
+    }
+    return {packedChunks, sourceChunkIndices, sourceChunkLocalOffsets};
+}
+
 
 /**
  * @typedef {object} InsertStatement
  * @property {string} sql
  * @property {(item: unknown) => import('@sqlite.org/sqlite-wasm').BindingSpec} bind
  */
-
-const DICTIONARY_DB_SCHEMA_VERSION = 1;
 
 export class DictionaryDatabase {
     constructor() {
@@ -59,6 +142,10 @@ export class DictionaryDatabase {
         this._usesFallbackStorage = false;
         /** @type {{mode: string, forceFallback: boolean, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, attempts?: Array<{strategy: string, target: string, flags: string, error: string}>, lastError?: string|null}|null} */
         this._openStorageDiagnostics = null;
+        /** @type {Record<string, unknown>|null} */
+        this._startupCleanupIncompleteImportsSummary = null;
+        /** @type {Record<string, unknown>|null} */
+        this._startupCleanupMissingTermRecordShardsSummary = null;
         /** @type {number} */
         this._bulkImportDepth = 0;
         /** @type {boolean} */
@@ -73,38 +160,54 @@ export class DictionaryDatabase {
         this._termEntryContentIdByHash = new Map();
         /** @type {Map<string, {id: number, offset: number, length: number, dictName: string}>} */
         this._termEntryContentMetaByHash = new Map();
+        /** @type {Map<number, Map<number, {id: number, offset: number, length: number, dictName: string}>>} */
+        this._termEntryContentMetaByHashPair = new Map();
         /** @type {boolean} */
         this._termEntryContentHasExistingRows = true;
         /** @type {boolean} */
         this._enableTermEntryContentDedup = true;
         /** @type {Map<string, import('@sqlite.org/sqlite-wasm').PreparedStatement>} */
         this._statementCache = new Map();
-        /** @type {Map<string, {definitionTags: string|null, termTags: string|undefined, rules: string, glossary: import('dictionary-data').TermGlossary[]}>} */
+        /** @type {number} */
+        this._statementCacheMaxEntries = this._computeStatementCacheMaxEntries();
+        /** @type {Map<string, {definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson?: string, glossary?: import('dictionary-data').TermGlossary[]}>} */
         this._termEntryContentCache = new Map();
+        /** @type {Map<string, {contentOffset: number, contentLength: number, contentDictName: string, uncompressedLength: number}>} */
+        this._sharedGlossaryArtifactMetaByDictionary = new Map();
+        /** @type {Map<string, Uint8Array>} */
+        this._sharedGlossaryArtifactInflatedByDictionary = new Map();
+        /** @type {number} */
+        this._termEntryContentCacheMaxEntries = TERM_ENTRY_CONTENT_CACHE_MAX_ENTRIES;
         /** @type {TextEncoder} */
         this._textEncoder = new TextEncoder();
         /** @type {TextDecoder} */
         this._textDecoder = new TextDecoder();
         /** @type {boolean} */
         this._termContentZstdInitialized = false;
+        /** @type {'baseline'|'raw-bytes'} */
+        this._termContentStorageMode = TERM_CONTENT_STORAGE_MODE_BASELINE;
         /** @type {Map<string, boolean>} */
         this._termExactPresenceCache = new Map();
+        /** @type {number} */
+        this._termExactPresenceCacheMaxEntries = this._computeTermExactPresenceCacheMaxEntries();
         /** @type {Map<string, boolean>} */
         this._termPrefixNegativeCache = new Map();
+        /** @type {number|null} */
+        this._maxHeadwordLengthCache = null;
         /** @type {Map<string, {expression: Map<string, number[]>, reading: Map<string, number[]>, expressionReverse: Map<string, number[]>, readingReverse: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}>} */
         this._directTermIndexByDictionary = new Map();
         /** @type {import('@sqlite.org/sqlite-wasm').sqlite3_module|null} */
         this._termsVtabModule = null;
         /** @type {boolean} */
         this._termsVtabModuleRegistered = false;
-        /** @type {boolean} */
-        this._forceDropTermsTableOnInit = false;
         /** @type {Map<number, {ids: number[], index: number}>} */
         this._termsVtabCursorState = new Map();
         /** @type {boolean} */
         this._enableSqliteSecondaryIndexes = false;
         /** @type {number} */
         this._termContentCompressionMinBytes = 1048576;
+        /** @type {number} */
+        this._rawTermContentPackTargetBytes = DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES;
         /** @type {boolean} */
         this._importDebugLogging = false;
         /** @type {number} */
@@ -117,6 +220,20 @@ export class DictionaryDatabase {
         this._termBulkAddFailFastMinRowsBeforeCheck = 32768;
         /** @type {number} */
         this._termBulkAddFailFastWindowSize = 5;
+        /** @type {number} */
+        this._termBulkAddBatchSize = 25000;
+        /** @type {boolean} */
+        this._adaptiveTermBulkAddBatchSize = true;
+        /** @type {boolean} */
+        this._retryBeginImmediateTransaction = false;
+        /** @type {boolean} */
+        this._skipIntraBatchContentDedup = false;
+        /** @type {number} */
+        this._termBulkAddStagingMaxRows = this._computeDefaultTermBulkAddStagingMaxRows();
+        /** @type {boolean} */
+        this._termRecordRowAppendFastPath = true;
+        /** @type {{contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number}|null} */
+        this._lastBulkAddTermsMetrics = null;
         /** @type {TermContentOpfsStore} */
         this._termContentStore = new TermContentOpfsStore();
         /** @type {TermRecordOpfsStore} */
@@ -153,6 +270,7 @@ export class DictionaryDatabase {
             this._termContentZstdInitialized = true;
             await this._deleteLegacyIndexedDb();
             await this._cleanupIncompleteImports();
+            await this._cleanupMissingTermRecordShards();
 
             // keep existing draw worker split behaviour.
             const isWorker = self.constructor.name !== 'Window';
@@ -194,6 +312,7 @@ export class DictionaryDatabase {
         this._termEntryContentIdByHash.clear();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
+        this._invalidateMaxHeadwordLengthCache();
         this._directTermIndexByDictionary.clear();
         this._clearTermsVtabCursorState();
         this._termsVtabModuleRegistered = false;
@@ -217,6 +336,22 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {boolean} suspended
+     * @returns {Promise<void>}
+     */
+    async setSuspended(suspended) {
+        if (suspended) {
+            if (this._db !== null) {
+                await this.close();
+            }
+            return;
+        }
+        if (this._db === null) {
+            await this.prepare();
+        }
+    }
+
+    /**
      * @returns {boolean}
      */
     usesFallbackStorage() {
@@ -231,6 +366,20 @@ export class DictionaryDatabase {
             return null;
         }
         return {...this._openStorageDiagnostics};
+    }
+
+    /**
+     * @returns {Record<string, unknown>|null}
+     */
+    getStartupCleanupIncompleteImportsSummary() {
+        return this._startupCleanupIncompleteImportsSummary;
+    }
+
+    /**
+     * @returns {Record<string, unknown>|null}
+     */
+    getStartupCleanupMissingTermRecordShardsSummary() {
+        return this._startupCleanupMissingTermRecordShardsSummary;
     }
 
     /** */
@@ -248,12 +397,12 @@ export class DictionaryDatabase {
             }
             this._termEntryContentIdByKey.clear();
             this._termEntryContentIdByHash.clear();
-            this._termEntryContentMetaByHash.clear();
+            this._clearTermEntryContentMetaCaches();
             this._termEntryContentCache.clear();
             this._termExactPresenceCache.clear();
             this._termPrefixNegativeCache.clear();
             this._directTermIndexByDictionary.clear();
-            db.exec('BEGIN IMMEDIATE');
+            await this._beginImmediateTransaction(db);
             this._bulkImportTransactionOpen = true;
         }
         ++this._bulkImportDepth;
@@ -261,25 +410,85 @@ export class DictionaryDatabase {
 
     /**
      * @param {((index: number, count: number) => void)?} [onCheckpoint]
+     * @returns {Promise<{commitMs: number, termContentEndImportSessionMs: number, termContentEndImportSessionFlushPendingWritesMs: number, termContentEndImportSessionAwaitQueuedWritesMs: number, termContentEndImportSessionCloseWritableMs: number, termContentDrainCycleCount: number, termContentWriteCallCount: number, termContentSingleChunkWriteCount: number, termContentMergedWriteCount: number, termContentTotalWriteBytes: number, termContentMergedWriteBytes: number, termContentMaxWriteBytes: number, termContentMergedGroupChunkCount: number, termContentMaxMergedGroupChunkCount: number, termContentFlushDueToBytesCount: number, termContentFlushDueToChunkCount: number, termContentFlushFinalGroupCount: number, termContentWriteCoalesceTargetBytes: number, termContentWriteCoalesceMaxChunks: number, termRecordEndImportSessionMs: number, termsVirtualTableSyncMs: number, createIndexesMs: number, createIndexesCheckpointCount: number, cacheResetMs: number, runtimePragmasMs: number, totalMs: number}|null>}
      */
     async finishBulkImport(onCheckpoint = null) {
         if (this._bulkImportDepth <= 0) {
-            return;
+            return null;
         }
         --this._bulkImportDepth;
         if (this._bulkImportDepth === 0) {
             const db = this._requireDb();
+            const tFinishBulkImportStart = safePerformance.now();
+            let commitMs = 0;
+            let termContentEndImportSessionMs = 0;
+            let termContentEndImportSessionFlushPendingWritesMs = 0;
+            let termContentEndImportSessionAwaitQueuedWritesMs = 0;
+            let termContentEndImportSessionCloseWritableMs = 0;
+            let termContentDrainCycleCount = 0;
+            let termContentWriteCallCount = 0;
+            let termContentSingleChunkWriteCount = 0;
+            let termContentMergedWriteCount = 0;
+            let termContentTotalWriteBytes = 0;
+            let termContentMergedWriteBytes = 0;
+            let termContentMaxWriteBytes = 0;
+            let termContentMergedGroupChunkCount = 0;
+            let termContentMaxMergedGroupChunkCount = 0;
+            let termContentFlushDueToBytesCount = 0;
+            let termContentFlushDueToChunkCount = 0;
+            let termContentFlushFinalGroupCount = 0;
+            let termContentWriteCoalesceTargetBytes = 0;
+            let termContentWriteCoalesceMaxChunks = 0;
+            let termRecordEndImportSessionMs = 0;
+            let termsVirtualTableSyncMs = 0;
+            let createIndexesMs = 0;
+            let createIndexesCheckpointCount = 0;
+            let cacheResetMs = 0;
+            let runtimePragmasMs = 0;
             try {
                 if (this._bulkImportTransactionOpen) {
+                    const tCommitStart = safePerformance.now();
                     db.exec('COMMIT');
+                    commitMs = safePerformance.now() - tCommitStart;
                     this._bulkImportTransactionOpen = false;
                 }
-                await this._termContentStore.endImportSession();
-                await this._termRecordStore.endImportSession();
+                const tTermContentEndImportSessionStart = safePerformance.now();
+                const termContentEndImportSessionPromise = this._termContentStore.endImportSession()
+                    .then(() => {
+                        termContentEndImportSessionMs = safePerformance.now() - tTermContentEndImportSessionStart;
+                        const metrics = this._termContentStore.getLastEndImportSessionMetrics();
+                        if (metrics !== null) {
+                            termContentEndImportSessionFlushPendingWritesMs = metrics.flushPendingWritesMs;
+                            termContentEndImportSessionAwaitQueuedWritesMs = metrics.awaitQueuedWritesMs;
+                            termContentEndImportSessionCloseWritableMs = metrics.closeWritableMs;
+                            termContentDrainCycleCount = metrics.drainCycleCount;
+                            termContentWriteCallCount = metrics.writeCallCount;
+                            termContentSingleChunkWriteCount = metrics.singleChunkWriteCount;
+                            termContentMergedWriteCount = metrics.mergedWriteCount;
+                            termContentTotalWriteBytes = metrics.totalWriteBytes;
+                            termContentMergedWriteBytes = metrics.mergedWriteBytes;
+                            termContentMaxWriteBytes = metrics.maxWriteBytes;
+                            termContentMergedGroupChunkCount = metrics.mergedGroupChunkCount;
+                            termContentMaxMergedGroupChunkCount = metrics.maxMergedGroupChunkCount;
+                            termContentFlushDueToBytesCount = metrics.flushDueToBytesCount;
+                            termContentFlushDueToChunkCount = metrics.flushDueToChunkCount;
+                            termContentFlushFinalGroupCount = metrics.flushFinalGroupCount;
+                            termContentWriteCoalesceTargetBytes = metrics.writeCoalesceTargetBytes;
+                            termContentWriteCoalesceMaxChunks = metrics.writeCoalesceMaxChunks;
+                        }
+                    });
+                const tTermRecordEndImportSessionStart = safePerformance.now();
+                const termRecordEndImportSessionPromise = this._termRecordStore.endImportSession()
+                    .then(() => {
+                        termRecordEndImportSessionMs = safePerformance.now() - tTermRecordEndImportSessionStart;
+                    });
+                await Promise.all([termContentEndImportSessionPromise, termRecordEndImportSessionPromise]);
                 if (this._termsVirtualTableDirty) {
-                    db.exec('BEGIN IMMEDIATE');
+                    await this._beginImmediateTransaction(db);
                     try {
+                        const tTermsVirtualTableSyncStart = safePerformance.now();
                         await this._syncTermsVirtualTableFromRecordStore();
+                        termsVirtualTableSyncMs = safePerformance.now() - tTermsVirtualTableSyncStart;
                         db.exec('COMMIT');
                         this._termsVirtualTableDirty = false;
                     } catch (e) {
@@ -288,21 +497,88 @@ export class DictionaryDatabase {
                     }
                 }
                 const createIndexStatements = this._createIndexesSql();
+                const tCreateIndexesStart = safePerformance.now();
                 for (let i = 0; i < createIndexStatements.length; ++i) {
                     db.exec(createIndexStatements[i]);
                     if (typeof onCheckpoint === 'function') {
                         onCheckpoint(i + 1, createIndexStatements.length);
                     }
                 }
+                createIndexesMs = safePerformance.now() - tCreateIndexesStart;
+                createIndexesCheckpointCount = createIndexStatements.length;
+                const tCacheResetStart = safePerformance.now();
                 this._termEntryContentIdByKey.clear();
                 this._termEntryContentIdByHash.clear();
-                this._termEntryContentMetaByHash.clear();
+                this._clearTermEntryContentMetaCaches();
                 this._termEntryContentCache.clear();
                 this._termExactPresenceCache.clear();
                 this._termPrefixNegativeCache.clear();
                 this._directTermIndexByDictionary.clear();
+                cacheResetMs = safePerformance.now() - tCacheResetStart;
                 this._deferTermsVirtualTableSync = false;
+                const tRuntimePragmasStart = safePerformance.now();
                 this._applyRuntimePragmas();
+                runtimePragmasMs = safePerformance.now() - tRuntimePragmasStart;
+                const totalMs = safePerformance.now() - tFinishBulkImportStart;
+                if (this._importDebugLogging) {
+                    log.log(
+                        '[manabitan-db-import] finishBulkImport ' +
+                        `total=${totalMs.toFixed(1)}ms ` +
+                        `commit=${commitMs.toFixed(1)}ms ` +
+                        `termContentEnd=${termContentEndImportSessionMs.toFixed(1)}ms ` +
+                        `termContentFlush=${termContentEndImportSessionFlushPendingWritesMs.toFixed(1)}ms ` +
+                        `termContentAwait=${termContentEndImportSessionAwaitQueuedWritesMs.toFixed(1)}ms ` +
+                        `termContentClose=${termContentEndImportSessionCloseWritableMs.toFixed(1)}ms ` +
+                        `termContentDrainCycles=${termContentDrainCycleCount} ` +
+                        `termContentWrites=${termContentWriteCallCount} ` +
+                        `termContentSingleWrites=${termContentSingleChunkWriteCount} ` +
+                        `termContentMergedWrites=${termContentMergedWriteCount} ` +
+                        `termContentTotalWriteBytes=${termContentTotalWriteBytes} ` +
+                        `termContentMergedWriteBytes=${termContentMergedWriteBytes} ` +
+                        `termContentMaxWriteBytes=${termContentMaxWriteBytes} ` +
+                        `termContentMergedGroupChunks=${termContentMergedGroupChunkCount} ` +
+                        `termContentMaxMergedGroupChunks=${termContentMaxMergedGroupChunkCount} ` +
+                        `termContentFlushDueToBytes=${termContentFlushDueToBytesCount} ` +
+                        `termContentFlushDueToChunks=${termContentFlushDueToChunkCount} ` +
+                        `termContentFlushFinalGroups=${termContentFlushFinalGroupCount} ` +
+                        `termContentWriteCoalesceTargetBytes=${termContentWriteCoalesceTargetBytes} ` +
+                        `termContentWriteCoalesceMaxChunks=${termContentWriteCoalesceMaxChunks} ` +
+                        `termRecordEnd=${termRecordEndImportSessionMs.toFixed(1)}ms ` +
+                        `termsVtabSync=${termsVirtualTableSyncMs.toFixed(1)}ms ` +
+                        `createIndexes=${createIndexesMs.toFixed(1)}ms ` +
+                        `cacheReset=${cacheResetMs.toFixed(1)}ms ` +
+                        `runtimePragmas=${runtimePragmasMs.toFixed(1)}ms ` +
+                        `indexStatements=${createIndexesCheckpointCount}`,
+                    );
+                }
+                return {
+                    commitMs,
+                    termContentEndImportSessionMs,
+                    termContentEndImportSessionFlushPendingWritesMs,
+                    termContentEndImportSessionAwaitQueuedWritesMs,
+                    termContentEndImportSessionCloseWritableMs,
+                    termContentDrainCycleCount,
+                    termContentWriteCallCount,
+                    termContentSingleChunkWriteCount,
+                    termContentMergedWriteCount,
+                    termContentTotalWriteBytes,
+                    termContentMergedWriteBytes,
+                    termContentMaxWriteBytes,
+                    termContentMergedGroupChunkCount,
+                    termContentMaxMergedGroupChunkCount,
+                    termContentFlushDueToBytesCount,
+                    termContentFlushDueToChunkCount,
+                    termContentFlushFinalGroupCount,
+                    termContentWriteCoalesceTargetBytes,
+                    termContentWriteCoalesceMaxChunks,
+                    termRecordEndImportSessionMs,
+                    termsVirtualTableSyncMs,
+                    createIndexesMs,
+                    createIndexesCheckpointCount,
+                    cacheResetMs,
+                    runtimePragmasMs,
+                    totalMs,
+                };
             } finally {
                 if (this._bulkImportTransactionOpen) {
                     try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
@@ -311,38 +587,6 @@ export class DictionaryDatabase {
                 await this._termContentStore.endImportSession();
                 await this._termRecordStore.endImportSession();
             }
-        }
-    }
-
-    /** */
-    async abortBulkImport() {
-        if (this._bulkImportDepth <= 0) {
-            return;
-        }
-        const db = this._requireDb();
-        this._bulkImportDepth = 0;
-        try {
-            if (this._bulkImportTransactionOpen) {
-                db.exec('ROLLBACK');
-                this._bulkImportTransactionOpen = false;
-            }
-            await this._termContentStore.abortImportSession();
-            await this._termRecordStore.abortImportSession();
-            this._termsVirtualTableDirty = false;
-        } finally {
-            if (this._bulkImportTransactionOpen) {
-                try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
-                this._bulkImportTransactionOpen = false;
-            }
-            this._termEntryContentIdByKey.clear();
-            this._termEntryContentIdByHash.clear();
-            this._termEntryContentMetaByHash.clear();
-            this._termEntryContentCache.clear();
-            this._termExactPresenceCache.clear();
-            this._termPrefixNegativeCache.clear();
-            this._directTermIndexByDictionary.clear();
-            this._deferTermsVirtualTableSync = false;
-            this._applyRuntimePragmas();
         }
     }
 
@@ -361,12 +605,32 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {{termContentStorageMode?: 'baseline'|'raw-bytes'}} [options]
+     */
+    setImportOptimizationFlags(options = {}) {
+        this._adaptiveTermBulkAddBatchSize = true;
+        this._retryBeginImmediateTransaction = false;
+        this._skipIntraBatchContentDedup = false;
+        this._termBulkAddStagingMaxRows = this._computeDefaultTermBulkAddStagingMaxRows();
+        this._termRecordRowAppendFastPath = true;
+        this._termContentStorageMode = (options.termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) ?
+            options.termContentStorageMode :
+            TERM_CONTENT_STORAGE_MODE_BASELINE;
+        this._termContentCompressionMinBytes = 1048576;
+        this._rawTermContentPackTargetBytes = DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES;
+        this._termContentStore.setImportStorageMode(this._termContentStorageMode);
+        this._termContentStore.setWriteCoalesceMaxChunksOverride(null);
+    }
+
+    /**
      * @returns {Promise<boolean>}
      */
     async purge() {
         if (this._isOpening) {
             throw new Error('Cannot purge database while opening');
         }
+
+        this._invalidateMaxHeadwordLengthCache();
 
         if (this._db !== null) {
             if (this._bulkImportTransactionOpen) {
@@ -399,7 +663,7 @@ export class DictionaryDatabase {
         await this.prepare();
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
-        this._termEntryContentMetaByHash.clear();
+        this._clearTermEntryContentMetaCaches();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -430,29 +694,15 @@ export class DictionaryDatabase {
             // In-memory/non-WAL databases may reject checkpoint pragmas.
         }
         try {
-            /** @type {ArrayBuffer|null} */
-            let exported = null;
-            const exportBinaryImage = /** @type {unknown} */ (Reflect.get(db, 'exportBinaryImage'));
-            if (typeof exportBinaryImage === 'function') {
+            const snapshotDb = await this._createExportSnapshotDatabase();
+            let exported;
+            try {
+                exported = this._exportDatabaseImage(snapshotDb, sqlite3);
+            } finally {
                 try {
-                    const raw = /** @type {() => Uint8Array|ArrayBuffer} */ (exportBinaryImage).call(db);
-                    const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
-                    if (bytes.byteLength > 0) {
-                        exported = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-                    }
+                    snapshotDb.close();
                 } catch (_) {
-                    // Fall back to sqlite3_js_db_export below.
-                }
-            }
-            if (exported === null) {
-                const dbPointer = db.pointer;
-                if (typeof dbPointer !== 'number') {
-                    throw new Error('sqlite database pointer is unavailable');
-                }
-                const raw = sqlite3.capi.sqlite3_js_db_export(dbPointer);
-                const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
-                if (bytes.byteLength > 0) {
-                    exported = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+                    // Ignore snapshot close failures after export.
                 }
             }
             if (exported === null || exported.byteLength === 0) {
@@ -473,6 +723,315 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @returns {Promise<import('@sqlite.org/sqlite-wasm').Database>}
+     */
+    async _createExportSnapshotDatabase() {
+        const sourceDb = this._requireDb();
+        const sqlite3 = this._requireSqlite3();
+        const snapshotDb = new sqlite3.oo1.DB(':memory:', 'ct');
+        snapshotDb.exec(`
+            PRAGMA journal_mode = DELETE;
+            PRAGMA synchronous = NORMAL;
+            PRAGMA user_version = ${CURRENT_DICTIONARY_SCHEMA_VERSION};
+
+            CREATE TABLE dictionaries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                version INTEGER NOT NULL,
+                summaryJson TEXT NOT NULL
+            );
+
+            CREATE TABLE terms (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                expression TEXT NOT NULL,
+                reading TEXT NOT NULL,
+                expressionReverse TEXT,
+                readingReverse TEXT,
+                definitionTags TEXT,
+                termTags TEXT,
+                rules TEXT,
+                score INTEGER,
+                glossaryJson TEXT NOT NULL,
+                sequence INTEGER
+            );
+
+            CREATE TABLE termMeta (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                expression TEXT NOT NULL,
+                mode TEXT NOT NULL,
+                dataJson TEXT NOT NULL
+            );
+
+            CREATE TABLE kanji (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                character TEXT NOT NULL,
+                onyomi TEXT,
+                kunyomi TEXT,
+                tags TEXT,
+                meaningsJson TEXT NOT NULL,
+                statsJson TEXT
+            );
+
+            CREATE TABLE kanjiMeta (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                character TEXT NOT NULL,
+                mode TEXT NOT NULL,
+                dataJson TEXT NOT NULL
+            );
+
+            CREATE TABLE tagMeta (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                name TEXT NOT NULL,
+                category TEXT,
+                ord INTEGER,
+                notes TEXT,
+                score INTEGER
+            );
+
+            CREATE TABLE media (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                path TEXT NOT NULL,
+                mediaType TEXT NOT NULL,
+                width INTEGER NOT NULL,
+                height INTEGER NOT NULL,
+                content BLOB NOT NULL
+            );
+        `);
+
+        snapshotDb.exec('BEGIN');
+        try {
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT title, version, summaryJson FROM dictionaries ORDER BY id ASC',
+                'INSERT INTO dictionaries(title, version, summaryJson) VALUES($title, $version, $summaryJson)',
+                (row) => ({
+                    $title: this._asString(row.title),
+                    $version: this._asNumber(row.version, 0),
+                    $summaryJson: this._asString(row.summaryJson),
+                }),
+            );
+            await this._copyTermRowsToDatabase(snapshotDb);
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT dictionary, expression, mode, dataJson FROM termMeta ORDER BY id ASC',
+                'INSERT INTO termMeta(dictionary, expression, mode, dataJson) VALUES($dictionary, $expression, $mode, $dataJson)',
+                (row) => ({
+                    $dictionary: this._asString(row.dictionary),
+                    $expression: this._asString(row.expression),
+                    $mode: this._asString(row.mode),
+                    $dataJson: this._asString(row.dataJson),
+                }),
+            );
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT dictionary, character, onyomi, kunyomi, tags, meaningsJson, statsJson FROM kanji ORDER BY id ASC',
+                'INSERT INTO kanji(dictionary, character, onyomi, kunyomi, tags, meaningsJson, statsJson) VALUES($dictionary, $character, $onyomi, $kunyomi, $tags, $meaningsJson, $statsJson)',
+                (row) => ({
+                    $dictionary: this._asString(row.dictionary),
+                    $character: this._asString(row.character),
+                    $onyomi: this._asNullableString(row.onyomi),
+                    $kunyomi: this._asNullableString(row.kunyomi),
+                    $tags: this._asNullableString(row.tags),
+                    $meaningsJson: this._asString(row.meaningsJson),
+                    $statsJson: this._asNullableString(row.statsJson),
+                }),
+            );
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT dictionary, character, mode, dataJson FROM kanjiMeta ORDER BY id ASC',
+                'INSERT INTO kanjiMeta(dictionary, character, mode, dataJson) VALUES($dictionary, $character, $mode, $dataJson)',
+                (row) => ({
+                    $dictionary: this._asString(row.dictionary),
+                    $character: this._asString(row.character),
+                    $mode: this._asString(row.mode),
+                    $dataJson: this._asString(row.dataJson),
+                }),
+            );
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT dictionary, name, category, ord, notes, score FROM tagMeta ORDER BY id ASC',
+                'INSERT INTO tagMeta(dictionary, name, category, ord, notes, score) VALUES($dictionary, $name, $category, $ord, $notes, $score)',
+                (row) => ({
+                    $dictionary: this._asString(row.dictionary),
+                    $name: this._asString(row.name),
+                    $category: this._asNullableString(row.category),
+                    $ord: this._asNullableNumber(row.ord),
+                    $notes: this._asNullableString(row.notes),
+                    $score: this._asNullableNumber(row.score),
+                }),
+            );
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT dictionary, path, mediaType, width, height, content FROM media ORDER BY id ASC',
+                'INSERT INTO media(dictionary, path, mediaType, width, height, content) VALUES($dictionary, $path, $mediaType, $width, $height, $content)',
+                (row) => ({
+                    $dictionary: this._asString(row.dictionary),
+                    $path: this._asString(row.path),
+                    $mediaType: this._asString(row.mediaType),
+                    $width: this._asNumber(row.width, 0),
+                    $height: this._asNumber(row.height, 0),
+                    $content: this._toUint8Array(row.content) ?? new Uint8Array(),
+                }),
+            );
+            snapshotDb.exec('COMMIT');
+        } catch (error) {
+            try {
+                snapshotDb.exec('ROLLBACK');
+            } catch (_) {
+                // Ignore rollback errors after export snapshot failures.
+            }
+            try {
+                snapshotDb.close();
+            } catch (_) {
+                // Ignore close errors while surfacing the original snapshot failure.
+            }
+            throw error;
+        }
+
+        return snapshotDb;
+    }
+
+    /**
+     * @param {import('@sqlite.org/sqlite-wasm').Database} sourceDb
+     * @param {import('@sqlite.org/sqlite-wasm').Database} targetDb
+     * @param {string} sourceSql
+     * @param {string} targetSql
+     * @param {(row: import('core').SafeAny) => Record<string, import('@sqlite.org/sqlite-wasm').Bindable>} createBind
+     * @returns {Promise<void>}
+     */
+    async _copyRowsToDatabase(sourceDb, targetDb, sourceSql, targetSql, createBind) {
+        const sourceStmt = /** @type {import('@sqlite.org/sqlite-wasm').PreparedStatement} */ (sourceDb.prepare(sourceSql));
+        const targetStmt = /** @type {import('@sqlite.org/sqlite-wasm').PreparedStatement} */ (targetDb.prepare(targetSql));
+        try {
+            sourceStmt.reset(true);
+            while (sourceStmt.step()) {
+                const row = /** @type {import('core').SafeAny} */ (sourceStmt.get({}));
+                targetStmt.reset(true);
+                targetStmt.bind(createBind(row));
+                targetStmt.step();
+            }
+        } finally {
+            try {
+                sourceStmt.finalize();
+            } catch (_) {
+                // Ignore finalization errors for export snapshot reads.
+            }
+            try {
+                targetStmt.finalize();
+            } catch (_) {
+                // Ignore finalization errors for export snapshot writes.
+            }
+        }
+    }
+
+    /**
+     * Rebuilds legacy inline term rows from the external term record/content stores
+     * so exports do not depend on the runtime virtual table module being available.
+     * @param {import('@sqlite.org/sqlite-wasm').Database} targetDb
+     * @returns {Promise<void>}
+     */
+    async _copyTermRowsToDatabase(targetDb) {
+        await this._termContentStore.ensureLoadedForRead();
+        const targetStmt = /** @type {import('@sqlite.org/sqlite-wasm').PreparedStatement} */ (targetDb.prepare(
+            'INSERT INTO terms(dictionary, expression, reading, expressionReverse, readingReverse, definitionTags, termTags, rules, score, glossaryJson, sequence) VALUES($dictionary, $expression, $reading, $expressionReverse, $readingReverse, $definitionTags, $termTags, $rules, $score, $glossaryJson, $sequence)',
+        ));
+        try {
+            for (const id of this._termRecordStore.getAllIds()) {
+                const record = this._termRecordStore.getById(id);
+                if (typeof record === 'undefined') { continue; }
+                const row = await this._deserializeTermRow({
+                    id,
+                    dictionary: record.dictionary,
+                    expression: record.expression,
+                    reading: record.reading,
+                    expressionReverse: record.expressionReverse,
+                    readingReverse: record.readingReverse,
+                    entryContentId: null,
+                    entryContentOffset: record.entryContentOffset,
+                    entryContentLength: record.entryContentLength,
+                    entryContentDictName: record.entryContentDictName,
+                    definitionTags: '',
+                    termTags: '',
+                    rules: '',
+                    score: record.score,
+                    glossaryJson: '[]',
+                    sequence: record.sequence,
+                });
+                targetStmt.reset(true);
+                targetStmt.bind({
+                    $dictionary: row.dictionary,
+                    $expression: row.expression,
+                    $reading: row.reading,
+                    $expressionReverse: row.expressionReverse,
+                    $readingReverse: row.readingReverse,
+                    $definitionTags: row.definitionTags,
+                    $termTags: typeof row.termTags === 'string' ? row.termTags : null,
+                    $rules: row.rules,
+                    $score: row.score,
+                    $glossaryJson: JSON.stringify(row.glossary),
+                    $sequence: row.sequence,
+                });
+                targetStmt.step();
+            }
+        } finally {
+            try {
+                targetStmt.finalize();
+            } catch (_) {
+                // Ignore finalization errors for export snapshot writes.
+            }
+        }
+    }
+
+    /**
+     * @param {import('@sqlite.org/sqlite-wasm').Database} db
+     * @param {import('@sqlite.org/sqlite-wasm').Sqlite3Static} sqlite3
+     * @returns {ArrayBuffer|null}
+     * @throws {Error}
+     */
+    _exportDatabaseImage(db, sqlite3) {
+        /** @type {ArrayBuffer|null} */
+        let exported = null;
+        const exportBinaryImage = /** @type {unknown} */ (Reflect.get(db, 'exportBinaryImage'));
+        if (typeof exportBinaryImage === 'function') {
+            try {
+                const raw = /** @type {() => Uint8Array|ArrayBuffer} */ (exportBinaryImage).call(db);
+                const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
+                if (bytes.byteLength > 0) {
+                    exported = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+                }
+            } catch (_) {
+                // Fall back to sqlite3_js_db_export below.
+            }
+        }
+        if (exported !== null) {
+            return exported;
+        }
+
+        const dbPointer = db.pointer;
+        if (typeof dbPointer !== 'number') {
+            throw new Error('sqlite database pointer is unavailable');
+        }
+        const raw = sqlite3.capi.sqlite3_js_db_export(dbPointer);
+        const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
+        if (bytes.byteLength > 0) {
+            return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+        }
+        return null;
+    }
+
+    /**
      * @param {ArrayBuffer} content
      */
     async importDatabase(content) {
@@ -489,9 +1048,10 @@ export class DictionaryDatabase {
 
         this._sqlite3 = sqlite3;
         await this._openConnection();
+        this._invalidateMaxHeadwordLengthCache();
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
-        this._termEntryContentMetaByHash.clear();
+        this._clearTermEntryContentMetaCaches();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
@@ -504,8 +1064,6 @@ export class DictionaryDatabase {
      */
     async deleteDictionary(dictionaryName, progressRate, onProgress) {
         const db = this._requireDb();
-        const tDeleteStart = safePerformance.now();
-        const tCountStart = safePerformance.now();
 
         /** @type {[table: string, keyColumn: string][]} */
         const targets = [
@@ -527,9 +1085,8 @@ export class DictionaryDatabase {
 
         /** @type {number[]} */
         const counts = [];
-        const termRecordIndex = this._termRecordStore.getDictionaryIndex(dictionaryName);
-        const termCount = termRecordIndex.expression.size > 0 ?
-            [...termRecordIndex.expression.values()].reduce((sum, list) => sum + list.length, 0) :
+        const termCount = this._termRecordStore.getDictionaryIndex(dictionaryName).expression.size > 0 ?
+            [...this._termRecordStore.getDictionaryIndex(dictionaryName).expression.values()].reduce((sum, list) => sum + list.length, 0) :
             0;
         progressData.count += termCount;
         counts.push(termCount);
@@ -542,22 +1099,15 @@ export class DictionaryDatabase {
         }
 
         progressData.storesProcesed = 0;
-        const countElapsedMs = Math.max(0, safePerformance.now() - tCountStart);
-        const tDeleteWorkStart = safePerformance.now();
-        let termRecordDeleteElapsedMs = 0;
-        let sqlDeleteElapsedMs = 0;
 
-        db.exec('BEGIN IMMEDIATE');
+        await this._beginImmediateTransaction(db);
         try {
             let countIndex = 1;
-            const tTermRecordDeleteStart = safePerformance.now();
             const deletedTerms = await this._termRecordStore.deleteByDictionary(dictionaryName);
-            termRecordDeleteElapsedMs = Math.max(0, safePerformance.now() - tTermRecordDeleteStart);
             this._termsVirtualTableDirty = true;
             progressData.processed += deletedTerms;
             ++progressData.storesProcesed;
             onProgress(progressData);
-            const tSqlDeleteStart = safePerformance.now();
             for (let i = 0; i < targets.length; ++i) {
                 const [table, keyColumn] = targets[i];
                 db.exec({sql: `DELETE FROM ${table} WHERE ${keyColumn} = $value`, bind: {$value: dictionaryName}});
@@ -567,7 +1117,6 @@ export class DictionaryDatabase {
                     onProgress(progressData);
                 }
             }
-            sqlDeleteElapsedMs = Math.max(0, safePerformance.now() - tSqlDeleteStart);
             db.exec('COMMIT');
         } catch (e) {
             try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
@@ -575,23 +1124,13 @@ export class DictionaryDatabase {
         }
 
         onProgress(progressData);
+        this._invalidateMaxHeadwordLengthCache();
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
-        this._termEntryContentMetaByHash.clear();
+        this._clearTermEntryContentMetaCaches();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
-        const totalElapsedMs = Math.max(0, safePerformance.now() - tDeleteStart);
-        reportDiagnostics('dictionary-delete-summary', {
-            dictionary: dictionaryName,
-            expectedRows: progressData.count,
-            processedRows: progressData.processed,
-            countElapsedMs,
-            deleteWorkElapsedMs: Math.max(0, safePerformance.now() - tDeleteWorkStart),
-            termRecordDeleteElapsedMs,
-            sqlDeleteElapsedMs,
-            totalElapsedMs,
-        });
     }
 
     /**
@@ -601,10 +1140,24 @@ export class DictionaryDatabase {
     _getCachedStatement(sql) {
         const cached = this._statementCache.get(sql);
         if (typeof cached !== 'undefined') {
+            this._statementCache.delete(sql);
+            this._statementCache.set(sql, cached);
             return cached;
         }
         const db = this._requireDb();
         const created = /** @type {import('@sqlite.org/sqlite-wasm').PreparedStatement} */ (db.prepare(sql));
+        while (this._statementCache.size >= this._statementCacheMaxEntries) {
+            const first = this._statementCache.entries().next();
+            if (first.done) {
+                break;
+            }
+            this._statementCache.delete(first.value[0]);
+            try {
+                first.value[1].finalize();
+            } catch (_) {
+                // NOP
+            }
+        }
         this._statementCache.set(sql, created);
         return created;
     }
@@ -621,10 +1174,15 @@ export class DictionaryDatabase {
         this._statementCache.clear();
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();
-        this._termEntryContentMetaByHash.clear();
+        this._clearTermEntryContentMetaCaches();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
+    }
+
+    /** */
+    _invalidateMaxHeadwordLengthCache() {
+        this._maxHeadwordLengthCache = null;
     }
 
     /**
@@ -701,6 +1259,15 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {string} dictionaryCacheKey
+     * @param {string} term
+     * @returns {string}
+     */
+    _createTermExactPresenceCacheKey(dictionaryCacheKey, term) {
+        return `${dictionaryCacheKey}\u001f${term}`;
+    }
+
+    /**
      * @param {string} dictionaryName
      * @returns {{expression: Map<string, number[]>, reading: Map<string, number[]>, expressionReverse: Map<string, number[]>, readingReverse: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}}
      */
@@ -768,9 +1335,11 @@ export class DictionaryDatabase {
             const termIndexMap = new Map();
             /** @type {Map<number, {matchSource: import('dictionary-database').MatchSource, itemIndex: number}[]>} */
             const idMatches = new Map();
+            const dictionaryCacheKey = this._getDictionaryCacheKey(dictionaryNames);
             for (let i = 0; i < termList.length; ++i) {
                 const term = termList[i];
-                const cachedPresence = this._termExactPresenceCache.get(term);
+                const termPresenceKey = this._createTermExactPresenceCacheKey(dictionaryCacheKey, term);
+                const cachedPresence = this._termExactPresenceCache.get(termPresenceKey);
                 if (cachedPresence === false) {
                     continue;
                 }
@@ -825,7 +1394,8 @@ export class DictionaryDatabase {
                         }
                     }
                 }
-                this._termExactPresenceCache.set(term, found);
+                const termPresenceKey = this._createTermExactPresenceCacheKey(dictionaryCacheKey, term);
+                this._setTermExactPresenceCached(termPresenceKey, found);
             }
 
             if (idMatches.size === 0) {
@@ -1364,6 +1934,30 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @returns {Promise<number>}
+     */
+    async getMaxHeadwordLength() {
+        const cached = this._maxHeadwordLengthCache;
+        if (typeof cached === 'number') {
+            return cached;
+        }
+
+        const db = this._requireDb();
+        const value = db.selectValue(`
+            SELECT MAX(
+                CASE
+                    WHEN LENGTH(COALESCE(reading, '')) > LENGTH(COALESCE(expression, '')) THEN LENGTH(COALESCE(reading, ''))
+                    ELSE LENGTH(COALESCE(expression, ''))
+                END
+            )
+            FROM terms
+        `);
+        const maxHeadwordLength = Math.max(0, this._asNumber(value, 0));
+        this._maxHeadwordLengthCache = maxHeadwordLength;
+        return maxHeadwordLength;
+    }
+
+    /**
      * @returns {Promise<{
      *   scannedCount: number,
      *   removedCount: number,
@@ -1387,6 +1981,7 @@ export class DictionaryDatabase {
                 failedTitles: [],
                 parseErrorCount: 0,
             };
+            this._startupCleanupIncompleteImportsSummary = summary;
             reportDiagnostics('dictionary-startup-cleanup-summary', summary);
             return summary;
         }
@@ -1457,7 +2052,99 @@ export class DictionaryDatabase {
             failedTitles: [...failedTitles].sort((a, b) => a.localeCompare(b)),
             parseErrorCount,
         };
+        this._startupCleanupIncompleteImportsSummary = summary;
         reportDiagnostics('dictionary-startup-cleanup-summary', summary);
+        return summary;
+    }
+
+    /**
+     * @returns {Promise<{
+     *   scannedCount: number,
+     *   expectedTermDictionaryCount: number,
+     *   missingShardDictionaryCount: number,
+     *   missingShardDictionaryNames: string[],
+     *   removedCount: number,
+     *   removedTitles: string[],
+     *   failedCount: number,
+     *   failedTitles: string[],
+     *   parseErrorCount: number,
+     *   shardIntegrity: {
+     *     expectedShardCount: number,
+     *     actualShardCount: number,
+     *     missingShardCount: number,
+     *     missingShardFileNames: string[],
+     *     missingDictionaryNames: string[],
+     *     orphanShardCount: number,
+     *     orphanShardFileNames: string[],
+     *     orphanDictionaryNames: string[],
+     *     removedOrphanShardCount: number,
+     *     invalidShardPayloadCount: number,
+     *     invalidShardFileNames: string[],
+     *     rewroteAllShardsFromMemory: boolean
+     *   }
+     * }>}
+     */
+    async _cleanupMissingTermRecordShards() {
+        const db = this._requireDb();
+        const rows = db.selectObjects('SELECT title, summaryJson FROM dictionaries ORDER BY id ASC');
+        /** @type {string[]} */
+        const expectedTermDictionaryNames = [];
+        let parseErrorCount = 0;
+        for (const row of rows) {
+            const title = this._asString(row.title).trim();
+            if (title.length === 0) { continue; }
+            let summary;
+            try {
+                summary = /** @type {unknown} */ (parseJson(this._asString(row.summaryJson)));
+            } catch (_) {
+                ++parseErrorCount;
+                continue;
+            }
+            if (typeof summary !== 'object' || summary === null || Array.isArray(summary)) {
+                continue;
+            }
+            const counts = /** @type {unknown} */ (Reflect.get(summary, 'counts'));
+            const terms = (typeof counts === 'object' && counts !== null) ? /** @type {unknown} */ (Reflect.get(counts, 'terms')) : null;
+            const total = (typeof terms === 'object' && terms !== null) ? this._asNumber(Reflect.get(terms, 'total'), 0) : 0;
+            if (total > 0) {
+                expectedTermDictionaryNames.push(title);
+            }
+        }
+        const shardIntegrity = await this._termRecordStore.verifyIntegrity(expectedTermDictionaryNames);
+        const missingShardDictionaryNames = [...new Set(
+            (Array.isArray(shardIntegrity.missingDictionaryNames) ? shardIntegrity.missingDictionaryNames : [])
+                .filter((name) => typeof name === 'string' && name.length > 0),
+        )].sort((a, b) => a.localeCompare(b));
+
+        /** @type {string[]} */
+        const removedTitles = [];
+        /** @type {string[]} */
+        const failedTitles = [];
+        for (const title of missingShardDictionaryNames) {
+            try {
+                await this.deleteDictionary(title, 1000, () => {});
+                removedTitles.push(title);
+            } catch (e) {
+                const error = toError(e);
+                log.error(new Error(`Failed to remove dictionary with missing term-record shard '${title}': ${error.message}`));
+                failedTitles.push(title);
+            }
+        }
+
+        const summary = {
+            scannedCount: rows.length,
+            expectedTermDictionaryCount: expectedTermDictionaryNames.length,
+            missingShardDictionaryCount: missingShardDictionaryNames.length,
+            missingShardDictionaryNames,
+            removedCount: removedTitles.length,
+            removedTitles: [...removedTitles].sort((a, b) => a.localeCompare(b)),
+            failedCount: failedTitles.length,
+            failedTitles: [...failedTitles].sort((a, b) => a.localeCompare(b)),
+            parseErrorCount,
+            shardIntegrity,
+        };
+        this._startupCleanupMissingTermRecordShardsSummary = summary;
+        reportDiagnostics('dictionary-term-record-integrity-summary', summary);
         return summary;
     }
 
@@ -1526,11 +2213,13 @@ export class DictionaryDatabase {
         }
         if (count <= 0) { return; }
         if (objectStoreName === 'terms') {
+            this._invalidateMaxHeadwordLengthCache();
+            this._lastBulkAddTermsMetrics = null;
             this._termEntryContentCache.clear();
             if (!this._bulkImportTransactionOpen) {
                 this._termEntryContentIdByHash.clear();
                 this._termEntryContentIdByKey.clear();
-                this._termEntryContentMetaByHash.clear();
+                this._clearTermEntryContentMetaCaches();
             }
             this._termExactPresenceCache.clear();
             this._termPrefixNegativeCache.clear();
@@ -1545,7 +2234,7 @@ export class DictionaryDatabase {
         const useLocalTransaction = !this._bulkImportTransactionOpen;
 
         if (useLocalTransaction) {
-            db.exec('BEGIN IMMEDIATE');
+            await this._beginImmediateTransaction(db);
         }
         try {
             await this._bulkInsertWithDescriptor(descriptor, items, start, count);
@@ -1558,6 +2247,104 @@ export class DictionaryDatabase {
             }
             throw e;
         }
+    }
+
+    /**
+     * @returns {{contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number}|null}
+     */
+    getLastBulkAddTermsMetrics() {
+        return this._lastBulkAddTermsMetrics;
+    }
+
+    /**
+     * @param {string} dictionary
+     * @returns {{contentOffset: number, contentLength: number, contentDictName: string, uncompressedLength: number}|null}
+     */
+    _getSharedGlossaryArtifactMeta(dictionary) {
+        const cached = this._sharedGlossaryArtifactMetaByDictionary.get(dictionary);
+        if (typeof cached !== 'undefined') {
+            return cached;
+        }
+        const db = this._requireDb();
+        const row = db.selectObject(
+            'SELECT contentOffset, contentLength, contentDictName, uncompressedLength FROM sharedGlossaryArtifacts WHERE dictionary = $dictionary LIMIT 1',
+            {$dictionary: dictionary},
+        );
+        if (typeof row === 'undefined') {
+            return null;
+        }
+        const meta = {
+            contentOffset: this._asNumber(row.contentOffset, -1),
+            contentLength: this._asNumber(row.contentLength, 0),
+            contentDictName: this._asString(row.contentDictName),
+            uncompressedLength: this._asNumber(row.uncompressedLength, 0),
+        };
+        this._sharedGlossaryArtifactMetaByDictionary.set(dictionary, meta);
+        return meta;
+    }
+
+    /**
+     * @param {string} dictionary
+     * @param {number} glossaryOffset
+     * @param {number} glossaryLength
+     * @returns {Promise<Uint8Array>}
+     */
+    async _readCompressedSharedGlossarySlice(dictionary, glossaryOffset, glossaryLength) {
+        const cached = this._sharedGlossaryArtifactInflatedByDictionary.get(dictionary);
+        if (cached instanceof Uint8Array) {
+            return cached.subarray(glossaryOffset, glossaryOffset + glossaryLength);
+        }
+        const meta = this._getSharedGlossaryArtifactMeta(dictionary);
+        if (meta === null || meta.contentOffset < 0 || meta.contentLength <= 0) {
+            return new Uint8Array(0);
+        }
+        const compressedBytes = await this._termContentStore.readSlice(meta.contentOffset, meta.contentLength);
+        let inflatedBytes = compressedBytes;
+        if (meta.contentDictName === RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME) {
+            const defaultHeapSize = meta.uncompressedLength > 0 ? meta.uncompressedLength : (compressedBytes.byteLength * 16);
+            inflatedBytes = zstdDecompress(compressedBytes, {defaultHeapSize});
+        }
+        this._sharedGlossaryArtifactInflatedByDictionary.set(dictionary, inflatedBytes);
+        return inflatedBytes.subarray(glossaryOffset, glossaryOffset + glossaryLength);
+    }
+
+    /**
+     * @param {string} dictionary
+     * @param {Uint8Array} bytes
+     * @param {string} contentDictName
+     * @param {number} uncompressedLength
+     * @returns {Promise<{offset: number, length: number}>}
+     */
+    async appendRawSharedGlossaryArtifact(dictionary, bytes, contentDictName, uncompressedLength) {
+        const spans = await this._termContentStore.appendBatch([bytes]);
+        const span = spans.length > 0 ? spans[0] : {offset: 0, length: 0};
+        const db = this._requireDb();
+        db.exec({
+            sql: `
+                INSERT INTO sharedGlossaryArtifacts(dictionary, contentOffset, contentLength, contentDictName, uncompressedLength)
+                VALUES($dictionary, $contentOffset, $contentLength, $contentDictName, $uncompressedLength)
+                ON CONFLICT(dictionary) DO UPDATE SET
+                    contentOffset = excluded.contentOffset,
+                    contentLength = excluded.contentLength,
+                    contentDictName = excluded.contentDictName,
+                    uncompressedLength = excluded.uncompressedLength
+            `,
+            bind: {
+                $dictionary: dictionary,
+                $contentOffset: span.offset,
+                $contentLength: span.length,
+                $contentDictName: contentDictName,
+                $uncompressedLength: Math.max(0, uncompressedLength),
+            },
+        });
+        this._sharedGlossaryArtifactMetaByDictionary.set(dictionary, {
+            contentOffset: span.offset,
+            contentLength: span.length,
+            contentDictName,
+            uncompressedLength: Math.max(0, uncompressedLength),
+        });
+        this._sharedGlossaryArtifactInflatedByDictionary.delete(dictionary);
+        return span;
     }
 
     /**
@@ -1715,7 +2502,7 @@ export class DictionaryDatabase {
         const useLocalTransaction = !this._bulkImportTransactionOpen;
 
         if (useLocalTransaction) {
-            db.exec('BEGIN IMMEDIATE');
+            await this._beginImmediateTransaction(db);
         }
         try {
             for (let i = start, ii = start + count; i < ii; ++i) {
@@ -1777,187 +2564,265 @@ export class DictionaryDatabase {
         /** @type {number[]} */
         const termBatchRowsPerSecond = [];
         let failFastConsecutiveLowThroughputWindows = 0;
-
-        /** @type {import('@sqlite.org/sqlite-wasm').Bindable[][]} */
-        const termRows = [];
-        /** @type {(string|null)[]} */
-        const unresolvedTermContentHashes = [];
-        /** @type {{contentHash: string, contentBytes: Uint8Array, contentDictName: string|null}[]} */
-        const pendingContentRows = [];
-        /** @type {Map<string, number>} */
-        const pendingContentRowIndexByHash = new Map();
-        const termBatchSize = 25000;
+        const termBatchSize = this._getTermBulkAddBatchSizeForCount(count);
+        const stagingBatchSize = Math.max(512, Math.min(this._termBulkAddStagingMaxRows, termBatchSize));
         const contentBatchSize = 8192;
+        const shouldDedupWithinBatch = !this._skipIntraBatchContentDedup;
+        let processedRowCount = 0;
+        let insertedRowCount = 0;
+        let totalPendingContentUniqueCount = 0;
+        const compressionDictName = count > 0 ? resolveTermContentZstdDictName((/** @type {import('dictionary-database').DatabaseTermEntry} */ (items[start])).dictionary) : null;
+
+        /** @type {import('dictionary-database').DatabaseTermEntry[]} */
+        let stagedRows = [];
+        /** @type {number[]} */
+        let stagedPendingContentIndexes = [];
+        /** @type {number[]} */
+        let stagedContentOffsets = [];
+        /** @type {number[]} */
+        let stagedContentLengths = [];
+        /** @type {(string|null)[]} */
+        let stagedContentDictNames = [];
+        /** @type {(string|null)[]} */
+        let pendingContentHashes = [];
+        /** @type {number[]} */
+        let pendingContentHash1s = [];
+        /** @type {number[]} */
+        let pendingContentHash2s = [];
+        /** @type {Uint8Array[]} */
+        let pendingContentBytes = [];
+        /** @type {Map<string, number>|null} */
+        let pendingContentRowIndexByHash = shouldDedupWithinBatch ? new Map() : null;
+        /** @type {Map<number, Map<number, number>>|null} */
+        let pendingContentRowIndexByHashPair = shouldDedupWithinBatch ? new Map() : null;
 
         if (useLocalTransaction) {
-            db.exec('BEGIN IMMEDIATE');
+            await this._beginImmediateTransaction(db);
         }
         try {
+            const flushStagedRows = async () => {
+                if (stagedRows.length === 0) {
+                    stagedPendingContentIndexes = [];
+                    stagedContentOffsets = [];
+                    stagedContentLengths = [];
+                    stagedContentDictNames = [];
+                    pendingContentHashes = [];
+                    pendingContentHash1s = [];
+                    pendingContentHash2s = [];
+                    pendingContentBytes = [];
+                    if (pendingContentRowIndexByHash !== null) {
+                        pendingContentRowIndexByHash.clear();
+                    }
+                    if (pendingContentRowIndexByHashPair !== null) {
+                        pendingContentRowIndexByHashPair.clear();
+                    }
+                    return;
+                }
+
+                if (pendingContentBytes.length > 0) {
+                    totalPendingContentUniqueCount += pendingContentBytes.length;
+                    const tCompressStart = safePerformance.now();
+                    const storageChunks = this._createTermContentStorageChunks(
+                        pendingContentBytes,
+                        compressionDictName,
+                        stagedRows.map((row, index) => {
+                            const pendingIndex = stagedPendingContentIndexes[index];
+                            return pendingIndex >= 0 ? (row.termEntryContentDictName ?? null) : null;
+                        }),
+                    );
+                    compressContentMs += safePerformance.now() - tCompressStart;
+                    const tAppendStart = safePerformance.now();
+                    const spans = await this._termContentStore.appendBatch(storageChunks.storedChunks);
+                    for (const chunk of storageChunks.storedChunks) {
+                        appendedContentBytes += chunk.byteLength;
+                    }
+                    appendContentMs += safePerformance.now() - tAppendStart;
+
+                    for (let i = 0, ii = stagedRows.length; i < ii; ++i) {
+                        const pendingIndex = stagedPendingContentIndexes[i];
+                        if (pendingIndex < 0) { continue; }
+                        const span = spans[storageChunks.entryToStoredChunkIndexes[pendingIndex]];
+                        if (typeof span === 'undefined') {
+                            throw new Error('Failed to resolve staged term entry content span for bulk term insert');
+                        }
+                        stagedPendingContentIndexes[i] = -1;
+                        stagedContentOffsets[i] = span.offset;
+                        stagedContentLengths[i] = span.length;
+                        stagedContentDictNames[i] = storageChunks.contentDictNames[pendingIndex] ?? 'raw';
+                    }
+
+                    for (let i = 0, ii = pendingContentBytes.length; i < ii; i += contentBatchSize) {
+                        const chunkCount = Math.min(contentBatchSize, ii - i);
+                        const tContentSqlStart = safePerformance.now();
+                        for (let j = i, jj = i + chunkCount; j < jj; ++j) {
+                            const span = spans[storageChunks.entryToStoredChunkIndexes[j]];
+                            const contentDictName = storageChunks.contentDictNames[j];
+                            this._cacheTermEntryContentMeta(
+                                pendingContentHashes[j],
+                                span.offset,
+                                span.length,
+                                contentDictName,
+                                0,
+                                pendingContentHash1s[j],
+                                pendingContentHash2s[j],
+                            );
+                        }
+                        const contentBatchMs = safePerformance.now() - tContentSqlStart;
+                        insertContentSqlMs += contentBatchMs;
+                        contentBatchDurationsMs.push(contentBatchMs);
+                    }
+                }
+
+                for (let i = 0, ii = stagedRows.length; i < ii; i += termBatchSize) {
+                    const chunkCount = Math.min(termBatchSize, ii - i);
+                    const tTermSqlStart = safePerformance.now();
+                    const split = await this._insertResolvedImportTermEntries(stagedRows, stagedContentOffsets, stagedContentLengths, stagedContentDictNames, i, chunkCount);
+                    const termBatchMs = safePerformance.now() - tTermSqlStart;
+                    insertTermsSqlMs += termBatchMs;
+                    insertTermRecordAppendMs += split.termRecordAppendMs;
+                    insertTermsVtabMs += split.termsVtabInsertMs;
+                    termBatchDurationsMs.push(termBatchMs);
+
+                    const batchRowsPerSecond = termBatchMs > 0 ? ((chunkCount * 1000) / termBatchMs) : 0;
+                    termBatchRowsPerSecond.push(batchRowsPerSecond);
+                    insertedRowCount += chunkCount;
+                    if (this._importDebugLogging && termBatchMs >= this._termBulkAddFailFastSlowBatchMs) {
+                        throw new Error(`term batch stalled: rows=${chunkCount} elapsed=${termBatchMs.toFixed(1)}ms`);
+                    }
+
+                    if (this._importDebugLogging && termBatchRowsPerSecond.length >= this._termBulkAddFailFastWindowSize) {
+                        const windowStart = termBatchRowsPerSecond.length - this._termBulkAddFailFastWindowSize;
+                        const window = termBatchRowsPerSecond.slice(windowStart);
+                        const windowAverageRowsPerSecond = window.reduce((sum, value) => sum + value, 0) / window.length;
+                        if (insertedRowCount >= this._termBulkAddFailFastMinRowsBeforeCheck && windowAverageRowsPerSecond < this._termBulkAddFailFastMinRowsPerSecond) {
+                            ++failFastConsecutiveLowThroughputWindows;
+                            if (failFastConsecutiveLowThroughputWindows >= 3) {
+                                throw new Error(
+                                    `term batch throughput degraded: window_avg_rps=${windowAverageRowsPerSecond.toFixed(1)} ` +
+                                    `threshold=${this._termBulkAddFailFastMinRowsPerSecond.toFixed(1)} rows=${insertedRowCount}/${count}`,
+                                );
+                            }
+                        } else {
+                            failFastConsecutiveLowThroughputWindows = 0;
+                        }
+                    }
+                }
+
+                stagedRows = [];
+                stagedPendingContentIndexes = [];
+                stagedContentOffsets = [];
+                stagedContentLengths = [];
+                stagedContentDictNames = [];
+                pendingContentHashes = [];
+                pendingContentHash1s = [];
+                pendingContentHash2s = [];
+                pendingContentBytes = [];
+                pendingContentRowIndexByHash = shouldDedupWithinBatch ? new Map() : null;
+                pendingContentRowIndexByHashPair = shouldDedupWithinBatch ? new Map() : null;
+            };
+
             for (let i = start, ii = start + count; i < ii; ++i) {
+                ++processedRowCount;
                 const row = /** @type {import('dictionary-database').DatabaseTermEntry} */ (items[i]);
                 const tComputeStart = safePerformance.now();
                 const precomputedHash = (typeof row.termEntryContentHash === 'string' && row.termEntryContentHash.length > 0) ? row.termEntryContentHash : null;
-                const precomputedBytes = row.termEntryContentBytes instanceof Uint8Array ? row.termEntryContentBytes : null;
+                const precomputedHash1 = Number.isInteger(row.termEntryContentHash1) ? (/** @type {number} */ (row.termEntryContentHash1) >>> 0) : -1;
+                const precomputedHash2 = Number.isInteger(row.termEntryContentHash2) ? (/** @type {number} */ (row.termEntryContentHash2) >>> 0) : -1;
+                const hasPrecomputedHashPair = precomputedHash1 >= 0 && precomputedHash2 >= 0;
+                const precomputedBytes = row.termEntryContentBytes instanceof Uint8Array ? row.termEntryContentBytes : this._getRawTermContentBytesIfAvailable(row);
                 let contentHash = precomputedHash;
+                let contentHash1 = precomputedHash1;
+                let contentHash2 = precomputedHash2;
                 let contentBytes = precomputedBytes;
-                if (contentHash === null || contentBytes === null) {
+                if ((contentHash === null && !hasPrecomputedHashPair) || contentBytes === null) {
                     const rules = row.rules;
                     const definitionTags = row.definitionTags ?? row.tags ?? '';
                     const termTags = row.termTags ?? '';
                     const contentJson = row.termEntryContentJson ?? this._serializeTermEntryContent(rules, definitionTags, termTags, row.glossary);
                     contentHash = contentHash ?? this._hashEntryContent(contentJson);
                     contentBytes = contentBytes ?? this._textEncoder.encode(contentJson);
+                    if (contentHash1 < 0 || contentHash2 < 0) {
+                        const hashPair = parseContentHashHexPair(contentHash);
+                        if (hashPair !== null) {
+                            [contentHash1, contentHash2] = hashPair;
+                        }
+                    }
                 }
                 computeContentMs += safePerformance.now() - tComputeStart;
 
-                const existingMeta = this._termEntryContentMetaByHash.get(contentHash);
+                let existingMeta = (contentHash1 >= 0 && contentHash2 >= 0) ?
+                    this._getTermEntryContentMetaByHashPair(contentHash1, contentHash2) :
+                    void 0;
+                if (typeof existingMeta === 'undefined' && contentHash !== null) {
+                    existingMeta = this._termEntryContentMetaByHash.get(contentHash);
+                }
                 if (typeof existingMeta !== 'undefined') {
                     ++resolvedFromCacheCount;
-                    termRows.push([
-                        row.dictionary,
-                        row.expression,
-                        row.reading,
-                        row.expressionReverse ?? null,
-                        row.readingReverse ?? null,
-                        null,
-                        existingMeta.offset,
-                        existingMeta.length,
-                        existingMeta.dictName,
-                        '',
-                        '',
-                        '',
-                        row.score,
-                        '[]',
-                        typeof row.sequence === 'number' ? row.sequence : null,
-                    ]);
-                    unresolvedTermContentHashes.push(null);
+                    stagedRows.push(row);
+                    stagedPendingContentIndexes.push(-1);
+                    stagedContentOffsets.push(existingMeta.offset);
+                    stagedContentLengths.push(existingMeta.length);
+                    stagedContentDictNames.push(existingMeta.dictName);
                     continue;
                 }
 
-                if (!pendingContentRowIndexByHash.has(contentHash)) {
-                    const tCompressStart = safePerformance.now();
-                    const contentDictName = resolveTermContentZstdDictName(row.dictionary);
-                    let contentZstd = contentBytes;
-                    let effectiveDictName = 'raw';
-                    if (contentBytes.byteLength >= this._termContentCompressionMinBytes) {
-                        const compressed = compressTermContentZstd(contentBytes, contentDictName);
-                        if (compressed.byteLength < contentBytes.byteLength) {
-                            contentZstd = compressed;
-                            effectiveDictName = contentDictName ?? '';
+                let pendingContentIndex = -1;
+                if (pendingContentRowIndexByHashPair !== null && contentHash1 >= 0 && contentHash2 >= 0) {
+                    const pendingContentRowIndexByHash2 = pendingContentRowIndexByHashPair.get(contentHash1);
+                    if (typeof pendingContentRowIndexByHash2 !== 'undefined') {
+                        const existingPendingContentIndex = pendingContentRowIndexByHash2.get(contentHash2);
+                        if (typeof existingPendingContentIndex === 'number') {
+                            pendingContentIndex = existingPendingContentIndex;
                         }
                     }
+                }
+                if (pendingContentIndex < 0 && pendingContentRowIndexByHash !== null && contentHash !== null) {
+                    const existingPendingContentIndex = pendingContentRowIndexByHash.get(contentHash);
+                    if (typeof existingPendingContentIndex === 'number') {
+                        pendingContentIndex = existingPendingContentIndex;
+                    }
+                }
+                if (pendingContentIndex < 0) {
+                    const tCompressStart = safePerformance.now();
                     compressContentMs += safePerformance.now() - tCompressStart;
-                    pendingContentRowIndexByHash.set(contentHash, pendingContentRows.length);
-                    pendingContentRows.push({
-                        contentHash,
-                        contentBytes: contentZstd,
-                        contentDictName: effectiveDictName,
-                    });
+                    pendingContentIndex = pendingContentBytes.length;
+                    if (pendingContentRowIndexByHash !== null && contentHash !== null) {
+                        pendingContentRowIndexByHash.set(contentHash, pendingContentIndex);
+                    }
+                    if (pendingContentRowIndexByHashPair !== null && contentHash1 >= 0 && contentHash2 >= 0) {
+                        let pendingContentRowIndexByHash2 = pendingContentRowIndexByHashPair.get(contentHash1);
+                        if (typeof pendingContentRowIndexByHash2 === 'undefined') {
+                            pendingContentRowIndexByHash2 = new Map();
+                            pendingContentRowIndexByHashPair.set(contentHash1, pendingContentRowIndexByHash2);
+                        }
+                        pendingContentRowIndexByHash2.set(contentHash2, pendingContentIndex);
+                    }
+                    pendingContentHashes.push(contentHash);
+                    pendingContentHash1s.push(contentHash1);
+                    pendingContentHash2s.push(contentHash2);
+                    pendingContentBytes.push(contentBytes);
                 }
 
-                termRows.push([
-                    row.dictionary,
-                    row.expression,
-                    row.reading,
-                    row.expressionReverse ?? null,
-                    row.readingReverse ?? null,
-                    0,
-                    null,
-                    null,
-                    null,
-                    '',
-                    '',
-                    '',
-                    row.score,
-                    '[]',
-                    typeof row.sequence === 'number' ? row.sequence : null,
-                ]);
-                unresolvedTermContentHashes.push(contentHash);
+                stagedRows.push(row);
+                stagedPendingContentIndexes.push(pendingContentIndex);
+                stagedContentOffsets.push(-1);
+                stagedContentLengths.push(-1);
+                stagedContentDictNames.push(null);
 
                 const tNow = safePerformance.now();
                 if (this._importDebugLogging && (tNow - lastProgressLog) >= this._termBulkAddLogIntervalMs) {
                     lastProgressLog = tNow;
                     log.log(
-                        `[manabitan-db-import] bulkAdd terms progress rows=${i - start + 1}/${count} ` +
-                        `cached=${resolvedFromCacheCount} pendingUnique=${pendingContentRows.length}`,
+                        `[manabitan-db-import] bulkAdd terms progress rows=${processedRowCount}/${count} ` +
+                        `cached=${resolvedFromCacheCount} pendingUnique=${pendingContentBytes.length}`,
                     );
                 }
-            }
 
-            if (pendingContentRows.length > 0) {
-                const tAppendStart = safePerformance.now();
-                const contentChunks = pendingContentRows.map((row) => row.contentBytes);
-                const spans = await this._termContentStore.appendBatch(contentChunks);
-                for (const chunk of contentChunks) {
-                    appendedContentBytes += chunk.byteLength;
-                }
-                appendContentMs += safePerformance.now() - tAppendStart;
-
-                for (let i = 0, ii = pendingContentRows.length; i < ii; i += contentBatchSize) {
-                    const chunkCount = Math.min(contentBatchSize, ii - i);
-                    const tContentSqlStart = safePerformance.now();
-                    for (let j = i, jj = i + chunkCount; j < jj; ++j) {
-                        const span = spans[j];
-                        const row = pendingContentRows[j];
-                        this._termEntryContentMetaByHash.set(row.contentHash, {
-                            id: 0,
-                            offset: span.offset,
-                            length: span.length,
-                            dictName: row.contentDictName ?? 'raw',
-                        });
-                    }
-                    const contentBatchMs = safePerformance.now() - tContentSqlStart;
-                    insertContentSqlMs += contentBatchMs;
-                    contentBatchDurationsMs.push(contentBatchMs);
+                if (stagedRows.length >= stagingBatchSize) {
+                    await flushStagedRows();
                 }
             }
-
-            for (let i = 0, ii = unresolvedTermContentHashes.length; i < ii; ++i) {
-                const contentHash = unresolvedTermContentHashes[i];
-                if (contentHash === null) { continue; }
-                const meta = this._termEntryContentMetaByHash.get(contentHash);
-                if (typeof meta === 'undefined') {
-                    throw new Error('Failed to resolve term entry content metadata for bulk term insert');
-                }
-                termRows[i][6] = meta.offset;
-                termRows[i][7] = meta.length;
-                termRows[i][8] = meta.dictName;
-            }
-
-            for (let i = 0, ii = termRows.length; i < ii; i += termBatchSize) {
-                const chunkCount = Math.min(termBatchSize, ii - i);
-                const tTermSqlStart = safePerformance.now();
-                const split = await this._insertResolvedTermRows(termRows, i, chunkCount);
-                const termBatchMs = safePerformance.now() - tTermSqlStart;
-                insertTermsSqlMs += termBatchMs;
-                insertTermRecordAppendMs += split.termRecordAppendMs;
-                insertTermsVtabMs += split.termsVtabInsertMs;
-                termBatchDurationsMs.push(termBatchMs);
-
-                const batchRowsPerSecond = termBatchMs > 0 ? ((chunkCount * 1000) / termBatchMs) : 0;
-                termBatchRowsPerSecond.push(batchRowsPerSecond);
-                if (this._importDebugLogging && termBatchMs >= this._termBulkAddFailFastSlowBatchMs) {
-                    throw new Error(`term batch stalled: rows=${chunkCount} elapsed=${termBatchMs.toFixed(1)}ms`);
-                }
-
-                if (this._importDebugLogging && termBatchRowsPerSecond.length >= this._termBulkAddFailFastWindowSize) {
-                    const windowStart = termBatchRowsPerSecond.length - this._termBulkAddFailFastWindowSize;
-                    const window = termBatchRowsPerSecond.slice(windowStart);
-                    const windowAverageRowsPerSecond = window.reduce((sum, value) => sum + value, 0) / window.length;
-                    const rowsProcessed = Math.min(i + chunkCount, termRows.length);
-                    if (rowsProcessed >= this._termBulkAddFailFastMinRowsBeforeCheck && windowAverageRowsPerSecond < this._termBulkAddFailFastMinRowsPerSecond) {
-                        ++failFastConsecutiveLowThroughputWindows;
-                        if (failFastConsecutiveLowThroughputWindows >= 3) {
-                            throw new Error(
-                                `term batch throughput degraded: window_avg_rps=${windowAverageRowsPerSecond.toFixed(1)} ` +
-                                `threshold=${this._termBulkAddFailFastMinRowsPerSecond.toFixed(1)} rows=${rowsProcessed}/${termRows.length}`,
-                            );
-                        }
-                    } else {
-                        failFastConsecutiveLowThroughputWindows = 0;
-                    }
-                }
-            }
+            await flushStagedRows();
             if (useLocalTransaction) {
                 const tCommitStart = safePerformance.now();
                 db.exec('COMMIT');
@@ -1977,7 +2842,10 @@ export class DictionaryDatabase {
                     `append=${appendContentMs.toFixed(1)}ms contentSql=${insertContentSqlMs.toFixed(1)}ms ` +
                     `termsSql=${insertTermsSqlMs.toFixed(1)}ms termRecordAppend=${insertTermRecordAppendMs.toFixed(1)}ms ` +
                     `termsVtabInsert=${insertTermsVtabMs.toFixed(1)}ms commit=${commitMs.toFixed(1)}ms ` +
-                    `cached=${resolvedFromCacheCount} newUnique=${pendingContentRows.length} ` +
+                    `intraBatchDedup=${String(shouldDedupWithinBatch)} ` +
+                    `recordFastPath=${String(this._termRecordRowAppendFastPath)} ` +
+                    `stagingBatchSize=${stagingBatchSize} ` +
+                    `cached=${resolvedFromCacheCount} newUnique=${totalPendingContentUniqueCount} ` +
                     `rps=${rowsPerSecond.toFixed(1)} bps=${bytesPerSecond.toFixed(1)} ` +
                     `termBatchAvg=${avgTermBatchMs.toFixed(1)}ms termBatchP95=${p95TermBatchMs.toFixed(1)}ms ` +
                     `contentBatchAvg=${avgContentBatchMs.toFixed(1)}ms contentBatchP95=${p95ContentBatchMs.toFixed(1)}ms`,
@@ -1998,25 +2866,29 @@ export class DictionaryDatabase {
      * @returns {Promise<{termRecordAppendMs: number, termsVtabInsertMs: number}>}
      */
     async _insertResolvedTermRows(rows, start, count) {
-        /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
-        const records = [];
-        for (let i = start, ii = start + count; i < ii; ++i) {
-            const row = rows[i];
-            records.push({
-                dictionary: this._asString(row[0]),
-                expression: this._asString(row[1]),
-                reading: this._asString(row[2]),
-                expressionReverse: this._asNullableString(row[3]) ?? null,
-                readingReverse: this._asNullableString(row[4]) ?? null,
-                entryContentOffset: this._asNumber(row[6], -1),
-                entryContentLength: this._asNumber(row[7], -1),
-                entryContentDictName: this._asNullableString(row[8]),
-                score: this._asNumber(row[12], 0),
-                sequence: this._asNullableNumber(row[14]) ?? null,
-            });
-        }
         const tRecordAppendStart = safePerformance.now();
-        await this._termRecordStore.appendBatch(records);
+        if (this._termRecordRowAppendFastPath) {
+            await this._termRecordStore.appendBatchFromTermRows(rows, start, count);
+        } else {
+            /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
+            const records = [];
+            for (let i = start, ii = start + count; i < ii; ++i) {
+                const row = rows[i];
+                records.push({
+                    dictionary: this._asString(row[0]),
+                    expression: this._asString(row[1]),
+                    reading: this._asString(row[2]),
+                    expressionReverse: this._asNullableString(row[3]) ?? null,
+                    readingReverse: this._asNullableString(row[4]) ?? null,
+                    entryContentOffset: this._asNumber(row[6], -1),
+                    entryContentLength: this._asNumber(row[7], -1),
+                    entryContentDictName: this._asNullableString(row[8]),
+                    score: this._asNumber(row[12], 0),
+                    sequence: this._asNullableNumber(row[14]) ?? null,
+                });
+            }
+            await this._termRecordStore.appendBatch(records);
+        }
         const termRecordAppendMs = safePerformance.now() - tRecordAppendStart;
         let termsVtabInsertMs = 0;
         const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
@@ -2024,18 +2896,68 @@ export class DictionaryDatabase {
             this._termsVirtualTableDirty = true;
         } else {
             const tVtabStart = safePerformance.now();
-            await this._insertTermRowsIntoVirtualTable(records);
+            await this._insertTermRowsIntoVirtualTable(count);
             termsVtabInsertMs = safePerformance.now() - tVtabStart;
         }
         return {termRecordAppendMs, termsVtabInsertMs};
     }
 
     /**
-     * @param {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} records
+     * @param {import('dictionary-database').DatabaseTermEntry[]} rows
+     * @param {number[]} contentOffsets
+     * @param {number[]} contentLengths
+     * @param {(string|null)[]} contentDictNames
+     * @param {number} start
+     * @param {number} count
+     * @returns {Promise<{termRecordAppendMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number}>}
+     */
+    async _insertResolvedImportTermEntries(rows, contentOffsets, contentLengths, contentDictNames, start, count) {
+        const tRecordAppendStart = safePerformance.now();
+        let termRecordEncodeMs = 0;
+        let termRecordWriteMs = 0;
+        if (this._termRecordRowAppendFastPath) {
+            const metrics = await this._termRecordStore.appendBatchFromResolvedImportTermEntries(rows, start, count, contentOffsets, contentLengths, contentDictNames);
+            termRecordEncodeMs = metrics.encodeMs;
+            termRecordWriteMs = metrics.appendWriteMs;
+        } else {
+            /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
+            const records = [];
+            for (let i = start, ii = start + count; i < ii; ++i) {
+                const row = rows[i];
+                records.push({
+                    dictionary: row.dictionary,
+                    expression: row.expression,
+                    reading: row.reading,
+                    expressionReverse: row.expressionReverse ?? null,
+                    readingReverse: row.readingReverse ?? null,
+                    entryContentOffset: contentOffsets[i],
+                    entryContentLength: contentLengths[i],
+                    entryContentDictName: contentDictNames[i],
+                    score: row.score,
+                    sequence: typeof row.sequence === 'number' ? row.sequence : null,
+                });
+            }
+            await this._termRecordStore.appendBatch(records);
+        }
+        const termRecordAppendMs = safePerformance.now() - tRecordAppendStart;
+        let termsVtabInsertMs = 0;
+        const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
+        if (deferVirtualTableWrite) {
+            this._termsVirtualTableDirty = true;
+        } else {
+            const tVtabStart = safePerformance.now();
+            await this._insertTermRowsIntoVirtualTable(count);
+            termsVtabInsertMs = safePerformance.now() - tVtabStart;
+        }
+        return {termRecordAppendMs, termRecordEncodeMs, termRecordWriteMs, termsVtabInsertMs};
+    }
+
+    /**
+     * @param {number} count
      * @returns {Promise<void>}
      */
-    async _insertTermRowsIntoVirtualTable(records) {
-        this._termsVirtualTableDirty = records.length > 0;
+    async _insertTermRowsIntoVirtualTable(count) {
+        this._termsVirtualTableDirty = count > 0;
     }
 
     /**
@@ -2061,6 +2983,65 @@ export class DictionaryDatabase {
             }
         }
         await this._insertResolvedTermRows(rows.map((row) => row.values), 0, rows.length);
+    }
+
+    /** */
+    _clearTermEntryContentMetaCaches() {
+        this._termEntryContentMetaByHash.clear();
+        this._termEntryContentMetaByHashPair.clear();
+    }
+
+    /**
+     * @param {number} hash1
+     * @param {number} hash2
+     * @returns {{id: number, offset: number, length: number, dictName: string}|undefined}
+     */
+    _getTermEntryContentMetaByHashPair(hash1, hash2) {
+        const byHash2 = this._termEntryContentMetaByHashPair.get(hash1 >>> 0);
+        return typeof byHash2 !== 'undefined' ? byHash2.get(hash2 >>> 0) : void 0;
+    }
+
+    /**
+     * @param {number} hash1
+     * @param {number} hash2
+     * @param {{id: number, offset: number, length: number, dictName: string}} meta
+     */
+    _setTermEntryContentMetaByHashPair(hash1, hash2, meta) {
+        hash1 >>>= 0;
+        hash2 >>>= 0;
+        let byHash2 = this._termEntryContentMetaByHashPair.get(hash1);
+        if (typeof byHash2 === 'undefined') {
+            byHash2 = new Map();
+            this._termEntryContentMetaByHashPair.set(hash1, byHash2);
+        }
+        byHash2.set(hash2, meta);
+    }
+
+    /**
+     * @param {string|null} contentHash
+     * @param {number} offset
+     * @param {number} length
+     * @param {string|null|undefined} dictName
+     * @param {number} [id]
+     * @param {number} [hash1]
+     * @param {number} [hash2]
+     * @returns {{id: number, offset: number, length: number, dictName: string}}
+     */
+    _cacheTermEntryContentMeta(contentHash, offset, length, dictName, id = 0, hash1 = -1, hash2 = -1) {
+        const meta = {id, offset, length, dictName: dictName ?? 'raw'};
+        if (typeof contentHash === 'string' && contentHash.length > 0) {
+            this._termEntryContentMetaByHash.set(contentHash, meta);
+            if (hash1 < 0 || hash2 < 0) {
+                const parsedHashPair = parseContentHashHexPair(contentHash);
+                if (parsedHashPair !== null) {
+                    [hash1, hash2] = parsedHashPair;
+                }
+            }
+        }
+        if (hash1 >= 0 && hash2 >= 0) {
+            this._setTermEntryContentMetaByHashPair(hash1, hash2, meta);
+        }
+        return meta;
     }
 
     /**
@@ -2111,12 +3092,7 @@ export class DictionaryDatabase {
             const id = firstId + (i - start);
             this._termEntryContentIdByHash.set(rows[i].contentHash, id);
             this._termEntryContentIdByKey.set(rows[i].contentHash, id);
-            this._termEntryContentMetaByHash.set(rows[i].contentHash, {
-                id,
-                offset: spans[i].offset,
-                length: spans[i].length,
-                dictName: rows[i].contentDictName ?? 'raw',
-            });
+            this._cacheTermEntryContentMeta(rows[i].contentHash, spans[i].offset, spans[i].length, rows[i].contentDictName, id);
         }
     }
 
@@ -2128,54 +3104,105 @@ export class DictionaryDatabase {
      */
     async _bulkAddTermsWithoutContentDedup(items, start, count) {
         const useLocalTransaction = !this._bulkImportTransactionOpen;
-        const batchSize = 25000;
+        const batchSize = this._getTermBulkAddBatchSizeForCount(count);
+        let contentAppendMs = 0;
+        let termRecordBuildMs = 0;
+        let termRecordEncodeMs = 0;
+        let termRecordWriteMs = 0;
+        let termsVtabInsertMs = 0;
 
         if (useLocalTransaction) {
-            this._requireDb().exec('BEGIN IMMEDIATE');
+            await this._beginImmediateTransaction(this._requireDb());
         }
         try {
             for (let i = start, ii = start + count; i < ii; i += batchSize) {
                 const chunkCount = Math.min(batchSize, ii - i);
                 /** @type {Uint8Array[]} */
-                const contentChunks = [];
-                /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
-                const recordRows = [];
+                const contentChunks = new Array(chunkCount);
+                /** @type {number[]} */
+                const contentOffsets = new Array(chunkCount);
+                /** @type {number[]} */
+                const contentLengths = new Array(chunkCount);
                 for (let j = 0; j < chunkCount; ++j) {
                     const row = /** @type {import('dictionary-database').DatabaseTermEntry} */ (items[i + j]);
+                    const precomputedContentBytes = row.termEntryContentBytes instanceof Uint8Array ? row.termEntryContentBytes : this._getRawTermContentBytesIfAvailable(row);
+                    if (precomputedContentBytes instanceof Uint8Array) {
+                        contentChunks[j] = precomputedContentBytes;
+                        continue;
+                    }
                     const rules = row.rules ?? '';
                     const definitionTags = row.definitionTags ?? row.tags ?? '';
                     const termTags = row.termTags ?? '';
                     const contentJson = row.termEntryContentJson ?? this._serializeTermEntryContent(rules, definitionTags, termTags, row.glossary);
-                    const contentBytes = row.termEntryContentBytes instanceof Uint8Array ? row.termEntryContentBytes : this._textEncoder.encode(contentJson);
-                    contentChunks.push(contentBytes);
-                    recordRows.push({
-                        dictionary: row.dictionary,
-                        expression: row.expression,
-                        reading: row.reading,
-                        expressionReverse: row.expressionReverse ?? null,
-                        readingReverse: row.readingReverse ?? null,
-                        entryContentOffset: -1,
-                        entryContentLength: -1,
-                        entryContentDictName: 'raw',
-                        score: row.score,
-                        sequence: typeof row.sequence === 'number' ? row.sequence : null,
-                    });
+                    contentChunks[j] = this._textEncoder.encode(contentJson);
                 }
-                const spans = await this._termContentStore.appendBatch(contentChunks);
-                for (let j = 0; j < spans.length; ++j) {
-                    recordRows[j].entryContentOffset = spans[j].offset;
-                    recordRows[j].entryContentLength = spans[j].length;
+                let chunksToAppend = contentChunks;
+                const tContentAppendStart = safePerformance.now();
+                if (this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) {
+                    const {packedChunks, sourceChunkIndices, sourceChunkLocalOffsets} = packContentChunksIntoSlabs(
+                        contentChunks,
+                        this._rawTermContentPackTargetBytes,
+                    );
+                    chunksToAppend = packedChunks;
+                    /** @type {number[]} */
+                    const packedOffsets = new Array(packedChunks.length);
+                    /** @type {number[]} */
+                    const packedLengths = new Array(packedChunks.length);
+                    await this._termContentStore.appendBatchToArrays(packedChunks, packedOffsets, packedLengths);
+                    for (let j = 0; j < chunkCount; ++j) {
+                        const packedIndex = sourceChunkIndices[j];
+                        contentOffsets[j] = packedOffsets[packedIndex] + sourceChunkLocalOffsets[j];
+                        contentLengths[j] = contentChunks[j].byteLength;
+                    }
+                } else {
+                    await this._termContentStore.appendBatchToArrays(contentChunks, contentOffsets, contentLengths);
                 }
-                await this._termRecordStore.appendBatch(recordRows);
+                contentAppendMs += safePerformance.now() - tContentAppendStart;
+                const explicitContentDictName = chunkCount > 0 ? (items[i].termEntryContentDictName ?? null) : null;
+                let contentDictName = 'raw';
+                if (
+                    this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
+                    typeof explicitContentDictName === 'string' &&
+                    explicitContentDictName.length > 0
+                ) {
+                    contentDictName = explicitContentDictName;
+                } else if (
+                    this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
+                    chunksToAppend.every((contentBytes) => isRawTermContentBinary(contentBytes))
+                ) {
+                    contentDictName = RAW_TERM_CONTENT_DICT_NAME;
+                }
+                const metrics = await this._termRecordStore.appendBatchFromImportTermEntriesResolvedContent(items, i, chunkCount, contentOffsets, contentLengths, contentDictName);
+                termRecordBuildMs += metrics.buildRecordsMs;
+                termRecordEncodeMs += metrics.encodeMs;
+                termRecordWriteMs += metrics.appendWriteMs;
                 const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
                 if (deferVirtualTableWrite) {
                     this._termsVirtualTableDirty = true;
                 } else {
-                    await this._insertTermRowsIntoVirtualTable(recordRows);
+                    const tTermsVtabInsertStart = safePerformance.now();
+                    await this._insertTermRowsIntoVirtualTable(chunkCount);
+                    termsVtabInsertMs += safePerformance.now() - tTermsVtabInsertStart;
                 }
             }
             if (useLocalTransaction) {
                 this._requireDb().exec('COMMIT');
+            }
+            this._lastBulkAddTermsMetrics = {
+                contentAppendMs,
+                termRecordBuildMs,
+                termRecordEncodeMs,
+                termRecordWriteMs,
+                termsVtabInsertMs,
+            };
+            if (this._importDebugLogging) {
+                log.log(
+                    `[manabitan-db-import] bulkAdd terms no-dedup contentAppend=${contentAppendMs.toFixed(1)}ms ` +
+                    `termRecordBuild=${termRecordBuildMs.toFixed(1)}ms ` +
+                    `termRecordEncode=${termRecordEncodeMs.toFixed(1)}ms ` +
+                    `termRecordWrite=${termRecordWriteMs.toFixed(1)}ms ` +
+                    `termsVtabInsert=${termsVtabInsertMs.toFixed(1)}ms`,
+                );
             }
         } catch (e) {
             if (useLocalTransaction) {
@@ -2212,7 +3239,7 @@ export class DictionaryDatabase {
                     const length = this._asNumber(row.contentLength, -1);
                     const dictName = this._asNullableString(row.contentDictName) ?? 'raw';
                     if (offset >= 0 && length > 0) {
-                        this._termEntryContentMetaByHash.set(contentHash, {id: cachedHashId, offset, length, dictName});
+                        this._cacheTermEntryContentMeta(contentHash, offset, length, dictName, cachedHashId);
                     }
                 }
             }
@@ -2238,12 +3265,7 @@ export class DictionaryDatabase {
         }
         this._termEntryContentIdByHash.set(contentHash, id);
         this._termEntryContentIdByKey.set(contentKey, id);
-        this._termEntryContentMetaByHash.set(contentHash, {
-            id,
-            offset: span.offset,
-            length: span.length,
-            dictName: contentDictName ?? 'raw',
-        });
+        this._cacheTermEntryContentMeta(contentHash, span.offset, span.length, contentDictName, id);
         return id;
     }
 
@@ -2265,7 +3287,7 @@ export class DictionaryDatabase {
                 if (!this._termEntryContentIdByHash.has(contentHash)) {
                     this._termEntryContentIdByHash.set(contentHash, id);
                 }
-                this._termEntryContentMetaByHash.set(contentHash, {id, offset, length, dictName});
+                this._cacheTermEntryContentMeta(contentHash, offset, length, dictName, id);
             }
         }
     }
@@ -2318,7 +3340,7 @@ export class DictionaryDatabase {
     async _openConnection() {
         this._sqlite3 = await getSqlite3();
         try {
-            this._db = await openOpfsDatabase();
+            this._db = await openOpfsDatabase('DictionaryDatabase._openConnection');
         } catch (error) {
             const diagnostics = getLastOpenStorageDiagnostics();
             const message = (error instanceof Error) ? error.message : String(error);
@@ -2334,6 +3356,7 @@ export class DictionaryDatabase {
         this._applyRuntimePragmas();
 
         await this._initializeSchema();
+        await this._runSchemaMigrations();
     }
 
     /** */
@@ -2406,10 +3429,17 @@ export class DictionaryDatabase {
                 height INTEGER NOT NULL,
                 content BLOB NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS sharedGlossaryArtifacts (
+                dictionary TEXT PRIMARY KEY,
+                contentOffset INTEGER NOT NULL,
+                contentLength INTEGER NOT NULL,
+                contentDictName TEXT NOT NULL,
+                uncompressedLength INTEGER NOT NULL
+            );
         `);
-        await this._runSchemaMigrations();
-        await this._ensureTermsVirtualTable();
         await this._migrateTermsContentSchema();
+        await this._ensureTermsVirtualTable();
         if (!this._enableSqliteSecondaryIndexes) {
             for (const dropIndexSql of this._createDropIndexesSql()) {
                 db.exec(dropIndexSql);
@@ -2423,73 +3453,127 @@ export class DictionaryDatabase {
     /** */
     async _runSchemaMigrations() {
         const db = this._requireDb();
-        const currentVersion = this._getSchemaVersion();
-        const schemaMigrations = this._getSchemaMigrations();
-        if (currentVersion > DICTIONARY_DB_SCHEMA_VERSION) {
-            throw new Error(`Unsupported dictionary schema version: ${currentVersion}`);
+        const installedSchemaVersion = Math.max(0, this._asNumber(db.selectValue('PRAGMA user_version'), 0));
+        if (installedSchemaVersion > CURRENT_DICTIONARY_SCHEMA_VERSION) {
+            reportDiagnostics('dictionary-schema-migration-skipped', {
+                reason: 'newer-installed-version',
+                installedSchemaVersion,
+                currentSchemaVersion: CURRENT_DICTIONARY_SCHEMA_VERSION,
+            });
+            return;
         }
-        for (let nextVersion = currentVersion + 1; nextVersion <= DICTIONARY_DB_SCHEMA_VERSION; ++nextVersion) {
-            const migration = schemaMigrations.get(nextVersion);
-            if (typeof migration !== 'function') {
-                throw new Error(`Missing dictionary schema migration for version ${nextVersion}`);
-            }
-            await migration();
+        let currentSchemaVersion = installedSchemaVersion;
+        let migrationCount = 0;
+        while (currentSchemaVersion < CURRENT_DICTIONARY_SCHEMA_VERSION) {
+            const nextVersion = currentSchemaVersion + 1;
+            const migrationStart = safePerformance.now();
+            const migrationSummary = await this._runSchemaMigrationToVersion(nextVersion);
             db.exec(`PRAGMA user_version = ${nextVersion}`);
+            ++migrationCount;
+            reportDiagnostics('dictionary-schema-migration-applied', {
+                fromVersion: currentSchemaVersion,
+                toVersion: nextVersion,
+                elapsedMs: Math.max(0, safePerformance.now() - migrationStart),
+                summary: migrationSummary,
+            });
+            currentSchemaVersion = nextVersion;
+        }
+        reportDiagnostics('dictionary-schema-migration-summary', {
+            installedSchemaVersion,
+            currentSchemaVersion,
+            migrationCount,
+        });
+    }
+
+    /**
+     * @param {number} version
+     * @returns {Promise<Record<string, number|string|boolean|null>>}
+     */
+    async _runSchemaMigrationToVersion(version) {
+        switch (version) {
+            case 1:
+                return await this._wipeDictionaryDataForSchemaMigration('wipe-unversioned-dictionary-data');
+            case 2:
+                return await this._migrateSchemaVersion2();
+            case 3:
+                return await this._wipeDictionaryDataForSchemaMigration('reset-dictionary-data-for-raw-v3');
+            case 4:
+                return await this._wipeDictionaryDataForSchemaMigration('reset-dictionary-data-for-raw-v4');
+            default:
+                throw new Error(`Unhandled dictionary schema migration target version: ${version}`);
         }
     }
 
     /**
-     * @returns {Map<number, (() => Promise<void>)>}
+     * Migration v1: reset all imported dictionary data when legacy installs had no schema version.
+     * @param {string} migration
+     * @returns {Promise<Record<string, number|string|boolean|null>>}
      */
-    _getSchemaMigrations() {
-        return new Map([
-            [1, this._migrateSchemaVersion1.bind(this)],
-        ]);
-    }
-
-    /**
-     * @returns {number}
-     */
-    _getSchemaVersion() {
+    async _wipeDictionaryDataForSchemaMigration(migration) {
         const db = this._requireDb();
-        return this._asNumber(db.selectValue('PRAGMA user_version'), 0);
-    }
+        const dictionariesBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM dictionaries'), 0);
+        const termMetaBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM termMeta'), 0);
+        const kanjiBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM kanji'), 0);
+        const kanjiMetaBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM kanjiMeta'), 0);
+        const tagMetaBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM tagMeta'), 0);
+        const mediaBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM media'), 0);
+        const termContentBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM termEntryContent'), 0);
+        const sharedGlossaryArtifactsBefore = this._asNumber(db.selectValue('SELECT COUNT(*) FROM sharedGlossaryArtifacts'), 0);
+        const termRecordsBefore = this._termRecordStore.size;
 
-    /**
-     * Initial schema migration for legacy unversioned databases.
-     * Resets dictionary payloads/artifacts so partially-compatible legacy layouts
-     * cannot survive into schema-versioned startup.
-     * @returns {Promise<void>}
-     */
-    async _migrateSchemaVersion1() {
-        const db = this._requireDb();
-        db.exec('BEGIN IMMEDIATE');
+        await this._termContentStore.reset();
+        await this._termRecordStore.reset();
+        await this._beginImmediateTransaction(db);
         try {
-            db.exec('DELETE FROM dictionaries');
-            db.exec('DELETE FROM termEntryContent');
-            db.exec('DELETE FROM termMeta');
-            db.exec('DELETE FROM kanji');
-            db.exec('DELETE FROM kanjiMeta');
-            db.exec('DELETE FROM tagMeta');
             db.exec('DELETE FROM media');
+            db.exec('DELETE FROM tagMeta');
+            db.exec('DELETE FROM kanjiMeta');
+            db.exec('DELETE FROM kanji');
+            db.exec('DELETE FROM termMeta');
+            db.exec('DELETE FROM termEntryContent');
+            db.exec('DELETE FROM sharedGlossaryArtifacts');
+            db.exec('DELETE FROM dictionaries');
             db.exec('COMMIT');
         } catch (e) {
             try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
             throw e;
         }
 
-        await this._termContentStore.reset();
-        await this._termRecordStore.reset();
-        this._termEntryContentIdByKey.clear();
-        this._termEntryContentIdByHash.clear();
-        this._termEntryContentMetaByHash.clear();
         this._termEntryContentCache.clear();
+        this._termEntryContentIdByHash.clear();
+        this._clearTermEntryContentMetaCaches();
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
+        this._termEntryContentIdByKey.clear();
+        this._sharedGlossaryArtifactMetaByDictionary.clear();
+        this._sharedGlossaryArtifactInflatedByDictionary.clear();
         this._termsVirtualTableDirty = false;
-        this._termEntryContentHasExistingRows = false;
-        this._forceDropTermsTableOnInit = true;
+        this._deferTermsVirtualTableSync = false;
+
+        return {
+            migration,
+            dictionariesBefore,
+            termRecordsBefore,
+            termContentBefore,
+            termMetaBefore,
+            kanjiBefore,
+            kanjiMetaBefore,
+            tagMetaBefore,
+            mediaBefore,
+            sharedGlossaryArtifactsBefore,
+        };
+    }
+
+    /**
+     * Migration v2: reserved scaffold for future schema changes.
+     * @returns {Promise<Record<string, number|string|boolean|null>>}
+     */
+    async _migrateSchemaVersion2() {
+        await Promise.resolve();
+        return {
+            migration: 'schema-v2-noop',
+        };
     }
 
     /**
@@ -2553,9 +3637,7 @@ export class DictionaryDatabase {
         const termsType = typeof termsEntry === 'undefined' ? '' : this._asString(termsEntry.type);
         const termsSql = typeof termsEntry === 'undefined' ? '' : this._asString(termsEntry.sql).toUpperCase();
         const isVirtualTerms = termsSql.startsWith('CREATE VIRTUAL TABLE');
-        if (this._forceDropTermsTableOnInit && termsType.length > 0) {
-            db.exec('DROP TABLE terms');
-        } else if (termsType === 'table' && !isVirtualTerms) {
+        if (termsType === 'table' && !isVirtualTerms) {
             await this._migrateLegacyTermsTableToExternalStore();
             db.exec('DROP TABLE terms');
         } else if (isVirtualTerms && !termsSql.includes('MANABITAN_TERMS')) {
@@ -2580,7 +3662,6 @@ export class DictionaryDatabase {
                 sequence
             )
         `);
-        this._forceDropTermsTableOnInit = false;
         this._termsVirtualTableDirty = false;
     }
 
@@ -2734,6 +3815,62 @@ export class DictionaryDatabase {
             WHERE entryContentId IS NULL
         `);
 
+        const externalizeRows = db.selectObjects(`
+            SELECT id, contentZstd, contentDictName, rules, definitionTags, termTags, glossaryJson
+            FROM termEntryContent
+            WHERE
+                (contentOffset IS NULL OR contentOffset < 0 OR contentLength IS NULL OR contentLength <= 0)
+        `);
+        if (externalizeRows.length > 0) {
+            const chunks = [];
+            /** @type {{id: number, contentDictName: string|null}[]} */
+            const externalizedRows = [];
+            for (const row of externalizeRows) {
+                const id = this._asNumber(row.id, -1);
+                if (id <= 0) { continue; }
+
+                let contentBytes = this._toUint8Array(row.contentZstd);
+                let contentDictName = this._asNullableString(row.contentDictName);
+                if (contentBytes === null || contentBytes.byteLength <= 0) {
+                    const glossaryJson = this._asString(row.glossaryJson);
+                    contentBytes = encodeRawTermContentBinary(
+                        this._asString(row.rules),
+                        this._asString(row.definitionTags),
+                        this._asString(row.termTags),
+                        this._textEncoder.encode(glossaryJson),
+                        this._textEncoder,
+                    );
+                    contentDictName = RAW_TERM_CONTENT_DICT_NAME;
+                }
+                chunks.push(contentBytes);
+                externalizedRows.push({id, contentDictName});
+            }
+            if (chunks.length > 0) {
+                const spans = await this._termContentStore.appendBatch(chunks);
+                let spanIndex = 0;
+                for (const {id, contentDictName} of externalizedRows) {
+                    const span = spans[spanIndex++];
+                    db.exec({
+                        sql: `
+                            UPDATE termEntryContent
+                            SET
+                                contentOffset = $contentOffset,
+                                contentLength = $contentLength,
+                                contentDictName = $contentDictName,
+                                contentZstd = NULL
+                            WHERE id = $id
+                        `,
+                        bind: {
+                            $contentOffset: span.offset,
+                            $contentLength: span.length,
+                            $contentDictName: contentDictName,
+                            $id: id,
+                        },
+                    });
+                }
+            }
+        }
+
         db.exec(`
             UPDATE terms
             SET
@@ -2759,41 +3896,6 @@ export class DictionaryDatabase {
                 entryContentId IS NOT NULL AND
                 (entryContentOffset IS NULL OR entryContentOffset < 0 OR entryContentLength IS NULL OR entryContentLength <= 0)
         `);
-
-        const externalizeRows = db.selectObjects(`
-            SELECT id, contentZstd
-            FROM termEntryContent
-            WHERE
-                contentZstd IS NOT NULL AND
-                length(contentZstd) > 0 AND
-                (contentOffset IS NULL OR contentOffset < 0 OR contentLength IS NULL OR contentLength <= 0)
-        `);
-        if (externalizeRows.length > 0) {
-            const chunks = [];
-            for (const row of externalizeRows) {
-                const contentZstd = this._toUint8Array(row.contentZstd);
-                if (contentZstd === null || contentZstd.byteLength <= 0) { continue; }
-                chunks.push(contentZstd);
-            }
-            if (chunks.length > 0) {
-                const spans = await this._termContentStore.appendBatch(chunks);
-                let spanIndex = 0;
-                for (const row of externalizeRows) {
-                    const id = this._asNumber(row.id, -1);
-                    const contentZstd = this._toUint8Array(row.contentZstd);
-                    if (id <= 0 || contentZstd === null || contentZstd.byteLength <= 0) { continue; }
-                    const span = spans[spanIndex++];
-                    db.exec({
-                        sql: `
-                            UPDATE termEntryContent
-                            SET contentOffset = $contentOffset, contentLength = $contentLength, contentZstd = NULL
-                            WHERE id = $id
-                        `,
-                        bind: {$contentOffset: span.offset, $contentLength: span.length, $id: id},
-                    });
-                }
-            }
-        }
     }
 
     /**
@@ -3187,7 +4289,7 @@ export class DictionaryDatabase {
         const rowsById = new Map();
         const recordsById = this._termRecordStore.getByIds(ids);
         for (const [id, record] of recordsById) {
-            const row = this._deserializeTermRow({
+            const row = await this._deserializeTermRow({
                 id,
                 dictionary: record.dictionary,
                 expression: record.expression,
@@ -3212,9 +4314,9 @@ export class DictionaryDatabase {
 
     /**
      * @param {import('core').SafeAny} row
-     * @returns {import('dictionary-database').DatabaseTermEntryWithId}
+     * @returns {Promise<import('dictionary-database').DatabaseTermEntryWithId>}
      */
-    _deserializeTermRow(row) {
+    async _deserializeTermRow(row) {
         const entryContentId = this._asNullableNumber(row.entryContentId);
         const contentOffset = this._asNumber(row.entryContentOffset, -1);
         const contentLength = this._asNumber(row.entryContentLength, -1);
@@ -3231,42 +4333,150 @@ export class DictionaryDatabase {
         let rules;
         /** @type {import('dictionary-data').TermGlossary[]} */
         let glossary;
+        /** @type {(() => import('dictionary-data').TermGlossary[])|null} */
+        let glossaryResolver = null;
 
         if (cacheKey.length > 0) {
-            const cached = this._termEntryContentCache.get(cacheKey);
-            if (typeof cached !== 'undefined') {
-                definitionTags = cached.definitionTags;
-                termTags = cached.termTags;
-                rules = cached.rules;
-                glossary = cached.glossary;
-            } else {
-                const contentBytes = (contentOffset >= 0 && contentLength > 0) ? this._termContentStore.readSlice(contentOffset, contentLength) : null;
+            let cached = this._getCachedTermEntryContent(cacheKey);
+            if (typeof cached === 'undefined') {
+                /** @type {Uint8Array|null} */
+                let contentBytes = null;
+                if (contentOffset >= 0 && contentLength > 0) {
+                    try {
+                        contentBytes = await this._termContentStore.readSlice(contentOffset, contentLength);
+                    } catch (e) {
+                        logTermContentZstdError(e);
+                        contentBytes = null;
+                    }
+                }
                 if (contentBytes !== null && contentBytes.length > 0) {
                     try {
-                        const contentJson = (contentDictName === 'raw') ?
-                            this._textDecoder.decode(contentBytes) :
-                            this._textDecoder.decode(decompressTermContentZstd(contentBytes, contentDictName.length > 0 ? contentDictName : null));
-                        const content = /** @type {{rules?: string, definitionTags?: string, termTags?: string, glossary?: import('dictionary-data').TermGlossary[]}} */ (
-                            this._safeParseJson(contentJson, {})
-                        );
-                        definitionTags = this._asNullableString(content.definitionTags) ?? null;
-                        termTags = this._asNullableString(content.termTags);
-                        rules = this._asString(content.rules);
-                        glossary = Array.isArray(content.glossary) ? content.glossary : [];
+                        const rawSharedGlossaryHeader = (
+                            contentDictName === RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME ||
+                            isRawTermContentSharedGlossaryBinary(contentBytes)
+                        ) ?
+                            decodeRawTermContentSharedGlossaryHeader(contentBytes, this._textDecoder) :
+                            null;
+                        if (rawSharedGlossaryHeader !== null) {
+                            definitionTags = this._asNullableString(rawSharedGlossaryHeader.definitionTags) ?? null;
+                            termTags = this._asNullableString(rawSharedGlossaryHeader.termTags);
+                            rules = this._asString(rawSharedGlossaryHeader.rules);
+                            const rawGlossaryJsonBytes = contentDictName === RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME ?
+                                await this._readCompressedSharedGlossarySlice(
+                                    this._asString(row.dictionary),
+                                    rawSharedGlossaryHeader.glossaryOffset,
+                                    rawSharedGlossaryHeader.glossaryLength,
+                                ) :
+                                await this._termContentStore.readSlice(
+                                    rawSharedGlossaryHeader.glossaryOffset,
+                                    rawSharedGlossaryHeader.glossaryLength,
+                                );
+                            const glossaryJson = this._textDecoder.decode(rawGlossaryJsonBytes);
+                            glossary = this._safeParseJson(glossaryJson, []);
+                            cached = {
+                                definitionTags,
+                                termTags,
+                                rules,
+                                glossaryJson,
+                                glossary: Array.isArray(glossary) ? glossary : [],
+                            };
+                        } else {
+                            const rawContentHeader = (
+                                contentDictName === RAW_TERM_CONTENT_DICT_NAME ||
+                                isRawTermContentBinary(contentBytes)
+                            ) ?
+                                decodeRawTermContentHeader(contentBytes, this._textDecoder) :
+                                null;
+                            if (rawContentHeader !== null) {
+                                definitionTags = this._asNullableString(rawContentHeader.definitionTags) ?? null;
+                                termTags = this._asNullableString(rawContentHeader.termTags);
+                                rules = this._asString(rawContentHeader.rules);
+                                const rawGlossaryJsonBytes = getRawTermContentGlossaryJsonBytes(
+                                    contentBytes,
+                                    rawContentHeader.glossaryJsonOffset,
+                                    rawContentHeader.glossaryJsonLength,
+                                );
+                                const glossaryJson = this._textDecoder.decode(rawGlossaryJsonBytes);
+                                glossary = this._safeParseJson(glossaryJson, []);
+                                cached = {
+                                    definitionTags,
+                                    termTags,
+                                    rules,
+                                    glossaryJson,
+                                    glossary: Array.isArray(glossary) ? glossary : [],
+                                };
+                            } else {
+                                const contentJson = (contentDictName === 'raw') ?
+                                    this._textDecoder.decode(contentBytes) :
+                                    this._textDecoder.decode(decompressTermContentZstd(contentBytes, contentDictName.length > 0 ? contentDictName : null));
+                                const parsedHeader = this._parseSerializedTermEntryContentHeader(contentJson);
+                                if (parsedHeader !== null) {
+                                    definitionTags = parsedHeader.definitionTags;
+                                    termTags = parsedHeader.termTags;
+                                    rules = parsedHeader.rules;
+                                    glossary = this._safeParseJson(parsedHeader.glossaryJson, []);
+                                    cached = {
+                                        definitionTags,
+                                        termTags,
+                                        rules,
+                                        glossaryJson: parsedHeader.glossaryJson,
+                                        glossary: Array.isArray(glossary) ? glossary : [],
+                                    };
+                                } else {
+                                    const content = /** @type {{rules?: string, definitionTags?: string, termTags?: string, glossary?: import('dictionary-data').TermGlossary[]}} */ (
+                                        this._safeParseJson(contentJson, {})
+                                    );
+                                    definitionTags = this._asNullableString(content.definitionTags) ?? null;
+                                    termTags = this._asNullableString(content.termTags);
+                                    rules = this._asString(content.rules);
+                                    glossary = Array.isArray(content.glossary) ? content.glossary : [];
+                                    cached = {
+                                        definitionTags,
+                                        termTags,
+                                        rules,
+                                        glossaryJson: JSON.stringify(glossary),
+                                        glossary,
+                                    };
+                                }
+                            }
+                        }
                     } catch (e) {
                         logTermContentZstdError(e);
                         definitionTags = null;
                         termTags = '';
                         rules = '';
                         glossary = [];
+                        cached = {
+                            definitionTags,
+                            termTags,
+                            rules,
+                            glossaryJson: '[]',
+                            glossary,
+                        };
                     }
                 } else {
                     definitionTags = null;
                     termTags = '';
                     rules = '';
                     glossary = [];
+                    cached = {
+                        definitionTags,
+                        termTags,
+                        rules,
+                        glossaryJson: '[]',
+                        glossary,
+                    };
                 }
-                this._termEntryContentCache.set(cacheKey, {definitionTags, termTags, rules, glossary});
+                this._setCachedTermEntryContent(cacheKey, cached);
+            }
+            definitionTags = cached.definitionTags;
+            termTags = cached.termTags;
+            rules = cached.rules;
+            if (Array.isArray(cached.glossary)) {
+                glossary = cached.glossary;
+            } else {
+                glossary = [];
+                glossaryResolver = () => this._resolveCachedTermEntryGlossary(cached);
             }
         } else {
             definitionTags = this._asNullableString(row.definitionTags) ?? null;
@@ -3274,7 +4484,7 @@ export class DictionaryDatabase {
             rules = this._asString(row.rules);
             glossary = this._safeParseJson(this._asString(row.glossaryJson), []);
         }
-        return {
+        const termEntry = {
             id: this._asNumber(row.id, -1),
             expression: this._asString(row.expression),
             reading: this._asString(row.reading),
@@ -3287,6 +4497,161 @@ export class DictionaryDatabase {
             sequence: this._asNullableNumber(row.sequence),
             termTags,
             dictionary: this._asString(row.dictionary),
+        };
+        if (glossaryResolver !== null) {
+            Object.defineProperty(termEntry, 'glossary', {
+                enumerable: true,
+                configurable: true,
+                get: () => {
+                    const resolvedGlossary = glossaryResolver();
+                    Object.defineProperty(termEntry, 'glossary', {
+                        enumerable: true,
+                        configurable: true,
+                        writable: true,
+                        value: resolvedGlossary,
+                    });
+                    return resolvedGlossary;
+                },
+                set: (value) => {
+                    Object.defineProperty(termEntry, 'glossary', {
+                        enumerable: true,
+                        configurable: true,
+                        writable: true,
+                        value: Array.isArray(value) ? value : [],
+                    });
+                },
+            });
+        }
+        return termEntry;
+    }
+
+    /**
+     * @param {string} cacheKey
+     * @returns {{definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson?: string, glossary?: import('dictionary-data').TermGlossary[]}|undefined}
+     */
+    _getCachedTermEntryContent(cacheKey) {
+        const cached = this._termEntryContentCache.get(cacheKey);
+        if (typeof cached === 'undefined') {
+            return void 0;
+        }
+        // Promote recently used entries.
+        this._termEntryContentCache.delete(cacheKey);
+        this._termEntryContentCache.set(cacheKey, cached);
+        return cached;
+    }
+
+    /**
+     * @param {string} cacheKey
+     * @param {{definitionTags: string|null, termTags: string|undefined, rules: string, glossaryJson?: string, glossary?: import('dictionary-data').TermGlossary[]}} value
+     */
+    _setCachedTermEntryContent(cacheKey, value) {
+        if (this._termEntryContentCache.has(cacheKey)) {
+            this._termEntryContentCache.delete(cacheKey);
+        }
+        this._termEntryContentCache.set(cacheKey, value);
+        while (this._termEntryContentCache.size > this._termEntryContentCacheMaxEntries) {
+            const oldestKey = this._termEntryContentCache.keys().next().value;
+            if (typeof oldestKey !== 'string') { break; }
+            this._termEntryContentCache.delete(oldestKey);
+        }
+    }
+
+    /**
+     * @param {string} cacheKey
+     * @param {boolean} present
+     */
+    _setTermExactPresenceCached(cacheKey, present) {
+        if (this._termExactPresenceCache.has(cacheKey)) {
+            this._termExactPresenceCache.delete(cacheKey);
+        }
+        this._termExactPresenceCache.set(cacheKey, present);
+        while (this._termExactPresenceCache.size > this._termExactPresenceCacheMaxEntries) {
+            const oldestKey = this._termExactPresenceCache.keys().next().value;
+            if (typeof oldestKey !== 'string') { break; }
+            this._termExactPresenceCache.delete(oldestKey);
+        }
+    }
+
+    /**
+     * @param {{glossaryJson?: string, glossary?: import('dictionary-data').TermGlossary[], definitionTags: string|null, termTags: string|undefined, rules: string}} cached
+     * @returns {import('dictionary-data').TermGlossary[]}
+     */
+    _resolveCachedTermEntryGlossary(cached) {
+        if (Array.isArray(cached.glossary)) {
+            return cached.glossary;
+        }
+        const parsedGlossary = this._safeParseJson(typeof cached.glossaryJson === 'string' ? cached.glossaryJson : '[]', []);
+        cached.glossary = Array.isArray(parsedGlossary) ? parsedGlossary : [];
+        return cached.glossary;
+    }
+
+    /**
+     * @param {string} value
+     * @param {number} startIndex
+     * @returns {{token: string, endIndex: number}|null}
+     */
+    _readJsonStringToken(value, startIndex) {
+        if (startIndex < 0 || startIndex >= value.length || value[startIndex] !== '"') {
+            return null;
+        }
+        let i = startIndex + 1;
+        const ii = value.length;
+        while (i < ii) {
+            const c = value[i];
+            if (c === '\\') {
+                i += 2;
+                continue;
+            }
+            if (c === '"') {
+                return {
+                    token: value.slice(startIndex, i + 1),
+                    endIndex: i + 1,
+                };
+            }
+            ++i;
+        }
+        return null;
+    }
+
+    /**
+     * @param {string} contentJson
+     * @returns {{rules: string, definitionTags: string|null, termTags: string|undefined, glossaryJson: string}|null}
+     */
+    _parseSerializedTermEntryContentHeader(contentJson) {
+        const prefixRules = '{"rules":';
+        const prefixDefinitionTags = ',"definitionTags":';
+        const prefixTermTags = ',"termTags":';
+        const prefixGlossary = ',"glossary":';
+        if (!contentJson.startsWith(prefixRules) || !contentJson.endsWith('}')) {
+            return null;
+        }
+
+        let index = prefixRules.length;
+        const rulesToken = this._readJsonStringToken(contentJson, index);
+        if (rulesToken === null) { return null; }
+        index = rulesToken.endIndex;
+        if (!contentJson.startsWith(prefixDefinitionTags, index)) { return null; }
+        index += prefixDefinitionTags.length;
+
+        const definitionTagsToken = this._readJsonStringToken(contentJson, index);
+        if (definitionTagsToken === null) { return null; }
+        index = definitionTagsToken.endIndex;
+        if (!contentJson.startsWith(prefixTermTags, index)) { return null; }
+        index += prefixTermTags.length;
+
+        const termTagsToken = this._readJsonStringToken(contentJson, index);
+        if (termTagsToken === null) { return null; }
+        index = termTagsToken.endIndex;
+        if (!contentJson.startsWith(prefixGlossary, index)) { return null; }
+        index += prefixGlossary.length;
+        if (index > contentJson.length - 1) { return null; }
+
+        const glossaryJson = contentJson.slice(index, -1);
+        return {
+            rules: /** @type {string} */ (this._safeParseJson(rulesToken.token, '')),
+            definitionTags: this._asNullableString(this._safeParseJson(definitionTagsToken.token, '')) ?? null,
+            termTags: this._asNullableString(this._safeParseJson(termTagsToken.token, '')),
+            glossaryJson,
         };
     }
 
@@ -3448,6 +4813,51 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @returns {number}
+     */
+    _computeStatementCacheMaxEntries() {
+        const memoryGiB = this._getApproximateDeviceMemoryGiB();
+        return memoryGiB !== null && memoryGiB <= 4 ? LOW_MEMORY_STATEMENT_CACHE_MAX_ENTRIES : DEFAULT_STATEMENT_CACHE_MAX_ENTRIES;
+    }
+
+    /**
+     * @returns {number}
+     */
+    _computeTermExactPresenceCacheMaxEntries() {
+        const memoryGiB = this._getApproximateDeviceMemoryGiB();
+        return memoryGiB !== null && memoryGiB <= 4 ? LOW_MEMORY_TERM_EXACT_PRESENCE_CACHE_MAX_ENTRIES : DEFAULT_TERM_EXACT_PRESENCE_CACHE_MAX_ENTRIES;
+    }
+
+    /**
+     * @returns {number}
+     */
+    _computeDefaultTermBulkAddStagingMaxRows() {
+        const memoryGiB = this._getApproximateDeviceMemoryGiB();
+        if (memoryGiB !== null && memoryGiB <= 4) {
+            return TERM_BULK_ADD_STAGING_MAX_ROWS;
+        }
+        if (memoryGiB !== null && memoryGiB >= 8) {
+            return HIGH_MEMORY_TERM_BULK_ADD_STAGING_MAX_ROWS;
+        }
+        return DEFAULT_TERM_BULK_ADD_STAGING_MAX_ROWS;
+    }
+
+    /**
+     * @returns {number|null}
+     */
+    _getApproximateDeviceMemoryGiB() {
+        try {
+            const rawValue = /** @type {unknown} */ (Reflect.get(globalThis.navigator ?? {}, 'deviceMemory'));
+            if (typeof rawValue === 'number' && Number.isFinite(rawValue) && rawValue > 0) {
+                return rawValue;
+            }
+        } catch (_) {
+            // NOP
+        }
+        return null;
+    }
+
+    /**
      * @param {number[]} values
      * @returns {number}
      */
@@ -3548,14 +4958,33 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {import('dictionary-database').DatabaseTermEntry} row
+     * @returns {Uint8Array|null}
+     */
+    _getRawTermContentBytesIfAvailable(row) {
+        const glossaryJsonBytes = row.termEntryContentRawGlossaryJsonBytes;
+        if (!(glossaryJsonBytes instanceof Uint8Array) || glossaryJsonBytes.byteLength === 0) {
+            return null;
+        }
+        const rules = row.rules ?? '';
+        const definitionTags = row.definitionTags ?? row.tags ?? '';
+        const termTags = row.termTags ?? '';
+        const contentBytes = encodeRawTermContentBinary(rules, definitionTags, termTags, glossaryJsonBytes, this._textEncoder);
+        row.termEntryContentBytes = contentBytes;
+        row.termEntryContentRawGlossaryJsonBytes = void 0;
+        return contentBytes;
+    }
+
+    /**
      * @param {string} contentJson
      * @returns {string}
      */
     _hashEntryContent(contentJson) {
         let h1 = 0x811c9dc5;
         let h2 = 0x9e3779b9;
-        for (let i = 0, ii = contentJson.length; i < ii; ++i) {
-            const code = contentJson.charCodeAt(i);
+        const bytes = this._textEncoder.encode(contentJson);
+        for (let i = 0, ii = bytes.length; i < ii; ++i) {
+            const code = bytes[i];
             h1 = Math.imul((h1 ^ code) >>> 0, 0x01000193);
             h2 = Math.imul((h2 ^ code) >>> 0, 0x85ebca6b);
             h2 = (h2 ^ (h2 >>> 13)) >>> 0;
@@ -3564,6 +4993,125 @@ export class DictionaryDatabase {
             h1 = 1;
         }
         return `${(h1 >>> 0).toString(16).padStart(8, '0')}${(h2 >>> 0).toString(16).padStart(8, '0')}`;
+    }
+
+    /**
+     * @param {Uint8Array[]} contentBytesList
+     * @param {string|null} compressionDictName
+     * @param {(string|null)[]} [contentDictNameOverrides]
+     * @returns {{storedChunks: Uint8Array[], contentDictNames: string[], entryToStoredChunkIndexes: number[]}}
+     */
+    _createTermContentStorageChunks(contentBytesList, compressionDictName, contentDictNameOverrides = []) {
+        if (this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) {
+            return {
+                storedChunks: contentBytesList,
+                contentDictNames: contentBytesList.map((contentBytes, index) => {
+                    const override = contentDictNameOverrides[index];
+                    if (typeof override === 'string' && override.length > 0) {
+                        return override;
+                    }
+                    return isRawTermContentBinary(contentBytes) ?
+                        RAW_TERM_CONTENT_DICT_NAME :
+                        (isRawTermContentSharedGlossaryBinary(contentBytes) ? RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME : 'raw');
+                }),
+                entryToStoredChunkIndexes: contentBytesList.map((_, index) => index),
+            };
+        }
+        /** @type {Uint8Array[]} */
+        const storedChunks = [];
+        /** @type {string[]} */
+        const contentDictNames = [];
+        for (const contentBytes of contentBytesList) {
+            let storedBytes = contentBytes;
+            let effectiveDictName = 'raw';
+            if (contentBytes.byteLength >= this._termContentCompressionMinBytes) {
+                const compressed = compressTermContentZstd(contentBytes, compressionDictName);
+                if (compressed.byteLength < contentBytes.byteLength) {
+                    storedBytes = compressed;
+                    effectiveDictName = compressionDictName ?? '';
+                }
+            }
+            storedChunks.push(storedBytes);
+            contentDictNames.push(effectiveDictName);
+        }
+        return {
+            storedChunks,
+            contentDictNames,
+            entryToStoredChunkIndexes: storedChunks.map((_, index) => index),
+        };
+    }
+
+    /**
+     * @param {number} rowCount
+     * @returns {number}
+     */
+    _getTermBulkAddBatchSizeForCount(rowCount) {
+        const baseline = this._termBulkAddBatchSize;
+        if (!this._adaptiveTermBulkAddBatchSize) {
+            return baseline;
+        }
+        let candidate = baseline;
+        if (rowCount >= 300000) {
+            candidate = 75000;
+        } else if (rowCount >= 160000) {
+            candidate = 75000;
+        } else if (rowCount >= 60000) {
+            candidate = 50000;
+        } else if (rowCount >= 20000) {
+            candidate = 37500;
+        }
+        return Math.max(1024, Math.min(100000, Math.max(baseline, candidate)));
+    }
+
+    /**
+     * @param {Error} error
+     * @returns {boolean}
+     */
+    _isRetryableBeginImmediateError(error) {
+        return /SQLITE_BUSY|SQLITE_LOCKED|database is locked/i.test(error.message);
+    }
+
+    /**
+     * @param {number} ms
+     * @returns {Promise<void>}
+     */
+    async _sleep(ms) {
+        if (ms <= 0) { return; }
+        await new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
+    /**
+     * @param {import('@sqlite.org/sqlite-wasm').Database} db
+     * @returns {Promise<void>}
+     * @throws {Error}
+     */
+    async _beginImmediateTransaction(db) {
+        if (!this._retryBeginImmediateTransaction) {
+            db.exec('BEGIN IMMEDIATE');
+            return;
+        }
+        const retryBackoffMs = [0, 8, 16, 32, 64, 128];
+        /** @type {Error|null} */
+        let lastError = null;
+        for (let i = 0; i < retryBackoffMs.length; ++i) {
+            await this._sleep(retryBackoffMs[i]);
+            try {
+                db.exec('BEGIN IMMEDIATE');
+                return;
+            } catch (e) {
+                const error = toError(e);
+                lastError = error;
+                if (!this._isRetryableBeginImmediateError(error) || i >= (retryBackoffMs.length - 1)) {
+                    throw error;
+                }
+            }
+        }
+        if (lastError !== null) {
+            throw lastError;
+        }
+        throw new Error('BEGIN IMMEDIATE failed with unknown error');
     }
 
     /** */
@@ -3589,7 +5137,10 @@ export class DictionaryDatabase {
         db.exec('PRAGMA cache_size = -131072');
         db.exec('PRAGMA cache_spill = OFF');
         db.exec('PRAGMA wal_autocheckpoint = 0');
-        db.exec('PRAGMA locking_mode = EXCLUSIVE');
+        // OPFS-backed sqlite handles can see generic I/O/CANTOPEN failures under
+        // contention when EXCLUSIVE mode is held for long imports. Keep NORMAL
+        // here so concurrent extension handles can continue to cooperate.
+        db.exec('PRAGMA locking_mode = NORMAL');
     }
 
     /**

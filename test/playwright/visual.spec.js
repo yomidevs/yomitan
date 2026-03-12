@@ -15,11 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {readFileSync} from 'fs';
+import {existsSync, readFileSync} from 'fs';
 import path from 'path';
 import {pathToFileURL} from 'url';
 import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
 import {expect, root, test} from './playwright-util.js';
+
+if (process.platform === 'win32') {
+    test.skip(true, 'Chromium visual extension tests are not reliable on local Windows runs.');
+}
+
+const localJmdictEnglishPath = path.join(root, 'dictionaries/jmdict_english.zip');
 
 test.beforeEach(async ({context}) => {
     // Wait for the on-install welcome.html tab to load, which becomes the foreground tab
@@ -31,13 +37,15 @@ test('welcome', async ({page, extensionId}) => {
     // Open welcome page
     console.log('Open welcome page');
     await page.goto(`chrome-extension://${extensionId}/welcome.html`);
-    await expect(page.getByText('Welcome to Yomitan!')).toBeVisible();
+    await expect(page.getByText('Welcome to Manabitan!')).toBeVisible();
 
     // Take a screenshot of the welcome page
     await expect.soft(page).toHaveScreenshot('welcome-page.png');
 });
 test.describe('settings', () => {
     test('local load of jmdict_english', async ({page, extensionId}) => {
+        test.skip(!existsSync(localJmdictEnglishPath), 'Requires dictionaries/jmdict_english.zip test data.');
+
         // Open settings
         console.log('Open settings');
         await page.goto(`chrome-extension://${extensionId}/settings.html`);
@@ -52,7 +60,7 @@ test.describe('settings', () => {
 
         // Load in jmdict_english.zip
         console.log('Load in jmdict_english.zip');
-        await page.locator('input[id="dictionary-import-file-input"]').setInputFiles(path.join(root, 'dictionaries/jmdict_english.zip'));
+        await page.locator('input[id="dictionary-import-file-input"]').setInputFiles(localJmdictEnglishPath);
         await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 
         // Take a screenshot of the settings page with jmdict loaded

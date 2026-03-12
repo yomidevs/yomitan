@@ -1388,24 +1388,38 @@
             "type": "object",
             "required": [
                 "database",
-                "dataTransmissionConsentShown"
+                "dataTransmissionConsentShown",
+                "dictionaryAutoUpdates"
             ],
             "properties": {
                 "database": {
                     "type": "object",
                     "required": [
-                        "prefixWildcardsSupported"
+                        "prefixWildcardsSupported",
+                        "maxHeadwordLength"
                     ],
                     "properties": {
                         "prefixWildcardsSupported": {
                             "type": "boolean",
                             "default": false
+                        },
+                        "maxHeadwordLength": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "default": 0
                         }
                     }
                 },
                 "dataTransmissionConsentShown": {
                     "type": "boolean",
                     "default": false
+                },
+                "dictionaryAutoUpdates": {
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         }

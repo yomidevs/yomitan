@@ -47,6 +47,8 @@ export class DisplayAudio {
         this._eventListeners = new EventListenerCollection();
         /** @type {Map<string, import('display-audio').CacheItem>} */
         this._cache = new Map();
+        /** @type {number} */
+        this._cacheMaxSize = 256;
         /** @type {Element} */
         this._menuContainer = querySelectorNotNull(document, '#popup-menus');
         /** @type {import('core').TokenObject} */
@@ -375,14 +377,31 @@ export class DisplayAudio {
     _getCacheItem(term, reading, create) {
         const key = this._getTermReadingKey(term, reading);
         let cacheEntry = this._cache.get(key);
-        if (typeof cacheEntry === 'undefined' && create) {
+        if (typeof cacheEntry !== 'undefined') {
+            // Maintain LRU order using insertion order of Map.
+            this._cache.delete(key);
+            this._cache.set(key, cacheEntry);
+            return cacheEntry;
+        }
+        if (create) {
             cacheEntry = {
                 sourceMap: new Map(),
                 primaryCardAudio: null,
             };
             this._cache.set(key, cacheEntry);
+            this._evictCacheEntries();
         }
         return cacheEntry;
+    }
+
+    /** */
+    _evictCacheEntries() {
+        const cacheMaxSize = Math.max(1, Math.trunc(this._cacheMaxSize));
+        while (this._cache.size > cacheMaxSize) {
+            const oldestKey = this._cache.keys().next();
+            if (oldestKey.done) { break; }
+            this._cache.delete(oldestKey.value);
+        }
     }
 
     /**

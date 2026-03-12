@@ -17,7 +17,16 @@
  */
 
 import {describe, expect, test, vi} from 'vitest';
-import {Backend} from '../ext/js/background/backend.js';
+
+vi.mock('../ext/lib/kanji-processor.js', () => ({
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
+    convertVariants: (text) => text,
+}));
+
+const {Backend} = await import('../ext/js/background/backend.js');
 
 /**
  * @returns {(this: unknown) => Promise<unknown>}
@@ -55,6 +64,7 @@ describe('Backend stale dictionary option pruning', () => {
             _dictionaryDatabase: {
                 getDictionaryInfo: async () => [{title: 'A'}, {title: 'Shared'}],
             },
+            _ensureDictionaryDatabaseReady: async () => {},
             _optionsUtil: {
                 save: optionsUtilSave,
             },
@@ -103,6 +113,7 @@ describe('Backend stale dictionary option pruning', () => {
             _dictionaryDatabase: {
                 getDictionaryInfo: async () => [{title: 'A'}],
             },
+            _ensureDictionaryDatabaseReady: async () => {},
             _optionsUtil: {
                 save: optionsUtilSave,
             },
@@ -135,6 +146,7 @@ describe('Backend stale dictionary option pruning', () => {
                     throw new Error('dictionary info unavailable');
                 },
             },
+            _ensureDictionaryDatabaseReady: async () => {},
             _optionsUtil: {
                 save: optionsUtilSave,
             },

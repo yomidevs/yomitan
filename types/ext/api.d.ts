@@ -186,6 +186,7 @@ type ApiSurface = {
         params: {
             notes: Anki.Note[];
             fetchAdditionalInfo: boolean;
+            fetchDuplicateNoteIds: boolean;
         };
         return: Anki.NoteInfoWrapper[];
     };
@@ -288,6 +289,37 @@ type ApiSurface = {
     getDictionaryInfo: {
         params: void;
         return: DictionaryImporter.Summary[];
+    };
+    deleteDictionaryByTitle: {
+        params: {
+            dictionaryTitle: string;
+        };
+        return: void;
+    };
+    getDictionaryCounts: {
+        params: {
+            dictionaryNames: string[];
+            getTotal: boolean;
+        };
+        return: DictionaryDatabase.DictionaryCounts;
+    };
+    checkDictionaryUpdates: {
+        params: {
+            dictionaryTitles?: string[];
+        };
+        return: Backend.DictionaryUpdateCheckResult[];
+    };
+    updateDictionaryByTitle: {
+        params: {
+            dictionaryTitle: string;
+        };
+        return: Backend.DictionaryUpdateResult;
+    };
+    setDictionaryImportMode: {
+        params: {
+            active: boolean;
+        };
+        return: void;
     };
     purgeDatabase: {
         params: void;

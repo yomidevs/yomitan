@@ -91,6 +91,12 @@ export class TextScanner extends EventDispatcher {
         this._textSourceCurrentSelected = false;
         /** @type {boolean} */
         this._pendingLookup = false;
+        /** @type {number} */
+        this._lookupTimeoutMs = 3_000;
+        /** @type {number} */
+        this._lookupSequence = 0;
+        /** @type {?number} */
+        this._activeLookupSequence = null;
         /** @type {?import('text-scanner').SelectionRestoreInfo} */
         this._selectionRestoreInfo = null;
 
@@ -470,10 +476,12 @@ export class TextScanner extends EventDispatcher {
      * @param {import('text-scanner').InputInfo} inputInfo
      * @param {boolean} showEmpty shows a "No results found" popup if no results are found
      * @param {boolean} disallowExpandStartOffset disallows expanding the start offset of the range
+     * @param {?number} lookupSequence
      */
-    async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false, disallowExpandStartOffset = false) {
+    async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false, disallowExpandStartOffset = false, lookupSequence = null) {
         try {
             safePerformance.mark('scanner:_search:start');
+            if (this._isLookupStale(lookupSequence)) { return; }
             const isAltText = textSource instanceof TextSourceElement;
             if (inputInfo.pointerType === 'touch') {
                 if (isAltText) {
@@ -507,6 +515,7 @@ export class TextScanner extends EventDispatcher {
 
             const getSearchContextPromise = this._getSearchContext();
             const getSearchContextResult = getSearchContextPromise instanceof Promise ? await getSearchContextPromise : getSearchContextPromise;
+            if (this._isLookupStale(lookupSequence)) { return; }
             const {detail} = getSearchContextResult;
             const optionsContext = this._createOptionsContextForInput(getSearchContextResult.optionsContext, inputInfo);
 
@@ -517,6 +526,7 @@ export class TextScanner extends EventDispatcher {
             /** @type {'terms'|'kanji'} */
             let type = 'terms';
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
+            if (this._isLookupStale(lookupSequence)) { return; }
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
             } else if (showEmpty || (textSource !== null && isAltText && await this._isTextLookupWorthy(textSource.content))) {
@@ -524,6 +534,7 @@ export class TextScanner extends EventDispatcher {
                 dictionaryEntries = [];
                 sentence = {text: '', offset: 0};
             }
+            if (this._isLookupStale(lookupSequence)) { return; }
 
             if (dictionaryEntries !== null && sentence !== null) {
                 this._inputInfoCurrent = inputInfo;
@@ -550,6 +561,7 @@ export class TextScanner extends EventDispatcher {
             safePerformance.mark('scanner:_search:end');
             safePerformance.measure('scanner:_search', 'scanner:_search:start', 'scanner:_search:end');
         } catch (error) {
+            if (this._isLookupStale(lookupSequence)) { return; }
             this.trigger('searchError', {
                 error: error instanceof Error ? error : new Error(`A search error occurred: ${error}`),
                 textSource,
@@ -1318,6 +1330,10 @@ export class TextScanner extends EventDispatcher {
     async _searchAt(x, y, inputInfo) {
         if (this._pendingLookup) { return; }
 
+        const lookupSequence = ++this._lookupSequence;
+        this._activeLookupSequence = lookupSequence;
+        /** @type {?import('text-source').TextSource} */
+        let activeTextSource = null;
         try {
             safePerformance.mark('scanner:_searchAt:start');
             const sourceInput = inputInfo.input;
@@ -1335,17 +1351,42 @@ export class TextScanner extends EventDispatcher {
                 return;
             }
 
-            const textSource = this._textSourceGenerator.getRangeFromPoint(x, y, {
+            activeTextSource = this._textSourceGenerator.getRangeFromPoint(x, y, {
                 deepContentScan: this._deepContentScan,
                 normalizeCssZoom: this._normalizeCssZoom,
                 language: this._language,
             });
-            if (textSource !== null) {
+            if (activeTextSource !== null) {
                 try {
                     this._isMouseOverText = true;
-                    await this._search(textSource, searchTerms, searchKanji, inputInfo);
+                    const searchPromise = this._search(activeTextSource, searchTerms, searchKanji, inputInfo, false, false, lookupSequence);
+                    const timeoutMs = this._lookupTimeoutMs;
+                    if (Number.isFinite(timeoutMs) && timeoutMs > 0) {
+                        /** @type {?import('core').Timeout} */
+                        let timeout = null;
+                        /** @type {Promise<boolean>} */
+                        const timeoutPromise = new Promise((resolve) => {
+                            timeout = setTimeout(() => {
+                                timeout = null;
+                                resolve(true);
+                            }, timeoutMs);
+                        });
+                        const timedOut = await Promise.race([
+                            searchPromise.then(() => false),
+                            timeoutPromise,
+                        ]);
+                        if (timeout !== null) {
+                            clearTimeout(timeout);
+                            timeout = null;
+                        }
+                        if (this._isLookupStale(lookupSequence) || timedOut) {
+                            return;
+                        }
+                    } else {
+                        await searchPromise;
+                    }
                 } finally {
-                    textSource.cleanup();
+                    activeTextSource.cleanup();
                 }
             } else {
                 this._isMouseOverText = false;
@@ -1356,8 +1397,19 @@ export class TextScanner extends EventDispatcher {
         } catch (e) {
             log.error(e);
         } finally {
+            if (this._activeLookupSequence === lookupSequence) {
+                this._activeLookupSequence = null;
+            }
             this._pendingLookup = false;
         }
+    }
+
+    /**
+     * @param {?number} lookupSequence
+     * @returns {boolean}
+     */
+    _isLookupStale(lookupSequence) {
+        return (lookupSequence !== null && this._activeLookupSequence !== lookupSequence);
     }
 
     /**

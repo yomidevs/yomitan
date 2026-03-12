@@ -47,6 +47,7 @@ export type NoteFields = {
 export type NoteInfoWrapper = {
     canAdd: boolean;
     valid: boolean;
+    isDuplicate: boolean;
     noteIds: NoteId[] | null;
     noteInfos?: (NoteInfo | null)[];
 };

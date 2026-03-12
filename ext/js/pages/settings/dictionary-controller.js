@@ -16,16 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as ajvSchemas0 from '../../../lib/validate-schemas.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {deferPromise} from '../../core/utilities.js';
-import {compareRevisions} from '../../dictionary/dictionary-data-util.js';
-import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-
-const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 
 class DictionaryEntry {
     /**
@@ -173,29 +167,16 @@ class DictionaryEntry {
      */
     async checkForUpdate() {
         this._updatesAvailable.hidden = true;
-        const {isUpdatable, indexUrl, revision: currentRevision, downloadUrl: currentDownloadUrl} = this._dictionaryInfo;
-        if (!isUpdatable || !indexUrl || !currentDownloadUrl) { return false; }
-        const response = await fetch(indexUrl);
-
-        /** @type {unknown} */
-        const index = await readResponseJson(response);
-
-        if (!ajvSchemas.dictionaryIndex(index)) {
-            throw new Error('Invalid dictionary index');
-        }
-
-        const validIndex = /** @type {import('dictionary-data').Index} */ (index);
-        const {revision: latestRevision, downloadUrl: latestDownloadUrl} = validIndex;
-
-        if (!compareRevisions(currentRevision, latestRevision)) {
+        const [updateCheck] = await this._dictionaryController.settingsController.application.api.checkDictionaryUpdates([this.dictionaryTitle]);
+        if (typeof updateCheck === 'undefined') {
             return false;
         }
-
-        const downloadUrl = latestDownloadUrl ?? currentDownloadUrl;
-
-        this._updateDownloadUrl = downloadUrl;
+        if (typeof updateCheck.error === 'string' && updateCheck.error.length > 0) {
+            log.error(new Error(updateCheck.error));
+        }
+        this._updateDownloadUrl = updateCheck.hasUpdate ? (updateCheck.downloadUrl ?? this._dictionaryInfo.downloadUrl ?? null) : null;
         this._showUpdatesAvailableButton();
-        return true;
+        return updateCheck.hasUpdate;
     }
 
     /**
@@ -244,7 +225,7 @@ class DictionaryEntry {
                 this._delete();
                 break;
             case 'showDetails':
-                this._showDetails();
+                void this._showDetails();
                 break;
             case 'moveTo':
                 this._showMoveToModal();
@@ -282,23 +263,22 @@ class DictionaryEntry {
 
     /** */
     _onOutdatedButtonClick() {
-        this._showDetails();
+        void this._showDetails();
     }
 
     /** */
     _onUpdateButtonClick() {
-        const downloadUrl = this._updatesAvailable.dataset.downloadUrl;
-        this._dictionaryController.updateDictionary(this.dictionaryTitle, downloadUrl);
+        this._dictionaryController.updateDictionary(this.dictionaryTitle);
     }
 
     /** */
     _onIntegrityButtonClick() {
-        this._showDetails();
+        void this._showDetails();
     }
 
     /** */
-    _showDetails() {
-        const {title, revision, version, counts, prefixWildcardsSupported} = this._dictionaryInfo;
+    async _showDetails() {
+        const {title, revision, version, counts, prefixWildcardsSupported, isUpdatable, indexUrl, downloadUrl} = this._dictionaryInfo;
 
         const modal = this._dictionaryController.modalController.getModal('dictionary-details');
         if (modal === null) { return; }
@@ -321,6 +301,10 @@ class DictionaryEntry {
         const useDeinflectionsSetting = querySelectorNotNull(modal.node, '.dictionary-use-deinflections-setting');
         /** @type {HTMLElement} */
         const useDeinflectionsToggle = querySelectorNotNull(useDeinflectionsSetting, '.dictionary-use-deinflections-toggle');
+        /** @type {HTMLElement} */
+        const autoUpdateSetting = querySelectorNotNull(modal.node, '.dictionary-auto-update-setting');
+        /** @type {HTMLInputElement} */
+        const autoUpdateToggle = querySelectorNotNull(autoUpdateSetting, '.dictionary-auto-update-toggle');
 
         titleElement.textContent = title;
         versionElement.textContent = `rev.${revision}`;
@@ -331,6 +315,16 @@ class DictionaryEntry {
 
         useDeinflectionsSetting.hidden = !counts?.terms.total;
         useDeinflectionsToggle.dataset.setting = `dictionaries[${this._index}].useDeinflections`;
+
+        const canAutoUpdate = (isUpdatable === true && typeof indexUrl === 'string' && typeof downloadUrl === 'string');
+        autoUpdateSetting.hidden = !canAutoUpdate;
+        autoUpdateToggle.checked = false;
+        delete autoUpdateToggle.dataset.indexUrl;
+        if (canAutoUpdate) {
+            const optionsFull = await this._dictionaryController.settingsController.getOptionsFull();
+            autoUpdateToggle.checked = optionsFull.global.dictionaryAutoUpdates.includes(indexUrl);
+            autoUpdateToggle.dataset.indexUrl = indexUrl;
+        }
 
         this._setupDetails(detailsTableElement);
 
@@ -641,6 +635,11 @@ export class DictionaryController {
         return this._modalController;
     }
 
+    /** @type {import('./settings-controller.js').SettingsController} */
+    get settingsController() {
+        return this._settingsController;
+    }
+
     /** @type {number} */
     get dictionaryOptionCount() {
         return this._dictionaryEntries.length;
@@ -670,6 +669,7 @@ export class DictionaryController {
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
         dictionaryDeleteButton.addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
         dictionaryUpdateButton.addEventListener('click', this._onDictionaryConfirmUpdate.bind(this), false);
+        /** @type {HTMLInputElement} */ (querySelectorNotNull(document, '.dictionary-auto-update-toggle')).addEventListener('change', this._onDictionaryAutoUpdateToggleChange.bind(this), false);
 
         dictionaryMoveButton.addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
 
@@ -742,7 +742,7 @@ export class DictionaryController {
      * @param {string} dictionaryTitle
      * @param {string|undefined} downloadUrl
      */
-    updateDictionary(dictionaryTitle, downloadUrl) {
+    updateDictionary(dictionaryTitle, downloadUrl = void 0) {
         const modal = this._updateDictionaryModal;
         if (modal === null) { return; }
         modal.node.dataset.downloadUrl = downloadUrl;
@@ -1075,6 +1075,29 @@ export class DictionaryController {
     }
 
     /**
+     * @param {Event} e
+     */
+    async _onDictionaryAutoUpdateToggleChange(e) {
+        const toggle = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const indexUrl = toggle.dataset.indexUrl;
+        if (typeof indexUrl !== 'string' || indexUrl.length === 0) {
+            return;
+        }
+        const optionsFull = await this._settingsController.getOptionsFull();
+        const nextIndexUrls = new Set(optionsFull.global.dictionaryAutoUpdates);
+        if (toggle.checked) {
+            nextIndexUrls.add(indexUrl);
+        } else {
+            nextIndexUrls.delete(indexUrl);
+        }
+        await this._settingsController.modifyGlobalSettings([{
+            action: 'set',
+            path: 'dictionaryAutoUpdates',
+            value: [...nextIndexUrls].sort((a, b) => a.localeCompare(b)),
+        }]);
+    }
+
+    /**
      * @param {string} dictionaryTitle
      */
     _hideUpdatesAvailableButton(dictionaryTitle) {
@@ -1206,7 +1229,7 @@ export class DictionaryController {
 
             const token = this._databaseStateToken;
             const dictionaryTitles = this._dictionaryEntries.map(({dictionaryTitle}) => dictionaryTitle);
-            const {counts, total} = await new DictionaryWorker().getDictionaryCounts(dictionaryTitles, true);
+            const {counts, total} = await this._settingsController.application.api.getDictionaryCounts(dictionaryTitles, true);
             if (this._databaseStateToken !== token) { return; }
 
             for (let i = 0, ii = Math.min(counts.length, this._dictionaryEntries.length); i < ii; ++i) {
@@ -1361,37 +1384,17 @@ export class DictionaryController {
 
     /**
      * @param {string} dictionaryTitle
-     * @param {string|undefined} downloadUrl
+     * @param {string|undefined} _downloadUrl
      */
-    async _updateDictionary(dictionaryTitle, downloadUrl) {
+    async _updateDictionary(dictionaryTitle, _downloadUrl) {
         if (this._checkingIntegrity || this._checkingUpdates || this._dictionaries === null) { return; }
-
-        const dictionaryInfo = this._dictionaries.find((entry) => entry.title === dictionaryTitle);
-        if (typeof dictionaryInfo === 'undefined') { throw new Error('Dictionary not found'); }
-        downloadUrl = downloadUrl ?? dictionaryInfo.downloadUrl;
-        if (typeof downloadUrl !== 'string') { throw new Error('Attempted to update dictionary without download URL'); }
-
-        const options = await this._settingsController.getOptionsFull();
-        const {profiles} = options;
-
-        /** @type {import('settings-controller.js').ProfilesDictionarySettings} */
-        const profilesDictionarySettings = {};
-
-        for (const profile of profiles) {
-            const dictionaries = profile.options.dictionaries;
-            for (let i = 0; i < dictionaries.length; ++i) {
-                if (dictionaries[i].name === dictionaryTitle) {
-                    profilesDictionarySettings[profile.id] = {...dictionaries[i], index: i};
-                    break;
-                }
-            }
+        const result = await this._settingsController.application.api.updateDictionaryByTitle(dictionaryTitle);
+        if (typeof result.error === 'string' && result.error.length > 0) {
+            log.error(new Error(result.error));
         }
-
-        await this._deleteDictionary(dictionaryTitle);
-        /** @type {import('core').DeferredPromiseDetails<void>} */
-        const {promise: importPromise, resolve} = deferPromise();
-        this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, profilesDictionarySettings, onImportDone: resolve});
-        await importPromise;
+        if (result.status !== 'updated') {
+            return;
+        }
     }
 
     /**
@@ -1409,7 +1412,9 @@ export class DictionaryController {
      * @param {import('dictionary-worker').DeleteProgressCallback} onProgress
      */
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
-        await new DictionaryWorker().deleteDictionary(dictionaryTitle, onProgress);
+        onProgress({processed: 0, count: 1, storeCount: 1, storesProcesed: 0});
+        await this._settingsController.application.api.deleteDictionaryByTitle(dictionaryTitle);
+        onProgress({processed: 1, count: 1, storeCount: 1, storesProcesed: 1});
         /** @type {import('core').DeferredPromiseDetails<void>} */
         const {promise: dictionariesUpdatePromise, resolve} = deferPromise();
         this._onDictionariesUpdate = resolve;

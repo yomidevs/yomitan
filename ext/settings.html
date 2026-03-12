@@ -608,18 +608,6 @@
                 </p>
             </div>
         </div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Text scan length</div>
-                <div class="settings-item-description">Change how many characters are read when scanning for terms.</div>
-                <div class="warning-text margin-above">
-                    <strong>Setting this value too high (100+) may impact performance.</strong>
-                </div>
-            </div>
-            <div class="settings-item-right">
-                <input type="number" data-setting="scanning.length" min="1" step="1">
-            </div>
-        </div></div>
         <div class="settings-item settings-item-button advanced-only" data-modal-action="show,input-action-prevention"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure input action prevention&hellip;</div>
@@ -2321,6 +2309,33 @@
                         <button type="button" class="low-emphasis danger" id="settings-reset-button">Reset Settings</button>
                     </div>
                 </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Diagnostics logs</div>
+                <div class="settings-item-description">
+                    Export recent runtime diagnostics and errors to share when reporting issues.
+                    Review the exported JSON before sending it.
+                </div>
+            </div>
+            <div class="settings-item-right settings-item-button-group-container">
+                <div class="settings-item-button-group">
+                    <div class="settings-item-button-group-item">
+                        <button type="button" class="low-emphasis" id="diagnostics-copy-button">Copy Diagnostics</button>
+                    </div>
+                    <div class="settings-item-button-group-item">
+                        <button type="button" class="low-emphasis" id="diagnostics-download-button">Download Diagnostics</button>
+                    </div>
+                    <div class="settings-item-button-group-item">
+                        <button type="button" class="low-emphasis danger" id="diagnostics-clear-button">Clear Diagnostics</button>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-description" id="diagnostics-export-status">No diagnostics export generated yet.</div>
             </div>
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">

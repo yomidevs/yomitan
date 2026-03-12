@@ -184,6 +184,7 @@ type AllTextProcessors = {
             normalizeRadicalCharacters: TextProcessor<boolean>;
             alphanumericWidthVariants: BidirectionalConversionPreprocessor;
             convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
+            convertIterationMarksToKanjiDuplication: BidirectionalConversionPreprocessor;
             collapseEmphaticSequences: TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
             standardizeKanji: TextProcessor<boolean>;
         };

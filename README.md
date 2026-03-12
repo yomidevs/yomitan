@@ -61,6 +61,32 @@ Install from the latest GitHub release page:
 
 ### [Download for Chrome, Firefox, Edge](https://github.com/ManabiIO/manabitan/releases/latest)
 
+## Roadmap
+
+### Priority (unsorted)
+
+- [ ] Auto-update
+- [ ] Ereader performance
+- [ ] Improve onboarding for easier default installation
+- [ ] Change Manabitan import/export to a smaller, optimized format, and provide separate Yomitan import/export paths
+
+### Backlog
+
+- [ ] Full-text search option per dictionary for searching glosses
+- [ ] Voice input for search
+- [ ] Default TTS
+
+### Optimization TODO
+
+- [ ] Import
+- [ ] Export
+- [ ] Yomitan import
+- [ ] Yomitan export
+- [ ] Deletion
+- [ ] Lookups
+- [ ] 64KB chunking of glossaries for compression
+- [ ] Add the ManabiDictionaries custom zstd dictionaries
+
 ## Contributing
 
 🚀 **Dip your toes into contributing by looking at issues with the label [good first issue](https://github.com/ManabiIO/manabitan/issues?q=is%3Aissue+is%3Aopen+label%3A%22gоοd+fіrst+іssսe%22).**
@@ -156,6 +182,12 @@ The generated browser packages are written to the `builds/` directory, including
 - `manabitan-firefox.zip`
 - `manabitan-firefox-dev.zip`
 - `manabitan-edge.zip`
+
+### Release Tagging
+
+- Tag releases with `./tag.sh` from the repository root.
+- By default, the script requires you to be on `main` and creates a CalVer-style 4-part tag (`YY.M.D.N`).
+- To tag from a different branch, set `MANABITAN_RELEASE_BRANCH=<branch>` when running the script.
 
 ## Third-Party Libraries
 
