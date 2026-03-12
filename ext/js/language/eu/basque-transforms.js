@@ -323,7 +323,7 @@ export const basqueTransforms = {
         },
         'Adverbial Participle to -tu': {
             name: 'Adverbial Participle to -tu',
-            rules: [suffixInflection('ta', 'tu', ['adv'], ['v'])],
+            rules: [suffixInflection('ta', '', ['adv'], ['v'])],
         },
         'Adverbial Participle after n': {
             name: 'Adverbial Participle after n',
@@ -331,7 +331,7 @@ export const basqueTransforms = {
         },
         'Adverbial Participle to -i': {
             name: 'Adverbial Participle to -i',
-            rules: [suffixInflection('ita', '', ['adv'], ['v'])],
+            rules: [suffixInflection('ita', 'i', ['adv'], ['v'])],
         },
         'Negative/Adverbial Participle 1': {
             name: 'Negative/Adverbial Participle',
