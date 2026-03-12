@@ -189,19 +189,36 @@ async function resolveFirefoxAddonPath() {
  * @param {import('selenium-webdriver').ThenableWebDriver} driver
  * @returns {Promise<string>}
  */
-async function waitForExtensionBaseUrl(driver) {
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string} [installedAddonId]
+ * @returns {Promise<string>}
+ */
+async function waitForExtensionBaseUrl(driver, installedAddonId = '') {
+    const normalizedAddonId = String(installedAddonId || '').trim();
+    const expectedBaseUrl = normalizedAddonId.length > 0 ? `moz-extension://${normalizedAddonId}` : '';
     const deadline = Date.now() + 30_000;
+    let fallbackBaseUrl = '';
     while (Date.now() < deadline) {
         const handles = await driver.getAllWindowHandles();
         for (const handle of handles) {
             await driver.switchTo().window(handle);
             const url = String(await driver.getCurrentUrl());
-            const match = /^(moz-extension:\/\/[^/]+)\//.exec(url);
+            const match = /^(moz-extension:\/\/[^/]+)(?:\/|$)/.exec(url);
             if (match !== null) {
-                return match[1];
+                fallbackBaseUrl = match[1];
+                if (expectedBaseUrl.length === 0 || expectedBaseUrl === match[1]) {
+                    return match[1];
+                }
             }
         }
         await driver.sleep(300);
+    }
+    if (fallbackBaseUrl.length > 0) {
+        return fallbackBaseUrl;
+    }
+    if (expectedBaseUrl.length > 0) {
+        return expectedBaseUrl;
     }
     fail('Unable to discover Firefox extension base URL');
 }
@@ -447,8 +464,8 @@ async function main() {
         );
 
         const temporaryAddonInstall = String(process.env.MANABITAN_FIREFOX_TEMPORARY_ADDON ?? '1').trim() !== '0';
-        await driver.installAddon(addonPath, temporaryAddonInstall);
-        const extensionBaseUrl = await waitForExtensionBaseUrl(driver);
+        const installedAddonId = await driver.installAddon(addonPath, temporaryAddonInstall);
+        const extensionBaseUrl = await waitForExtensionBaseUrl(driver, String(installedAddonId || ''));
         report.extensionBaseUrl = extensionBaseUrl;
 
         await importDictionaryFixture(driver, extensionBaseUrl);

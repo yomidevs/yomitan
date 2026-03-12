@@ -475,7 +475,14 @@ async function addReportPhase(report, page, name, details, startMs, endMs, profi
     if (processSampler !== null && typeof processSampler.sampleNow === 'function') {
         try { await processSampler.sampleNow(); } catch (_) {}
     }
-    const screenshotBuffer = await page.screenshot({fullPage: true});
+    let screenshotBase64 = '';
+    try {
+        const screenshotBuffer = await page.screenshot({fullPage: true, timeout: 10_000});
+        screenshotBase64 = screenshotBuffer.toString('base64');
+    } catch (error) {
+        details = `${String(errorMessage(error))}. ${details}`;
+        screenshotBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2X2f8AAAAASUVORK5CYII=';
+    }
     const resourceUsage = processSampler?.summarize(startMs, endMs) ?? null;
     report.phases.push({
         name,
@@ -486,7 +493,7 @@ async function addReportPhase(report, page, name, details, startMs, endMs, profi
         resourceUsage,
         hotspots: profileData?.hotspots ?? [],
         perfMetrics: profileData?.perfMetrics ?? null,
-        screenshotBase64: screenshotBuffer.toString('base64'),
+        screenshotBase64,
         screenshotMimeType: 'image/png',
     });
 }
@@ -542,7 +549,7 @@ function renderReportHtml(report) {
                 <p><strong>JS Heap/Task:</strong> ${phase.perfMetrics === null ? 'n/a' : escapeHtml(`heapBefore=${phase.perfMetrics.heapUsedBeforeMb === null ? 'n/a' : formatMemoryMb(phase.perfMetrics.heapUsedBeforeMb)} heapAfter=${phase.perfMetrics.heapUsedAfterMb === null ? 'n/a' : formatMemoryMb(phase.perfMetrics.heapUsedAfterMb)} heapDelta=${phase.perfMetrics.heapDeltaMb === null ? 'n/a' : formatMemoryMb(phase.perfMetrics.heapDeltaMb)} taskDelta=${phase.perfMetrics.taskDurationDeltaMs === null ? 'n/a' : formatDuration(phase.perfMetrics.taskDurationDeltaMs)}`)}</p>
                 <div><strong>Top JS Hotspots:</strong></div>
                 <div class="hotspot-list">${hotspotHtml}</div>
-                <img src="${imageUrl}" alt="${escapeHtml(phase.name)} screenshot">
+                ${phase.screenshotBase64.length > 0 ? `<img src="${imageUrl}" alt="${escapeHtml(phase.name)} screenshot">` : '<div class="phase-screenshot-missing">Screenshot unavailable.</div>'}
             </section>
         `;
     }).join('\n');
@@ -576,6 +583,7 @@ function renderReportHtml(report) {
     .source-line-hit { background: #7f1d1d; }
     .source-line-no { color: #94a3b8; min-width: 38px; text-align: right; user-select: none; }
     .source-line code { color: inherit; background: none; font: inherit; white-space: pre; }
+    .phase-screenshot-missing { margin-top: 10px; color: #64748b; font-style: italic; }
     img { margin-top: 10px; max-width: 100%; border: 1px solid #d8dee4; border-radius: 8px; }
   </style>
 </head>

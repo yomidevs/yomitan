@@ -921,20 +921,37 @@ async function waitForImportWithPhaseScreenshots(driver, report, dictionaryName,
  * @returns {Promise<string>}
  * @throws {Error}
  */
-async function waitForExtensionBaseUrl(driver) {
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string} [installedAddonId]
+ * @returns {Promise<string>}
+ */
+async function waitForExtensionBaseUrl(driver, installedAddonId = '') {
+    const normalizedAddonId = String(installedAddonId || '').trim();
+    const expectedBaseUrl = normalizedAddonId.length > 0 ? `moz-extension://${normalizedAddonId}` : '';
     const deadline = Date.now() + 30_000;
+    let fallbackBaseUrl = '';
     while (Date.now() < deadline) {
         const handlesUnknown = /** @type {unknown} */ (await driver.getAllWindowHandles());
         const handles = Array.isArray(handlesUnknown) ? handlesUnknown.map(String) : [];
         for (const handle of handles) {
             await driver.switchTo().window(handle);
             const url = String(await driver.getCurrentUrl());
-            const match = /^(moz-extension:\/\/[^/]+)\//.exec(url);
+            const match = /^(moz-extension:\/\/[^/]+)(?:\/|$)/.exec(url);
             if (match !== null) {
-                return match[1];
+                fallbackBaseUrl = match[1];
+                if (expectedBaseUrl.length === 0 || expectedBaseUrl === match[1]) {
+                    return match[1];
+                }
             }
         }
         await driver.sleep(500);
+    }
+    if (fallbackBaseUrl.length > 0) {
+        return fallbackBaseUrl;
+    }
+    if (expectedBaseUrl.length > 0) {
+        return expectedBaseUrl;
     }
     fail('Failed to discover moz-extension base URL from open tabs.');
 }
@@ -2187,11 +2204,11 @@ async function main() {
         const cacheWarmupEnd = safePerformance.now();
 
         const temporaryAddonInstall = parseBooleanEnv(process.env.MANABITAN_FIREFOX_TEMPORARY_ADDON, true);
-        await driver.installAddon(xpiPath, temporaryAddonInstall);
+        const installedAddonId = await driver.installAddon(xpiPath, temporaryAddonInstall);
         const firefoxPid = await getFirefoxProcessId(driver);
 
         const baseUrlStart = safePerformance.now();
-        const extensionBaseUrl = await waitForExtensionBaseUrl(driver);
+        const extensionBaseUrl = await waitForExtensionBaseUrl(driver, String(installedAddonId || ''));
         const baseUrlEnd = safePerformance.now();
         await addReportPhase(report, driver, 'Install extension and discover base URL', 'Extension installed and moz-extension base URL discovered', baseUrlStart, baseUrlEnd);
         const firefoxPidStart = safePerformance.now();
