@@ -130,6 +130,9 @@ type AllTextProcessors = {
     et: {
         pre: CapitalizationPreprocessors;
     };
+    eu: {
+        pre: CapitalizationPreprocessors;
+    };
     fa: {
         pre: {
             removeArabicScriptDiacritics: TextProcessor;
