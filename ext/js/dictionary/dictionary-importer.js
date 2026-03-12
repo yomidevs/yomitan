@@ -332,7 +332,7 @@ export class DictionaryImporter {
         };
         /** @type {{parserProfile?: Record<string, string|number|boolean|null>|null, materializationMs?: number, chunkSinkMs?: number, chunkCount?: number, totalRows?: number}|null} */
         let lastFastTermBankReadProfile = null;
-        /** @type {{readBytesMs?: number, decodeRowsMs?: number, reverseRowsMs?: number, metadataRebaseMs?: number, chunkSinkMs?: number, chunkCount?: number, totalRows?: number, rowChunkSize?: number}|null} */
+        /** @type {{readBytesMs?: number, decodeRowsMs?: number, reverseRowsMs?: number, metadataRebaseMs?: number, chunkSinkMs?: number, chunkCount?: number, totalRows?: number, rowChunkSize?: number, readingEqualsExpressionCount?: number, sequencePresentCount?: number, zeroScoreCount?: number, nonZeroScoreCount?: number, sharedGlossaryRowCount?: number, contentLengthExtendedCount?: number, avgContentLength?: number, avgExpressionLength?: number, avgReadingLength?: number}|null} */
         let lastArtifactTermBankReadProfile = null;
 
         /**
@@ -957,6 +957,15 @@ export class DictionaryImporter {
                             artifactReadBytesMs,
                             artifactDecodeRowsMs: lastArtifactTermBankReadProfile.decodeRowsMs ?? null,
                             artifactReverseRowsMs: lastArtifactTermBankReadProfile.reverseRowsMs ?? null,
+                            readingEqualsExpressionCount: lastArtifactTermBankReadProfile.readingEqualsExpressionCount ?? null,
+                            sequencePresentCount: lastArtifactTermBankReadProfile.sequencePresentCount ?? null,
+                            zeroScoreCount: lastArtifactTermBankReadProfile.zeroScoreCount ?? null,
+                            nonZeroScoreCount: lastArtifactTermBankReadProfile.nonZeroScoreCount ?? null,
+                            sharedGlossaryRowCount: lastArtifactTermBankReadProfile.sharedGlossaryRowCount ?? null,
+                            contentLengthExtendedCount: lastArtifactTermBankReadProfile.contentLengthExtendedCount ?? null,
+                            avgContentLength: lastArtifactTermBankReadProfile.avgContentLength ?? null,
+                            avgExpressionLength: lastArtifactTermBankReadProfile.avgExpressionLength ?? null,
+                            avgReadingLength: lastArtifactTermBankReadProfile.avgReadingLength ?? null,
                             artifactBulkAddTermsMs,
                             artifactContentAppendMs,
                             artifactMetadataAppendMs: artifactContentAppendMs,
@@ -2588,6 +2597,15 @@ export class DictionaryImporter {
         const reverseRowsMs = 0;
         let importerChunkSinkMs = 0;
         const metadataRebaseMs = 0;
+        let readingEqualsExpressionCount = 0;
+        let sequencePresentCount = 0;
+        let zeroScoreCount = 0;
+        let nonZeroScoreCount = 0;
+        let sharedGlossaryRowCount = 0;
+        let contentLengthExtendedCount = 0;
+        let contentLengthTotal = 0;
+        let expressionLengthTotal = 0;
+        let readingLengthTotal = 0;
         for (let i = 0; i < rowCount; ++i) {
             if ((cursor + 4) > bytes.byteLength) {
                 throw new Error(`Invalid term artifact payload in '${filename}': truncated expression length`);
@@ -2612,6 +2630,11 @@ export class DictionaryImporter {
                 readingLength === expressionLength &&
                 byteRangeEqual(bytes, expressionStart, readingStart, expressionLength)
             );
+            if (readingMatchesExpression) {
+                ++readingEqualsExpressionCount;
+            }
+            expressionLengthTotal += expressionLength;
+            readingLengthTotal += readingLength;
             const readingRaw = readingMatchesExpression ?
                 expression :
                 textDecoder.decode(bytes.subarray(cursor, cursor + readingLength));
@@ -2620,14 +2643,26 @@ export class DictionaryImporter {
                 bytes.subarray(cursor, cursor + readingLength);
             cursor += readingLength;
             const score = view.getInt32(cursor, true);
+            if (score === 0) {
+                ++zeroScoreCount;
+            } else {
+                ++nonZeroScoreCount;
+            }
             cursor += 4;
             const sequenceRaw = view.getInt32(cursor, true);
+            if (sequenceRaw >= 0) {
+                ++sequencePresentCount;
+            }
             cursor += 4;
             const hash1 = view.getUint32(cursor, true);
             cursor += 4;
             const hash2 = view.getUint32(cursor, true);
             cursor += 4;
             const contentLength = view.getUint32(cursor, true);
+            contentLengthTotal += contentLength;
+            if (contentLength > 0xfffd) {
+                ++contentLengthExtendedCount;
+            }
             cursor += 4;
             if ((cursor + contentLength) > bytes.byteLength) {
                 throw new Error(`Invalid term artifact payload in '${filename}': truncated content bytes`);
@@ -2668,6 +2703,7 @@ export class DictionaryImporter {
                 sequence,
             };
             if (termContentStorageMode === 'raw-bytes' && isRawTermContentSharedGlossaryBinary(contentBytes)) {
+                ++sharedGlossaryRowCount;
                 entry.termEntryContentDictName = sharedGlossaryBaseOffset > 0 ?
                     RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME :
                     RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME;
@@ -2714,6 +2750,15 @@ export class DictionaryImporter {
             chunkCount: streamToChunkHandler ? chunkIndex : 0,
             totalRows: rowCount,
             rowChunkSize: chunkSize,
+            readingEqualsExpressionCount,
+            sequencePresentCount,
+            zeroScoreCount,
+            nonZeroScoreCount,
+            sharedGlossaryRowCount,
+            contentLengthExtendedCount,
+            avgContentLength: rowCount > 0 ? (contentLengthTotal / rowCount) : 0,
+            avgExpressionLength: rowCount > 0 ? (expressionLengthTotal / rowCount) : 0,
+            avgReadingLength: rowCount > 0 ? (readingLengthTotal / rowCount) : 0,
         };
         return {termList: streamToChunkHandler ? [] : termList, requirements: null};
     }
