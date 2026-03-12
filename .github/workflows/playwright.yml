@@ -1,20 +1,73 @@
 name: Playwright Tests
+
 on:
   push:
-    branches: [master]
+    branches: [main]
+    paths:
+      - ext/**
+      - dev/**
+      - test/playwright/**
+      - test/e2e/**
+      - test/data/**
+      - package.json
+      - package-lock.json
+      - playwright.config.js
+      - .github/actions/setup/**
+      - .github/workflows/playwright.yml
+      - .github/workflows/playwright_comment.yml
   pull_request:
+    paths:
+      - ext/**
+      - dev/**
+      - test/playwright/**
+      - test/e2e/**
+      - test/data/**
+      - package.json
+      - package-lock.json
+      - playwright.config.js
+      - .github/actions/setup/**
+      - .github/workflows/playwright.yml
+      - .github/workflows/playwright_comment.yml
+  workflow_dispatch:
+
 permissions:
   contents: read
+
+concurrency:
+  group: playwright-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  playwright-tests:
-    if: ${{ false }}
-    timeout-minutes: 60
+  playwright-integration:
+    name: Playwright Integration
+    timeout-minutes: 30
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shardIndex: [1, 2, 3, 4, 5]
-        shardTotal: [5]
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup
+
+      - name: Build
+        run: npm run build
+
+      - name: Cache playwright browsers
+        id: cache-playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: cache-playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright Browsers
+        if: ${{ steps.cache-playwright.outputs.cache-hit != 'true' }}
+        run: npx playwright install chromium
+
+      - name: Run integration tests
+        run: npm run test:playwright:integration
+
+  playwright-visual:
+    name: Playwright Visual
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
     steps:
       - name: Remove all fonts
         run: rm -rf /usr/share/fonts
@@ -28,8 +81,6 @@ jobs:
           execute_install_scripts: true
 
       - uses: ./.github/actions/setup
-        with:
-          node-version: '22'
 
       - name: Build
         run: npm run build
@@ -38,167 +89,104 @@ jobs:
         id: cache-playwright
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.cache/ms-playwright
-          key: cache-playwright-${{ hashFiles('package-lock.json') }} # playwright version is included in package-lock, so this serves as a reasonable cache key
+          path: ~/.cache/ms-playwright
+          key: cache-playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
-      - if: ${{ steps.cache-playwright.outputs.cache-hit != 'true' }}
-        name: Install Playwright Browsers
+      - name: Install Playwright Browsers
+        if: ${{ steps.cache-playwright.outputs.cache-hit != 'true' }}
         run: npx playwright install chromium
 
       - name: Grab latest dictionaries from dictionaries branch
         uses: actions/checkout@v6
         with:
-          repository: yomidevs/yomitan # so that this works on forks
+          repository: yomidevs/yomitan
           ref: dictionaries
           path: dictionaries
 
-      ### [PR] master-screenshots
-
-      - name: "[PR] Grab latest screenshots from master branch"
-        uses: dawidd6/action-download-artifact@07ab29fd4a977ae4d2b275087cf67563dfdf0295 # pin@v2
+      - name: '[PR] Grab latest screenshots from main branch'
+        uses: dawidd6/action-download-artifact@07ab29fd4a977ae4d2b275087cf67563dfdf0295 # v9
+        id: baseline-screenshots
         continue-on-error: true
-        id: master-screenshots
+        if: github.event_name == 'pull_request'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          repo: yomidevs/yomitan # so that this works on forks
+          repo: ${{ github.repository }}
           name: playwright-screenshots
-          branch: master
+          branch: main
           workflow: playwright.yml
           workflow_conclusion: success
           path: test/playwright/__screenshots__/
-        if: github.event_name == 'pull_request'
 
-      - name: "[PR] Store steps.master-screenshots.outcome in a file"
-        run: echo ${{ steps.master-screenshots.outcome }} > ./master-screenshots-outcome
+      - name: '[PR] Store baseline screenshot download outcome'
         if: github.event_name == 'pull_request'
+        run: echo ${{ steps.baseline-screenshots.outcome }} > ./baseline-screenshots-outcome
 
-      - name: "[PR] Upload master-screenshots-outcome"
-        uses: actions/upload-artifact@v6
-        with:
-          name: master-screenshots-outcome-${{ matrix.shardIndex }}
-          path: master-screenshots-outcome
-        if: github.event_name == 'pull_request'
-
-      ### actual tests
-      - name: "[PR] Run tests & compare against master"
-        id: playwright
-        run: |
-          npm run -s test:playwright -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} 2>&1 | tee ./playwright-output || true
+      - name: '[PR] Run visual tests against main screenshots'
+        if: github.event_name == 'pull_request' && steps.baseline-screenshots.outcome != 'failure'
         continue-on-error: true
-        if: github.event_name == 'pull_request' && steps.master-screenshots.outcome != 'failure'
+        run: |
+          npm run -s test:playwright:visual 2>&1 | tee ./playwright-output || true
 
-      - name: "[Push] Run tests & save screenshots"
-        id: playwright-master
-        run: npm run -s test:playwright -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} -u 2>&1 | tee ./playwright-output
-        if: github.event_name == 'push'
+      - name: '[Push] Refresh screenshots'
+        if: github.event_name != 'pull_request'
+        run: npm run -s test:playwright:visual -- -u 2>&1 | tee ./playwright-output
 
-      - uses: actions/upload-artifact@v6
-        with:
-          name: playwright-screenshots-${{ matrix.shardIndex }}
-          path: test/playwright/__screenshots__/
-          retention-days: 1
+      - name: Ensure playwright output exists
+        if: always()
+        shell: bash
+        run: |
+          if [ ! -f playwright-output ]; then
+            printf '%s\n' 'Playwright visual tests did not run.' > playwright-output
+          fi
 
-      - name: Upload blob report to GitHub Actions Artifacts
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: blob-report-${{ matrix.shardIndex }}
-          path: blob-report
-          retention-days: 1
+      - name: Generate HTML report
+        if: ${{ !cancelled() && hashFiles('blob-report/**') != '' }}
+        run: npx playwright merge-reports --reporter html ./blob-report
 
-      - uses: actions/upload-artifact@v6
-        with:
-          name: playwright-output-${{ matrix.shardIndex }}
-          path: playwright-output
-          retention-days: 1
+      - name: Generate JSON report
+        if: ${{ !cancelled() && hashFiles('blob-report/**') != '' }}
+        run: npx playwright merge-reports --reporter json ./blob-report > playwright-results.json
 
-  playwright:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    # Merge reports after playwright-tests, even if some shards have failed
-    if: ${{ false }}
-    needs: [playwright-tests]
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/actions/setup
-        with:
-          node-version: '22'
-
-      ### playwright-report
-      - name: Download blob reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v7
-        with:
-          path: all-blob-reports
-          pattern: blob-report-*
-          merge-multiple: true
-
-      - name: Merge into HTML Report
-        run: npx playwright merge-reports --reporter html ./all-blob-reports
-
-      - name: Merge into JSON Report
-        run: npx playwright merge-reports --reporter json ./all-blob-reports > playwright-results.json
+      - name: Ensure playwright results JSON exists
+        if: always()
+        shell: bash
+        run: |
+          if [ ! -f playwright-results.json ]; then
+            printf '%s\n' '{"stats":{"unexpected":0,"flaky":0}}' > playwright-results.json
+          fi
 
       - uses: actions/upload-artifact@v6
-        with:
-          name: playwright-report
-          path: playwright-report/
-
-      - uses: actions/upload-artifact@v6
-        with:
-          name: playwright-results-json
-          path: playwright-results.json
-
-      ### playwright-screenshots
-      - name: Download & merge screenshots from GitHub Actions Artifacts
-        uses: actions/download-artifact@v7
-        with:
-          path: test/playwright/__screenshots__
-          pattern: playwright-screenshots-*
-          merge-multiple: true
-
-      - uses: actions/upload-artifact@v6
+        if: github.event_name != 'pull_request'
         with:
           name: playwright-screenshots
           path: test/playwright/__screenshots__/
-
-      ### [PR] master-screenshots-outcome
-      - name: '[PR] Download master-screenshots-outcome files'
-        uses: actions/download-artifact@v7
-        with:
-          path: master-screenshots-outcomes
-          pattern: master-screenshots-outcome-*
-          merge-multiple: true
-        if: github.event_name == 'pull_request'
-
-      - name: '[PR] Calculate if any shard failed to download master screenshots'
-        run: |
-          if grep -q "failure" master-screenshots-outcomes/*; then
-            echo "failure" > master-screenshots-outcome
-          else
-            echo "success" > master-screenshots-outcome
-          fi
-        if: github.event_name == 'pull_request'
-
-      - name: '[PR] Upload master-screenshots-outcome'
-        uses: actions/upload-artifact@v6
-        with:
-          name: master-screenshots-outcome
-          path: master-screenshots-outcome
-        if: github.event_name == 'pull_request'
-
-      ### playwright-output
-      - name: Download playwright-output files
-        uses: actions/download-artifact@v7
-        with:
-          path: playwright-outputs
-          pattern: playwright-output-*
-          merge-multiple: true
-
-      - name: Merge playwright output files
-        run: cat playwright-outputs/* > playwright-output
+          retention-days: 1
 
       - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: playwright-results-json
+          path: playwright-results.json
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v6
+        if: always()
         with:
           name: playwright-output
           path: playwright-output
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v6
+        if: github.event_name == 'pull_request'
+        with:
+          name: baseline-screenshots-outcome
+          path: baseline-screenshots-outcome
+          retention-days: 7

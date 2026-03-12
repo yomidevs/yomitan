@@ -5,11 +5,17 @@ on:
     workflows: ["Playwright Tests"]
     types:
       - completed
-permissions: {}
+
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   playwright_comment:
     runs-on: ubuntu-latest
     permissions:
+      actions: read
+      contents: read
       pull-requests: write
     if: >
       github.event.workflow_run.event == 'pull_request' &&
@@ -28,14 +34,13 @@ jobs:
           run_id: ${{ github.event.workflow_run.id }}
           name: playwright-output
 
-      - name: Grab master-screenshots-outcome from PR run
+      - name: Grab baseline-screenshots-outcome from PR run
         uses: dawidd6/action-download-artifact@07ab29fd4a977ae4d2b275087cf67563dfdf0295 # v9
         continue-on-error: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           run_id: ${{ github.event.workflow_run.id }}
-          name: master-screenshots-outcome
-        if: github.event_name == 'pull_request'
+          name: baseline-screenshots-outcome
 
       - name: Grab playwright-results-json from PR run
         uses: dawidd6/action-download-artifact@07ab29fd4a977ae4d2b275087cf67563dfdf0295 # v9
@@ -60,7 +65,11 @@ jobs:
         env:
           ARTIFACTS_JSON: ${{ steps.playwright-report.outputs.artifacts }}
         run: |
-          ID=$(echo "$ARTIFACTS_JSON" | jq -r '.[0].id');
+          if [ -z "$ARTIFACTS_JSON" ]; then
+            echo "id=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          ID=$(echo "$ARTIFACTS_JSON" | jq -r '.[0].id // empty')
           echo "id=$ID" >> "$GITHUB_OUTPUT"
 
       - name: Load artifacts into environment variables
@@ -69,13 +78,18 @@ jobs:
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           {
             echo "PLAYWRIGHT_OUTPUT<<$EOF";
-            cat ./playwright-output;
+            [ -f ./playwright-output ] && cat ./playwright-output;
             echo "$EOF";
-            echo "MASTER_SCREENSHOTS_OUTCOME<<$EOF";
-            [ -f ./master-screenshots-outcome ] && cat ./master-screenshots-outcome;
+            echo "BASELINE_SCREENSHOTS_OUTCOME<<$EOF";
+            [ -f ./baseline-screenshots-outcome ] && cat ./baseline-screenshots-outcome;
             echo "$EOF";
-            echo "FAILED=$(jq -r '.stats.unexpected' playwright-results.json)";
-            echo "FLAKY=$(jq -r '.stats.flaky' playwright-results.json)";
+            if [ -f playwright-results.json ]; then
+              echo "FAILED=$(jq -r '.stats.unexpected // 0' playwright-results.json)";
+              echo "FLAKY=$(jq -r '.stats.flaky // 0' playwright-results.json)";
+            else
+              echo "FAILED=0";
+              echo "FLAKY=0";
+            fi
           } >> "$GITHUB_OUTPUT"
 
       # this is required because github.event.workflow_run.pull_requests is not available for PRs from forks
@@ -83,19 +97,16 @@ jobs:
         id: source-run-info
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Find the most recently updated open PR at the repo with the requested commit:
           SEARCH_QUERY: >-
             type:pr state:open sort:updated-desc
             repo:${{ github.repository }}
             ${{ github.event.workflow_run.head_sha }}
-          # Minimal graphql search query to fetch the PR `number` field:
           GQL: |-
             query($filter: String!) {
               search( query: $filter, type: ISSUE, first: 1) {
                 nodes { ... on PullRequest { number } }
               }
             }
-          # Formats the GQL response into a `key=value` string + basic error handling
           JQ_FILTER: >-
             .data.search.nodes[0]
             | if (.number == null) then error("Could not find PR number") end
@@ -103,17 +114,17 @@ jobs:
         run: |
           gh api graphql --field "filter=$SEARCH_QUERY" --raw-field "query=$GQL" --jq "$JQ_FILTER" >> "${GITHUB_OUTPUT}"
 
-      - name: "[Comment] Couldn't download screenshots from master branch"
+      - name: "[Comment] Couldn't download screenshots from main branch"
         uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
-        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME == 'failure'
+        if: steps.playwright.outputs.BASELINE_SCREENSHOTS_OUTCOME == 'failure'
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
-            :heavy_exclamation_mark: Could not fetch screenshots from master branch, so had nothing to make a visual comparison against; please check the "master-screenshots" step in the workflow run and rerun it before merging.
+            :heavy_exclamation_mark: Could not fetch screenshots from the main branch, so had nothing to make a visual comparison against; please check the baseline-screenshot step in the workflow run and rerun it before merging.
 
       - name: "[Comment] Warning: Visual differences caused by this PR; please check the playwright report"
         uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
-        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FAILED != 0
+        if: steps.playwright.outputs.BASELINE_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FAILED != 0 && steps.playwright-report-artifact-id.outputs.id != ''
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
@@ -121,7 +132,7 @@ jobs:
 
       - name: "[Comment] Success (but flaky): No visual differences introduced by this PR (but flaky tests detected)"
         uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
-        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FLAKY != 0 && steps.playwright.outputs.FAILED == 0
+        if: steps.playwright.outputs.BASELINE_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FLAKY != 0 && steps.playwright.outputs.FAILED == 0 && steps.playwright-report-artifact-id.outputs.id != ''
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
@@ -129,7 +140,7 @@ jobs:
 
       - name: "[Comment] Success: No visual differences introduced by this PR"
         uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
-        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FLAKY == 0 && steps.playwright.outputs.FAILED == 0
+        if: steps.playwright.outputs.BASELINE_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FLAKY == 0 && steps.playwright.outputs.FAILED == 0 && steps.playwright-report-artifact-id.outputs.id != ''
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |

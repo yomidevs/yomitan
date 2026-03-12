@@ -3,45 +3,44 @@ name: Firefox Extension E2E
 on:
   push:
     branches: [main]
+    paths:
+      - ext/**
+      - dev/**
+      - test/firefox/**
+      - test/e2e/**
+      - test/data/**
+      - package.json
+      - package-lock.json
+      - .github/actions/setup/**
+      - .github/workflows/firefox-extension-e2e.yml
   pull_request:
     paths:
       - ext/**
-      - test/firefox/**
       - dev/**
+      - test/firefox/**
+      - test/e2e/**
+      - test/data/**
       - package.json
       - package-lock.json
+      - .github/actions/setup/**
       - .github/workflows/firefox-extension-e2e.yml
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: firefox-extension-e2e-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   firefox-e2e:
     runs-on: ubuntu-latest
-    if: ${{ false }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Restore dependencies
-        id: restore-dependencies
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: firefox-e2e-js-depend-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install dependencies
-        if: steps.restore-dependencies.outputs.cache-hit != 'true'
-        run: npm ci
-
-      - name: Build third-party libraries
-        run: npm run build:libs
+      - uses: ./.github/actions/setup
 
       - name: Build Firefox dev package
         run: |
