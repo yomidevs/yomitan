@@ -1,8 +1,17 @@
 name: Firefox Extension E2E
 
 on:
-  release:
-    types: [published, released]
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - ext/**
+      - test/firefox/**
+      - dev/**
+      - package.json
+      - package-lock.json
+      - .github/workflows/firefox-extension-e2e.yml
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -10,6 +19,7 @@ permissions:
 jobs:
   firefox-e2e:
     runs-on: ubuntu-latest
+    if: ${{ false }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6

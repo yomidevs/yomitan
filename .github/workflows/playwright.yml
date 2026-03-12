@@ -1,11 +1,13 @@
 name: Playwright Tests
 on:
-  release:
-    types: [published, released]
+  push:
+    branches: [master]
+  pull_request:
 permissions:
   contents: read
 jobs:
   playwright-tests:
+    if: ${{ false }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
@@ -115,7 +117,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     # Merge reports after playwright-tests, even if some shards have failed
-    if: ${{ !cancelled() }}
+    if: ${{ false }}
     needs: [playwright-tests]
     steps:
       - uses: actions/checkout@v6

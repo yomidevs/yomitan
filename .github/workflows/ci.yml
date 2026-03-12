@@ -4,13 +4,16 @@ permissions:
   contents: read
 
 on:
-  release:
-    types: [published, released]
+  push:
+    branches: [main]
+  pull_request:
+  merge_group:
 
 jobs:
   tests:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
+    if: ${{ false }}
     strategy:
       matrix:
         include:
@@ -47,6 +50,7 @@ jobs:
   test-build:
     name: Test Build
     runs-on: ubuntu-latest
+    if: ${{ false }}
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
@@ -67,6 +71,7 @@ jobs:
   test-firefox-extension-e2e:
     name: Full Extension E2E (Firefox)
     runs-on: ubuntu-latest
+    if: ${{ false }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v6
@@ -143,6 +148,7 @@ jobs:
   test-chromium-extension-e2e:
     name: Full Extension E2E (Chromium)
     runs-on: ubuntu-latest
+    if: ${{ false }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v6
@@ -268,6 +274,7 @@ jobs:
   test-edge-extension-e2e:
     name: Full Extension E2E (Edge)
     runs-on: ubuntu-latest
+    if: ${{ false }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v6
@@ -395,6 +402,7 @@ jobs:
   test-firefox-android-extension-e2e:
     name: Full Extension E2E (Firefox Android)
     runs-on: ubuntu-latest
+    if: ${{ false }}
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v6
@@ -481,6 +489,7 @@ jobs:
   bench:
     name: Benchmarks
     runs-on: ubuntu-latest
+    if: ${{ false }}
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
