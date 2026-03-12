@@ -29,6 +29,7 @@ import {promisify} from 'node:util';
 import {safePerformance} from '../../ext/js/core/safe-performance.js';
 import {runAnkiDedupeContractMatrix} from '../e2e/anki-dedupe-matrix.js';
 import {createAnkiMockState} from '../e2e/anki-mock-state.js';
+import {extractFirefoxAndroidApkUrls, extractFirefoxAndroidStableReleaseVersions, selectPreferredFirefoxAndroidApkUrl} from './firefox-android-release-utils.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(dirname, '..', '..');
@@ -259,30 +260,26 @@ async function resolveLatestFirefoxApkUrl() {
         fail(`Failed to fetch Firefox Android release listing: ${listingResponse.status} ${listingResponse.statusText}`);
     }
     const listingHtml = await listingResponse.text();
-    const versions = [...listingHtml.matchAll(/href="([^"/]+)\/"/g)]
-        .map((match) => String(match[1] || ''))
-        .filter((version) => /^\d+\.\d+(?:\.\d+)?$/.test(version))
-        .sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
+    const versions = extractFirefoxAndroidStableReleaseVersions(listingHtml, baseUrl);
     if (versions.length === 0) {
         fail('No stable Firefox Android versions found.');
     }
     const latestVersion = versions[versions.length - 1];
-    const directoryUrl = `${baseUrl}${latestVersion}/android/fenix-${latestVersion}-android-x86_64/`;
+    const directoryUrl = new URL(`${latestVersion}/android/fenix-${latestVersion}-android-x86_64/`, baseUrl).href;
     const directoryResponse = await fetch(directoryUrl);
     if (!directoryResponse.ok) {
         fail(`Failed to fetch Firefox Android x86_64 listing for ${latestVersion}`);
     }
     const directoryHtml = await directoryResponse.text();
-    const apkCandidates = [...directoryHtml.matchAll(/href="([^"]+\.apk)"/g)].map((match) => String(match[1] || ''));
+    const apkCandidates = extractFirefoxAndroidApkUrls(directoryHtml, directoryUrl);
     if (apkCandidates.length === 0) {
         fail(`No APK found for Firefox Android ${latestVersion}.`);
     }
-    const preferred = (
-        apkCandidates.find((value) => value.endsWith(`fenix-${latestVersion}.multi.android-x86_64.apk`)) ||
-        apkCandidates.find((value) => value.includes('.android-x86_64.apk')) ||
-        apkCandidates[0]
-    );
-    return `${directoryUrl}${preferred}`;
+    const preferred = selectPreferredFirefoxAndroidApkUrl(apkCandidates, latestVersion);
+    if (typeof preferred !== 'string') {
+        fail(`Could not determine a preferred Firefox Android x86_64 APK for ${latestVersion}.`);
+    }
+    return preferred;
 }
 
 /**
