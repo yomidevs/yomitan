@@ -694,29 +694,15 @@ export class DictionaryDatabase {
             // In-memory/non-WAL databases may reject checkpoint pragmas.
         }
         try {
-            /** @type {ArrayBuffer|null} */
-            let exported = null;
-            const exportBinaryImage = /** @type {unknown} */ (Reflect.get(db, 'exportBinaryImage'));
-            if (typeof exportBinaryImage === 'function') {
+            const snapshotDb = await this._createExportSnapshotDatabase();
+            let exported;
+            try {
+                exported = this._exportDatabaseImage(snapshotDb, sqlite3);
+            } finally {
                 try {
-                    const raw = /** @type {() => Uint8Array|ArrayBuffer} */ (exportBinaryImage).call(db);
-                    const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
-                    if (bytes.byteLength > 0) {
-                        exported = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-                    }
+                    snapshotDb.close();
                 } catch (_) {
-                    // Fall back to sqlite3_js_db_export below.
-                }
-            }
-            if (exported === null) {
-                const dbPointer = db.pointer;
-                if (typeof dbPointer !== 'number') {
-                    throw new Error('sqlite database pointer is unavailable');
-                }
-                const raw = sqlite3.capi.sqlite3_js_db_export(dbPointer);
-                const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
-                if (bytes.byteLength > 0) {
-                    exported = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+                    // Ignore snapshot close failures after export.
                 }
             }
             if (exported === null || exported.byteLength === 0) {
@@ -734,6 +720,315 @@ export class DictionaryDatabase {
             log.warn(wrappedError);
             throw wrappedError;
         }
+    }
+
+    /**
+     * @returns {Promise<import('@sqlite.org/sqlite-wasm').Database>}
+     */
+    async _createExportSnapshotDatabase() {
+        const sourceDb = this._requireDb();
+        const sqlite3 = this._requireSqlite3();
+        const snapshotDb = new sqlite3.oo1.DB(':memory:', 'ct');
+        snapshotDb.exec(`
+            PRAGMA journal_mode = DELETE;
+            PRAGMA synchronous = NORMAL;
+            PRAGMA user_version = ${CURRENT_DICTIONARY_SCHEMA_VERSION};
+
+            CREATE TABLE dictionaries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                version INTEGER NOT NULL,
+                summaryJson TEXT NOT NULL
+            );
+
+            CREATE TABLE terms (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                expression TEXT NOT NULL,
+                reading TEXT NOT NULL,
+                expressionReverse TEXT,
+                readingReverse TEXT,
+                definitionTags TEXT,
+                termTags TEXT,
+                rules TEXT,
+                score INTEGER,
+                glossaryJson TEXT NOT NULL,
+                sequence INTEGER
+            );
+
+            CREATE TABLE termMeta (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                expression TEXT NOT NULL,
+                mode TEXT NOT NULL,
+                dataJson TEXT NOT NULL
+            );
+
+            CREATE TABLE kanji (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                character TEXT NOT NULL,
+                onyomi TEXT,
+                kunyomi TEXT,
+                tags TEXT,
+                meaningsJson TEXT NOT NULL,
+                statsJson TEXT
+            );
+
+            CREATE TABLE kanjiMeta (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                character TEXT NOT NULL,
+                mode TEXT NOT NULL,
+                dataJson TEXT NOT NULL
+            );
+
+            CREATE TABLE tagMeta (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                name TEXT NOT NULL,
+                category TEXT,
+                ord INTEGER,
+                notes TEXT,
+                score INTEGER
+            );
+
+            CREATE TABLE media (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dictionary TEXT NOT NULL,
+                path TEXT NOT NULL,
+                mediaType TEXT NOT NULL,
+                width INTEGER NOT NULL,
+                height INTEGER NOT NULL,
+                content BLOB NOT NULL
+            );
+        `);
+
+        snapshotDb.exec('BEGIN');
+        try {
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT title, version, summaryJson FROM dictionaries ORDER BY id ASC',
+                'INSERT INTO dictionaries(title, version, summaryJson) VALUES($title, $version, $summaryJson)',
+                (row) => ({
+                    $title: this._asString(row.title),
+                    $version: this._asNumber(row.version, 0),
+                    $summaryJson: this._asString(row.summaryJson),
+                }),
+            );
+            await this._copyTermRowsToDatabase(snapshotDb);
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT dictionary, expression, mode, dataJson FROM termMeta ORDER BY id ASC',
+                'INSERT INTO termMeta(dictionary, expression, mode, dataJson) VALUES($dictionary, $expression, $mode, $dataJson)',
+                (row) => ({
+                    $dictionary: this._asString(row.dictionary),
+                    $expression: this._asString(row.expression),
+                    $mode: this._asString(row.mode),
+                    $dataJson: this._asString(row.dataJson),
+                }),
+            );
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT dictionary, character, onyomi, kunyomi, tags, meaningsJson, statsJson FROM kanji ORDER BY id ASC',
+                'INSERT INTO kanji(dictionary, character, onyomi, kunyomi, tags, meaningsJson, statsJson) VALUES($dictionary, $character, $onyomi, $kunyomi, $tags, $meaningsJson, $statsJson)',
+                (row) => ({
+                    $dictionary: this._asString(row.dictionary),
+                    $character: this._asString(row.character),
+                    $onyomi: this._asNullableString(row.onyomi),
+                    $kunyomi: this._asNullableString(row.kunyomi),
+                    $tags: this._asNullableString(row.tags),
+                    $meaningsJson: this._asString(row.meaningsJson),
+                    $statsJson: this._asNullableString(row.statsJson),
+                }),
+            );
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT dictionary, character, mode, dataJson FROM kanjiMeta ORDER BY id ASC',
+                'INSERT INTO kanjiMeta(dictionary, character, mode, dataJson) VALUES($dictionary, $character, $mode, $dataJson)',
+                (row) => ({
+                    $dictionary: this._asString(row.dictionary),
+                    $character: this._asString(row.character),
+                    $mode: this._asString(row.mode),
+                    $dataJson: this._asString(row.dataJson),
+                }),
+            );
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT dictionary, name, category, ord, notes, score FROM tagMeta ORDER BY id ASC',
+                'INSERT INTO tagMeta(dictionary, name, category, ord, notes, score) VALUES($dictionary, $name, $category, $ord, $notes, $score)',
+                (row) => ({
+                    $dictionary: this._asString(row.dictionary),
+                    $name: this._asString(row.name),
+                    $category: this._asNullableString(row.category),
+                    $ord: this._asNullableNumber(row.ord),
+                    $notes: this._asNullableString(row.notes),
+                    $score: this._asNullableNumber(row.score),
+                }),
+            );
+            await this._copyRowsToDatabase(
+                sourceDb,
+                snapshotDb,
+                'SELECT dictionary, path, mediaType, width, height, content FROM media ORDER BY id ASC',
+                'INSERT INTO media(dictionary, path, mediaType, width, height, content) VALUES($dictionary, $path, $mediaType, $width, $height, $content)',
+                (row) => ({
+                    $dictionary: this._asString(row.dictionary),
+                    $path: this._asString(row.path),
+                    $mediaType: this._asString(row.mediaType),
+                    $width: this._asNumber(row.width, 0),
+                    $height: this._asNumber(row.height, 0),
+                    $content: this._toUint8Array(row.content) ?? new Uint8Array(),
+                }),
+            );
+            snapshotDb.exec('COMMIT');
+        } catch (error) {
+            try {
+                snapshotDb.exec('ROLLBACK');
+            } catch (_) {
+                // Ignore rollback errors after export snapshot failures.
+            }
+            try {
+                snapshotDb.close();
+            } catch (_) {
+                // Ignore close errors while surfacing the original snapshot failure.
+            }
+            throw error;
+        }
+
+        return snapshotDb;
+    }
+
+    /**
+     * @param {import('@sqlite.org/sqlite-wasm').Database} sourceDb
+     * @param {import('@sqlite.org/sqlite-wasm').Database} targetDb
+     * @param {string} sourceSql
+     * @param {string} targetSql
+     * @param {(row: import('core').SafeAny) => Record<string, import('@sqlite.org/sqlite-wasm').Bindable>} createBind
+     * @returns {Promise<void>}
+     */
+    async _copyRowsToDatabase(sourceDb, targetDb, sourceSql, targetSql, createBind) {
+        const sourceStmt = /** @type {import('@sqlite.org/sqlite-wasm').PreparedStatement} */ (sourceDb.prepare(sourceSql));
+        const targetStmt = /** @type {import('@sqlite.org/sqlite-wasm').PreparedStatement} */ (targetDb.prepare(targetSql));
+        try {
+            sourceStmt.reset(true);
+            while (sourceStmt.step()) {
+                const row = /** @type {import('core').SafeAny} */ (sourceStmt.get({}));
+                targetStmt.reset(true);
+                targetStmt.bind(createBind(row));
+                targetStmt.step();
+            }
+        } finally {
+            try {
+                sourceStmt.finalize();
+            } catch (_) {
+                // Ignore finalization errors for export snapshot reads.
+            }
+            try {
+                targetStmt.finalize();
+            } catch (_) {
+                // Ignore finalization errors for export snapshot writes.
+            }
+        }
+    }
+
+    /**
+     * Rebuilds legacy inline term rows from the external term record/content stores
+     * so exports do not depend on the runtime virtual table module being available.
+     * @param {import('@sqlite.org/sqlite-wasm').Database} targetDb
+     * @returns {Promise<void>}
+     */
+    async _copyTermRowsToDatabase(targetDb) {
+        await this._termContentStore.ensureLoadedForRead();
+        const targetStmt = /** @type {import('@sqlite.org/sqlite-wasm').PreparedStatement} */ (targetDb.prepare(
+            'INSERT INTO terms(dictionary, expression, reading, expressionReverse, readingReverse, definitionTags, termTags, rules, score, glossaryJson, sequence) VALUES($dictionary, $expression, $reading, $expressionReverse, $readingReverse, $definitionTags, $termTags, $rules, $score, $glossaryJson, $sequence)',
+        ));
+        try {
+            for (const id of this._termRecordStore.getAllIds()) {
+                const record = this._termRecordStore.getById(id);
+                if (typeof record === 'undefined') { continue; }
+                const row = await this._deserializeTermRow({
+                    id,
+                    dictionary: record.dictionary,
+                    expression: record.expression,
+                    reading: record.reading,
+                    expressionReverse: record.expressionReverse,
+                    readingReverse: record.readingReverse,
+                    entryContentId: null,
+                    entryContentOffset: record.entryContentOffset,
+                    entryContentLength: record.entryContentLength,
+                    entryContentDictName: record.entryContentDictName,
+                    definitionTags: '',
+                    termTags: '',
+                    rules: '',
+                    score: record.score,
+                    glossaryJson: '[]',
+                    sequence: record.sequence,
+                });
+                targetStmt.reset(true);
+                targetStmt.bind({
+                    $dictionary: row.dictionary,
+                    $expression: row.expression,
+                    $reading: row.reading,
+                    $expressionReverse: row.expressionReverse,
+                    $readingReverse: row.readingReverse,
+                    $definitionTags: row.definitionTags,
+                    $termTags: typeof row.termTags === 'string' ? row.termTags : null,
+                    $rules: row.rules,
+                    $score: row.score,
+                    $glossaryJson: JSON.stringify(row.glossary),
+                    $sequence: row.sequence,
+                });
+                targetStmt.step();
+            }
+        } finally {
+            try {
+                targetStmt.finalize();
+            } catch (_) {
+                // Ignore finalization errors for export snapshot writes.
+            }
+        }
+    }
+
+    /**
+     * @param {import('@sqlite.org/sqlite-wasm').Database} db
+     * @param {import('@sqlite.org/sqlite-wasm').Sqlite3Static} sqlite3
+     * @returns {ArrayBuffer|null}
+     * @throws {Error}
+     */
+    _exportDatabaseImage(db, sqlite3) {
+        /** @type {ArrayBuffer|null} */
+        let exported = null;
+        const exportBinaryImage = /** @type {unknown} */ (Reflect.get(db, 'exportBinaryImage'));
+        if (typeof exportBinaryImage === 'function') {
+            try {
+                const raw = /** @type {() => Uint8Array|ArrayBuffer} */ (exportBinaryImage).call(db);
+                const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
+                if (bytes.byteLength > 0) {
+                    exported = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+                }
+            } catch (_) {
+                // Fall back to sqlite3_js_db_export below.
+            }
+        }
+        if (exported !== null) {
+            return exported;
+        }
+
+        const dbPointer = db.pointer;
+        if (typeof dbPointer !== 'number') {
+            throw new Error('sqlite database pointer is unavailable');
+        }
+        const raw = sqlite3.capi.sqlite3_js_db_export(dbPointer);
+        const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
+        if (bytes.byteLength > 0) {
+            return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+        }
+        return null;
     }
 
     /**
@@ -3143,8 +3438,8 @@ export class DictionaryDatabase {
                 uncompressedLength INTEGER NOT NULL
             );
         `);
-        await this._ensureTermsVirtualTable();
         await this._migrateTermsContentSchema();
+        await this._ensureTermsVirtualTable();
         if (!this._enableSqliteSecondaryIndexes) {
             for (const dropIndexSql of this._createDropIndexesSql()) {
                 db.exec(dropIndexSql);
@@ -3520,6 +3815,62 @@ export class DictionaryDatabase {
             WHERE entryContentId IS NULL
         `);
 
+        const externalizeRows = db.selectObjects(`
+            SELECT id, contentZstd, contentDictName, rules, definitionTags, termTags, glossaryJson
+            FROM termEntryContent
+            WHERE
+                (contentOffset IS NULL OR contentOffset < 0 OR contentLength IS NULL OR contentLength <= 0)
+        `);
+        if (externalizeRows.length > 0) {
+            const chunks = [];
+            /** @type {{id: number, contentDictName: string|null}[]} */
+            const externalizedRows = [];
+            for (const row of externalizeRows) {
+                const id = this._asNumber(row.id, -1);
+                if (id <= 0) { continue; }
+
+                let contentBytes = this._toUint8Array(row.contentZstd);
+                let contentDictName = this._asNullableString(row.contentDictName);
+                if (contentBytes === null || contentBytes.byteLength <= 0) {
+                    const glossaryJson = this._asString(row.glossaryJson);
+                    contentBytes = encodeRawTermContentBinary(
+                        this._asString(row.rules),
+                        this._asString(row.definitionTags),
+                        this._asString(row.termTags),
+                        this._textEncoder.encode(glossaryJson),
+                        this._textEncoder,
+                    );
+                    contentDictName = RAW_TERM_CONTENT_DICT_NAME;
+                }
+                chunks.push(contentBytes);
+                externalizedRows.push({id, contentDictName});
+            }
+            if (chunks.length > 0) {
+                const spans = await this._termContentStore.appendBatch(chunks);
+                let spanIndex = 0;
+                for (const {id, contentDictName} of externalizedRows) {
+                    const span = spans[spanIndex++];
+                    db.exec({
+                        sql: `
+                            UPDATE termEntryContent
+                            SET
+                                contentOffset = $contentOffset,
+                                contentLength = $contentLength,
+                                contentDictName = $contentDictName,
+                                contentZstd = NULL
+                            WHERE id = $id
+                        `,
+                        bind: {
+                            $contentOffset: span.offset,
+                            $contentLength: span.length,
+                            $contentDictName: contentDictName,
+                            $id: id,
+                        },
+                    });
+                }
+            }
+        }
+
         db.exec(`
             UPDATE terms
             SET
@@ -3545,41 +3896,6 @@ export class DictionaryDatabase {
                 entryContentId IS NOT NULL AND
                 (entryContentOffset IS NULL OR entryContentOffset < 0 OR entryContentLength IS NULL OR entryContentLength <= 0)
         `);
-
-        const externalizeRows = db.selectObjects(`
-            SELECT id, contentZstd
-            FROM termEntryContent
-            WHERE
-                contentZstd IS NOT NULL AND
-                length(contentZstd) > 0 AND
-                (contentOffset IS NULL OR contentOffset < 0 OR contentLength IS NULL OR contentLength <= 0)
-        `);
-        if (externalizeRows.length > 0) {
-            const chunks = [];
-            for (const row of externalizeRows) {
-                const contentZstd = this._toUint8Array(row.contentZstd);
-                if (contentZstd === null || contentZstd.byteLength <= 0) { continue; }
-                chunks.push(contentZstd);
-            }
-            if (chunks.length > 0) {
-                const spans = await this._termContentStore.appendBatch(chunks);
-                let spanIndex = 0;
-                for (const row of externalizeRows) {
-                    const id = this._asNumber(row.id, -1);
-                    const contentZstd = this._toUint8Array(row.contentZstd);
-                    if (id <= 0 || contentZstd === null || contentZstd.byteLength <= 0) { continue; }
-                    const span = spans[spanIndex++];
-                    db.exec({
-                        sql: `
-                            UPDATE termEntryContent
-                            SET contentOffset = $contentOffset, contentLength = $contentLength, contentZstd = NULL
-                            WHERE id = $id
-                        `,
-                        bind: {$contentOffset: span.offset, $contentLength: span.length, $id: id},
-                    });
-                }
-            }
-        }
     }
 
     /**

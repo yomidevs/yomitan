@@ -39,13 +39,19 @@ export const test = base.extend({
         }
 
         const pathToExtension = path.join(root, 'ext');
+        const runHeadless = (process.env.MANABITAN_CHROMIUM_HEADLESS ?? (process.platform === 'win32' ? '0' : '1')).trim() === '1';
+        const hideWindow = (process.env.MANABITAN_CHROMIUM_HIDE_WINDOW ?? (process.platform === 'win32' ? '1' : '0')).trim() === '1';
+        /** @type {string[]} */
+        const launchArgs = [
+            `--disable-extensions-except=${pathToExtension}`,
+            `--load-extension=${pathToExtension}`,
+        ];
+        if (!runHeadless && hideWindow) {
+            launchArgs.push('--window-position=3000,3000', '--window-size=1280,800', '--start-minimized');
+        }
         const context = await chromium.launchPersistentContext('', {
-            // Disabled: headless: false,
-            args: [
-                '--headless=new',
-                `--disable-extensions-except=${pathToExtension}`,
-                `--load-extension=${pathToExtension}`,
-            ],
+            headless: runHeadless,
+            args: launchArgs,
         });
         try {
             await use(context);
@@ -59,7 +65,16 @@ export const test = base.extend({
     extensionId: async ({context}, use) => {
         let [background] = context.serviceWorkers();
         if (!background) {
-            background = await context.waitForEvent('serviceworker', {timeout: 15_000});
+            try {
+                background = await context.waitForEvent('serviceworker', {timeout: 15_000});
+            } catch (_) {
+                const extensionPage = context.pages().find((page) => page.url().startsWith('chrome-extension://'));
+                if (extensionPage) {
+                    await use(extensionPage.url().split('/')[2]);
+                    return;
+                }
+                throw _;
+            }
         }
 
         const extensionId = background.url().split('/')[2];

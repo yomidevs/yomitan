@@ -19,6 +19,8 @@ import {describe, expect, test, vi} from 'vitest';
 import {createApiMap, extendApiMap, getApiMapHandler, invokeApiMapHandler} from '../ext/js/core/api-map.js';
 import {ExtensionError} from '../ext/js/core/extension-error.js';
 
+const invokeApiHandler = /** @type {any} */ (invokeApiMapHandler);
+
 describe('api-map', () => {
     test('createApiMap and getApiMapHandler return registered handlers', () => {
         const pingHandler = vi.fn(() => 'pong');
@@ -43,26 +45,26 @@ describe('api-map', () => {
     });
 
     test('invokeApiMapHandler returns false for missing handlers and tolerates handlerNotFoundCallback errors', () => {
-        const map = createApiMap([]);
+        const map = /** @type {any} */ (createApiMap([]));
         const callback = vi.fn();
         const handlerNotFoundCallback = vi.fn(() => {
             throw new Error('expected callback error');
         });
 
-        expect(invokeApiMapHandler(map, 'missing', {}, [], callback)).toBe(false);
+        expect(invokeApiHandler(map, 'missing', {}, [], callback)).toBe(false);
         expect(callback).not.toHaveBeenCalled();
 
-        expect(invokeApiMapHandler(map, 'missing', {}, [], callback, handlerNotFoundCallback)).toBe(false);
+        expect(invokeApiHandler(map, 'missing', {}, [], callback, handlerNotFoundCallback)).toBe(false);
         expect(handlerNotFoundCallback).toHaveBeenCalledTimes(1);
         expect(callback).not.toHaveBeenCalled();
     });
 
     test('invokeApiMapHandler handles synchronous handler results', () => {
         const handler = vi.fn((params, extra) => `${params}-${extra}`);
-        const map = createApiMap([['sync', handler]]);
+        const map = /** @type {any} */ (createApiMap([['sync', handler]]));
         const callback = vi.fn();
 
-        const isAsync = invokeApiMapHandler(map, 'sync', 'p', ['x'], callback);
+        const isAsync = invokeApiHandler(map, 'sync', 'p', ['x'], callback);
         expect(isAsync).toBe(false);
         expect(handler).toHaveBeenCalledWith('p', 'x');
         expect(callback).toHaveBeenCalledWith({result: 'p-x'});
@@ -72,22 +74,22 @@ describe('api-map', () => {
         const error = new Error('sync failure');
         error.name = 'SyncFailure';
         error.stack = 'SyncFailure: sync failure\nat test';
-        const map = createApiMap([['throw-sync', () => {
+        const map = /** @type {any} */ (createApiMap([['throw-sync', () => {
             throw error;
-        }]]);
+        }]]));
         const callback = vi.fn();
 
-        const isAsync = invokeApiMapHandler(map, 'throw-sync', {}, [], callback);
+        const isAsync = invokeApiHandler(map, 'throw-sync', {}, [], callback);
         expect(isAsync).toBe(false);
         expect(callback).toHaveBeenCalledWith({error: ExtensionError.serialize(error)});
     });
 
     test('invokeApiMapHandler handles asynchronous handler resolution', async () => {
         const asyncHandler = vi.fn(async () => ({ok: true}));
-        const map = createApiMap([['async-ok', asyncHandler]]);
+        const map = /** @type {any} */ (createApiMap([['async-ok', asyncHandler]]));
         const callback = vi.fn();
 
-        const isAsync = invokeApiMapHandler(map, 'async-ok', 'p', ['x'], callback);
+        const isAsync = invokeApiHandler(map, 'async-ok', 'p', ['x'], callback);
         expect(isAsync).toBe(true);
         expect(callback).not.toHaveBeenCalled();
 
@@ -100,12 +102,12 @@ describe('api-map', () => {
     test('invokeApiMapHandler serializes asynchronous handler rejections', async () => {
         const extensionError = new ExtensionError('async failure');
         extensionError.data = {code: 42};
-        const map = createApiMap([['async-fail', async () => {
+        const map = /** @type {any} */ (createApiMap([['async-fail', async () => {
             throw extensionError;
-        }]]);
+        }]]));
         const callback = vi.fn();
 
-        const isAsync = invokeApiMapHandler(map, 'async-fail', {}, [], callback);
+        const isAsync = invokeApiHandler(map, 'async-fail', {}, [], callback);
         expect(isAsync).toBe(true);
 
         await Promise.resolve();
@@ -115,10 +117,10 @@ describe('api-map', () => {
     });
 
     test('invokeApiMapHandler serializes non-error asynchronous rejection values', async () => {
-        const map = createApiMap([['async-fail-value', () => Promise.reject('reject-value')]]);
+        const map = /** @type {any} */ (createApiMap([['async-fail-value', () => Promise.reject('reject-value')]]));
         const callback = vi.fn();
 
-        const isAsync = invokeApiMapHandler(map, 'async-fail-value', {}, [], callback);
+        const isAsync = invokeApiHandler(map, 'async-fail-value', {}, [], callback);
         expect(isAsync).toBe(true);
 
         await Promise.resolve();

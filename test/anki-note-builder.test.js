@@ -48,24 +48,62 @@ class MockTemplateRenderer {
     }
 }
 
-function createTermEntry() {
+/**
+ * @param {string} text
+ * @returns {import('dictionary').TermSource}
+ */
+function createSource(text) {
     return {
+        originalText: text,
+        transformedText: text,
+        deinflectedText: text,
+        matchType: 'exact',
+        matchSource: 'term',
+        isPrimary: true,
+    };
+}
+
+/**
+ * @returns {import('dictionary').DictionaryEntry}
+ */
+function createTermEntry() {
+    return /** @type {import('dictionary').DictionaryEntry} */ ({
         type: 'term',
         headwords: [
             {
                 term: 'term',
                 reading: 'reading',
-                sources: [{originalText: 'term', deinflectedText: 'term'}],
+                sources: [createSource('term')],
             },
         ],
-    };
+    });
 }
 
+/**
+ * @returns {import('dictionary').DictionaryEntry}
+ */
 function createKanjiEntry() {
-    return {
+    return /** @type {import('dictionary').DictionaryEntry} */ ({
         type: 'kanji',
         character: '字',
-    };
+    });
+}
+
+/**
+ * @returns {MockTemplateRenderer}
+ */
+function createTemplateRenderer() {
+    return new MockTemplateRenderer();
+}
+
+/**
+ * @param {MockTemplateRenderer} templateRenderer
+ * @returns {import('../ext/js/templates/template-renderer-proxy.js').TemplateRendererProxy}
+ */
+function asTemplateRenderer(templateRenderer) {
+    return /** @type {import('../ext/js/templates/template-renderer-proxy.js').TemplateRendererProxy} */ (
+        /** @type {unknown} */ (templateRenderer)
+    );
 }
 
 /**
@@ -134,11 +172,11 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             }),
             parseText: vi.fn(async () => []),
         };
-        const templateRenderer = new MockTemplateRenderer();
-        const ankiNoteBuilder = new AnkiNoteBuilder(api, templateRenderer);
+        const templateRenderer = createTemplateRenderer();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, asTemplateRenderer(templateRenderer));
         const cardFormat = createCardFormat(dictionaryEntry.type);
 
-        const createNoteDetails = {
+        const createNoteDetails = /** @type {import('anki-note-builder').CreateNoteDetails} */ ({
             dictionaryEntry,
             cardFormat,
             context: createContext(),
@@ -152,10 +190,10 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             compactTags: false,
             mediaOptions: null,
             dictionaryStylesMap: new Map(),
-        };
+        });
 
         const {note} = await ankiNoteBuilder.createNote(createNoteDetails);
-        const duplicateCheckNote = await ankiNoteBuilder.createDuplicateCheckNote({
+        const duplicateCheckNote = await ankiNoteBuilder.createDuplicateCheckNote(/** @type {import('anki-note-builder').CreateDuplicateCheckNoteDetails} */ ({
             dictionaryEntry,
             cardFormat,
             context: createContext(),
@@ -167,7 +205,7 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             glossaryLayoutMode: 'default',
             compactTags: false,
             dictionaryStylesMap: new Map(),
-        });
+        }));
 
         expect(duplicateCheckNote.fields).toStrictEqual({Front: note.fields.Front});
         expect(duplicateCheckNote.options).toStrictEqual({
@@ -188,10 +226,10 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             }),
             parseText: vi.fn(async () => []),
         };
-        const templateRenderer = new MockTemplateRenderer();
-        const ankiNoteBuilder = new AnkiNoteBuilder(api, templateRenderer);
+        const templateRenderer = createTemplateRenderer();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, asTemplateRenderer(templateRenderer));
 
-        const note = await ankiNoteBuilder.createDuplicateCheckNote({
+        const note = await ankiNoteBuilder.createDuplicateCheckNote(/** @type {import('anki-note-builder').CreateDuplicateCheckNoteDetails} */ ({
             dictionaryEntry: createTermEntry(),
             cardFormat: createCardFormat('term'),
             context: createContext(),
@@ -203,7 +241,7 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             glossaryLayoutMode: 'default',
             compactTags: false,
             dictionaryStylesMap: new Map(),
-        });
+        }));
 
         expect(note.fields).toStrictEqual({Front: 'front-[first]'});
         expect(templateRenderer.markers).toStrictEqual(['first']);
@@ -217,20 +255,20 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             }),
             parseText: vi.fn(async () => []),
         };
-        const templateRenderer = new MockTemplateRenderer();
-        const ankiNoteBuilder = new AnkiNoteBuilder(api, templateRenderer);
+        const templateRenderer = createTemplateRenderer();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, asTemplateRenderer(templateRenderer));
 
-        const note = await ankiNoteBuilder.createDuplicateCheckNote({
-            dictionaryEntry: {
+        const note = await ankiNoteBuilder.createDuplicateCheckNote(/** @type {import('anki-note-builder').CreateDuplicateCheckNoteDetails} */ ({
+            dictionaryEntry: /** @type {import('dictionary').DictionaryEntry} */ ({
                 type: 'term',
                 headwords: [
                     {
                         term: '<term>&',
                         reading: 'reading',
-                        sources: [{originalText: '<term>&', deinflectedText: '<term>&'}],
+                        sources: [createSource('<term>&')],
                     },
                 ],
-            },
+            }),
             cardFormat: createSingleFieldCardFormat('term', '{expression}'),
             context: createContext(),
             template: 'unused',
@@ -241,7 +279,7 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             glossaryLayoutMode: 'default',
             compactTags: false,
             dictionaryStylesMap: new Map(),
-        });
+        }));
 
         expect(note.fields).toStrictEqual({Front: '&lt;term&gt;&amp;'});
         expect(templateRenderer.markers).toStrictEqual([]);
@@ -254,18 +292,18 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             }),
             parseText: vi.fn(async () => []),
         };
-        const templateRenderer = new MockTemplateRenderer();
-        const ankiNoteBuilder = new AnkiNoteBuilder(api, templateRenderer);
+        const templateRenderer = createTemplateRenderer();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, asTemplateRenderer(templateRenderer));
 
-        const note = await ankiNoteBuilder.createDuplicateCheckNote({
-            dictionaryEntry: {
+        const note = await ankiNoteBuilder.createDuplicateCheckNote(/** @type {import('anki-note-builder').CreateDuplicateCheckNoteDetails} */ ({
+            dictionaryEntry: /** @type {import('dictionary').DictionaryEntry} */ ({
                 type: 'term',
                 headwords: [
-                    {term: '打ち込む', reading: 'うちこむ', sources: [{originalText: '打ち込む', deinflectedText: '打ち込む'}]},
-                    {term: '撃ち込む', reading: 'うちこむ', sources: [{originalText: '撃ち込む', deinflectedText: '撃ち込む'}]},
-                    {term: '打ち込む', reading: 'うちこむ', sources: [{originalText: '打ち込む', deinflectedText: '打ち込む'}]},
+                    {term: '打ち込む', reading: 'うちこむ', sources: [createSource('打ち込む')]},
+                    {term: '撃ち込む', reading: 'うちこむ', sources: [createSource('撃ち込む')]},
+                    {term: '打ち込む', reading: 'うちこむ', sources: [createSource('打ち込む')]},
                 ],
-            },
+            }),
             cardFormat: createSingleFieldCardFormat('term', '{expression}'),
             context: createContext(),
             template: 'unused',
@@ -276,7 +314,7 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             glossaryLayoutMode: 'default',
             compactTags: false,
             dictionaryStylesMap: new Map(),
-        });
+        }));
 
         expect(note.fields).toStrictEqual({Front: '打ち込む、撃ち込む'});
         expect(templateRenderer.markers).toStrictEqual([]);
@@ -289,10 +327,10 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             }),
             parseText: vi.fn(async () => []),
         };
-        const templateRenderer = new MockTemplateRenderer();
-        const ankiNoteBuilder = new AnkiNoteBuilder(api, templateRenderer);
+        const templateRenderer = createTemplateRenderer();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, asTemplateRenderer(templateRenderer));
 
-        const note = await ankiNoteBuilder.createDuplicateCheckNote({
+        const note = await ankiNoteBuilder.createDuplicateCheckNote(/** @type {import('anki-note-builder').CreateDuplicateCheckNoteDetails} */ ({
             dictionaryEntry: createKanjiEntry(),
             cardFormat: createSingleFieldCardFormat('kanji', '{character}'),
             context: createContext(),
@@ -304,7 +342,7 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             glossaryLayoutMode: 'default',
             compactTags: false,
             dictionaryStylesMap: new Map(),
-        });
+        }));
 
         expect(note.fields).toStrictEqual({Front: '字'});
         expect(templateRenderer.markers).toStrictEqual([]);
@@ -317,17 +355,17 @@ describe('AnkiNoteBuilder.createDuplicateCheckNote', () => {
             }),
             parseText: vi.fn(async () => []),
         };
-        const templateRenderer = new MockTemplateRenderer();
-        const ankiNoteBuilder = new AnkiNoteBuilder(api, templateRenderer);
+        const templateRenderer = createTemplateRenderer();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, asTemplateRenderer(templateRenderer));
 
-        const note = ankiNoteBuilder.createDuplicateCheckNoteFast({
+        const note = ankiNoteBuilder.createDuplicateCheckNoteFast(/** @type {import('anki-note-builder').CreateDuplicateCheckNoteDetails} */ ({
             dictionaryEntry: createTermEntry(),
             cardFormat: createSingleFieldCardFormat('term', 'literal-front'),
             tags: ['tag'],
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
             resultOutputMode: 'split',
-        });
+        }));
 
         expect(note?.fields).toStrictEqual({Front: 'literal-front'});
         expect(templateRenderer.markers).toStrictEqual([]);

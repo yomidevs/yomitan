@@ -18,6 +18,10 @@
 import {describe, expect, test, vi} from 'vitest';
 
 vi.mock('../ext/lib/kanji-processor.js', () => ({
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
     convertVariants: (text) => text,
 }));
 
@@ -65,21 +69,24 @@ function createNote(front, back) {
 /**
  * @param {import('anki').CanAddNotesDetail[]} canAddNotesWithErrorDetail
  * @param {number[][]} duplicateNoteIds
- * @returns {Record<string, unknown>}
+ * @returns {any}
  */
 function createBackendContext(canAddNotesWithErrorDetail, duplicateNoteIds) {
-    const notesInfo = vi.fn(async (noteIds) => noteIds.map((noteId) => ({
+    const notesInfo = vi.fn(async (/** @type {number[]} */ noteIds) => noteIds.map((/** @type {number} */ noteId) => ({
         noteId,
+        fields: {},
+        modelName: 'Model',
         cards: [noteId + 1000],
         cardsInfo: [],
         tags: [],
     })));
-    const cardsInfo = vi.fn(async (cardIds) => cardIds.map((cardId) => ({
+    const cardsInfo = vi.fn(async (/** @type {number[]} */ cardIds) => cardIds.map((/** @type {number} */ cardId) => ({
         noteId: cardId - 1000,
+        cardId,
         cardState: 0,
         flags: 0,
     })));
-    return {
+    return /** @type {any} */ ({
         _anki: {
             canAddNotesWithErrorDetail: vi.fn(async () => canAddNotesWithErrorDetail),
             findNoteIds: vi.fn(async () => duplicateNoteIds),
@@ -91,7 +98,7 @@ function createBackendContext(canAddNotesWithErrorDetail, duplicateNoteIds) {
         _findDuplicatesFallback: getBackendMethod('_findDuplicatesFallback'),
         partitionAddibleNotes: getBackendMethod('partitionAddibleNotes'),
         _notesCardsInfoBatched: getBackendMethod('_notesCardsInfoBatched'),
-    };
+    });
 }
 
 describe('Backend Anki deduplication', () => {
@@ -105,7 +112,9 @@ describe('Backend Anki deduplication', () => {
             {canAdd: true, error: null},
         ], [[42]]);
 
-        const result = await getBackendMethod('_onApiGetAnkiNoteInfo').call(context, {notes, fetchAdditionalInfo: false});
+        const result = /** @type {import('anki').NoteInfoWrapper[]} */ (
+            await getBackendMethod('_onApiGetAnkiNoteInfo').call(context, {notes, fetchAdditionalInfo: false})
+        );
 
         expect(context._anki.findNoteIds).toHaveBeenCalledTimes(1);
         expect(context._anki.findNoteIds).toHaveBeenCalledWith([
@@ -136,11 +145,13 @@ describe('Backend Anki deduplication', () => {
             {canAdd: true, error: null},
         ], [[42]]);
 
-        const result = await getBackendMethod('_onApiGetAnkiNoteInfo').call(context, {
-            notes,
-            fetchAdditionalInfo: false,
-            fetchDuplicateNoteIds: false,
-        });
+        const result = /** @type {import('anki').NoteInfoWrapper[]} */ (
+            await getBackendMethod('_onApiGetAnkiNoteInfo').call(context, {
+                notes,
+                fetchAdditionalInfo: false,
+                fetchDuplicateNoteIds: false,
+            })
+        );
 
         expect(context._anki.findNoteIds).not.toHaveBeenCalled();
         expect(result).toStrictEqual([
@@ -159,7 +170,9 @@ describe('Backend Anki deduplication', () => {
             {canAdd: false, error: 'cannot create note because it is a duplicate'},
         ], [[101], [202]]);
 
-        const result = await getBackendMethod('_onApiGetAnkiNoteInfo').call(context, {notes, fetchAdditionalInfo: true});
+        const result = /** @type {import('anki').NoteInfoWrapper[]} */ (
+            await getBackendMethod('_onApiGetAnkiNoteInfo').call(context, {notes, fetchAdditionalInfo: true})
+        );
 
         expect(context._anki.notesInfo).toHaveBeenCalledTimes(1);
         expect(context._anki.notesInfo).toHaveBeenCalledWith([101, 202]);

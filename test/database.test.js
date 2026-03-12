@@ -257,6 +257,7 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
     );
     /** @type {Uint8Array[]} */
     const chunks = [textEncoder.encode('MBTB0001')];
+    /** @type {Uint8Array[]|null} */
     const sharedGlossaryBytes = termContentMode === 'raw-v3' || termContentMode === 'raw-v4' ? [] : null;
     /** @type {Map<string, {offset: number, length: number}>|null} */
     const sharedGlossarySpanByKey = termContentMode === 'raw-v3' || termContentMode === 'raw-v4' ? new Map() : null;
@@ -279,15 +280,16 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
             const glossaryKey = JSON.stringify(entry.glossary);
             let span = /** @type {{offset: number, length: number}|undefined} */ (sharedGlossarySpanByKey?.get(glossaryKey));
             if (typeof span === 'undefined') {
-                const offset = sharedGlossaryBytes.reduce((sum, chunk) => (sum + chunk.byteLength), 0);
+                const glossaryByteChunks = /** @type {Uint8Array[]} */ (sharedGlossaryBytes);
+                const offset = glossaryByteChunks.reduce((sum, chunk) => (sum + chunk.byteLength), 0);
                 span = {offset, length: glossaryBytes.byteLength};
                 sharedGlossarySpanByKey?.set(glossaryKey, span);
-                sharedGlossaryBytes?.push(glossaryBytes);
+                glossaryByteChunks.push(glossaryBytes);
             }
             return encodeRawTermContentSharedGlossaryBinary(
                 entry.rules,
-                entry.definitionTags,
-                entry.termTags,
+                entry.definitionTags ?? '',
+                entry.termTags ?? '',
                 span.offset,
                 span.length,
                 textEncoder,
@@ -582,7 +584,9 @@ describe('Database', () => {
                 expect.soft(errors.some((error) => error.message.includes('Unsupported dictionary format version: 0'))).toBe(true);
                 expect.soft(await dictionaryDatabase.getDictionaryInfo()).toStrictEqual([]);
             } finally {
-                await dictionaryDatabase.close();
+                if (dictionaryDatabase.isPrepared()) {
+                    await dictionaryDatabase.close();
+                }
             }
         });
     });
@@ -673,7 +677,7 @@ describe('Database', () => {
 
             await dictionaryDatabase.bulkAdd('terms', entries, 0, entries.length);
 
-            // eslint-disable-next-line no-underscore-dangle
+
             const db = dictionaryDatabase._requireDb();
             const termsCount = db.selectValue('SELECT COUNT(*) FROM terms');
             const termsWithExternalContentCount = db.selectValue(`
@@ -736,7 +740,7 @@ describe('Database', () => {
 
             await dictionaryDatabase.bulkAdd('terms', entries, 0, entries.length);
 
-            // eslint-disable-next-line no-underscore-dangle
+
             const db = dictionaryDatabase._requireDb();
             const reusedContentCount = db.selectValue(`
                 SELECT COUNT(*)
@@ -832,6 +836,9 @@ describe('Database', () => {
                 expect.soft(info[0]?.importSuccess).toBe(true);
 
                 const counts = await dictionaryDatabase.getDictionaryCounts(['Artifact Raw Dictionary'], true);
+                if (counts.total === null) {
+                    throw new Error('Expected dictionary counts total for raw-v3 import');
+                }
                 expect.soft(counts.total.terms).toBeGreaterThan(0);
 
                 const titles = new Map([
@@ -841,7 +848,9 @@ describe('Database', () => {
                 expect.soft(results.length).toBeGreaterThan(0);
                 expect.soft(results.some((entry) => entry.dictionary === 'Artifact Raw Dictionary')).toBe(true);
             } finally {
-                await dictionaryDatabase.close();
+                if (dictionaryDatabase.isPrepared()) {
+                    await dictionaryDatabase.close();
+                }
             }
         });
 
@@ -865,6 +874,9 @@ describe('Database', () => {
                 expect.soft(info[0]?.importSuccess).toBe(true);
 
                 const counts = await dictionaryDatabase.getDictionaryCounts(['Artifact Raw V4 Dictionary'], true);
+                if (counts.total === null) {
+                    throw new Error('Expected dictionary counts total for raw-v4 import');
+                }
                 expect.soft(counts.total.terms).toBeGreaterThan(0);
 
                 const titles = new Map([
@@ -1208,7 +1220,7 @@ describe('Database', () => {
                 {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
             );
 
-            // eslint-disable-next-line no-underscore-dangle
+
             const db = dictionaryDatabase._requireDb();
             const summaryRow = db.selectObject('SELECT summaryJson FROM dictionaries WHERE title = $title LIMIT 1', {$title: testDictionaryIndex.title});
             expect.soft(typeof summaryRow).toBe('object');
@@ -1257,7 +1269,7 @@ describe('Database', () => {
                 {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
             );
 
-            // eslint-disable-next-line no-underscore-dangle
+
             const db = dictionaryDatabase._requireDb();
             db.exec({
                 sql: 'UPDATE dictionaries SET summaryJson = $summaryJson WHERE title = $title',
@@ -1345,7 +1357,7 @@ describe('Database', () => {
                 await reopenedTermRecordStore.prepare();
                 try {
                     // Simulate a stale empty cached index even though the records are loaded.
-                    // eslint-disable-next-line no-underscore-dangle
+
                     reopenedTermRecordStore._indexByDictionary.set('Test Dictionary', {
                         expression: new Map(),
                         reading: new Map(),
@@ -1371,7 +1383,7 @@ describe('Database', () => {
             const dictionaryDatabase = new DictionaryDatabase();
             await dictionaryDatabase.prepare();
 
-            // eslint-disable-next-line no-underscore-dangle
+
             const db = dictionaryDatabase._requireDb();
             db.exec({
                 sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
@@ -1451,7 +1463,7 @@ describe('Database', () => {
 
             const beforeInfo = await dictionaryDatabase.getDictionaryInfo();
             expect.soft(beforeInfo.length).toBe(1);
-            // eslint-disable-next-line no-underscore-dangle
+
             const db = dictionaryDatabase._requireDb();
             db.exec('PRAGMA user_version = 0');
             const runSchemaMigrations = Reflect.get(dictionaryDatabase, '_runSchemaMigrations');
@@ -1479,7 +1491,7 @@ describe('Database', () => {
                 {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
             );
 
-            // eslint-disable-next-line no-underscore-dangle
+
             const db = dictionaryDatabase._requireDb();
             db.exec('PRAGMA user_version = 1');
             const runSchemaMigrations = Reflect.get(dictionaryDatabase, '_runSchemaMigrations');
@@ -1511,7 +1523,7 @@ describe('Database', () => {
                 {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
             );
 
-            // eslint-disable-next-line no-underscore-dangle
+
             const db = dictionaryDatabase._requireDb();
             const runSchemaMigrations = Reflect.get(dictionaryDatabase, '_runSchemaMigrations');
             if (typeof runSchemaMigrations !== 'function') {
@@ -1538,7 +1550,7 @@ describe('Database', () => {
                 {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
             );
 
-            // eslint-disable-next-line no-underscore-dangle
+
             const db = dictionaryDatabase._requireDb();
             db.exec('PRAGMA user_version = 999');
             const runSchemaMigrations = Reflect.get(dictionaryDatabase, '_runSchemaMigrations');

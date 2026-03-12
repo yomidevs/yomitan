@@ -372,6 +372,7 @@ describe('utility helpers', () => {
         circular.self = circular;
         expect(() => clone(circular)).toThrow('Circular');
 
+        /** @type {unknown[]} */
         const circularArray = [];
         circularArray.push(circularArray);
         expect(() => clone(circularArray)).toThrow('Circular');
@@ -417,9 +418,10 @@ describe('utility helpers', () => {
 
     test('sanitizeCSS normalizes cssRules output via CSSStyleSheet', () => {
         const originalCSSStyleSheetDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleSheet');
-        /* eslint-disable jsdoc/require-jsdoc */
+
         class FakeCSSStyleSheet {
             constructor() {
+                /** @type {Array<{cssText?: string}>} */
                 this.cssRules = [];
             }
 
@@ -434,7 +436,7 @@ describe('utility helpers', () => {
                 ];
             }
         }
-        /* eslint-enable jsdoc/require-jsdoc */
+
         Object.defineProperty(globalThis, 'CSSStyleSheet', {
             configurable: true,
             writable: true,
@@ -459,7 +461,7 @@ describe('utility helpers', () => {
         const originalCSSStyleSheetDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleSheet');
         const originalCSSStyleRuleDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleRule');
 
-        /* eslint-disable jsdoc/require-jsdoc */
+
         class FakeCSSStyleRule {
             /**
              * @param {string} selectorText
@@ -473,6 +475,7 @@ describe('utility helpers', () => {
 
         class FakeCSSStyleSheet {
             constructor() {
+                /** @type {Array<{cssText?: string}>} */
                 this.cssRules = [];
             }
 
@@ -490,7 +493,7 @@ describe('utility helpers', () => {
                 this.cssRules = css.split('\n').filter((line) => line.length > 0).map((line) => ({cssText: line}));
             }
         }
-        /* eslint-enable jsdoc/require-jsdoc */
+
 
         Object.defineProperty(globalThis, 'CSSStyleSheet', {
             configurable: true,
@@ -552,7 +555,7 @@ describe('utility helpers', () => {
     test('addScopeToCssLegacy handles empty cssText values when serializing final rules', () => {
         const originalCSSStyleSheetDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleSheet');
         const originalCSSStyleRuleDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleRule');
-        /* eslint-disable jsdoc/require-jsdoc */
+
         class FakeCSSStyleRule {
             /**
              * @param {string} selectorText
@@ -565,6 +568,7 @@ describe('utility helpers', () => {
         }
         class FakeCSSStyleSheet {
             constructor() {
+                /** @type {Array<{cssText?: string}>} */
                 this.cssRules = [];
                 this.replaceCount = 0;
             }
@@ -581,7 +585,7 @@ describe('utility helpers', () => {
                 this.cssRules = [{}];
             }
         }
-        /* eslint-enable jsdoc/require-jsdoc */
+
         Object.defineProperty(globalThis, 'CSSStyleSheet', {
             configurable: true,
             writable: true,

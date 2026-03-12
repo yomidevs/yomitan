@@ -1244,7 +1244,7 @@ export class Backend {
     /** @type {import('api').ApiHandler<'deleteDictionaryByTitle'>} */
     async _onApiDeleteDictionaryByTitle({dictionaryTitle}) {
         await this._runWithDictionaryMutationLock(async () => {
-            await this._ensureDictionaryDatabaseReady();
+            await this._ensureDictionaryDatabaseReady({allowDuringMutation: true});
             await this._dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, () => {});
         });
     }
@@ -1273,7 +1273,7 @@ export class Backend {
     /** @type {import('api').ApiHandler<'purgeDatabase'>} */
     async _onApiPurgeDatabase() {
         await this._runWithDictionaryMutationLock(async () => {
-            await this._ensureDictionaryDatabaseReady();
+            await this._ensureDictionaryDatabaseReady({allowDuringMutation: true});
             await this._dictionaryDatabase.purge();
             await this._handleDatabaseUpdated('dictionary', 'purge');
         });
@@ -1289,7 +1289,7 @@ export class Backend {
     /** @type {import('api').ApiHandler<'importDictionaryDatabase'>} */
     async _onApiImportDictionaryDatabase({content}) {
         await this._runWithDictionaryMutationLock(async () => {
-            await this._ensureDictionaryDatabaseReady();
+            await this._ensureDictionaryDatabaseReady({allowDuringMutation: true});
             await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
             await this._handleDatabaseUpdated('dictionary', 'import');
         });
@@ -1978,14 +1978,16 @@ export class Backend {
     }
 
     /**
+     * @param {object} [root0]
+     * @param {boolean} [root0.allowDuringMutation=false]
      * @returns {Promise<number|null>}
      */
-    async _computeMaxHeadwordLengthFromDatabase() {
+    async _computeMaxHeadwordLengthFromDatabase({allowDuringMutation = false} = {}) {
         if (this._dictionaryImportModeActive) {
             return null;
         }
         try {
-            await this._ensureDictionaryDatabaseReady();
+            await this._ensureDictionaryDatabaseReady({allowDuringMutation});
         } catch (_) {
             return null;
         }
@@ -2027,10 +2029,12 @@ export class Backend {
 
     /**
      * @param {string} source
+     * @param {object} [root0]
+     * @param {boolean} [root0.allowDuringMutation=false]
      * @returns {Promise<number>}
      */
-    async _refreshCachedMaxHeadwordLength(source) {
-        const computed = await this._computeMaxHeadwordLengthFromDatabase();
+    async _refreshCachedMaxHeadwordLength(source, {allowDuringMutation = false} = {}) {
+        const computed = await this._computeMaxHeadwordLengthFromDatabase({allowDuringMutation});
         if (computed === null) {
             return this._getStoredGlobalMaxHeadwordLength();
         }
@@ -2045,7 +2049,7 @@ export class Backend {
      */
     async _handleDatabaseUpdated(type, cause) {
         if (type === 'dictionary') {
-            await this._refreshCachedMaxHeadwordLength('background');
+            await this._refreshCachedMaxHeadwordLength('background', {allowDuringMutation: this._dictionaryMutationActive});
         }
         this._triggerDatabaseUpdated(type, cause);
     }
@@ -3183,7 +3187,7 @@ export class Backend {
                 if ('close' in dictionaryDatabase && typeof dictionaryDatabase.close === 'function') {
                     await dictionaryDatabase.close();
                 }
-                await dictionaryDatabase.prepare();
+                await this._ensureDictionaryDatabaseReady();
             } catch (e) {
                 log.error(e);
             }
@@ -3509,7 +3513,7 @@ export class Backend {
 
         /** @type {import('backend').DictionaryUpdateResult|void} */
         const updateResult = await this._runWithDictionaryMutationLock(async () => {
-            await this._ensureDictionaryDatabaseReady();
+            await this._ensureDictionaryDatabaseReady({allowDuringMutation: true});
             const latestDictionaries = await this._dictionaryDatabase.getDictionaryInfo();
             const latestDictionary = latestDictionaries.find((dictionary) => dictionary.title === dictionaryTitle);
             if (
@@ -4484,9 +4488,14 @@ export class Backend {
     }
 
     /**
+     * @param {object} [root0]
+     * @param {boolean} [root0.allowDuringMutation=false]
      * @returns {Promise<void>}
      */
-    async _ensureDictionaryDatabaseReady() {
+    async _ensureDictionaryDatabaseReady({allowDuringMutation = false} = {}) {
+        if (!allowDuringMutation && this._dictionaryMutationPromise !== null) {
+            await this._dictionaryMutationPromise;
+        }
         if (this._dictionaryImportModeActive) {
             throw new Error('Dictionary database access is suspended while import is in progress');
         }
@@ -4525,29 +4534,46 @@ export class Backend {
                 return;
             }
             if (active) {
-                this._dictionaryImportModeActive = true;
-                if (this._dictionaryDatabasePreparePromise !== null) {
-                    try {
-                        await this._dictionaryDatabasePreparePromise;
-                    } catch (_) {
-                        // NOP
-                    }
-                }
                 const setSuspendedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'setSuspended'));
-                if (typeof setSuspendedMethod === 'function') {
-                    await /** @type {(suspended: boolean) => Promise<void>} */ (setSuspendedMethod).call(this._dictionaryDatabase, true);
-                } else {
-                    const isPreparedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'isPrepared'));
-                    const closeMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'close'));
-                    if (typeof isPreparedMethod === 'function' && typeof closeMethod === 'function') {
-                        const isPrepared = /** @type {() => boolean} */ (isPreparedMethod).call(this._dictionaryDatabase);
-                        if (isPrepared) {
-                            await /** @type {() => Promise<void>} */ (closeMethod).call(this._dictionaryDatabase);
+                let suspensionApplied = false;
+                this._dictionaryImportModeActive = true;
+                try {
+                    if (this._dictionaryDatabasePreparePromise !== null) {
+                        try {
+                            await this._dictionaryDatabasePreparePromise;
+                        } catch (_) {
+                            // NOP
                         }
                     }
+                    if (typeof setSuspendedMethod === 'function') {
+                        await /** @type {(suspended: boolean) => Promise<void>} */ (setSuspendedMethod).call(this._dictionaryDatabase, true);
+                        suspensionApplied = true;
+                    } else {
+                        const isPreparedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'isPrepared'));
+                        const closeMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'close'));
+                        if (typeof isPreparedMethod === 'function' && typeof closeMethod === 'function') {
+                            const isPrepared = /** @type {() => boolean} */ (isPreparedMethod).call(this._dictionaryDatabase);
+                            if (isPrepared) {
+                                await /** @type {() => Promise<void>} */ (closeMethod).call(this._dictionaryDatabase);
+                                suspensionApplied = true;
+                            }
+                        }
+                    }
+                    await Promise.resolve(this._translator.clearDatabaseCaches());
+                    reportDiagnostics('dictionary-import-mode-changed', {active: true});
+                } catch (e) {
+                    this._dictionaryImportModeActive = false;
+                    if (suspensionApplied) {
+                        try {
+                            await (typeof setSuspendedMethod === 'function' ?
+                                /** @type {(suspended: boolean) => Promise<void>} */ (setSuspendedMethod).call(this._dictionaryDatabase, false) :
+                                this._ensureDictionaryDatabaseReady());
+                        } catch (rollbackError) {
+                            log.error(rollbackError);
+                        }
+                    }
+                    throw e;
                 }
-                await Promise.resolve(this._translator.clearDatabaseCaches());
-                reportDiagnostics('dictionary-import-mode-changed', {active: true});
                 return;
             }
 

@@ -19,6 +19,10 @@
 import {describe, expect, test, vi} from 'vitest';
 
 vi.mock('../ext/lib/kanji-processor.js', () => ({
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
     convertVariants: (text) => text,
 }));
 

@@ -36,7 +36,8 @@ const args = process.argv.slice(2);
 
 const child = spawn(playwrightBin, args, {
     stdio: 'inherit',
-    shell: false,
+    // On Windows, playwright resolves to a .cmd shim which must run through the shell.
+    shell: process.platform === 'win32',
 });
 
 const timeoutSeconds = Number.parseInt(process.env.PLAYWRIGHT_HARD_TIMEOUT_SECONDS ?? '900', 10);

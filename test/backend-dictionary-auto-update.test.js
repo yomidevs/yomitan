@@ -18,6 +18,10 @@
 import {afterEach, describe, expect, test, vi} from 'vitest';
 
 vi.mock('../ext/lib/kanji-processor.js', () => ({
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
     convertVariants: (text) => text,
 }));
 
@@ -88,6 +92,56 @@ function createCheckResult(overrides = {}) {
 }
 
 describe('Backend dictionary auto-update helpers', () => {
+    test('setDictionaryImportMode(true) clears the import-mode flag when suspension activation fails', async () => {
+        const failure = new Error('suspend failed');
+        const setSuspended = vi.fn(async (suspended) => {
+            if (suspended) {
+                throw failure;
+            }
+        });
+        const clearDatabaseCaches = vi.fn(async () => {});
+        const context = {
+            _setDictionaryImportModePromise: null,
+            _dictionaryImportModeActive: false,
+            _dictionaryDatabasePreparePromise: null,
+            _dictionaryDatabase: {setSuspended},
+            _translator: {clearDatabaseCaches},
+        };
+
+        await expect(getBackendMethod('_setDictionaryImportMode').call(context, true)).rejects.toBe(failure);
+
+        expect(context._dictionaryImportModeActive).toBe(false);
+        expect(context._setDictionaryImportModePromise).toBe(null);
+        expect(setSuspended).toHaveBeenCalledTimes(1);
+        expect(setSuspended).toHaveBeenCalledWith(true);
+        expect(clearDatabaseCaches).not.toHaveBeenCalled();
+    });
+
+    test('setDictionaryImportMode(true) resumes the database if activation fails after suspension', async () => {
+        const failure = new Error('cache clear failed');
+        const setSuspended = vi.fn()
+            .mockImplementationOnce(async () => {})
+            .mockImplementationOnce(async () => {});
+        const clearDatabaseCaches = vi.fn(async () => {
+            throw failure;
+        });
+        const context = {
+            _setDictionaryImportModePromise: null,
+            _dictionaryImportModeActive: false,
+            _dictionaryDatabasePreparePromise: null,
+            _dictionaryDatabase: {setSuspended},
+            _translator: {clearDatabaseCaches},
+            _ensureDictionaryDatabaseReady: vi.fn(async () => {}),
+        };
+
+        await expect(getBackendMethod('_setDictionaryImportMode').call(context, true)).rejects.toBe(failure);
+
+        expect(context._dictionaryImportModeActive).toBe(false);
+        expect(context._setDictionaryImportModePromise).toBe(null);
+        expect(setSuspended.mock.calls).toStrictEqual([[true], [false]]);
+        expect(context._ensureDictionaryDatabaseReady).not.toHaveBeenCalled();
+    });
+
     test('Prunes stale auto-update settings and runtime state', async () => {
         const saveOptions = vi.fn(async () => {});
         const setState = vi.fn(async () => {});

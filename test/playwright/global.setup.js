@@ -22,11 +22,25 @@ import {ManifestUtil} from '../../dev/manifest-util.js';
 import {root} from './playwright-util.js';
 
 const manifestPath = path.join(root, 'ext/manifest.json');
-const copyManifestPath = path.join(root, 'ext/manifest-old.json');
+const backupDirectoryPath = path.join(root, 'playwright/.cache');
+const copyManifestPath = path.join(backupDirectoryPath, 'manifest-old.json');
+const legacyCopyManifestPath = path.join(root, 'ext/manifest-old.json');
 
 setup('use test manifest', () => {
     const manifestUtil = new ManifestUtil();
     const variant = manifestUtil.getManifest('chrome-playwright');
-    fs.renameSync(manifestPath, copyManifestPath);
+
+    fs.mkdirSync(backupDirectoryPath, {recursive: true});
+
+    // Restore the original manifest first if a previous run was interrupted.
+    if (fs.existsSync(copyManifestPath)) {
+        fs.copyFileSync(copyManifestPath, manifestPath);
+        fs.rmSync(copyManifestPath, {force: true});
+    } else if (fs.existsSync(legacyCopyManifestPath)) {
+        fs.copyFileSync(legacyCopyManifestPath, manifestPath);
+        fs.rmSync(legacyCopyManifestPath, {force: true});
+    }
+
+    fs.copyFileSync(manifestPath, copyManifestPath);
     fs.writeFileSync(manifestPath, ManifestUtil.createManifestString(variant).replace('$YOMITAN_VERSION', '0.0.0.0'));
 });

@@ -26,7 +26,9 @@ const benchmarkOptions = Object.freeze({
 });
 
 const noteCount = 50;
-const dictionaryEntries = Array.from({length: noteCount}, () => createTermEntry());
+const dictionaryEntries = /** @type {import('dictionary').DictionaryEntry[]} */ (
+    Array.from({length: noteCount}, () => createTermEntry())
+);
 
 const {window, teardown} = await setupDomTest();
 afterAll(async () => {
@@ -61,7 +63,7 @@ describe('Display Anki deduplication', () => {
  */
 function createDisplayAnki(document) {
     const api = {
-        getAnkiNoteInfo: vi.fn(async (notes) => notes.map((note) => ({
+        getAnkiNoteInfo: vi.fn(async (/** @type {import('anki').Note[]} */ notes) => notes.map((/** @type {import('anki').Note} */ note) => ({
             canAdd: true,
             valid: true,
             isDuplicate: false,
@@ -81,7 +83,7 @@ function createDisplayAnki(document) {
         dictionaryEntryNodes: [],
         getOptions: () => ({anki: {enable: true, fieldTemplates: ''}, dictionaries: []}),
         getContentOrigin: () => ({tabId: 1, frameId: 0}),
-        getOptionsContext: () => ({}),
+        getOptionsContext: () => /** @type {import('settings').OptionsContext} */ ({current: true}),
         getLanguageSummary: () => ({}),
         createNotification: () => ({setContent: vi.fn(), open: vi.fn(), close: vi.fn()}),
         progressIndicatorVisible: {
@@ -96,9 +98,12 @@ function createDisplayAnki(document) {
             setupNode: vi.fn(),
         },
     };
-    const displayAnki = new DisplayAnki(display, {
-        getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true})),
-    });
+    const displayAnki = new DisplayAnki(
+        /** @type {import('../ext/js/display/display.js').Display} */ (/** @type {unknown} */ (display)),
+        /** @type {import('../ext/js/display/display-audio.js').DisplayAudio} */ (/** @type {unknown} */ ({
+            getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true})),
+        })),
+    );
     displayAnki._checkForDuplicates = true;
     displayAnki._duplicateBehavior = 'prevent';
     displayAnki._displayTagsAndFlags = 'never';
@@ -116,16 +121,23 @@ function createDisplayAnki(document) {
 }
 
 function createTermEntry() {
-    return {
+    return /** @type {import('dictionary').DictionaryEntry} */ ({
         type: 'term',
         headwords: [
             {
                 term: 'term',
                 reading: 'reading',
-                sources: [{originalText: 'term', deinflectedText: 'term'}],
+                sources: [{
+                    originalText: 'term',
+                    transformedText: 'term',
+                    deinflectedText: 'term',
+                    matchType: 'exact',
+                    matchSource: 'term',
+                    isPrimary: true,
+                }],
             },
         ],
-    };
+    });
 }
 
 /**

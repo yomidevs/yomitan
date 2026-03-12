@@ -41,7 +41,7 @@
         "test:unit:options": "vitest run --config test/data/vitest.options.config.json",
         "test:coverage": "npm run test:unit:coverage && node ./dev/bin/coverage-monitor.js",
         "test:playwright": "node ./dev/bin/run-playwright.js test",
-        "test:playwright:integration": "node ./dev/bin/run-playwright.js test test/playwright/integration.spec.js --project=chromium --workers=1 --reporter=line",
+        "test:playwright:integration": "node ./dev/bin/run-playwright.js test integration.spec.js --project=chromium --workers=1 --reporter=line",
         "test:e2e:firefox-extension": "node ./test/firefox/extension-two-dictionary-import.e2e.js",
         "test:e2e:firefox-android-extension": "node ./test/android/firefox-extension-smoke.e2e.js",
         "test:e2e:chromium-extension": "node ./test/chromium/extension-two-dictionary-import.e2e.js",

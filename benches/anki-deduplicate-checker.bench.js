@@ -30,6 +30,10 @@ import {createFindKanjiOptions, createFindTermsOptions} from '../test/utilities/
 
 setupStubs();
 vi.mock('../ext/lib/kanji-processor.js', () => ({
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
     convertVariants: (text) => text,
 }));
 
@@ -66,7 +70,6 @@ afterAll(async () => {
 // The window property needs to be referenced for it to be initialized.
 void window;
 // @ts-expect-error - Document and Window are not accessible here and are not read directly.
-// eslint-disable-next-line no-undefined
 const ankiTemplateRenderer = new AnkiTemplateRenderer(undefined, undefined);
 await ankiTemplateRenderer.prepare();
 
@@ -104,7 +107,7 @@ const kanjiDuplicateCheckDetails = [createDuplicateCheckDetails(kanjiDictionaryE
 const kanjiCreateNoteDetails = [createCreateNoteDetails(kanjiDictionaryEntry, kanjiCardFormat, dictionaryStylesMap)];
 const termDuplicateCheckNotes = await Promise.all(termDuplicateCheckDetails.map((details) => ankiNoteBuilder.createDuplicateCheckNote(details)));
 const duplicateNoteKeys = createDuplicateNoteKeys(termDuplicateCheckNotes);
-const backend = createBackendHarness();
+const backend = /** @type {any} */ (createBackendBenchmarkHarness(duplicateNoteKeys));
 
 describe('Anki deduplicate checker', () => {
     bench(`AnkiNoteBuilder.createDuplicateCheckNote - term batch (n=${termDuplicateCheckDetails.length})`, async () => {
@@ -215,11 +218,11 @@ function createDuplicateCheckDetails(dictionaryEntry, cardFormat, dictionaryStyl
  * @returns {import('anki-note-builder').CreateNoteDetails}
  */
 function createCreateNoteDetails(dictionaryEntry, cardFormat, dictionaryStylesMap) {
-    return {
+    return /** @type {import('anki-note-builder').CreateNoteDetails} */ ({
         ...createDuplicateCheckDetails(dictionaryEntry, cardFormat, dictionaryStylesMap),
         requirements: [],
         mediaOptions: null,
-    };
+    });
 }
 
 /**
@@ -267,7 +270,7 @@ function createDuplicateNoteKeys(notes) {
 
 /**
  * @param {Set<string>} duplicateNoteKeys
- * @returns {Backend}
+ * @returns {any}
  */
 function createBackendBenchmarkHarness(duplicateNoteKeys) {
     const backend = Object.create(Backend.prototype);
@@ -317,6 +320,8 @@ class DuplicateCheckBenchmarkAnki {
     async notesInfo(noteIds) {
         return noteIds.map((noteId) => ({
             noteId,
+            fields: {},
+            modelName: 'Model',
             cards: [noteId + 1000],
             cardsInfo: [],
             tags: [],
@@ -330,13 +335,12 @@ class DuplicateCheckBenchmarkAnki {
     async cardsInfo(cardIds) {
         return cardIds.map((cardId) => ({
             noteId: cardId - 1000,
+            cardId,
             cardState: 0,
             flags: 0,
         }));
     }
 }
-
-backend = createBackendBenchmarkHarness(duplicateNoteKeys);
 
 /**
  * @param {import('anki').Note} note

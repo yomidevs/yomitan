@@ -21,8 +21,14 @@ import path from 'path';
 import {root} from './playwright-util.js';
 
 const manifestPath = path.join(root, 'ext/manifest.json');
-const copyManifestPath = path.join(root, 'ext/manifest-old.json');
+const copyManifestPath = path.join(root, 'playwright/.cache/manifest-old.json');
+const legacyCopyManifestPath = path.join(root, 'ext/manifest-old.json');
 
 teardown('bring back original manifest', () => {
-    fs.renameSync(copyManifestPath, manifestPath);
+    if (fs.existsSync(copyManifestPath)) {
+        fs.copyFileSync(copyManifestPath, manifestPath);
+        fs.rmSync(copyManifestPath, {force: true});
+    }
+
+    fs.rmSync(legacyCopyManifestPath, {force: true});
 });

@@ -26,7 +26,13 @@ describe('Japanese text preprocessors', () => {
             throw new Error('Japanese text processors not found');
         }
 
-        const processorWithId = japaneseProcessors.textPreprocessors.find(({id}) => id === 'convertIterationMarksToKanjiDuplication');
+        const {textPreprocessors} = japaneseProcessors;
+        expect(Array.isArray(textPreprocessors)).toBe(true);
+        if (!Array.isArray(textPreprocessors)) {
+            throw new Error('Japanese text preprocessors not found');
+        }
+
+        const processorWithId = textPreprocessors.find(({id}) => id === 'convertIterationMarksToKanjiDuplication');
         expect(processorWithId).toBeDefined();
         if (typeof processorWithId === 'undefined') {
             throw new Error('Iteration mark processor not found');

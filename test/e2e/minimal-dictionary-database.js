@@ -15,17 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {execFile as execFileCallback} from 'node:child_process';
-import {mkdtemp, readFile} from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
-import {promisify} from 'node:util';
+import sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import {dedupeDictionaryTitle, dedupeSearchTerm} from './anki-dedupe-matrix.js';
 
-const execFile = promisify(execFileCallback);
-
-/** @type {Promise<string>|null} */
-let dictionaryDatabaseBase64Promise = null;
+/** @type {Map<string, Promise<string>>} */
+const dictionaryDatabaseBase64PromiseMap = new Map();
 
 /**
  * @param {string} value
@@ -36,16 +30,27 @@ function escapeSqlString(value) {
 }
 
 /**
+ * @param {{
+ *   title: string,
+ *   revision: string,
+ *   expression: string,
+ *   reading: string,
+ *   glossary: string[],
+ * }} options
  * @returns {Promise<string>}
  */
-export async function getMinimalDictionaryDatabaseBase64() {
-    if (dictionaryDatabaseBase64Promise !== null) {
-        return await dictionaryDatabaseBase64Promise;
+export async function createDictionaryDatabaseBase64(options) {
+    const {title, revision, expression, reading, glossary} = options;
+    const cacheKey = JSON.stringify({title, revision, expression, reading, glossary});
+    let promise = dictionaryDatabaseBase64PromiseMap.get(cacheKey);
+    if (typeof promise !== 'undefined') {
+        return await promise;
     }
-    dictionaryDatabaseBase64Promise = (async () => {
+
+    promise = (async () => {
         const summaryJson = JSON.stringify({
-            title: dedupeDictionaryTitle,
-            revision: 'anki-dedupe',
+            title,
+            revision,
             sequenced: true,
             version: 3,
             importDate: Date.now(),
@@ -61,10 +66,11 @@ export async function getMinimalDictionaryDatabaseBase64() {
             styles: '',
             importSuccess: true,
         });
-        const glossaryJson = JSON.stringify(['dedupe fixture definition']);
+        const glossaryJson = JSON.stringify(glossary);
         const sql = `
             PRAGMA journal_mode = DELETE;
             PRAGMA synchronous = NORMAL;
+            PRAGMA user_version = 4;
 
             CREATE TABLE dictionaries (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -155,28 +161,47 @@ export async function getMinimalDictionaryDatabaseBase64() {
             CREATE INDEX idx_media_path ON media(path);
 
             INSERT INTO dictionaries(title, version, summaryJson)
-            VALUES ('${escapeSqlString(dedupeDictionaryTitle)}', 3, '${escapeSqlString(summaryJson)}');
+            VALUES ('${escapeSqlString(title)}', 3, '${escapeSqlString(summaryJson)}');
 
             INSERT INTO terms(
                 dictionary, expression, reading, expressionReverse, readingReverse,
                 definitionTags, termTags, rules, score, glossaryJson, sequence
             ) VALUES (
-                '${escapeSqlString(dedupeDictionaryTitle)}', '${escapeSqlString(dedupeSearchTerm)}', 'よむ', NULL, NULL,
+                '${escapeSqlString(title)}', '${escapeSqlString(expression)}', '${escapeSqlString(reading)}', NULL, NULL,
                 '', '', '', 0, '${escapeSqlString(glossaryJson)}', 1
             );
         `;
 
-        const tempDirectory = await mkdtemp(path.join(os.tmpdir(), 'manabitan-e2e-dedupe-db-'));
-        const databasePath = path.join(tempDirectory, 'dictionary.sqlite3');
+        const sqlite3 = await sqlite3InitModule();
+        const db = new sqlite3.oo1.DB(':memory:', 'ct');
         try {
-            await execFile('sqlite3', [databasePath, sql], {encoding: 'utf8'});
-        } catch (e) {
-            throw new Error(
-                `Failed to generate minimal dictionary database; sqlite3 is required on PATH: ${e instanceof Error ? e.message : String(e)}`,
-            );
+            if (typeof db.pointer !== 'number') {
+                throw new Error('sqlite database pointer is unavailable');
+            }
+            db.exec(sql);
+            const raw = sqlite3.capi.sqlite3_js_db_export(db.pointer);
+            const bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
+            if (bytes.byteLength === 0) {
+                throw new Error('Generated dictionary database export was empty');
+            }
+            return Buffer.from(bytes).toString('base64');
+        } finally {
+            db.close();
         }
-        const databaseContent = await readFile(databasePath);
-        return databaseContent.toString('base64');
     })();
-    return await dictionaryDatabaseBase64Promise;
+    dictionaryDatabaseBase64PromiseMap.set(cacheKey, promise);
+    return await promise;
+}
+
+/**
+ * @returns {Promise<string>}
+ */
+export async function getMinimalDictionaryDatabaseBase64() {
+    return await createDictionaryDatabaseBase64({
+        title: dedupeDictionaryTitle,
+        revision: 'anki-dedupe',
+        expression: dedupeSearchTerm,
+        reading: 'よむ',
+        glossary: ['dedupe fixture definition'],
+    });
 }

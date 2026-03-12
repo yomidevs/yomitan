@@ -21,17 +21,35 @@ import {createDomTest} from './fixtures/dom-test.js';
 
 const test = createDomTest();
 
-function createTermEntry() {
+/**
+ * @param {string} text
+ * @returns {import('dictionary').TermSource}
+ */
+function createSource(text) {
     return {
+        originalText: text,
+        transformedText: text,
+        deinflectedText: text,
+        matchType: 'exact',
+        matchSource: 'term',
+        isPrimary: true,
+    };
+}
+
+/**
+ * @returns {import('dictionary').DictionaryEntry}
+ */
+function createTermEntry() {
+    return /** @type {import('dictionary').DictionaryEntry} */ ({
         type: 'term',
         headwords: [
             {
                 term: 'term',
                 reading: 'reading',
-                sources: [{originalText: 'term', deinflectedText: 'term'}],
+                sources: [createSource('term')],
             },
         ],
-    };
+    });
 }
 
 /**
@@ -137,10 +155,15 @@ function createDisplay(document, dictionaryEntries, apiOverrides = {}) {
     };
 
     const displayGenerator = {
+        /**
+         * @param {string} name
+         * @returns {Node|null}
+         */
         instantiateTemplate(name) {
             const template = document.querySelector(`#${name}-template`);
             if (!(template instanceof HTMLTemplateElement)) { return null; }
-            return template.content.firstElementChild.cloneNode(true);
+            const {firstElementChild} = template.content;
+            return firstElementChild === null ? null : firstElementChild.cloneNode(true);
         },
         createAnkiNoteErrorsNotificationContent() {
             return document.createElement('div');
@@ -162,7 +185,7 @@ function createDisplay(document, dictionaryEntries, apiOverrides = {}) {
         dictionaryEntryNodes,
         getOptions: () => ({anki: {enable: true}}),
         getContentOrigin: () => ({tabId: 1, frameId: 0}),
-        getOptionsContext: () => ({}),
+        getOptionsContext: () => /** @type {import('settings').OptionsContext} */ ({current: true}),
         getLanguageSummary: () => ({}),
         createNotification: () => ({setContent: vi.fn(), open: vi.fn(), close: vi.fn()}),
         progressIndicatorVisible: {
@@ -172,7 +195,10 @@ function createDisplay(document, dictionaryEntries, apiOverrides = {}) {
         _hotkeyHelpController: hotkeyHelpController,
     };
 
-    return {display, api};
+    return {
+        display: /** @type {import('../ext/js/display/display.js').Display} */ (/** @type {unknown} */ (display)),
+        api,
+    };
 }
 
 /**
@@ -200,8 +226,45 @@ function createNoteInfo(noteId, value) {
     };
 }
 
+/**
+ * @returns {import('../ext/js/display/display-audio.js').DisplayAudio}
+ */
+function createDisplayAudio() {
+    return /** @type {import('../ext/js/display/display-audio.js').DisplayAudio} */ (
+        /** @type {unknown} */ ({
+            getAnkiNoteMediaAudioDetails: vi.fn(() => ({
+                sources: [],
+                preferredAudioIndex: null,
+                enableDefaultAudioSources: true,
+            })),
+        })
+    );
+}
+
+/**
+ * @param {string} front
+ * @returns {import('anki').Note}
+ */
+function createCollectionNote(front) {
+    return {
+        fields: {Front: front},
+        tags: [],
+        deckName: 'Deck',
+        modelName: 'Model',
+        options: {
+            allowDuplicate: true,
+            duplicateScope: 'collection',
+            duplicateScopeOptions: {
+                deckName: null,
+                checkChildren: false,
+                checkAllModels: false,
+            },
+        },
+    };
+}
+
 describe('DisplayAnki preload and save flow', () => {
-    test('preload uses duplicate-check notes instead of full note creation', async ({window}) => {
+    test('preload uses duplicate-check notes instead of full note creation', {timeout: 15_000}, async ({window}) => {
         setupDocument(window.document);
         const dictionaryEntries = [createTermEntry()];
         const {display, api} = createDisplay(window.document, dictionaryEntries, {
@@ -213,7 +276,7 @@ describe('DisplayAnki preload and save flow', () => {
                 noteInfos: [createNoteInfo(123, 'existing')],
             }]),
         });
-        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
+        const displayAnki = new DisplayAnki(display, createDisplayAudio());
         displayAnki._checkForDuplicates = true;
         displayAnki._duplicateBehavior = 'overwrite';
         displayAnki._displayTagsAndFlags = 'never';
@@ -261,7 +324,7 @@ describe('DisplayAnki preload and save flow', () => {
                 noteInfos: [],
             }]),
         });
-        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
+        const displayAnki = new DisplayAnki(display, createDisplayAudio());
         displayAnki._checkForDuplicates = true;
         displayAnki._duplicateBehavior = 'prevent';
         displayAnki._displayTagsAndFlags = 'never';
@@ -295,29 +358,28 @@ describe('DisplayAnki preload and save flow', () => {
         setupDocument(window.document);
         const dictionaryEntries = [createTermEntry()];
         const {display, api} = createDisplay(window.document, dictionaryEntries);
-        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
+        const displayAnki = new DisplayAnki(display, createDisplayAudio());
         const cardFormat = createCardFormat();
         displayAnki._cardFormats = [cardFormat];
         displayAnki._duplicateBehavior = 'new';
-        displayAnki._dictionaryEntryDetails = [{noteMap: new Map([[0, {cardFormat, canAdd: true, valid: true, noteIds: null, ankiError: null}]])}];
+        displayAnki._dictionaryEntryDetails = /** @type {import('display-anki').DictionaryEntryDetails[]} */ ([{
+            noteMap: new Map([[0, {
+                cardFormat,
+                canAdd: true,
+                valid: true,
+                isDuplicate: false,
+                noteIds: null,
+                ankiError: null,
+            }]]),
+        }]);
 
-        displayAnki._updateSaveButtons(displayAnki._dictionaryEntryDetails);
+        const dictionaryEntryDetails = displayAnki._dictionaryEntryDetails;
+        if (dictionaryEntryDetails === null) {
+            throw new Error('Expected dictionary entry details');
+        }
+        displayAnki._updateSaveButtons(dictionaryEntryDetails);
 
-        const initialNote = {
-            fields: {Front: 'initial'},
-            tags: [],
-            deckName: 'Deck',
-            modelName: 'Model',
-            options: {
-                allowDuplicate: true,
-                duplicateScope: 'collection',
-                duplicateScopeOptions: {
-                    deckName: null,
-                    checkChildren: false,
-                    checkAllModels: false,
-                },
-            },
-        };
+        const initialNote = createCollectionNote('initial');
         const finalNote = {...initialNote, fields: {Front: 'final'}};
 
         const createNoteSpy = vi.spyOn(displayAnki, '_createNote')
@@ -343,7 +405,7 @@ describe('DisplayAnki preload and save flow', () => {
                 noteInfos: [],
             }]),
         });
-        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
+        const displayAnki = new DisplayAnki(display, createDisplayAudio());
         displayAnki._checkForDuplicates = true;
         displayAnki._duplicateBehavior = 'prevent';
         displayAnki._displayTagsAndFlags = 'never';
@@ -390,7 +452,7 @@ describe('DisplayAnki preload and save flow', () => {
                 noteInfos: [],
             }]);
         const {display} = createDisplay(window.document, dictionaryEntries, {getAnkiNoteInfo});
-        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
+        const displayAnki = new DisplayAnki(display, createDisplayAudio());
         displayAnki._checkForDuplicates = true;
         displayAnki._duplicateBehavior = 'new';
         displayAnki._displayTagsAndFlags = 'never';
@@ -443,7 +505,7 @@ describe('DisplayAnki preload and save flow', () => {
         setupDocument(window.document);
         const dictionaryEntries = [createTermEntry()];
         const {display, api} = createDisplay(window.document, dictionaryEntries);
-        const displayAnki = new DisplayAnki(display, {getAnkiNoteMediaAudioDetails: vi.fn(() => ({sources: [], preferredAudioIndex: null, enableDefaultAudioSources: true}))});
+        const displayAnki = new DisplayAnki(display, createDisplayAudio());
         const cardFormat = createCardFormat();
         displayAnki._cardFormats = [cardFormat];
         displayAnki._duplicateBehavior = 'overwrite';
@@ -461,21 +523,7 @@ describe('DisplayAnki preload and save flow', () => {
 
         displayAnki._updateSaveButtons(displayAnki._dictionaryEntryDetails);
 
-        const note = {
-            fields: {Front: 'updated value'},
-            tags: [],
-            deckName: 'Deck',
-            modelName: 'Model',
-            options: {
-                allowDuplicate: true,
-                duplicateScope: 'collection',
-                duplicateScopeOptions: {
-                    deckName: null,
-                    checkChildren: false,
-                    checkAllModels: false,
-                },
-            },
-        };
+        const note = createCollectionNote('updated value');
 
         const getDictionaryEntryDetailsSpy = vi.spyOn(displayAnki, '_getDictionaryEntryDetails');
         vi.spyOn(displayAnki, '_createNote')

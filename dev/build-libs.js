@@ -31,9 +31,63 @@ const require = createRequire(import.meta.url);
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const extDir = path.join(dirname, '..', 'ext');
+const dictionaryWasmTarget = 'wasm32-freestanding';
 
 /**
- * @param {string} compiler
+ * @typedef {{command: string, args?: string[]}} CompilerCommand
+ */
+
+/**
+ * @param {string|undefined} value
+ * @returns {value is string}
+ */
+function isNonEmptyString(value) {
+    return typeof value === 'string' && value.length > 0;
+}
+
+/**
+ * @param {string} command
+ * @returns {CompilerCommand}
+ */
+function createCompilerCommand(command) {
+    const name = path.basename(command).toLowerCase();
+    return (
+        name === 'zig' || name === 'zig.exe' ?
+            {command, args: ['cc']} :
+            {command}
+    );
+}
+
+/**
+ * @returns {CompilerCommand[]}
+ */
+function getWindowsWingetCompilerCommands() {
+    if (process.platform !== 'win32') { return []; }
+
+    const localAppData = process.env.LOCALAPPDATA;
+    if (!isNonEmptyString(localAppData)) { return []; }
+
+    const packagesDir = path.join(localAppData, 'Microsoft', 'WinGet', 'Packages');
+    if (!fs.existsSync(packagesDir)) { return []; }
+
+    /** @type {CompilerCommand[]} */
+    const commands = [];
+    for (const pkgEntry of fs.readdirSync(packagesDir, {withFileTypes: true})) {
+        if (!pkgEntry.isDirectory() || !pkgEntry.name.toLowerCase().startsWith('zig.zig')) { continue; }
+        const packageDir = path.join(packagesDir, pkgEntry.name);
+        for (const versionEntry of fs.readdirSync(packageDir, {withFileTypes: true})) {
+            if (!versionEntry.isDirectory()) { continue; }
+            const zigPath = path.join(packageDir, versionEntry.name, 'zig.exe');
+            if (fs.existsSync(zigPath)) {
+                commands.push(createCompilerCommand(zigPath));
+            }
+        }
+    }
+    return commands;
+}
+
+/**
+ * @param {CompilerCommand} compiler
  * @returns {boolean}
  */
 function canBuildWasmTarget(compiler) {
@@ -43,9 +97,10 @@ function canBuildWasmTarget(compiler) {
     try {
         fs.writeFileSync(sourcePath, 'void probe(void) {}\n', 'utf8');
         execFileSync(
-            compiler,
+            compiler.command,
             [
-                '--target=wasm32',
+                ...(compiler.args ?? []),
+                `--target=${dictionaryWasmTarget}`,
                 '-nostdlib',
                 '-Wl,--no-entry',
                 '-Wl,--export=probe',
@@ -65,22 +120,26 @@ function canBuildWasmTarget(compiler) {
 }
 
 /**
- * @returns {string}
+ * @returns {CompilerCommand}
  * @throws {Error}
  */
-function getWasmCapableClang() {
-    const candidates = /** @type {string[]} */ ([
+function getWasmCapableCompiler() {
+    const candidates = /** @type {CompilerCommand[]} */ ([
         process.env.MANABITAN_CLANG,
         process.env.CLANG,
         'clang',
         'clang-18',
         'clang-17',
+        'zig',
         '/opt/homebrew/opt/llvm/bin/clang',
         '/usr/bin/clang',
-    ].filter((value) => typeof value === 'string' && value.length > 0));
+        ...getWindowsWingetCompilerCommands().map(({command}) => command),
+    ]
+        .filter(isNonEmptyString)
+        .map((value) => createCompilerCommand(value)));
     for (const candidate of candidates) {
         try {
-            execFileSync(candidate, ['--version'], {stdio: 'ignore'});
+            execFileSync(candidate.command, [...(candidate.args ?? []), '--version'], {stdio: 'ignore'});
         } catch {
             continue;
         }
@@ -89,8 +148,8 @@ function getWasmCapableClang() {
         }
     }
     throw new Error(
-        'Missing a wasm32-capable clang required to build dictionary wasm assets. ' +
-        'Set MANABITAN_CLANG or CLANG to a compiler that can link --target=wasm32.',
+        'Missing a wasm32-capable compiler required to build dictionary wasm assets. ' +
+        `Set MANABITAN_CLANG or CLANG to a compiler that can link --target=${dictionaryWasmTarget}, such as clang or zig.`,
     );
 }
 
@@ -154,11 +213,11 @@ async function buildDictionaryWasm(out) {
         },
     ];
 
-    const clang = getWasmCapableClang();
+    const compiler = getWasmCapableCompiler();
 
     for (const target of wasmSources) {
         const args = [
-            '--target=wasm32',
+            `--target=${dictionaryWasmTarget}`,
             '-O3',
             '-nostdlib',
             '-Wl,--no-entry',
@@ -167,7 +226,7 @@ async function buildDictionaryWasm(out) {
             args.push(`-Wl,--export=${exportName}`);
         }
         args.push('-Wl,--strip-all', '-o', target.outputPath, target.sourcePath);
-        execFileSync(clang, args, {stdio: 'inherit'});
+        execFileSync(compiler.command, [...(compiler.args ?? []), ...args], {stdio: 'inherit'});
     }
 }
 

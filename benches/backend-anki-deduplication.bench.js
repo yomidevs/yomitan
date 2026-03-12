@@ -18,6 +18,10 @@
 import {bench, describe, vi} from 'vitest';
 
 vi.mock('../ext/lib/kanji-processor.js', () => ({
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
     convertVariants: (text) => text,
 }));
 
@@ -32,7 +36,7 @@ const benchmarkOptions = Object.freeze({
 const noteCount = 50;
 const oversizedFieldValue = 'x'.repeat(4096);
 const notes = createNotes(noteCount, oversizedFieldValue);
-const backend = createBackendHarness();
+const backend = /** @type {any} */ (createBackendBenchmarkHarness(notes));
 
 describe('Backend Anki deduplication', () => {
     bench(`Backend._stripNotesArray (n=${noteCount})`, () => {
@@ -62,9 +66,10 @@ describe('Backend Anki deduplication', () => {
  * @returns {import('anki').Note[]}
  */
 function createNotes(count, oversizedFieldValue) {
+    /** @type {import('anki').Note[]} */
     const result = [];
     for (let i = 0; i < count; ++i) {
-        result.push({
+        result.push(/** @type {import('anki').Note} */ ({
             fields: {
                 Front: `term-${i}`,
                 Back: oversizedFieldValue,
@@ -82,14 +87,14 @@ function createNotes(count, oversizedFieldValue) {
                     checkAllModels: false,
                 },
             },
-        });
+        }));
     }
     return result;
 }
 
 /**
  * @param {import('anki').Note[]} notesToDuplicate
- * @returns {Backend}
+ * @returns {any}
  */
 function createBackendBenchmarkHarness(notesToDuplicate) {
     const backend = Object.create(Backend.prototype);
@@ -139,6 +144,8 @@ class DuplicateCheckBenchmarkAnki {
     async notesInfo(noteIds) {
         return noteIds.map((noteId) => ({
             noteId,
+            fields: {},
+            modelName: 'Model',
             cards: [noteId + 1000],
             cardsInfo: [],
             tags: [],
@@ -152,13 +159,12 @@ class DuplicateCheckBenchmarkAnki {
     async cardsInfo(cardIds) {
         return cardIds.map((cardId) => ({
             noteId: cardId - 1000,
+            cardId,
             cardState: 0,
             flags: 0,
         }));
     }
 }
-
-backend = createBackendBenchmarkHarness(notes);
 
 /**
  * @param {import('anki').Note} note

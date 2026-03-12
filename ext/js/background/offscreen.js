@@ -386,6 +386,16 @@ export class Offscreen {
     }
 
     /**
+     * @param {unknown} reason
+     */
+    _rejectPendingDictionaryWorkerResponses(reason) {
+        for (const {reject} of this._dictionaryWorkerResponseHandlers.values()) {
+            reject(reason);
+        }
+        this._dictionaryWorkerResponseHandlers.clear();
+    }
+
+    /**
      * @param {ErrorEvent} event
      */
     _onDictionaryWorkerError(event) {
@@ -396,6 +406,7 @@ export class Offscreen {
             colno: event.colno,
             message: event.message,
         };
+        this._rejectPendingDictionaryWorkerResponses(error);
         log.error(error);
     }
 

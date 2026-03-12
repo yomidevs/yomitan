@@ -27,7 +27,7 @@ export function setupStubs() {
         },
     });
 
-    // eslint-disable-next-line jsdoc/require-jsdoc
+
     function Worker() {
         return {
             addEventListener: () => {},

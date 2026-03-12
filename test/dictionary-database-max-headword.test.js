@@ -61,7 +61,11 @@ describe('DictionaryDatabase max headword length cache', () => {
 
         expect(result).toBe(11);
         expect(selectValue).toHaveBeenCalledTimes(1);
-        const [sql] = selectValue.mock.calls[0];
+        const firstCall = selectValue.mock.calls[0];
+        if (typeof firstCall === 'undefined') {
+            throw new Error('Expected selectValue to be called');
+        }
+        const sql = /** @type {[string]} */ (/** @type {unknown} */ (firstCall))[0];
         expect(sql).toContain('LENGTH(COALESCE(reading');
         expect(sql).toContain('LENGTH(COALESCE(expression');
     });

@@ -121,7 +121,7 @@ export async function startAnkiMockHttpServer(mockState) {
                         reject(error);
                         return;
                     }
-                    resolve();
+                    resolve(void 0);
                 });
             });
         },

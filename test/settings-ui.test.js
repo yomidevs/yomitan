@@ -31,10 +31,12 @@ describe('Settings UI scan length exposure', () => {
     });
 
     test('recommended settings no longer modify scanning.length', () => {
-        const json = JSON.parse(fs.readFileSync(path.join(dirname, '..', 'ext', 'data', 'recommended-settings.json'), {encoding: 'utf8'}));
+        const json = /** @type {Record<string, Array<{modification: {path: string}}>>} */ (
+            JSON.parse(fs.readFileSync(path.join(dirname, '..', 'ext', 'data', 'recommended-settings.json'), {encoding: 'utf8'}))
+        );
 
         for (const entries of Object.values(json)) {
-            const hasScanLengthSetting = entries.some(({modification}) => modification.path === 'scanning.length');
+            const hasScanLengthSetting = entries.some((entry) => entry.modification.path === 'scanning.length');
             expect(hasScanLengthSetting).toBe(false);
         }
     });

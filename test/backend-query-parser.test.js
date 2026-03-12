@@ -18,6 +18,10 @@
 import {describe, expect, test, vi} from 'vitest';
 
 vi.mock('../ext/lib/kanji-processor.js', () => ({
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
     convertVariants: (text) => text,
 }));
 
@@ -36,10 +40,10 @@ function getTextParseScanningMethod() {
 }
 
 /**
- * @returns {unknown}
+ * @returns {any}
  */
 function createBackendContext() {
-    return {
+    return /** @type {any} */ ({
         _ensureDictionaryDatabaseReady: async () => {},
         _getProfileOptions: () => ({}),
         _getTranslatorFindTermsOptions: () => ({}),
@@ -47,7 +51,7 @@ function createBackendContext() {
         _translator: {
             findTerms: vi.fn(async () => ({dictionaryEntries: [], originalTextLength: 0})),
         },
-    };
+    });
 }
 
 describe('Backend query parser segmentation', () => {
@@ -61,7 +65,7 @@ describe('Backend query parser segmentation', () => {
     ])('splits unmatched text for %s', async (text, expected) => {
         const context = createBackendContext();
 
-        const actual = await textParseScanning.call(context, text, text.length, {});
+        const actual = await textParseScanning.call(context, text, text.length, /** @type {import('settings').OptionsContext} */ ({current: true}));
 
         expect(actual).toStrictEqual(expected);
     });
@@ -74,20 +78,27 @@ describe('Backend query parser segmentation', () => {
         context._translator.findTerms = vi.fn(async (_mode, substring) => {
             if (substring.startsWith(source) && substring.length >= source.length) {
                 return {
-                    dictionaryEntries: [{
+                    dictionaryEntries: /** @type {import('dictionary').DictionaryEntry[]} */ ([{
                         headwords: [{
                             term: source,
                             reading: '',
-                            sources: [{originalText: source, isPrimary: true, matchType: 'exact'}],
+                            sources: [{
+                                originalText: source,
+                                transformedText: source,
+                                deinflectedText: source,
+                                isPrimary: true,
+                                matchType: 'exact',
+                                matchSource: 'term',
+                            }],
                         }],
-                    }],
+                    }]),
                     originalTextLength: source.length,
                 };
             }
             return {dictionaryEntries: [], originalTextLength: 0};
         });
 
-        const actual = await textParseScanning.call(context, source, derivedScanLength, {});
+        const actual = await textParseScanning.call(context, source, derivedScanLength, /** @type {import('settings').OptionsContext} */ ({current: true}));
 
         expect(actual).toStrictEqual([[
             {
@@ -96,7 +107,14 @@ describe('Backend query parser segmentation', () => {
                 headwords: [[{
                     term: source,
                     reading: '',
-                    sources: [{originalText: source, isPrimary: true, matchType: 'exact'}],
+                    sources: [{
+                        originalText: source,
+                        transformedText: source,
+                        deinflectedText: source,
+                        isPrimary: true,
+                        matchType: 'exact',
+                        matchSource: 'term',
+                    }],
                 }]],
             },
         ]]);

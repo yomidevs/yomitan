@@ -50,11 +50,11 @@ const searchPersistentStateController = new SearchPersistentStateController();
 
 const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
 
-// eslint-disable-next-line no-underscore-dangle
+
 const onKeyDownMethod = searchDisplayController._onKeyDown.bind(searchDisplayController);
-// eslint-disable-next-line no-underscore-dangle
+
 const onSearchMethod = searchDisplayController._onSearch.bind(searchDisplayController);
-// eslint-disable-next-line no-underscore-dangle
+
 const onSearchKeydownMethod = searchDisplayController._onSearchKeydown.bind(searchDisplayController);
 
 /**

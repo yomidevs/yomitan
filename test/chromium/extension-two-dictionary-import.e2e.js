@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable @stylistic/max-statements-per-line, @stylistic/multiline-ternary, @typescript-eslint/ban-ts-comment, @typescript-eslint/no-base-to-string, @typescript-eslint/no-shadow, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, jsdoc/require-jsdoc, no-empty, no-shadow, no-undefined, unicorn/no-useless-undefined, unicorn/prefer-spread */
+/* eslint-disable @stylistic/max-statements-per-line, @stylistic/multiline-ternary, @typescript-eslint/ban-ts-comment, no-empty, unicorn/no-useless-undefined, unicorn/prefer-spread */
 
 // @ts-nocheck
 
@@ -3508,4 +3508,4 @@ async function main() {
 }
 
 await main();
-/* eslint-enable @stylistic/max-statements-per-line, @stylistic/multiline-ternary, @typescript-eslint/ban-ts-comment, @typescript-eslint/no-base-to-string, @typescript-eslint/no-shadow, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, jsdoc/require-jsdoc, no-empty, no-shadow, no-undefined, unicorn/no-useless-undefined, unicorn/prefer-spread */
+/* eslint-enable @stylistic/max-statements-per-line, @stylistic/multiline-ternary, @typescript-eslint/ban-ts-comment, no-empty, unicorn/no-useless-undefined, unicorn/prefer-spread */

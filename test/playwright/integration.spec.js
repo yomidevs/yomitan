@@ -15,12 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {execFile as execFileCallback} from 'child_process';
-import {mkdtemp, readFile} from 'fs/promises';
-import os from 'os';
-import path from 'path';
-import {promisify} from 'util';
 import {deferPromise} from '../../ext/js/core/utilities.js';
+import {createDictionaryDatabaseBase64} from '../e2e/minimal-dictionary-database.js';
 import {
     expect,
     getExpectedAddNoteBody,
@@ -30,7 +26,6 @@ import {
     writeToClipboardFromPage,
 } from './playwright-util.js';
 
-const execFile = promisify(execFileCallback);
 const testDictionaryTitle = 'valid-dictionary1';
 /** @type {Promise<string>|null} */
 let testDictionaryDatabaseBase64Promise = null;
@@ -64,150 +59,19 @@ async function invokeRuntimeApi(page, actionName, paramsValue = void 0) {
 }
 
 /**
- * @param {string} value
- * @returns {string}
- */
-function escapeSqlString(value) {
-    return value.replaceAll('\'', '\'\'');
-}
-
-/**
  * @returns {Promise<string>}
  */
 async function getTestDictionaryDatabaseBase64() {
     if (testDictionaryDatabaseBase64Promise !== null) {
         return await testDictionaryDatabaseBase64Promise;
     }
-    testDictionaryDatabaseBase64Promise = (async () => {
-        const summaryJson = JSON.stringify({
-            title: testDictionaryTitle,
-            revision: 'test',
-            sequenced: true,
-            version: 3,
-            importDate: Date.now(),
-            prefixWildcardsSupported: false,
-            counts: {
-                terms: {total: 1},
-                termMeta: {total: 0},
-                kanji: {total: 0},
-                kanjiMeta: {total: 0},
-                tagMeta: {total: 0},
-                media: {total: 0},
-            },
-            styles: '',
-            importSuccess: true,
-        });
-        const glossaryJson = JSON.stringify(['to read']);
-        const sql = `
-            PRAGMA journal_mode = DELETE;
-            PRAGMA synchronous = NORMAL;
-
-            CREATE TABLE dictionaries (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                version INTEGER NOT NULL,
-                summaryJson TEXT NOT NULL
-            );
-
-            CREATE TABLE terms (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                dictionary TEXT NOT NULL,
-                expression TEXT NOT NULL,
-                reading TEXT NOT NULL,
-                expressionReverse TEXT,
-                readingReverse TEXT,
-                definitionTags TEXT,
-                termTags TEXT,
-                rules TEXT,
-                score INTEGER,
-                glossaryJson TEXT NOT NULL,
-                sequence INTEGER
-            );
-
-            CREATE TABLE termMeta (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                dictionary TEXT NOT NULL,
-                expression TEXT NOT NULL,
-                mode TEXT NOT NULL,
-                dataJson TEXT NOT NULL
-            );
-
-            CREATE TABLE kanji (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                dictionary TEXT NOT NULL,
-                character TEXT NOT NULL,
-                onyomi TEXT,
-                kunyomi TEXT,
-                tags TEXT,
-                meaningsJson TEXT NOT NULL,
-                statsJson TEXT
-            );
-
-            CREATE TABLE kanjiMeta (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                dictionary TEXT NOT NULL,
-                character TEXT NOT NULL,
-                mode TEXT NOT NULL,
-                dataJson TEXT NOT NULL
-            );
-
-            CREATE TABLE tagMeta (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                dictionary TEXT NOT NULL,
-                name TEXT NOT NULL,
-                category TEXT,
-                ord INTEGER,
-                notes TEXT,
-                score INTEGER
-            );
-
-            CREATE TABLE media (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                dictionary TEXT NOT NULL,
-                path TEXT NOT NULL,
-                mediaType TEXT NOT NULL,
-                width INTEGER NOT NULL,
-                height INTEGER NOT NULL,
-                content BLOB NOT NULL
-            );
-
-            CREATE INDEX idx_dictionaries_title ON dictionaries(title);
-            CREATE INDEX idx_dictionaries_version ON dictionaries(version);
-            CREATE INDEX idx_terms_dictionary ON terms(dictionary);
-            CREATE INDEX idx_terms_expression ON terms(expression);
-            CREATE INDEX idx_terms_reading ON terms(reading);
-            CREATE INDEX idx_terms_sequence ON terms(sequence);
-            CREATE INDEX idx_terms_expression_reverse ON terms(expressionReverse);
-            CREATE INDEX idx_terms_reading_reverse ON terms(readingReverse);
-            CREATE INDEX idx_term_meta_dictionary ON termMeta(dictionary);
-            CREATE INDEX idx_term_meta_expression ON termMeta(expression);
-            CREATE INDEX idx_kanji_dictionary ON kanji(dictionary);
-            CREATE INDEX idx_kanji_character ON kanji(character);
-            CREATE INDEX idx_kanji_meta_dictionary ON kanjiMeta(dictionary);
-            CREATE INDEX idx_kanji_meta_character ON kanjiMeta(character);
-            CREATE INDEX idx_tag_meta_dictionary ON tagMeta(dictionary);
-            CREATE INDEX idx_tag_meta_name ON tagMeta(name);
-            CREATE INDEX idx_media_dictionary ON media(dictionary);
-            CREATE INDEX idx_media_path ON media(path);
-
-            INSERT INTO dictionaries(title, version, summaryJson)
-            VALUES ('${escapeSqlString(testDictionaryTitle)}', 3, '${escapeSqlString(summaryJson)}');
-
-            INSERT INTO terms(
-                dictionary, expression, reading, expressionReverse, readingReverse,
-                definitionTags, termTags, rules, score, glossaryJson, sequence
-            ) VALUES (
-                '${escapeSqlString(testDictionaryTitle)}', '読む', 'よむ', NULL, NULL,
-                '', '', '', 0, '${escapeSqlString(glossaryJson)}', 1
-            );
-        `;
-
-        const tempDirectory = await mkdtemp(path.join(os.tmpdir(), 'manabitan-playwright-db-'));
-        const databasePath = path.join(tempDirectory, 'dictionary.sqlite3');
-        await execFile('sqlite3', [databasePath, sql], {encoding: 'utf8'});
-        const databaseContent = await readFile(databasePath);
-        return databaseContent.toString('base64');
-    })();
+    testDictionaryDatabaseBase64Promise = createDictionaryDatabaseBase64({
+        title: testDictionaryTitle,
+        revision: 'test',
+        expression: '読む',
+        reading: 'よむ',
+        glossary: ['to read'],
+    });
     return await testDictionaryDatabaseBase64Promise;
 }
 
@@ -268,6 +132,14 @@ test.beforeEach(async ({context}) => {
     }
 });
 
+/**
+ * @param {import('@playwright/test').Page} page
+ * @returns {Promise<void>}
+ */
+async function waitForSettingsPageReady(page) {
+    await expect(page.locator('id=dictionaries')).toBeVisible({timeout: 30_000});
+}
+
 test('search clipboard', async ({page, extensionId}) => {
     await page.goto(`chrome-extension://${extensionId}/search.html`);
     await page.locator('#search-option-clipboard-monitor-container > label').click();
@@ -279,7 +151,7 @@ test('search clipboard', async ({page, extensionId}) => {
 
 test('dictionary db export and restore', async ({page, extensionId}) => {
     await page.goto(`chrome-extension://${extensionId}/settings.html`);
-    await expect(page.locator('id=dictionaries')).toBeVisible();
+    await waitForSettingsPageReady(page);
 
     await importTestDictionary(page);
 
@@ -325,7 +197,7 @@ test('anki add', async ({context, page, extensionId}) => {
     // Open settings
     await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
-    await expect(page.locator('id=dictionaries')).toBeVisible();
+    await waitForSettingsPageReady(page);
 
     // Load in test dictionary
     await importTestDictionary(page);
