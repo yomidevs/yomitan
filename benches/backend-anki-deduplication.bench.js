@@ -32,7 +32,7 @@ const benchmarkOptions = Object.freeze({
 const noteCount = 50;
 const oversizedFieldValue = 'x'.repeat(4096);
 const notes = createNotes(noteCount, oversizedFieldValue);
-let backend;
+const backend = createBackendHarness();
 
 describe('Backend Anki deduplication', () => {
     bench(`Backend._stripNotesArray (n=${noteCount})`, () => {

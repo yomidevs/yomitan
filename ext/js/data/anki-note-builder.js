@@ -782,5 +782,8 @@ function getReading(text, reading, readingMode, readingOverride) {
  * @returns {string}
  */
 function escapeAnkiFieldValue(value) {
-    return value.replace(htmlEscapePattern, (character) => htmlEscapeMap[character]);
+    return value.replace(
+        htmlEscapePattern,
+        (character) => htmlEscapeMap[/** @type {keyof typeof htmlEscapeMap} */ (character)],
+    );
 }

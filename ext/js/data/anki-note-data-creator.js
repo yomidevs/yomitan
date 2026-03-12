@@ -488,7 +488,13 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
         get dictScopedStyles() { return getCachedValue(styleInfo)?.dictScopedStyles; },
         get definitionTags() { return type === 'term' ? getCachedValue(commonInfo).definitionTags : void 0; },
         get termTags() { return getCachedValue(termTags); },
-        get definitions() { return getCachedValue(commonInfo).definitions; },
+        ...(
+            type === 'term' ?
+                {} :
+                {
+                    get definitions() { return getCachedValue(commonInfo).definitions; },
+                }
+        ),
         get frequencies() { return getCachedValue(frequencies); },
         get frequencyNumbers() { return getCachedValue(frequencyNumbers); },
         get frequencyHarmonic() { return getCachedValue(frequencyHarmonic); },

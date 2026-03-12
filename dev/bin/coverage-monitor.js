@@ -75,6 +75,12 @@ if (args.help) {
 }
 
 /**
+ * @typedef {'lines' | 'functions' | 'branches' | 'statements'} CoverageMetricKey
+ * @typedef {{total: number, covered: number, pct: number}} CoverageMetric
+ * @typedef {{total: Record<CoverageMetricKey, CoverageMetric>} & Record<string, unknown>} CoverageSummary
+ */
+
+/**
  * @param {string | undefined} value
  * @param {string} option
  * @returns {number | null}
@@ -105,8 +111,8 @@ function parsePositiveInteger(value) {
 }
 
 /**
- * @param {{total?: unknown}} summary
- * @returns {summary is {total: Record<string, {total: number, covered: number, pct: number}>}}
+ * @param {unknown} summary
+ * @returns {summary is CoverageSummary}
  */
 function isValidSummary(summary) {
     if (!summary || typeof summary !== 'object') {
@@ -179,7 +185,7 @@ try {
         throw new Error(`Invalid coverage summary format in ${summaryPath}`);
     }
 
-    /** @type {Array<'lines' | 'functions' | 'branches' | 'statements'>} */
+    /** @type {CoverageMetricKey[]} */
     const metricKeys = ['lines', 'functions', 'branches', 'statements'];
     const totals = summary.total;
 
@@ -194,10 +200,11 @@ try {
     const fileMetrics = Object.entries(summary)
         .filter(([name, value]) => name !== 'total' && value && typeof value === 'object')
         .map(([file, value]) => {
-            const lines = /** @type {{lines?: {pct?: number, total?: number, covered?: number}}} */ (value).lines;
-            const pct = Number.isFinite(lines?.pct) ? /** @type {number} */ (lines.pct) : 0;
-            const total = Number.isFinite(lines?.total) ? /** @type {number} */ (lines.total) : 0;
-            const covered = Number.isFinite(lines?.covered) ? /** @type {number} */ (lines.covered) : 0;
+            const rawLines = /** @type {{lines?: unknown}} */ (value).lines;
+            const lines = (rawLines && typeof rawLines === 'object') ? /** @type {Partial<CoverageMetric>} */ (rawLines) : {};
+            const pct = (typeof lines.pct === 'number' && Number.isFinite(lines.pct)) ? lines.pct : 0;
+            const total = (typeof lines.total === 'number' && Number.isFinite(lines.total)) ? lines.total : 0;
+            const covered = (typeof lines.covered === 'number' && Number.isFinite(lines.covered)) ? lines.covered : 0;
             return {
                 file: toRelativePath(file),
                 linesPct: pct,

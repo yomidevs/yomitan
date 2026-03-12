@@ -1047,6 +1047,7 @@ export class Backend {
         // @ts-expect-error - ts is not smart enough to realize that filtering !!x removes null and undefined
         const cardIds = notesInfo.flatMap((x) => x?.cards).filter((x) => !!x);
         const cardsInfo = await this._anki.cardsInfo(cardIds);
+        /** @type {Map<number, import('anki').CardInfo>} */
         const firstCardInfoByNoteId = new Map();
         for (const cardInfo of cardsInfo) {
             if (cardInfo === null || firstCardInfoByNoteId.has(cardInfo.noteId)) { continue; }
@@ -3231,7 +3232,7 @@ export class Backend {
         if (!isObjectNotArray(alarms) || typeof alarms.get !== 'function' || typeof alarms.create !== 'function') {
             return;
         }
-        const alarm = await new Promise((resolve, reject) => {
+        const alarm = /** @type {?chrome.alarms.Alarm} */ (await new Promise((resolve, reject) => {
             alarms.get(DICTIONARY_AUTO_UPDATE_ALARM_NAME, (result) => {
                 const runtimeError = chrome.runtime.lastError;
                 if (runtimeError) {
@@ -3240,11 +3241,11 @@ export class Backend {
                 }
                 resolve(result);
             });
-        });
+        }));
         if (alarm !== null) {
             return;
         }
-        alarms.create(DICTIONARY_AUTO_UPDATE_ALARM_NAME, {periodInMinutes: 60});
+        void alarms.create(DICTIONARY_AUTO_UPDATE_ALARM_NAME, {periodInMinutes: 60});
     }
 
     /**
@@ -3698,11 +3699,11 @@ export class Backend {
             }
             profile.options.dictionaries = dictionaries;
 
-            if (mainDictionaryProfileIds.has(profile.id)) {
-                profile.options.general.mainDictionary = importedSummary.title;
-            } else if (importedSummary.sequenced && profile.options.general.mainDictionary === '') {
-                profile.options.general.mainDictionary = importedSummary.title;
-            } else if (profile.options.general.mainDictionary === previousSummary.title) {
+            if (
+                mainDictionaryProfileIds.has(profile.id) ||
+                (importedSummary.sequenced && profile.options.general.mainDictionary === '') ||
+                profile.options.general.mainDictionary === previousSummary.title
+            ) {
                 profile.options.general.mainDictionary = importedSummary.title;
             }
 

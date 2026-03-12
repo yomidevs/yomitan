@@ -1006,7 +1006,12 @@ export class DisplayAnki {
     async _getDictionaryEntryDetails(dictionaryEntries, fetchDuplicateNoteIds = true, filter = null) {
         const notePromises = [];
         const noteTargets = [];
+        /** @type {Map<number, ReturnType<DisplayAnki['_getCommonNoteBuildData']>>} */
         const commonNoteBuildDataPromises = new Map();
+        /**
+         * @param {number} cardFormatIndex
+         * @returns {ReturnType<DisplayAnki['_getCommonNoteBuildData']>}
+         */
         const getCommonNoteBuildData = (cardFormatIndex) => {
             let promise = commonNoteBuildDataPromises.get(cardFormatIndex);
             if (typeof promise === 'undefined') {

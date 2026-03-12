@@ -391,15 +391,13 @@ export function convertExplicitKanjiDuplicationToIterationMarks(text) {
     let result = '';
     let previousCharacter = null;
     for (const character of text) {
-        if (
+        result += (
             previousCharacter !== null &&
             character === previousCharacter &&
             isCodePointKanji(/** @type {number} */ (character.codePointAt(0)))
-        ) {
-            result += '々';
-        } else {
-            result += character;
-        }
+        ) ?
+            '々' :
+            character;
         previousCharacter = character;
     }
     return result;

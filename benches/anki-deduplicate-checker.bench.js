@@ -104,7 +104,7 @@ const kanjiDuplicateCheckDetails = [createDuplicateCheckDetails(kanjiDictionaryE
 const kanjiCreateNoteDetails = [createCreateNoteDetails(kanjiDictionaryEntry, kanjiCardFormat, dictionaryStylesMap)];
 const termDuplicateCheckNotes = await Promise.all(termDuplicateCheckDetails.map((details) => ankiNoteBuilder.createDuplicateCheckNote(details)));
 const duplicateNoteKeys = createDuplicateNoteKeys(termDuplicateCheckNotes);
-let backend;
+const backend = createBackendHarness();
 
 describe('Anki deduplicate checker', () => {
     bench(`AnkiNoteBuilder.createDuplicateCheckNote - term batch (n=${termDuplicateCheckDetails.length})`, async () => {

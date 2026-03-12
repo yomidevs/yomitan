@@ -1,5 +1,7 @@
+#!/usr/bin/env node
 /*
  * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,24 +17,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import codspeedPlugin from '@codspeed/vitest-plugin';
-import {configDefaults, defineConfig} from 'vitest/config';
+import {ESLint} from 'eslint';
 
-export default defineConfig({
-    plugins: [codspeedPlugin()],
-    test: {
-        exclude: [
-            ...configDefaults.exclude,
-            'dev/lib/**',
-            'ext/lib/**',
-            'test/playwright/**',
-            'test/json.test.js',
-            '.tmp-*.test.js',
-        ],
-        poolOptions: {
-            threads: {
-                useAtomics: true,
-            },
-        },
-    },
-});
+const eslint = new ESLint();
+const results = await eslint.lintFiles(['**/*.json']);
+const formatter = await eslint.loadFormatter('stylish');
+const output = await formatter.format(results);
+
+if (output.length > 0) {
+    process.stdout.write(output);
+}
+
+const hasErrors = results.some(({errorCount, fatalErrorCount}) => errorCount > 0 || fatalErrorCount > 0);
+process.exitCode = hasErrors ? 1 : 0;

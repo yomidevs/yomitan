@@ -398,7 +398,9 @@ describe('DisplayAnki preload and save flow', () => {
         displayAnki._dictionaryEntryDetails = null;
 
         await displayAnki._updateDictionaryEntryDetails();
-        await new Promise((resolve) => setTimeout(resolve, 0));
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
 
         expect(getAnkiNoteInfo).toHaveBeenNthCalledWith(1, [{
             fields: {Front: 'term'},

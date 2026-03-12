@@ -25,7 +25,7 @@
         "//END-WARNING": "",
         "test:js": "npx eslint . --ignore-pattern '**/*.json'",
         "test:json": "npm run test:json:format && npm run test:json:types",
-        "test:json:format": "npx eslint '**/*.json'",
+        "test:json:format": "node ./dev/bin/lint-json.js",
         "test:json:types": "vitest run --config test/data/vitest.json.config.json",
         "test:css": "npx stylelint \"ext/**/*.css\" \"test/**/*.css\" \"dev/**/*.css\"",
         "test:html": "npx html-validate \"ext/**/*.html\" \"test/**/*.html\" \"dev/**/*.html\"",
