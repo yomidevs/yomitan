@@ -55,6 +55,7 @@ const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation((...args) => {
     }
     consoleLog(...args);
 });
+const {translator, styles} = await createTranslatorContext(dictionaryDirectory, dictionaryName);
 
 const {window, teardown} = await setupDomTest();
 afterAll(async () => {
@@ -85,7 +86,6 @@ const api = {
     },
 };
 const ankiNoteBuilder = new AnkiNoteBuilder(api, ankiTemplateRenderer.templateRenderer);
-const {translator, styles} = await createTranslatorContext(dictionaryDirectory, dictionaryName);
 const termFindOptions = createFindTermsOptions(dictionaryName, optionsPresets, 'default');
 const kanjiFindOptions = createFindKanjiOptions(dictionaryName, optionsPresets, 'kanji');
 const {dictionaryEntries: termDictionaryEntries} = await translator.findTerms('split', '打ち込む', termFindOptions);
@@ -104,7 +104,7 @@ const kanjiDuplicateCheckDetails = [createDuplicateCheckDetails(kanjiDictionaryE
 const kanjiCreateNoteDetails = [createCreateNoteDetails(kanjiDictionaryEntry, kanjiCardFormat, dictionaryStylesMap)];
 const termDuplicateCheckNotes = await Promise.all(termDuplicateCheckDetails.map((details) => ankiNoteBuilder.createDuplicateCheckNote(details)));
 const duplicateNoteKeys = createDuplicateNoteKeys(termDuplicateCheckNotes);
-const backend = createBackendBenchmarkHarness(duplicateNoteKeys);
+let backend;
 
 describe('Anki deduplicate checker', () => {
     bench(`AnkiNoteBuilder.createDuplicateCheckNote - term batch (n=${termDuplicateCheckDetails.length})`, async () => {
@@ -335,6 +335,8 @@ class DuplicateCheckBenchmarkAnki {
         }));
     }
 }
+
+backend = createBackendBenchmarkHarness(duplicateNoteKeys);
 
 /**
  * @param {import('anki').Note} note

@@ -1464,11 +1464,11 @@ describe('Database', () => {
             expect.soft(afterInfo).toStrictEqual([]);
             const counts = await dictionaryDatabase.getDictionaryCounts([], true);
             expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
-            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(3);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(4);
             await dictionaryDatabase.close();
         });
 
-        test('Schema migration v2 upgrades from v1 without wiping dictionary data, and v3 resets for raw-v3 schema', async ({expect}) => {
+        test('Schema migration v2 upgrades from v1 without wiping dictionary data, and v3/v4 reset dictionary data', async ({expect}) => {
             const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
             const dictionaryDatabase = new DictionaryDatabase();
             await dictionaryDatabase.prepare();
@@ -1495,7 +1495,7 @@ describe('Database', () => {
 
             const afterInfo = await dictionaryDatabase.getDictionaryInfo();
             expect.soft(afterInfo).toStrictEqual([]);
-            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(3);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(4);
             expect.soft(v2Summary).toStrictEqual({migration: 'schema-v2-noop'});
             await dictionaryDatabase.close();
         });
@@ -1523,7 +1523,7 @@ describe('Database', () => {
             const info = await dictionaryDatabase.getDictionaryInfo();
             expect.soft(info.length).toBe(1);
             expect.soft(info[0]?.importSuccess).toBe(true);
-            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(3);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(4);
             await dictionaryDatabase.close();
         });
 
@@ -1552,6 +1552,22 @@ describe('Database', () => {
             expect.soft(info[0]?.importSuccess).toBe(true);
             expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(999);
             await dictionaryDatabase.close();
+        });
+
+        test('Schema migration throws for unknown target version', async ({expect}) => {
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            try {
+                const runSchemaMigrationToVersion = Reflect.get(dictionaryDatabase, '_runSchemaMigrationToVersion');
+                if (typeof runSchemaMigrationToVersion !== 'function') {
+                    throw new Error('Expected _runSchemaMigrationToVersion method');
+                }
+                await expect(Promise.resolve(runSchemaMigrationToVersion.call(dictionaryDatabase, 999)))
+                    .rejects
+                    .toThrow('Unhandled dictionary schema migration target version: 999');
+            } finally {
+                await dictionaryDatabase.close();
+            }
         });
     });
     describe('Database cleanup', () => {

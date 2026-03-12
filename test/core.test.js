@@ -16,9 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {describe, expect, test} from 'vitest';
+import {describe, expect, test, vi} from 'vitest';
 import {DynamicProperty} from '../ext/js/core/dynamic-property.js';
-import {deepEqual} from '../ext/js/core/utilities.js';
+import {
+    addScopeToCss,
+    addScopeToCssLegacy,
+    clone,
+    deepEqual,
+    deferPromise,
+    escapeRegExp,
+    generateId,
+    promiseTimeout,
+    sanitizeCSS,
+    stringReverse,
+} from '../ext/js/core/utilities.js';
+import {log} from '../ext/js/core/log.js';
 
 describe('DynamicProperty', () => {
     /** @type {import('test/core').DynamicPropertyTestData} */
@@ -315,5 +327,284 @@ describe('deepEqual', () => {
             const actual2 = deepEqual(value2, value1);
             expect(actual2).toStrictEqual(expected);
         });
+    });
+});
+
+describe('utility helpers', () => {
+    test('escapeRegExp escapes regex metacharacters', () => {
+        const input = 'a.b*c+d?^${}()|[]\\-';
+        const escaped = escapeRegExp(input);
+        expect(escaped).toBe('a\\.b\\*c\\+d\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\\\-');
+        expect(new RegExp(`^${escaped}$`).test(input)).toBe(true);
+    });
+
+    test('stringReverse preserves surrogate pairs', () => {
+        expect(stringReverse('A😀𠮷B')).toBe('B𠮷😀A');
+    });
+
+    test('clone deep-clones arrays and objects', () => {
+        const original = {
+            value: 1,
+            nested: {value: 2},
+            array: [{value: 3}, true, 'text', null],
+        };
+        const copied = clone(original);
+        expect(copied).toStrictEqual(original);
+        expect(copied).not.toBe(original);
+        expect(copied.nested).not.toBe(original.nested);
+        expect(copied.array).not.toBe(original.array);
+        expect(copied.array[0]).not.toBe(original.array[0]);
+    });
+
+    test('clone preserves primitive values and throws for unsupported/circular values', () => {
+        const symbol = Symbol('token');
+        expect(clone(null)).toBeNull();
+        expect(clone(true)).toBe(true);
+        expect(clone(42)).toBe(42);
+        expect(clone('text')).toBe('text');
+        expect(clone(123n)).toBe(123n);
+        expect(clone(symbol)).toBe(symbol);
+        expect(clone(void 0)).toBe(void 0);
+        expect(() => clone(() => {})).toThrow('Cannot clone object of type function');
+
+        /** @type {{self?: unknown}} */
+        const circular = {};
+        circular.self = circular;
+        expect(() => clone(circular)).toThrow('Circular');
+
+        const circularArray = [];
+        circularArray.push(circularArray);
+        expect(() => clone(circularArray)).toThrow('Circular');
+    });
+
+    test('generateId returns lowercase hex of expected length', () => {
+        const id = generateId(16);
+        expect(id).toHaveLength(32);
+        expect(id).toMatch(/^[0-9a-f]+$/);
+        expect(generateId(0)).toBe('');
+    });
+
+    test('deferPromise can resolve and reject externally', async () => {
+        const deferredResolve = deferPromise();
+        const deferredReject = deferPromise();
+        const error = new Error('expected reject');
+
+        deferredResolve.resolve('ok');
+        deferredReject.reject(error);
+
+        await expect(deferredResolve.promise).resolves.toBe('ok');
+        await expect(deferredReject.promise).rejects.toBe(error);
+    });
+
+    test('promiseTimeout resolves immediately for non-positive delay and later for positive delay', async () => {
+        await expect(promiseTimeout(0)).resolves.toBeUndefined();
+
+        vi.useFakeTimers();
+        try {
+            let resolved = false;
+            const delayedPromise = promiseTimeout(10).then(() => {
+                resolved = true;
+            });
+            await vi.advanceTimersByTimeAsync(9);
+            expect(resolved).toBe(false);
+            await vi.advanceTimersByTimeAsync(1);
+            await delayedPromise;
+            expect(resolved).toBe(true);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    test('sanitizeCSS normalizes cssRules output via CSSStyleSheet', () => {
+        const originalCSSStyleSheetDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleSheet');
+        /* eslint-disable jsdoc/require-jsdoc */
+        class FakeCSSStyleSheet {
+            constructor() {
+                this.cssRules = [];
+            }
+
+            /**
+             * @param {string} css
+             */
+            replaceSync(css) {
+                this.cssRules = [
+                    {cssText: `${css}-rule-1`},
+                    {cssText: ''},
+                    {cssText: `${css}-rule-2`},
+                ];
+            }
+        }
+        /* eslint-enable jsdoc/require-jsdoc */
+        Object.defineProperty(globalThis, 'CSSStyleSheet', {
+            configurable: true,
+            writable: true,
+            value: FakeCSSStyleSheet,
+        });
+        try {
+            expect(sanitizeCSS('x')).toBe('x-rule-1\n\nx-rule-2');
+        } finally {
+            if (typeof originalCSSStyleSheetDescriptor !== 'undefined') {
+                Object.defineProperty(globalThis, 'CSSStyleSheet', originalCSSStyleSheetDescriptor);
+            } else {
+                Reflect.deleteProperty(globalThis, 'CSSStyleSheet');
+            }
+        }
+    });
+
+    test('addScopeToCss wraps css in the provided scope', () => {
+        expect(addScopeToCss('.a{color:red;}', '#scope')).toBe('#scope {.a{color:red;}\n}');
+    });
+
+    test('addScopeToCssLegacy rewrites only style rules', () => {
+        const originalCSSStyleSheetDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleSheet');
+        const originalCSSStyleRuleDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleRule');
+
+        /* eslint-disable jsdoc/require-jsdoc */
+        class FakeCSSStyleRule {
+            /**
+             * @param {string} selectorText
+             * @param {string} cssText
+             */
+            constructor(selectorText, cssText) {
+                this.selectorText = selectorText;
+                this.cssText = cssText;
+            }
+        }
+
+        class FakeCSSStyleSheet {
+            constructor() {
+                this.cssRules = [];
+            }
+
+            /**
+             * @param {string} css
+             */
+            replaceSync(css) {
+                if (css === 'input-css') {
+                    this.cssRules = [
+                        new FakeCSSStyleRule('.a,.b', '.a,.b{color:red;}'),
+                        {cssText: '@media all {}'},
+                    ];
+                    return;
+                }
+                this.cssRules = css.split('\n').filter((line) => line.length > 0).map((line) => ({cssText: line}));
+            }
+        }
+        /* eslint-enable jsdoc/require-jsdoc */
+
+        Object.defineProperty(globalThis, 'CSSStyleSheet', {
+            configurable: true,
+            writable: true,
+            value: FakeCSSStyleSheet,
+        });
+        Object.defineProperty(globalThis, 'CSSStyleRule', {
+            configurable: true,
+            writable: true,
+            value: FakeCSSStyleRule,
+        });
+        try {
+            expect(addScopeToCssLegacy('input-css', '#scope')).toBe('#scope .a, #scope .b{color:red;}');
+        } finally {
+            if (typeof originalCSSStyleSheetDescriptor !== 'undefined') {
+                Object.defineProperty(globalThis, 'CSSStyleSheet', originalCSSStyleSheetDescriptor);
+            } else {
+                Reflect.deleteProperty(globalThis, 'CSSStyleSheet');
+            }
+            if (typeof originalCSSStyleRuleDescriptor !== 'undefined') {
+                Object.defineProperty(globalThis, 'CSSStyleRule', originalCSSStyleRuleDescriptor);
+            } else {
+                Reflect.deleteProperty(globalThis, 'CSSStyleRule');
+            }
+        }
+    });
+
+    test('addScopeToCssLegacy falls back when stylesheet parsing fails', () => {
+        const originalCSSStyleSheetDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleSheet');
+        const logSpy = vi.spyOn(log, 'log').mockImplementation(() => {});
+        class ThrowingCSSStyleSheet {
+            /**
+             * @param {string} _css
+             * @throws {Error}
+             */
+            replaceSync(_css) {
+                throw new Error('stylesheet parse failure');
+            }
+        }
+        Object.defineProperty(globalThis, 'CSSStyleSheet', {
+            configurable: true,
+            writable: true,
+            value: ThrowingCSSStyleSheet,
+        });
+        try {
+            expect(addScopeToCssLegacy('.a{color:red;}', '#fallback')).toBe('#fallback {.a{color:red;}\n}');
+            expect(logSpy).toHaveBeenCalledTimes(1);
+            expect(logSpy.mock.calls[0][0]).toContain('falling back on addScopeToCss: stylesheet parse failure');
+        } finally {
+            logSpy.mockRestore();
+            if (typeof originalCSSStyleSheetDescriptor !== 'undefined') {
+                Object.defineProperty(globalThis, 'CSSStyleSheet', originalCSSStyleSheetDescriptor);
+            } else {
+                Reflect.deleteProperty(globalThis, 'CSSStyleSheet');
+            }
+        }
+    });
+
+    test('addScopeToCssLegacy handles empty cssText values when serializing final rules', () => {
+        const originalCSSStyleSheetDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleSheet');
+        const originalCSSStyleRuleDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'CSSStyleRule');
+        /* eslint-disable jsdoc/require-jsdoc */
+        class FakeCSSStyleRule {
+            /**
+             * @param {string} selectorText
+             * @param {string} cssText
+             */
+            constructor(selectorText, cssText) {
+                this.selectorText = selectorText;
+                this.cssText = cssText;
+            }
+        }
+        class FakeCSSStyleSheet {
+            constructor() {
+                this.cssRules = [];
+                this.replaceCount = 0;
+            }
+
+            /**
+             * @param {string} _css
+             */
+            replaceSync(_css) {
+                this.replaceCount += 1;
+                if (this.replaceCount === 1) {
+                    this.cssRules = [new FakeCSSStyleRule('.x', '.x{color:red;}')];
+                    return;
+                }
+                this.cssRules = [{}];
+            }
+        }
+        /* eslint-enable jsdoc/require-jsdoc */
+        Object.defineProperty(globalThis, 'CSSStyleSheet', {
+            configurable: true,
+            writable: true,
+            value: FakeCSSStyleSheet,
+        });
+        Object.defineProperty(globalThis, 'CSSStyleRule', {
+            configurable: true,
+            writable: true,
+            value: FakeCSSStyleRule,
+        });
+        try {
+            expect(addScopeToCssLegacy('input-css', '#scope')).toBe('');
+        } finally {
+            if (typeof originalCSSStyleSheetDescriptor !== 'undefined') {
+                Object.defineProperty(globalThis, 'CSSStyleSheet', originalCSSStyleSheetDescriptor);
+            } else {
+                Reflect.deleteProperty(globalThis, 'CSSStyleSheet');
+            }
+            if (typeof originalCSSStyleRuleDescriptor !== 'undefined') {
+                Object.defineProperty(globalThis, 'CSSStyleRule', originalCSSStyleRuleDescriptor);
+            } else {
+                Reflect.deleteProperty(globalThis, 'CSSStyleRule');
+            }
+        }
     });
 });

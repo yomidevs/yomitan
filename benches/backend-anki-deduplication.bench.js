@@ -32,7 +32,7 @@ const benchmarkOptions = Object.freeze({
 const noteCount = 50;
 const oversizedFieldValue = 'x'.repeat(4096);
 const notes = createNotes(noteCount, oversizedFieldValue);
-const backend = createBackendBenchmarkHarness(notes);
+let backend;
 
 describe('Backend Anki deduplication', () => {
     bench(`Backend._stripNotesArray (n=${noteCount})`, () => {
@@ -157,6 +157,8 @@ class DuplicateCheckBenchmarkAnki {
         }));
     }
 }
+
+backend = createBackendBenchmarkHarness(notes);
 
 /**
  * @param {import('anki').Note} note
