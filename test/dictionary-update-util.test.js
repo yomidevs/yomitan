@@ -130,6 +130,51 @@ describe('dictionary-update-util', () => {
         expect(options.profiles[1].options.general.mainDictionary).toBe('Updated Dictionary');
     });
 
+    test('applyImportedDictionarySettings enables new dictionaries for the selected settings profile', () => {
+        const options = /** @type {import('settings').Options} */ (/** @type {unknown} */ ({
+            version: 0,
+            profileCurrent: 0,
+            global: {
+                database: {
+                    prefixWildcardsSupported: false,
+                    autoUpdateDictionariesOnStartup: false,
+                },
+                dataTransmissionConsentShown: false,
+            },
+            profiles: [
+                {
+                    id: 'profile-0',
+                    options: {
+                        general: {mainDictionary: ''},
+                        dictionaries: [],
+                        anki: {cardFormats: []},
+                    },
+                },
+                {
+                    id: 'profile-1',
+                    options: {
+                        general: {mainDictionary: ''},
+                        dictionaries: [],
+                        anki: {cardFormats: []},
+                    },
+                },
+            ],
+        }));
+
+        applyImportedDictionarySettings(options, /** @type {import('dictionary-importer').Summary} */ ({
+            title: 'Imported Dictionary',
+            revision: '1',
+            sequenced: false,
+            version: 3,
+            importDate: 0,
+            prefixWildcardsSupported: false,
+            styles: '',
+        }), /** @type {import('settings-controller').ProfilesDictionarySettings} */ ({}), 1);
+
+        expect(options.profiles[0].options.dictionaries[0]).toMatchObject({name: 'Imported Dictionary', enabled: false});
+        expect(options.profiles[1].options.dictionaries[0]).toMatchObject({name: 'Imported Dictionary', enabled: true});
+    });
+
     test('updateDictionaryAnkiFieldTemplates rewrites matching dictionary field segments', () => {
         const options = /** @type {import('settings').Options} */ (/** @type {unknown} */ ({
             version: 0,

@@ -666,7 +666,7 @@ export class DictionaryImportController {
         }
 
         try {
-            applyImportedDictionarySettings(optionsFull, summary, profilesDictionarySettings);
+            applyImportedDictionarySettings(optionsFull, summary, profilesDictionarySettings, this._settingsController.profileIndex);
             updateDictionaryAnkiFieldTemplates(optionsFull, profilesDictionarySettings, summary.title);
             await this._settingsController.setAllSettings(optionsFull);
             return [];

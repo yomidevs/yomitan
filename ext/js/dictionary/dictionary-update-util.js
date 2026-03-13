@@ -95,10 +95,16 @@ export function getProfilesDictionarySettings(optionsFull, dictionaryTitle) {
  * @param {import('settings').Options} optionsFull
  * @param {import('dictionary-importer').Summary} summary
  * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
+ * @param {number} [activeProfileIndex]
  */
-export function applyImportedDictionarySettings(optionsFull, summary, profilesDictionarySettings) {
+export function applyImportedDictionarySettings(optionsFull, summary, profilesDictionarySettings, activeProfileIndex = optionsFull.profileCurrent) {
     const {title, sequenced, styles} = summary;
-    const profileIndex = optionsFull.profileCurrent;
+    const profileIndex = (
+        activeProfileIndex >= 0 &&
+        activeProfileIndex < optionsFull.profiles.length
+    ) ?
+        activeProfileIndex :
+        optionsFull.profileCurrent;
 
     for (let i = 0; i < optionsFull.profiles.length; ++i) {
         const profile = optionsFull.profiles[i];
