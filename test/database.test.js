@@ -24,6 +24,7 @@ import {BlobWriter, TextReader, ZipWriter} from '@zip.js/zip.js';
 import {beforeEach, describe, test, vi} from 'vitest';
 import {createDictionaryArchiveData, getDictionaryArchiveIndex} from '../dev/dictionary-archive-util.js';
 import {parseJson} from '../dev/json.js';
+import {Database} from '../ext/js/data/database.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
 import {encodeRawTermContentSharedGlossaryBinary} from '../ext/js/dictionary/raw-term-content.js';
@@ -42,6 +43,75 @@ setupStubs();
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 vi.stubGlobal('fetch', fetch);
 vi.stubGlobal('chrome', chrome);
+
+const LEGACY_INDEXEDDB_NAME = 'dict';
+const LEGACY_INDEXEDDB_STRUCTURE = [
+    {
+        version: 20,
+        stores: {
+            terms: {
+                primaryKey: {keyPath: 'id', autoIncrement: true},
+                indices: ['dictionary', 'expression', 'reading'],
+            },
+            kanji: {
+                primaryKey: {autoIncrement: true},
+                indices: ['dictionary', 'character'],
+            },
+            tagMeta: {
+                primaryKey: {autoIncrement: true},
+                indices: ['dictionary'],
+            },
+            dictionaries: {
+                primaryKey: {autoIncrement: true},
+                indices: ['title', 'version'],
+            },
+        },
+    },
+    {
+        version: 30,
+        stores: {
+            termMeta: {
+                primaryKey: {autoIncrement: true},
+                indices: ['dictionary', 'expression'],
+            },
+            kanjiMeta: {
+                primaryKey: {autoIncrement: true},
+                indices: ['dictionary', 'character'],
+            },
+            tagMeta: {
+                primaryKey: {autoIncrement: true},
+                indices: ['dictionary', 'name'],
+            },
+        },
+    },
+    {
+        version: 40,
+        stores: {
+            terms: {
+                primaryKey: {keyPath: 'id', autoIncrement: true},
+                indices: ['dictionary', 'expression', 'reading', 'sequence'],
+            },
+        },
+    },
+    {
+        version: 50,
+        stores: {
+            terms: {
+                primaryKey: {keyPath: 'id', autoIncrement: true},
+                indices: ['dictionary', 'expression', 'reading', 'sequence', 'expressionReverse', 'readingReverse'],
+            },
+        },
+    },
+    {
+        version: 60,
+        stores: {
+            media: {
+                primaryKey: {keyPath: 'id', autoIncrement: true},
+                indices: ['dictionary', 'path'],
+            },
+        },
+    },
+];
 
 /**
  * @returns {{
@@ -220,6 +290,169 @@ function concatUint8Arrays(chunks) {
         offset += chunk.byteLength;
     }
     return result;
+}
+
+/**
+ * @param {unknown} value
+ * @returns {ArrayBuffer}
+ */
+function cloneArrayBuffer(value) {
+    if (value instanceof ArrayBuffer) {
+        return value.slice(0);
+    }
+    if (ArrayBuffer.isView(value)) {
+        const typedArray = /** @type {ArrayBufferView} */ (value);
+        return typedArray.buffer.slice(typedArray.byteOffset, typedArray.byteOffset + typedArray.byteLength);
+    }
+    return new ArrayBuffer(0);
+}
+
+/**
+ * @param {DictionaryDatabase} dictionaryDatabase
+ * @returns {Promise<{
+ *   dictionaries: import('dictionary-importer').Summary[],
+ *   terms: import('dictionary-database').DatabaseTermEntry[],
+ *   termMeta: import('dictionary-database').DatabaseTermMeta[],
+ *   kanji: import('dictionary-database').DatabaseKanjiEntry[],
+ *   kanjiMeta: import('dictionary-database').DatabaseKanjiMeta[],
+ *   tagMeta: import('dictionary-database').Tag[],
+ *   media: import('dictionary-database').MediaDataArrayBufferContent[],
+ * }>}
+ */
+async function createLegacyIndexedDbSnapshot(dictionaryDatabase) {
+    const db = getRequiredDb(dictionaryDatabase);
+    const dictionaries = await dictionaryDatabase.getDictionaryInfo();
+    const terms = db.selectObjects(`
+        SELECT
+            dictionary,
+            expression,
+            reading,
+            expressionReverse,
+            readingReverse,
+            definitionTags,
+            termTags,
+            rules,
+            score,
+            glossaryJson,
+            sequence
+        FROM terms
+        ORDER BY rowid ASC
+    `).map((row) => ({
+        dictionary: row.dictionary,
+        expression: row.expression,
+        reading: row.reading,
+        expressionReverse: row.expressionReverse,
+        readingReverse: row.readingReverse,
+        definitionTags: row.definitionTags,
+        termTags: row.termTags,
+        rules: row.rules,
+        score: row.score,
+        glossary: /** @type {import('dictionary-data').TermGlossary[]} */ (parseJson(row.glossaryJson)),
+        sequence: row.sequence,
+    }));
+    const termMeta = db.selectObjects('SELECT dictionary, expression, mode, dataJson FROM termMeta ORDER BY id ASC')
+        .map((row) => ({
+            dictionary: row.dictionary,
+            expression: row.expression,
+            mode: row.mode,
+            data: parseJson(row.dataJson),
+        }));
+    const kanji = db.selectObjects('SELECT dictionary, character, onyomi, kunyomi, tags, meaningsJson, statsJson FROM kanji ORDER BY id ASC')
+        .map((row) => ({
+            dictionary: row.dictionary,
+            character: row.character,
+            onyomi: row.onyomi,
+            kunyomi: row.kunyomi,
+            tags: row.tags,
+            meanings: /** @type {string[]} */ (parseJson(row.meaningsJson)),
+            stats: typeof row.statsJson === 'string' ? /** @type {{[name: string]: string}} */ (parseJson(row.statsJson)) : void 0,
+        }));
+    const kanjiMeta = db.selectObjects('SELECT dictionary, character, mode, dataJson FROM kanjiMeta ORDER BY id ASC')
+        .map((row) => ({
+            dictionary: row.dictionary,
+            character: row.character,
+            mode: row.mode,
+            data: parseJson(row.dataJson),
+        }));
+    const tagMeta = db.selectObjects('SELECT dictionary, name, category, ord, notes, score FROM tagMeta ORDER BY id ASC')
+        .map((row) => ({
+            dictionary: row.dictionary,
+            name: row.name,
+            category: row.category,
+            order: row.ord,
+            notes: row.notes,
+            score: row.score,
+        }));
+    const media = db.selectObjects('SELECT dictionary, path, mediaType, width, height, content FROM media ORDER BY id ASC')
+        .map((row) => ({
+            dictionary: row.dictionary,
+            path: row.path,
+            mediaType: row.mediaType,
+            width: row.width,
+            height: row.height,
+            content: cloneArrayBuffer(row.content),
+        }));
+    return {
+        dictionaries,
+        terms,
+        termMeta,
+        kanji,
+        kanjiMeta,
+        tagMeta,
+        media,
+    };
+}
+
+/**
+ * @param {Awaited<ReturnType<typeof createLegacyIndexedDbSnapshot>>} snapshot
+ * @returns {Promise<void>}
+ */
+async function populateLegacyIndexedDb(snapshot) {
+    const legacyDatabase = new Database();
+    await legacyDatabase.open(LEGACY_INDEXEDDB_NAME, 60, LEGACY_INDEXEDDB_STRUCTURE);
+    try {
+        for (const [storeName, rows] of Object.entries(snapshot)) {
+            if (!Array.isArray(rows) || rows.length === 0) {
+                continue;
+            }
+            await legacyDatabase.bulkAdd(
+                /** @type {import('dictionary-database').ObjectStoreName} */ (storeName),
+                rows,
+                0,
+                rows.length,
+            );
+        }
+    } finally {
+        legacyDatabase.close();
+    }
+}
+
+/**
+ * @returns {Promise<IDBDatabase|null>}
+ */
+async function openLegacyIndexedDbIfPresent() {
+    return await new Promise((resolve, reject) => {
+        let createdNewDatabase = false;
+        const request = indexedDB.open(LEGACY_INDEXEDDB_NAME);
+        request.onupgradeneeded = (event) => {
+            createdNewDatabase = event.oldVersion === 0;
+        };
+        request.onerror = () => {
+            reject(request.error ?? new Error(`Failed to open IndexedDB database '${LEGACY_INDEXEDDB_NAME}'`));
+        };
+        request.onsuccess = () => {
+            const db = request.result;
+            if (!createdNewDatabase && db.objectStoreNames.length > 0) {
+                resolve(db);
+                return;
+            }
+            db.close();
+            const deleteRequest = indexedDB.deleteDatabase(LEGACY_INDEXEDDB_NAME);
+            deleteRequest.onsuccess = () => resolve(null);
+            deleteRequest.onerror = () => resolve(null);
+            deleteRequest.onblocked = () => resolve(null);
+        };
+    });
 }
 
 /**
@@ -1550,6 +1783,99 @@ describe('Database', () => {
                 await dictionaryDatabase.close();
             }
         });
+
+        test('Migrates dictionaries from legacy IndexedDB into SQLite on first startup', async ({expect}) => {
+            const opfsRootDirectoryHandle = createInMemoryOpfsDirectoryHandle();
+            const restoreNavigator = installInMemoryOpfsNavigator(opfsRootDirectoryHandle);
+            try {
+                const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1', 'Legacy Dictionary');
+                const importDetails = {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'};
+
+                const sourceDictionaryDatabase = new DictionaryDatabase();
+                await sourceDictionaryDatabase.prepare();
+                await createDictionaryImporter(expect).importDictionary(sourceDictionaryDatabase, testDictionarySource, importDetails);
+
+                const expectedInfo = await sourceDictionaryDatabase.getDictionaryInfo();
+                const expectedCounts = await sourceDictionaryDatabase.getDictionaryCounts(['Legacy Dictionary'], true);
+                const legacySnapshot = await createLegacyIndexedDbSnapshot(sourceDictionaryDatabase);
+                await sourceDictionaryDatabase.purge();
+                await sourceDictionaryDatabase.close();
+
+                await populateLegacyIndexedDb(legacySnapshot);
+                const legacyDbBeforeMigration = await openLegacyIndexedDbIfPresent();
+                expect.soft(legacyDbBeforeMigration).not.toBeNull();
+                legacyDbBeforeMigration?.close();
+
+                const migratedDictionaryDatabase = new DictionaryDatabase();
+                await migratedDictionaryDatabase.prepare();
+                try {
+                    const migratedInfo = await migratedDictionaryDatabase.getDictionaryInfo();
+                    const migratedCounts = await migratedDictionaryDatabase.getDictionaryCounts(['Legacy Dictionary'], true);
+                    expect.soft(migratedInfo).toStrictEqual(expectedInfo);
+                    expect.soft(migratedCounts).toStrictEqual(expectedCounts);
+
+                    const legacyDbAfterMigration = await openLegacyIndexedDbIfPresent();
+                    expect.soft(legacyDbAfterMigration).toBeNull();
+                    legacyDbAfterMigration?.close();
+                } finally {
+                    await migratedDictionaryDatabase.close();
+                }
+            } finally {
+                restoreNavigator();
+            }
+        }, 15000);
+
+        test('Skips legacy IndexedDB migration when SQLite already has dictionaries', async ({expect}) => {
+            const opfsRootDirectoryHandle = createInMemoryOpfsDirectoryHandle();
+            const restoreNavigator = installInMemoryOpfsNavigator(opfsRootDirectoryHandle);
+            try {
+                const legacyDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1', 'Legacy Dictionary');
+                const currentDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1', 'Current Dictionary');
+                const importDetails = {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'};
+
+                const legacySourceDatabase = new DictionaryDatabase();
+                await legacySourceDatabase.prepare();
+                await createDictionaryImporter(expect).importDictionary(legacySourceDatabase, legacyDictionarySource, importDetails);
+                const legacySnapshot = await createLegacyIndexedDbSnapshot(legacySourceDatabase);
+                await legacySourceDatabase.purge();
+                await legacySourceDatabase.close();
+
+                const currentDictionaryDatabase = new DictionaryDatabase();
+                await currentDictionaryDatabase.prepare();
+                await createDictionaryImporter(expect).importDictionary(currentDictionaryDatabase, currentDictionarySource, importDetails);
+                const expectedInfo = await currentDictionaryDatabase.getDictionaryInfo();
+                const expectedCounts = await currentDictionaryDatabase.getDictionaryCounts(['Current Dictionary'], true);
+
+                await populateLegacyIndexedDb(legacySnapshot);
+                try {
+                    const migrateLegacyIndexedDbIfNeeded = Reflect.get(currentDictionaryDatabase, '_migrateLegacyIndexedDbIfNeeded');
+                    if (typeof migrateLegacyIndexedDbIfNeeded !== 'function') {
+                        throw new Error('Expected _migrateLegacyIndexedDbIfNeeded method');
+                    }
+                    await Promise.resolve(migrateLegacyIndexedDbIfNeeded.call(currentDictionaryDatabase));
+
+                    const deleteLegacyIndexedDb = Reflect.get(currentDictionaryDatabase, '_deleteLegacyIndexedDb');
+                    if (typeof deleteLegacyIndexedDb !== 'function') {
+                        throw new Error('Expected _deleteLegacyIndexedDb method');
+                    }
+                    await Promise.resolve(deleteLegacyIndexedDb.call(currentDictionaryDatabase));
+
+                    const info = await currentDictionaryDatabase.getDictionaryInfo();
+                    const counts = await currentDictionaryDatabase.getDictionaryCounts(['Current Dictionary'], true);
+                    expect.soft(info).toStrictEqual(expectedInfo);
+                    expect.soft(info.map((item) => item.title)).toStrictEqual(['Current Dictionary']);
+                    expect.soft(counts).toStrictEqual(expectedCounts);
+
+                    const legacyDbAfterPrepare = await openLegacyIndexedDbIfPresent();
+                    expect.soft(legacyDbAfterPrepare).toBeNull();
+                    legacyDbAfterPrepare?.close();
+                } finally {
+                    await currentDictionaryDatabase.close();
+                }
+            } finally {
+                restoreNavigator();
+            }
+        }, 15000);
 
         test('Schema migration v1 wipes unversioned dictionary data and advances to current schema version', async ({expect}) => {
             const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');

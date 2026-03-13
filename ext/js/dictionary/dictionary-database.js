@@ -63,6 +63,25 @@ const HIGH_MEMORY_TERM_BULK_ADD_STAGING_MAX_ROWS = 10240;
 const TERM_CONTENT_STORAGE_MODE_BASELINE = 'baseline';
 const TERM_CONTENT_STORAGE_MODE_RAW_BYTES = 'raw-bytes';
 const DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES = 4 * 1024 * 1024;
+const LEGACY_DICTIONARY_INDEXEDDB_NAME = 'dict';
+const LEGACY_DICTIONARY_INDEXEDDB_STORES = /** @type {const} */ ([
+    'dictionaries',
+    'terms',
+    'termMeta',
+    'kanji',
+    'kanjiMeta',
+    'tagMeta',
+    'media',
+]);
+const LEGACY_DICTIONARY_INDEXEDDB_BATCH_SIZE = {
+    dictionaries: 128,
+    terms: 2048,
+    termMeta: 2048,
+    kanji: 1024,
+    kanjiMeta: 2048,
+    tagMeta: 1024,
+    media: 64,
+};
 
 /**
  * @param {string} value
@@ -268,6 +287,7 @@ export class DictionaryDatabase {
             await this._openConnection();
             await initializeTermContentZstd();
             this._termContentZstdInitialized = true;
+            await this._migrateLegacyIndexedDbIfNeeded();
             await this._deleteLegacyIndexedDb();
             await this._cleanupIncompleteImports();
             await this._cleanupMissingTermRecordShards();
@@ -3904,6 +3924,236 @@ export class DictionaryDatabase {
     }
 
     /**
+     * Migrates dictionaries from the legacy IndexedDB database on first SQLite startup.
+     * @returns {Promise<void>}
+     */
+    async _migrateLegacyIndexedDbIfNeeded() {
+        if (typeof indexedDB === 'undefined') {
+            return;
+        }
+        if (!this._isLegacyIndexedDbMigrationNeeded()) {
+            reportDiagnostics('dictionary-legacy-indexeddb-migration-skipped', {
+                reason: 'sqlite-not-empty',
+            });
+            return;
+        }
+
+        const legacyDb = await this._openLegacyIndexedDbIfPresent();
+        if (legacyDb === null) {
+            reportDiagnostics('dictionary-legacy-indexeddb-migration-skipped', {
+                reason: 'legacy-database-missing',
+            });
+            return;
+        }
+
+        let bulkImportStarted = false;
+        /** @type {Record<string, number>} */
+        const migratedRowsByStore = {};
+        try {
+            const dictionariesPreview = await this._readLegacyIndexedDbStoreBatch(legacyDb, 'dictionaries', null, 1);
+            if (dictionariesPreview.rows.length === 0) {
+                reportDiagnostics('dictionary-legacy-indexeddb-migration-skipped', {
+                    reason: 'legacy-database-empty',
+                });
+                return;
+            }
+
+            await this.startBulkImport();
+            bulkImportStarted = true;
+
+            let totalRows = 0;
+            for (const storeName of LEGACY_DICTIONARY_INDEXEDDB_STORES) {
+                if (!legacyDb.objectStoreNames.contains(storeName)) {
+                    continue;
+                }
+                let migratedRowCount = 0;
+                const batchSize = LEGACY_DICTIONARY_INDEXEDDB_BATCH_SIZE[storeName];
+                await this._forEachLegacyIndexedDbStoreBatch(legacyDb, storeName, batchSize, async (rows) => {
+                    const migratedRows = (storeName === 'terms') ?
+                        rows.map((row) => this._normalizeLegacyIndexedDbTermRow(row)) :
+                        rows;
+                    await this.bulkAdd(storeName, migratedRows, 0, migratedRows.length);
+                    migratedRowCount += migratedRows.length;
+                    totalRows += migratedRows.length;
+                });
+                migratedRowsByStore[storeName] = migratedRowCount;
+            }
+
+            await this.finishBulkImport();
+            bulkImportStarted = false;
+            reportDiagnostics('dictionary-legacy-indexeddb-migration-summary', {
+                status: 'migrated',
+                totalRows,
+                migratedRowsByStore,
+                usedFallbackStorage: this._usesFallbackStorage,
+            });
+        } catch (e) {
+            const error = toError(e);
+            if (bulkImportStarted) {
+                try {
+                    await this.finishBulkImport();
+                } catch (_) {
+                    // Ignore finalization failures; cleanup below resets the partial migration.
+                }
+            }
+            try {
+                await this._wipeDictionaryDataForSchemaMigration('rollback-legacy-indexeddb-migration');
+            } catch (cleanupError) {
+                log.error(cleanupError);
+            }
+            reportDiagnostics('dictionary-legacy-indexeddb-migration-summary', {
+                status: 'failed',
+                migratedRowsByStore,
+                error: error.message,
+            });
+            throw new Error(`Failed to migrate legacy IndexedDB dictionaries: ${error.message}`);
+        } finally {
+            legacyDb.close();
+        }
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    _isLegacyIndexedDbMigrationNeeded() {
+        if (!this._termRecordStore.isEmpty()) {
+            return false;
+        }
+        const db = this._requireDb();
+        const hasSqliteRows = this._asNumber(
+            db.selectValue(`
+                SELECT
+                    EXISTS(SELECT 1 FROM dictionaries LIMIT 1) OR
+                    EXISTS(SELECT 1 FROM termEntryContent LIMIT 1) OR
+                    EXISTS(SELECT 1 FROM termMeta LIMIT 1) OR
+                    EXISTS(SELECT 1 FROM kanji LIMIT 1) OR
+                    EXISTS(SELECT 1 FROM kanjiMeta LIMIT 1) OR
+                    EXISTS(SELECT 1 FROM tagMeta LIMIT 1) OR
+                    EXISTS(SELECT 1 FROM media LIMIT 1) OR
+                    EXISTS(SELECT 1 FROM sharedGlossaryArtifacts LIMIT 1)
+            `),
+            0,
+        ) === 1;
+        return !hasSqliteRows;
+    }
+
+    /**
+     * @returns {Promise<IDBDatabase|null>}
+     */
+    async _openLegacyIndexedDbIfPresent() {
+        return await new Promise((resolve, reject) => {
+            let createdNewDatabase = false;
+            const request = indexedDB.open(LEGACY_DICTIONARY_INDEXEDDB_NAME);
+            request.onupgradeneeded = (event) => {
+                createdNewDatabase = event.oldVersion === 0;
+            };
+            request.onerror = () => {
+                reject(request.error ?? new Error(`Failed to open legacy IndexedDB database '${LEGACY_DICTIONARY_INDEXEDDB_NAME}'`));
+            };
+            request.onsuccess = () => {
+                const db = request.result;
+                if (!createdNewDatabase && db.objectStoreNames.length > 0) {
+                    resolve(db);
+                    return;
+                }
+                db.close();
+                void this._deleteLegacyIndexedDb()
+                    .then(() => resolve(null))
+                    .catch(() => resolve(null));
+            };
+        });
+    }
+
+    /**
+     * @param {IDBDatabase} db
+     * @param {string} storeName
+     * @param {IDBValidKey|null} lowerBoundExclusive
+     * @param {number} batchSize
+     * @returns {Promise<{rows: unknown[], lastKey: IDBValidKey|null}>}
+     */
+    async _readLegacyIndexedDbStoreBatch(db, storeName, lowerBoundExclusive, batchSize) {
+        return await new Promise((resolve, reject) => {
+            const transaction = db.transaction([storeName], 'readonly');
+            const objectStore = transaction.objectStore(storeName);
+            const range = lowerBoundExclusive === null ? null : IDBKeyRange.lowerBound(lowerBoundExclusive, true);
+            const request = objectStore.openCursor(range, 'next');
+            /** @type {unknown[]} */
+            const rows = [];
+            /** @type {IDBValidKey|null} */
+            let lastKey = null;
+
+            transaction.onabort = () => {
+                reject(transaction.error ?? new Error(`Legacy IndexedDB transaction aborted for store '${storeName}'`));
+            };
+            request.onerror = () => {
+                reject(request.error ?? new Error(`Failed to read legacy IndexedDB store '${storeName}'`));
+            };
+            request.onsuccess = () => {
+                const cursor = request.result;
+                if (cursor !== null && rows.length < batchSize) {
+                    rows.push(cursor.value);
+                    lastKey = cursor.primaryKey;
+                    cursor.continue();
+                    return;
+                }
+                resolve({rows, lastKey});
+            };
+        });
+    }
+
+    /**
+     * @param {IDBDatabase} db
+     * @param {string} storeName
+     * @param {number} batchSize
+     * @param {(rows: unknown[]) => Promise<void>} onBatch
+     * @returns {Promise<void>}
+     */
+    async _forEachLegacyIndexedDbStoreBatch(db, storeName, batchSize, onBatch) {
+        /** @type {IDBValidKey|null} */
+        let lowerBoundExclusive = null;
+        while (true) {
+            const {rows, lastKey} = await this._readLegacyIndexedDbStoreBatch(db, storeName, lowerBoundExclusive, batchSize);
+            if (rows.length === 0) {
+                return;
+            }
+            await onBatch(rows);
+            if (lastKey === null || rows.length < batchSize) {
+                return;
+            }
+            lowerBoundExclusive = lastKey;
+        }
+    }
+
+    /**
+     * @param {unknown} row
+     * @returns {import('dictionary-database').DatabaseTermEntry}
+     */
+    _normalizeLegacyIndexedDbTermRow(row) {
+        /** @type {import('dictionary-database').DatabaseTermEntry} */
+        const migratedRow = {
+            .../** @type {import('core').SafeAny} */ (row),
+        };
+        const expression = this._asString(migratedRow.expression);
+        const reading = this._asString(migratedRow.reading);
+        if (typeof migratedRow.expressionReverse !== 'string') {
+            migratedRow.expressionReverse = stringReverse(expression);
+        }
+        if (typeof migratedRow.readingReverse !== 'string') {
+            migratedRow.readingReverse = stringReverse(reading);
+        }
+        if (typeof migratedRow.rules !== 'string') {
+            migratedRow.rules = '';
+        }
+        if (typeof migratedRow.definitionTags !== 'string') {
+            migratedRow.definitionTags = typeof migratedRow.tags === 'string' ? migratedRow.tags : '';
+        }
+        if (typeof migratedRow.termTags !== 'string') {
+            migratedRow.termTags = '';
+        }
+        return migratedRow;
+    }
+
+    /**
      * Best effort cleanup for old IndexedDB storage from pre-sqlite builds.
      */
     async _deleteLegacyIndexedDb() {
@@ -3912,7 +4162,7 @@ export class DictionaryDatabase {
         }
         await new Promise((resolve) => {
             try {
-                const request = indexedDB.deleteDatabase('dict');
+                const request = indexedDB.deleteDatabase(LEGACY_DICTIONARY_INDEXEDDB_NAME);
                 request.onsuccess = () => resolve(void 0);
                 request.onerror = () => resolve(void 0);
                 request.onblocked = () => resolve(void 0);
