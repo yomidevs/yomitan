@@ -39,6 +39,16 @@ type ApiSurface = {
         params: void;
         return: DictionaryImporter.Summary[];
     };
+    exportDictionaryDatabaseOffscreen: {
+        params: void;
+        return: string;
+    };
+    importDictionaryDatabaseOffscreen: {
+        params: {
+            content: string;
+        };
+        return: void;
+    };
     databasePurgeOffscreen: {
         params: void;
         return: boolean;

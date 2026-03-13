@@ -22,7 +22,7 @@ import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {sanitizeCSS} from '../core/utilities.js';
-import {arrayBufferToBase64} from '../data/array-buffer-util.js';
+import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {WebExtension} from '../extension/web-extension.js';
 import {Translator} from '../language/translator.js';
@@ -55,6 +55,8 @@ export class Offscreen {
             ['clipboardSetBrowserOffscreen',   this._setClipboardBrowser.bind(this)],
             ['databasePrepareOffscreen',       this._prepareDatabaseHandler.bind(this)],
             ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
+            ['exportDictionaryDatabaseOffscreen', this._exportDictionaryDatabaseHandler.bind(this)],
+            ['importDictionaryDatabaseOffscreen', this._importDictionaryDatabaseHandler.bind(this)],
             ['databasePurgeOffscreen',         this._purgeDatabaseHandler.bind(this)],
             ['databaseGetMediaOffscreen',      this._getMediaHandler.bind(this)],
             ['translatorPrepareOffscreen',     this._prepareTranslatorHandler.bind(this)],
@@ -115,6 +117,16 @@ export class Offscreen {
     /** @type {import('offscreen').ApiHandler<'getDictionaryInfoOffscreen'>} */
     async _getDictionaryInfoHandler() {
         return await this._dictionaryDatabase.getDictionaryInfo();
+    }
+
+    /** @type {import('offscreen').ApiHandler<'exportDictionaryDatabaseOffscreen'>} */
+    async _exportDictionaryDatabaseHandler() {
+        return arrayBufferToBase64(await this._dictionaryDatabase.exportDatabase());
+    }
+
+    /** @type {import('offscreen').ApiHandler<'importDictionaryDatabaseOffscreen'>} */
+    async _importDictionaryDatabaseHandler({content}) {
+        await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
     }
 
     /** @type {import('offscreen').ApiHandler<'databasePurgeOffscreen'>} */

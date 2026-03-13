@@ -291,6 +291,16 @@ type ApiSurface = {
         params: void;
         return: DictionaryImporter.Summary[];
     };
+    exportDictionaryDatabase: {
+        params: void;
+        return: ArrayBuffer;
+    };
+    importDictionaryDatabase: {
+        params: {
+            content: ArrayBuffer;
+        };
+        return: void;
+    };
     purgeDatabase: {
         params: void;
         return: void;

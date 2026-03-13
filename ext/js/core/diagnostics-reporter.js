@@ -14,26 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import {vi} from 'vitest';
 
 /**
- *
+ * PR1 keeps only correctness-essential diagnostics paths.
+ * The richer diagnostics pipeline from the fork is intentionally not upstreamed here.
+ * @param {string} _event
+ * @param {unknown} [_payload]
  */
-export function setupStubs() {
-    vi.stubGlobal('yomitanRequireOpfs', false);
-    vi.stubGlobal('self', {
-        constructor: {
-            name: 'Window',
-        },
-    });
-
-
-    /** @returns {{addEventListener: () => void, terminate: () => void}} */
-    function Worker() {
-        return {
-            addEventListener: () => {},
-            terminate: () => {},
-        };
-    }
-    vi.stubGlobal('Worker', Worker);
+export function reportDiagnostics(_event, _payload = {}) {
+    // NOP
 }

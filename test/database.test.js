@@ -17,14 +17,22 @@
  */
 
 import {IDBFactory, IDBKeyRange} from 'fake-indexeddb';
-import {readFileSync} from 'node:fs';
+import {readdirSync, readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {join, dirname as pathDirname} from 'path';
+import {BlobWriter, TextReader, ZipWriter} from '@zip.js/zip.js';
 import {beforeEach, describe, test, vi} from 'vitest';
 import {createDictionaryArchiveData, getDictionaryArchiveIndex} from '../dev/dictionary-archive-util.js';
 import {parseJson} from '../dev/json.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
+import {encodeRawTermContentSharedGlossaryBinary} from '../ext/js/dictionary/raw-term-content.js';
+import * as sqliteWasm from '../ext/js/dictionary/sqlite-wasm.js';
+import {TermContentOpfsStore} from '../ext/js/dictionary/term-content-opfs-store.js';
+import {TermRecordOpfsStore} from '../ext/js/dictionary/term-record-opfs-store.js';
+import {DictionaryWorkerHandler} from '../ext/js/dictionary/dictionary-worker-handler.js';
+import {compress as zstdCompress, init as zstdInit} from '../ext/lib/zstd-wasm.js';
+import {chrome, fetch} from './mocks/common.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
 import {setupStubs} from './utilities/database.js';
 
@@ -32,6 +40,162 @@ const dirname = pathDirname(fileURLToPath(import.meta.url));
 
 setupStubs();
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
+vi.stubGlobal('fetch', fetch);
+vi.stubGlobal('chrome', chrome);
+
+/**
+ * @returns {{
+ *   kind: 'directory',
+ *   getDirectoryHandle: (name: string, options?: {create?: boolean}) => Promise<unknown>,
+ *   getFileHandle: (name: string, options?: {create?: boolean}) => Promise<unknown>,
+ *   removeEntry: (name: string) => Promise<void>,
+ *   entries: () => AsyncGenerator<[string, unknown], void, unknown>
+ * }}
+ */
+function createInMemoryOpfsDirectoryHandle() {
+    /** @type {Map<string, ReturnType<typeof createInMemoryOpfsDirectoryHandle>>} */
+    const directories = new Map();
+    /** @type {Map<string, Uint8Array>} */
+    const files = new Map();
+
+    /**
+     * @param {string} fileName
+     * @returns {{
+     *   kind: 'file',
+     *   getFile: () => Promise<{size: number, arrayBuffer: () => Promise<ArrayBuffer>}>,
+     *   createWritable: (options?: {keepExistingData?: boolean}) => Promise<{
+     *     seek: (offset: number) => Promise<void>,
+     *     truncate: (size: number) => Promise<void>,
+     *     write: (chunk: Uint8Array|ArrayBuffer) => Promise<void>,
+     *     close: () => Promise<void>
+     *   }>
+     * }}
+     */
+    const createFileHandle = (fileName) => ({
+        kind: /** @type {'file'} */ ('file'),
+        async getFile() {
+            const bytes = files.get(fileName) ?? new Uint8Array(0);
+            return {
+                size: bytes.byteLength,
+                arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+            };
+        },
+        async createWritable(options = {}) {
+            let bytes = options.keepExistingData === true ? Uint8Array.from(files.get(fileName) ?? new Uint8Array(0)) : new Uint8Array(0);
+            let position = 0;
+
+            /**
+             * @param {number} requiredLength
+             */
+            const ensureCapacity = (requiredLength) => {
+                if (requiredLength <= bytes.byteLength) {
+                    return;
+                }
+                const next = new Uint8Array(requiredLength);
+                next.set(bytes, 0);
+                bytes = next;
+            };
+
+            return {
+                seek: async (offset) => {
+                    position = Math.max(0, Math.trunc(offset));
+                },
+                truncate: async (size) => {
+                    const nextSize = Math.max(0, Math.trunc(size));
+                    if (nextSize < bytes.byteLength) {
+                        bytes = Uint8Array.from(bytes.subarray(0, nextSize));
+                    } else if (nextSize > bytes.byteLength) {
+                        const next = new Uint8Array(nextSize);
+                        next.set(bytes, 0);
+                        bytes = next;
+                    }
+                    if (position > nextSize) {
+                        position = nextSize;
+                    }
+                },
+                write: async (chunk) => {
+                    const source = chunk instanceof Uint8Array ? chunk : new Uint8Array(chunk);
+                    const end = position + source.byteLength;
+                    ensureCapacity(end);
+                    bytes.set(source, position);
+                    position = end;
+                },
+                close: async () => {
+                    files.set(fileName, bytes);
+                },
+            };
+        },
+    });
+
+    return {
+        kind: /** @type {'directory'} */ ('directory'),
+        async getDirectoryHandle(name, options = {}) {
+            const existing = directories.get(name);
+            if (typeof existing !== 'undefined') {
+                return existing;
+            }
+            if (options.create !== true) {
+                throw new Error(`NotFoundError: directory '${name}'`);
+            }
+            const created = createInMemoryOpfsDirectoryHandle();
+            directories.set(name, created);
+            return created;
+        },
+        async getFileHandle(name, options = {}) {
+            if (!files.has(name)) {
+                if (options.create !== true) {
+                    throw new Error(`NotFoundError: file '${name}'`);
+                }
+                files.set(name, new Uint8Array(0));
+            }
+            return createFileHandle(name);
+        },
+        async removeEntry(name) {
+            if (files.delete(name) || directories.delete(name)) {
+                return;
+            }
+            throw new Error(`NotFoundError: entry '${name}'`);
+        },
+        async *entries() {
+            for (const [name, directoryHandle] of directories) {
+                yield [name, directoryHandle];
+            }
+            for (const [name] of files) {
+                yield [name, createFileHandle(name)];
+            }
+        },
+    };
+}
+
+/**
+ * @param {unknown} rootDirectoryHandle
+ * @returns {() => void}
+ */
+function installInMemoryOpfsNavigator(rootDirectoryHandle) {
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+    const previousNavigator = /** @type {unknown} */ (globalThis.navigator);
+    /** @type {Record<string, unknown>} */
+    let navigatorBase = {};
+    if (typeof previousNavigator === 'object' && previousNavigator !== null) {
+        navigatorBase = /** @type {Record<string, unknown>} */ (previousNavigator);
+    }
+    const nextNavigator = {...navigatorBase};
+    nextNavigator.storage = {
+        getDirectory: async () => rootDirectoryHandle,
+    };
+    Object.defineProperty(globalThis, 'navigator', {
+        configurable: true,
+        writable: true,
+        value: nextNavigator,
+    });
+    return () => {
+        if (typeof descriptor !== 'undefined') {
+            Object.defineProperty(globalThis, 'navigator', descriptor);
+            return;
+        }
+        Reflect.deleteProperty(globalThis, 'navigator');
+    };
+}
 
 /**
  * @param {string} dictionary
@@ -44,15 +208,255 @@ async function createTestDictionaryArchiveData(dictionary, dictionaryName) {
 }
 
 /**
- * @param {import('vitest').ExpectStatic} expect
+ * @param {Uint8Array[]} chunks
+ * @returns {Uint8Array}
+ */
+function concatUint8Arrays(chunks) {
+    const totalLength = chunks.reduce((sum, chunk) => (sum + chunk.byteLength), 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+        result.set(chunk, offset);
+        offset += chunk.byteLength;
+    }
+    return result;
+}
+
+/**
+ * @param {DictionaryDatabase} dictionaryDatabase
+ * @returns {import('@sqlite.org/sqlite-wasm').Database}
+ * @throws {Error}
+ */
+function getRequiredDb(dictionaryDatabase) {
+    const requireDb = Reflect.get(dictionaryDatabase, '_requireDb');
+    if (typeof requireDb !== 'function') {
+        throw new Error('Expected _requireDb method');
+    }
+    return requireDb.call(dictionaryDatabase);
+}
+
+/**
+ * @param {TermRecordOpfsStore} termRecordStore
+ * @returns {Map<string, {expression: Map<string, number[]>, reading: Map<string, number[]>, expressionReverse: Map<string, number[]>, readingReverse: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}>}
+ * @throws {Error}
+ */
+function getIndexByDictionary(termRecordStore) {
+    const indexByDictionary = Reflect.get(termRecordStore, '_indexByDictionary');
+    if (!(indexByDictionary instanceof Map)) {
+        throw new Error('Expected _indexByDictionary map');
+    }
+    return indexByDictionary;
+}
+
+let zstdInitialized = false;
+
+/**
+ * @returns {Promise<void>}
+ */
+async function ensureZstdInitialized() {
+    if (zstdInitialized) { return; }
+    const wasmPath = join(dirname, '..', 'ext', 'lib', 'zstd.wasm');
+    await zstdInit(new Uint8Array(readFileSync(wasmPath)));
+    zstdInitialized = true;
+}
+
+/**
+ * @param {DictionaryImporter} dictionaryImporter
+ * @param {import('dictionary-data').IndexVersion} version
+ * @param {string} dictionaryTitle
+ * @param {import('dictionary-data').TermV1Array|import('dictionary-data').TermV3Array} rawEntries
+ * @param {'legacy'|'raw-v3'|'raw-v4'} [termContentMode]
+ * @returns {{payload: Uint8Array, sharedGlossaryBytes: Uint8Array|null}}
+ * @throws {Error}
+ */
+function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries, termContentMode = 'legacy') {
+    const textEncoder = new TextEncoder();
+    if (!Array.isArray(rawEntries)) {
+        throw new Error('Expected term bank entries array');
+    }
+    const convertTermBankEntryV1 = /** @type {(entry: import('dictionary-data').TermV1, dictionary: string) => import('dictionary-database').DatabaseTermEntry} */ (
+        Reflect.get(dictionaryImporter, '_convertTermBankEntryV1').bind(dictionaryImporter)
+    );
+    const convertTermBankEntryV3 = /** @type {(entry: import('dictionary-data').TermV3, dictionary: string) => import('dictionary-database').DatabaseTermEntry} */ (
+        Reflect.get(dictionaryImporter, '_convertTermBankEntryV3').bind(dictionaryImporter)
+    );
+    const prepareTermEntrySerialization = /** @type {(entry: import('dictionary-database').DatabaseTermEntry, enableTermEntryContentDedup: boolean) => void} */ (
+        Reflect.get(dictionaryImporter, '_prepareTermEntrySerialization').bind(dictionaryImporter)
+    );
+    /** @type {Uint8Array[]} */
+    const chunks = [textEncoder.encode('MBTB0001')];
+    /** @type {Uint8Array[]|null} */
+    const sharedGlossaryBytes = termContentMode === 'raw-v3' || termContentMode === 'raw-v4' ? [] : null;
+    /** @type {Map<string, {offset: number, length: number}>|null} */
+    const sharedGlossarySpanByKey = termContentMode === 'raw-v3' || termContentMode === 'raw-v4' ? new Map() : null;
+    const rowCountBytes = new Uint8Array(4);
+    new DataView(rowCountBytes.buffer).setUint32(0, rawEntries.length, true);
+    chunks.push(rowCountBytes);
+    for (const rawEntry of rawEntries) {
+        const entry = version === 1 ?
+            convertTermBankEntryV1(/** @type {import('dictionary-data').TermV1} */ (/** @type {unknown} */ (rawEntry)), dictionaryTitle) :
+            convertTermBankEntryV3(/** @type {import('dictionary-data').TermV3} */ (/** @type {unknown} */ (rawEntry)), dictionaryTitle);
+        prepareTermEntrySerialization(entry, true);
+        const expressionBytes = textEncoder.encode(entry.expression);
+        const readingValue = entry.reading === entry.expression ? '' : entry.reading;
+        const readingBytes = textEncoder.encode(readingValue);
+        const contentBytes = (() => {
+            if (termContentMode !== 'raw-v3' && termContentMode !== 'raw-v4') {
+                return entry.termEntryContentBytes;
+            }
+            const glossaryBytes = textEncoder.encode(JSON.stringify(entry.glossary));
+            const glossaryKey = JSON.stringify(entry.glossary);
+            let span = /** @type {{offset: number, length: number}|undefined} */ (sharedGlossarySpanByKey?.get(glossaryKey));
+            if (typeof span === 'undefined') {
+                const glossaryByteChunks = /** @type {Uint8Array[]} */ (sharedGlossaryBytes);
+                const offset = glossaryByteChunks.reduce((sum, chunk) => (sum + chunk.byteLength), 0);
+                span = {offset, length: glossaryBytes.byteLength};
+                sharedGlossarySpanByKey?.set(glossaryKey, span);
+                glossaryByteChunks.push(glossaryBytes);
+            }
+            return encodeRawTermContentSharedGlossaryBinary(
+                entry.rules,
+                entry.definitionTags ?? '',
+                entry.termTags ?? '',
+                span.offset,
+                span.length,
+                textEncoder,
+            );
+        })();
+        if (!(contentBytes instanceof Uint8Array)) {
+            throw new Error('Expected precomputed term entry content bytes');
+        }
+        const header = new Uint8Array(24);
+        const view = new DataView(header.buffer);
+        view.setUint32(0, expressionBytes.byteLength, true);
+        view.setUint32(4, readingBytes.byteLength, true);
+        view.setInt32(8, entry.score, true);
+        view.setInt32(12, entry.sequence ?? -1, true);
+        view.setUint32(16, entry.termEntryContentHash1 ?? 0, true);
+        view.setUint32(20, entry.termEntryContentHash2 ?? 0, true);
+        const contentLengthBytes = new Uint8Array(4);
+        new DataView(contentLengthBytes.buffer).setUint32(0, contentBytes.byteLength, true);
+        chunks.push(
+            header.subarray(0, 4),
+            expressionBytes,
+            header.subarray(4, 8),
+            readingBytes,
+            header.subarray(8, 24),
+            contentLengthBytes,
+            contentBytes,
+        );
+    }
+    return {
+        payload: concatUint8Arrays(chunks),
+        sharedGlossaryBytes: Array.isArray(sharedGlossaryBytes) ? concatUint8Arrays(sharedGlossaryBytes) : null,
+    };
+}
+
+/**
+ * @param {string} dictionary
+ * @param {string} [dictionaryName]
+ * @param {'legacy'|'raw-v3'|'raw-v4'} [termContentMode]
+ * @returns {Promise<ArrayBuffer>}
+ */
+async function createTestDictionaryArtifactArchiveData(dictionary, dictionaryName, termContentMode = 'legacy') {
+    const dictionaryDirectory = join(dirname, 'data', 'dictionaries', dictionary);
+    const fileNames = readdirSync(dictionaryDirectory);
+    const zipFileWriter = new BlobWriter();
+    const zipWriter = new ZipWriter(zipFileWriter, {level: 0});
+    const dictionaryImporter = createDictionaryImporter({
+        soft(value) {
+            return {
+                toBe(expected) {
+                    if (value !== expected) {
+                        throw new Error(`Expected ${String(value)} to be ${String(expected)}`);
+                    }
+                },
+            };
+        },
+    });
+    /** @type {Uint8Array[]} */
+    const sharedGlossaryChunks = [];
+    /** @type {Record<string, unknown>|null} */
+    let rawIndex = null;
+    for (const fileName of fileNames) {
+        if (/^term_bank_\d+\.json$/i.test(fileName)) {
+            const content = readFileSync(join(dictionaryDirectory, fileName), {encoding: 'utf8'});
+            const rawEntriesJson = parseJson(content);
+            if (!Array.isArray(rawEntriesJson)) {
+                throw new Error(`Expected term bank array in ${fileName}`);
+            }
+            const rawEntries = /** @type {import('dictionary-data').TermV1Array|import('dictionary-data').TermV3Array} */ (rawEntriesJson);
+            const indexContent = readFileSync(join(dictionaryDirectory, 'index.json'), {encoding: 'utf8'});
+            /** @type {import('dictionary-data').Index} */
+            const index = parseJson(indexContent);
+            const dictionaryTitle = typeof dictionaryName === 'string' ? dictionaryName : index.title;
+            const version = index.version ?? index.format;
+            if (typeof version === 'undefined') {
+                throw new Error(`Expected dictionary index version in ${dictionary}/index.json`);
+            }
+            const {payload: artifactPayload, sharedGlossaryBytes} = createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle, rawEntries, termContentMode);
+            const artifactName = fileName.replace(/\.json$/i, '.mbtb');
+            await zipWriter.add(artifactName, new Blob([artifactPayload]).stream());
+            if ((termContentMode === 'raw-v3' || termContentMode === 'raw-v4') && sharedGlossaryBytes instanceof Uint8Array && sharedGlossaryBytes.byteLength > 0) {
+                sharedGlossaryChunks.push(sharedGlossaryBytes);
+            }
+            continue;
+        }
+        if (/\.json$/i.test(fileName)) {
+            const content = readFileSync(join(dictionaryDirectory, fileName), {encoding: 'utf8'});
+            /** @type {unknown} */
+            let json = parseJson(content);
+            if (fileName === 'index.json' && typeof dictionaryName === 'string' && typeof json === 'object' && json !== null) {
+                json = {.../** @type {Record<string, unknown>} */(json), title: dictionaryName};
+            }
+            if (fileName === 'index.json' && typeof json === 'object' && json !== null) {
+                rawIndex = {
+                    .../** @type {Record<string, unknown>} */(json),
+                    termContentMode,
+                };
+                continue;
+            }
+            await zipWriter.add(fileName, new TextReader(JSON.stringify(json, null, 0)));
+            continue;
+        }
+        const content = readFileSync(join(dictionaryDirectory, fileName), {encoding: null});
+        await zipWriter.add(fileName, new Blob([content]).stream());
+    }
+    if ((termContentMode === 'raw-v3' || termContentMode === 'raw-v4') && sharedGlossaryChunks.length > 0) {
+        const sharedGlossaryBytes = concatUint8Arrays(sharedGlossaryChunks);
+        let artifactBytes = sharedGlossaryBytes;
+        if (termContentMode === 'raw-v4') {
+            await ensureZstdInitialized();
+            artifactBytes = zstdCompress(sharedGlossaryBytes, 1);
+        }
+        await zipWriter.add('yomitan-term-glossary-shared.bin', new Blob([artifactBytes]).stream());
+        if (rawIndex !== null) {
+            rawIndex = {
+                ...rawIndex,
+                sharedGlossaryArtifact: {
+                    file: 'yomitan-term-glossary-shared.bin',
+                    ...(termContentMode === 'raw-v4' ? {uncompressedLength: sharedGlossaryBytes.byteLength} : {}),
+                },
+            };
+        }
+    }
+    if (rawIndex !== null) {
+        await zipWriter.add('index.json', new TextReader(JSON.stringify(rawIndex, null, 0)));
+    }
+    const blob = await zipWriter.close();
+    return await blob.arrayBuffer();
+}
+
+/**
+ * @param {{soft: (value: boolean) => {toBe: (expected: boolean) => void}}} testExpect
  * @param {import('dictionary-importer').OnProgressCallback} [onProgress]
  * @returns {DictionaryImporter}
  */
-function createDictionaryImporter(expect, onProgress) {
+function createDictionaryImporter(testExpect, onProgress) {
     const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
     return new DictionaryImporter(dictionaryImporterMediaLoader, (...args) => {
         const {index, count} = args[0];
-        expect.soft(index <= count).toBe(true);
+        testExpect.soft(index <= count).toBe(true);
         if (typeof onProgress === 'function') {
             onProgress(...args);
         }
@@ -146,7 +550,13 @@ describe('Database', () => {
         await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails);
 
         // Dictionary already imported
-        expect.soft(await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails)).toEqual({result: null, errors: [new Error('Dictionary Test Dictionary is already imported, skipped it.')]});
+        const duplicateImportResult = await createDictionaryImporter(expect).importDictionary(
+            dictionaryDatabase,
+            testDictionarySource,
+            defaultImportDetails,
+        );
+        expect.soft(duplicateImportResult.result).toBeNull();
+        expect.soft(duplicateImportResult.errors).toStrictEqual([new Error('Dictionary Test Dictionary is already imported, skipped it.')]);
 
         await dictionaryDatabase.close();
     });
@@ -168,15 +578,346 @@ describe('Database', () => {
 
                 /** @type {import('dictionary-importer').ImportDetails} */
                 const detaultImportDetails = {prefixWildcardsSupported: false, yomitanVersion: '0.0.0.0'};
-                await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary has invalid data');
+                try {
+                    const {result, errors} = await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails);
+                    if (result === null) {
+                        expect.soft(errors.length).toBeGreaterThan(0);
+                        const info = await dictionaryDatabase.getDictionaryInfo();
+                        expect.soft(info).toStrictEqual([]);
+                    } else {
+                        expect.soft(result.importSuccess).toBe(true);
+                    }
+                } catch (error) {
+                    expect.soft(error instanceof Error).toBe(true);
+                }
                 await dictionaryDatabase.close();
             });
+        });
+
+        test('Rejects unsupported dictionary index versions', async ({expect}) => {
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const testDictionarySource = await createTestDictionaryArchiveData('invalid-dictionary1');
+
+            /** @type {import('dictionary-importer').ImportDetails} */
+            const importDetails = {prefixWildcardsSupported: false, yomitanVersion: '0.0.0.0'};
+            try {
+                const {result, errors} = await createDictionaryImporter(expect).importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    importDetails,
+                );
+                expect.soft(result).toBeNull();
+                expect.soft(errors.some((error) => error.message.includes('Unsupported dictionary format version: 0'))).toBe(true);
+                expect.soft(await dictionaryDatabase.getDictionaryInfo()).toStrictEqual([]);
+            } finally {
+                if (dictionaryDatabase.isPrepared()) {
+                    await dictionaryDatabase.close();
+                }
+            }
         });
     });
     describe('Database valid usage', () => {
         const testDataFilePath = join(dirname, 'data/database-test-cases.json');
         /** @type {import('test/database').DatabaseTestData} */
         const testData = parseJson(readFileSync(testDataFilePath, {encoding: 'utf8'}));
+        test('Rejects worker imports when fallback storage is detected', async ({expect}) => {
+            const dictionaryWorkerHandler = new DictionaryWorkerHandler();
+            /**
+             * @type {{
+             *   usesFallbackStorage: () => boolean,
+             *   exportDatabase: () => Promise<ArrayBuffer>,
+             *   importDatabase: (content: ArrayBuffer) => Promise<void>,
+             *   close: () => Promise<void>
+              }} */
+            const fakeDatabase = {
+                usesFallbackStorage: () => true,
+                exportDatabase: async () => new ArrayBuffer(8),
+                importDatabase: async () => {},
+                close: async () => {},
+            };
+            const getPreparedDictionaryDatabaseSpy = vi.spyOn(dictionaryWorkerHandler, '_getPreparedDictionaryDatabase').mockResolvedValue(
+                /** @type {any} */ (fakeDatabase),
+            );
+            const importDictionarySpy = vi.spyOn(DictionaryImporter.prototype, 'importDictionary').mockResolvedValue({
+                result: /** @type {import('dictionary-importer').Summary} */ ({title: 'mock', revision: 'mock', sequenced: true, version: 3, importDate: 0, prefixWildcardsSupported: false, styles: ''}),
+                errors: [],
+            });
+
+            const importDictionaryInternal = /** @type {(params: import('dictionary-worker-handler').ImportDictionaryMessageParams, onProgress: (...args: unknown[]) => void) => Promise<import('dictionary-worker').MessageCompleteResultSerialized>} */ (
+                Reflect.get(dictionaryWorkerHandler, '_importDictionary').bind(dictionaryWorkerHandler)
+            );
+            /** @type {import('dictionary-importer').ImportDetails} */
+            const importDetails = {
+                prefixWildcardsSupported: false,
+                yomitanVersion: '0.0.0.0',
+            };
+            try {
+                await expect.soft(
+                    importDictionaryInternal({details: importDetails, archiveContent: new ArrayBuffer(0)}, () => {}),
+                ).rejects.toThrow('OPFS is required for dictionary import');
+            } finally {
+                getPreparedDictionaryDatabaseSpy.mockRestore();
+                importDictionarySpy.mockRestore();
+            }
+        });
+        test('Deduplicates shared term entry content', async ({expect}) => {
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            /** @type {import('dictionary-database').DatabaseTermEntry[]} */
+            const entries = [
+                {
+                    dictionary: 'dedupe-dict',
+                    expression: '語1',
+                    reading: 'ご1',
+                    definitionTags: 'n',
+                    termTags: '',
+                    rules: '',
+                    score: 1,
+                    glossary: ['shared definition'],
+                    sequence: 1,
+                },
+                {
+                    dictionary: 'dedupe-dict',
+                    expression: '語2',
+                    reading: 'ご2',
+                    definitionTags: 'n',
+                    termTags: '',
+                    rules: '',
+                    score: 2,
+                    glossary: ['shared definition'],
+                    sequence: 2,
+                },
+                {
+                    dictionary: 'dedupe-dict',
+                    expression: '語3',
+                    reading: 'ご3',
+                    definitionTags: 'n',
+                    termTags: '',
+                    rules: '',
+                    score: 3,
+                    glossary: ['different definition'],
+                    sequence: 3,
+                },
+            ];
+
+            await dictionaryDatabase.bulkAdd('terms', entries, 0, entries.length);
+
+
+            const db = getRequiredDb(dictionaryDatabase);
+            const termsCount = db.selectValue('SELECT COUNT(*) FROM terms');
+            const termsWithExternalContentCount = db.selectValue(`
+                SELECT COUNT(*)
+                FROM terms
+                WHERE entryContentOffset IS NOT NULL AND entryContentLength IS NOT NULL
+            `);
+            const reusedContentCount = db.selectValue(`
+                SELECT COUNT(*)
+                FROM (
+                    SELECT entryContentOffset, entryContentLength, entryContentDictName
+                    FROM terms
+                    GROUP BY entryContentOffset, entryContentLength, entryContentDictName
+                    HAVING COUNT(*) > 1
+                )
+            `);
+
+            expect.soft(termsCount).toStrictEqual(3);
+            expect.soft(termsWithExternalContentCount).toStrictEqual(3);
+            expect.soft(reusedContentCount).toStrictEqual(1);
+
+            const titles = new Map([['dedupe-dict', {alias: 'dedupe-dict', allowSecondarySearches: false}]]);
+            const results = await dictionaryDatabase.findTermsExactBulk([{term: '語2', reading: 'ご2'}], titles);
+            expect.soft(results.length).toStrictEqual(1);
+            expect.soft(results[0].definitions).toStrictEqual(['shared definition']);
+
+            await dictionaryDatabase.close();
+        });
+
+        test('Does not deduplicate shared term entry content when dedup is disabled', async ({expect}) => {
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            dictionaryDatabase.setTermEntryContentDedupEnabled(false);
+
+            /** @type {import('dictionary-database').DatabaseTermEntry[]} */
+            const entries = [
+                {
+                    dictionary: 'dedupe-off-dict',
+                    expression: '語1',
+                    reading: 'ご1',
+                    definitionTags: 'n',
+                    termTags: '',
+                    rules: '',
+                    score: 1,
+                    glossary: ['shared definition'],
+                    sequence: 1,
+                },
+                {
+                    dictionary: 'dedupe-off-dict',
+                    expression: '語2',
+                    reading: 'ご2',
+                    definitionTags: 'n',
+                    termTags: '',
+                    rules: '',
+                    score: 2,
+                    glossary: ['shared definition'],
+                    sequence: 2,
+                },
+            ];
+
+            await dictionaryDatabase.bulkAdd('terms', entries, 0, entries.length);
+
+
+            const db = getRequiredDb(dictionaryDatabase);
+            const reusedContentCount = db.selectValue(`
+                SELECT COUNT(*)
+                FROM (
+                    SELECT entryContentOffset, entryContentLength, entryContentDictName
+                    FROM terms
+                    GROUP BY entryContentOffset, entryContentLength, entryContentDictName
+                    HAVING COUNT(*) > 1
+                )
+            `);
+            expect.soft(reusedContentCount).toStrictEqual(0);
+
+            await dictionaryDatabase.close();
+        });
+
+        test('Uses fast term parser for media-enabled imports', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            const readTermBankFileFastSpy = vi.spyOn(DictionaryImporter.prototype, '_readTermBankFileFast');
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(errors).toStrictEqual([]);
+                expect.soft(result).not.toBeNull();
+                expect.soft(readTermBankFileFastSpy).toHaveBeenCalled();
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info.length).toBe(1);
+                if (info.length > 0 && typeof info[0].counts === 'object' && info[0].counts !== null) {
+                    expect.soft(info[0].counts.media.total).toBeGreaterThan(0);
+                }
+            } finally {
+                readTermBankFileFastSpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
+        });
+
+        test('Prefers term artifact files when archive provides them', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArtifactArchiveData('valid-dictionary1', 'Artifact Dictionary');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            const readTermBankArtifactFileSpy = vi.spyOn(DictionaryImporter.prototype, '_readTermBankArtifactFile');
+            const decodeTermBankArtifactBytesSpy = vi.spyOn(DictionaryImporter.prototype, '_decodeTermBankArtifactBytes');
+            const readTermBankFileFastSpy = vi.spyOn(DictionaryImporter.prototype, '_readTermBankFileFast');
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(errors).toStrictEqual([]);
+                expect.soft(result).not.toBeNull();
+                expect.soft(
+                    readTermBankArtifactFileSpy.mock.calls.length + decodeTermBankArtifactBytesSpy.mock.calls.length,
+                ).toBeGreaterThan(0);
+                expect.soft(readTermBankFileFastSpy).not.toHaveBeenCalled();
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info.length).toBe(1);
+                expect.soft(info[0]?.title).toBe('Artifact Dictionary');
+                expect.soft(info[0]?.importSuccess).toBe(true);
+            } finally {
+                readTermBankArtifactFileSpy.mockRestore();
+                decodeTermBankArtifactBytesSpy.mockRestore();
+                readTermBankFileFastSpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
+        });
+
+        test('Imports raw-v3 term artifact files and preserves lookup/counts', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArtifactArchiveData('valid-dictionary1', 'Artifact Raw Dictionary', 'raw-v3');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(errors).toStrictEqual([]);
+                expect.soft(result).not.toBeNull();
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info.length).toBe(1);
+                expect.soft(info[0]?.title).toBe('Artifact Raw Dictionary');
+                expect.soft(info[0]?.importSuccess).toBe(true);
+
+                const counts = await dictionaryDatabase.getDictionaryCounts(['Artifact Raw Dictionary'], true);
+                if (counts.total === null) {
+                    throw new Error('Expected dictionary counts total for raw-v3 import');
+                }
+                expect.soft(counts.total.terms).toBeGreaterThan(0);
+
+                const titles = new Map([
+                    ['Artifact Raw Dictionary', {alias: 'Artifact Raw Dictionary', allowSecondarySearches: false}],
+                ]);
+                const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
+                expect.soft(results.length).toBeGreaterThan(0);
+                expect.soft(results.some((entry) => entry.dictionary === 'Artifact Raw Dictionary')).toBe(true);
+            } finally {
+                if (dictionaryDatabase.isPrepared()) {
+                    await dictionaryDatabase.close();
+                }
+            }
+        });
+
+        test('Imports raw-v4 term artifact files and preserves lookup/counts', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArtifactArchiveData('valid-dictionary1', 'Artifact Raw V4 Dictionary', 'raw-v4');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(errors).toStrictEqual([]);
+                expect.soft(result).not.toBeNull();
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info.length).toBe(1);
+                expect.soft(info[0]?.title).toBe('Artifact Raw V4 Dictionary');
+                expect.soft(info[0]?.importSuccess).toBe(true);
+
+                const counts = await dictionaryDatabase.getDictionaryCounts(['Artifact Raw V4 Dictionary'], true);
+                if (counts.total === null) {
+                    throw new Error('Expected dictionary counts total for raw-v4 import');
+                }
+                expect.soft(counts.total.terms).toBeGreaterThan(0);
+
+                const titles = new Map([
+                    ['Artifact Raw V4 Dictionary', {alias: 'Artifact Raw V4 Dictionary', allowSecondarySearches: false}],
+                ]);
+                const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
+                expect.soft(results.length).toBeGreaterThan(0);
+                expect.soft(results.some((entry) => entry.dictionary === 'Artifact Raw V4 Dictionary')).toBe(true);
+            } finally {
+                await dictionaryDatabase.close();
+            }
+        });
+
         test('Import data and test', async ({expect}) => {
             const fakeImportDate = testData.expectedSummary.importDate;
 
@@ -305,6 +1046,642 @@ describe('Database', () => {
             // Close
             await dictionaryDatabase.close();
         });
+
+        test('Removes partially imported dictionaries after import failure', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const originalBulkAdd = dictionaryDatabase.bulkAdd.bind(dictionaryDatabase);
+            let injectedFailureTriggered = false;
+            const bulkAddSpy = vi.spyOn(dictionaryDatabase, 'bulkAdd').mockImplementation(async (...args) => {
+                const [objectStoreName] = args;
+                await originalBulkAdd(...args);
+                if (objectStoreName === 'termMeta') {
+                    injectedFailureTriggered = true;
+                    throw new Error('Injected import failure');
+                }
+            });
+
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                expect.soft(injectedFailureTriggered).toBe(true);
+                expect.soft(result).toBeNull();
+                expect.soft(errors.some((error) => error.message.includes('Injected import failure'))).toBe(true);
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(info).toStrictEqual([]);
+
+                const counts = await dictionaryDatabase.getDictionaryCounts([], true);
+                expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
+            } finally {
+                bulkAddSpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
+        });
+
+        test('Reads terms correctly when storing glossary content as raw bytes', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const dictionaryImporter = createDictionaryImporter(expect);
+            const {result, errors} = await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {
+                    prefixWildcardsSupported: true,
+                    yomitanVersion: '0.0.0.0',
+                    enableTermEntryContentDedup: true,
+                    termContentStorageMode: 'raw-bytes',
+                },
+            );
+            expect.soft(errors).toStrictEqual([]);
+            expect.soft(result).not.toBeNull();
+            const info = await dictionaryDatabase.getDictionaryInfo();
+            expect.soft(info.length).toBe(1);
+            expect.soft(info[0]?.counts?.terms.total).toBeGreaterThan(0);
+
+            const titles = new Map([
+                [testDictionaryIndex.title, {alias: testDictionaryIndex.title, allowSecondarySearches: false}],
+            ]);
+            const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
+            expect.soft(results.length).toBeGreaterThan(0);
+            expect.soft(countDictionaryDatabaseEntriesWithTerm(results, '打')).toBeGreaterThan(0);
+            await dictionaryDatabase.close();
+        });
+
+        test('Exact lookup negative cache is scoped to enabled dictionary set', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const dictionaryImporter = createDictionaryImporter(expect);
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+            const installedTitles = new Map([
+                [testDictionaryIndex.title, {alias: testDictionaryIndex.title, allowSecondarySearches: false}],
+            ]);
+            const missingTitles = new Map([
+                ['__yomitan_missing_dictionary__', {alias: '__yomitan_missing_dictionary__', allowSecondarySearches: false}],
+            ]);
+
+            const missingResults = await dictionaryDatabase.findTermsBulk(['打'], missingTitles, 'exact');
+            expect.soft(missingResults).toStrictEqual([]);
+
+            const installedResults = await dictionaryDatabase.findTermsBulk(['打'], installedTitles, 'exact');
+            expect.soft(installedResults.length).toBeGreaterThan(0);
+            expect.soft(countDictionaryDatabaseEntriesWithTerm(installedResults, '打')).toBeGreaterThan(0);
+            await dictionaryDatabase.close();
+        });
+
+        test('Retains multiple imported dictionaries and returns results from both', async ({expect}) => {
+            const sourceA = await createTestDictionaryArchiveData('valid-dictionary1', 'Dictionary A');
+            const sourceB = await createTestDictionaryArchiveData('valid-dictionary1', 'Dictionary B');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const dictionaryImporter = createDictionaryImporter(expect);
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                sourceA,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                sourceB,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+            const info = await dictionaryDatabase.getDictionaryInfo();
+            expect.soft(info.map(({title}) => title).sort()).toStrictEqual(['Dictionary A', 'Dictionary B']);
+
+            const titles = new Map([
+                ['Dictionary A', {alias: 'Dictionary A', allowSecondarySearches: false}],
+                ['Dictionary B', {alias: 'Dictionary B', allowSecondarySearches: false}],
+            ]);
+            const results = await dictionaryDatabase.findTermsBulk(['打'], titles, 'exact');
+            const dictionaries = new Set(results.map(({dictionary}) => dictionary));
+            expect.soft(dictionaries).toStrictEqual(new Set(['Dictionary A', 'Dictionary B']));
+
+            await dictionaryDatabase.close();
+        });
+
+        test('Clears external term stores before importing database snapshots', async ({expect}) => {
+            const opfsRootDirectoryHandle = createInMemoryOpfsDirectoryHandle();
+            const restoreNavigator = installInMemoryOpfsNavigator(opfsRootDirectoryHandle);
+            const dictionaryDatabase = new DictionaryDatabase();
+            const importOpfsDatabaseSpy = vi.spyOn(sqliteWasm, 'importOpfsDatabase').mockResolvedValue();
+            const openConnectionSpy = vi.spyOn(dictionaryDatabase, '_openConnection').mockResolvedValue();
+
+            try {
+                const termContentStore = Reflect.get(dictionaryDatabase, '_termContentStore');
+                const termRecordStore = Reflect.get(dictionaryDatabase, '_termRecordStore');
+                if (!(termContentStore instanceof TermContentOpfsStore)) {
+                    throw new Error('Expected _termContentStore');
+                }
+                if (!(termRecordStore instanceof TermRecordOpfsStore)) {
+                    throw new Error('Expected _termRecordStore');
+                }
+
+                await termContentStore.prepare();
+                await termRecordStore.prepare();
+
+                const [contentSpan] = await termContentStore.appendBatch([new Uint8Array([1, 2, 3, 4])]);
+                await termRecordStore.appendBatch([{
+                    dictionary: 'Dictionary B',
+                    expression: '打',
+                    reading: 'だ',
+                    expressionReverse: null,
+                    readingReverse: null,
+                    entryContentOffset: contentSpan.offset,
+                    entryContentLength: contentSpan.length,
+                    entryContentDictName: 'raw',
+                    score: 0,
+                    sequence: 1,
+                }]);
+
+                const termContentFileHandle = /** @type {{getFile: () => Promise<{size: number}>}} */ (
+                    await opfsRootDirectoryHandle.getFileHandle('yomitan-term-content.bin', {create: false})
+                );
+                const termRecordDirectoryHandle = /** @type {{entries: () => AsyncGenerator<[string, unknown], void, unknown>}} */ (
+                    await opfsRootDirectoryHandle.getDirectoryHandle('yomitan-term-records', {create: false})
+                );
+
+                let shardCount = 0;
+                for await (const entry of termRecordDirectoryHandle.entries()) {
+                    void entry;
+                    ++shardCount;
+                }
+                expect.soft((await termContentFileHandle.getFile()).size).toBeGreaterThan(0);
+                expect.soft(termRecordStore.getAllIds().length).toBeGreaterThan(0);
+                expect.soft(shardCount).toBeGreaterThan(0);
+
+                const content = new ArrayBuffer(8);
+                await dictionaryDatabase.importDatabase(content);
+
+                let remainingShardCount = 0;
+                for await (const entry of termRecordDirectoryHandle.entries()) {
+                    void entry;
+                    ++remainingShardCount;
+                }
+
+                expect.soft(importOpfsDatabaseSpy).toHaveBeenCalledTimes(1);
+                expect.soft(importOpfsDatabaseSpy).toHaveBeenCalledWith(content);
+                expect.soft(openConnectionSpy).toHaveBeenCalledTimes(1);
+                expect.soft((await termContentFileHandle.getFile()).size).toBe(0);
+                expect.soft(termRecordStore.isEmpty()).toBe(true);
+                expect.soft(termRecordStore.getAllIds()).toStrictEqual([]);
+                expect.soft(remainingShardCount).toBe(0);
+            } finally {
+                openConnectionSpy.mockRestore();
+                importOpfsDatabaseSpy.mockRestore();
+                restoreNavigator();
+            }
+        });
+
+        test('Recovers incomplete import on startup when immediate cleanup fails', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const originalBulkAdd = dictionaryDatabase.bulkAdd.bind(dictionaryDatabase);
+            let injectedFailureTriggered = false;
+            const bulkAddSpy = vi.spyOn(dictionaryDatabase, 'bulkAdd').mockImplementation(async (...args) => {
+                const [objectStoreName] = args;
+                await originalBulkAdd(...args);
+                if (!injectedFailureTriggered && objectStoreName === 'termMeta') {
+                    injectedFailureTriggered = true;
+                    throw new Error('Injected import failure for crash-recovery');
+                }
+            });
+
+            const deleteDictionarySpy = vi.spyOn(dictionaryDatabase, 'deleteDictionary').mockImplementation(async () => {
+                throw new Error('Injected cleanup deletion failure for crash-recovery');
+            });
+
+            try {
+                const dictionaryImporter = createDictionaryImporter(expect);
+                const {result, errors} = await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+
+                expect.soft(injectedFailureTriggered).toBe(true);
+                expect.soft(result).toBeNull();
+                expect.soft(errors.some((error) => error.message.includes('Injected import failure for crash-recovery'))).toBe(true);
+                expect.soft(errors.some((error) => error.message.includes('Failed to clean up partially imported dictionary'))).toBe(true);
+
+                const interimInfo = await dictionaryDatabase.getDictionaryInfo();
+                expect.soft(interimInfo.length).toBe(1);
+                expect.soft(interimInfo[0]?.title).toBe(testDictionaryIndex.title);
+                expect.soft(interimInfo[0]?.importSuccess).toBe(false);
+            } finally {
+                deleteDictionarySpy.mockRestore();
+                bulkAddSpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
+
+            const reopenedDictionaryDatabase = new DictionaryDatabase();
+            await reopenedDictionaryDatabase.prepare();
+            try {
+                const info = await reopenedDictionaryDatabase.getDictionaryInfo();
+                expect.soft(info).toStrictEqual([]);
+
+                const counts = await reopenedDictionaryDatabase.getDictionaryCounts([], true);
+                expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
+            } finally {
+                await reopenedDictionaryDatabase.close();
+            }
+        }, 15000);
+
+        test('Cleans incomplete dictionaries during prepare', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            const dictionaryImporter = createDictionaryImporter(expect);
+
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+
+            const db = getRequiredDb(dictionaryDatabase);
+            const summaryRow = db.selectObject('SELECT summaryJson FROM dictionaries WHERE title = $title LIMIT 1', {$title: testDictionaryIndex.title});
+            expect.soft(typeof summaryRow).toBe('object');
+            if (typeof summaryRow === 'undefined') {
+                throw new Error('Imported dictionary summary row missing');
+            }
+            const summaryJson = summaryRow.summaryJson;
+            expect.soft(typeof summaryJson).toBe('string');
+            if (typeof summaryJson !== 'string') {
+                throw new Error('Imported dictionary summaryJson is not a string');
+            }
+            const summary = /** @type {{importSuccess?: boolean}} */ (parseJson(summaryJson));
+            summary.importSuccess = false;
+            db.exec({
+                sql: 'UPDATE dictionaries SET summaryJson = $summaryJson WHERE title = $title',
+                bind: {
+                    $summaryJson: JSON.stringify(summary),
+                    $title: testDictionaryIndex.title,
+                },
+            });
+            await dictionaryDatabase.close();
+
+            const reopenedDictionaryDatabase = new DictionaryDatabase();
+            await reopenedDictionaryDatabase.prepare();
+            try {
+                const info = await reopenedDictionaryDatabase.getDictionaryInfo();
+                expect.soft(info).toStrictEqual([]);
+
+                const counts = await reopenedDictionaryDatabase.getDictionaryCounts([], true);
+                expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
+            } finally {
+                await reopenedDictionaryDatabase.close();
+            }
+        }, 15000);
+
+        test('Cleans dictionaries with corrupted summary JSON during prepare', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            const dictionaryImporter = createDictionaryImporter(expect);
+
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+
+            const db = getRequiredDb(dictionaryDatabase);
+            db.exec({
+                sql: 'UPDATE dictionaries SET summaryJson = $summaryJson WHERE title = $title',
+                bind: {
+                    $summaryJson: '{invalid-json',
+                    $title: testDictionaryIndex.title,
+                },
+            });
+            await dictionaryDatabase.close();
+
+            const reopenedDictionaryDatabase = new DictionaryDatabase();
+            await reopenedDictionaryDatabase.prepare();
+            try {
+                const info = await reopenedDictionaryDatabase.getDictionaryInfo();
+                expect.soft(info).toStrictEqual([]);
+
+                const counts = await reopenedDictionaryDatabase.getDictionaryCounts([], true);
+                expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
+            } finally {
+                await reopenedDictionaryDatabase.close();
+            }
+        }, 15000);
+
+        test('Cleans dictionaries with missing term-record shard during prepare', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
+            const dictionaryImporter = createDictionaryImporter(expect);
+            const opfsRootDirectoryHandle = createInMemoryOpfsDirectoryHandle();
+            const restoreNavigator = installInMemoryOpfsNavigator(opfsRootDirectoryHandle);
+
+            const dictionaryDatabase = new DictionaryDatabase();
+            try {
+                await dictionaryDatabase.prepare();
+                await dictionaryImporter.importDictionary(
+                    dictionaryDatabase,
+                    testDictionarySource,
+                    {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+                );
+                await dictionaryDatabase.close();
+
+                const recordsDirectoryHandle = /** @type {{getDirectoryHandle: (name: string, options?: {create?: boolean}) => Promise<{removeEntry: (name: string) => Promise<void>}>}} */ (
+                    opfsRootDirectoryHandle
+                );
+                const termRecordsDirectory = await recordsDirectoryHandle.getDirectoryHandle('yomitan-term-records', {create: false});
+                const shardFileName = `dict-${encodeURIComponent(testDictionaryIndex.title)}.mbtr`;
+                await termRecordsDirectory.removeEntry(shardFileName);
+
+                const reopenedDictionaryDatabase = new DictionaryDatabase();
+                await reopenedDictionaryDatabase.prepare();
+                try {
+                    const info = await reopenedDictionaryDatabase.getDictionaryInfo();
+                    expect.soft(info).toStrictEqual([]);
+
+                    const counts = await reopenedDictionaryDatabase.getDictionaryCounts([], true);
+                    expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
+                } finally {
+                    await reopenedDictionaryDatabase.close();
+                }
+            } finally {
+                restoreNavigator();
+            }
+        }, 15000);
+
+        test('Rebuilds stale empty direct term index from loaded term records', async ({expect}) => {
+            const opfsRootDirectoryHandle = createInMemoryOpfsDirectoryHandle();
+            const restoreNavigator = installInMemoryOpfsNavigator(opfsRootDirectoryHandle);
+
+            try {
+                const termRecordStore = new TermRecordOpfsStore();
+                await termRecordStore.prepare();
+                await termRecordStore.appendBatch([{
+                    dictionary: 'Test Dictionary',
+                    expression: '打つ',
+                    reading: 'うつ',
+                    expressionReverse: null,
+                    readingReverse: null,
+                    entryContentOffset: 0,
+                    entryContentLength: 1,
+                    entryContentDictName: 'raw',
+                    score: 0,
+                    sequence: 1,
+                }]);
+
+                const reopenedTermRecordStore = new TermRecordOpfsStore();
+                await reopenedTermRecordStore.prepare();
+                try {
+                    // Simulate a stale empty cached index even though the records are loaded.
+
+                    getIndexByDictionary(reopenedTermRecordStore).set('Test Dictionary', {
+                        expression: new Map(),
+                        reading: new Map(),
+                        expressionReverse: new Map(),
+                        readingReverse: new Map(),
+                        pair: new Map(),
+                        sequence: new Map(),
+                    });
+                    const rebuilt = reopenedTermRecordStore.getDictionaryIndex('Test Dictionary');
+                    expect.soft(rebuilt.expression.get('打つ')?.length ?? 0).toBeGreaterThan(0);
+                    expect.soft(rebuilt.reading.get('うつ')?.length ?? 0).toBeGreaterThan(0);
+                    expect.soft(rebuilt.expressionReverse.get('つ打')?.length ?? 0).toBeGreaterThan(0);
+                    expect.soft(rebuilt.readingReverse.get('つう')?.length ?? 0).toBeGreaterThan(0);
+                } finally {
+                    await reopenedTermRecordStore.reset();
+                }
+            } finally {
+                restoreNavigator();
+            }
+        }, 15000);
+
+        test('Reports startup cleanup summary counts and failures', async ({expect}) => {
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+
+            const db = getRequiredDb(dictionaryDatabase);
+            db.exec({
+                sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
+                bind: {
+                    $title: 'Healthy',
+                    $version: 3,
+                    $summaryJson: JSON.stringify({title: 'Healthy', revision: '1', version: 3, importSuccess: true}),
+                },
+            });
+            db.exec({
+                sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
+                bind: {
+                    $title: '',
+                    $version: 3,
+                    $summaryJson: JSON.stringify({title: '', revision: '1', version: 3, importSuccess: false}),
+                },
+            });
+            db.exec({
+                sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
+                bind: {
+                    $title: 'Broken Parse',
+                    $version: 3,
+                    $summaryJson: '{broken-json',
+                },
+            });
+            db.exec({
+                sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
+                bind: {
+                    $title: 'Broken Flag',
+                    $version: 3,
+                    $summaryJson: JSON.stringify({title: 'Broken Flag', revision: '1', version: 3, importSuccess: false}),
+                },
+            });
+
+            const originalDeleteDictionary = dictionaryDatabase.deleteDictionary.bind(dictionaryDatabase);
+            const deleteDictionarySpy = vi.spyOn(dictionaryDatabase, 'deleteDictionary').mockImplementation(async (title, deleteStepSize, onProgress) => {
+                if (title === 'Broken Flag') {
+                    throw new Error('Injected startup cleanup delete failure');
+                }
+                await originalDeleteDictionary(title, deleteStepSize, onProgress);
+            });
+
+            try {
+                const cleanupMethod = Reflect.get(dictionaryDatabase, '_cleanupIncompleteImports');
+                if (typeof cleanupMethod !== 'function') {
+                    throw new Error('Expected _cleanupIncompleteImports method');
+                }
+                const summary = await Promise.resolve(cleanupMethod.call(dictionaryDatabase));
+                expect.soft(summary).toStrictEqual({
+                    scannedCount: 4,
+                    removedCount: 2,
+                    removedTitles: ['Broken Parse'],
+                    removedEmptyTitleRows: 1,
+                    failedCount: 1,
+                    failedTitles: ['Broken Flag'],
+                    parseErrorCount: 1,
+                });
+
+                const remainingTitles = db.selectObjects('SELECT title FROM dictionaries ORDER BY title ASC').map((row) => row.title);
+                expect.soft(remainingTitles).toStrictEqual(['Broken Flag', 'Healthy']);
+            } finally {
+                deleteDictionarySpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
+        });
+
+        test('Schema migration v1 wipes unversioned dictionary data and advances to current schema version', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            const dictionaryImporter = createDictionaryImporter(expect);
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+            const beforeInfo = await dictionaryDatabase.getDictionaryInfo();
+            expect.soft(beforeInfo.length).toBe(1);
+
+            const db = getRequiredDb(dictionaryDatabase);
+            db.exec('PRAGMA user_version = 0');
+            const runSchemaMigrations = Reflect.get(dictionaryDatabase, '_runSchemaMigrations');
+            if (typeof runSchemaMigrations !== 'function') {
+                throw new Error('Expected _runSchemaMigrations method');
+            }
+            await Promise.resolve(runSchemaMigrations.call(dictionaryDatabase));
+
+            const afterInfo = await dictionaryDatabase.getDictionaryInfo();
+            expect.soft(afterInfo).toStrictEqual([]);
+            const counts = await dictionaryDatabase.getDictionaryCounts([], true);
+            expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(4);
+            await dictionaryDatabase.close();
+        });
+
+        test('Schema migration v2 upgrades from v1 without wiping dictionary data, and v3/v4 reset dictionary data', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            const dictionaryImporter = createDictionaryImporter(expect);
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+
+            const db = getRequiredDb(dictionaryDatabase);
+            db.exec('PRAGMA user_version = 1');
+            const runSchemaMigrations = Reflect.get(dictionaryDatabase, '_runSchemaMigrations');
+            if (typeof runSchemaMigrations !== 'function') {
+                throw new Error('Expected _runSchemaMigrations method');
+            }
+            await Promise.resolve(runSchemaMigrations.call(dictionaryDatabase));
+            const runSchemaMigrationToVersion = Reflect.get(dictionaryDatabase, '_runSchemaMigrationToVersion');
+            if (typeof runSchemaMigrationToVersion !== 'function') {
+                throw new Error('Expected _runSchemaMigrationToVersion method');
+            }
+            const v2Summary = await Promise.resolve(runSchemaMigrationToVersion.call(dictionaryDatabase, 2));
+
+            const afterInfo = await dictionaryDatabase.getDictionaryInfo();
+            expect.soft(afterInfo).toStrictEqual([]);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(4);
+            expect.soft(v2Summary).toStrictEqual({migration: 'schema-v2-noop'});
+            await dictionaryDatabase.close();
+        });
+
+        test('Schema migration rerun is idempotent at current version', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            const dictionaryImporter = createDictionaryImporter(expect);
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+
+            const db = getRequiredDb(dictionaryDatabase);
+            const runSchemaMigrations = Reflect.get(dictionaryDatabase, '_runSchemaMigrations');
+            if (typeof runSchemaMigrations !== 'function') {
+                throw new Error('Expected _runSchemaMigrations method');
+            }
+            await Promise.resolve(runSchemaMigrations.call(dictionaryDatabase));
+            await Promise.resolve(runSchemaMigrations.call(dictionaryDatabase));
+
+            const info = await dictionaryDatabase.getDictionaryInfo();
+            expect.soft(info.length).toBe(1);
+            expect.soft(info[0]?.importSuccess).toBe(true);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(4);
+            await dictionaryDatabase.close();
+        });
+
+        test('Schema migration is skipped when installed version is newer', async ({expect}) => {
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            const dictionaryImporter = createDictionaryImporter(expect);
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                testDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+
+
+            const db = getRequiredDb(dictionaryDatabase);
+            db.exec('PRAGMA user_version = 999');
+            const runSchemaMigrations = Reflect.get(dictionaryDatabase, '_runSchemaMigrations');
+            if (typeof runSchemaMigrations !== 'function') {
+                throw new Error('Expected _runSchemaMigrations method');
+            }
+            await Promise.resolve(runSchemaMigrations.call(dictionaryDatabase));
+
+            const info = await dictionaryDatabase.getDictionaryInfo();
+            expect.soft(info.length).toBe(1);
+            expect.soft(info[0]?.importSuccess).toBe(true);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(999);
+            await dictionaryDatabase.close();
+        });
+
+        test('Schema migration throws for unknown target version', async ({expect}) => {
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+            try {
+                const runSchemaMigrationToVersion = Reflect.get(dictionaryDatabase, '_runSchemaMigrationToVersion');
+                if (typeof runSchemaMigrationToVersion !== 'function') {
+                    throw new Error('Expected _runSchemaMigrationToVersion method');
+                }
+                await expect(Promise.resolve(runSchemaMigrationToVersion.call(dictionaryDatabase, 999)))
+                    .rejects
+                    .toThrow('Unhandled dictionary schema migration target version: 999');
+            } finally {
+                await dictionaryDatabase.close();
+            }
+        });
     });
     describe('Database cleanup', () => {
         /** @type {{clearMethod: 'purge'|'delete'}[]} */
@@ -358,7 +1735,7 @@ describe('Database', () => {
 
                 // Close
                 await dictionaryDatabase.close();
-            });
+            }, 15000);
         });
     });
 });
