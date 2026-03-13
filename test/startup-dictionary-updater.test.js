@@ -18,9 +18,25 @@
 import {describe, expect, test, vi} from 'vitest';
 import {StartupDictionaryUpdater} from '../ext/js/background/startup-dictionary-updater.js';
 
+/**
+ * @param {string} title
+ * @returns {import('dictionary-importer').Summary}
+ */
+function createDictionarySummary(title) {
+    return /** @type {import('dictionary-importer').Summary} */ ({
+        title,
+        revision: '1',
+        sequenced: true,
+        version: 3,
+        importDate: 0,
+        prefixWildcardsSupported: false,
+        styles: '',
+    });
+}
+
 describe('StartupDictionaryUpdater', () => {
     test('skips work when the feature is disabled', async () => {
-        const getDictionaryInfo = vi.fn(async () => []);
+        const getDictionaryInfo = vi.fn(async () => /** @type {import('dictionary-importer').Summary[]} */ ([]));
         const updater = new StartupDictionaryUpdater({
             isEnabled: async () => false,
             hasRunThisSession: async () => false,
@@ -36,7 +52,9 @@ describe('StartupDictionaryUpdater', () => {
     });
 
     test('updates dictionaries sequentially and continues after failures', async () => {
+        /** @type {string[]} */
         const updatedTitles = [];
+        /** @type {{error: unknown, details: {dictionaryTitle: string, phase: 'check' | 'update'}}[]} */
         const errors = [];
         const markRunThisSession = vi.fn(async () => {});
         const updater = new StartupDictionaryUpdater({
@@ -44,9 +62,9 @@ describe('StartupDictionaryUpdater', () => {
             hasRunThisSession: async () => false,
             markRunThisSession,
             getDictionaryInfo: async () => [
-                {title: 'Dictionary A'},
-                {title: 'Dictionary B'},
-                {title: 'Dictionary C'},
+                createDictionarySummary('Dictionary A'),
+                createDictionarySummary('Dictionary B'),
+                createDictionarySummary('Dictionary C'),
             ],
             checkForUpdate: async ({title}) => {
                 if (title === 'Dictionary A') { return 'https://example.invalid/a.zip'; }

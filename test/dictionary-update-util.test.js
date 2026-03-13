@@ -23,28 +23,38 @@ import {
     updateDictionaryAnkiFieldTemplates,
 } from '../ext/js/dictionary/dictionary-update-util.js';
 
+/**
+ * @param {string} title
+ * @param {string} revision
+ * @param {boolean} isUpdatable
+ * @returns {import('dictionary-importer').Summary}
+ */
+function createDictionarySummary(title, revision, isUpdatable) {
+    return /** @type {import('dictionary-importer').Summary} */ ({
+        title,
+        revision,
+        sequenced: true,
+        version: 3,
+        importDate: 0,
+        prefixWildcardsSupported: false,
+        styles: '',
+        isUpdatable,
+        indexUrl: 'https://example.invalid/index.json',
+        downloadUrl: 'https://example.invalid/dictionary.zip',
+    });
+}
+
 describe('dictionary-update-util', () => {
     test('getDictionaryUpdateDownloadUrl skips dictionaries without update metadata', async () => {
-        const dictionaryInfo = {
-            title: 'Dictionary',
-            revision: '1',
-            isUpdatable: false,
-            indexUrl: 'https://example.invalid/index.json',
-            downloadUrl: 'https://example.invalid/dictionary.zip',
-        };
+        const dictionaryInfo = createDictionarySummary('Dictionary', '1', false);
 
         expect(await getDictionaryUpdateDownloadUrl(dictionaryInfo)).toBeNull();
     });
 
     test('getDictionaryUpdateDownloadUrl returns latest download URL for newer revisions', async () => {
-        const dictionaryInfo = {
-            title: 'Dictionary',
-            revision: '1',
-            isUpdatable: true,
-            indexUrl: 'https://example.invalid/index.json',
-            downloadUrl: 'https://example.invalid/current.zip',
-        };
-        const fetchIndex = async () => ({
+        const dictionaryInfo = createDictionarySummary('Dictionary', '1', true);
+        dictionaryInfo.downloadUrl = 'https://example.invalid/current.zip';
+        const fetchIndex = /** @type {(url: string) => Promise<Response>} */ (async () => /** @type {Response} */ (/** @type {unknown} */ ({
             ok: true,
             status: 200,
             json: async () => ({
@@ -62,14 +72,22 @@ describe('dictionary-update-util', () => {
                 indexUrl: 'https://example.invalid/index.json',
                 downloadUrl: 'https://example.invalid/latest.zip',
             }),
-        });
+        })));
 
         expect(await getDictionaryUpdateDownloadUrl(dictionaryInfo, fetchIndex)).toBe('https://example.invalid/latest.zip');
     });
 
     test('applyImportedDictionarySettings preserves dictionary order and updates main dictionary references', () => {
-        const options = {
+        const options = /** @type {import('settings').Options} */ (/** @type {unknown} */ ({
+            version: 0,
             profileCurrent: 1,
+            global: {
+                database: {
+                    prefixWildcardsSupported: false,
+                    autoUpdateDictionariesOnStartup: false,
+                },
+                dataTransmissionConsentShown: false,
+            },
             profiles: [
                 {
                     id: 'profile-0',
@@ -93,10 +111,18 @@ describe('dictionary-update-util', () => {
                     },
                 },
             ],
-        };
+        }));
 
         const profilesDictionarySettings = getProfilesDictionarySettings(options, 'Test Dictionary');
-        applyImportedDictionarySettings(options, {title: 'Updated Dictionary', sequenced: true, styles: 'new'}, profilesDictionarySettings);
+        applyImportedDictionarySettings(options, /** @type {import('dictionary-importer').Summary} */ ({
+            title: 'Updated Dictionary',
+            revision: '2',
+            sequenced: true,
+            version: 3,
+            importDate: 0,
+            prefixWildcardsSupported: false,
+            styles: 'new',
+        }), profilesDictionarySettings);
 
         expect(options.profiles[0].options.dictionaries[0]).toMatchObject({name: 'Updated Dictionary', alias: 'My Alias', styles: 'new'});
         expect(options.profiles[1].options.dictionaries[0]).toMatchObject({name: 'Updated Dictionary', alias: 'Updated Dictionary', styles: 'new'});
@@ -105,7 +131,16 @@ describe('dictionary-update-util', () => {
     });
 
     test('updateDictionaryAnkiFieldTemplates rewrites matching dictionary field segments', () => {
-        const options = {
+        const options = /** @type {import('settings').Options} */ (/** @type {unknown} */ ({
+            version: 0,
+            profileCurrent: 0,
+            global: {
+                database: {
+                    prefixWildcardsSupported: false,
+                    autoUpdateDictionariesOnStartup: false,
+                },
+                dataTransmissionConsentShown: false,
+            },
             profiles: [
                 {
                     id: 'profile-0',
@@ -123,8 +158,8 @@ describe('dictionary-update-util', () => {
                     },
                 },
             ],
-        };
-        const profilesDictionarySettings = {
+        }));
+        const profilesDictionarySettings = /** @type {import('settings-controller').ProfilesDictionarySettings} */ ({
             'profile-0': {
                 index: 0,
                 name: 'Test Dictionary',
@@ -136,7 +171,7 @@ describe('dictionary-update-util', () => {
                 useDeinflections: true,
                 styles: '',
             },
-        };
+        });
 
         const modified = updateDictionaryAnkiFieldTemplates(options, profilesDictionarySettings, 'Updated Dictionary');
 
