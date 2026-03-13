@@ -24,6 +24,15 @@ const READING_EQUALS_EXPRESSION_U32 = 0xffffffff;
 let wasmPromise = null;
 
 /**
+ * @typedef {{
+ *   stringLengths: Uint16Array,
+ *   stringsBuffer: Uint8Array,
+ *   expressionIndexes: Uint32Array,
+ *   readingIndexes: Uint32Array,
+ * }} PreinternedTermRecordPlan
+ */
+
+/**
  * @param {TextEncoder} textEncoder
  * @returns {{stringOffsets: number[], stringLengths: number[], internString: (value: string) => number, internStringBytes: (value: string, bytes: Uint8Array) => number, buildStringsBuffer: () => Uint8Array}}
  */
@@ -139,6 +148,16 @@ async function getWasm() {
  * @returns {Promise<Uint8Array|null>}
  */
 export async function encodeTermRecordsWithWasm(records, textEncoder) {
+    return await encodeTermRecordsWithWasmPreinterned(records, textEncoder, null);
+}
+
+/**
+ * @param {{id: number, dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
+ * @param {TextEncoder} textEncoder
+ * @param {PreinternedTermRecordPlan|null} preinternedPlan
+ * @returns {Promise<Uint8Array|null>}
+ */
+export async function encodeTermRecordsWithWasmPreinterned(records, textEncoder, preinternedPlan) {
     if (records.length === 0) {
         return new Uint8Array(0);
     }
@@ -148,22 +167,35 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     const metasU32 = new Uint32Array(metasBuffer);
     const metasI32 = new Int32Array(metasBuffer);
     const {stringLengths, internString, internStringBytes, buildStringsBuffer} = createStringInterner(textEncoder);
+    const planExpressionIndexes = preinternedPlan?.expressionIndexes ?? null;
+    const planReadingIndexes = preinternedPlan?.readingIndexes ?? null;
     let recordIndex = 0;
     for (const record of records) {
-        const expressionIndex = record.expressionBytes instanceof Uint8Array ?
-            internStringBytes(record.expression, record.expressionBytes) :
-            internString(record.expression);
+        let expressionIndex;
+        if (planExpressionIndexes instanceof Uint32Array) {
+            expressionIndex = planExpressionIndexes[recordIndex];
+        } else if (record.expressionBytes instanceof Uint8Array) {
+            expressionIndex = internStringBytes(record.expression, record.expressionBytes);
+        } else {
+            expressionIndex = internString(record.expression);
+        }
         const readingEqualsExpression = record.reading === record.expression;
-        const readingIndex = readingEqualsExpression ?
-            expressionIndex :
-            (
-                record.readingBytes instanceof Uint8Array ?
-                    internStringBytes(record.reading, record.readingBytes) :
-                    internString(record.reading)
-            );
+        let readingIndex;
+        if (planReadingIndexes instanceof Uint32Array) {
+            readingIndex = planReadingIndexes[recordIndex];
+        } else if (readingEqualsExpression) {
+            readingIndex = expressionIndex;
+        } else if (record.readingBytes instanceof Uint8Array) {
+            readingIndex = internStringBytes(record.reading, record.readingBytes);
+        } else {
+            readingIndex = internString(record.reading);
+        }
         if (
-            stringLengths[expressionIndex] > U16_NULL ||
-            stringLengths[readingIndex] > U16_NULL
+            !(preinternedPlan instanceof Object) &&
+            (
+                stringLengths[expressionIndex] > U16_NULL ||
+                stringLengths[readingIndex] > U16_NULL
+            )
         ) {
             return null;
         }
@@ -176,12 +208,13 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
         metasI32[metaIndex + 5] = record.sequence ?? -1;
         ++recordIndex;
     }
-    const stringLengthsBuffer = new ArrayBuffer(stringLengths.length * 2);
-    const stringLengthsU16 = new Uint16Array(stringLengthsBuffer);
-    for (let i = 0; i < stringLengths.length; ++i) {
-        stringLengthsU16[i] = stringLengths[i];
-    }
-    const stringsBuffer = buildStringsBuffer();
+    const stringLengthsU16 = preinternedPlan?.stringLengths ?? Uint16Array.from(stringLengths);
+    const stringLengthsBuffer = new Uint8Array(
+        stringLengthsU16.buffer,
+        stringLengthsU16.byteOffset,
+        stringLengthsU16.byteLength,
+    );
+    const stringsBuffer = preinternedPlan?.stringsBuffer ?? buildStringsBuffer();
     wasm.wasm_reset_heap();
     const metasPtr = wasm.wasm_alloc(metasBuffer.byteLength);
     const stringLengthsPtr = wasm.wasm_alloc(stringLengthsBuffer.byteLength);
@@ -191,10 +224,10 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     }
     const wasmHeapAfterAlloc = new Uint8Array(wasm.memory.buffer);
     wasmHeapAfterAlloc.set(new Uint8Array(metasBuffer), metasPtr);
-    wasmHeapAfterAlloc.set(new Uint8Array(stringLengthsBuffer), stringLengthsPtr);
+    wasmHeapAfterAlloc.set(stringLengthsBuffer, stringLengthsPtr);
     wasmHeapAfterAlloc.set(stringsBuffer, stringsPtr);
 
-    const encodedSize = wasm.calc_encoded_size(records.length, stringLengths.length, stringLengthsPtr, stringsBuffer.byteLength, metasPtr);
+    const encodedSize = wasm.calc_encoded_size(records.length, stringLengthsU16.length, stringLengthsPtr, stringsBuffer.byteLength, metasPtr);
     if (encodedSize <= 0) {
         return new Uint8Array(0);
     }
@@ -202,7 +235,7 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
     if (outPtr === 0) {
         return null;
     }
-    const written = wasm.encode_records(records.length, stringLengths.length, stringLengthsPtr, stringsPtr, stringsBuffer.byteLength, metasPtr, outPtr);
+    const written = wasm.encode_records(records.length, stringLengthsU16.length, stringLengthsPtr, stringsPtr, stringsBuffer.byteLength, metasPtr, outPtr);
     if (written <= 0) {
         return new Uint8Array(0);
     }

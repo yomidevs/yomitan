@@ -75,6 +75,62 @@ const EMPTY_TERM_GLOSSARY = [];
 Object.freeze(EMPTY_TERM_GLOSSARY);
 
 /**
+ * @returns {{
+ *   internStringBytes: (value: string, bytes: Uint8Array) => number,
+ *   buildPlan: (expressionIndexes: number[], readingIndexes: number[]) => import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan,
+ * }}
+ */
+function createArtifactTermRecordPreinternedPlanBuilder() {
+    /** @type {Map<string, number>} */
+    const stringIndexByValue = new Map();
+    /** @type {number[]} */
+    const stringLengths = [];
+    /** @type {Uint8Array[]} */
+    const stringBytesList = [];
+
+    return {
+        internStringBytes(value, bytes) {
+            const cached = stringIndexByValue.get(value);
+            if (typeof cached === 'number') {
+                return cached;
+            }
+            const index = stringBytesList.length;
+            stringIndexByValue.set(value, index);
+            stringLengths.push(bytes.byteLength);
+            stringBytesList.push(bytes);
+            return index;
+        },
+        buildPlan(expressionIndexes, readingIndexes) {
+            let totalStringBytes = 0;
+            for (const length of stringLengths) {
+                totalStringBytes += length;
+            }
+            const stringsBuffer = new Uint8Array(totalStringBytes);
+            let cursor = 0;
+            for (const bytes of stringBytesList) {
+                stringsBuffer.set(bytes, cursor);
+                cursor += bytes.byteLength;
+            }
+            return {
+                stringLengths: Uint16Array.from(stringLengths),
+                stringsBuffer,
+                expressionIndexes: Uint32Array.from(expressionIndexes),
+                readingIndexes: Uint32Array.from(readingIndexes),
+            };
+        },
+    };
+}
+
+/**
+ * @param {import('dictionary-database').DatabaseTermEntry[]} rows
+ * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan} plan
+ * @returns {void}
+ */
+function setTermRecordPreinternedPlan(rows, plan) {
+    /** @type {{termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan}} */ (/** @type {unknown} */ (rows)).termRecordPreinternedPlan = plan;
+}
+
+/**
  * @param {string} value
  * @returns {string}
  */
@@ -2589,6 +2645,11 @@ export class DictionaryImporter {
         const streamToChunkHandler = typeof onChunk === 'function';
         /** @type {import('dictionary-database').DatabaseTermEntry[]} */
         const termList = streamToChunkHandler ? [] : new Array(rowCount);
+        let termRecordPlanBuilder = createArtifactTermRecordPreinternedPlanBuilder();
+        /** @type {number[]} */
+        let termRecordExpressionIndexes = [];
+        /** @type {number[]} */
+        let termRecordReadingIndexes = [];
         const chunkSize = this._termArtifactRowChunkSize;
         const chunkCount = Math.max(1, Math.ceil(rowCount / Math.max(1, chunkSize)));
         let chunkIndex = 0;
@@ -2641,6 +2702,12 @@ export class DictionaryImporter {
             const readingBytes = readingMatchesExpression ?
                 expressionBytes :
                 bytes.subarray(cursor, cursor + readingLength);
+            const expressionIndex = termRecordPlanBuilder.internStringBytes(expression, expressionBytes);
+            const readingIndex = readingMatchesExpression ?
+                expressionIndex :
+                termRecordPlanBuilder.internStringBytes(readingRaw, readingBytes);
+            termRecordExpressionIndexes.push(expressionIndex);
+            termRecordReadingIndexes.push(readingIndex);
             cursor += readingLength;
             const score = view.getInt32(cursor, true);
             if (score === 0) {
@@ -2713,6 +2780,7 @@ export class DictionaryImporter {
             if (streamToChunkHandler) {
                 termList.push(entry);
                 if (termList.length >= chunkSize) {
+                    setTermRecordPreinternedPlan(termList, termRecordPlanBuilder.buildPlan(termRecordExpressionIndexes, termRecordReadingIndexes));
                     ++chunkIndex;
                     const tChunkSinkStart = Date.now();
                     await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} */ (onChunk)(termList, null, {
@@ -2723,6 +2791,9 @@ export class DictionaryImporter {
                     });
                     importerChunkSinkMs += Math.max(0, Date.now() - tChunkSinkStart);
                     termList.length = 0;
+                    termRecordPlanBuilder = createArtifactTermRecordPreinternedPlanBuilder();
+                    termRecordExpressionIndexes = [];
+                    termRecordReadingIndexes = [];
                 }
             } else {
                 termList[i] = entry;
@@ -2730,6 +2801,7 @@ export class DictionaryImporter {
         }
         decodeRowsMs = Math.max(0, Date.now() - tDecodeRowsStart);
         if (streamToChunkHandler && termList.length > 0) {
+            setTermRecordPreinternedPlan(termList, termRecordPlanBuilder.buildPlan(termRecordExpressionIndexes, termRecordReadingIndexes));
             ++chunkIndex;
             const tChunkSinkStart = Date.now();
             await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[], requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} */ (onChunk)(termList, null, {
@@ -2740,6 +2812,8 @@ export class DictionaryImporter {
             });
             importerChunkSinkMs += Math.max(0, Date.now() - tChunkSinkStart);
             termList.length = 0;
+        } else if (!streamToChunkHandler) {
+            setTermRecordPreinternedPlan(termList, termRecordPlanBuilder.buildPlan(termRecordExpressionIndexes, termRecordReadingIndexes));
         }
         this._lastArtifactTermBankReadProfile = {
             readBytesMs,

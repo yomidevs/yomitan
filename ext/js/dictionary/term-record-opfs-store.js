@@ -19,7 +19,7 @@ import {parseJson} from '../core/json.js';
 import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {safePerformance} from '../core/safe-performance.js';
 import {RAW_TERM_CONTENT_DICT_NAME, RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME} from './raw-term-content.js';
-import {encodeTermRecordsWithWasm} from './term-record-wasm-encoder.js';
+import {encodeTermRecordsWithWasm, encodeTermRecordsWithWasmPreinterned} from './term-record-wasm-encoder.js';
 
 const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
 const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
@@ -53,6 +53,15 @@ const DEFAULT_WRITE_COALESCE_TARGET_BYTES = 4 * 1024 * 1024;
 const LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
 const HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES = 16 * 1024 * 1024;
 const WRITE_COALESCE_MAX_CHUNKS = 512;
+
+/**
+ * @param {unknown[]} rows
+ * @returns {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}
+ */
+function getTermRecordPreinternedPlan(rows) {
+    const value = /** @type {{termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan}} */ (/** @type {unknown} */ (rows)).termRecordPreinternedPlan;
+    return value ?? null;
+}
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW = 0;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2 = 1;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3 = 2;
@@ -602,10 +611,18 @@ export class TermRecordOpfsStore {
             this._indexDirty = true;
         }
         buildRecordsMs = safePerformance.now() - tBuildStart;
+        const preinternedPlan = (
+            start === 0 &&
+            count === rows.length &&
+            rows !== null &&
+            typeof rows === 'object'
+        ) ?
+            getTermRecordPreinternedPlan(rows) :
+            null;
         if (recordsByDictionary === null) {
             const state = await this._getOrCreateShardState(firstDictionaryName);
             if (state !== null) {
-                const metrics = await this._encodeAndAppendChunkForState(state, singleDictionaryRecords);
+                const metrics = await this._encodeAndAppendChunkForState(state, singleDictionaryRecords, preinternedPlan);
                 encodeMs += metrics.encodeMs;
                 appendWriteMs += metrics.appendWriteMs;
             }
@@ -614,7 +631,7 @@ export class TermRecordOpfsStore {
         for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
             const state = await this._getOrCreateShardState(dictionaryName);
             if (state === null) { continue; }
-            const metrics = await this._encodeAndAppendChunkForState(state, dictionaryRecords);
+            const metrics = await this._encodeAndAppendChunkForState(state, dictionaryRecords, preinternedPlan);
             encodeMs += metrics.encodeMs;
             appendWriteMs += metrics.appendWriteMs;
         }
@@ -624,11 +641,12 @@ export class TermRecordOpfsStore {
     /**
      * @param {TermRecordShardState} state
      * @param {TermRecord[]} records
+     * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} [preinternedPlan]
      * @returns {Promise<{encodeMs: number, appendWriteMs: number}>}
      */
-    async _encodeAndAppendChunkForState(state, records) {
+    async _encodeAndAppendChunkForState(state, records, preinternedPlan = null) {
         const tEncodeStart = safePerformance.now();
-        const chunk = await this._encodeRecords(records);
+        const chunk = await this._encodeRecords(records, preinternedPlan);
         const encodeMs = safePerformance.now() - tEncodeStart;
         const tAppendStart = safePerformance.now();
         await this._appendEncodedChunk(state, chunk, records[0]?.id ?? 0, records.length);
@@ -1234,15 +1252,18 @@ export class TermRecordOpfsStore {
 
     /**
      * @param {TermRecord[]} records
+     * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} [preinternedPlan]
      * @returns {Promise<Uint8Array>}
      */
-    async _encodeRecords(records) {
+    async _encodeRecords(records, preinternedPlan = null) {
         if (records.length === 0) {
             return new Uint8Array(0);
         }
         if (!this._wasmEncoderUnavailable) {
             try {
-                const encoded = await encodeTermRecordsWithWasm(records, this._textEncoder);
+                const encoded = preinternedPlan === null ?
+                    await encodeTermRecordsWithWasm(records, this._textEncoder) :
+                    await encodeTermRecordsWithWasmPreinterned(records, this._textEncoder, preinternedPlan);
                 if (encoded instanceof Uint8Array) {
                     return encoded;
                 }
