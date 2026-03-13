@@ -53,7 +53,7 @@ export class BackupController {
         this._optionsUtil = null;
 
         /** @type {?import('core').TokenObject} */
-        this._settingsExportDatabaseToken = null;
+        this._settingsDatabaseOperationToken = null;
 
         try {
             this._optionsUtil = new OptionsUtil();
@@ -86,6 +86,9 @@ export class BackupController {
         this._addNodeEventListener('#settings-export-db-button', 'click', this._onSettingsExportDatabaseClick.bind(this), false);
         this._addNodeEventListener('#settings-import-db-button', 'click', this._onSettingsImportDatabaseClick.bind(this), false);
         this._addNodeEventListener('#settings-import-db', 'change', this._onSettingsImportDatabaseChange.bind(this), false);
+        this._addNodeEventListener('#settings-migrate-legacy-indexeddb-button', 'click', this._onSettingsMigrateLegacyIndexedDbClick.bind(this), false);
+        this._settingsController.application.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        await this._updateLegacyIndexedDbMigrationUi();
     }
 
     // Private
@@ -584,6 +587,75 @@ export class BackupController {
     }
 
     /**
+     * @param {import('api').LegacyIndexedDbMigrationReason} reason
+     * @returns {{message: string, color: string, enabled: boolean}}
+     */
+    _getLegacyIndexedDbMigrationUiState(reason) {
+        switch (reason) {
+            case 'available':
+                return {
+                    message: 'Legacy IndexedDB dictionary data was found and the current SQLite dictionary database is empty. You can try the experimental migration.',
+                    color: '#8B6508',
+                    enabled: true,
+                };
+            case 'indexeddb-unavailable':
+                return {
+                    message: 'IndexedDB is unavailable in this context, so the experimental migration cannot run here.',
+                    color: '#8B0000',
+                    enabled: false,
+                };
+            case 'legacy-database-empty':
+                return {
+                    message: 'A legacy IndexedDB dictionary database was found, but it does not contain any dictionaries to migrate.',
+                    color: '#666666',
+                    enabled: false,
+                };
+            case 'sqlite-not-empty':
+                return {
+                    message: 'The current SQLite dictionary database already contains dictionaries. This experimental migration only runs when the SQLite dictionary database is empty.',
+                    color: '#8B0000',
+                    enabled: false,
+                };
+            default:
+                return {
+                    message: 'No legacy IndexedDB dictionary database was detected.',
+                    color: '#666666',
+                    enabled: false,
+                };
+        }
+    }
+
+    /** */
+    async _updateLegacyIndexedDbMigrationUi() {
+        const button = document.querySelector('#settings-migrate-legacy-indexeddb-button');
+        const statusNode = document.querySelector('#settings-legacy-indexeddb-migration-status');
+        if (!(button instanceof HTMLButtonElement) || !(statusNode instanceof HTMLElement)) {
+            return;
+        }
+
+        try {
+            const status = await this._settingsController.application.api.getLegacyIndexedDbMigrationStatus();
+            const {message, color, enabled} = this._getLegacyIndexedDbMigrationUiState(status.reason);
+            statusNode.textContent = message;
+            statusNode.style.color = color;
+            button.disabled = !enabled || this._settingsDatabaseOperationToken !== null;
+        } catch (error) {
+            log.error(error);
+            statusNode.textContent = 'Unable to determine whether a legacy IndexedDB dictionary database is available.';
+            statusNode.style.color = '#8B0000';
+            button.disabled = true;
+        }
+    }
+
+    /** */
+    _clearDatabaseOperationError() {
+        const errorMessageContainer = document.querySelector('#db-ops-error-report');
+        if (errorMessageContainer instanceof HTMLElement) {
+            errorMessageContainer.style.display = 'none';
+        }
+    }
+
+    /**
      * @returns {Promise<ArrayBuffer>}
      */
     async _exportDatabase() {
@@ -592,22 +664,21 @@ export class BackupController {
 
     /** */
     async _onSettingsExportDatabaseClick() {
-        if (this._settingsExportDatabaseToken !== null) {
+        if (this._settingsDatabaseOperationToken !== null) {
             // An existing import or export is in progress.
             this._databaseExportImportErrorMessage('An export or import operation is already in progress. Please wait till it is over.', true);
             return;
         }
 
-        /** @type {HTMLElement} */
-        const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
-        errorMessageContainer.style.display = 'none';
+        this._clearDatabaseOperationError();
 
         const date = new Date(Date.now());
         const pageExitPrevention = this._settingsController.preventPageExit();
         try {
             /** @type {import('core').TokenObject} */
             const token = {};
-            this._settingsExportDatabaseToken = token;
+            this._settingsDatabaseOperationToken = token;
+            await this._updateLegacyIndexedDbMigrationUi();
             this._setDatabaseExportImportStatus('Exporting dictionary collection...');
             const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.sqlite3`;
             const data = await this._exportDatabase();
@@ -620,7 +691,8 @@ export class BackupController {
             this._databaseExportImportErrorMessage('Errors encountered while exporting. Please try again. Restart the browser if it continues to fail.');
         } finally {
             pageExitPrevention.end();
-            this._settingsExportDatabaseToken = null;
+            this._settingsDatabaseOperationToken = null;
+            await this._updateLegacyIndexedDbMigrationUi();
         }
     }
 
@@ -644,15 +716,13 @@ export class BackupController {
      * @param {Event} e
      */
     async _onSettingsImportDatabaseChange(e) {
-        if (this._settingsExportDatabaseToken !== null) {
+        if (this._settingsDatabaseOperationToken !== null) {
             // An existing import or export is in progress.
             this._databaseExportImportErrorMessage('An export or import operation is already in progress. Please wait till it is over.', true);
             return;
         }
 
-        /** @type {HTMLElement} */
-        const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
-        errorMessageContainer.style.display = 'none';
+        this._clearDatabaseOperationError();
 
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
         const files = element.files;
@@ -664,7 +734,8 @@ export class BackupController {
         try {
             /** @type {import('core').TokenObject} */
             const token = {};
-            this._settingsExportDatabaseToken = token;
+            this._settingsDatabaseOperationToken = token;
+            await this._updateLegacyIndexedDbMigrationUi();
             this._setDatabaseExportImportStatus('Importing dictionary collection...');
             await this._importDatabase(file);
             this._setDatabaseExportImportStatus(
@@ -677,7 +748,62 @@ export class BackupController {
             this._databaseExportImportErrorMessage('Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.');
         } finally {
             pageExitPrevention.end();
-            this._settingsExportDatabaseToken = null;
+            this._settingsDatabaseOperationToken = null;
+            await this._updateLegacyIndexedDbMigrationUi();
         }
+    }
+
+    /** */
+    async _onSettingsMigrateLegacyIndexedDbClick() {
+        if (this._settingsDatabaseOperationToken !== null) {
+            this._databaseExportImportErrorMessage('An export, import, or migration operation is already in progress. Please wait until it finishes.', true);
+            return;
+        }
+
+        this._clearDatabaseOperationError();
+
+        const pageExitPrevention = this._settingsController.preventPageExit();
+        try {
+            const status = await this._settingsController.application.api.getLegacyIndexedDbMigrationStatus();
+            if (!status.migrationAvailable) {
+                const {message} = this._getLegacyIndexedDbMigrationUiState(status.reason);
+                this._databaseExportImportErrorMessage(message, true);
+                await this._updateLegacyIndexedDbMigrationUi();
+                return;
+            }
+
+            /** @type {import('core').TokenObject} */
+            const token = {};
+            this._settingsDatabaseOperationToken = token;
+            await this._updateLegacyIndexedDbMigrationUi();
+            this._setDatabaseExportImportStatus('Running experimental legacy IndexedDB migration...');
+
+            const result = await this._settingsController.application.api.migrateLegacyIndexedDb();
+            if (result.result !== 'migrated') {
+                const {message} = this._getLegacyIndexedDbMigrationUiState(result.reason ?? 'legacy-database-missing');
+                this._setDatabaseExportImportStatus('', '#4169e1', true);
+                this._databaseExportImportErrorMessage(message);
+                return;
+            }
+
+            this._settingsController.application.triggerStorageChanged();
+            this._setDatabaseExportImportStatus(
+                `Done migrating ${result.totalRows} legacy IndexedDB rows into SQLite. Review your dictionaries and export a backup if everything looks correct.`,
+                '#006633',
+            );
+        } catch (error) {
+            log.log(error);
+            this._setDatabaseExportImportStatus('', '#4169e1', true);
+            this._databaseExportImportErrorMessage('Encountered errors while running the experimental migration. Please restart the browser and verify your dictionaries before trying again.');
+        } finally {
+            pageExitPrevention.end();
+            this._settingsDatabaseOperationToken = null;
+            await this._updateLegacyIndexedDbMigrationUi();
+        }
+    }
+
+    /** */
+    _onDatabaseUpdated() {
+        void this._updateLegacyIndexedDbMigrationUi();
     }
 }

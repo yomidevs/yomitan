@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type * as Api from './api';
 import type * as Dictionary from './dictionary';
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
@@ -38,6 +39,14 @@ type ApiSurface = {
     getDictionaryInfoOffscreen: {
         params: void;
         return: DictionaryImporter.Summary[];
+    };
+    getLegacyIndexedDbMigrationStatusOffscreen: {
+        params: void;
+        return: Api.LegacyIndexedDbMigrationStatus;
+    };
+    migrateLegacyIndexedDbOffscreen: {
+        params: void;
+        return: Api.LegacyIndexedDbMigrationResult;
     };
     exportDictionaryDatabaseOffscreen: {
         params: void;

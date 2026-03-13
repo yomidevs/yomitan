@@ -55,6 +55,8 @@ export class Offscreen {
             ['clipboardSetBrowserOffscreen',   this._setClipboardBrowser.bind(this)],
             ['databasePrepareOffscreen',       this._prepareDatabaseHandler.bind(this)],
             ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
+            ['getLegacyIndexedDbMigrationStatusOffscreen', this._getLegacyIndexedDbMigrationStatusHandler.bind(this)],
+            ['migrateLegacyIndexedDbOffscreen', this._migrateLegacyIndexedDbHandler.bind(this)],
             ['exportDictionaryDatabaseOffscreen', this._exportDictionaryDatabaseHandler.bind(this)],
             ['importDictionaryDatabaseOffscreen', this._importDictionaryDatabaseHandler.bind(this)],
             ['databasePurgeOffscreen',         this._purgeDatabaseHandler.bind(this)],
@@ -117,6 +119,16 @@ export class Offscreen {
     /** @type {import('offscreen').ApiHandler<'getDictionaryInfoOffscreen'>} */
     async _getDictionaryInfoHandler() {
         return await this._dictionaryDatabase.getDictionaryInfo();
+    }
+
+    /** @type {import('offscreen').ApiHandler<'getLegacyIndexedDbMigrationStatusOffscreen'>} */
+    async _getLegacyIndexedDbMigrationStatusHandler() {
+        return await this._dictionaryDatabase.getLegacyIndexedDbMigrationStatus();
+    }
+
+    /** @type {import('offscreen').ApiHandler<'migrateLegacyIndexedDbOffscreen'>} */
+    async _migrateLegacyIndexedDbHandler() {
+        return await this._dictionaryDatabase.migrateLegacyIndexedDb();
     }
 
     /** @type {import('offscreen').ApiHandler<'exportDictionaryDatabaseOffscreen'>} */

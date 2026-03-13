@@ -2343,6 +2343,28 @@
             </div>
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">
+                    Experimental: migrate legacy IndexedDB dictionaries to SQLite
+                </div>
+                <div class="warning-text margin-above">
+                    This is an experimental recovery path for older dictionary data. It might break your dictionary collection.
+                    Export your current dictionary collection first, and only use this when you need to recover dictionaries
+                    from a legacy IndexedDB-backed Yomitan installation.
+                </div>
+                <div class="settings-item-description margin-above" id="settings-legacy-indexeddb-migration-status">
+                    Checking whether a legacy IndexedDB dictionary database is available...
+                </div>
+            </div>
+            <div class="settings-item-right settings-item-button-group-container">
+                <div class="settings-item-button-group">
+                    <div class="settings-item-button-group-item">
+                        <button type="button" class="low-emphasis danger" id="settings-migrate-legacy-indexeddb-button">Run Experimental Migration</button>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-right settings-item-button-group-container">
                 <div class="settings-item-button-group">
                     <div class="settings-item-button-group-item">

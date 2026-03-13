@@ -287,8 +287,6 @@ export class DictionaryDatabase {
             await this._openConnection();
             await initializeTermContentZstd();
             this._termContentZstdInitialized = true;
-            await this._migrateLegacyIndexedDbIfNeeded();
-            await this._deleteLegacyIndexedDb();
             await this._cleanupIncompleteImports();
             await this._cleanupMissingTermRecordShards();
 
@@ -687,6 +685,56 @@ export class DictionaryDatabase {
         this._termExactPresenceCache.clear();
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
+        return result;
+    }
+
+    /**
+     * @returns {Promise<{
+     *   reason: 'available'|'indexeddb-unavailable'|'legacy-database-missing'|'legacy-database-empty'|'sqlite-not-empty',
+     *   hasLegacyDatabase: boolean,
+     *   hasLegacyData: boolean,
+     *   sqliteEmpty: boolean,
+     *   migrationAvailable: boolean,
+     * }>}
+     */
+    async getLegacyIndexedDbMigrationStatus() {
+        const {legacyDb, status} = await this._getLegacyIndexedDbMigrationStatusDetails();
+        legacyDb?.close();
+        return status;
+    }
+
+    /**
+     * @returns {Promise<{
+     *   result: 'migrated'|'skipped',
+     *   reason: null|'indexeddb-unavailable'|'legacy-database-missing'|'legacy-database-empty'|'sqlite-not-empty',
+     *   migratedRowsByStore: Partial<Record<import('dictionary-database').ObjectStoreName, number>>,
+     *   totalRows: number,
+     *   usedFallbackStorage: boolean,
+     * }>}
+     */
+    async migrateLegacyIndexedDb() {
+        const {legacyDb, status} = await this._getLegacyIndexedDbMigrationStatusDetails();
+        if (legacyDb === null || !status.migrationAvailable) {
+            legacyDb?.close();
+            reportDiagnostics('dictionary-legacy-indexeddb-migration-skipped', {
+                reason: status.reason,
+            });
+            return {
+                result: 'skipped',
+                reason: status.reason,
+                migratedRowsByStore: {},
+                totalRows: 0,
+                usedFallbackStorage: this._usesFallbackStorage,
+            };
+        }
+
+        let result;
+        try {
+            result = await this._migrateLegacyIndexedDb(legacyDb);
+        } finally {
+            legacyDb.close();
+        }
+        await this._deleteLegacyIndexedDb();
         return result;
     }
 
@@ -3924,44 +3972,84 @@ export class DictionaryDatabase {
     }
 
     /**
-     * Migrates dictionaries from the legacy IndexedDB database on first SQLite startup.
-     * @returns {Promise<void>}
+     * @returns {Promise<{
+     *   legacyDb: IDBDatabase|null,
+     *   status: {
+     *     reason: 'available'|'indexeddb-unavailable'|'legacy-database-missing'|'legacy-database-empty'|'sqlite-not-empty',
+     *     hasLegacyDatabase: boolean,
+     *     hasLegacyData: boolean,
+     *     sqliteEmpty: boolean,
+     *     migrationAvailable: boolean,
+     *   },
+     * }>}
      */
-    async _migrateLegacyIndexedDbIfNeeded() {
+    async _getLegacyIndexedDbMigrationStatusDetails() {
+        const sqliteEmpty = this._isSqliteDictionaryStorageEmpty();
         if (typeof indexedDB === 'undefined') {
-            return;
+            return {
+                legacyDb: null,
+                status: {
+                    reason: 'indexeddb-unavailable',
+                    hasLegacyDatabase: false,
+                    hasLegacyData: false,
+                    sqliteEmpty,
+                    migrationAvailable: false,
+                },
+            };
         }
-        if (!this._isLegacyIndexedDbMigrationNeeded()) {
-            reportDiagnostics('dictionary-legacy-indexeddb-migration-skipped', {
-                reason: 'sqlite-not-empty',
-            });
-            return;
-        }
-
         const legacyDb = await this._openLegacyIndexedDbIfPresent();
-        if (legacyDb === null) {
-            reportDiagnostics('dictionary-legacy-indexeddb-migration-skipped', {
-                reason: 'legacy-database-missing',
-            });
-            return;
-        }
-
-        let bulkImportStarted = false;
-        /** @type {Record<string, number>} */
-        const migratedRowsByStore = {};
         try {
-            const dictionariesPreview = await this._readLegacyIndexedDbStoreBatch(legacyDb, 'dictionaries', null, 1);
-            if (dictionariesPreview.rows.length === 0) {
-                reportDiagnostics('dictionary-legacy-indexeddb-migration-skipped', {
-                    reason: 'legacy-database-empty',
-                });
-                return;
+            const hasLegacyDatabase = legacyDb !== null;
+            let hasLegacyData = false;
+            if (legacyDb !== null && legacyDb.objectStoreNames.contains('dictionaries')) {
+                const dictionariesPreview = await this._readLegacyIndexedDbStoreBatch(legacyDb, 'dictionaries', null, 1);
+                hasLegacyData = dictionariesPreview.rows.length > 0;
             }
 
+            let reason = 'available';
+            if (!hasLegacyDatabase) {
+                reason = 'legacy-database-missing';
+            } else if (!hasLegacyData) {
+                reason = 'legacy-database-empty';
+            } else if (!sqliteEmpty) {
+                reason = 'sqlite-not-empty';
+            }
+            return {
+                legacyDb,
+                status: {
+                    reason,
+                    hasLegacyDatabase,
+                    hasLegacyData,
+                    sqliteEmpty,
+                    migrationAvailable: reason === 'available',
+                },
+            };
+        } catch (e) {
+            legacyDb?.close();
+            throw e;
+        }
+    }
+
+    /**
+     * Migrates dictionaries from the legacy IndexedDB database into SQLite.
+     * @param {IDBDatabase} legacyDb
+     * @returns {Promise<{
+     *   result: 'migrated',
+     *   reason: null,
+     *   migratedRowsByStore: Partial<Record<import('dictionary-database').ObjectStoreName, number>>,
+     *   totalRows: number,
+     *   usedFallbackStorage: boolean,
+     * }>}
+     */
+    async _migrateLegacyIndexedDb(legacyDb) {
+        let bulkImportStarted = false;
+        /** @type {Partial<Record<import('dictionary-database').ObjectStoreName, number>>} */
+        const migratedRowsByStore = {};
+        let totalRows = 0;
+        try {
             await this.startBulkImport();
             bulkImportStarted = true;
 
-            let totalRows = 0;
             for (const storeName of LEGACY_DICTIONARY_INDEXEDDB_STORES) {
                 if (!legacyDb.objectStoreNames.contains(storeName)) {
                     continue;
@@ -3987,6 +4075,13 @@ export class DictionaryDatabase {
                 migratedRowsByStore,
                 usedFallbackStorage: this._usesFallbackStorage,
             });
+            return {
+                result: 'migrated',
+                reason: null,
+                migratedRowsByStore,
+                totalRows,
+                usedFallbackStorage: this._usesFallbackStorage,
+            };
         } catch (e) {
             const error = toError(e);
             if (bulkImportStarted) {
@@ -4007,15 +4102,13 @@ export class DictionaryDatabase {
                 error: error.message,
             });
             throw new Error(`Failed to migrate legacy IndexedDB dictionaries: ${error.message}`);
-        } finally {
-            legacyDb.close();
         }
     }
 
     /**
      * @returns {boolean}
      */
-    _isLegacyIndexedDbMigrationNeeded() {
+    _isSqliteDictionaryStorageEmpty() {
         if (!this._termRecordStore.isEmpty()) {
             return false;
         }
@@ -4129,9 +4222,10 @@ export class DictionaryDatabase {
      * @returns {import('dictionary-database').DatabaseTermEntry}
      */
     _normalizeLegacyIndexedDbTermRow(row) {
+        const rawRow = /** @type {Record<string, unknown>} */ (/** @type {import('core').SafeAny} */ (row));
         /** @type {import('dictionary-database').DatabaseTermEntry} */
         const migratedRow = {
-            .../** @type {import('core').SafeAny} */ (row),
+            ...rawRow,
         };
         const expression = this._asString(migratedRow.expression);
         const reading = this._asString(migratedRow.reading);

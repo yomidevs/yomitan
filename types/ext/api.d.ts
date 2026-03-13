@@ -121,6 +121,29 @@ export type GetTermFrequenciesDetailsTermReadingListItem = {
     reading: string | null;
 };
 
+export type LegacyIndexedDbMigrationReason =
+    'available' |
+    'indexeddb-unavailable' |
+    'legacy-database-missing' |
+    'legacy-database-empty' |
+    'sqlite-not-empty';
+
+export type LegacyIndexedDbMigrationStatus = {
+    reason: LegacyIndexedDbMigrationReason;
+    hasLegacyDatabase: boolean;
+    hasLegacyData: boolean;
+    sqliteEmpty: boolean;
+    migrationAvailable: boolean;
+};
+
+export type LegacyIndexedDbMigrationResult = {
+    result: 'migrated' | 'skipped';
+    reason: LegacyIndexedDbMigrationReason | null;
+    migratedRowsByStore: Partial<Record<DictionaryDatabase.ObjectStoreName, number>>;
+    totalRows: number;
+    usedFallbackStorage: boolean;
+};
+
 type ApiSurface = {
     applicationReady: {
         params: void;
@@ -290,6 +313,14 @@ type ApiSurface = {
     getDictionaryInfo: {
         params: void;
         return: DictionaryImporter.Summary[];
+    };
+    getLegacyIndexedDbMigrationStatus: {
+        params: void;
+        return: LegacyIndexedDbMigrationStatus;
+    };
+    migrateLegacyIndexedDb: {
+        params: void;
+        return: LegacyIndexedDbMigrationResult;
     };
     exportDictionaryDatabase: {
         params: void;

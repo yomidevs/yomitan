@@ -249,6 +249,20 @@ export class API {
     }
 
     /**
+     * @returns {Promise<import('api').ApiReturn<'getLegacyIndexedDbMigrationStatus'>>}
+     */
+    getLegacyIndexedDbMigrationStatus() {
+        return this._invoke('getLegacyIndexedDbMigrationStatus', void 0);
+    }
+
+    /**
+     * @returns {Promise<import('api').ApiReturn<'migrateLegacyIndexedDb'>>}
+     */
+    migrateLegacyIndexedDb() {
+        return this._invoke('migrateLegacyIndexedDb', void 0);
+    }
+
+    /**
      * @returns {Promise<import('api').ApiReturn<'exportDictionaryDatabase'>>}
      */
     exportDictionaryDatabase() {

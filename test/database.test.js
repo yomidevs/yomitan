@@ -298,11 +298,15 @@ function concatUint8Arrays(chunks) {
  */
 function cloneArrayBuffer(value) {
     if (value instanceof ArrayBuffer) {
-        return value.slice(0);
+        const copy = new Uint8Array(value.byteLength);
+        copy.set(new Uint8Array(value));
+        return copy.buffer;
     }
     if (ArrayBuffer.isView(value)) {
         const typedArray = /** @type {ArrayBufferView} */ (value);
-        return typedArray.buffer.slice(typedArray.byteOffset, typedArray.byteOffset + typedArray.byteLength);
+        const copy = new Uint8Array(typedArray.byteLength);
+        copy.set(new Uint8Array(typedArray.buffer, typedArray.byteOffset, typedArray.byteLength));
+        return copy.buffer;
     }
     return new ArrayBuffer(0);
 }
@@ -1784,7 +1788,7 @@ describe('Database', () => {
             }
         });
 
-        test('Migrates dictionaries from legacy IndexedDB into SQLite on first startup', async ({expect}) => {
+        test('Migrates dictionaries from legacy IndexedDB into SQLite only when requested', async ({expect}) => {
             const opfsRootDirectoryHandle = createInMemoryOpfsDirectoryHandle();
             const restoreNavigator = installInMemoryOpfsNavigator(opfsRootDirectoryHandle);
             try {
@@ -1809,6 +1813,22 @@ describe('Database', () => {
                 const migratedDictionaryDatabase = new DictionaryDatabase();
                 await migratedDictionaryDatabase.prepare();
                 try {
+                    const statusBeforeMigration = await migratedDictionaryDatabase.getLegacyIndexedDbMigrationStatus();
+                    expect.soft(statusBeforeMigration).toStrictEqual({
+                        reason: 'available',
+                        hasLegacyDatabase: true,
+                        hasLegacyData: true,
+                        sqliteEmpty: true,
+                        migrationAvailable: true,
+                    });
+
+                    const infoBeforeMigration = await migratedDictionaryDatabase.getDictionaryInfo();
+                    expect.soft(infoBeforeMigration).toStrictEqual([]);
+
+                    const migrationResult = await migratedDictionaryDatabase.migrateLegacyIndexedDb();
+                    expect.soft(migrationResult.result).toBe('migrated');
+                    expect.soft(migrationResult.reason).toBeNull();
+
                     const migratedInfo = await migratedDictionaryDatabase.getDictionaryInfo();
                     const migratedCounts = await migratedDictionaryDatabase.getDictionaryCounts(['Legacy Dictionary'], true);
                     expect.soft(migratedInfo).toStrictEqual(expectedInfo);
@@ -1848,17 +1868,23 @@ describe('Database', () => {
 
                 await populateLegacyIndexedDb(legacySnapshot);
                 try {
-                    const migrateLegacyIndexedDbIfNeeded = Reflect.get(currentDictionaryDatabase, '_migrateLegacyIndexedDbIfNeeded');
-                    if (typeof migrateLegacyIndexedDbIfNeeded !== 'function') {
-                        throw new Error('Expected _migrateLegacyIndexedDbIfNeeded method');
-                    }
-                    await Promise.resolve(migrateLegacyIndexedDbIfNeeded.call(currentDictionaryDatabase));
+                    const statusBeforeMigration = await currentDictionaryDatabase.getLegacyIndexedDbMigrationStatus();
+                    expect.soft(statusBeforeMigration).toStrictEqual({
+                        reason: 'sqlite-not-empty',
+                        hasLegacyDatabase: true,
+                        hasLegacyData: true,
+                        sqliteEmpty: false,
+                        migrationAvailable: false,
+                    });
 
-                    const deleteLegacyIndexedDb = Reflect.get(currentDictionaryDatabase, '_deleteLegacyIndexedDb');
-                    if (typeof deleteLegacyIndexedDb !== 'function') {
-                        throw new Error('Expected _deleteLegacyIndexedDb method');
-                    }
-                    await Promise.resolve(deleteLegacyIndexedDb.call(currentDictionaryDatabase));
+                    const migrationResult = await currentDictionaryDatabase.migrateLegacyIndexedDb();
+                    expect.soft(migrationResult).toMatchObject({
+                        result: 'skipped',
+                        reason: 'sqlite-not-empty',
+                        migratedRowsByStore: {},
+                        totalRows: 0,
+                    });
+                    expect.soft(typeof migrationResult.usedFallbackStorage).toBe('boolean');
 
                     const info = await currentDictionaryDatabase.getDictionaryInfo();
                     const counts = await currentDictionaryDatabase.getDictionaryCounts(['Current Dictionary'], true);
@@ -1866,9 +1892,9 @@ describe('Database', () => {
                     expect.soft(info.map((item) => item.title)).toStrictEqual(['Current Dictionary']);
                     expect.soft(counts).toStrictEqual(expectedCounts);
 
-                    const legacyDbAfterPrepare = await openLegacyIndexedDbIfPresent();
-                    expect.soft(legacyDbAfterPrepare).toBeNull();
-                    legacyDbAfterPrepare?.close();
+                    const legacyDbAfterAttempt = await openLegacyIndexedDbIfPresent();
+                    expect.soft(legacyDbAfterAttempt).not.toBeNull();
+                    legacyDbAfterAttempt?.close();
                 } finally {
                     await currentDictionaryDatabase.close();
                 }

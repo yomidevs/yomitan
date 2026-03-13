@@ -191,6 +191,20 @@ export class DictionaryDatabaseProxy {
     }
 
     /**
+     * @returns {Promise<import('api').LegacyIndexedDbMigrationStatus>}
+     */
+    async getLegacyIndexedDbMigrationStatus() {
+        return this._offscreen.sendMessagePromise({action: 'getLegacyIndexedDbMigrationStatusOffscreen'});
+    }
+
+    /**
+     * @returns {Promise<import('api').LegacyIndexedDbMigrationResult>}
+     */
+    async migrateLegacyIndexedDb() {
+        return this._offscreen.sendMessagePromise({action: 'migrateLegacyIndexedDbOffscreen'});
+    }
+
+    /**
      * @returns {Promise<ArrayBuffer>}
      */
     async exportDatabase() {
