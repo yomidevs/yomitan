@@ -1467,6 +1467,36 @@ export const japaneseTransforms = {
                 suffixInflection('がる', 'い', ['v5'], ['adj-i']),
             ],
         },
+        '-やがる': {
+            name: '-やがる',
+            description: 'Vulgar auxiliary showing contempt, irritation, or hostility toward the subject.\n' +
+            'Usage: Attach やがる to the continuative form (連用形) of verbs. It itself conjugates as a godan verb.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～やがる',
+                    description: '相手の言動をののしったり、腹立たしく思ったりする気持ちをこめて言う。',
+                },
+            ],
+            rules: [
+                suffixInflection('やがる', 'る', ['v5'], ['v1']),
+                suffixInflection('いやがる', 'う', ['v5'], ['v5']),
+                suffixInflection('きやがる', 'く', ['v5'], ['v5']),
+                suffixInflection('ぎやがる', 'ぐ', ['v5'], ['v5']),
+                suffixInflection('しやがる', 'す', ['v5'], ['v5']),
+                suffixInflection('ちやがる', 'つ', ['v5'], ['v5']),
+                suffixInflection('にやがる', 'ぬ', ['v5'], ['v5']),
+                suffixInflection('びやがる', 'ぶ', ['v5'], ['v5']),
+                suffixInflection('みやがる', 'む', ['v5'], ['v5']),
+                suffixInflection('りやがる', 'る', ['v5'], ['v5']),
+                suffixInflection('じやがる', 'ずる', ['v5'], ['vz']),
+                suffixInflection('しやがる', 'する', ['v5'], ['vs']),
+                suffixInflection('為やがる', '為る', ['v5'], ['vs']),
+                suffixInflection('きやがる', 'くる', ['v5'], ['vk']),
+                suffixInflection('来やがる', '来る', ['v5'], ['vk']),
+                suffixInflection('來やがる', '來る', ['v5'], ['vk']),
+            ],
+        },
         '-え': {
             name: '-え',
             description: 'Slang. A sound change of i-adjectives.\n' +
