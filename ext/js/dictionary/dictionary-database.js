@@ -1918,7 +1918,7 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @returns {{contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number}|null}
+     * @returns {{contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number, termRecordInternMs?: number, termRecordPackLengthsMs?: number, termRecordHeapCopyMs?: number, termRecordWasmEncodeMs?: number}|null}
      */
     getLastBulkAddTermsMetrics() {
         return this._lastBulkAddTermsMetrics;
@@ -2778,6 +2778,10 @@ export class DictionaryDatabase {
         let termRecordEncodeMs = 0;
         let termRecordWriteMs = 0;
         let termsVtabInsertMs = 0;
+        let termRecordInternMs = 0;
+        let termRecordPackLengthsMs = 0;
+        let termRecordHeapCopyMs = 0;
+        let termRecordWasmEncodeMs = 0;
 
         if (useLocalTransaction) {
             await this._beginImmediateTransaction(this._requireDb());
@@ -2844,6 +2848,10 @@ export class DictionaryDatabase {
                 termRecordBuildMs += metrics.buildRecordsMs;
                 termRecordEncodeMs += metrics.encodeMs;
                 termRecordWriteMs += metrics.appendWriteMs;
+                termRecordInternMs += metrics.internMs ?? 0;
+                termRecordPackLengthsMs += metrics.packLengthsMs ?? 0;
+                termRecordHeapCopyMs += metrics.heapCopyMs ?? 0;
+                termRecordWasmEncodeMs += metrics.wasmEncodeMs ?? 0;
                 const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
                 if (deferVirtualTableWrite) {
                     this._termsVirtualTableDirty = true;
@@ -2862,6 +2870,10 @@ export class DictionaryDatabase {
                 termRecordEncodeMs,
                 termRecordWriteMs,
                 termsVtabInsertMs,
+                termRecordInternMs,
+                termRecordPackLengthsMs,
+                termRecordHeapCopyMs,
+                termRecordWasmEncodeMs,
             };
             if (this._importDebugLogging) {
                 log.log(
