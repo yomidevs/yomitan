@@ -1933,6 +1933,9 @@ export class TermRecordOpfsStore {
         } else {
             readingList.push(record.id);
         }
+        if (record.expressionReverse === null) {
+            record.expressionReverse = this._reverseString(record.expression);
+        }
         if (record.expressionReverse !== null) {
             const expressionReverseList = index.expressionReverse.get(record.expressionReverse);
             if (typeof expressionReverseList === 'undefined') {
@@ -1940,6 +1943,11 @@ export class TermRecordOpfsStore {
             } else {
                 expressionReverseList.push(record.id);
             }
+        }
+        if (record.readingReverse === null) {
+            record.readingReverse = record.reading === record.expression ?
+                record.expressionReverse :
+                this._reverseString(record.reading);
         }
         if (record.readingReverse !== null) {
             const readingReverseList = index.readingReverse.get(record.readingReverse);

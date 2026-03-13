@@ -2738,15 +2738,6 @@ export class DictionaryImporter {
             const contentEnd = contentStart + contentLength;
             const reading = readingRaw.length > 0 ? readingRaw : expression;
             const sequence = sequenceRaw >= 0 ? sequenceRaw : void 0;
-            let expressionReverse;
-            let readingReverse;
-            if (prefixWildcardsSupported) {
-                const reversedExpression = this._reverseString(expression);
-                expressionReverse = reversedExpression;
-                readingReverse = (this._reuseExpressionReverseForReading && reading === expression) ?
-                    reversedExpression :
-                    this._reverseString(reading);
-            }
             let contentBytes = bytes.subarray(contentStart, contentEnd);
             if (sharedGlossaryBaseOffset > 0 && isRawTermContentSharedGlossaryBinary(contentBytes)) {
                 contentBytes = rebaseRawTermContentSharedGlossaryBinary(contentBytes, sharedGlossaryBaseOffset);
@@ -2757,8 +2748,8 @@ export class DictionaryImporter {
                 reading,
                 expressionBytes,
                 readingBytes,
-                expressionReverse,
-                readingReverse,
+                expressionReverse: void 0,
+                readingReverse: void 0,
                 definitionTags: null,
                 rules: '',
                 score,
