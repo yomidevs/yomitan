@@ -237,10 +237,11 @@ export class TermRecordOpfsStore {
     }
 
     /**
-     * @param {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} records
+     * @param {{dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} records
+     * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} [preinternedPlan]
      * @returns {Promise<void>}
      */
-    async appendBatch(records) {
+    async appendBatch(records, preinternedPlan = null) {
         if (records.length === 0) { return; }
         /** @type {Map<string, TermRecord[]>} */
         const recordsByDictionary = new Map();
@@ -251,6 +252,8 @@ export class TermRecordOpfsStore {
                 dictionary: row.dictionary,
                 expression: row.expression,
                 reading: row.reading,
+                expressionBytes: row.expressionBytes instanceof Uint8Array ? row.expressionBytes : void 0,
+                readingBytes: row.readingBytes instanceof Uint8Array ? row.readingBytes : void 0,
                 expressionReverse: row.expressionReverse,
                 readingReverse: row.readingReverse,
                 entryContentOffset: row.entryContentOffset,
@@ -279,7 +282,12 @@ export class TermRecordOpfsStore {
         for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
             const state = await this._getOrCreateShardState(dictionaryName);
             if (state === null) { continue; }
-            await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords), dictionaryRecords[0]?.id ?? 0, dictionaryRecords.length);
+            await this._appendEncodedChunk(
+                state,
+                await this._encodeRecords(dictionaryRecords, preinternedPlan),
+                dictionaryRecords[0]?.id ?? 0,
+                dictionaryRecords.length,
+            );
         }
     }
 
@@ -367,9 +375,10 @@ export class TermRecordOpfsStore {
      * @param {number[]} contentOffsets
      * @param {number[]} contentLengths
      * @param {(string|null)[]} contentDictNames
+     * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} [preinternedPlan]
      * @returns {Promise<{buildRecordsMs: number, encodeMs: number, appendWriteMs: number}>}
      */
-    async appendBatchFromResolvedImportTermEntries(rows, start, count, contentOffsets, contentLengths, contentDictNames) {
+    async appendBatchFromResolvedImportTermEntries(rows, start, count, contentOffsets, contentLengths, contentDictNames, preinternedPlan = null) {
         if (count <= 0) { return {buildRecordsMs: 0, encodeMs: 0, appendWriteMs: 0}; }
         if (contentOffsets.length < (start + count) || contentLengths.length < (start + count) || contentDictNames.length < (start + count)) {
             throw new Error('appendBatchFromResolvedImportTermEntries content refs length is smaller than row count');
@@ -385,7 +394,7 @@ export class TermRecordOpfsStore {
         let singleDictionaryRecordCount = 0;
         let singleDictionaryName = '';
         for (let i = start, ii = start + count; i < ii; ++i) {
-            const row = /** @type {{dictionary: string, expression: string, reading: string, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[i]);
+            const row = /** @type {{dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[i]);
             const id = this._nextId++;
             const dictionary = row.dictionary;
             /** @type {TermRecord} */
@@ -394,6 +403,8 @@ export class TermRecordOpfsStore {
                 dictionary,
                 expression: row.expression,
                 reading: row.reading,
+                expressionBytes: row.expressionBytes instanceof Uint8Array ? row.expressionBytes : void 0,
+                readingBytes: row.readingBytes instanceof Uint8Array ? row.readingBytes : void 0,
                 expressionReverse: row.expressionReverse ?? null,
                 readingReverse: row.readingReverse ?? null,
                 entryContentOffset: contentOffsets[i],
@@ -436,7 +447,7 @@ export class TermRecordOpfsStore {
         if (recordsByDictionary === null) {
             const state = await this._getOrCreateShardState(singleDictionaryName);
             if (state !== null) {
-                const metrics = await this._encodeAndAppendChunkForState(state, singleDictionaryRecords);
+                const metrics = await this._encodeAndAppendChunkForState(state, singleDictionaryRecords, preinternedPlan);
                 encodeMs += metrics.encodeMs;
                 appendWriteMs += metrics.appendWriteMs;
             }
@@ -445,7 +456,7 @@ export class TermRecordOpfsStore {
         for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
             const state = await this._getOrCreateShardState(dictionaryName);
             if (state === null) { continue; }
-            const metrics = await this._encodeAndAppendChunkForState(state, dictionaryRecords);
+            const metrics = await this._encodeAndAppendChunkForState(state, dictionaryRecords, preinternedPlan);
             encodeMs += metrics.encodeMs;
             appendWriteMs += metrics.appendWriteMs;
         }

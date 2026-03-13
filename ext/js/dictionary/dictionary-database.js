@@ -123,6 +123,31 @@ function packContentChunksIntoSlabs(chunks, targetBytes) {
     return {packedChunks, sourceChunkIndices, sourceChunkLocalOffsets};
 }
 
+/**
+ * @param {unknown[]} rows
+ * @returns {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}
+ */
+function getTermRecordPreinternedPlan(rows) {
+    const value = /** @type {{termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan}} */ (/** @type {unknown} */ (rows)).termRecordPreinternedPlan;
+    return value ?? null;
+}
+
+/**
+ * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} plan
+ * @param {number} start
+ * @param {number} count
+ * @returns {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}
+ */
+function sliceTermRecordPreinternedPlan(plan, start, count) {
+    if (plan === null) { return null; }
+    return {
+        stringLengths: plan.stringLengths,
+        stringsBuffer: plan.stringsBuffer,
+        expressionIndexes: plan.expressionIndexes.subarray(start, start + count),
+        readingIndexes: plan.readingIndexes.subarray(start, start + count),
+    };
+}
+
 
 /**
  * @typedef {object} InsertStatement
@@ -2584,12 +2609,21 @@ export class DictionaryDatabase {
         const tRecordAppendStart = safePerformance.now();
         let termRecordEncodeMs = 0;
         let termRecordWriteMs = 0;
+        const termRecordPreinternedPlan = sliceTermRecordPreinternedPlan(getTermRecordPreinternedPlan(rows), start, count);
         if (this._termRecordRowAppendFastPath) {
-            const metrics = await this._termRecordStore.appendBatchFromResolvedImportTermEntries(rows, start, count, contentOffsets, contentLengths, contentDictNames);
+            const metrics = await this._termRecordStore.appendBatchFromResolvedImportTermEntries(
+                rows,
+                start,
+                count,
+                contentOffsets,
+                contentLengths,
+                contentDictNames,
+                termRecordPreinternedPlan,
+            );
             termRecordEncodeMs = metrics.encodeMs;
             termRecordWriteMs = metrics.appendWriteMs;
         } else {
-            /** @type {{dictionary: string, expression: string, reading: string, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
+            /** @type {{dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string|null, score: number, sequence: number|null}[]} */
             const records = [];
             for (let i = start, ii = start + count; i < ii; ++i) {
                 const row = rows[i];
@@ -2597,6 +2631,8 @@ export class DictionaryDatabase {
                     dictionary: row.dictionary,
                     expression: row.expression,
                     reading: row.reading,
+                    expressionBytes: row.expressionBytes,
+                    readingBytes: row.readingBytes,
                     expressionReverse: row.expressionReverse ?? null,
                     readingReverse: row.readingReverse ?? null,
                     entryContentOffset: contentOffsets[i],
@@ -2606,7 +2642,7 @@ export class DictionaryDatabase {
                     sequence: typeof row.sequence === 'number' ? row.sequence : null,
                 });
             }
-            await this._termRecordStore.appendBatch(records);
+            await this._termRecordStore.appendBatch(records, termRecordPreinternedPlan);
         }
         const termRecordAppendMs = safePerformance.now() - tRecordAppendStart;
         let termsVtabInsertMs = 0;
