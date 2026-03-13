@@ -24,6 +24,8 @@ import {log} from '../core/log.js';
 import {sanitizeCSS} from '../core/utilities.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {DictionaryImporter} from '../dictionary/dictionary-importer.js';
+import {DictionaryImporterMediaLoader} from '../dictionary/dictionary-importer-media-loader.js';
 import {WebExtension} from '../extension/web-extension.js';
 import {Translator} from '../language/translator.js';
 
@@ -56,6 +58,8 @@ export class Offscreen {
             ['databasePrepareOffscreen',       this._prepareDatabaseHandler.bind(this)],
             ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
             ['databasePurgeOffscreen',         this._purgeDatabaseHandler.bind(this)],
+            ['databaseDeleteDictionaryOffscreen', this._deleteDictionaryHandler.bind(this)],
+            ['databaseImportDictionaryFromUrlOffscreen', this._importDictionaryFromUrlHandler.bind(this)],
             ['databaseGetMediaOffscreen',      this._getMediaHandler.bind(this)],
             ['translatorPrepareOffscreen',     this._prepareTranslatorHandler.bind(this)],
             ['findKanjiOffscreen',             this._findKanjiHandler.bind(this)],
@@ -120,6 +124,37 @@ export class Offscreen {
     /** @type {import('offscreen').ApiHandler<'databasePurgeOffscreen'>} */
     async _purgeDatabaseHandler() {
         return await this._dictionaryDatabase.purge();
+    }
+
+    /** @type {import('offscreen').ApiHandler<'databaseDeleteDictionaryOffscreen'>} */
+    async _deleteDictionaryHandler({dictionaryTitle}) {
+        await this._prepareDatabaseHandler();
+        await this._dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, () => {});
+    }
+
+    /** @type {import('offscreen').ApiHandler<'databaseImportDictionaryFromUrlOffscreen'>} */
+    async _importDictionaryFromUrlHandler({url, details}) {
+        await this._prepareDatabaseHandler();
+
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch the URL: ${url}`);
+        }
+
+        const archiveContent = await response.arrayBuffer();
+        const dictionaryImporter = new DictionaryImporter(new DictionaryImporterMediaLoader());
+        const {result, errors} = await dictionaryImporter.importDictionary(this._dictionaryDatabase, archiveContent, details);
+        return {
+            result,
+            errors: errors.map((error) => ExtensionError.serialize(error)),
+        };
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseGetMediaOffscreen'>} */

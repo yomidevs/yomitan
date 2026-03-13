@@ -198,6 +198,27 @@ export class DictionaryDatabaseProxy {
     }
 
     /**
+     * @param {string} dictionaryTitle
+     * @returns {Promise<void>}
+     */
+    async deleteDictionary(dictionaryTitle) {
+        await this._offscreen.sendMessagePromise({action: 'databaseDeleteDictionaryOffscreen', params: {dictionaryTitle}});
+    }
+
+    /**
+     * @param {string} url
+     * @param {import('dictionary-importer').ImportDetails} details
+     * @returns {Promise<import('dictionary-worker').MessageCompleteResult>}
+     */
+    async importDictionaryFromUrl(url, details) {
+        const response = await this._offscreen.sendMessagePromise({action: 'databaseImportDictionaryFromUrlOffscreen', params: {url, details}});
+        return {
+            result: response.result,
+            errors: response.errors.map((error) => ExtensionError.deserialize(error)),
+        };
+    }
+
+    /**
      * @param {import('dictionary-database').MediaRequest[]} targets
      * @returns {Promise<import('dictionary-database').Media[]>}
      */

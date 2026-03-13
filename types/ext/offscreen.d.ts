@@ -18,6 +18,7 @@
 import type * as Dictionary from './dictionary';
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
+import type * as DictionaryWorker from './dictionary-worker';
 import type * as Environment from './environment';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
@@ -42,6 +43,19 @@ type ApiSurface = {
     databasePurgeOffscreen: {
         params: void;
         return: boolean;
+    };
+    databaseDeleteDictionaryOffscreen: {
+        params: {
+            dictionaryTitle: string;
+        };
+        return: void;
+    };
+    databaseImportDictionaryFromUrlOffscreen: {
+        params: {
+            url: string;
+            details: DictionaryImporter.ImportDetails;
+        };
+        return: DictionaryWorker.MessageCompleteResultSerialized;
     };
     databaseGetMediaOffscreen: {
         params: {

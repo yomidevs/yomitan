@@ -1394,10 +1394,15 @@
                 "database": {
                     "type": "object",
                     "required": [
-                        "prefixWildcardsSupported"
+                        "prefixWildcardsSupported",
+                        "autoUpdateDictionariesOnStartup"
                     ],
                     "properties": {
                         "prefixWildcardsSupported": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "autoUpdateDictionariesOnStartup": {
                             "type": "boolean",
                             "default": false
                         }
