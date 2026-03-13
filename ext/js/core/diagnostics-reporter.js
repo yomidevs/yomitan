@@ -15,24 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Api from './api';
-
-export type DatabaseUpdateType = 'dictionary';
-
-export type DatabaseUpdateCause = 'purge' | 'delete' | 'import' | 'migrate';
-
-export type MecabParseResults = [
-    dictionary: string,
-    content: Api.ParseTextLine[],
-][];
-
-export type TabInfo = {
-    tab: chrome.tabs.Tab;
-    url: string | null;
-};
-
-export type FindTabsPredicate = (tabInfo: TabInfo) => boolean | Promise<boolean>;
-
-export type CanAddResults = {note: import('anki').Note, isDuplicate: boolean}[];
-
-export type Mode = 'existingOrNewTab' | 'newTab' | 'popup';
+/**
+ * PR1 keeps only correctness-essential diagnostics paths.
+ * The richer diagnostics pipeline from the fork is intentionally not upstreamed here.
+ * @param {string} _event
+ * @param {unknown} [_payload]
+ */
+export function reportDiagnostics(_event, _payload = {}) {
+    // NOP
+}

@@ -170,6 +170,10 @@ export class Backend {
             ['getZoom',                      this._onApiGetZoom.bind(this)],
             ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)],
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
+            ['getLegacyIndexedDbMigrationStatus', this._onApiGetLegacyIndexedDbMigrationStatus.bind(this)],
+            ['migrateLegacyIndexedDb',       this._onApiMigrateLegacyIndexedDb.bind(this)],
+            ['exportDictionaryDatabase',     this._onApiExportDictionaryDatabase.bind(this)],
+            ['importDictionaryDatabase',     this._onApiImportDictionaryDatabase.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
             ['getMedia',                     this._onApiGetMedia.bind(this)],
             ['logGenericErrorBackend',       this._onApiLogGenericErrorBackend.bind(this)],
@@ -925,6 +929,31 @@ export class Backend {
     /** @type {import('api').ApiHandler<'getDictionaryInfo'>} */
     async _onApiGetDictionaryInfo() {
         return await this._dictionaryDatabase.getDictionaryInfo();
+    }
+
+    /** @type {import('api').ApiHandler<'getLegacyIndexedDbMigrationStatus'>} */
+    async _onApiGetLegacyIndexedDbMigrationStatus() {
+        return await this._dictionaryDatabase.getLegacyIndexedDbMigrationStatus();
+    }
+
+    /** @type {import('api').ApiHandler<'migrateLegacyIndexedDb'>} */
+    async _onApiMigrateLegacyIndexedDb() {
+        const result = await this._dictionaryDatabase.migrateLegacyIndexedDb();
+        if (result.result === 'migrated') {
+            this._triggerDatabaseUpdated('dictionary', 'migrate');
+        }
+        return result;
+    }
+
+    /** @type {import('api').ApiHandler<'exportDictionaryDatabase'>} */
+    async _onApiExportDictionaryDatabase() {
+        return await this._dictionaryDatabase.exportDatabase();
+    }
+
+    /** @type {import('api').ApiHandler<'importDictionaryDatabase'>} */
+    async _onApiImportDictionaryDatabase({content}) {
+        await this._dictionaryDatabase.importDatabase(content);
+        this._triggerDatabaseUpdated('dictionary', 'import');
     }
 
     /** @type {import('api').ApiHandler<'purgeDatabase'>} */

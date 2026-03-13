@@ -249,6 +249,35 @@ export class API {
     }
 
     /**
+     * @returns {Promise<import('api').ApiReturn<'getLegacyIndexedDbMigrationStatus'>>}
+     */
+    getLegacyIndexedDbMigrationStatus() {
+        return this._invoke('getLegacyIndexedDbMigrationStatus', void 0);
+    }
+
+    /**
+     * @returns {Promise<import('api').ApiReturn<'migrateLegacyIndexedDb'>>}
+     */
+    migrateLegacyIndexedDb() {
+        return this._invoke('migrateLegacyIndexedDb', void 0);
+    }
+
+    /**
+     * @returns {Promise<import('api').ApiReturn<'exportDictionaryDatabase'>>}
+     */
+    exportDictionaryDatabase() {
+        return this._invoke('exportDictionaryDatabase', void 0);
+    }
+
+    /**
+     * @param {import('api').ApiParam<'importDictionaryDatabase', 'content'>} content
+     * @returns {Promise<import('api').ApiReturn<'importDictionaryDatabase'>>}
+     */
+    importDictionaryDatabase(content) {
+        return this._invoke('importDictionaryDatabase', {content});
+    }
+
+    /**
      * @returns {Promise<import('api').ApiReturn<'purgeDatabase'>>}
      */
     purgeDatabase() {

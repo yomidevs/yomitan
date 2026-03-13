@@ -53,6 +53,22 @@ export type DatabaseTermEntry = {
     rules: string;
     score: number;
     glossary: DictionaryData.TermGlossary[];
+    /** Pre-serialized glossary JSON for import fast-path. */
+    glossaryJson?: string;
+    /** Pre-serialized dedupe payload JSON for import fast-path. */
+    termEntryContentJson?: string;
+    /** Precomputed dedupe payload hash for import fast-path. */
+    termEntryContentHash?: string;
+    /** Precomputed dedupe payload hash high 32 bits for import fast-path. */
+    termEntryContentHash1?: number;
+    /** Precomputed dedupe payload hash low 32 bits for import fast-path. */
+    termEntryContentHash2?: number;
+    /** Pre-encoded dedupe payload bytes for import fast-path. */
+    termEntryContentBytes?: Uint8Array;
+    /** Explicit raw term-content storage dict name for import fast-path. */
+    termEntryContentDictName?: string;
+    /** Raw glossary JSON bytes retained for lazy raw-content encoding. */
+    termEntryContentRawGlossaryJsonBytes?: Uint8Array;
     sequence?: number;
     termTags?: string;
     dictionary: string;
@@ -213,8 +229,8 @@ export type ObjectStoreData<T extends ObjectStoreName> = (
     never
 );
 
-export type DatabaseUpdateItem = {
-    primaryKey: IDBValidKey;
+export type DatabaseUpdateItem<T extends ObjectStoreName = ObjectStoreName> = {
+    primaryKey: number;
     data: ObjectStoreData<T>;
 };
 
@@ -270,15 +286,20 @@ export type FindMultiBulkData<TItem = unknown> = {
     indexIndex: number;
 };
 
-export type CreateQuery<TItem = unknown> = (item: TItem) => (IDBValidKey | IDBKeyRange | null);
+export type CreateQuery<TItem = unknown> = (item: TItem) => (string | number | null);
 
 export type FindPredicate<TItem = unknown, TRow = unknown> = (row: TRow, item: TItem) => boolean;
 
 export type CreateResult<TItem = unknown, TRow = unknown, TResult = unknown> = (row: TRow, data: FindMultiBulkData<TItem>) => TResult;
 
-export type DictionarySet = {
-    has(value: string): boolean;
-};
+export type DictionarySet =
+    Set<string> |
+    Map<string, unknown> |
+    {
+        has(value: string): boolean;
+        readonly size: number;
+        [Symbol.iterator](): Iterator<string>;
+    };
 
 /** API for communicating with its own worker */
 

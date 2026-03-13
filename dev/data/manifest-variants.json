@@ -106,7 +106,8 @@
                     "popup.html",
                     "template-renderer.html",
                     "js/*",
-                    "lib/resvg.wasm"
+                    "lib/resvg.wasm",
+                    "lib/sqlite/*"
                 ],
                 "matches": [
                     "<all_urls>"
