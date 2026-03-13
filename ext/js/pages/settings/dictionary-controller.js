@@ -16,16 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as ajvSchemas0 from '../../../lib/validate-schemas.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {deferPromise} from '../../core/utilities.js';
-import {compareRevisions} from '../../dictionary/dictionary-data-util.js';
+import {
+    createDefaultDictionarySettings,
+    getDictionaryUpdateDownloadUrl,
+    getProfilesDictionarySettings,
+} from '../../dictionary/dictionary-update-util.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-
-const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 
 class DictionaryEntry {
     /**
@@ -173,25 +173,10 @@ class DictionaryEntry {
      */
     async checkForUpdate() {
         this._updatesAvailable.hidden = true;
-        const {isUpdatable, indexUrl, revision: currentRevision, downloadUrl: currentDownloadUrl} = this._dictionaryInfo;
-        if (!isUpdatable || !indexUrl || !currentDownloadUrl) { return false; }
-        const response = await fetch(indexUrl);
-
-        /** @type {unknown} */
-        const index = await readResponseJson(response);
-
-        if (!ajvSchemas.dictionaryIndex(index)) {
-            throw new Error('Invalid dictionary index');
-        }
-
-        const validIndex = /** @type {import('dictionary-data').Index} */ (index);
-        const {revision: latestRevision, downloadUrl: latestDownloadUrl} = validIndex;
-
-        if (!compareRevisions(currentRevision, latestRevision)) {
+        const downloadUrl = await getDictionaryUpdateDownloadUrl(this._dictionaryInfo);
+        if (downloadUrl === null) {
             return false;
         }
-
-        const downloadUrl = latestDownloadUrl ?? currentDownloadUrl;
 
         this._updateDownloadUrl = downloadUrl;
         this._showUpdatesAvailableButton();
@@ -813,16 +798,7 @@ export class DictionaryController {
      * @returns {import('settings').DictionaryOptions}
      */
     static createDefaultDictionarySettings(name, enabled, styles) {
-        return {
-            name,
-            alias: name,
-            enabled,
-            allowSecondarySearches: false,
-            definitionsCollapsible: 'not-collapsible',
-            partsOfSpeechFilter: true,
-            useDeinflections: true,
-            styles: styles ?? '',
-        };
+        return createDefaultDictionarySettings(name, enabled, styles);
     }
 
     /**
@@ -859,7 +835,7 @@ export class DictionaryController {
             }
 
             for (const {title, styles} of missingDictionaries) {
-                const value = DictionaryController.createDefaultDictionarySettings(title, newDictionariesEnabled, styles);
+                const value = createDefaultDictionarySettings(title, newDictionariesEnabled, styles);
                 dictionaryOptionsArray.push(value);
                 modified = true;
             }
@@ -1371,20 +1347,7 @@ export class DictionaryController {
         if (typeof downloadUrl !== 'string') { throw new Error('Attempted to update dictionary without download URL'); }
 
         const options = await this._settingsController.getOptionsFull();
-        const {profiles} = options;
-
-        /** @type {import('settings-controller.js').ProfilesDictionarySettings} */
-        const profilesDictionarySettings = {};
-
-        for (const profile of profiles) {
-            const dictionaries = profile.options.dictionaries;
-            for (let i = 0; i < dictionaries.length; ++i) {
-                if (dictionaries[i].name === dictionaryTitle) {
-                    profilesDictionarySettings[profile.id] = {...dictionaries[i], index: i};
-                    break;
-                }
-            }
-        }
+        const profilesDictionarySettings = getProfilesDictionarySettings(options, dictionaryTitle);
 
         await this._deleteDictionary(dictionaryTitle);
         /** @type {import('core').DeferredPromiseDetails<void>} */

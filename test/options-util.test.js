@@ -252,6 +252,7 @@ function createOptionsTestData1() {
         global: {
             database: {
                 prefixWildcardsSupported: false,
+                autoUpdateDictionariesOnStartup: false,
             },
         },
     };
@@ -704,10 +705,11 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 74,
+        version: 75,
         global: {
             database: {
                 prefixWildcardsSupported: false,
+                autoUpdateDictionariesOnStartup: false,
             },
             dataTransmissionConsentShown: false,
         },
@@ -780,6 +782,14 @@ describe('OptionsUtil', () => {
             modify(optionsModified);
             const optionsUpdated = await optionsUtil.update(structuredClone(optionsModified));
             expect(structuredClone(optionsUpdated)).toStrictEqual(structuredClone(options));
+        });
+
+        test('includes dictionary startup auto-update option', async () => {
+            const optionsUtil = new OptionsUtil();
+            await optionsUtil.prepare();
+
+            const options = optionsUtil.getDefault();
+            expect(options.global.database.autoUpdateDictionariesOnStartup).toBe(false);
         });
     });
 

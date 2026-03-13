@@ -33,6 +33,14 @@ import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {DictionaryImporter} from '../dictionary/dictionary-importer.js';
+import {DictionaryImporterMediaLoader} from '../dictionary/dictionary-importer-media-loader.js';
+import {
+    applyImportedDictionarySettings,
+    getDictionaryUpdateDownloadUrl,
+    getProfilesDictionarySettings,
+    updateDictionaryAnkiFieldTemplates,
+} from '../dictionary/dictionary-update-util.js';
 import {Environment} from '../extension/environment.js';
 import {CacheMap} from '../general/cache-map.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
@@ -45,6 +53,7 @@ import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, Translato
 import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
+import {StartupDictionaryUpdater} from './startup-dictionary-updater.js';
 
 /**
  * This class controls the core logic of the extension, including API calls
@@ -330,6 +339,7 @@ export class Backend {
             this._options = await this._optionsUtil.load();
 
             this._applyOptions('background');
+            await this._updateDictionariesOnStartup();
 
             this._attachOmniboxListener();
 
@@ -2793,6 +2803,129 @@ export class Backend {
                 chrome.storage.session.set({openedWelcomePage: true}),
             ]);
         }
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _updateDictionariesOnStartup() {
+        const updater = new StartupDictionaryUpdater({
+            isEnabled: async () => this._getOptionsFull(false).global.database.autoUpdateDictionariesOnStartup,
+            hasRunThisSession: this._hasRunStartupDictionaryUpdatesThisSession.bind(this),
+            markRunThisSession: this._markStartupDictionaryUpdatesThisSession.bind(this),
+            getDictionaryInfo: async () => await this._dictionaryDatabase.getDictionaryInfo(),
+            checkForUpdate: async (dictionaryInfo) => await getDictionaryUpdateDownloadUrl(dictionaryInfo),
+            updateDictionary: this._updateDictionaryOnStartup.bind(this),
+            onError: this._onStartupDictionaryUpdateError.bind(this),
+        });
+        try {
+            await updater.run();
+        } catch (e) {
+            log.error(e);
+        }
+    }
+
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async _hasRunStartupDictionaryUpdatesThisSession() {
+        const result = await chrome.storage.session.get(['startupDictionaryUpdatesRun']);
+        return !!result.startupDictionaryUpdatesRun;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _markStartupDictionaryUpdatesThisSession() {
+        await chrome.storage.session.set({startupDictionaryUpdatesRun: true});
+    }
+
+    /**
+     * @param {unknown} error
+     * @param {{dictionaryTitle: string, phase: 'check' | 'update'}} details
+     */
+    _onStartupDictionaryUpdateError(error, {dictionaryTitle, phase}) {
+        log.error(`Startup dictionary ${phase} failed for ${dictionaryTitle}`);
+        log.error(error);
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     * @param {string} downloadUrl
+     * @returns {Promise<void>}
+     */
+    async _updateDictionaryOnStartup(dictionaryTitle, downloadUrl) {
+        const options = clone(this._getOptionsFull(false));
+        const profilesDictionarySettings = getProfilesDictionarySettings(options, dictionaryTitle);
+
+        await this._deleteDictionaryForStartupUpdate(dictionaryTitle);
+        this._triggerDatabaseUpdated('dictionary', 'delete');
+
+        const importDetails = {
+            prefixWildcardsSupported: options.global.database.prefixWildcardsSupported,
+            yomitanVersion: chrome.runtime.getManifest().version,
+        };
+        const {result, errors} = await this._importDictionaryFromUrlForStartupUpdate(downloadUrl, importDetails);
+        if (result === null) {
+            if (errors.length > 0) {
+                throw errors[0];
+            }
+            throw new Error(`Failed to import dictionary update: ${dictionaryTitle}`);
+        }
+
+        applyImportedDictionarySettings(options, result, profilesDictionarySettings);
+        updateDictionaryAnkiFieldTemplates(options, profilesDictionarySettings, result.title);
+
+        this._options = options;
+        await this._saveOptions('background');
+
+        for (const error of errors) {
+            log.error(error);
+        }
+        this._triggerDatabaseUpdated('dictionary', 'import');
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     * @returns {Promise<void>}
+     */
+    async _deleteDictionaryForStartupUpdate(dictionaryTitle) {
+        if ('deleteDictionary' in this._dictionaryDatabase && typeof this._dictionaryDatabase.deleteDictionary === 'function') {
+            await this._dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, () => {});
+            return;
+        }
+        throw new Error('Dictionary deletion is not supported in the current runtime');
+    }
+
+    /**
+     * @param {string} url
+     * @param {import('dictionary-importer').ImportDetails} details
+     * @returns {Promise<import('dictionary-worker').MessageCompleteResult>}
+     */
+    async _importDictionaryFromUrlForStartupUpdate(url, details) {
+        if ('importDictionaryFromUrl' in this._dictionaryDatabase && typeof this._dictionaryDatabase.importDictionaryFromUrl === 'function') {
+            return await this._dictionaryDatabase.importDictionaryFromUrl(url, details);
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch the URL: ${url}`);
+        }
+
+        const archiveContent = await response.arrayBuffer();
+        const dictionaryImporter = new DictionaryImporter(new DictionaryImporterMediaLoader());
+        return await dictionaryImporter.importDictionary(
+            /** @type {DictionaryDatabase} */ (this._dictionaryDatabase),
+            archiveContent,
+            details,
+        );
     }
 
     /**

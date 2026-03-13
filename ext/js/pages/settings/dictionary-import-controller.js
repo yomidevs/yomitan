@@ -20,10 +20,12 @@ import {ExtensionError} from '../../core/extension-error.js';
 import {readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {toError} from '../../core/to-error.js';
-import {getKebabCase} from '../../data/anki-template-util.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
+import {
+    applyImportedDictionarySettings,
+    updateDictionaryAnkiFieldTemplates,
+} from '../../dictionary/dictionary-update-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {DictionaryController} from './dictionary-controller.js';
 
 export class DictionaryImportController {
     /**
@@ -640,27 +642,9 @@ export class DictionaryImportController {
             return errors;
         }
 
-        const errors2 = await this._addDictionarySettings(result, profilesDictionarySettings);
+        const errors2 = await this._updateSettingsAfterDictionaryImport(result, profilesDictionarySettings);
 
         await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
-
-        // Only runs if updating a dictionary
-        if (profilesDictionarySettings !== null) {
-            const options = await this._settingsController.getOptionsFull();
-            const {profiles} = options;
-
-            for (const profile of profiles) {
-                for (const cardFormat of profile.options.anki.cardFormats) {
-                    const ankiTermFields = cardFormat.fields;
-                    const oldFieldSegmentRegex = new RegExp(getKebabCase(profilesDictionarySettings[profile.id].name), 'g');
-                    const newFieldSegment = getKebabCase(result.title);
-                    for (const key of Object.keys(ankiTermFields)) {
-                        ankiTermFields[key].value = ankiTermFields[key].value.replace(oldFieldSegmentRegex, newFieldSegment);
-                    }
-                }
-            }
-            await this._settingsController.setAllSettings(options);
-        }
 
         if (errors.length > 0) {
             errors.push(new Error(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`));
@@ -675,55 +659,35 @@ export class DictionaryImportController {
      * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      * @returns {Promise<Error[]>}
      */
-    async _addDictionarySettings(summary, profilesDictionarySettings) {
-        const {title, sequenced, styles} = summary;
-        let optionsFull;
+    async _updateSettingsAfterDictionaryImport(summary, profilesDictionarySettings) {
+        const optionsFull = await this._getOptionsFullWithRetry();
+        if (!optionsFull) {
+            return [new Error('Failed to automatically set dictionary settings. A page refresh and manual enabling of the dictionary may be required.')];
+        }
+
+        try {
+            applyImportedDictionarySettings(optionsFull, summary, profilesDictionarySettings);
+            updateDictionaryAnkiFieldTemplates(optionsFull, profilesDictionarySettings, summary.title);
+            await this._settingsController.setAllSettings(optionsFull);
+            return [];
+        } catch (error) {
+            return [toError(error)];
+        }
+    }
+
+    /**
+     * @returns {Promise<import('settings').Options|undefined>}
+     */
+    async _getOptionsFullWithRetry() {
         // Workaround Firefox bug sometimes causing getOptionsFull to fail
-        for (let i = 0, success = false; (i < 10) && (success === false); i++) {
+        for (let i = 0; i < 10; ++i) {
             try {
-                optionsFull = await this._settingsController.getOptionsFull();
-                success = true;
+                return await this._settingsController.getOptionsFull();
             } catch (error) {
                 log.error(error);
             }
         }
-        if (!optionsFull) { return [new Error('Failed to automatically set dictionary settings. A page refresh and manual enabling of the dictionary may be required.')]; }
-
-        const profileIndex = this._settingsController.profileIndex;
-        /** @type {import('settings-modifications').Modification[]} */
-        const targets = [];
-        const profileCount = optionsFull.profiles.length;
-        for (let i = 0; i < profileCount; ++i) {
-            const {options, id: profileId} = optionsFull.profiles[i];
-            const enabled = profileIndex === i;
-            const defaultSettings = DictionaryController.createDefaultDictionarySettings(title, enabled, styles);
-            const path1 = `profiles[${i}].options.dictionaries`;
-
-            if (profilesDictionarySettings === null || typeof profilesDictionarySettings[profileId] === 'undefined') {
-                targets.push({action: 'push', path: path1, items: [defaultSettings]});
-            } else {
-                const {index, alias, name, ...currentSettings} = profilesDictionarySettings[profileId];
-                const newAlias = alias === name ? title : alias;
-                targets.push({
-                    action: 'splice',
-                    path: path1,
-                    start: index,
-                    items: [{
-                        ...currentSettings,
-                        styles,
-                        name: title,
-                        alias: newAlias,
-                    }],
-                    deleteCount: 0,
-                });
-            }
-
-            if (sequenced && options.general.mainDictionary === '') {
-                const path2 = `profiles[${i}].options.general.mainDictionary`;
-                targets.push({action: 'set', path: path2, value: title});
-            }
-        }
-        return await this._modifyGlobalSettings(targets);
+        return void 0;
     }
 
     /**
