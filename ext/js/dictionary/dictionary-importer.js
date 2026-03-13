@@ -368,6 +368,7 @@ export class DictionaryImporter {
         this._reverseStringCache.clear();
         dictionaryDatabase.setImportOptimizationFlags({
             termContentStorageMode,
+            expectedTermContentImportBytes: void 0,
         });
         const tImportStart = Date.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
@@ -515,6 +516,7 @@ export class DictionaryImporter {
         if (effectiveTermContentStorageMode !== termContentStorageMode) {
             dictionaryDatabase.setImportOptimizationFlags({
                 termContentStorageMode: effectiveTermContentStorageMode,
+                expectedTermContentImportBytes: void 0,
             });
         }
         const packedTermArtifactEntry = (
@@ -604,6 +606,25 @@ export class DictionaryImporter {
             termArtifactManifest !== null &&
             termArtifactManifest.termBanksByArtifact.size > 0
         );
+        const expectedTermContentImportBytes = (
+            effectiveTermContentStorageMode === 'raw-bytes'
+        ) ?
+            this._estimateExpectedTermContentImportBytes(
+                packedTermArtifactBytes,
+                sharedGlossaryArtifactBytes,
+                termArtifactManifest,
+                preloadedTermArtifactBytes,
+                termArtifactFiles,
+            ) :
+            null;
+        dictionaryDatabase.setImportOptimizationFlags(
+            expectedTermContentImportBytes === null ?
+                {termContentStorageMode: effectiveTermContentStorageMode} :
+                {
+                    termContentStorageMode: effectiveTermContentStorageMode,
+                    expectedTermContentImportBytes,
+                },
+        );
         /** @type {Array<import('@zip.js/zip.js').Entry|{filename: string}>} */
         const activeTermFiles = usePackedTermArtifact ?
             this._createPackedTermArtifactFiles(termArtifactManifest.termBanksByArtifact) :
@@ -612,7 +633,8 @@ export class DictionaryImporter {
             `banks terms=${activeTermFiles.length} termArtifacts=${termArtifactFiles.length} ` +
             `termMeta=${termMetaFiles.length} kanji=${kanjiFiles.length} kanjiMeta=${kanjiMetaFiles.length} tags=${tagFiles.length} ` +
             `useArtifactTerms=${String(useTermArtifactFiles || usePackedTermArtifact)} packedTermArtifact=${String(packedTermArtifactBytes !== null)} ` +
-            `preloadedTermArtifacts=${String(preloadedTermArtifactBytes !== null)}`,
+            `preloadedTermArtifacts=${String(preloadedTermArtifactBytes !== null)} ` +
+            `expectedTermContentImportBytes=${String(expectedTermContentImportBytes)}`,
         );
 
         // Load and import data
@@ -2224,6 +2246,49 @@ export class DictionaryImporter {
             }
         }
         return results;
+    }
+
+    /**
+     * @param {Uint8Array|null} packedTermArtifactBytes
+     * @param {Uint8Array|null} sharedGlossaryArtifactBytes
+     * @param {{termBanksByArtifact: Map<string, {packedOffset: number, packedLength: number, rows: number|null}>}|null} termArtifactManifest
+     * @param {Map<string, Uint8Array>|null} preloadedTermArtifactBytes
+     * @param {import('@zip.js/zip.js').Entry[]} termArtifactFiles
+     * @returns {number|null}
+     */
+    _estimateExpectedTermContentImportBytes(
+        packedTermArtifactBytes,
+        sharedGlossaryArtifactBytes,
+        termArtifactManifest,
+        preloadedTermArtifactBytes,
+        termArtifactFiles,
+    ) {
+        let total = 0;
+        if (packedTermArtifactBytes instanceof Uint8Array) {
+            total += packedTermArtifactBytes.byteLength;
+        } else if (preloadedTermArtifactBytes !== null) {
+            for (const bytes of preloadedTermArtifactBytes.values()) {
+                total += bytes.byteLength;
+            }
+        } else if (termArtifactManifest !== null) {
+            for (const {packedLength} of termArtifactManifest.termBanksByArtifact.values()) {
+                total += packedLength;
+            }
+        } else {
+            for (const termArtifactFile of termArtifactFiles) {
+                const size = typeof termArtifactFile.uncompressedSize === 'number' && Number.isFinite(termArtifactFile.uncompressedSize) ?
+                    Math.max(0, Math.trunc(termArtifactFile.uncompressedSize)) :
+                    0;
+                total += size;
+            }
+        }
+        if (
+            sharedGlossaryArtifactBytes instanceof Uint8Array &&
+            !(packedTermArtifactBytes instanceof Uint8Array)
+        ) {
+            total += sharedGlossaryArtifactBytes.byteLength;
+        }
+        return total > 0 ? total : null;
     }
 
     /**
