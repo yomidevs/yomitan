@@ -19,7 +19,7 @@ import {parseJson} from '../core/json.js';
 import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {safePerformance} from '../core/safe-performance.js';
 import {RAW_TERM_CONTENT_DICT_NAME, RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME} from './raw-term-content.js';
-import {encodeTermRecordsWithWasm, encodeTermRecordsWithWasmPreinterned} from './term-record-wasm-encoder.js';
+import {encodeTermRecordArtifactChunkWithWasmPreinterned, encodeTermRecordsWithWasm, encodeTermRecordsWithWasmPreinterned} from './term-record-wasm-encoder.js';
 
 const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
 const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
@@ -1526,6 +1526,22 @@ export class TermRecordOpfsStore {
     async _encodeArtifactChunkRecords(chunk, contentOffsets, contentLengths, preinternedPlan = null) {
         if (chunk.rowCount === 0) {
             return new Uint8Array(0);
+        }
+        if (preinternedPlan !== null && !this._wasmEncoderUnavailable) {
+            try {
+                const encoded = await encodeTermRecordArtifactChunkWithWasmPreinterned(
+                    chunk,
+                    contentOffsets,
+                    contentLengths,
+                    this._textEncoder,
+                    preinternedPlan,
+                );
+                if (encoded instanceof Uint8Array) {
+                    return encoded;
+                }
+            } catch (_) {
+                this._wasmEncoderUnavailable = true;
+            }
         }
         /** @type {TermRecord[]} */
         const records = new Array(chunk.rowCount);
