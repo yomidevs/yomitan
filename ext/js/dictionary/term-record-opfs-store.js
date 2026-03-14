@@ -80,6 +80,7 @@ const ENTRY_CONTENT_DICT_NAME_VALUE_MASK = 0x7fff;
  * @property {string} dictionary
  * @property {string} expression
  * @property {string} reading
+ * @property {boolean} [readingEqualsExpression]
  * @property {Uint8Array} [expressionBytes]
  * @property {Uint8Array} [readingBytes]
  * @property {string|null} expressionReverse
@@ -397,14 +398,17 @@ export class TermRecordOpfsStore {
             const row = /** @type {{dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[i]);
             const id = this._nextId++;
             const dictionary = row.dictionary;
+            const readingEqualsExpression = row.reading === row.expression;
+            const useLazyArtifactStrings = preinternedPlan !== null;
             /** @type {TermRecord} */
             const record = {
                 id,
                 dictionary,
-                expression: row.expression,
-                reading: row.reading,
+                expression: useLazyArtifactStrings ? '' : row.expression,
+                reading: useLazyArtifactStrings ? '' : row.reading,
+                readingEqualsExpression,
                 expressionBytes: row.expressionBytes instanceof Uint8Array ? row.expressionBytes : void 0,
-                readingBytes: row.readingBytes instanceof Uint8Array ? row.readingBytes : void 0,
+                readingBytes: !readingEqualsExpression && row.readingBytes instanceof Uint8Array ? row.readingBytes : void 0,
                 expressionReverse: row.expressionReverse ?? null,
                 readingReverse: row.readingReverse ?? null,
                 entryContentOffset: contentOffsets[i],
@@ -1931,6 +1935,7 @@ export class TermRecordOpfsStore {
      * @param {TermRecord} record
      */
     _addRecordToDictionaryIndex(index, record) {
+        this._ensureDecodedRecordStrings(record);
         const expressionList = index.expression.get(record.expression);
         if (typeof expressionList === 'undefined') {
             index.expression.set(record.expression, [record.id]);
@@ -1983,6 +1988,23 @@ export class TermRecordOpfsStore {
                 index.sequence.set(record.sequence, [record.id]);
             } else {
                 sequenceList.push(record.id);
+            }
+        }
+    }
+
+    /**
+     * @param {TermRecord} record
+     * @returns {void}
+     */
+    _ensureDecodedRecordStrings(record) {
+        if (record.expression.length === 0 && record.expressionBytes instanceof Uint8Array && record.expressionBytes.byteLength > 0) {
+            record.expression = this._decodeString(record.expressionBytes, 0, record.expressionBytes.byteLength);
+        }
+        if (record.reading.length === 0) {
+            if (record.readingEqualsExpression === true) {
+                record.reading = record.expression;
+            } else if (record.readingBytes instanceof Uint8Array && record.readingBytes.byteLength > 0) {
+                record.reading = this._decodeString(record.readingBytes, 0, record.readingBytes.byteLength);
             }
         }
     }

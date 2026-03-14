@@ -143,7 +143,7 @@ async function getWasm() {
 }
 
 /**
- * @param {{id: number, dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
+ * @param {{id: number, dictionary: string, expression: string, reading: string, readingEqualsExpression?: boolean, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
  * @param {TextEncoder} textEncoder
  * @returns {Promise<Uint8Array|null>}
  */
@@ -152,7 +152,7 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
 }
 
 /**
- * @param {{id: number, dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
+ * @param {{id: number, dictionary: string, expression: string, reading: string, readingEqualsExpression?: boolean, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
  * @param {TextEncoder} textEncoder
  * @param {PreinternedTermRecordPlan|null} preinternedPlan
  * @returns {Promise<Uint8Array|null>}
@@ -179,7 +179,7 @@ export async function encodeTermRecordsWithWasmPreinterned(records, textEncoder,
         } else {
             expressionIndex = internString(record.expression);
         }
-        const readingEqualsExpression = record.reading === record.expression;
+        const readingEqualsExpression = record.readingEqualsExpression ?? (record.reading === record.expression);
         let readingIndex;
         if (planReadingIndexes instanceof Uint32Array) {
             readingIndex = planReadingIndexes[recordIndex];
