@@ -327,6 +327,8 @@ export class DictionaryImportController {
         this._importFileDrop.addEventListener('drop', this._onFileDrop.bind(this), false);
 
         this._settingsController.on('importDictionaryFromUrl', this._onEventImportDictionaryFromUrl.bind(this));
+        this._settingsController.on('importDictionaryFromFile', this._onEventImportDictionaryFromFile.bind(this));
+        this._settingsController.on('downloadDictionaryFromUrl', this._onEventDownloadDictionaryFromUrl.bind(this));
 
         document.addEventListener('click', this._onDocumentClickCaptureBind, true);
         globalThis.addEventListener('manabitan:modal-visibility-changed', this._onModalVisibilityChangedEventBind, false);
@@ -862,6 +864,33 @@ export class DictionaryImportController {
         void this.importFilesFromURLs(url, profilesDictionarySettings, onImportDone);
     }
 
+    /**
+     * @param {import('settings-controller').EventArgument<'importDictionaryFromFile'>} details
+     */
+    _onEventImportDictionaryFromFile({files, profilesDictionarySettings, onImportDone}) {
+        void this.importFiles(files, profilesDictionarySettings, onImportDone);
+    }
+
+    /**
+     * @param {import('settings-controller').EventArgument<'downloadDictionaryFromUrl'>} details
+     */
+    _onEventDownloadDictionaryFromUrl({url, onDownloadDone}) {
+        void (async () => {
+            let file = null;
+            try {
+                file = await this.downloadDictionaryFileFromURL(url);
+            } catch (error) {
+                const e = toError(error);
+                log.error(e);
+                this._showErrors([e]);
+            } finally {
+                if (typeof onDownloadDone === 'function') {
+                    onDownloadDone(file);
+                }
+            }
+        })();
+    }
+
     /** */
     _onImportFileButtonClick() {
         /** @type {HTMLInputElement} */ (this._importFileInput).click();
@@ -1054,6 +1083,34 @@ export class DictionaryImportController {
             onImportDone,
             importProgressTracker,
         );
+    }
+
+    /**
+     * @param {File[]} files
+     * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
+     * @param {import('settings-controller').ImportDictionaryDoneCallback} onImportDone
+     */
+    async importFiles(files, profilesDictionarySettings, onImportDone) {
+        const importProgressTracker = new ImportProgressTracker(this._getFileImportSteps(), files.length);
+        void this._importDictionaries(
+            this._arrayToAsyncGenerator(files),
+            profilesDictionarySettings,
+            onImportDone,
+            importProgressTracker,
+        );
+    }
+
+    /**
+     * @param {string} url
+     * @returns {Promise<File>}
+     */
+    async downloadDictionaryFileFromURL(url) {
+        const generator = this._generateFilesFromUrls([url], () => {});
+        const result = await generator.next();
+        if (result.done || !(result.value instanceof File)) {
+            throw new Error(`Failed to download dictionary from ${url}`);
+        }
+        return result.value;
     }
 
     /**

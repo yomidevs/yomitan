@@ -242,3 +242,89 @@ export async function encodeTermRecordsWithWasmPreinterned(records, textEncoder,
     const heapAfterEncode = new Uint8Array(wasm.memory.buffer);
     return heapAfterEncode.slice(outPtr, outPtr + written);
 }
+
+/**
+ * @param {{rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[]}} chunk
+ * @param {number[]} contentOffsets
+ * @param {number[]} contentLengths
+ * @param {TextEncoder} textEncoder
+ * @param {PreinternedTermRecordPlan|null} preinternedPlan
+ * @returns {Promise<Uint8Array|null>}
+ */
+export async function encodeTermRecordArtifactChunkWithWasmPreinterned(chunk, contentOffsets, contentLengths, textEncoder, preinternedPlan) {
+    const count = chunk.rowCount;
+    if (count === 0) {
+        return new Uint8Array(0);
+    }
+    const wasm = await getWasm();
+
+    const metasBuffer = new ArrayBuffer(count * META_BYTES);
+    const metasU32 = new Uint32Array(metasBuffer);
+    const metasI32 = new Int32Array(metasBuffer);
+    const {stringLengths, internString, internStringBytes, buildStringsBuffer} = createStringInterner(textEncoder);
+    const planExpressionIndexes = preinternedPlan?.expressionIndexes ?? null;
+    const planReadingIndexes = preinternedPlan?.readingIndexes ?? null;
+    for (let i = 0; i < count; ++i) {
+        const expressionBytes = chunk.expressionBytesList[i];
+        const readingEqualsExpression = chunk.readingEqualsExpressionList[i] === true;
+        const expressionIndex = planExpressionIndexes instanceof Uint32Array ? planExpressionIndexes[i] : internStringBytes('', expressionBytes);
+        let readingIndex;
+        if (planReadingIndexes instanceof Uint32Array) {
+            readingIndex = planReadingIndexes[i];
+        } else if (readingEqualsExpression) {
+            readingIndex = expressionIndex;
+        } else {
+            const readingBytes = chunk.readingBytesList[i];
+            readingIndex = readingBytes instanceof Uint8Array ? internStringBytes('', readingBytes) : internString('');
+        }
+        if (
+            !(preinternedPlan instanceof Object) &&
+            (
+                stringLengths[expressionIndex] > U16_NULL ||
+                stringLengths[readingIndex] > U16_NULL
+            )
+        ) {
+            return null;
+        }
+        const metaIndex = i * META_U32_FIELDS;
+        metasU32[metaIndex + 0] = expressionIndex >>> 0;
+        metasU32[metaIndex + 1] = readingEqualsExpression ? READING_EQUALS_EXPRESSION_U32 : (readingIndex >>> 0);
+        metasI32[metaIndex + 2] = contentOffsets[i] | 0;
+        metasI32[metaIndex + 3] = contentLengths[i] | 0;
+        metasI32[metaIndex + 4] = (chunk.scoreList[i] ?? 0) | 0;
+        metasI32[metaIndex + 5] = chunk.sequenceList[i] ?? -1;
+    }
+    const stringLengthsU16 = preinternedPlan?.stringLengths ?? Uint16Array.from(stringLengths);
+    const stringLengthsBuffer = new Uint8Array(
+        stringLengthsU16.buffer,
+        stringLengthsU16.byteOffset,
+        stringLengthsU16.byteLength,
+    );
+    const stringsBuffer = preinternedPlan?.stringsBuffer ?? buildStringsBuffer();
+    wasm.wasm_reset_heap();
+    const metasPtr = wasm.wasm_alloc(metasBuffer.byteLength);
+    const stringLengthsPtr = wasm.wasm_alloc(stringLengthsBuffer.byteLength);
+    const stringsPtr = wasm.wasm_alloc(stringsBuffer.byteLength);
+    if (metasPtr === 0 || stringLengthsPtr === 0 || stringsPtr === 0) {
+        return null;
+    }
+    const wasmHeapAfterAlloc = new Uint8Array(wasm.memory.buffer);
+    wasmHeapAfterAlloc.set(new Uint8Array(metasBuffer), metasPtr);
+    wasmHeapAfterAlloc.set(stringLengthsBuffer, stringLengthsPtr);
+    wasmHeapAfterAlloc.set(stringsBuffer, stringsPtr);
+
+    const encodedSize = wasm.calc_encoded_size(count, stringLengthsU16.length, stringLengthsPtr, stringsBuffer.byteLength, metasPtr);
+    if (encodedSize <= 0) {
+        return new Uint8Array(0);
+    }
+    const outPtr = wasm.wasm_alloc(encodedSize);
+    if (outPtr === 0) {
+        return null;
+    }
+    const written = wasm.encode_records(count, stringLengthsU16.length, stringLengthsPtr, stringsPtr, stringsBuffer.byteLength, metasPtr, outPtr);
+    if (written <= 0) {
+        return new Uint8Array(0);
+    }
+    const heapAfterEncode = new Uint8Array(wasm.memory.buffer);
+    return heapAfterEncode.slice(outPtr, outPtr + written);
+}

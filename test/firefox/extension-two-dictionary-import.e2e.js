@@ -352,6 +352,22 @@ async function startE2ELocalServer(paths) {
     const wagahaiHtml = await readFile(wagahaiHtmlPath);
     const jitendexZip = await readFile(paths.jitendexPath);
     const jmdictZip = await readFile(paths.jmdictPath);
+    /**
+     * @param {import('node:http').ServerResponse} response
+     * @param {Buffer} body
+     * @returns {Promise<void>}
+     */
+    const writeSlowZipResponse = async (response, body) => {
+        const chunkCount = 6;
+        const chunkSize = Math.max(1, Math.ceil(body.byteLength / chunkCount));
+        for (let offset = 0; offset < body.byteLength; offset += chunkSize) {
+            response.write(body.subarray(offset, Math.min(body.byteLength, offset + chunkSize)));
+            await new Promise((resolve) => {
+                setTimeout(resolve, 350);
+            });
+        }
+        response.end();
+    };
     const server = createServer((request, response) => {
         const requestUrl = request.url || '/';
         const headers = {
@@ -372,6 +388,15 @@ async function startE2ELocalServer(paths) {
             response.end(jitendexZip);
             return;
         }
+        if (requestUrl === '/dictionaries/jitendex-slow.zip') {
+            response.writeHead(200, {
+                ...headers,
+                'Content-Type': 'application/zip',
+                'Content-Length': String(jitendexZip.byteLength),
+            });
+            void writeSlowZipResponse(response, jitendexZip);
+            return;
+        }
         if (requestUrl === '/dictionaries/jmdict.zip') {
             response.writeHead(200, {
                 ...headers,
@@ -379,6 +404,15 @@ async function startE2ELocalServer(paths) {
                 'Content-Length': String(jmdictZip.byteLength),
             });
             response.end(jmdictZip);
+            return;
+        }
+        if (requestUrl === '/dictionaries/jmdict-slow.zip') {
+            response.writeHead(200, {
+                ...headers,
+                'Content-Type': 'application/zip',
+                'Content-Length': String(jmdictZip.byteLength),
+            });
+            void writeSlowZipResponse(response, jmdictZip);
             return;
         }
         if (requestUrl === '/wagahai-neko.html') {
@@ -1028,6 +1062,18 @@ async function openSearchPageViaActionPopup(driver, extensionBaseUrl) {
 
 /**
  * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string} extensionBaseUrl
+ * @returns {Promise<string>}
+ */
+async function openSearchPageInNewTab(driver, extensionBaseUrl) {
+    await driver.switchTo().newWindow('tab');
+    await driver.get(`${extensionBaseUrl}/search.html`);
+    await driver.wait(until.elementLocated(By.css('#search-textbox')), 30_000);
+    return await driver.getWindowHandle();
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
  * @param {string} term
  * @param {string[]} expectedDictionaryNames
  * @param {number} [timeoutMs]
@@ -1625,7 +1671,7 @@ async function main() {
                         name: 'JMdict',
                         description: 'Real JMdict from recommended dictionaries',
                         homepage: '',
-                        downloadUrl: `${localServer.baseUrl}/dictionaries/jmdict.zip`,
+                        downloadUrl: `${localServer.baseUrl}/dictionaries/jmdict-slow.zip`,
                     },
                 ],
                 kanji: [],
@@ -1674,10 +1720,55 @@ async function main() {
         const jitendexSettleEnd = safePerformance.now();
         await addReportPhase(report, driver, 'Jitendex: settle after progress clear', 'Waited 2000ms after progress text cleared before starting next import', jitendexSettleStart, jitendexSettleEnd);
 
+        // Selenium return values are untyped (`any`).
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const settingsWindowHandle = /** @type {string} */ (await driver.getWindowHandle());
+        const searchTabOpenStart = safePerformance.now();
+        const searchWindowHandle = /** @type {string} */ (await openSearchPageInNewTab(driver, extensionBaseUrl));
+        const searchTabOpenEnd = safePerformance.now();
+        await addReportPhase(report, driver, 'Open dedicated search tab', 'Opened search.html in a second tab so search can be exercised while settings keeps importing', searchTabOpenStart, searchTabOpenEnd);
+
+        const initialSearchWhileIdleStart = safePerformance.now();
+        const initialSearchWhileIdleCounts = await searchTermAndGetDictionaryHitCounts(driver, '暗記', ['Jitendex'], 20_000);
+        const initialSearchWhileIdleEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Verify baseline Jitendex search before concurrent import',
+            `Dedicated search tab returned counts: ${JSON.stringify(initialSearchWhileIdleCounts)}`,
+            initialSearchWhileIdleStart,
+            initialSearchWhileIdleEnd,
+        );
+        if ((initialSearchWhileIdleCounts.Jitendex ?? 0) < 1) {
+            fail(`Expected baseline Jitendex lookup to work before concurrent import; saw ${JSON.stringify(initialSearchWhileIdleCounts)}`);
+        }
+
+        await driver.switchTo().window(settingsWindowHandle);
+
         const jmdictClickStart = safePerformance.now();
         const jmdictImportUrl = await installRecommendedDictionary(driver, 'JMdict');
         const jmdictClickEnd = safePerformance.now();
         await addReportPhase(report, driver, 'Click JMdict download', `Triggered recommended JMdict import via URL: ${jmdictImportUrl}`, jmdictClickStart, jmdictClickEnd);
+
+        await driver.sleep(700);
+        await driver.switchTo().window(searchWindowHandle);
+        const searchDuringImportStart = safePerformance.now();
+        const searchDuringImportCounts = await searchTermAndGetDictionaryHitCounts(driver, '暗記', ['Jitendex'], 20_000);
+        const searchDuringImportEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Verify Jitendex search during JMdict import',
+            `While slow JMdict import was in progress, dedicated search tab returned counts: ${JSON.stringify(searchDuringImportCounts)}`,
+            searchDuringImportStart,
+            searchDuringImportEnd,
+        );
+        if ((searchDuringImportCounts.Jitendex ?? 0) < 1) {
+            const importDiagnostics = await getSearchPageDiagnostics(driver);
+            fail(`Expected Jitendex search to remain available during JMdict import; saw ${JSON.stringify(searchDuringImportCounts)} diagnostics=${JSON.stringify(importDiagnostics)}`);
+        }
+
+        await driver.switchTo().window(settingsWindowHandle);
         const jmdictProfileStart = safePerformance.now();
         await beginPageProfilePhase(driver);
         const jmdictSampler = startFirefoxResourceSampler(firefoxPid);
@@ -1799,6 +1890,56 @@ async function main() {
             ),
             verifyStart,
             verifyEnd,
+        );
+
+        const updateTriggerStart = safePerformance.now();
+        await driver.executeScript(`
+            const modal = document.querySelector('#dictionary-confirm-update-modal');
+            const button = document.querySelector('#dictionary-confirm-update-button');
+            if (!(modal instanceof HTMLElement) || !(button instanceof HTMLElement)) {
+                throw new Error('Update modal/button missing');
+            }
+            modal.dataset.dictionaryTitle = 'Jitendex';
+            modal.dataset.downloadUrl = arguments[0];
+            button.click();
+        `, `${localServer.baseUrl}/dictionaries/jitendex-slow.zip`);
+        const updateTriggerEnd = safePerformance.now();
+        await addReportPhase(report, driver, 'Trigger slow Jitendex update', 'Queued a Jitendex update against a throttled local ZIP endpoint', updateTriggerStart, updateTriggerEnd);
+
+        await driver.sleep(700);
+        await driver.switchTo().window(searchWindowHandle);
+        const searchDuringUpdateStart = safePerformance.now();
+        const searchDuringUpdateCounts = await searchTermAndGetDictionaryHitCounts(driver, '暗記', ['Jitendex', 'JMdict'], 20_000);
+        const searchDuringUpdateEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Verify search during Jitendex update download',
+            `While slow Jitendex update was in progress, dedicated search tab returned counts: ${JSON.stringify(searchDuringUpdateCounts)}`,
+            searchDuringUpdateStart,
+            searchDuringUpdateEnd,
+        );
+        if ((searchDuringUpdateCounts.Jitendex ?? 0) < 1 || (searchDuringUpdateCounts.JMdict ?? 0) < 1) {
+            const updateDiagnostics = await getSearchPageDiagnostics(driver);
+            fail(`Expected installed dictionaries to remain searchable during Jitendex update; saw ${JSON.stringify(searchDuringUpdateCounts)} diagnostics=${JSON.stringify(updateDiagnostics)}`);
+        }
+
+        await driver.switchTo().window(settingsWindowHandle);
+        const updateProfileStart = safePerformance.now();
+        await beginPageProfilePhase(driver);
+        const updateSampler = startFirefoxResourceSampler(firefoxPid);
+        await waitForImportWithPhaseScreenshots(driver, report, 'Jitendex', '2 installed, 2 enabled', 300_000);
+        const updateResourceSummary = await updateSampler.stop();
+        const updatePageSummary = await endPageProfilePhase(driver);
+        const updateProfileEnd = safePerformance.now();
+        const updateImportDebug = await getLastImportDebug(driver);
+        await addReportPhase(
+            report,
+            driver,
+            'Jitendex update resource profile',
+            `${formatResourceSummary(updateResourceSummary)} longTasks={count:${String(updatePageSummary.longTaskCount)},totalMs:${updatePageSummary.longTaskTotalMs.toFixed(1)},peakMs:${updatePageSummary.longTaskPeakMs.toFixed(1)}} topMeasures=${JSON.stringify(updatePageSummary.topMeasures)} topLongTasks=${JSON.stringify(updatePageSummary.topLongTasks)} importDebug=${JSON.stringify(updateImportDebug)}`,
+            updateProfileStart,
+            updateProfileEnd,
         );
 
         const searchOpenStart = safePerformance.now();

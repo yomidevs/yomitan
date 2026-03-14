@@ -51,6 +51,15 @@ export type Events = {
         profilesDictionarySettings: ProfilesDictionarySettings;
         onImportDone: ImportDictionaryDoneCallback;
     };
+    importDictionaryFromFile: {
+        files: File[];
+        profilesDictionarySettings: ProfilesDictionarySettings;
+        onImportDone: ImportDictionaryDoneCallback;
+    };
+    downloadDictionaryFromUrl: {
+        url: string;
+        onDownloadDone: ((file: File|null) => void) | null;
+    };
     dictionaryEnabled: Record<string, never>;
     scanInputsChanged: {
         source: ScanInputsController | ScanInputsSimpleController;

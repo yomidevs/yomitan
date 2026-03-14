@@ -19,7 +19,7 @@ import {parseJson} from '../core/json.js';
 import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {safePerformance} from '../core/safe-performance.js';
 import {RAW_TERM_CONTENT_DICT_NAME, RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME} from './raw-term-content.js';
-import {encodeTermRecordsWithWasm, encodeTermRecordsWithWasmPreinterned} from './term-record-wasm-encoder.js';
+import {encodeTermRecordArtifactChunkWithWasmPreinterned, encodeTermRecordsWithWasm, encodeTermRecordsWithWasmPreinterned} from './term-record-wasm-encoder.js';
 
 const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
 const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
@@ -125,6 +125,7 @@ class DenseIdRecordStore {
 
     /**
      * @returns {Generator<number, void, void>}
+     * @yields {number}
      */
     *keys() {
         for (let i = 1, ii = this._records.length; i < ii; ++i) {
@@ -136,6 +137,7 @@ class DenseIdRecordStore {
 
     /**
      * @returns {Generator<TermRecord, void, void>}
+     * @yields {TermRecord}
      */
     *values() {
         for (let i = 1, ii = this._records.length; i < ii; ++i) {
@@ -741,8 +743,8 @@ export class TermRecordOpfsStore {
             throw new Error('appendBatchFromArtifactChunkResolvedContent content arrays are smaller than row count');
         }
         const tBuildStart = safePerformance.now();
-        /** @type {TermRecord[]} */
-        const records = new Array(count);
+        const firstId = this._nextId;
+        const existingIndex = this._deferIndexBuild ? void 0 : this._indexByDictionary.get(chunk.dictionary);
         for (let i = 0; i < count; ++i) {
             const id = this._nextId++;
             const sequenceValue = chunk.sequenceList[i];
@@ -763,27 +765,25 @@ export class TermRecordOpfsStore {
                 score: chunk.scoreList[i] ?? 0,
                 sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
             };
-            records[i] = record;
             this._recordsById.set(id, record);
+            if (typeof existingIndex !== 'undefined') {
+                this._addRecordToDictionaryIndex(existingIndex, record);
+            }
         }
         if (this._deferIndexBuild) {
             this._indexDirty = true;
-        } else {
-            const existingIndex = this._indexByDictionary.get(chunk.dictionary);
-            if (typeof existingIndex !== 'undefined') {
-                for (const record of records) {
-                    this._addRecordToDictionaryIndex(existingIndex, record);
-                }
-            }
         }
         const buildRecordsMs = safePerformance.now() - tBuildStart;
         const state = await this._getOrCreateShardState(chunk.dictionary);
         if (state === null) {
             return {buildRecordsMs, encodeMs: 0, appendWriteMs: 0};
         }
-        const metrics = await this._encodeAndAppendChunkForState(
+        const metrics = await this._encodeAndAppendArtifactChunkForState(
             state,
-            records,
+            chunk,
+            firstId,
+            contentOffsets,
+            contentLengths,
             chunk.termRecordPreinternedPlan ?? null,
         );
         return {buildRecordsMs, encodeMs: metrics.encodeMs, appendWriteMs: metrics.appendWriteMs};
@@ -801,6 +801,25 @@ export class TermRecordOpfsStore {
         const encodeMs = safePerformance.now() - tEncodeStart;
         const tAppendStart = safePerformance.now();
         await this._appendEncodedChunk(state, chunk, records[0]?.id ?? 0, records.length);
+        const appendWriteMs = safePerformance.now() - tAppendStart;
+        return {encodeMs, appendWriteMs};
+    }
+
+    /**
+     * @param {TermRecordShardState} state
+     * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[]}} chunk
+     * @param {number} firstId
+     * @param {number[]} contentOffsets
+     * @param {number[]} contentLengths
+     * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} [preinternedPlan]
+     * @returns {Promise<{encodeMs: number, appendWriteMs: number}>}
+     */
+    async _encodeAndAppendArtifactChunkForState(state, chunk, firstId, contentOffsets, contentLengths, preinternedPlan = null) {
+        const tEncodeStart = safePerformance.now();
+        const encodedChunk = await this._encodeArtifactChunkRecords(chunk, contentOffsets, contentLengths, preinternedPlan);
+        const encodeMs = safePerformance.now() - tEncodeStart;
+        const tAppendStart = safePerformance.now();
+        await this._appendEncodedChunk(state, encodedChunk, firstId, chunk.rowCount);
         const appendWriteMs = safePerformance.now() - tAppendStart;
         return {encodeMs, appendWriteMs};
     }
@@ -1495,6 +1514,58 @@ export class TermRecordOpfsStore {
             view.setInt32(cursor, record.sequence ?? -1, true); cursor += 4;
         }
         return output;
+    }
+
+    /**
+     * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[]}} chunk
+     * @param {number[]} contentOffsets
+     * @param {number[]} contentLengths
+     * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} [preinternedPlan]
+     * @returns {Promise<Uint8Array>}
+     */
+    async _encodeArtifactChunkRecords(chunk, contentOffsets, contentLengths, preinternedPlan = null) {
+        if (chunk.rowCount === 0) {
+            return new Uint8Array(0);
+        }
+        if (!this._wasmEncoderUnavailable) {
+            try {
+                const encoded = await encodeTermRecordArtifactChunkWithWasmPreinterned(
+                    chunk,
+                    contentOffsets,
+                    contentLengths,
+                    this._textEncoder,
+                    preinternedPlan,
+                );
+                if (encoded instanceof Uint8Array) {
+                    return encoded;
+                }
+            } catch (_) {
+                this._wasmEncoderUnavailable = true;
+            }
+        }
+        /** @type {TermRecord[]} */
+        const records = new Array(chunk.rowCount);
+        for (let i = 0; i < chunk.rowCount; ++i) {
+            const id = i + 1;
+            const sequenceValue = chunk.sequenceList[i];
+            records[i] = {
+                id,
+                dictionary: chunk.dictionary,
+                expression: '',
+                reading: '',
+                readingEqualsExpression: chunk.readingEqualsExpressionList[i] === true,
+                expressionBytes: chunk.expressionBytesList[i],
+                readingBytes: chunk.readingEqualsExpressionList[i] === true ? void 0 : chunk.readingBytesList[i],
+                expressionReverse: null,
+                readingReverse: null,
+                entryContentOffset: contentOffsets[i],
+                entryContentLength: contentLengths[i],
+                entryContentDictName: 'raw',
+                score: chunk.scoreList[i] ?? 0,
+                sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
+            };
+        }
+        return await this._encodeRecords(records, preinternedPlan);
     }
 
     /**
