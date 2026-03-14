@@ -48,7 +48,7 @@ vi.stubGlobal('chrome', chrome);
  *   kind: 'directory',
  *   getDirectoryHandle: (name: string, options?: {create?: boolean}) => Promise<unknown>,
  *   getFileHandle: (name: string, options?: {create?: boolean}) => Promise<unknown>,
-  *   removeEntry: (name: string) => Promise<void>,
+ *   removeEntry: (name: string) => Promise<void>,
  *   entries: () => AsyncGenerator<[string, unknown], void, unknown>,
  *   values: () => AsyncGenerator<unknown, void, unknown>
  * }}
@@ -499,7 +499,13 @@ function createSimpleFindTermsOptions(dictionaryName) {
         primaryReading: '',
         textReplacements: [],
         enabledDictionaryMap: new Map([
-            [dictionaryName, {index: 0, priority: 0, allowSecondarySearches: false}],
+            [dictionaryName, {
+                index: 0,
+                alias: dictionaryName,
+                allowSecondarySearches: false,
+                partsOfSpeechFilter: true,
+                useDeinflections: true,
+            }],
         ]),
         excludeDictionaryDefinitions: null,
         searchResolution: 'letter',

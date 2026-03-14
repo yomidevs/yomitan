@@ -69,7 +69,7 @@ type ApiSurface = {
     };
     importDictionaryArchiveOffscreen: {
         params: {
-            archiveContent: ArrayBuffer;
+            archiveContent: string;
             importDetails: DictionaryImporter.ImportDetails;
         };
         return: {

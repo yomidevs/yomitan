@@ -25,6 +25,26 @@ import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js'
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(dirname, '..', '..');
 const sourceDictionaryDirectory = path.join(root, 'test', 'data', 'dictionaries', 'valid-dictionary1');
+const minimalTermBankEntries = [
+    ['読む', 'よむ', '', '', 100, ['to read'], 1, ''],
+    ['強み', 'つよみ', '', '', 90, ['strong point'], 2, ''],
+];
+/** @type {[string, unknown][]} */
+const minimalDictionaryDataFiles = [
+    ['term_bank_1.json', minimalTermBankEntries],
+    ['term_bank_2.json', []],
+    ['term_meta_bank_1.json', []],
+    ['kanji_bank_1.json', []],
+    ['kanji_meta_bank_1.json', []],
+];
+const mediaFixtureFiles = [
+    'aosaba_auto.png',
+    'aosaba_mono.png',
+    'character.gif',
+    'character2.gif',
+    'character3.gif',
+    'image.gif',
+];
 
 export const autoUpdateDictionaryFixtureTitles = {
     initial: 'Auto Update Dictionary',
@@ -80,6 +100,12 @@ async function createDictionaryVersionArchive(directory, definition) {
     indexContent.downloadUrl = definition.downloadUrl;
     await writeFile(indexPath, `${JSON.stringify(indexContent, null, 4)}\n`, 'utf8');
     await writeFile(path.join(directory, 'styles.css'), definition.styles, 'utf8');
+    for (const [fileName, content] of minimalDictionaryDataFiles) {
+        await writeFile(path.join(directory, fileName), `${JSON.stringify(content, null, 4)}\n`, 'utf8');
+    }
+    for (const fileName of mediaFixtureFiles) {
+        await rm(path.join(directory, fileName), {force: true});
+    }
     const archiveBuffer = Buffer.from(await createDictionaryArchiveData(directory));
     const archivePath = `${directory}.zip`;
     await writeFile(archivePath, archiveBuffer);

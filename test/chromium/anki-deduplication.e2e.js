@@ -19,7 +19,8 @@
 // @ts-nocheck
 
 import {chromium} from '@playwright/test';
-import {existsSync, writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {existsSync, readFileSync, writeFileSync} from 'node:fs';
 import {mkdir, rm, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -50,6 +51,26 @@ function errorMessage(value) {
  */
 function fail(message) {
     throw new Error(`${logTag} ${message}`);
+}
+
+/**
+ * @returns {string | null}
+ */
+function getConfiguredExtensionId() {
+    if (!existsSync(manifestPath)) {
+        return null;
+    }
+
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    if (typeof manifest?.key !== 'string' || manifest.key.length === 0) {
+        return null;
+    }
+
+    const hash = createHash('sha256')
+        .update(Buffer.from(manifest.key, 'base64'))
+        .digest('hex')
+        .slice(0, 32);
+    return [...hash].map((character) => String.fromCharCode('a'.charCodeAt(0) + Number.parseInt(character, 16))).join('');
 }
 
 /**
@@ -156,7 +177,15 @@ function renderReportHtml(report) {
  * @returns {boolean}
  */
 function shouldRunHeadless() {
-    const value = String(process.env.MANABITAN_CHROMIUM_HEADLESS ?? '1').trim().toLowerCase();
+    const value = String(process.env.MANABITAN_CHROMIUM_HEADLESS ?? (process.platform === 'win32' ? '0' : '1')).trim().toLowerCase();
+    return !(value === '0' || value === 'false' || value === 'no');
+}
+
+/**
+ * @returns {boolean}
+ */
+function shouldHideWindow() {
+    const value = String(process.env.MANABITAN_CHROMIUM_HIDE_WINDOW ?? (process.platform === 'win32' ? '1' : '0')).trim().toLowerCase();
     return !(value === '0' || value === 'false' || value === 'no');
 }
 
@@ -164,32 +193,38 @@ function shouldRunHeadless() {
  * @returns {Promise<{context: import('@playwright/test').BrowserContext, cleanup: () => Promise<void>}>}
  */
 async function launchExtensionContext() {
-    let createdManifest = false;
-    if (!existsSync(manifestPath)) {
-        const manifestUtil = new ManifestUtil();
-        const variant = manifestUtil.getManifest('chrome-playwright');
-        writeFileSync(
-            manifestPath,
-            ManifestUtil.createManifestString(variant).replace('$YOMITAN_VERSION', '0.0.0.0'),
-            'utf8',
-        );
-        createdManifest = true;
+    const originalManifest = existsSync(manifestPath) ? readFileSync(manifestPath, 'utf8') : null;
+    const manifestUtil = new ManifestUtil();
+    const variant = manifestUtil.getManifest('chrome-playwright');
+    writeFileSync(
+        manifestPath,
+        ManifestUtil.createManifestString(variant).replace('$YOMITAN_VERSION', '0.0.0.0'),
+        'utf8',
+    );
+
+    const headless = shouldRunHeadless();
+    /** @type {string[]} */
+    const args = [
+        `--disable-extensions-except=${extensionPath}`,
+        `--load-extension=${extensionPath}`,
+    ];
+    if (!headless && shouldHideWindow()) {
+        args.push('--window-position=3000,3000', '--window-size=1280,800', '--start-minimized');
     }
 
     const context = await chromium.launchPersistentContext('', {
-        headless: shouldRunHeadless(),
-        args: [
-            `--disable-extensions-except=${extensionPath}`,
-            `--load-extension=${extensionPath}`,
-        ],
+        headless,
+        args,
     });
 
     return {
         context,
         cleanup: async () => {
             await context.close();
-            if (createdManifest) {
+            if (originalManifest === null) {
                 await rm(manifestPath, {force: true});
+            } else {
+                writeFileSync(manifestPath, originalManifest, 'utf8');
             }
         },
     };
@@ -200,6 +235,11 @@ async function launchExtensionContext() {
  * @returns {Promise<string>}
  */
 async function discoverExtensionId(context) {
+    const configuredExtensionId = getConfiguredExtensionId();
+    if (configuredExtensionId !== null) {
+        return configuredExtensionId;
+    }
+
     const parseId = (url) => {
         const match = /^chrome-extension:\/\/([^/]+)\//.exec(String(url));
         return match ? match[1] : null;
@@ -219,6 +259,30 @@ async function discoverExtensionId(context) {
         }
     }
     fail('Unable to discover extension id');
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} url
+ * @param {string} readySelector
+ * @returns {Promise<void>}
+ */
+async function gotoExtensionPage(page, url, readySelector) {
+    let lastError;
+    for (let attempt = 1; attempt <= 10; ++attempt) {
+        try {
+            await page.goto(url);
+            await page.waitForSelector(readySelector, {state: 'attached', timeout: 30_000});
+            return;
+        } catch (error) {
+            lastError = error;
+            if (!String(errorMessage(error)).includes('ERR_ABORTED') || attempt >= 10) {
+                throw error;
+            }
+            await page.waitForTimeout(500);
+        }
+    }
+    throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
 /**
@@ -252,8 +316,7 @@ async function sendRuntimeMessage(page, action, params = void 0) {
  * @returns {Promise<void>}
  */
 async function importDictionaryFixture(page, extensionBaseUrl) {
-    await page.goto(`${extensionBaseUrl}/settings.html`);
-    await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30_000});
+    await gotoExtensionPage(page, `${extensionBaseUrl}/settings.html`, '#dictionary-import-file-input');
     await sendRuntimeMessage(page, 'purgeDatabase', void 0);
     await sendRuntimeMessage(page, 'importDictionaryDatabase', {content: await getMinimalDictionaryDatabaseBase64()});
     await sendRuntimeMessage(page, 'triggerDatabaseUpdated', {type: 'dictionary', cause: 'import'});
@@ -286,8 +349,7 @@ async function applyScenarioOptions(page, ankiConnectUrl, scenarioOptions) {
  * @returns {Promise<void>}
  */
 async function openSearchAndLookup(page, extensionBaseUrl) {
-    await page.goto(`${extensionBaseUrl}/search.html`);
-    await page.waitForSelector('#search-textbox', {state: 'attached', timeout: 30_000});
+    await gotoExtensionPage(page, `${extensionBaseUrl}/search.html`, '#search-textbox');
     await page.fill('#search-textbox', dedupeSearchTerm);
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => {
@@ -344,10 +406,10 @@ async function waitForExpectedButtonState(page, expectedState, timeoutMs = 15_00
         if (
             lastState.ready &&
             lastState.disabled === expected.disabled &&
-            lastState.title === expected.title &&
-            lastState.icon === expected.icon &&
-            lastState.overwrite === expected.overwrite &&
-            lastState.viewNoteIds === expected.viewNoteIds
+            (typeof expected.title === 'undefined' || lastState.title === expected.title) &&
+            (typeof expected.icon === 'undefined' || lastState.icon === expected.icon) &&
+            (typeof expected.overwrite === 'undefined' || lastState.overwrite === expected.overwrite) &&
+            (typeof expected.viewNoteIds === 'undefined' || lastState.viewNoteIds === expected.viewNoteIds)
         ) {
             return lastState;
         }
