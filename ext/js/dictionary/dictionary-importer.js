@@ -75,9 +75,21 @@ const EMPTY_TERM_GLOSSARY = [];
 Object.freeze(EMPTY_TERM_GLOSSARY);
 
 /**
+ * @template T
+ * @param {number} length
+ * @returns {T[]}
+ */
+function createSparseArray(length) {
+    /** @type {T[]} */
+    const result = [];
+    result.length = length;
+    return result;
+}
+
+/**
  * @returns {{
  *   internStringBytes: (bytes: Uint8Array) => number,
- *   buildPlan: (expressionIndexes: number[], readingIndexes: number[]) => import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan,
+ *   buildPlan: (expressionIndexes: number[]|Uint32Array, readingIndexes: number[]|Uint32Array, count?: number) => import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan,
  * }}
  */
 function createArtifactTermRecordPreinternedPlanBuilder() {
@@ -140,7 +152,7 @@ function createArtifactTermRecordPreinternedPlanBuilder() {
             stringBytesList.push(bytes);
             return index;
         },
-        buildPlan(expressionIndexes, readingIndexes) {
+        buildPlan(expressionIndexes, readingIndexes, count = expressionIndexes.length) {
             let totalStringBytes = 0;
             for (const length of stringLengths) {
                 totalStringBytes += length;
@@ -154,8 +166,12 @@ function createArtifactTermRecordPreinternedPlanBuilder() {
             return {
                 stringLengths: Uint16Array.from(stringLengths),
                 stringsBuffer,
-                expressionIndexes: Uint32Array.from(expressionIndexes),
-                readingIndexes: Uint32Array.from(readingIndexes),
+                expressionIndexes: expressionIndexes instanceof Uint32Array ?
+                    expressionIndexes.slice(0, count) :
+                    Uint32Array.from(expressionIndexes.slice(0, count)),
+                readingIndexes: readingIndexes instanceof Uint32Array ?
+                    readingIndexes.slice(0, count) :
+                    Uint32Array.from(readingIndexes.slice(0, count)),
             };
         },
     };
@@ -2788,11 +2804,21 @@ export class DictionaryImporter {
         /** @type {(string|null)[]} */
         let chunkContentDictNames = [];
         let termRecordPlanBuilder = createArtifactTermRecordPreinternedPlanBuilder();
-        /** @type {number[]} */
-        let termRecordExpressionIndexes = [];
-        /** @type {number[]} */
-        let termRecordReadingIndexes = [];
         const chunkSize = this._termArtifactRowChunkSize;
+        /** @type {number[]|Uint32Array} */
+        let termRecordExpressionIndexes = directArtifactChunkImport ? new Uint32Array(chunkSize) : [];
+        /** @type {number[]|Uint32Array} */
+        let termRecordReadingIndexes = directArtifactChunkImport ? new Uint32Array(chunkSize) : [];
+        let chunkRowCount = 0;
+        if (directArtifactChunkImport) {
+            chunkExpressionBytes = createSparseArray(chunkSize);
+            chunkReadingBytes = createSparseArray(chunkSize);
+            chunkReadingEqualsExpression = createSparseArray(chunkSize);
+            chunkScores = createSparseArray(chunkSize);
+            chunkSequences = createSparseArray(chunkSize);
+            chunkContentBytes = createSparseArray(chunkSize);
+            chunkContentDictNames = createSparseArray(chunkSize);
+        }
         const chunkCount = Math.max(1, Math.ceil(rowCount / Math.max(1, chunkSize)));
         let chunkIndex = 0;
         const tDecodeRowsStart = Date.now();
@@ -2844,8 +2870,13 @@ export class DictionaryImporter {
             const readingIndex = readingMatchesExpression ?
                 expressionIndex :
                 termRecordPlanBuilder.internStringBytes(readingBytes);
-            termRecordExpressionIndexes.push(expressionIndex);
-            termRecordReadingIndexes.push(readingIndex);
+            if (directArtifactChunkImport) {
+                termRecordExpressionIndexes[chunkRowCount] = expressionIndex;
+                termRecordReadingIndexes[chunkRowCount] = readingIndex;
+            } else {
+                /** @type {number[]} */ (termRecordExpressionIndexes).push(expressionIndex);
+                /** @type {number[]} */ (termRecordReadingIndexes).push(readingIndex);
+            }
             cursor += readingLength;
             const score = view.getInt32(cursor, true);
             if (score === 0) {
@@ -2890,13 +2921,14 @@ export class DictionaryImporter {
             cursor = contentEnd;
             if (streamToChunkHandler) {
                 if (directArtifactChunkImport) {
-                    chunkExpressionBytes.push(expressionBytes);
-                    chunkReadingBytes.push(readingBytes);
-                    chunkReadingEqualsExpression.push(readingMatchesExpression);
-                    chunkScores.push(score);
-                    chunkSequences.push(sequence);
-                    chunkContentBytes.push(contentBytes);
-                    chunkContentDictNames.push(contentDictName);
+                    chunkExpressionBytes[chunkRowCount] = expressionBytes;
+                    chunkReadingBytes[chunkRowCount] = readingBytes;
+                    chunkReadingEqualsExpression[chunkRowCount] = readingMatchesExpression;
+                    chunkScores[chunkRowCount] = score;
+                    chunkSequences[chunkRowCount] = sequence;
+                    chunkContentBytes[chunkRowCount] = contentBytes;
+                    chunkContentDictNames[chunkRowCount] = contentDictName;
+                    ++chunkRowCount;
                 } else {
                     /** @type {import('dictionary-database').DatabaseTermEntry} */
                     const entry = {
@@ -2923,17 +2955,17 @@ export class DictionaryImporter {
                     termList.push(entry);
                 }
                 const streamedRowCount = directArtifactChunkImport ?
-                    chunkExpressionBytes.length :
+                    chunkRowCount :
                     termList.length;
                 if (streamedRowCount >= chunkSize) {
-                    const termRecordPreinternedPlan = termRecordPlanBuilder.buildPlan(termRecordExpressionIndexes, termRecordReadingIndexes);
+                    const termRecordPreinternedPlan = termRecordPlanBuilder.buildPlan(termRecordExpressionIndexes, termRecordReadingIndexes, streamedRowCount);
                     ++chunkIndex;
                     const tChunkSinkStart = Date.now();
                     /** @type {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} */
                     const chunkPayload = directArtifactChunkImport ?
                         {
                             dictionary: dictionaryTitle,
-                            rowCount: chunkExpressionBytes.length,
+                            rowCount: streamedRowCount,
                             expressionBytesList: chunkExpressionBytes,
                             readingBytesList: chunkReadingBytes,
                             readingEqualsExpressionList: chunkReadingEqualsExpression,
@@ -2955,19 +2987,20 @@ export class DictionaryImporter {
                     });
                     importerChunkSinkMs += Math.max(0, Date.now() - tChunkSinkStart);
                     if (directArtifactChunkImport) {
-                        chunkExpressionBytes = [];
-                        chunkReadingBytes = [];
-                        chunkReadingEqualsExpression = [];
-                        chunkScores = [];
-                        chunkSequences = [];
-                        chunkContentBytes = [];
-                        chunkContentDictNames = [];
+                        chunkExpressionBytes = createSparseArray(chunkSize);
+                        chunkReadingBytes = createSparseArray(chunkSize);
+                        chunkReadingEqualsExpression = createSparseArray(chunkSize);
+                        chunkScores = createSparseArray(chunkSize);
+                        chunkSequences = createSparseArray(chunkSize);
+                        chunkContentBytes = createSparseArray(chunkSize);
+                        chunkContentDictNames = createSparseArray(chunkSize);
+                        chunkRowCount = 0;
                     } else {
                         termList.length = 0;
                     }
                     termRecordPlanBuilder = createArtifactTermRecordPreinternedPlanBuilder();
-                    termRecordExpressionIndexes = [];
-                    termRecordReadingIndexes = [];
+                    termRecordExpressionIndexes = directArtifactChunkImport ? new Uint32Array(chunkSize) : [];
+                    termRecordReadingIndexes = directArtifactChunkImport ? new Uint32Array(chunkSize) : [];
                 }
             } else {
                 /** @type {import('dictionary-database').DatabaseTermEntry} */
@@ -2996,22 +3029,23 @@ export class DictionaryImporter {
             }
         }
         decodeRowsMs = Math.max(0, Date.now() - tDecodeRowsStart);
-        if (streamToChunkHandler && (directArtifactChunkImport ? chunkExpressionBytes.length > 0 : termList.length > 0)) {
-            const termRecordPreinternedPlan = termRecordPlanBuilder.buildPlan(termRecordExpressionIndexes, termRecordReadingIndexes);
+        if (streamToChunkHandler && (directArtifactChunkImport ? chunkRowCount > 0 : termList.length > 0)) {
+            const streamedRowCount = directArtifactChunkImport ? chunkRowCount : termList.length;
+            const termRecordPreinternedPlan = termRecordPlanBuilder.buildPlan(termRecordExpressionIndexes, termRecordReadingIndexes, streamedRowCount);
             ++chunkIndex;
             const tChunkSinkStart = Date.now();
             /** @type {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} */
             const chunkPayload = directArtifactChunkImport ?
                 {
                     dictionary: dictionaryTitle,
-                    rowCount: chunkExpressionBytes.length,
-                    expressionBytesList: chunkExpressionBytes,
-                    readingBytesList: chunkReadingBytes,
-                    readingEqualsExpressionList: chunkReadingEqualsExpression,
-                    scoreList: chunkScores,
-                    sequenceList: chunkSequences,
-                    contentBytesList: chunkContentBytes,
-                    contentDictNameList: chunkContentDictNames,
+                    rowCount: streamedRowCount,
+                    expressionBytesList: chunkExpressionBytes.slice(0, streamedRowCount),
+                    readingBytesList: chunkReadingBytes.slice(0, streamedRowCount),
+                    readingEqualsExpressionList: chunkReadingEqualsExpression.slice(0, streamedRowCount),
+                    scoreList: chunkScores.slice(0, streamedRowCount),
+                    sequenceList: chunkSequences.slice(0, streamedRowCount),
+                    contentBytesList: chunkContentBytes.slice(0, streamedRowCount),
+                    contentDictNameList: chunkContentDictNames.slice(0, streamedRowCount),
                     termRecordPreinternedPlan,
                 } :
                 termList;
