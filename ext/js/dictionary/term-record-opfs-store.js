@@ -655,6 +655,68 @@ export class TermRecordOpfsStore {
     }
 
     /**
+     * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
+     * @param {number[]} contentOffsets
+     * @param {number[]} contentLengths
+     * @param {(string|null)[]} contentDictNames
+     * @returns {Promise<{buildRecordsMs: number, encodeMs: number, appendWriteMs: number}>}
+     */
+    async appendBatchFromArtifactChunkResolvedContent(chunk, contentOffsets, contentLengths, contentDictNames) {
+        const count = chunk.rowCount;
+        if (count <= 0) { return {buildRecordsMs: 0, encodeMs: 0, appendWriteMs: 0}; }
+        if (contentOffsets.length < count || contentLengths.length < count || contentDictNames.length < count) {
+            throw new Error('appendBatchFromArtifactChunkResolvedContent content arrays are smaller than row count');
+        }
+        const tBuildStart = safePerformance.now();
+        /** @type {TermRecord[]} */
+        const records = new Array(count);
+        for (let i = 0; i < count; ++i) {
+            const id = this._nextId++;
+            const sequenceValue = chunk.sequenceList[i];
+            /** @type {TermRecord} */
+            const record = {
+                id,
+                dictionary: chunk.dictionary,
+                expression: '',
+                reading: '',
+                readingEqualsExpression: chunk.readingEqualsExpressionList[i] === true,
+                expressionBytes: chunk.expressionBytesList[i],
+                readingBytes: chunk.readingEqualsExpressionList[i] === true ? void 0 : chunk.readingBytesList[i],
+                expressionReverse: null,
+                readingReverse: null,
+                entryContentOffset: contentOffsets[i],
+                entryContentLength: contentLengths[i],
+                entryContentDictName: contentDictNames[i] ?? 'raw',
+                score: chunk.scoreList[i] ?? 0,
+                sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
+            };
+            records[i] = record;
+            this._recordsById.set(id, record);
+        }
+        if (this._deferIndexBuild) {
+            this._indexDirty = true;
+        } else {
+            const existingIndex = this._indexByDictionary.get(chunk.dictionary);
+            if (typeof existingIndex !== 'undefined') {
+                for (const record of records) {
+                    this._addRecordToDictionaryIndex(existingIndex, record);
+                }
+            }
+        }
+        const buildRecordsMs = safePerformance.now() - tBuildStart;
+        const state = await this._getOrCreateShardState(chunk.dictionary);
+        if (state === null) {
+            return {buildRecordsMs, encodeMs: 0, appendWriteMs: 0};
+        }
+        const metrics = await this._encodeAndAppendChunkForState(
+            state,
+            records,
+            chunk.termRecordPreinternedPlan ?? null,
+        );
+        return {buildRecordsMs, encodeMs: metrics.encodeMs, appendWriteMs: metrics.appendWriteMs};
+    }
+
+    /**
      * @param {TermRecordShardState} state
      * @param {TermRecord[]} records
      * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} [preinternedPlan]

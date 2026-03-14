@@ -1944,6 +1944,27 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
+     * @returns {Promise<void>}
+     */
+    async bulkAddArtifactTermsChunk(chunk) {
+        this._lastBulkAddTermsMetrics = null;
+        this._termEntryContentCache.clear();
+        if (!this._bulkImportTransactionOpen) {
+            this._termEntryContentIdByHash.clear();
+            this._termEntryContentIdByKey.clear();
+            this._clearTermEntryContentMetaCaches();
+        }
+        this._termExactPresenceCache.clear();
+        this._termPrefixNegativeCache.clear();
+        this._directTermIndexByDictionary.clear();
+        if (this._enableTermEntryContentDedup) {
+            throw new Error('bulkAddArtifactTermsChunk requires content dedup to be disabled');
+        }
+        await this._bulkAddArtifactTermsChunkWithoutContentDedup(chunk);
+    }
+
+    /**
      * @returns {{contentAppendMs: number, termRecordBuildMs: number, termRecordEncodeMs: number, termRecordWriteMs: number, termsVtabInsertMs: number, termRecordInternMs?: number, termRecordPackLengthsMs?: number, termRecordHeapCopyMs?: number, termRecordWasmEncodeMs?: number}|null}
      */
     getLastBulkAddTermsMetrics() {
@@ -2921,6 +2942,128 @@ export class DictionaryDatabase {
                     `termsVtabInsert=${termsVtabInsertMs.toFixed(1)}ms`,
                 );
             }
+        } catch (e) {
+            if (useLocalTransaction) {
+                try { this._requireDb().exec('ROLLBACK'); } catch (_) { /* NOP */ }
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
+     * @returns {Promise<void>}
+     */
+    async _bulkAddArtifactTermsChunkWithoutContentDedup(chunk) {
+        const useLocalTransaction = !this._bulkImportTransactionOpen;
+        const count = chunk.rowCount;
+        if (count <= 0) {
+            this._lastBulkAddTermsMetrics = {
+                contentAppendMs: 0,
+                termRecordBuildMs: 0,
+                termRecordEncodeMs: 0,
+                termRecordWriteMs: 0,
+                termsVtabInsertMs: 0,
+                termRecordInternMs: 0,
+                termRecordPackLengthsMs: 0,
+                termRecordHeapCopyMs: 0,
+                termRecordWasmEncodeMs: 0,
+            };
+            return;
+        }
+        let contentAppendMs = 0;
+        let termRecordBuildMs = 0;
+        let termRecordEncodeMs = 0;
+        let termRecordWriteMs = 0;
+        let termsVtabInsertMs = 0;
+        let termRecordInternMs = 0;
+        let termRecordPackLengthsMs = 0;
+        let termRecordHeapCopyMs = 0;
+        let termRecordWasmEncodeMs = 0;
+
+        if (useLocalTransaction) {
+            await this._beginImmediateTransaction(this._requireDb());
+        }
+        try {
+            /** @type {number[]} */
+            const contentOffsets = new Array(count);
+            /** @type {number[]} */
+            const contentLengths = new Array(count);
+            /** @type {(string|null)[]} */
+            const contentDictNames = new Array(count);
+            const contentChunks = chunk.contentBytesList;
+            const tContentAppendStart = safePerformance.now();
+            if (this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) {
+                const {packedChunks, sourceChunkIndices, sourceChunkLocalOffsets} = packContentChunksIntoSlabs(
+                    contentChunks,
+                    this._rawTermContentPackTargetBytes,
+                );
+                /** @type {number[]} */
+                const packedOffsets = new Array(packedChunks.length);
+                /** @type {number[]} */
+                const packedLengths = new Array(packedChunks.length);
+                await this._termContentStore.appendBatchToArrays(packedChunks, packedOffsets, packedLengths);
+                for (let i = 0; i < count; ++i) {
+                    const packedIndex = sourceChunkIndices[i];
+                    contentOffsets[i] = packedOffsets[packedIndex] + sourceChunkLocalOffsets[i];
+                    contentLengths[i] = contentChunks[i].byteLength;
+                }
+            } else {
+                await this._termContentStore.appendBatchToArrays(contentChunks, contentOffsets, contentLengths);
+            }
+            for (let i = 0; i < count; ++i) {
+                const explicitContentDictName = chunk.contentDictNameList[i];
+                if (
+                    this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
+                    typeof explicitContentDictName === 'string' &&
+                    explicitContentDictName.length > 0
+                ) {
+                    contentDictNames[i] = explicitContentDictName;
+                } else if (
+                    this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
+                    isRawTermContentBinary(contentChunks[i])
+                ) {
+                    contentDictNames[i] = RAW_TERM_CONTENT_DICT_NAME;
+                } else {
+                    contentDictNames[i] = 'raw';
+                }
+            }
+            contentAppendMs += safePerformance.now() - tContentAppendStart;
+            const metrics = await this._termRecordStore.appendBatchFromArtifactChunkResolvedContent(
+                chunk,
+                contentOffsets,
+                contentLengths,
+                contentDictNames,
+            );
+            termRecordBuildMs += metrics.buildRecordsMs;
+            termRecordEncodeMs += metrics.encodeMs;
+            termRecordWriteMs += metrics.appendWriteMs;
+            termRecordInternMs += metrics.internMs ?? 0;
+            termRecordPackLengthsMs += metrics.packLengthsMs ?? 0;
+            termRecordHeapCopyMs += metrics.heapCopyMs ?? 0;
+            termRecordWasmEncodeMs += metrics.wasmEncodeMs ?? 0;
+            const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
+            if (deferVirtualTableWrite) {
+                this._termsVirtualTableDirty = true;
+            } else {
+                const tTermsVtabInsertStart = safePerformance.now();
+                await this._insertTermRowsIntoVirtualTable(count);
+                termsVtabInsertMs += safePerformance.now() - tTermsVtabInsertStart;
+            }
+            if (useLocalTransaction) {
+                this._requireDb().exec('COMMIT');
+            }
+            this._lastBulkAddTermsMetrics = {
+                contentAppendMs,
+                termRecordBuildMs,
+                termRecordEncodeMs,
+                termRecordWriteMs,
+                termsVtabInsertMs,
+                termRecordInternMs,
+                termRecordPackLengthsMs,
+                termRecordHeapCopyMs,
+                termRecordWasmEncodeMs,
+            };
         } catch (e) {
             if (useLocalTransaction) {
                 try { this._requireDb().exec('ROLLBACK'); } catch (_) { /* NOP */ }
