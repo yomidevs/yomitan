@@ -691,9 +691,6 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'kanjiFind'>} */
     async _onApiKanjiFind({text, optionsContext}) {
-        if (this._dictionaryImportModeActive) {
-            return [];
-        }
         await this._ensureDictionaryDatabaseReady();
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {maxResults}} = options;
@@ -705,9 +702,6 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'termsFind'>} */
     async _onApiTermsFind({text, details, optionsContext}) {
-        if (this._dictionaryImportModeActive) {
-            return {dictionaryEntries: [], originalTextLength: 0};
-        }
         await this._ensureDictionaryDatabaseReady();
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {resultOutputMode: mode, maxResults}} = options;
@@ -1082,9 +1076,6 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getDictionaryInfo'>} */
     async _onApiGetDictionaryInfo() {
-        if (this._dictionaryImportModeActive) {
-            return [];
-        }
         await this._ensureDictionaryDatabaseReady();
         return await this._dictionaryDatabase.getDictionaryInfo();
     }
@@ -1708,6 +1699,7 @@ export class Backend {
         void this._accessibilityController.update(this._getOptionsFull(false));
 
         this._textParseCache.clear();
+        void this._translator.clearDatabaseCaches();
 
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
     }
@@ -3499,9 +3491,6 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _ensureDictionaryDatabaseReady() {
-        if (this._dictionaryImportModeActive) {
-            throw new Error('Dictionary database access is suspended while import is in progress');
-        }
         const isPreparedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'isPrepared'));
         if (typeof isPreparedMethod === 'function') {
             const isPrepared = /** @type {() => boolean} */ (isPreparedMethod).call(this._dictionaryDatabase);
@@ -3545,30 +3534,13 @@ export class Backend {
                         // NOP
                     }
                 }
-                const setSuspendedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'setSuspended'));
-                if (typeof setSuspendedMethod === 'function') {
-                    await /** @type {(suspended: boolean) => Promise<void>} */ (setSuspendedMethod).call(this._dictionaryDatabase, true);
-                } else {
-                    const isPreparedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'isPrepared'));
-                    const closeMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'close'));
-                    if (typeof isPreparedMethod === 'function' && typeof closeMethod === 'function') {
-                        const isPrepared = /** @type {() => boolean} */ (isPreparedMethod).call(this._dictionaryDatabase);
-                        if (isPrepared) {
-                            await /** @type {() => Promise<void>} */ (closeMethod).call(this._dictionaryDatabase);
-                        }
-                    }
-                }
                 await Promise.resolve(this._translator.clearDatabaseCaches());
                 reportDiagnostics('dictionary-import-mode-changed', {active: true});
                 return;
             }
 
             this._dictionaryImportModeActive = false;
-            const setSuspendedMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'setSuspended'));
-            const resumePromise = (typeof setSuspendedMethod === 'function') ?
-                /** @type {(suspended: boolean) => Promise<void>} */ (setSuspendedMethod).call(this._dictionaryDatabase, false) :
-                this._ensureDictionaryDatabaseReady();
-            await resumePromise;
+            await this._ensureDictionaryDatabaseReady();
             reportDiagnostics('dictionary-import-mode-changed', {active: false});
             if (this._deferredDictionaryRefreshDuringImport) {
                 this._deferredDictionaryRefreshDuringImport = false;

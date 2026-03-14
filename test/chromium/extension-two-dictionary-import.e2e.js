@@ -1623,6 +1623,7 @@ async function waitForDictionaryDeleteCompletion(page, deletedDictionaryName, ex
 }
 
 async function searchTermAndGetDictionaryHitCounts(page, term, expectedDictionaryNames, timeoutMs = 15000, submitMode = 'enter') {
+    await page.bringToFront();
     await page.waitForSelector('#search-textbox', {state: 'attached', timeout: 30000});
     await page.waitForSelector('#search-button', {state: 'attached', timeout: 30000});
     if (!(await waitForBodyVisible(page, 30000))) {
@@ -2033,16 +2034,16 @@ async function main() {
         const configureImportSessionProfile = await runPhaseProfile(cdpSession, async () => {
             const importFlags = e2eImportFlags;
             await page.evaluate((flagsFromRunner) => {
-                globalThis.manabitanImportUseSession = true;
+                globalThis.manabitanImportUseSession = false;
                 globalThis.manabitanDisableIntegrityCounts = true;
                 globalThis.manabitanImportPerformanceFlags = (flagsFromRunner && typeof flagsFromRunner === 'object') ? {...flagsFromRunner} : {};
             }, importFlags);
         });
         const configureImportSessionEnd = safePerformance.now();
         const importSessionDetails = (e2eImportFlags !== null) ?
-            `Set globalThis.manabitanImportUseSession=true; applied explicit import flags ${JSON.stringify(e2eImportFlags)}` :
-            'Set globalThis.manabitanImportUseSession=true for shared backend session reuse during import profiling';
-        await addReportPhase(report, page, 'Enable import session reuse', importSessionDetails, configureImportSessionStart, configureImportSessionEnd, configureImportSessionProfile, processSampler);
+            `Set globalThis.manabitanImportUseSession=false; applied explicit import flags ${JSON.stringify(e2eImportFlags)}` :
+            'Set globalThis.manabitanImportUseSession=false for functional import/update availability verification';
+        await addReportPhase(report, page, 'Configure functional import mode', importSessionDetails, configureImportSessionStart, configureImportSessionEnd, configureImportSessionProfile, processSampler);
 
         await addReportPhase(
             report,
@@ -2096,167 +2097,6 @@ async function main() {
             return importDebug;
         };
 
-        const jitendexImportTriggerStart = safePerformance.now();
-        const jitendexImportTriggerProfile = await runPhaseProfile(cdpSession, async () => {
-            await page.setInputFiles('#dictionary-import-file-input', [cachedDictionaries.jitendexPath]);
-        });
-        const jitendexImportTriggerEnd = safePerformance.now();
-        await addReportPhase(
-            report,
-            page,
-            'Import Jitendex via file input',
-            `Triggered initial Jitendex import using cached archive ${cachedDictionaries.jitendexPath}`,
-            jitendexImportTriggerStart,
-            jitendexImportTriggerEnd,
-            jitendexImportTriggerProfile,
-            processSampler,
-        );
-        const jitendexImportDebug = await recordImportProgress(
-            'Jitendex',
-            'Waited for progress clear for initial Jitendex import',
-            async (onStepChange) => {
-                await waitForImportCompletion(page, 'Jitendex', 300000, onStepChange);
-            },
-        );
-        if (!(jitendexImportDebug && jitendexImportDebug.hasResult === true && typeof jitendexImportDebug.resultTitle === 'string' && jitendexImportDebug.resultTitle.includes('Jitendex'))) {
-            fail(`Initial Jitendex import did not finish with expected debug payload: ${JSON.stringify(jitendexImportDebug)}`);
-        }
-
-        if (quickImportBenchmarkMode) {
-            report.status = 'success';
-            console.log(`${e2eLogTag} PASS: Quick import benchmark mode completed (Jitendex).`);
-            return;
-        }
-
-        const reloadAfterJitendexImportStart = safePerformance.now();
-        await page.goto(`${extensionBaseUrl}/settings.html?popup-preview=false`);
-        await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30000});
-        const reloadAfterJitendexImportEnd = safePerformance.now();
-        await addReportPhase(
-            report,
-            page,
-            'Reload settings page after Jitendex import',
-            'Reloaded settings after the initial import so backend dictionary state and modal controls are refreshed before concurrent lookup checks.',
-            reloadAfterJitendexImportStart,
-            reloadAfterJitendexImportEnd,
-            null,
-            processSampler,
-        );
-
-        const enableJitendexStart = safePerformance.now();
-        const enableJitendexProfile = await runPhaseProfile(cdpSession, async () => {
-            const enableAllResult = await evalSendMessage(page, 'enableInstalledDictionaries');
-            if (!(enableAllResult && enableAllResult.ok === true)) {
-                throw new Error(`enableInstalledDictionaries failed before concurrent-import verification: ${JSON.stringify(enableAllResult)}`);
-            }
-            return await setEnabledDictionaries(page, ['Jitendex']);
-        });
-        const enableJitendexEnd = safePerformance.now();
-        await addReportPhase(
-            report,
-            page,
-            'Enable Jitendex before concurrent import verification',
-            `Enabled installed dictionaries and restricted active profile to Jitendex before starting JMdict import: ${JSON.stringify(enableJitendexProfile.result ?? null)}`,
-            enableJitendexStart,
-            enableJitendexEnd,
-            enableJitendexProfile,
-            processSampler,
-        );
-        const jitendexProbeStart = safePerformance.now();
-        const jitendexProbeProfile = await runPhaseProfile(cdpSession, async () => {
-            return await findOverlapLookupTerm(page, ['Jitendex'], [...jitendexProbeTerms, ...lookupProbeCandidates]);
-        });
-        const jitendexProbeEnd = safePerformance.now();
-        if (!(jitendexProbeProfile.result && jitendexProbeProfile.result.ok === true)) {
-            fail(`Unable to discover a Jitendex lookup term for concurrent-import verification. probes=${JSON.stringify(jitendexProbeProfile.result?.probes ?? [])}`);
-        }
-        const jitendexConcurrentTerm = String(jitendexProbeProfile.result?.term || jitendexProbeTerms[0] || lookupProbeCandidates[0] || '暗記');
-        await addReportPhase(
-            report,
-            page,
-            'Discover Jitendex concurrent probe term',
-            `Selected Jitendex lookup term "${jitendexConcurrentTerm}" for concurrent-import verification. probes=${JSON.stringify(jitendexProbeProfile.result?.probes ?? [])}`,
-            jitendexProbeStart,
-            jitendexProbeEnd,
-            jitendexProbeProfile,
-            processSampler,
-        );
-        const jitendexReadyStart = safePerformance.now();
-        const jitendexReadyProfile = await runPhaseProfile(cdpSession, async () => {
-            return await waitForBackendDictionaryReady(page, ['Jitendex'], jitendexConcurrentTerm, 60000, true);
-        });
-        const jitendexReadyEnd = safePerformance.now();
-        if (!(jitendexReadyProfile.result && jitendexReadyProfile.result.ok === true)) {
-            fail(`Backend dictionary readiness did not stabilize for Jitendex before concurrent JMdict import. diagnostics=${JSON.stringify(jitendexReadyProfile.result?.diagnostics ?? null)}`);
-        }
-        await addReportPhase(
-            report,
-            page,
-            'Wait for Jitendex backend readiness before concurrent import',
-            `Backend confirms Jitendex is loaded before opening concurrent-search assertions: ${JSON.stringify(jitendexReadyProfile.result?.diagnostics ?? null)}`,
-            jitendexReadyStart,
-            jitendexReadyEnd,
-            jitendexReadyProfile,
-            processSampler,
-        );
-
-        concurrentSearchPage = await context.newPage();
-        const concurrentSearchOpenStart = safePerformance.now();
-        await concurrentSearchPage.goto(`${extensionBaseUrl}/search.html`);
-        await concurrentSearchPage.waitForSelector('#search-textbox', {state: 'attached', timeout: 30000});
-        if (!(await waitForBodyVisible(concurrentSearchPage, 30000))) {
-            const forceUnhideResult = await concurrentSearchPage.evaluate(() => {
-                if (!(document.body instanceof HTMLElement)) {
-                    return {hadBody: false, wasHidden: null, nowHidden: null};
-                }
-                const wasHidden = document.body.hidden === true;
-                document.body.hidden = false;
-                return {hadBody: true, wasHidden, nowHidden: document.body.hidden === true};
-            });
-            await addReportPhase(
-                report,
-                concurrentSearchPage,
-                'Force unhide concurrent search page',
-                `Concurrent search page body was hidden after load; forced body.hidden=false. result=${JSON.stringify(forceUnhideResult)}`,
-                safePerformance.now(),
-                safePerformance.now(),
-                null,
-                processSampler,
-            );
-            if (!(await waitForBodyVisible(concurrentSearchPage, 5000))) {
-                fail('Concurrent search page body remained hidden');
-            }
-        }
-        const concurrentSearchOpenEnd = safePerformance.now();
-        await addReportPhase(
-            report,
-            concurrentSearchPage,
-            'Open dedicated concurrent search tab',
-            'Opened a second search.html tab so lookups can be exercised while settings continues importing/updating dictionaries.',
-            concurrentSearchOpenStart,
-            concurrentSearchOpenEnd,
-            null,
-            processSampler,
-        );
-
-        const baselineConcurrentSearchStart = safePerformance.now();
-        const baselineConcurrentSearchDiagnostics = await evalSendMessage(concurrentSearchPage, 'backendDiagnostics', jitendexConcurrentTerm);
-        const baselineConcurrentSearchEnd = safePerformance.now();
-        await addReportPhase(
-            report,
-            concurrentSearchPage,
-            'Verify baseline Jitendex lookup before concurrent JMdict import',
-            `Dedicated search tab runtime returned backend diagnostics for "${jitendexConcurrentTerm}" before JMdict import: ${JSON.stringify(baselineConcurrentSearchDiagnostics)}`,
-            baselineConcurrentSearchStart,
-            baselineConcurrentSearchEnd,
-            null,
-            processSampler,
-        );
-        const baselineConcurrentNames = new Set((Array.isArray(baselineConcurrentSearchDiagnostics?.termDictionaryNames) ? baselineConcurrentSearchDiagnostics.termDictionaryNames : []).map((value) => String(value || '').trim()).filter((value) => value.length > 0));
-        if (![...baselineConcurrentNames].some((name) => matchesDictionaryName(name, 'Jitendex'))) {
-            fail(`Expected baseline Jitendex lookup to work before JMdict import; saw ${JSON.stringify(baselineConcurrentSearchDiagnostics)}`);
-        }
-
         const jmdictImportTriggerStart = safePerformance.now();
         const jmdictImportTriggerProfile = await runPhaseProfile(cdpSession, async () => {
             await page.setInputFiles('#dictionary-import-file-input', [cachedDictionaries.jmdictPath]);
@@ -2266,10 +2106,151 @@ async function main() {
             report,
             page,
             'Import JMdict via file input',
-            `Triggered JMdict import using cached archive ${cachedDictionaries.jmdictPath}`,
+            `Triggered initial JMdict import using cached archive ${cachedDictionaries.jmdictPath}`,
             jmdictImportTriggerStart,
             jmdictImportTriggerEnd,
             jmdictImportTriggerProfile,
+            processSampler,
+        );
+        const jmdictImportDebug = await recordImportProgress(
+            'JMdict',
+            'Waited for progress clear for initial JMdict import',
+            async (onStepChange) => {
+                await waitForImportCompletion(page, 'JMdict', 300000, onStepChange);
+            },
+        );
+        if (!(jmdictImportDebug && jmdictImportDebug.hasResult === true && typeof jmdictImportDebug.resultTitle === 'string' && jmdictImportDebug.resultTitle.includes('JMdict'))) {
+            fail(`Initial JMdict import did not finish with expected debug payload: ${JSON.stringify(jmdictImportDebug)}`);
+        }
+
+        if (quickImportBenchmarkMode) {
+            report.status = 'success';
+            console.log(`${e2eLogTag} PASS: Quick import benchmark mode completed (JMdict).`);
+            return;
+        }
+
+        const reloadAfterJmdictImportStart = safePerformance.now();
+        await page.goto(`${extensionBaseUrl}/settings.html?popup-preview=false`);
+        await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30000});
+        const reloadAfterJmdictImportEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            'Reload settings page after JMdict import',
+            'Reloaded settings after the initial import so backend dictionary state and modal controls are refreshed before concurrent lookup checks.',
+            reloadAfterJmdictImportStart,
+            reloadAfterJmdictImportEnd,
+            null,
+            processSampler,
+        );
+
+        const enableJmdictStart = safePerformance.now();
+        const enableJmdictProfile = await runPhaseProfile(cdpSession, async () => {
+            const enableAllResult = await evalSendMessage(page, 'enableInstalledDictionaries');
+            if (!(enableAllResult && enableAllResult.ok === true)) {
+                throw new Error(`enableInstalledDictionaries failed before concurrent-import verification: ${JSON.stringify(enableAllResult)}`);
+            }
+            return await setEnabledDictionaries(page, ['JMdict']);
+        });
+        const enableJmdictEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            'Enable JMdict before concurrent import verification',
+            `Enabled installed dictionaries and restricted active profile to JMdict before starting Jitendex import: ${JSON.stringify(enableJmdictProfile.result ?? null)}`,
+            enableJmdictStart,
+            enableJmdictEnd,
+            enableJmdictProfile,
+            processSampler,
+        );
+        concurrentSearchPage = await context.newPage();
+        const concurrentSearchOpenStart = safePerformance.now();
+        await concurrentSearchPage.goto(`${extensionBaseUrl}/search.html`);
+        await concurrentSearchPage.waitForSelector('#search-textbox', {state: 'visible', timeout: 30000});
+        const concurrentSearchOpenEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            concurrentSearchPage,
+            'Open dedicated concurrent lookup tab',
+            'Opened a second extension search tab so dictionary search can be exercised while settings continues importing/updating dictionaries.',
+            concurrentSearchOpenStart,
+            concurrentSearchOpenEnd,
+            null,
+            processSampler,
+        );
+
+        const concurrentProbeTermStart = safePerformance.now();
+        const concurrentProbeTermProfile = await runPhaseProfile(cdpSession, async () => {
+            return await findOverlapLookupTerm(page, ['JMdict'], [...jmdictProbeTerms, ...lookupProbeCandidates]);
+        });
+        const concurrentProbeTermEnd = safePerformance.now();
+        if (!(concurrentProbeTermProfile.result && concurrentProbeTermProfile.result.ok === true)) {
+            fail(`Unable to discover a JMdict lookup probe term for concurrent verification: ${JSON.stringify(concurrentProbeTermProfile.result?.probes ?? [])}`);
+        }
+        const concurrentProbeTerm = String(concurrentProbeTermProfile.result.term || '');
+        await addReportPhase(
+            report,
+            page,
+            'Discover JMdict probe term for concurrent verification',
+            `Selected JMdict probe term "${concurrentProbeTerm}" for concurrent import/update verification. probes=${JSON.stringify(concurrentProbeTermProfile.result?.probes ?? [])}`,
+            concurrentProbeTermStart,
+            concurrentProbeTermEnd,
+            concurrentProbeTermProfile,
+            processSampler,
+        );
+
+        const concurrentBackendReadyStart = safePerformance.now();
+        const concurrentBackendReadyProfile = await runPhaseProfile(cdpSession, async () => {
+            return await waitForBackendDictionaryReady(concurrentSearchPage, ['JMdict'], concurrentProbeTerm, 60000, true);
+        });
+        const concurrentBackendReadyEnd = safePerformance.now();
+        if (!(concurrentBackendReadyProfile.result && concurrentBackendReadyProfile.result.ok === true)) {
+            fail(`JMdict lookup backend did not become ready before concurrent import verification: ${JSON.stringify(concurrentBackendReadyProfile.result?.diagnostics ?? null)}`);
+        }
+        await addReportPhase(
+            report,
+            concurrentSearchPage,
+            'Wait for JMdict lookup backend readiness before concurrent import',
+            `Dedicated search tab confirmed JMdict lookup backend readiness before Jitendex import: ${JSON.stringify(concurrentBackendReadyProfile.result?.diagnostics ?? null)}`,
+            concurrentBackendReadyStart,
+            concurrentBackendReadyEnd,
+            concurrentBackendReadyProfile,
+            processSampler,
+        );
+
+        const baselineConcurrentSearchStart = safePerformance.now();
+        const baselineConcurrentLookupProfile = await runPhaseProfile(cdpSession, async () => {
+            return await evalSendMessage(concurrentSearchPage, 'backendDiagnostics', concurrentProbeTerm);
+        });
+        const baselineConcurrentLookup = baselineConcurrentLookupProfile.result;
+        const baselineConcurrentSearchEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            concurrentSearchPage,
+            'Verify baseline JMdict lookup backend from search tab before concurrent Jitendex import',
+            `Dedicated search tab resolved backend diagnostics before Jitendex import: ${JSON.stringify(baselineConcurrentLookup)}`,
+            baselineConcurrentSearchStart,
+            baselineConcurrentSearchEnd,
+            baselineConcurrentLookupProfile,
+            processSampler,
+        );
+        if (!Array.isArray(baselineConcurrentLookup?.termDictionaryNames) || !baselineConcurrentLookup.termDictionaryNames.some((name) => matchesDictionaryName(String(name), 'JMdict'))) {
+            fail(`Expected baseline JMdict lookup backend before Jitendex import; saw ${JSON.stringify(baselineConcurrentLookup)}`);
+        }
+
+        const jitendexImportTriggerStart = safePerformance.now();
+        const jitendexImportTriggerProfile = await runPhaseProfile(cdpSession, async () => {
+            await page.setInputFiles('#dictionary-import-file-input', [cachedDictionaries.jitendexPath]);
+        });
+        const jitendexImportTriggerEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            page,
+            'Import Jitendex via file input',
+            `Triggered Jitendex import using cached archive ${cachedDictionaries.jitendexPath}`,
+            jitendexImportTriggerStart,
+            jitendexImportTriggerEnd,
+            jitendexImportTriggerProfile,
             processSampler,
         );
         let concurrentDbPressurePromise = null;
@@ -2286,32 +2267,34 @@ async function main() {
         }
         await page.waitForTimeout(700);
         const searchDuringImportStart = safePerformance.now();
-        const searchDuringImportDiagnostics = await evalSendMessage(concurrentSearchPage, 'backendDiagnostics', jitendexConcurrentTerm);
+        const searchDuringImportProfile = await runPhaseProfile(cdpSession, async () => {
+            return await evalSendMessage(concurrentSearchPage, 'backendDiagnostics', concurrentProbeTerm);
+        });
+        const searchDuringImportLookup = searchDuringImportProfile.result;
         const searchDuringImportEnd = safePerformance.now();
         await addReportPhase(
             report,
             concurrentSearchPage,
-            'Verify Jitendex lookup during JMdict import',
-            `While JMdict import was in progress, dedicated search tab runtime returned backend diagnostics for "${jitendexConcurrentTerm}": ${JSON.stringify(searchDuringImportDiagnostics)}`,
+            'Verify JMdict lookup backend during Jitendex import',
+            `While Jitendex import was in progress, dedicated search tab resolved backend diagnostics: ${JSON.stringify(searchDuringImportLookup)}`,
             searchDuringImportStart,
             searchDuringImportEnd,
-            null,
+            searchDuringImportProfile,
             processSampler,
         );
-        const searchDuringImportNames = new Set((Array.isArray(searchDuringImportDiagnostics?.termDictionaryNames) ? searchDuringImportDiagnostics.termDictionaryNames : []).map((value) => String(value || '').trim()).filter((value) => value.length > 0));
-        if (![...searchDuringImportNames].some((name) => matchesDictionaryName(name, 'Jitendex'))) {
-            fail(`Expected Jitendex lookup to remain available during JMdict import; saw ${JSON.stringify(searchDuringImportDiagnostics)}`);
+        if (!Array.isArray(searchDuringImportLookup?.termDictionaryNames) || !searchDuringImportLookup.termDictionaryNames.some((name) => matchesDictionaryName(String(name), 'JMdict'))) {
+            fail(`Expected JMdict lookup backend to remain available during Jitendex import; saw ${JSON.stringify(searchDuringImportLookup)}`);
         }
 
-        const jmdictImportDebug = await recordImportProgress(
-            'JMdict',
-            'Waited for progress clear for JMdict import after the concurrent-search check',
+        const jitendexImportDebug = await recordImportProgress(
+            'Jitendex',
+            'Waited for progress clear for Jitendex import after the concurrent-search check',
             async (onStepChange) => {
-                await waitForImportCompletion(page, 'JMdict', 300000, onStepChange);
+                await waitForImportCompletion(page, 'Jitendex', 300000, onStepChange);
             },
         );
-        if (!(jmdictImportDebug && jmdictImportDebug.hasResult === true && typeof jmdictImportDebug.resultTitle === 'string' && jmdictImportDebug.resultTitle.includes('JMdict'))) {
-            fail(`JMdict import did not finish with expected debug payload: ${JSON.stringify(jmdictImportDebug)}`);
+        if (!(jitendexImportDebug && jitendexImportDebug.hasResult === true && typeof jitendexImportDebug.resultTitle === 'string' && jitendexImportDebug.resultTitle.includes('Jitendex'))) {
+            fail(`Jitendex import did not finish with expected debug payload: ${JSON.stringify(jitendexImportDebug)}`);
         }
         if (concurrentDbPressurePromise !== null) {
             const concurrentDbPressureEnd = safePerformance.now();
@@ -2480,17 +2463,17 @@ async function main() {
                 if (!(modal instanceof HTMLElement) || !(button instanceof HTMLElement)) {
                     throw new Error('Update modal/button missing');
                 }
-                modal.dataset.dictionaryTitle = 'Jitendex';
+                modal.dataset.dictionaryTitle = 'JMdict';
                 modal.dataset.downloadUrl = downloadUrl;
                 button.click();
-            }, `${localServer.baseUrl}/dictionaries/jitendex-slow.zip`);
+            }, `${localServer.baseUrl}/dictionaries/jmdict-slow.zip`);
         });
         const updateTriggerEnd = safePerformance.now();
         await addReportPhase(
             report,
             page,
-            'Trigger slow Jitendex update',
-            `Queued a Jitendex update against a throttled local ZIP endpoint while keeping the dedicated search tab open. probeTerm="${readinessTerm}"`,
+            'Trigger slow JMdict update',
+            `Queued a JMdict update against a throttled local ZIP endpoint while keeping the dedicated search tab open. probeTerm="${readinessTerm}"`,
             updateTriggerStart,
             updateTriggerEnd,
             updateTriggerProfile,
@@ -2502,43 +2485,34 @@ async function main() {
         }
         await page.waitForTimeout(700);
         const searchDuringUpdateStart = safePerformance.now();
-        const searchDuringUpdateDiagnostics = await evalSendMessage(
-            concurrentSearchPage,
-            'backendDiagnostics',
-            readinessTerm,
-        );
+        const searchDuringUpdateProfile = await runPhaseProfile(cdpSession, async () => {
+            return await evalSendMessage(concurrentSearchPage, 'backendDiagnostics', readinessTerm);
+        });
+        const searchDuringUpdateLookup = searchDuringUpdateProfile.result;
         const searchDuringUpdateEnd = safePerformance.now();
         await addReportPhase(
             report,
             concurrentSearchPage,
-            'Verify lookup during Jitendex update download',
-            `While slow Jitendex update was in progress, dedicated search tab runtime returned backend diagnostics for "${readinessTerm}": ${JSON.stringify(searchDuringUpdateDiagnostics)}`,
+            'Verify JMdict lookup backend during JMdict update download',
+            `While slow JMdict update was in progress, dedicated search tab resolved backend diagnostics: ${JSON.stringify(searchDuringUpdateLookup)}`,
             searchDuringUpdateStart,
             searchDuringUpdateEnd,
-            null,
+            searchDuringUpdateProfile,
             processSampler,
         );
-        const searchDuringUpdateNames = new Set((Array.isArray(searchDuringUpdateDiagnostics?.termDictionaryNames) ? searchDuringUpdateDiagnostics.termDictionaryNames : []).map((value) => String(value || '').trim()).filter((value) => value.length > 0));
-        if (hasOverlapLookupTerm) {
-            if (
-                ![...searchDuringUpdateNames].some((name) => matchesDictionaryName(name, 'Jitendex')) ||
-                ![...searchDuringUpdateNames].some((name) => matchesDictionaryName(name, 'JMdict'))
-            ) {
-                fail(`Expected installed dictionaries to remain queryable during Jitendex update; saw ${JSON.stringify(searchDuringUpdateDiagnostics)}`);
-            }
-        } else if (![...searchDuringUpdateNames].some((name) => matchesDictionaryName(name, 'Jitendex'))) {
-            fail(`Expected Jitendex lookup to remain available during Jitendex update; saw ${JSON.stringify(searchDuringUpdateDiagnostics)}`);
+        if (!Array.isArray(searchDuringUpdateLookup?.termDictionaryNames) || !searchDuringUpdateLookup.termDictionaryNames.some((name) => matchesDictionaryName(String(name), 'JMdict'))) {
+            fail(`Expected JMdict lookup backend to remain available during JMdict update; saw ${JSON.stringify(searchDuringUpdateLookup)}`);
         }
 
         const updateImportDebug = await recordImportProgress(
-            'Jitendex update',
-            `Waited for progress clear for the Jitendex update after concurrent-search verification using term "${readinessTerm}"`,
+            'JMdict update',
+            'Waited for progress clear for the JMdict update after concurrent popup verification',
             async (onStepChange) => {
-                await waitForImportCompletion(page, 'Jitendex', 300000, onStepChange);
+                await waitForImportCompletion(page, 'JMdict', 300000, onStepChange);
             },
         );
-        if (!(updateImportDebug && updateImportDebug.hasResult === true && typeof updateImportDebug.resultTitle === 'string' && updateImportDebug.resultTitle.includes('Jitendex'))) {
-            fail(`Jitendex update did not finish with expected debug payload: ${JSON.stringify(updateImportDebug)}`);
+        if (!(updateImportDebug && updateImportDebug.hasResult === true && typeof updateImportDebug.resultTitle === 'string' && updateImportDebug.resultTitle.includes('JMdict'))) {
+            fail(`JMdict update did not finish with expected debug payload: ${JSON.stringify(updateImportDebug)}`);
         }
 
         const reloadSettingsStart = safePerformance.now();
