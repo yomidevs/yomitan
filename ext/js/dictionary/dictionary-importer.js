@@ -352,7 +352,7 @@ export class DictionaryImporter {
         /** @type {boolean} */
         this._adaptiveTermBankWasmInitialCapacity = false;
         /** @type {boolean} */
-        this._streamTermArtifactChunks = false;
+        this._streamTermArtifactChunks = true;
         /** @type {number} */
         this._termArtifactRowChunkSize = TERM_ARTIFACT_ROW_CHUNK_SIZE;
         /** @type {boolean} */
