@@ -86,6 +86,23 @@ function selectTermRecordPreinternedPlan(plan, indexes) {
         readingIndexes,
     };
 }
+
+/**
+ * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} plan
+ * @param {number} start
+ * @param {number} count
+ * @returns {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}
+ */
+function sliceTermRecordPreinternedPlan(plan, start, count) {
+    if (plan === null) { return null; }
+    const end = start + count;
+    return {
+        stringLengths: plan.stringLengths,
+        stringsBuffer: plan.stringsBuffer,
+        expressionIndexes: plan.expressionIndexes.slice(start, end),
+        readingIndexes: plan.readingIndexes.slice(start, end),
+    };
+}
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW = 0;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2 = 1;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3 = 2;
@@ -834,45 +851,65 @@ export class TermRecordOpfsStore {
             this._indexDirty = true;
         }
         const buildRecordsMs = safePerformance.now() - tBuildStart;
-        /** @type {Map<string, number[]>} */
-        const rowIndexesByContentDictName = new Map();
-        for (let i = 0; i < count; ++i) {
-            const key = contentDictNames[i] ?? 'raw';
-            const indexes = rowIndexesByContentDictName.get(key);
-            if (typeof indexes === 'undefined') {
-                rowIndexesByContentDictName.set(key, [i]);
-            } else {
-                indexes.push(i);
-            }
-        }
         let encodeMs = 0;
         let appendWriteMs = 0;
-        for (const [contentDictName, rowIndexes] of rowIndexesByContentDictName) {
+        const firstContentDictName = contentDictNames[0] ?? 'raw';
+        let singleContentDictName = true;
+        for (let i = 1; i < count; ++i) {
+            if ((contentDictNames[i] ?? 'raw') !== firstContentDictName) {
+                singleContentDictName = false;
+                break;
+            }
+        }
+        if (singleContentDictName) {
+            const state = await this._getOrCreateShardState(chunk.dictionary, firstContentDictName);
+            if (state === null) { return {buildRecordsMs, encodeMs, appendWriteMs}; }
+            const metrics = await this._encodeAndAppendArtifactChunkForState(
+                state,
+                chunk,
+                firstId,
+                contentOffsets,
+                contentLengths,
+                chunk.termRecordPreinternedPlan ?? null,
+            );
+            encodeMs += metrics.encodeMs;
+            appendWriteMs += metrics.appendWriteMs;
+            return {buildRecordsMs, encodeMs, appendWriteMs};
+        }
+        for (let runStart = 0; runStart < count;) {
+            const contentDictName = contentDictNames[runStart] ?? 'raw';
+            let runEnd = runStart + 1;
+            while (runEnd < count && (contentDictNames[runEnd] ?? 'raw') === contentDictName) {
+                ++runEnd;
+            }
+            const runCount = runEnd - runStart;
             const state = await this._getOrCreateShardState(chunk.dictionary, contentDictName);
-            if (state === null) { continue; }
+            if (state === null) {
+                runStart = runEnd;
+                continue;
+            }
             /** @type {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} */
             const chunkSlice = {
                 dictionary: chunk.dictionary,
-                rowCount: rowIndexes.length,
-                expressionBytesList: rowIndexes.map((index) => chunk.expressionBytesList[index]),
-                readingBytesList: rowIndexes.map((index) => chunk.readingBytesList[index]),
-                readingEqualsExpressionList: rowIndexes.map((index) => chunk.readingEqualsExpressionList[index]),
-                scoreList: rowIndexes.map((index) => chunk.scoreList[index]),
-                sequenceList: rowIndexes.map((index) => chunk.sequenceList[index]),
-                termRecordPreinternedPlan: selectTermRecordPreinternedPlan(chunk.termRecordPreinternedPlan ?? null, rowIndexes),
+                rowCount: runCount,
+                expressionBytesList: chunk.expressionBytesList.slice(runStart, runEnd),
+                readingBytesList: chunk.readingBytesList.slice(runStart, runEnd),
+                readingEqualsExpressionList: chunk.readingEqualsExpressionList.slice(runStart, runEnd),
+                scoreList: chunk.scoreList.slice(runStart, runEnd),
+                sequenceList: chunk.sequenceList.slice(runStart, runEnd),
+                termRecordPreinternedPlan: sliceTermRecordPreinternedPlan(chunk.termRecordPreinternedPlan ?? null, runStart, runCount),
             };
-            const groupContentOffsets = rowIndexes.map((index) => contentOffsets[index]);
-            const groupContentLengths = rowIndexes.map((index) => contentLengths[index]);
             const metrics = await this._encodeAndAppendArtifactChunkForState(
                 state,
                 chunkSlice,
-                firstId + rowIndexes[0],
-                groupContentOffsets,
-                groupContentLengths,
+                firstId + runStart,
+                contentOffsets.slice(runStart, runEnd),
+                contentLengths.slice(runStart, runEnd),
                 chunkSlice.termRecordPreinternedPlan ?? null,
             );
             encodeMs += metrics.encodeMs;
             appendWriteMs += metrics.appendWriteMs;
+            runStart = runEnd;
         }
         return {buildRecordsMs, encodeMs, appendWriteMs};
     }
