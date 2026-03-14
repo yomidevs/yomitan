@@ -25,6 +25,7 @@ const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
 const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
 const SHARD_FILE_PREFIX = 'dict-';
 const SHARD_FILE_SUFFIX = '.mbtr';
+const SHARD_FILE_CONTENT_DICT_SEPARATOR = '|';
 const BINARY_MAGIC_TEXT = 'MBTRR11B';
 const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRR10B';
 const PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC9';
@@ -61,6 +62,29 @@ const WRITE_COALESCE_MAX_CHUNKS = 512;
 function getTermRecordPreinternedPlan(rows) {
     const value = /** @type {{termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan}} */ (/** @type {unknown} */ (rows)).termRecordPreinternedPlan;
     return value ?? null;
+}
+
+/**
+ * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} plan
+ * @param {number[]} indexes
+ * @returns {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}
+ */
+function selectTermRecordPreinternedPlan(plan, indexes) {
+    if (plan === null) { return null; }
+    const count = indexes.length;
+    const expressionIndexes = new Uint32Array(count);
+    const readingIndexes = new Uint32Array(count);
+    for (let i = 0; i < count; ++i) {
+        const sourceIndex = indexes[i];
+        expressionIndexes[i] = plan.expressionIndexes[sourceIndex];
+        readingIndexes[i] = plan.readingIndexes[sourceIndex];
+    }
+    return {
+        stringLengths: plan.stringLengths,
+        stringsBuffer: plan.stringsBuffer,
+        expressionIndexes,
+        readingIndexes,
+    };
 }
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW = 0;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2 = 1;
@@ -331,7 +355,7 @@ export class TermRecordOpfsStore {
     async appendBatch(records, preinternedPlan = null) {
         if (records.length === 0) { return; }
         /** @type {Map<string, TermRecord[]>} */
-        const recordsByDictionary = new Map();
+        const recordsByShard = new Map();
         for (const row of records) {
             const id = this._nextId++;
             const record = {
@@ -350,11 +374,12 @@ export class TermRecordOpfsStore {
                 sequence: row.sequence,
             };
             this._recordsById.set(id, record);
-            const dictionaryRecords = recordsByDictionary.get(record.dictionary);
-            if (typeof dictionaryRecords === 'undefined') {
-                recordsByDictionary.set(record.dictionary, [record]);
+            const shardFileName = this._getShardFileName(record.dictionary, record.entryContentDictName);
+            const shardRecords = recordsByShard.get(shardFileName);
+            if (typeof shardRecords === 'undefined') {
+                recordsByShard.set(shardFileName, [record]);
             } else {
-                dictionaryRecords.push(record);
+                shardRecords.push(record);
             }
             if (!this._deferIndexBuild) {
                 const existingIndex = this._indexByDictionary.get(record.dictionary);
@@ -366,13 +391,14 @@ export class TermRecordOpfsStore {
         if (this._deferIndexBuild) {
             this._indexDirty = true;
         }
-        for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
-            const state = await this._getOrCreateShardState(dictionaryName);
+        for (const dictionaryRecords of recordsByShard.values()) {
+            const firstRecord = dictionaryRecords[0];
+            const state = await this._getOrCreateShardState(firstRecord.dictionary, firstRecord.entryContentDictName);
             if (state === null) { continue; }
             await this._appendEncodedChunk(
                 state,
                 await this._encodeRecords(dictionaryRecords, preinternedPlan),
-                dictionaryRecords[0]?.id ?? 0,
+                firstRecord?.id ?? 0,
                 dictionaryRecords.length,
             );
         }
@@ -388,10 +414,11 @@ export class TermRecordOpfsStore {
     async appendBatchFromTermRows(rows, start, count) {
         if (count <= 0) { return; }
         /** @type {Map<string, TermRecord[]>|null} */
-        let recordsByDictionary = null;
+        let recordsByShard = null;
         /** @type {TermRecord[]} */
         const singleDictionaryRecords = [];
         let singleDictionaryName = '';
+        let singleContentDictName = 'raw';
         for (let i = start, ii = start + count; i < ii; ++i) {
             const row = /** @type {[string, string, string, (string|null), (string|null), unknown, number, number, (string|null), unknown, unknown, unknown, number, unknown, (number|null)]} */ (rows[i]);
             const id = this._nextId++;
@@ -413,20 +440,22 @@ export class TermRecordOpfsStore {
             this._recordsById.set(id, record);
             if (i === start) {
                 singleDictionaryName = dictionary;
+                singleContentDictName = record.entryContentDictName;
             }
-            if (recordsByDictionary === null) {
-                if (dictionary === singleDictionaryName) {
+            if (recordsByShard === null) {
+                if (dictionary === singleDictionaryName && record.entryContentDictName === singleContentDictName) {
                     singleDictionaryRecords.push(record);
                 } else {
-                    recordsByDictionary = new Map();
-                    recordsByDictionary.set(singleDictionaryName, singleDictionaryRecords);
-                    recordsByDictionary.set(dictionary, [record]);
+                    recordsByShard = new Map();
+                    recordsByShard.set(this._getShardFileName(singleDictionaryName, singleContentDictName), singleDictionaryRecords);
+                    recordsByShard.set(this._getShardFileName(dictionary, record.entryContentDictName), [record]);
                 }
             } else {
-                let dictionaryRecords = recordsByDictionary.get(dictionary);
+                const shardFileName = this._getShardFileName(dictionary, record.entryContentDictName);
+                let dictionaryRecords = recordsByShard.get(shardFileName);
                 if (typeof dictionaryRecords === 'undefined') {
                     dictionaryRecords = [];
-                    recordsByDictionary.set(dictionary, dictionaryRecords);
+                    recordsByShard.set(shardFileName, dictionaryRecords);
                 }
                 dictionaryRecords.push(record);
             }
@@ -440,15 +469,16 @@ export class TermRecordOpfsStore {
         if (this._deferIndexBuild) {
             this._indexDirty = true;
         }
-        if (recordsByDictionary === null) {
-            const state = await this._getOrCreateShardState(singleDictionaryName);
+        if (recordsByShard === null) {
+            const state = await this._getOrCreateShardState(singleDictionaryName, singleContentDictName);
             if (state !== null) {
                 await this._appendEncodedChunk(state, await this._encodeRecords(singleDictionaryRecords), singleDictionaryRecords[0]?.id ?? 0, singleDictionaryRecords.length);
             }
             return;
         }
-        for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
-            const state = await this._getOrCreateShardState(dictionaryName);
+        for (const dictionaryRecords of recordsByShard.values()) {
+            const firstRecord = dictionaryRecords[0];
+            const state = await this._getOrCreateShardState(firstRecord.dictionary, firstRecord.entryContentDictName);
             if (state === null) { continue; }
             await this._appendEncodedChunk(state, await this._encodeRecords(dictionaryRecords), dictionaryRecords[0]?.id ?? 0, dictionaryRecords.length);
         }
@@ -474,12 +504,13 @@ export class TermRecordOpfsStore {
         let buildRecordsMs = 0;
         let encodeMs = 0;
         let appendWriteMs = 0;
-        /** @type {Map<string, TermRecord[]>|null} */
-        let recordsByDictionary = null;
+        /** @type {Map<string, {records: TermRecord[], indexes: number[]}>|null} */
+        let recordsByShard = null;
         /** @type {TermRecord[]} */
         const singleDictionaryRecords = new Array(count);
         let singleDictionaryRecordCount = 0;
         let singleDictionaryName = '';
+        let singleContentDictName = 'raw';
         for (let i = start, ii = start + count; i < ii; ++i) {
             const row = /** @type {{dictionary: string, expression: string, reading: string, readingEqualsExpression?: boolean, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[i]);
             const id = this._nextId++;
@@ -506,22 +537,31 @@ export class TermRecordOpfsStore {
             this._recordsById.set(id, record);
             if (i === start) {
                 singleDictionaryName = dictionary;
+                singleContentDictName = record.entryContentDictName;
             }
-            if (recordsByDictionary === null) {
-                if (dictionary === singleDictionaryName) {
+            if (recordsByShard === null) {
+                if (dictionary === singleDictionaryName && record.entryContentDictName === singleContentDictName) {
                     singleDictionaryRecords[singleDictionaryRecordCount++] = record;
                 } else {
-                    recordsByDictionary = new Map();
-                    recordsByDictionary.set(singleDictionaryName, singleDictionaryRecords.slice(0, singleDictionaryRecordCount));
-                    recordsByDictionary.set(dictionary, [record]);
+                    recordsByShard = new Map();
+                    recordsByShard.set(
+                        this._getShardFileName(singleDictionaryName, singleContentDictName),
+                        {
+                            records: singleDictionaryRecords.slice(0, singleDictionaryRecordCount),
+                            indexes: Array.from({length: singleDictionaryRecordCount}, (_, index) => index),
+                        },
+                    );
+                    recordsByShard.set(this._getShardFileName(dictionary, record.entryContentDictName), {records: [record], indexes: [i - start]});
                 }
             } else {
-                let dictionaryRecords = recordsByDictionary.get(dictionary);
-                if (typeof dictionaryRecords === 'undefined') {
-                    dictionaryRecords = [];
-                    recordsByDictionary.set(dictionary, dictionaryRecords);
+                const shardFileName = this._getShardFileName(dictionary, record.entryContentDictName);
+                let shardRecords = recordsByShard.get(shardFileName);
+                if (typeof shardRecords === 'undefined') {
+                    shardRecords = {records: [], indexes: []};
+                    recordsByShard.set(shardFileName, shardRecords);
                 }
-                dictionaryRecords.push(record);
+                shardRecords.records.push(record);
+                shardRecords.indexes.push(i - start);
             }
             if (!this._deferIndexBuild) {
                 const existingIndex = this._indexByDictionary.get(dictionary);
@@ -534,8 +574,8 @@ export class TermRecordOpfsStore {
             this._indexDirty = true;
         }
         buildRecordsMs = safePerformance.now() - tBuildStart;
-        if (recordsByDictionary === null) {
-            const state = await this._getOrCreateShardState(singleDictionaryName);
+        if (recordsByShard === null) {
+            const state = await this._getOrCreateShardState(singleDictionaryName, singleContentDictName);
             if (state !== null) {
                 const metrics = await this._encodeAndAppendChunkForState(state, singleDictionaryRecords, preinternedPlan);
                 encodeMs += metrics.encodeMs;
@@ -543,10 +583,11 @@ export class TermRecordOpfsStore {
             }
             return {buildRecordsMs, encodeMs, appendWriteMs};
         }
-        for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
-            const state = await this._getOrCreateShardState(dictionaryName);
+        for (const {records: dictionaryRecords, indexes} of recordsByShard.values()) {
+            const firstRecord = dictionaryRecords[0];
+            const state = await this._getOrCreateShardState(firstRecord.dictionary, firstRecord.entryContentDictName);
             if (state === null) { continue; }
-            const metrics = await this._encodeAndAppendChunkForState(state, dictionaryRecords, preinternedPlan);
+            const metrics = await this._encodeAndAppendChunkForState(state, dictionaryRecords, selectTermRecordPreinternedPlan(preinternedPlan, indexes));
             encodeMs += metrics.encodeMs;
             appendWriteMs += metrics.appendWriteMs;
         }
@@ -567,10 +608,11 @@ export class TermRecordOpfsStore {
             throw new Error('appendBatchFromImportTermEntries spans length is smaller than row count');
         }
         /** @type {Map<string, TermRecord[]>|null} */
-        let recordsByDictionary = null;
+        let recordsByShard = null;
         /** @type {TermRecord[]} */
         const singleDictionaryRecords = [];
         let singleDictionaryName = '';
+        let singleContentDictName = 'raw';
         for (let i = 0; i < count; ++i) {
             const row = /** @type {{dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[start + i]);
             const span = spans[i];
@@ -595,20 +637,22 @@ export class TermRecordOpfsStore {
             this._recordsById.set(id, record);
             if (i === 0) {
                 singleDictionaryName = dictionary;
+                singleContentDictName = record.entryContentDictName;
             }
-            if (recordsByDictionary === null) {
-                if (dictionary === singleDictionaryName) {
+            if (recordsByShard === null) {
+                if (dictionary === singleDictionaryName && record.entryContentDictName === singleContentDictName) {
                     singleDictionaryRecords.push(record);
                 } else {
-                    recordsByDictionary = new Map();
-                    recordsByDictionary.set(singleDictionaryName, singleDictionaryRecords);
-                    recordsByDictionary.set(dictionary, [record]);
+                    recordsByShard = new Map();
+                    recordsByShard.set(this._getShardFileName(singleDictionaryName, singleContentDictName), singleDictionaryRecords);
+                    recordsByShard.set(this._getShardFileName(dictionary, record.entryContentDictName), [record]);
                 }
             } else {
-                let dictionaryRecords = recordsByDictionary.get(dictionary);
+                const shardFileName = this._getShardFileName(dictionary, record.entryContentDictName);
+                let dictionaryRecords = recordsByShard.get(shardFileName);
                 if (typeof dictionaryRecords === 'undefined') {
                     dictionaryRecords = [];
-                    recordsByDictionary.set(dictionary, dictionaryRecords);
+                    recordsByShard.set(shardFileName, dictionaryRecords);
                 }
                 dictionaryRecords.push(record);
             }
@@ -622,15 +666,16 @@ export class TermRecordOpfsStore {
         if (this._deferIndexBuild) {
             this._indexDirty = true;
         }
-        if (recordsByDictionary === null) {
-            const state = await this._getOrCreateShardState(singleDictionaryName);
+        if (recordsByShard === null) {
+            const state = await this._getOrCreateShardState(singleDictionaryName, singleContentDictName);
             if (state !== null) {
                 await this._encodeAndAppendChunkForState(state, singleDictionaryRecords);
             }
             return;
         }
-        for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
-            const state = await this._getOrCreateShardState(dictionaryName);
+        for (const dictionaryRecords of recordsByShard.values()) {
+            const firstRecord = dictionaryRecords[0];
+            const state = await this._getOrCreateShardState(firstRecord.dictionary, firstRecord.entryContentDictName);
             if (state === null) { continue; }
             await this._encodeAndAppendChunkForState(state, dictionaryRecords);
         }
@@ -656,11 +701,12 @@ export class TermRecordOpfsStore {
         let encodeMs = 0;
         let appendWriteMs = 0;
         /** @type {Map<string, TermRecord[]>|null} */
-        let recordsByDictionary = null;
+        let recordsByShard = null;
         /** @type {TermRecord[]} */
         const singleDictionaryRecords = new Array(count);
         let singleDictionaryRecordCount = 0;
         let firstDictionaryName = '';
+        const normalizedContentDictName = contentDictName ?? 'raw';
         for (let i = 0; i < count; ++i) {
             const row = /** @type {{dictionary: string, expression: string, reading: string, readingEqualsExpression?: boolean, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[start + i]);
             const id = this._nextId++;
@@ -678,7 +724,7 @@ export class TermRecordOpfsStore {
                 readingReverse: row.readingReverse ?? null,
                 entryContentOffset: contentOffsets[i],
                 entryContentLength: contentLengths[i],
-                entryContentDictName: contentDictName ?? 'raw',
+                entryContentDictName: normalizedContentDictName,
                 score: row.score,
                 sequence: typeof row.sequence === 'number' ? row.sequence : null,
             };
@@ -686,19 +732,20 @@ export class TermRecordOpfsStore {
             if (i === 0) {
                 firstDictionaryName = dictionary;
             }
-            if (recordsByDictionary === null) {
+            if (recordsByShard === null) {
                 if (dictionary === firstDictionaryName) {
                     singleDictionaryRecords[singleDictionaryRecordCount++] = record;
                 } else {
-                    recordsByDictionary = new Map();
-                    recordsByDictionary.set(firstDictionaryName, singleDictionaryRecords.slice(0, singleDictionaryRecordCount));
-                    recordsByDictionary.set(dictionary, [record]);
+                    recordsByShard = new Map();
+                    recordsByShard.set(this._getShardFileName(firstDictionaryName, normalizedContentDictName), singleDictionaryRecords.slice(0, singleDictionaryRecordCount));
+                    recordsByShard.set(this._getShardFileName(dictionary, normalizedContentDictName), [record]);
                 }
             } else {
-                let dictionaryRecords = recordsByDictionary.get(dictionary);
+                const shardFileName = this._getShardFileName(dictionary, normalizedContentDictName);
+                let dictionaryRecords = recordsByShard.get(shardFileName);
                 if (typeof dictionaryRecords === 'undefined') {
                     dictionaryRecords = [];
-                    recordsByDictionary.set(dictionary, dictionaryRecords);
+                    recordsByShard.set(shardFileName, dictionaryRecords);
                 }
                 dictionaryRecords.push(record);
             }
@@ -721,8 +768,8 @@ export class TermRecordOpfsStore {
         ) ?
             getTermRecordPreinternedPlan(rows) :
             null;
-        if (recordsByDictionary === null) {
-            const state = await this._getOrCreateShardState(firstDictionaryName);
+        if (recordsByShard === null) {
+            const state = await this._getOrCreateShardState(firstDictionaryName, normalizedContentDictName);
             if (state !== null) {
                 const metrics = await this._encodeAndAppendChunkForState(state, singleDictionaryRecords, preinternedPlan);
                 encodeMs += metrics.encodeMs;
@@ -730,8 +777,9 @@ export class TermRecordOpfsStore {
             }
             return {buildRecordsMs, encodeMs, appendWriteMs};
         }
-        for (const [dictionaryName, dictionaryRecords] of recordsByDictionary) {
-            const state = await this._getOrCreateShardState(dictionaryName);
+        for (const dictionaryRecords of recordsByShard.values()) {
+            const firstRecord = dictionaryRecords[0];
+            const state = await this._getOrCreateShardState(firstRecord.dictionary, firstRecord.entryContentDictName);
             if (state === null) { continue; }
             const metrics = await this._encodeAndAppendChunkForState(state, dictionaryRecords, preinternedPlan);
             encodeMs += metrics.encodeMs;
@@ -786,19 +834,47 @@ export class TermRecordOpfsStore {
             this._indexDirty = true;
         }
         const buildRecordsMs = safePerformance.now() - tBuildStart;
-        const state = await this._getOrCreateShardState(chunk.dictionary);
-        if (state === null) {
-            return {buildRecordsMs, encodeMs: 0, appendWriteMs: 0};
+        /** @type {Map<string, number[]>} */
+        const rowIndexesByContentDictName = new Map();
+        for (let i = 0; i < count; ++i) {
+            const key = contentDictNames[i] ?? 'raw';
+            const indexes = rowIndexesByContentDictName.get(key);
+            if (typeof indexes === 'undefined') {
+                rowIndexesByContentDictName.set(key, [i]);
+            } else {
+                indexes.push(i);
+            }
         }
-        const metrics = await this._encodeAndAppendArtifactChunkForState(
-            state,
-            chunk,
-            firstId,
-            contentOffsets,
-            contentLengths,
-            chunk.termRecordPreinternedPlan ?? null,
-        );
-        return {buildRecordsMs, encodeMs: metrics.encodeMs, appendWriteMs: metrics.appendWriteMs};
+        let encodeMs = 0;
+        let appendWriteMs = 0;
+        for (const [contentDictName, rowIndexes] of rowIndexesByContentDictName) {
+            const state = await this._getOrCreateShardState(chunk.dictionary, contentDictName);
+            if (state === null) { continue; }
+            /** @type {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} */
+            const chunkSlice = {
+                dictionary: chunk.dictionary,
+                rowCount: rowIndexes.length,
+                expressionBytesList: rowIndexes.map((index) => chunk.expressionBytesList[index]),
+                readingBytesList: rowIndexes.map((index) => chunk.readingBytesList[index]),
+                readingEqualsExpressionList: rowIndexes.map((index) => chunk.readingEqualsExpressionList[index]),
+                scoreList: rowIndexes.map((index) => chunk.scoreList[index]),
+                sequenceList: rowIndexes.map((index) => chunk.sequenceList[index]),
+                termRecordPreinternedPlan: selectTermRecordPreinternedPlan(chunk.termRecordPreinternedPlan ?? null, rowIndexes),
+            };
+            const groupContentOffsets = rowIndexes.map((index) => contentOffsets[index]);
+            const groupContentLengths = rowIndexes.map((index) => contentLengths[index]);
+            const metrics = await this._encodeAndAppendArtifactChunkForState(
+                state,
+                chunkSlice,
+                firstId + rowIndexes[0],
+                groupContentOffsets,
+                groupContentLengths,
+                chunkSlice.termRecordPreinternedPlan ?? null,
+            );
+            encodeMs += metrics.encodeMs;
+            appendWriteMs += metrics.appendWriteMs;
+        }
+        return {buildRecordsMs, encodeMs, appendWriteMs};
     }
 
     /**
@@ -966,7 +1042,7 @@ export class TermRecordOpfsStore {
         /** @type {Set<string>} */
         const expectedFileNamesFromRecords = new Set();
         for (const record of this._recordsById.values()) {
-            const fileName = this._getShardFileName(record.dictionary);
+            const fileName = this._getShardFileName(record.dictionary, record.entryContentDictName);
             expectedFileNames.add(fileName);
             expectedFileNamesFromRecords.add(fileName);
         }
@@ -1715,32 +1791,34 @@ export class TermRecordOpfsStore {
             }
         }
 
-        /** @type {Map<string, TermRecord[]>} */
-        const recordsByDictionary = new Map();
+        /** @type {Map<string, {dictionaryName: string, contentDictName: string, records: TermRecord[]}>} */
+        const recordsByShard = new Map();
         const orderedRecords = [...this._recordsById.values()].sort((a, b) => a.id - b.id);
         for (const record of orderedRecords) {
-            const list = recordsByDictionary.get(record.dictionary);
-            if (typeof list === 'undefined') {
-                recordsByDictionary.set(record.dictionary, [record]);
+            const contentDictName = record.entryContentDictName ?? 'raw';
+            const fileName = this._getShardFileName(record.dictionary, contentDictName);
+            const shard = recordsByShard.get(fileName);
+            if (typeof shard === 'undefined') {
+                recordsByShard.set(fileName, {dictionaryName: record.dictionary, contentDictName, records: [record]});
             } else {
-                list.push(record);
+                shard.records.push(record);
             }
         }
 
-        for (const [dictionaryName, records] of recordsByDictionary) {
+        for (const [fileName, shard] of recordsByShard) {
+            const {contentDictName, records} = shard;
             const payload = await this._encodeRecords(records);
-            const fileName = this._getShardFileName(dictionaryName);
             const fileHandle = await this._recordsDirectoryHandle.getFileHandle(fileName, {create: true});
             const writable = await fileHandle.createWritable();
             await writable.truncate(0);
             let fileLength = 0;
             if (payload.byteLength > 0) {
-                const output = this._withBinaryHeader(payload, records[0]?.entryContentDictName ?? 'raw');
+                const output = this._withBinaryHeader(payload, contentDictName);
                 await writable.write(output);
                 fileLength = output.byteLength;
             }
             await writable.close();
-            this._shardStateByFileName.set(fileName, this._createShardState(fileName, fileHandle, fileLength, records[0]?.entryContentDictName ?? null));
+            this._shardStateByFileName.set(fileName, this._createShardState(fileName, fileHandle, fileLength, contentDictName));
         }
     }
 
@@ -1877,20 +1955,22 @@ export class TermRecordOpfsStore {
 
     /**
      * @param {string} dictionaryName
+     * @param {string} [contentDictName='raw']
      * @returns {Promise<TermRecordShardState|null>}
      */
-    async _getOrCreateShardState(dictionaryName) {
+    async _getOrCreateShardState(dictionaryName, contentDictName = 'raw') {
         if (this._recordsDirectoryHandle === null) {
             return null;
         }
-        const fileName = this._getShardFileName(dictionaryName);
+        const normalizedContentDictName = this._normalizeContentDictName(contentDictName);
+        const fileName = this._getShardFileName(dictionaryName, normalizedContentDictName);
         const existing = this._shardStateByFileName.get(fileName);
         if (typeof existing !== 'undefined') {
             return existing;
         }
         const fileHandle = await this._recordsDirectoryHandle.getFileHandle(fileName, {create: true});
         const file = await fileHandle.getFile();
-        const created = this._createShardState(fileName, fileHandle, file.size, this._getDictionarySharedContentDictName(dictionaryName));
+        const created = this._createShardState(fileName, fileHandle, file.size, normalizedContentDictName);
         this._shardStateByFileName.set(fileName, created);
         return created;
     }
@@ -1925,17 +2005,22 @@ export class TermRecordOpfsStore {
         if (this._recordsDirectoryHandle === null) {
             return;
         }
-        const fileName = this._getShardFileName(dictionaryName);
-        const state = this._shardStateByFileName.get(fileName);
-        if (typeof state !== 'undefined') {
-            await this._flushPendingWritesForShard(state);
-            await this._closeShardWritable(state);
-            this._shardStateByFileName.delete(fileName);
-        }
-        try {
-            await this._recordsDirectoryHandle.removeEntry(fileName);
-        } catch (_) {
-            // NOP
+        const fileNames = await this._listShardFileNames();
+        for (const fileName of fileNames) {
+            if (this._decodeDictionaryNameFromShardFileName(fileName) !== dictionaryName) {
+                continue;
+            }
+            const state = this._shardStateByFileName.get(fileName);
+            if (typeof state !== 'undefined') {
+                await this._flushPendingWritesForShard(state);
+                await this._closeShardWritable(state);
+                this._shardStateByFileName.delete(fileName);
+            }
+            try {
+                await this._recordsDirectoryHandle.removeEntry(fileName);
+            } catch (_) {
+                // NOP
+            }
         }
     }
 
@@ -1962,15 +2047,6 @@ export class TermRecordOpfsStore {
      * @param {string} dictionaryName
      * @returns {string|null}
      */
-    _getDictionarySharedContentDictName(dictionaryName) {
-        for (const record of this._recordsById.values()) {
-            if (record.dictionary === dictionaryName) {
-                return record.entryContentDictName;
-            }
-        }
-        return null;
-    }
-
     /**
      * @returns {number}
      */
@@ -2081,10 +2157,17 @@ export class TermRecordOpfsStore {
 
     /**
      * @param {string} dictionaryName
+     * @param {string} [contentDictName='raw']
      * @returns {string}
      */
-    _getShardFileName(dictionaryName) {
-        return `${SHARD_FILE_PREFIX}${encodeURIComponent(dictionaryName)}${SHARD_FILE_SUFFIX}`;
+    _getShardFileName(dictionaryName, contentDictName = 'raw') {
+        const normalizedContentDictName = this._normalizeContentDictName(contentDictName);
+        const encodedDictionaryName = encodeURIComponent(dictionaryName);
+        if (normalizedContentDictName === 'raw') {
+            return `${SHARD_FILE_PREFIX}${encodedDictionaryName}${SHARD_FILE_SUFFIX}`;
+        }
+        const encodedContentDictName = encodeURIComponent(normalizedContentDictName);
+        return `${SHARD_FILE_PREFIX}${encodedDictionaryName.length}${SHARD_FILE_CONTENT_DICT_SEPARATOR}${encodedDictionaryName}${encodedContentDictName}${SHARD_FILE_SUFFIX}`;
     }
 
     /**
@@ -2103,10 +2186,49 @@ export class TermRecordOpfsStore {
         if (!this._isShardFileName(fileName)) {
             return null;
         }
+        return this._decodeShardInfoFromShardFileName(fileName)?.dictionaryName ?? null;
+    }
+
+    /**
+     * @param {string|null|undefined} contentDictName
+     * @returns {string}
+     */
+    _normalizeContentDictName(contentDictName) {
+        return (typeof contentDictName === 'string' && contentDictName.length > 0) ? contentDictName : 'raw';
+    }
+
+    /**
+     * @param {string} fileName
+     * @returns {{dictionaryName: string, contentDictName: string}|null}
+     */
+    _decodeShardInfoFromShardFileName(fileName) {
+        if (!this._isShardFileName(fileName)) {
+            return null;
+        }
         const encoded = fileName.slice(SHARD_FILE_PREFIX.length, fileName.length - SHARD_FILE_SUFFIX.length);
+        const separatorIndex = encoded.indexOf(SHARD_FILE_CONTENT_DICT_SEPARATOR);
         try {
-            const decoded = decodeURIComponent(encoded);
-            return decoded.length > 0 ? decoded : null;
+            if (separatorIndex <= 0) {
+                const dictionaryName = decodeURIComponent(encoded);
+                return dictionaryName.length > 0 ? {dictionaryName, contentDictName: 'raw'} : null;
+            }
+            const dictionaryLength = Number.parseInt(encoded.slice(0, separatorIndex), 10);
+            if (!Number.isFinite(dictionaryLength) || dictionaryLength < 0) {
+                return null;
+            }
+            const payload = encoded.slice(separatorIndex + SHARD_FILE_CONTENT_DICT_SEPARATOR.length);
+            if (payload.length < dictionaryLength) {
+                return null;
+            }
+            const dictionaryName = decodeURIComponent(payload.slice(0, dictionaryLength));
+            const contentDictName = decodeURIComponent(payload.slice(dictionaryLength));
+            if (dictionaryName.length === 0) {
+                return null;
+            }
+            return {
+                dictionaryName,
+                contentDictName: contentDictName.length > 0 ? contentDictName : 'raw',
+            };
         } catch (_) {
             return null;
         }
