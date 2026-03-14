@@ -74,6 +74,79 @@ const ENTRY_CONTENT_DICT_NAME_FLAG_READING_REVERSE_EQUALS_EXPRESSION_REVERSE = 0
 const ENTRY_CONTENT_DICT_NAME_FLAGS_MASK = 0x8000;
 const ENTRY_CONTENT_DICT_NAME_VALUE_MASK = 0x7fff;
 
+class DenseIdRecordStore {
+    /** */
+    constructor() {
+        /** @type {(TermRecord|undefined)[]} */
+        this._records = [];
+        /** @type {number} */
+        this.size = 0;
+    }
+
+    /** */
+    clear() {
+        this._records = [];
+        this.size = 0;
+    }
+
+    /**
+     * @param {number} id
+     * @param {TermRecord} record
+     * @returns {DenseIdRecordStore}
+     */
+    set(id, record) {
+        if (typeof this._records[id] === 'undefined') {
+            ++this.size;
+        }
+        this._records[id] = record;
+        return this;
+    }
+
+    /**
+     * @param {number} id
+     * @returns {TermRecord|undefined}
+     */
+    get(id) {
+        return this._records[id];
+    }
+
+    /**
+     * @param {number} id
+     * @returns {boolean}
+     */
+    delete(id) {
+        if (typeof this._records[id] === 'undefined') {
+            return false;
+        }
+        this._records[id] = void 0;
+        --this.size;
+        return true;
+    }
+
+    /**
+     * @returns {Generator<number, void, void>}
+     */
+    *keys() {
+        for (let i = 1, ii = this._records.length; i < ii; ++i) {
+            if (typeof this._records[i] !== 'undefined') {
+                yield i;
+            }
+        }
+    }
+
+    /**
+     * @returns {Generator<TermRecord, void, void>}
+     */
+    *values() {
+        for (let i = 1, ii = this._records.length; i < ii; ++i) {
+            const record = this._records[i];
+            if (typeof record !== 'undefined') {
+                yield record;
+            }
+        }
+    }
+}
+
 /**
  * @typedef {object} TermRecord
  * @property {number} id
@@ -115,8 +188,8 @@ export class TermRecordOpfsStore {
         this._flushThresholdBytes = this._computeFlushThresholdBytes();
         /** @type {boolean} */
         this._importSessionActive = false;
-        /** @type {Map<number, TermRecord>} */
-        this._recordsById = new Map();
+        /** @type {DenseIdRecordStore} */
+        this._recordsById = new DenseIdRecordStore();
         /** @type {number} */
         this._nextId = 1;
         /** @type {Map<string, {expression: Map<string, number[]>, reading: Map<string, number[]>, expressionReverse: Map<string, number[]>, readingReverse: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}>} */
