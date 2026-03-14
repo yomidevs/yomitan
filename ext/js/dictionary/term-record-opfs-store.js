@@ -90,6 +90,17 @@ class DenseIdRecordStore {
     }
 
     /**
+     * @param {number} maxId
+     * @returns {void}
+     */
+    ensureCapacity(maxId) {
+        if (maxId < 0) { return; }
+        const requiredLength = maxId + 1;
+        if (this._records.length >= requiredLength) { return; }
+        this._records.length = requiredLength;
+    }
+
+    /**
      * @param {number} id
      * @param {TermRecord} record
      * @returns {DenseIdRecordStore}
@@ -744,6 +755,7 @@ export class TermRecordOpfsStore {
         }
         const tBuildStart = safePerformance.now();
         const firstId = this._nextId;
+        this._recordsById.ensureCapacity(firstId + count - 1);
         const existingIndex = this._deferIndexBuild ? void 0 : this._indexByDictionary.get(chunk.dictionary);
         for (let i = 0; i < count; ++i) {
             const id = this._nextId++;
