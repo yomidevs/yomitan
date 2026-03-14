@@ -829,13 +829,9 @@ export class TermRecordOpfsStore {
             const record = {
                 id,
                 dictionary: chunk.dictionary,
-                expression: '',
-                reading: '',
                 readingEqualsExpression: chunk.readingEqualsExpressionList[i] === true,
                 expressionBytes: chunk.expressionBytesList[i],
                 readingBytes: chunk.readingEqualsExpressionList[i] === true ? void 0 : chunk.readingBytesList[i],
-                expressionReverse: null,
-                readingReverse: null,
                 entryContentOffset: contentOffsets[i],
                 entryContentLength: contentLengths[i],
                 entryContentDictName: contentDictNames[i] ?? 'raw',
@@ -2327,7 +2323,7 @@ export class TermRecordOpfsStore {
         } else {
             readingList.push(record.id);
         }
-        if (record.expressionReverse === null) {
+        if (record.expressionReverse == null) {
             record.expressionReverse = this._reverseString(record.expression);
         }
         if (record.expressionReverse !== null) {
@@ -2338,7 +2334,7 @@ export class TermRecordOpfsStore {
                 expressionReverseList.push(record.id);
             }
         }
-        if (record.readingReverse === null) {
+        if (record.readingReverse == null) {
             record.readingReverse = record.reading === record.expression ?
                 record.expressionReverse :
                 this._reverseString(record.reading);
@@ -2375,14 +2371,19 @@ export class TermRecordOpfsStore {
      * @returns {void}
      */
     _ensureDecodedRecordStrings(record) {
-        if (record.expression.length === 0 && record.expressionBytes instanceof Uint8Array && record.expressionBytes.byteLength > 0) {
+        if ((typeof record.expression !== 'string' || record.expression.length === 0) && record.expressionBytes instanceof Uint8Array && record.expressionBytes.byteLength > 0) {
             record.expression = this._decodeString(record.expressionBytes, 0, record.expressionBytes.byteLength);
         }
-        if (record.reading.length === 0) {
+        if (typeof record.expression !== 'string') {
+            record.expression = '';
+        }
+        if (typeof record.reading !== 'string' || record.reading.length === 0) {
             if (record.readingEqualsExpression === true) {
                 record.reading = record.expression;
             } else if (record.readingBytes instanceof Uint8Array && record.readingBytes.byteLength > 0) {
                 record.reading = this._decodeString(record.readingBytes, 0, record.readingBytes.byteLength);
+            } else if (typeof record.reading !== 'string') {
+                record.reading = '';
             }
         }
     }
