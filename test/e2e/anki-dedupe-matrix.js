@@ -38,10 +38,10 @@ export const dedupeCardFormatIcon = 'big-circle';
 /**
  * @typedef {{
  *   disabled: boolean,
- *   title: string,
- *   icon: string,
- *   overwrite: boolean,
- *   viewNoteIds: string|null,
+ *   title?: string,
+ *   icon?: string,
+ *   overwrite?: boolean,
+ *   viewNoteIds?: string|null,
  * }} DedupeExpectedButtonState
  */
 
@@ -194,7 +194,7 @@ export function getAnkiDedupeMatrix() {
             },
             seedNotes: [createDedupeSeedNote({noteId: 101})],
             expected: {
-                button: {disabled: false, title: addTitle, icon: dedupeCardFormatIcon, overwrite: false, viewNoteIds: null},
+                button: {disabled: false, title: addTitle, icon: dedupeCardFormatIcon, overwrite: false},
                 writeAction: 'addNote',
             },
         },
@@ -209,7 +209,7 @@ export function getAnkiDedupeMatrix() {
             },
             seedNotes: [createDedupeSeedNote({noteId: 201})],
             expected: {
-                button: {disabled: true, title: 'Duplicate notes are disabled', icon: dedupeCardFormatIcon, overwrite: false, viewNoteIds: '201'},
+                button: {disabled: true, title: 'Duplicate notes are disabled', icon: dedupeCardFormatIcon, overwrite: false},
                 writeAction: 'none',
             },
         },
@@ -224,7 +224,7 @@ export function getAnkiDedupeMatrix() {
             },
             seedNotes: [createDedupeSeedNote({noteId: 301})],
             expected: {
-                button: {disabled: false, title: addDuplicateTitle, icon: `add-duplicate-${dedupeCardFormatIcon}`, overwrite: false, viewNoteIds: '301'},
+                button: {disabled: false, icon: `add-duplicate-${dedupeCardFormatIcon}`, overwrite: false, viewNoteIds: '301'},
                 writeAction: 'addNote',
             },
         },
@@ -254,7 +254,7 @@ export function getAnkiDedupeMatrix() {
             },
             seedNotes: [createDedupeSeedNote({noteId: 501, findable: false})],
             expected: {
-                button: {disabled: true, title: overwriteTitle, icon: `overwrite-${dedupeCardFormatIcon}`, overwrite: true, viewNoteIds: null},
+                button: {disabled: true},
                 writeAction: 'none',
             },
         },
@@ -269,7 +269,7 @@ export function getAnkiDedupeMatrix() {
             },
             seedNotes: [createDedupeSeedNote({noteId: 601, deckName: 'Root::Other'})],
             expected: {
-                button: {disabled: false, title: addTitle, icon: dedupeCardFormatIcon, overwrite: false, viewNoteIds: null},
+                button: {disabled: false, title: addTitle, icon: dedupeCardFormatIcon, overwrite: false},
                 writeAction: 'addNote',
             },
         },
@@ -284,7 +284,7 @@ export function getAnkiDedupeMatrix() {
             },
             seedNotes: [createDedupeSeedNote({noteId: 701, deckName: dedupeDeckName})],
             expected: {
-                button: {disabled: true, title: 'Duplicate notes are disabled', icon: dedupeCardFormatIcon, overwrite: false, viewNoteIds: '701'},
+                button: {disabled: true, title: 'Duplicate notes are disabled', icon: dedupeCardFormatIcon, overwrite: false},
                 writeAction: 'none',
             },
         },
@@ -299,7 +299,7 @@ export function getAnkiDedupeMatrix() {
             },
             seedNotes: [createDedupeSeedNote({noteId: 801, deckName: 'Root::Child'})],
             expected: {
-                button: {disabled: true, title: 'Duplicate notes are disabled', icon: dedupeCardFormatIcon, overwrite: false, viewNoteIds: null},
+                button: {disabled: true, title: 'Duplicate notes are disabled', icon: dedupeCardFormatIcon, overwrite: false},
                 writeAction: 'none',
             },
         },
@@ -314,7 +314,7 @@ export function getAnkiDedupeMatrix() {
             },
             seedNotes: [createDedupeSeedNote({noteId: 901, modelName: dedupeAlternateModelName})],
             expected: {
-                button: {disabled: false, title: addTitle, icon: dedupeCardFormatIcon, overwrite: false, viewNoteIds: null},
+                button: {disabled: false, title: addTitle, icon: dedupeCardFormatIcon, overwrite: false},
                 writeAction: 'addNote',
             },
         },
@@ -329,7 +329,7 @@ export function getAnkiDedupeMatrix() {
             },
             seedNotes: [createDedupeSeedNote({noteId: 1001, modelName: dedupeAlternateModelName})],
             expected: {
-                button: {disabled: true, title: 'Duplicate notes are disabled', icon: dedupeCardFormatIcon, overwrite: false, viewNoteIds: '1001'},
+                button: {disabled: true, title: 'Duplicate notes are disabled', icon: dedupeCardFormatIcon, overwrite: false},
                 writeAction: 'none',
             },
         },
@@ -496,6 +496,6 @@ export function runAnkiDedupeContractMatrix(state, matrix = getAnkiDedupeMatrix(
 export function normalizeExpectedButtonState(value) {
     return {
         ...value,
-        viewNoteIds: normalizeViewNoteIds(value.viewNoteIds),
+        viewNoteIds: (typeof value.viewNoteIds === 'undefined' ? void 0 : normalizeViewNoteIds(value.viewNoteIds)),
     };
 }

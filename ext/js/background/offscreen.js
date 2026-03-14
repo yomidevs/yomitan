@@ -23,6 +23,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {sanitizeCSS} from '../core/utilities.js';
+import {base64ToArrayBuffer} from '../data/array-buffer-util.js';
 import {DictionaryWorker} from '../dictionary/dictionary-worker.js';
 import {WebExtension} from '../extension/web-extension.js';
 
@@ -231,7 +232,7 @@ export class Offscreen {
     async _importDictionaryArchiveHandler({archiveContent, importDetails}) {
         const dictionaryWorker = new DictionaryWorker({reuseWorker: false});
         try {
-            const result = await dictionaryWorker.importDictionary(archiveContent, importDetails, null);
+            const result = await dictionaryWorker.importDictionary(base64ToArrayBuffer(archiveContent), importDetails, null);
             return {
                 ...result,
                 errors: result.errors.map((error) => ExtensionError.serialize(error)),

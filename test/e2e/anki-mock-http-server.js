@@ -71,7 +71,7 @@ export async function startAnkiMockHttpServer(mockState) {
             try {
                 const requestBody = await readJsonBody(request);
                 const {result, error} = mockState.handleRequestBody(requestBody);
-                const body = JSON.stringify({result, error});
+                const body = JSON.stringify(error === null ? result : {error});
                 response.writeHead(200, {
                     ...headers,
                     'Content-Type': 'application/json; charset=utf-8',
@@ -80,7 +80,7 @@ export async function startAnkiMockHttpServer(mockState) {
                 response.end(body);
             } catch (e) {
                 const message = e instanceof Error ? e.message : String(e);
-                const body = JSON.stringify({result: null, error: message});
+                const body = JSON.stringify({error: message});
                 response.writeHead(200, {
                     ...headers,
                     'Content-Type': 'application/json; charset=utf-8',

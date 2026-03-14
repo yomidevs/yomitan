@@ -128,7 +128,13 @@ export class OffscreenProxy {
      */
     async importDictionaryArchive(archiveContent, importDetails) {
         const result = /** @type {{result: import('dictionary-importer').Summary | null, errors: import('core').SerializedError[], debug?: unknown}} */ (
-            await this.sendMessagePromise({action: 'importDictionaryArchiveOffscreen', params: {archiveContent, importDetails}})
+            await this.sendMessagePromise({
+                action: 'importDictionaryArchiveOffscreen',
+                params: {
+                    archiveContent: arrayBufferToBase64(archiveContent),
+                    importDetails,
+                },
+            })
         );
         return {
             ...result,

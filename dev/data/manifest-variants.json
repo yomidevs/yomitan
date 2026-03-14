@@ -171,6 +171,13 @@
             "fileName": "manabitan-chrome-playwright.zip",
             "modifications": [
                 {
+                    "action": "set",
+                    "path": [
+                        "key"
+                    ],
+                    "value": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCVT50WLFmgMjARRAMqPSEtvAUYW/HB0Dh77LH4+wU+dOYI/YOEOXMOK2mG7KCQ2F7IhE7x1bU8ndIi9I9QXNNXnX8ycBv1Jgg4kYR6qd+LLkCaZDcGZkzt4+Cp9BR28Tr5BDqCAtdNggLU1gpptFQ74/dPcEz7obnCZ96XTiQi6QIDAQAB"
+                },
+                {
                     "action": "remove",
                     "path": [
                         "optional_permissions"

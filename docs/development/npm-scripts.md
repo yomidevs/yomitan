@@ -34,7 +34,7 @@ Scripts can be executed by running `npm run <name>`.
 
   > `adb` is required to be installed on your computer for this command to work!
 
-  Builds for Chromium and then uses `adb` to `push` the built zip file over to `/sdcard/yomitan`. You can then open up Kiwi Browser on the target phone and install the extension through that zip file.
+  Builds for Chromium and then uses `adb` to `push` the built zip file over to `/sdcard/yomitan/manabitan-kiwi-browser.zip`. You can then open up Kiwi Browser on the target phone and install the extension through that zip file.
 
 - `test`
   Runs all of the tests.
@@ -109,6 +109,10 @@ Scripts can be executed by running `npm run <name>`.
 - `test:playwright:integration`
   Runs Playwright integration tests in Chromium.
 
+- `test:playwright:integration:stress`
+  Repeats the Chromium Playwright integration lane multiple consecutive times to catch flake in the happy-path coverage.
+  Set `MANABITAN_REPEAT_COUNT` to override the default repeat count of `5`.
+
 - `test:e2e:firefox-extension`
   Runs Firefox extension end-to-end validation for dictionary imports (installs the extension, imports two dictionaries, and verifies both remain installed).
   Prerequisites:
@@ -118,6 +122,26 @@ Scripts can be executed by running `npm run <name>`.
   - Node.js 22
   - `selenium-webdriver` installed (`npm install --no-save selenium-webdriver@4.38.0`)
   - a built Firefox `.xpi` at `builds/manabitan-firefox-dev.xpi` (or set `MANABITAN_FIREFOX_XPI` to override)
+
+- `test:e2e:firefox-happy-path`
+  Runs a focused Firefox happy-path end-to-end flow using Selenium and a mocked AnkiConnect server.
+  The flow imports three dictionaries through the real settings UI, enables/configures Anki through the real settings UI, searches a shared term, verifies the results can be scrolled to observe all imported dictionaries, and saves a note from the search UI.
+
+  Prerequisites:
+
+  - Firefox installed
+  - `geckodriver` on `PATH`
+  - Node.js 22
+  - `selenium-webdriver` installed (`npm install --no-save selenium-webdriver@4.38.0`)
+  - a built Firefox addon package at `builds/manabitan-firefox-dev.zip` or `builds/manabitan-firefox-dev.xpi` (or set `MANABITAN_FIREFOX_XPI`)
+
+  Reports:
+
+  - `builds/firefox-happy-path-e2e-report.html` (+ `.json`)
+
+- `test:e2e:firefox-happy-path:stress`
+  Repeats the Firefox happy-path lane multiple consecutive times to catch intermittent failures.
+  Set `MANABITAN_REPEAT_COUNT` to override the default repeat count of `5`.
 
 - `test:e2e:chromium-anki-dedupe`
   Runs the dedicated Chromium Anki deduplication matrix using Playwright and a deterministic local mocked AnkiConnect endpoint.
@@ -137,6 +161,21 @@ Scripts can be executed by running `npm run <name>`.
 
   - `builds/chromium-e2e-anki-dedupe-report.html` (+ `.json`)
   - `builds/extension-e2e-anki-dedupe-report.html` (combined desktop tabs)
+
+- `test:e2e:chromium-android-extension`
+  Runs Chromium-on-Android smoke validation using Kiwi Browser as the Android Chromium host.
+  This lane verifies the packaged Chromium extension archive is structurally valid, stages it onto a connected Android device through `adb`, and confirms Kiwi launches successfully after the archive is pushed.
+  It does not claim automatic extension installation inside Android Chrome, because Chrome for Android does not support extensions and Kiwi installation is still user-mediated.
+
+  Prerequisites:
+
+  - `adb` installed and a connected device/emulator.
+  - Kiwi Browser installed on device, or set `MANABITAN_ANDROID_CHROMIUM_PACKAGE` to another supported Chromium package.
+  - built Chromium extension archive (`builds/manabitan-chrome-dev.zip` or `builds/manabitan-chrome.zip`), or set `MANABITAN_ANDROID_CHROMIUM_ZIP`.
+
+  Reports:
+
+  - `builds/chromium-android-e2e-report.html` (+ `.json`)
 
 - `test:e2e:firefox-anki-dedupe`
   Runs the dedicated Firefox Anki deduplication matrix using Selenium plus the same deterministic mocked AnkiConnect endpoint and expected-result matrix as Chromium.
@@ -174,12 +213,27 @@ Scripts can be executed by running `npm run <name>`.
 
   - `builds/firefox-android-e2e-anki-dedupe-report.html` (+ `.json`)
 
+- `test:e2e:chromium-android-anki-dedupe`
+  Runs Chromium-on-Android validation as Kiwi device smoke plus the same maximal dedupe matrix executed as protocol-level contract checks using the shared mock/state model.
+  This lane intentionally does not claim Android UI automation for extension save-note behavior; it verifies the Android Chromium host is reachable and that the dedupe write contract remains correct.
+
+  Prerequisites:
+
+  - `adb` installed and a connected device/emulator.
+  - Kiwi Browser installed on device, or set `MANABITAN_ANDROID_CHROMIUM_PACKAGE`.
+  - built Chromium extension archive (`builds/manabitan-chrome-dev.zip` or `builds/manabitan-chrome.zip`), or set `MANABITAN_ANDROID_CHROMIUM_ZIP`.
+
+  Reports:
+
+  - `builds/chromium-android-e2e-anki-dedupe-report.html` (+ `.json`)
+
 - `test:e2e:anki-dedupe`
   Nightly-grade aggregate launcher for the full dedupe coverage lanes:
 
   - Chromium UI matrix (`test:e2e:chromium-anki-dedupe`)
   - Firefox UI matrix (`test:e2e:firefox-anki-dedupe`)
   - Firefox Android smoke + protocol contract matrix (`test:e2e:firefox-android-anki-dedupe`)
+  - Chromium Android smoke + protocol contract matrix (`test:e2e:chromium-android-anki-dedupe`)
 
 - `test:build`
   Performs a dry run of the build process without generating any files.

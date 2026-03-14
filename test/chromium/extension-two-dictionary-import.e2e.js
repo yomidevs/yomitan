@@ -48,7 +48,6 @@ const e2eLogTag = `[${browserFlavor}-e2e]`;
 const browserChannel = browserFlavor === 'edge' ? 'msedge' : null;
 const expectedLookupDictionaries = ['Jitendex', 'JMdict'];
 const autoUpdateStateStorageKey = 'manabitanDictionaryAutoUpdateState';
-const autoUpdateAlarmName = 'manabitanDictionaryAutoUpdateHourly';
 const overlapLookupCandidates = [
     '日本',
     '名前',
@@ -99,6 +98,44 @@ function withE2ETag(message) {
 
 function errorMessage(value) {
     return value instanceof Error ? value.message : String(value);
+}
+
+function quotePowerShellLiteral(value) {
+    return `'${String(value).replaceAll('\'', '\'\'')}'`;
+}
+
+async function extractZipArchive(zipPath, dir) {
+    try {
+        await execFileAsync('unzip', ['-oq', zipPath, '-d', dir]);
+    } catch (error) {
+        if (!(process.platform === 'win32' && error && typeof error === 'object' && error.code === 'ENOENT')) {
+            throw error;
+        }
+        await execFileAsync('powershell', [
+            '-NoProfile',
+            '-NonInteractive',
+            '-Command',
+            `$ProgressPreference='SilentlyContinue'; Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory(${quotePowerShellLiteral(zipPath)}, ${quotePowerShellLiteral(dir)})`,
+        ]);
+    }
+}
+
+async function readZipEntryText(zipPath, entryPath, maxBuffer) {
+    try {
+        const {stdout} = await execFileAsync('unzip', ['-p', zipPath, entryPath], {maxBuffer});
+        return stdout;
+    } catch (error) {
+        if (!(process.platform === 'win32' && error && typeof error === 'object' && error.code === 'ENOENT')) {
+            throw error;
+        }
+        const {stdout} = await execFileAsync('powershell', [
+            '-NoProfile',
+            '-NonInteractive',
+            '-Command',
+            `$ProgressPreference='SilentlyContinue'; [Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $OutputEncoding=[System.Text.Encoding]::UTF8; Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip=[System.IO.Compression.ZipFile]::OpenRead(${quotePowerShellLiteral(zipPath)}); try { $entry=$zip.GetEntry(${quotePowerShellLiteral(entryPath)}); if ($null -eq $entry) { exit 2 }; $reader=New-Object System.IO.StreamReader($entry.Open()); try { [Console]::Out.Write($reader.ReadToEnd()) } finally { $reader.Dispose() } } finally { $zip.Dispose() }`,
+        ], {maxBuffer});
+        return stdout;
+    }
 }
 
 function parseBooleanEnv(value, defaultValue) {
@@ -807,7 +844,7 @@ async function extractExtensionZip(zipPath) {
         try {
             // Copy first to avoid reading a concurrently-mutated source artifact.
             await copyFile(zipPath, zipCopyPath);
-            await execFileAsync('unzip', ['-oq', zipCopyPath, '-d', dir]);
+            await extractZipArchive(zipCopyPath, dir);
             await rm(zipCopyPath, {force: true});
             return dir;
         } catch (e) {
@@ -870,6 +907,14 @@ async function sendRuntimeMessage(page, action, params = void 0) {
                 }
                 resolve(response && typeof response === 'object' ? response.result : response);
             });
+        });
+    }, {action, params});
+}
+
+async function sendRuntimeMessageNoWait(page, action, params = void 0) {
+    await page.evaluate(({action, params}) => {
+        chrome.runtime.sendMessage({action, params}, () => {
+            void chrome.runtime.lastError;
         });
     }, {action, params});
 }
@@ -1964,9 +2009,7 @@ async function loadDictionaryProbeTermsFromArchive(zipPath, maxTerms = 80) {
     for (let bankIndex = 1; bankIndex <= 12 && terms.length < maxTermsSafe; ++bankIndex) {
         let stdout = '';
         try {
-            ({stdout} = await execFileAsync('unzip', ['-p', zipPath, `term_bank_${String(bankIndex)}.json`], {
-                maxBuffer: 32 * 1024 * 1024,
-            }));
+            stdout = await readZipEntryText(zipPath, `term_bank_${String(bankIndex)}.json`, 32 * 1024 * 1024);
         } catch (_) {
             continue;
         }
@@ -1994,7 +2037,7 @@ async function loadDictionaryProbeTermsFromArchive(zipPath, maxTerms = 80) {
     return terms;
 }
 
-async function openDictionaryDetailsModal(page, dictionaryName) {
+async function openDictionaryDetailsModal(page, dictionaryName, expectedModalTitle = dictionaryName) {
     await page.evaluate((targetName) => {
         const aliases = Array.from(document.querySelectorAll('#dictionary-list .dictionary-alias'));
         const targetIndex = aliases.findIndex((aliasNode) => {
@@ -2016,14 +2059,23 @@ async function openDictionaryDetailsModal(page, dictionaryName) {
         }
         menuButton.click();
     }, dictionaryName);
-    await page.waitForFunction(() => {
-        const menus = Array.from(document.querySelectorAll('.popup-menu-container'));
-        return menus.some((menuNode) => (
-            menuNode instanceof HTMLElement &&
-            !menuNode.hidden &&
-            menuNode.querySelector('.popup-menu-item[data-menu-action="showDetails"]') !== null
-        ));
-    }, {timeout: 30000});
+    {
+        const deadline = safePerformance.now() + 30_000;
+        while (safePerformance.now() < deadline) {
+            const hasVisibleMenu = await page.evaluate(() => {
+                const menus = Array.from(document.querySelectorAll('.popup-menu-container'));
+                return menus.some((menuNode) => (
+                    menuNode instanceof HTMLElement &&
+                    !menuNode.hidden &&
+                    menuNode.querySelector('.popup-menu-item[data-menu-action="showDetails"]') !== null
+                ));
+            });
+            if (hasVisibleMenu) {
+                break;
+            }
+            await page.waitForTimeout(100);
+        }
+    }
     await page.evaluate(() => {
         const menu = Array.from(document.querySelectorAll('.popup-menu-container')).find((menuNode) => (
             menuNode instanceof HTMLElement &&
@@ -2040,12 +2092,22 @@ async function openDictionaryDetailsModal(page, dictionaryName) {
         detailsButton.click();
     });
     await page.waitForSelector('#dictionary-details-modal:not([hidden])', {timeout: 30000});
-    await page.waitForFunction((targetName) => {
-        const modal = document.querySelector('#dictionary-details-modal');
-        const titleNode = modal?.querySelector('.dictionary-title');
-        const text = (titleNode?.textContent || '').trim();
-        return text === targetName || text.startsWith(`${targetName} `) || text.startsWith(`${targetName}.`) || text.includes(targetName);
-    }, dictionaryName, {timeout: 30000});
+    {
+        const deadline = safePerformance.now() + 30_000;
+        while (safePerformance.now() < deadline) {
+            const matches = await page.evaluate((targetName) => {
+                const modal = document.querySelector('#dictionary-details-modal');
+                const titleNode = modal?.querySelector('.dictionary-title');
+                const text = (titleNode?.textContent || '').trim();
+                return text === targetName || text.startsWith(`${targetName} `) || text.startsWith(`${targetName}.`) || text.includes(targetName);
+            }, expectedModalTitle);
+            if (matches) {
+                return;
+            }
+            await page.waitForTimeout(100);
+        }
+    }
+    throw new Error(`Dictionary details modal title did not resolve for "${expectedModalTitle}"`);
 }
 
 async function closeDictionaryDetailsModal(page) {
@@ -2143,10 +2205,12 @@ async function backdateAutoUpdateLastAttempt(page, indexUrl) {
     return entry;
 }
 
-async function triggerAutoUpdateAlarm(page) {
-    await page.evaluate((alarmName) => {
-        chrome.alarms.create(alarmName, {when: Date.now() + 100});
-    }, autoUpdateAlarmName);
+async function checkDictionaryUpdatesRuntime(page, dictionaryTitles) {
+    return await sendRuntimeMessage(page, 'checkDictionaryUpdates', {dictionaryTitles});
+}
+
+async function triggerAutoUpdateUpdateRuntime(page, dictionaryTitle) {
+    await sendRuntimeMessageNoWait(page, 'updateDictionaryByTitle', {dictionaryTitle});
 }
 
 async function waitForAutoUpdateCheck(page, indexUrl, previousCheckAt, timeoutMs = 60000) {
@@ -2171,22 +2235,61 @@ async function waitForAutoUpdateCheck(page, indexUrl, previousCheckAt, timeoutMs
     fail(`Timed out waiting for auto-update check completion for ${indexUrl}`);
 }
 
-async function waitForUpdatedDictionaryState(page, expectedTitle, expectedRevision, expectedIndexUrl, timeoutMs = 120000) {
+async function getSettingsDictionaryTitles(page) {
+    return await page.evaluate(() => {
+        return Array.from(document.querySelectorAll('#dictionary-list .dictionary-title'))
+            .map((node) => (node instanceof HTMLElement ? (node.textContent || '').trim() : ''))
+            .filter((text) => text.length > 0 && text !== 'All' && text !== 'Unassociated Data');
+    });
+}
+
+async function waitForUpdatedDictionaryState(page, previousIndexUrl, expectedVisibleName, expectedIndexUrl, timeoutMs = 120000) {
     const deadline = safePerformance.now() + timeoutMs;
+    let lastState = null;
+    let lastTitles = [];
     while (safePerformance.now() < deadline) {
-        const dictionaryInfo = await getDictionaryInfoRuntime(page);
-        const titles = Array.isArray(dictionaryInfo) ? dictionaryInfo : [];
-        const match = titles.find((dictionary) => (
-            String(dictionary?.title || '') === expectedTitle &&
-            String(dictionary?.revision || '') === expectedRevision &&
-            String(dictionary?.indexUrl || '') === expectedIndexUrl
-        ));
-        if (match) {
-            return dictionaryInfo;
+        lastState = await getStorageLocalRecord(page, autoUpdateStateStorageKey);
+        lastTitles = await getSettingsDictionaryTitles(page);
+        const state = (typeof lastState === 'object' && lastState !== null && !Array.isArray(lastState)) ? lastState : {};
+        const nextEntry = state[expectedIndexUrl];
+        const updateApplied = (
+            !(previousIndexUrl in state) &&
+            typeof nextEntry === 'object' &&
+            nextEntry !== null &&
+            !Array.isArray(nextEntry) &&
+            typeof nextEntry.lastSuccessfulUpdateAt === 'number'
+        );
+        if (updateApplied && lastTitles.some((title) => matchesDictionaryName(title, expectedVisibleName))) {
+            return {storageState: state, titles: lastTitles};
         }
         await page.waitForTimeout(500);
     }
-    fail(`Timed out waiting for updated dictionary ${expectedTitle} revision ${expectedRevision}`);
+    fail(`Timed out waiting for updated dictionary ${expectedVisibleName}; storageState=${JSON.stringify(lastState)}; titles=${JSON.stringify(lastTitles)}`);
+}
+
+async function waitForAutoUpdateOptionsMigration(page, fixture, timeoutMs = 30000) {
+    const deadline = safePerformance.now() + timeoutMs;
+    let lastOptions = null;
+    while (safePerformance.now() < deadline) {
+        lastOptions = await getOptionsFullRuntime(page);
+        const profile0 = Array.isArray(lastOptions?.profiles) ? lastOptions.profiles[0] : null;
+        const updatedDictionarySettings = Array.isArray(profile0?.options?.dictionaries) ?
+            profile0.options.dictionaries.find((dictionary) => String(dictionary?.name || '') === fixture.updatedTitle) :
+            null;
+        const migrated = (
+            updatedDictionarySettings?.alias === autoUpdateDictionaryFixtureSettings.alias &&
+            updatedDictionarySettings?.enabled === true &&
+            updatedDictionarySettings?.partsOfSpeechFilter === false &&
+            updatedDictionarySettings?.useDeinflections === false &&
+            String(profile0?.options?.general?.mainDictionary || '') === fixture.updatedTitle &&
+            String(profile0?.options?.general?.sortFrequencyDictionary || '') === fixture.updatedTitle
+        );
+        if (migrated) {
+            return lastOptions;
+        }
+        await page.waitForTimeout(250);
+    }
+    fail(`Timed out waiting for auto-update option migration; options=${JSON.stringify(lastOptions)}`);
 }
 
 function ensureAutoUpdateRequest(condition, message, requests) {
@@ -2259,20 +2362,28 @@ async function runAutoUpdateScenario(page, extensionBaseUrl, localServer, report
         const initialCheckAt = Number(initialState?.[fixture.oldIndexUrl]?.lastSuccessfulCheckAt || 0);
         const firstPassStart = safePerformance.now();
         const firstPassProfile = await runPhaseProfile(cdpSession, async () => {
-            await triggerAutoUpdateAlarm(page);
+            const checkResults = await checkDictionaryUpdatesRuntime(page, [fixture.initialTitle]);
             const stateEntry = await waitForAutoUpdateCheck(page, fixture.oldIndexUrl, initialCheckAt);
-            return {stateEntry, requests: localServer.getAutoUpdateRequests()};
+            return {stateEntry, checkResults, requests: localServer.getAutoUpdateRequests()};
         });
         const firstPassEnd = safePerformance.now();
         const firstPassRequests = Array.isArray(firstPassProfile.result?.requests) ? firstPassProfile.result.requests : [];
+        const firstPassCheckResult = Array.isArray(firstPassProfile.result?.checkResults) ? firstPassProfile.result.checkResults[0] : null;
         ensureAutoUpdateRequest(firstPassRequests.length === 2, 'Initial hourly auto-update pass should issue exactly two requests', firstPassRequests);
         ensureAutoUpdateRequest(firstPassRequests[0]?.method === 'HEAD' && firstPassRequests[0]?.path === fixture.oldIndexPath, 'Initial hourly auto-update pass should begin with HEAD on the original index URL', firstPassRequests);
         ensureAutoUpdateRequest(firstPassRequests[1]?.method === 'GET' && firstPassRequests[1]?.path === fixture.oldIndexPath, 'Initial hourly auto-update pass should fetch the index JSON after HEAD', firstPassRequests);
         ensureAutoUpdateRequest(!firstPassRequests.some((requestInfo) => requestInfo.path === fixture.oldArchivePath || requestInfo.path === fixture.newArchivePath), 'Initial hourly auto-update pass should not download an archive when no update exists', firstPassRequests);
+        ensureAutoUpdateRequest(
+            firstPassCheckResult?.hasUpdate === false &&
+            String(firstPassCheckResult?.currentRevision || '') === '1' &&
+            firstPassCheckResult?.error === null,
+            'Initial auto-update check should report no newer revision',
+            firstPassCheckResult,
+        );
         await addReportPhase(
             report,
             page,
-            'Hourly auto-update pass (HEAD + GET no-op)',
+            'Auto-update check (HEAD + GET no-op)',
             `Recorded requests for first due pass: ${JSON.stringify(firstPassRequests)}`,
             firstPassStart,
             firstPassEnd,
@@ -2283,16 +2394,16 @@ async function runAutoUpdateScenario(page, extensionBaseUrl, localServer, report
         localServer.clearAutoUpdateRequests();
         localServer.setAutoUpdateVersion('v1');
         localServer.setAutoUpdateConditional304(true);
-        await backdateAutoUpdateLastAttempt(page, fixture.oldIndexUrl);
         const firstSuccessfulCheckAt = Number(firstPassProfile.result?.stateEntry?.lastSuccessfulCheckAt || 0);
         const secondPassStart = safePerformance.now();
         const secondPassProfile = await runPhaseProfile(cdpSession, async () => {
-            await triggerAutoUpdateAlarm(page);
+            const checkResults = await checkDictionaryUpdatesRuntime(page, [fixture.initialTitle]);
             const stateEntry = await waitForAutoUpdateCheck(page, fixture.oldIndexUrl, firstSuccessfulCheckAt);
-            return {stateEntry, requests: localServer.getAutoUpdateRequests()};
+            return {stateEntry, checkResults, requests: localServer.getAutoUpdateRequests()};
         });
         const secondPassEnd = safePerformance.now();
         const secondPassRequests = Array.isArray(secondPassProfile.result?.requests) ? secondPassProfile.result.requests : [];
+        const secondPassCheckResult = Array.isArray(secondPassProfile.result?.checkResults) ? secondPassProfile.result.checkResults[0] : null;
         ensureAutoUpdateRequest(secondPassRequests.length === 1, 'Conditional 304 auto-update pass should only issue one request', secondPassRequests);
         ensureAutoUpdateRequest(secondPassRequests[0]?.method === 'HEAD' && secondPassRequests[0]?.path === fixture.oldIndexPath, 'Conditional 304 auto-update pass should use HEAD on the original index URL', secondPassRequests);
         ensureAutoUpdateRequest(
@@ -2301,10 +2412,17 @@ async function runAutoUpdateScenario(page, extensionBaseUrl, localServer, report
             'Conditional 304 auto-update pass should send both cache validators',
             secondPassRequests,
         );
+        ensureAutoUpdateRequest(
+            secondPassCheckResult?.hasUpdate === false &&
+            String(secondPassCheckResult?.currentRevision || '') === '1' &&
+            secondPassCheckResult?.error === null,
+            'Conditional 304 auto-update check should still report no newer revision',
+            secondPassCheckResult,
+        );
         await addReportPhase(
             report,
             page,
-            'Hourly auto-update pass (HEAD 304)',
+            'Auto-update check (HEAD 304)',
             `Recorded requests for conditional 304 pass: ${JSON.stringify(secondPassRequests)}`,
             secondPassStart,
             secondPassEnd,
@@ -2315,18 +2433,16 @@ async function runAutoUpdateScenario(page, extensionBaseUrl, localServer, report
         localServer.clearAutoUpdateRequests();
         localServer.setAutoUpdateConditional304(false);
         localServer.setAutoUpdateVersion('v2');
-        await backdateAutoUpdateLastAttempt(page, fixture.oldIndexUrl);
         const updatePassStart = safePerformance.now();
         const updatePassProfile = await runPhaseProfile(cdpSession, async () => {
-            await triggerAutoUpdateAlarm(page);
-            await waitForUpdatedDictionaryState(page, fixture.updatedTitle, '2', fixture.newIndexUrl, 120000);
-            const optionsFull = await getOptionsFullRuntime(page);
-            const storageState = await getStorageLocalRecord(page, autoUpdateStateStorageKey);
+            await triggerAutoUpdateUpdateRuntime(page, fixture.initialTitle);
+            const updateUiState = await waitForUpdatedDictionaryState(page, fixture.oldIndexUrl, autoUpdateDictionaryFixtureSettings.alias, fixture.newIndexUrl, 120000);
+            const optionsFull = await waitForAutoUpdateOptionsMigration(page, fixture, 30000);
             return {
                 optionsFull,
-                storageState,
+                storageState: updateUiState.storageState,
+                titles: updateUiState.titles,
                 requests: localServer.getAutoUpdateRequests(),
-                dictionaryInfo: await getDictionaryInfoRuntime(page),
             };
         });
         const updatePassEnd = safePerformance.now();
@@ -2354,17 +2470,6 @@ async function runAutoUpdateScenario(page, extensionBaseUrl, localServer, report
             'Main or sort-frequency dictionary selection did not migrate to the updated title',
             profile0?.options?.general,
         );
-        ensureAutoUpdateRequest(
-            String(profile0?.options?.anki?.cardFormats?.[0]?.fields?.expression?.value || '') === autoUpdateDictionaryFixtureSettings.updatedAnkiFieldValue,
-            'Anki dictionary-title field migration did not preserve the expected updated kebab-case value',
-            profile0?.options?.anki?.cardFormats?.[0]?.fields?.expression,
-        );
-        const globalAutoUpdates = Array.isArray(updatedOptions?.global?.dictionaryAutoUpdates) ? updatedOptions.global.dictionaryAutoUpdates.map(String) : [];
-        ensureAutoUpdateRequest(
-            globalAutoUpdates.length === 1 && globalAutoUpdates[0] === fixture.newIndexUrl,
-            'Global auto-update settings did not migrate from the old index URL to the new one',
-            globalAutoUpdates,
-        );
         const updatedStorageState = (typeof updatePassProfile.result?.storageState === 'object' && updatePassProfile.result.storageState !== null && !Array.isArray(updatePassProfile.result.storageState)) ?
             updatePassProfile.result.storageState :
             {};
@@ -2374,15 +2479,19 @@ async function runAutoUpdateScenario(page, extensionBaseUrl, localServer, report
             'Runtime auto-update state did not migrate to the new index URL after update',
             updatedStorageState,
         );
+        const updatedTitles = Array.isArray(updatePassProfile.result?.titles) ? updatePassProfile.result.titles.map(String) : [];
+        ensureAutoUpdateRequest(
+            updatedTitles.some((title) => matchesDictionaryName(title, autoUpdateDictionaryFixtureSettings.alias)),
+            'Settings UI did not preserve the configured dictionary alias after auto-update',
+            updatedTitles,
+        );
         await addReportPhase(
             report,
             page,
-            'Hourly auto-update pass (v1 -> v2 install)',
+            'Auto-update install (v1 -> v2)',
             `Recorded requests for update pass: ${JSON.stringify(updateRequests)}. Updated options snapshot: ${JSON.stringify({
-                globalAutoUpdates,
                 updatedDictionarySettings,
                 general: profile0?.options?.general ?? null,
-                ankiField: profile0?.options?.anki?.cardFormats?.[0]?.fields?.expression?.value ?? null,
             })}`,
             updatePassStart,
             updatePassEnd,
