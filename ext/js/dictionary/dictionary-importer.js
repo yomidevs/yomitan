@@ -63,8 +63,9 @@ const ADAPTIVE_TERM_BANK_WASM_ROW_CHUNK_SIZE_UPPER_BOUND_BYTES = 128 * 1024 * 10
 const ADAPTIVE_TERM_BANK_WASM_INITIAL_META_CAPACITY_DIVISOR = 18;
 const ADAPTIVE_TERM_BANK_WASM_INITIAL_CONTENT_BYTES_PER_ROW = 128;
 const REVERSE_STRING_CACHE_MAX_ENTRIES = 4096;
-const TERM_BANK_ARTIFACT_MAGIC = 'MBTB0001';
-const TERM_BANK_ARTIFACT_MAGIC_BYTES = TERM_BANK_ARTIFACT_MAGIC.length;
+const TERM_BANK_ARTIFACT_MAGIC_V1 = 'MBTB0001';
+const TERM_BANK_ARTIFACT_MAGIC_V2 = 'MBTB0002';
+const TERM_BANK_ARTIFACT_MAGIC_BYTES = TERM_BANK_ARTIFACT_MAGIC_V1.length;
 const TERM_BANK_ARTIFACT_MANIFEST_FILE = 'manabitan-import-artifact.json';
 const TERM_BANK_PACKED_ARTIFACT_FILE = 'manabitan-term-banks-packed.bin';
 const TERM_BANK_SHARED_GLOSSARY_ARTIFACT_FILE = 'manabitan-term-glossary-shared.bin';
@@ -2779,7 +2780,12 @@ export class DictionaryImporter {
             throw new Error(`Invalid term artifact payload in '${filename}': too small`);
         }
         const magic = textDecoder.decode(bytes.subarray(0, TERM_BANK_ARTIFACT_MAGIC_BYTES));
-        if (magic !== TERM_BANK_ARTIFACT_MAGIC) {
+        const artifactVersion = (
+            magic === TERM_BANK_ARTIFACT_MAGIC_V2 ?
+                2 :
+                (magic === TERM_BANK_ARTIFACT_MAGIC_V1 ? 1 : 0)
+        );
+        if (artifactVersion === 0) {
             throw new Error(`Invalid term artifact payload in '${filename}': bad magic`);
         }
         const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -2849,15 +2855,23 @@ export class DictionaryImporter {
             cursor += expressionLength;
             const readingLength = view.getUint32(cursor, true);
             cursor += 4;
-            if ((cursor + readingLength + 20) > bytes.byteLength) {
+            const trailingRowBytes = artifactVersion >= 2 ? 21 : 20;
+            if ((cursor + readingLength + trailingRowBytes) > bytes.byteLength) {
                 throw new Error(`Invalid term artifact payload in '${filename}': truncated row payload`);
             }
             const readingStart = cursor;
-            const readingMatchesExpression = (
-                readingLength > 0 &&
-                readingLength === expressionLength &&
-                byteRangeEqual(bytes, expressionStart, readingStart, expressionLength)
-            );
+            let readingMatchesExpression;
+            if (artifactVersion >= 2) {
+                const flagsOffset = cursor + readingLength;
+                const rowFlags = bytes[flagsOffset] ?? 0;
+                readingMatchesExpression = (rowFlags & 0x01) !== 0;
+            } else {
+                readingMatchesExpression = (
+                    readingLength > 0 &&
+                    readingLength === expressionLength &&
+                    byteRangeEqual(bytes, expressionStart, readingStart, expressionLength)
+                );
+            }
             if (readingMatchesExpression) {
                 ++readingEqualsExpressionCount;
             }
@@ -2878,6 +2892,9 @@ export class DictionaryImporter {
                 /** @type {number[]} */ (termRecordReadingIndexes).push(readingIndex);
             }
             cursor += readingLength;
+            if (artifactVersion >= 2) {
+                cursor += 1;
+            }
             const score = view.getInt32(cursor, true);
             if (score === 0) {
                 ++zeroScoreCount;
