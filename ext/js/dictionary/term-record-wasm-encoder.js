@@ -143,7 +143,7 @@ async function getWasm() {
 }
 
 /**
- * @param {{id: number, dictionary: string, expression: string, reading: string, readingEqualsExpression?: boolean, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
+ * @param {{id: number, dictionary: string, expression?: string, reading?: string, readingEqualsExpression?: boolean, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string|null, readingReverse?: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
  * @param {TextEncoder} textEncoder
  * @returns {Promise<Uint8Array|null>}
  */
@@ -152,7 +152,7 @@ export async function encodeTermRecordsWithWasm(records, textEncoder) {
 }
 
 /**
- * @param {{id: number, dictionary: string, expression: string, reading: string, readingEqualsExpression?: boolean, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse: string|null, readingReverse: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
+ * @param {{id: number, dictionary: string, expression?: string, reading?: string, readingEqualsExpression?: boolean, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string|null, readingReverse?: string|null, entryContentOffset: number, entryContentLength: number, entryContentDictName: string, score: number, sequence: number|null}[]} records
  * @param {TextEncoder} textEncoder
  * @param {PreinternedTermRecordPlan|null} preinternedPlan
  * @returns {Promise<Uint8Array|null>}
@@ -171,24 +171,26 @@ export async function encodeTermRecordsWithWasmPreinterned(records, textEncoder,
     const planReadingIndexes = preinternedPlan?.readingIndexes ?? null;
     let recordIndex = 0;
     for (const record of records) {
+        const expression = record.expression ?? '';
+        const reading = record.reading ?? expression;
         let expressionIndex;
         if (planExpressionIndexes instanceof Uint32Array) {
             expressionIndex = planExpressionIndexes[recordIndex];
         } else if (record.expressionBytes instanceof Uint8Array) {
-            expressionIndex = internStringBytes(record.expression, record.expressionBytes);
+            expressionIndex = internStringBytes(expression, record.expressionBytes);
         } else {
-            expressionIndex = internString(record.expression);
+            expressionIndex = internString(expression);
         }
-        const readingEqualsExpression = record.readingEqualsExpression ?? (record.reading === record.expression);
+        const readingEqualsExpression = record.readingEqualsExpression ?? (reading === expression);
         let readingIndex;
         if (planReadingIndexes instanceof Uint32Array) {
             readingIndex = planReadingIndexes[recordIndex];
         } else if (readingEqualsExpression) {
             readingIndex = expressionIndex;
         } else if (record.readingBytes instanceof Uint8Array) {
-            readingIndex = internStringBytes(record.reading, record.readingBytes);
+            readingIndex = internStringBytes(reading, record.readingBytes);
         } else {
-            readingIndex = internString(record.reading);
+            readingIndex = internString(reading);
         }
         if (
             !(preinternedPlan instanceof Object) &&
