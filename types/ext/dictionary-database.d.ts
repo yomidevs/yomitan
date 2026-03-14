@@ -45,6 +45,7 @@ export type DrawMedia<T extends MediaType = ArrayBuffer> = {index: number} & Med
 export type DatabaseTermEntry = {
     expression: string;
     reading: string;
+    readingEqualsExpression?: boolean;
     expressionBytes?: Uint8Array;
     readingBytes?: Uint8Array;
     expressionReverse?: string;

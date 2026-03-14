@@ -395,10 +395,10 @@ export class TermRecordOpfsStore {
         let singleDictionaryRecordCount = 0;
         let singleDictionaryName = '';
         for (let i = start, ii = start + count; i < ii; ++i) {
-            const row = /** @type {{dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[i]);
+            const row = /** @type {{dictionary: string, expression: string, reading: string, readingEqualsExpression?: boolean, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[i]);
             const id = this._nextId++;
             const dictionary = row.dictionary;
-            const readingEqualsExpression = row.reading === row.expression;
+            const readingEqualsExpression = row.readingEqualsExpression === true || row.reading === row.expression;
             const useLazyArtifactStrings = preinternedPlan !== null;
             /** @type {TermRecord} */
             const record = {
@@ -576,7 +576,7 @@ export class TermRecordOpfsStore {
         let singleDictionaryRecordCount = 0;
         let firstDictionaryName = '';
         for (let i = 0; i < count; ++i) {
-            const row = /** @type {{dictionary: string, expression: string, reading: string, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[start + i]);
+            const row = /** @type {{dictionary: string, expression: string, reading: string, readingEqualsExpression?: boolean, expressionBytes?: Uint8Array, readingBytes?: Uint8Array, expressionReverse?: string, readingReverse?: string, score: number, sequence?: number}} */ (rows[start + i]);
             const id = this._nextId++;
             const dictionary = row.dictionary;
             /** @type {TermRecord} */
@@ -585,6 +585,7 @@ export class TermRecordOpfsStore {
                 dictionary,
                 expression: row.expression,
                 reading: row.reading,
+                readingEqualsExpression: row.readingEqualsExpression === true,
                 expressionBytes: row.expressionBytes instanceof Uint8Array ? row.expressionBytes : void 0,
                 readingBytes: row.readingBytes instanceof Uint8Array ? row.readingBytes : void 0,
                 expressionReverse: row.expressionReverse ?? null,

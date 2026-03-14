@@ -76,26 +76,66 @@ Object.freeze(EMPTY_TERM_GLOSSARY);
 
 /**
  * @returns {{
- *   internStringBytes: (value: string, bytes: Uint8Array) => number,
+ *   internStringBytes: (bytes: Uint8Array) => number,
  *   buildPlan: (expressionIndexes: number[], readingIndexes: number[]) => import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan,
  * }}
  */
 function createArtifactTermRecordPreinternedPlanBuilder() {
-    /** @type {Map<string, number>} */
-    const stringIndexByValue = new Map();
+    /** @type {Map<string, number[]>} */
+    const stringIndexesByHash = new Map();
     /** @type {number[]} */
     const stringLengths = [];
     /** @type {Uint8Array[]} */
     const stringBytesList = [];
 
+    /**
+     * @param {Uint8Array} bytes
+     * @returns {string}
+     */
+    const createBytesKey = (bytes) => {
+        let h1 = 0x811c9dc5;
+        let h2 = 0x9e3779b9;
+        for (let i = 0, ii = bytes.byteLength; i < ii; ++i) {
+            const code = bytes[i];
+            h1 = Math.imul((h1 ^ code) >>> 0, 0x01000193);
+            h2 = Math.imul((h2 ^ code) >>> 0, 0x85ebca6b);
+            h2 = (h2 ^ (h2 >>> 13)) >>> 0;
+        }
+        return `${h1 >>> 0}:${h2 >>> 0}:${bytes.byteLength}`;
+    };
+
+    /**
+     * @param {Uint8Array} lhs
+     * @param {Uint8Array} rhs
+     * @returns {boolean}
+     */
+    const bytesEqual = (lhs, rhs) => {
+        const length = lhs.byteLength;
+        if (length !== rhs.byteLength) { return false; }
+        for (let i = 0; i < length; ++i) {
+            if (lhs[i] !== rhs[i]) { return false; }
+        }
+        return true;
+    };
+
     return {
-        internStringBytes(value, bytes) {
-            const cached = stringIndexByValue.get(value);
-            if (typeof cached === 'number') {
-                return cached;
+        internStringBytes(bytes) {
+            const key = createBytesKey(bytes);
+            const cachedIndexes = stringIndexesByHash.get(key);
+            if (Array.isArray(cachedIndexes)) {
+                for (const cachedIndex of cachedIndexes) {
+                    const cachedBytes = stringBytesList[cachedIndex];
+                    if (cachedBytes instanceof Uint8Array && bytesEqual(cachedBytes, bytes)) {
+                        return cachedIndex;
+                    }
+                }
             }
             const index = stringBytesList.length;
-            stringIndexByValue.set(value, index);
+            if (Array.isArray(cachedIndexes)) {
+                cachedIndexes.push(index);
+            } else {
+                stringIndexesByHash.set(key, [index]);
+            }
             stringLengths.push(bytes.byteLength);
             stringBytesList.push(bytes);
             return index;
@@ -2742,7 +2782,6 @@ export class DictionaryImporter {
                 throw new Error(`Invalid term artifact payload in '${filename}': truncated expression`);
             }
             const expressionStart = cursor;
-            const expression = textDecoder.decode(bytes.subarray(cursor, cursor + expressionLength));
             const expressionBytes = bytes.subarray(cursor, cursor + expressionLength);
             cursor += expressionLength;
             const readingLength = view.getUint32(cursor, true);
@@ -2761,16 +2800,13 @@ export class DictionaryImporter {
             }
             expressionLengthTotal += expressionLength;
             readingLengthTotal += readingLength;
-            const readingRaw = readingMatchesExpression ?
-                expression :
-                textDecoder.decode(bytes.subarray(cursor, cursor + readingLength));
             const readingBytes = readingMatchesExpression ?
                 expressionBytes :
                 bytes.subarray(cursor, cursor + readingLength);
-            const expressionIndex = termRecordPlanBuilder.internStringBytes(expression, expressionBytes);
+            const expressionIndex = termRecordPlanBuilder.internStringBytes(expressionBytes);
             const readingIndex = readingMatchesExpression ?
                 expressionIndex :
-                termRecordPlanBuilder.internStringBytes(readingRaw, readingBytes);
+                termRecordPlanBuilder.internStringBytes(readingBytes);
             termRecordExpressionIndexes.push(expressionIndex);
             termRecordReadingIndexes.push(readingIndex);
             cursor += readingLength;
@@ -2801,7 +2837,6 @@ export class DictionaryImporter {
             }
             const contentStart = cursor;
             const contentEnd = contentStart + contentLength;
-            const reading = readingRaw.length > 0 ? readingRaw : expression;
             const sequence = sequenceRaw >= 0 ? sequenceRaw : void 0;
             let contentBytes = bytes.subarray(contentStart, contentEnd);
             if (sharedGlossaryBaseOffset > 0 && isRawTermContentSharedGlossaryBinary(contentBytes)) {
@@ -2809,8 +2844,9 @@ export class DictionaryImporter {
             }
             /** @type {import('dictionary-database').DatabaseTermEntry} */
             const entry = {
-                expression,
-                reading,
+                expression: '',
+                reading: '',
+                readingEqualsExpression: readingMatchesExpression,
                 expressionBytes,
                 readingBytes,
                 expressionReverse: void 0,
