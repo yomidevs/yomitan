@@ -311,6 +311,10 @@ function createProfileOptionsUpdatedTestData1() {
             termDisplayMode: 'ruby',
             sortFrequencyDictionary: null,
             sortFrequencyDictionaryOrder: 'descending',
+            popupBlurByFrequencyEnabled: false,
+            popupBlurByFrequencyDictionary: null,
+            popupBlurByFrequencyThreshold: 10000,
+            popupBlurByFrequencyOrder: null,
             stickySearchHeader: false,
             enableYomitanApi: false,
             yomitanApiServer: 'http://127.0.0.1:19633',
@@ -704,7 +708,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 74,
+        version: 75,
         global: {
             database: {
                 prefixWildcardsSupported: false,
@@ -738,6 +742,58 @@ describe('OptionsUtil', () => {
         const optionsUpdated = structuredClone(await optionsUtil.update(options));
         const optionsExpected = createOptionsUpdatedTestData1();
         expect(optionsUpdated).toStrictEqual(optionsExpected);
+    });
+
+    test('PopupFrequencyBlurDefaults', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = optionsUtil.getDefault();
+        expect(options.profiles[0].options.general).toMatchObject({
+            popupBlurByFrequencyEnabled: false,
+            popupBlurByFrequencyDictionary: null,
+            popupBlurByFrequencyThreshold: 10000,
+            popupBlurByFrequencyOrder: null,
+        });
+        expect(options.version).toBe(75);
+    });
+
+    test('PopupFrequencyBlurVersion75Migration', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = /** @type {import('settings').Options} */ (structuredClone(createOptionsUpdatedTestData1()));
+        options.version = 74;
+        const general = /** @type {import('core').SafeAny} */ (options.profiles[0].options.general);
+        delete general.popupBlurByFrequencyEnabled;
+        delete general.popupBlurByFrequencyDictionary;
+        delete general.popupBlurByFrequencyThreshold;
+        delete general.popupBlurByFrequencyOrder;
+
+        const optionsUpdated = structuredClone(await optionsUtil.update(options));
+        expect(optionsUpdated.version).toBe(75);
+        expect(optionsUpdated.profiles[0].options.general).toMatchObject({
+            popupBlurByFrequencyEnabled: false,
+            popupBlurByFrequencyDictionary: null,
+            popupBlurByFrequencyThreshold: 10000,
+            popupBlurByFrequencyOrder: null,
+        });
+    });
+
+    test('PopupFrequencyBlurNullOrderPreserved', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = optionsUtil.getDefault();
+        Object.assign(options.profiles[0].options.general, {
+            popupBlurByFrequencyEnabled: true,
+            popupBlurByFrequencyDictionary: 'Test Dictionary',
+            popupBlurByFrequencyThreshold: 1,
+            popupBlurByFrequencyOrder: null,
+        });
+
+        const optionsUpdated = structuredClone(await optionsUtil.update(structuredClone(options)));
+        expect(optionsUpdated.profiles[0].options.general.popupBlurByFrequencyOrder).toBe(null);
     });
 
     test('CumulativeFieldTemplatesUpdates', async () => {

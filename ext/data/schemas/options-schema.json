@@ -124,6 +124,10 @@
                                     "termDisplayMode",
                                     "sortFrequencyDictionary",
                                     "sortFrequencyDictionaryOrder",
+                                    "popupBlurByFrequencyEnabled",
+                                    "popupBlurByFrequencyDictionary",
+                                    "popupBlurByFrequencyThreshold",
+                                    "popupBlurByFrequencyOrder",
                                     "stickySearchHeader",
                                     "fontFamily",
                                     "fontSize",
@@ -335,6 +339,23 @@
                                         "type": "string",
                                         "enum": ["ascending", "descending"],
                                         "default": "descending"
+                                    },
+                                    "popupBlurByFrequencyEnabled": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "popupBlurByFrequencyDictionary": {
+                                        "type": ["string", "null"],
+                                        "default": null
+                                    },
+                                    "popupBlurByFrequencyThreshold": {
+                                        "type": "number",
+                                        "default": 10000
+                                    },
+                                    "popupBlurByFrequencyOrder": {
+                                        "type": ["string", "null"],
+                                        "enum": ["ascending", "descending", null],
+                                        "default": null
                                     },
                                     "stickySearchHeader": {
                                         "type": "boolean",

@@ -19,6 +19,7 @@ import {readFileSync} from 'fs';
 import path from 'path';
 import {pathToFileURL} from 'url';
 import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
+import {parseJson} from '../../ext/js/core/json.js';
 import {expect, root, test} from './playwright-util.js';
 
 test.beforeEach(async ({context}) => {
@@ -173,4 +174,77 @@ test.describe('popup', () => {
             await expect.soft(page).toHaveScreenshot(test_name + '.png');
         });
     }
+});
+test.describe('popup frequency blur', () => {
+    const popupFrequencyBlurTestsPath = path.join(root, 'test/data/html/popup-frequency-blur.html');
+
+    test.beforeEach(async ({page, extensionId}) => {
+        console.log('Open settings');
+        await page.goto(`chrome-extension://${extensionId}/settings.html`);
+        await expect.poll(async () => await page.evaluate(() => document.documentElement.dataset.loaded === 'true')).toBe(true);
+
+        await expect(page.locator('id=dictionaries')).toBeVisible();
+
+        const dictionary = await createDictionaryArchiveData(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
+        await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
+            name: 'valid-dictionary1.zip',
+            mimeType: 'application/x-zip',
+            buffer: Buffer.from(dictionary),
+        });
+        await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 1 * 60 * 1000});
+
+        await page.locator('#popup-frequency-blur-enabled').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
+        await expect(page.locator('#popup-frequency-blur-options')).toBeVisible();
+        await expect.poll(async () => await page.locator('#popup-frequency-blur-dictionary option').evaluateAll((elements) => {
+            return elements.some((element) => element.textContent === 'Test Dictionary');
+        })).toBe(true);
+        await page.locator('#popup-frequency-blur-dictionary').selectOption('Test Dictionary');
+        await page.locator('#popup-frequency-blur-threshold').fill('1');
+        await page.locator('#popup-frequency-blur-threshold').press('Tab');
+        await expect.poll(async () => {
+            const optionsString = /** @type {unknown} */ (await page.evaluate(() => new Promise((resolve) => {
+                chrome.storage.local.get(['options'], ({options}) => {
+                    resolve(typeof options === 'string' ? options : null);
+                });
+            })));
+            if (typeof optionsString !== 'string') { return false; }
+
+            const options = /** @type {import('settings').Options} */ (parseJson(optionsString));
+            const {general} = options.profiles[0].options;
+            return (
+                general.popupBlurByFrequencyEnabled === true &&
+                general.popupBlurByFrequencyDictionary === 'Test Dictionary' &&
+                general.popupBlurByFrequencyThreshold === 1 &&
+                general.popupBlurByFrequencyOrder !== null
+            );
+        }).toBe(true);
+
+        console.log('Open popup-frequency-blur.html');
+        await page.goto(pathToFileURL(popupFrequencyBlurTestsPath).toString());
+        await page.setViewportSize({width: 900, height: 700});
+        await expect(page.locator('#term-da')).toBeVisible();
+        await page.keyboard.down('Shift');
+    });
+
+    test.afterEach(async ({page}) => {
+        await page.keyboard.up('Shift');
+    });
+
+    test('blurred before hover, clear on hover, blurred on leave, and commonness threshold excludes 打つ', async ({page}) => {
+        const popupFramePromise = page.waitForEvent('frameattached', {timeout: 10000});
+
+        await page.locator('#term-da').hover();
+
+        const popupFrame = await popupFramePromise;
+        await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('blurred');
+
+        await popupFrame.locator('.content-outer').hover();
+        await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('revealed');
+
+        await page.locator('#outside-hover-target').hover();
+        await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('blurred');
+
+        await page.locator('#term-utsu').hover();
+        await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('off');
+    });
 });
