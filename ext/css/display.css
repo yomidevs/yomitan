@@ -472,11 +472,13 @@ a:has(rt) {
     position: absolute;
     inset: 0;
     z-index: 15;
+    padding: 1rem;
+    pointer-events: none;
+}
+.popup-frequency-blur-overlay:not([hidden]) {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
-    pointer-events: none;
 }
 .popup-frequency-blur-card {
     display: flex;

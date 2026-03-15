@@ -178,6 +178,33 @@ test.describe('popup', () => {
 test.describe('popup frequency blur', () => {
     const popupFrequencyBlurTestsPath = path.join(root, 'test/data/html/popup-frequency-blur.html');
 
+    /**
+     * @param {import('@playwright/test').Page} page
+     * @param {Partial<import('settings').ProfileOptions['general']>} generalSettings
+     * @returns {Promise<void>}
+     */
+    async function updateGeneralOptions(page, generalSettings) {
+        await page.evaluate((settings) => new Promise((resolve, reject) => {
+            chrome.storage.local.get(['options'], ({options}) => {
+                if (typeof options !== 'string') {
+                    reject(new Error('Options were not loaded from storage.'));
+                    return;
+                }
+
+                const optionsData = /** @type {import('settings').Options} */ (parseJson(options));
+                Object.assign(optionsData.profiles[0].options.general, settings);
+                chrome.storage.local.set({options: JSON.stringify(optionsData)}, () => {
+                    const error = chrome.runtime.lastError;
+                    if (typeof error?.message === 'string') {
+                        reject(new Error(error.message));
+                        return;
+                    }
+                    resolve(null);
+                });
+            });
+        }), generalSettings);
+    }
+
     test.beforeEach(async ({page, extensionId}) => {
         console.log('Open settings');
         await page.goto(`chrome-extension://${extensionId}/settings.html`);
@@ -192,32 +219,13 @@ test.describe('popup frequency blur', () => {
             buffer: Buffer.from(dictionary),
         });
         await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 1 * 60 * 1000});
-
-        await page.locator('#popup-frequency-blur-enabled').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
-        await expect(page.locator('#popup-frequency-blur-options')).toBeVisible();
-        await expect.poll(async () => await page.locator('#popup-frequency-blur-dictionary option').evaluateAll((elements) => {
-            return elements.some((element) => element.textContent === 'Test Dictionary');
-        })).toBe(true);
-        await page.locator('#popup-frequency-blur-dictionary').selectOption('Test Dictionary');
-        await page.locator('#popup-frequency-blur-threshold').fill('1');
-        await page.locator('#popup-frequency-blur-threshold').press('Tab');
-        await expect.poll(async () => {
-            const optionsString = /** @type {unknown} */ (await page.evaluate(() => new Promise((resolve) => {
-                chrome.storage.local.get(['options'], ({options}) => {
-                    resolve(typeof options === 'string' ? options : null);
-                });
-            })));
-            if (typeof optionsString !== 'string') { return false; }
-
-            const options = /** @type {import('settings').Options} */ (parseJson(optionsString));
-            const {general} = options.profiles[0].options;
-            return (
-                general.popupBlurByFrequencyEnabled === true &&
-                general.popupBlurByFrequencyDictionary === 'Test Dictionary' &&
-                general.popupBlurByFrequencyThreshold === 1 &&
-                general.popupBlurByFrequencyOrder !== null
-            );
-        }).toBe(true);
+        await updateGeneralOptions(page, {
+            popupBlurByFrequencyEnabled: true,
+            popupBlurByFrequencyDictionary: 'Test Dictionary',
+            popupBlurByFrequencyThreshold: 1,
+            popupBlurByFrequencyOrder: 'ascending',
+            popupBlurByFrequencyUnblurDelay: 0,
+        });
 
         console.log('Open popup-frequency-blur.html');
         await page.goto(pathToFileURL(popupFrequencyBlurTestsPath).toString());
@@ -236,15 +244,38 @@ test.describe('popup frequency blur', () => {
         await page.locator('#term-da').hover();
 
         const popupFrame = await popupFramePromise;
+        const overlay = popupFrame.locator('#popup-frequency-blur-overlay');
         await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('blurred');
+        await expect(overlay).toBeVisible();
 
         await popupFrame.locator('.content-outer').hover();
         await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('revealed');
+        await expect(overlay).toBeHidden();
 
         await page.locator('#outside-hover-target').hover();
         await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('blurred');
+        await expect(overlay).toBeVisible();
 
         await page.locator('#term-utsu').hover();
         await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('off');
+        await expect(overlay).toBeHidden();
+    });
+
+    test('disabled popup frequency blur keeps overlay hidden for qualifying terms', async ({page, extensionId}) => {
+        await page.goto(`chrome-extension://${extensionId}/settings.html`);
+        await expect.poll(async () => await page.evaluate(() => document.documentElement.dataset.loaded === 'true')).toBe(true);
+        await updateGeneralOptions(page, {popupBlurByFrequencyEnabled: false});
+
+        await page.goto(pathToFileURL(popupFrequencyBlurTestsPath).toString());
+        await page.setViewportSize({width: 900, height: 700});
+        await expect(page.locator('#term-da')).toBeVisible();
+
+        const popupFramePromise = page.waitForEvent('frameattached', {timeout: 10000});
+        await page.locator('#term-da').hover();
+
+        const popupFrame = await popupFramePromise;
+        const overlay = popupFrame.locator('#popup-frequency-blur-overlay');
+        await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('off');
+        await expect(overlay).toBeHidden();
     });
 });

@@ -107,6 +107,16 @@ function setupPopupDom(window) {
 }
 
 /**
+ * @param {import('jsdom').DOMWindow} window
+ * @returns {HTMLElement}
+ */
+function getOverlay(window) {
+    const overlay = window.document.querySelector('#popup-frequency-blur-overlay');
+    expect(overlay).not.toBe(null);
+    return /** @type {HTMLElement} */ (overlay);
+}
+
+/**
  * @param {{enabled?: boolean, dictionary?: string | null, threshold?: number, order?: import('settings').SortFrequencyDictionaryOrder | null, unblurDelay?: number}} [details]
  * @returns {PopupFrequencyBlurOptions}
  */
@@ -189,6 +199,7 @@ describe('PopupFrequencyBlurController', () => {
         display.setContent([createTermEntry([{frequency: 1}])]);
 
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
+        expect(getOverlay(window).hidden).toBe(false);
     });
 
     test('pointerenter reveals the popup and pointerleave re-blurs it', ({window}) => {
@@ -200,12 +211,15 @@ describe('PopupFrequencyBlurController', () => {
 
         const contentOuter = /** @type {HTMLElement} */ (window.document.querySelector('.content-outer'));
         expect(contentOuter).not.toBe(null);
+        expect(getOverlay(window).hidden).toBe(false);
 
         contentOuter.dispatchEvent(new window.Event('pointerenter'));
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('revealed');
+        expect(getOverlay(window).hidden).toBe(true);
 
         contentOuter.dispatchEvent(new window.Event('pointerleave'));
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
+        expect(getOverlay(window).hidden).toBe(false);
     });
 
     test('positive unblur delay auto-reveals without hover', async ({window}) => {
@@ -219,15 +233,29 @@ describe('PopupFrequencyBlurController', () => {
             display.setContent([createTermEntry([{frequency: 1}])]);
             expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
             expect(window.document.querySelector('#popup-frequency-blur-overlay-label')?.textContent).toBe('Hover or wait 2s to reveal');
+            expect(getOverlay(window).hidden).toBe(false);
 
             await vi.advanceTimersByTimeAsync(1000);
             expect(window.document.querySelector('#popup-frequency-blur-overlay-label')?.textContent).toBe('Hover or wait 1s to reveal');
 
             await vi.advanceTimersByTimeAsync(1000);
             expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('revealed');
+            expect(getOverlay(window).hidden).toBe(true);
         } finally {
             vi.useRealTimers();
         }
+    });
+
+    test('disabled setting keeps overlay hidden even when the term qualifies', ({window}) => {
+        setupPopupDom(window);
+        const display = new MockDisplay(createOptions({enabled: false, threshold: 1, order: 'ascending'}));
+        const controller = createController(display);
+        controller.prepare();
+
+        display.setContent([createTermEntry([{frequency: 1}])]);
+
+        expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('off');
+        expect(getOverlay(window).hidden).toBe(true);
     });
 
     test('missing selected-dictionary frequency keeps blur off', ({window}) => {
@@ -239,6 +267,7 @@ describe('PopupFrequencyBlurController', () => {
         display.setContent([createTermEntry([{dictionary: 'Other Dictionary', frequency: 1}])]);
 
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('off');
+        expect(getOverlay(window).hidden).toBe(true);
     });
 
     test('selected dictionary without a usable value keeps blur off', ({window}) => {
@@ -254,6 +283,7 @@ describe('PopupFrequencyBlurController', () => {
         }])]);
 
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('off');
+        expect(getOverlay(window).hidden).toBe(true);
     });
 
     test('non-term content keeps blur off', ({window}) => {
@@ -265,6 +295,7 @@ describe('PopupFrequencyBlurController', () => {
         display.setContent([], 'kanji');
 
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('off');
+        expect(getOverlay(window).hidden).toBe(true);
     });
 
     test('order null keeps blur off', ({window}) => {
@@ -276,6 +307,7 @@ describe('PopupFrequencyBlurController', () => {
         display.setContent([createTermEntry([{frequency: 1}])]);
 
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('off');
+        expect(getOverlay(window).hidden).toBe(true);
     });
 
     test('multi-headword entries use minimum values for ascending dictionaries', ({window}) => {
