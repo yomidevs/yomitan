@@ -17,7 +17,7 @@
 
 import {querySelectorNotNull} from '../dom/query-selector.js';
 
-const numberRegex = /[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/;
+const numberPattern = /[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/g;
 
 export class PopupFrequencyBlurController {
     /**
@@ -49,7 +49,7 @@ export class PopupFrequencyBlurController {
         /** @type {?number} */
         this._autoRevealTimeout = null;
         /** @type {?number} */
-        this._autoRevealCountdownInterval = null;
+        this._autoRevealCountdownTimeout = null;
         /** @type {?number} */
         this._autoRevealDeadline = null;
         /** @type {boolean} */
@@ -131,23 +131,28 @@ export class PopupFrequencyBlurController {
     }
 
     /** */
-    _updateOverlayText() {
-        const {dictionary, order, threshold, unblurDelay} = this;
+    /**
+     * @param {?number} selectedFrequency
+     */
+    _updateOverlayText(selectedFrequency = this._getFirstTermEntrySelectedFrequency()) {
+        const {dictionary, unblurDelay} = this;
         this._overlayLabel.textContent = (
             Number.isFinite(unblurDelay) && unblurDelay > 0 ?
             `Hover or wait ${this._formatDelaySeconds(this._getOverlayDelaySeconds())} to reveal` :
             'Hover to reveal'
         );
         this._overlaySublabel.textContent = (
-            dictionary !== null && order !== null && Number.isFinite(threshold) ?
-            `${dictionary} · ${order === 'ascending' ? 'rank <=' : 'occurrences >='} ${threshold}` :
+            this._enabled && dictionary !== null && selectedFrequency !== null ?
+            `${dictionary} · frequency ${selectedFrequency}` :
             ''
         );
     }
 
     /** */
     _updateStateFromContent() {
-        const desiredState = this._getDesiredState();
+        const selectedFrequency = this._getFirstTermEntrySelectedFrequency();
+        this._updateOverlayText(selectedFrequency);
+        const desiredState = this._getDesiredState(selectedFrequency);
         if (desiredState === 'blurred') {
             this._scheduleAutoReveal();
         } else if (desiredState === 'off') {
@@ -157,27 +162,20 @@ export class PopupFrequencyBlurController {
     }
 
     /**
+     * @param {?number} selectedFrequency
      * @returns {'off'|'blurred'|'revealed'}
      */
-    _getDesiredState() {
+    _getDesiredState(selectedFrequency = this._getFirstTermEntrySelectedFrequency()) {
         if (document.documentElement.dataset.pageType !== 'popup') { return 'off'; }
         if (!this._enabled || this._dictionary === null || this._order === null || !Number.isFinite(this._threshold)) {
             return 'off';
         }
-
-        const {dictionaryEntries} = this._display;
-        if (dictionaryEntries.length === 0) { return 'off'; }
-
-        const firstDictionaryEntry = dictionaryEntries[0];
-        if (firstDictionaryEntry.type !== 'term') { return 'off'; }
-
-        const comparableFrequency = this._getComparableFrequency(firstDictionaryEntry);
-        if (comparableFrequency === null) { return 'off'; }
+        if (selectedFrequency === null) { return 'off'; }
 
         const qualifies = (
             this._order === 'ascending' ?
-            comparableFrequency <= this._threshold :
-            comparableFrequency >= this._threshold
+            selectedFrequency <= this._threshold :
+            selectedFrequency >= this._threshold
         );
         if (!qualifies) { return 'off'; }
 
@@ -185,17 +183,28 @@ export class PopupFrequencyBlurController {
     }
 
     /**
+     * @returns {?number}
+     */
+    _getFirstTermEntrySelectedFrequency() {
+        const {dictionaryEntries} = this._display;
+        if (dictionaryEntries.length === 0) { return null; }
+
+        const firstDictionaryEntry = dictionaryEntries[0];
+        return firstDictionaryEntry.type === 'term' ? this._getSelectedFrequency(firstDictionaryEntry) : null;
+    }
+
+    /**
      * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
      * @returns {?number}
      */
-    _getComparableFrequency(dictionaryEntry) {
+    _getSelectedFrequency(dictionaryEntry) {
         const {dictionary, order} = this;
         if (dictionary === null || order === null) { return null; }
 
         let result = null;
         for (const frequency of dictionaryEntry.frequencies) {
             if (frequency.dictionary !== dictionary) { continue; }
-            const value = this._getUsableFrequencyValue(frequency);
+            const value = this._getSelectedFrequencyValue(frequency, order);
             if (value === null) { continue; }
             if (result === null) {
                 result = value;
@@ -213,15 +222,44 @@ export class PopupFrequencyBlurController {
 
     /**
      * @param {import('dictionary').TermFrequency} frequency
+     * @param {import('settings').SortFrequencyDictionaryOrder} order
      * @returns {?number}
      */
-    _getUsableFrequencyValue(frequency) {
-        const {frequency: value, displayValue, displayValueParsed} = frequency;
-        if (!Number.isFinite(value)) { return null; }
-        if (displayValueParsed && typeof displayValue === 'string' && !numberRegex.test(displayValue)) {
-            return null;
+    _getSelectedFrequencyValue(frequency, order) {
+        const displayValue = this._getParsedDisplayFrequencyValue(frequency, order);
+        if (displayValue !== null) { return displayValue; }
+
+        const {frequency: value} = frequency;
+        return Number.isFinite(value) ? value : null;
+    }
+
+    /**
+     * @param {import('dictionary').TermFrequency} frequency
+     * @param {import('settings').SortFrequencyDictionaryOrder} order
+     * @returns {?number}
+     */
+    _getParsedDisplayFrequencyValue({displayValue, displayValueParsed}, order) {
+        if (!displayValueParsed || typeof displayValue !== 'string') { return null; }
+
+        const matches = displayValue.match(numberPattern);
+        if (matches === null) { return null; }
+
+        let result = null;
+        for (const match of matches) {
+            const value = Number.parseFloat(match);
+            if (!Number.isFinite(value)) { continue; }
+            if (result === null) {
+                result = value;
+            } else {
+                result = (
+                    order === 'ascending' ?
+                    Math.min(result, value) :
+                    Math.max(result, value)
+                );
+            }
         }
-        return value;
+
+        return result;
     }
 
     /**
@@ -246,9 +284,7 @@ export class PopupFrequencyBlurController {
 
         this._autoRevealDeadline = Date.now() + (this._unblurDelay * 1000);
         this._updateOverlayText();
-        this._autoRevealCountdownInterval = window.setInterval(() => {
-            this._updateOverlayText();
-        }, 100);
+        this._scheduleOverlayCountdownUpdate();
         this._autoRevealTimeout = window.setTimeout(() => {
             this._clearAutoRevealTimeout();
             this._autoRevealTriggered = true;
@@ -257,13 +293,28 @@ export class PopupFrequencyBlurController {
     }
 
     /** */
+    _scheduleOverlayCountdownUpdate() {
+        const delaySeconds = this._getOverlayDelaySeconds();
+        const displaySeconds = Math.ceil(delaySeconds);
+        if (displaySeconds <= 1) { return; }
+
+        const nextUpdateDelay = Math.max(Math.ceil((delaySeconds - (displaySeconds - 1)) * 1000), 1);
+        this._autoRevealCountdownTimeout = window.setTimeout(() => {
+            this._autoRevealCountdownTimeout = null;
+            this._updateOverlayText();
+            this._scheduleOverlayCountdownUpdate();
+        }, nextUpdateDelay);
+    }
+
+    /** */
     _clearAutoRevealTimeout() {
-        if (this._autoRevealTimeout === null) { return; }
-        window.clearTimeout(this._autoRevealTimeout);
-        this._autoRevealTimeout = null;
-        if (this._autoRevealCountdownInterval !== null) {
-            window.clearInterval(this._autoRevealCountdownInterval);
-            this._autoRevealCountdownInterval = null;
+        if (this._autoRevealTimeout !== null) {
+            window.clearTimeout(this._autoRevealTimeout);
+            this._autoRevealTimeout = null;
+        }
+        if (this._autoRevealCountdownTimeout !== null) {
+            window.clearTimeout(this._autoRevealCountdownTimeout);
+            this._autoRevealCountdownTimeout = null;
         }
         this._autoRevealDeadline = null;
     }
@@ -273,9 +324,7 @@ export class PopupFrequencyBlurController {
      * @returns {string}
      */
     _formatDelaySeconds(delay) {
-        const roundedDelay = Math.ceil(delay * 10) / 10;
-        const formattedDelay = (roundedDelay % 1 === 0 ? roundedDelay.toFixed(0) : roundedDelay.toFixed(1));
-        return `${formattedDelay}s`;
+        return `${Math.max(Math.ceil(delay), 0)}s`;
     }
 
     /**

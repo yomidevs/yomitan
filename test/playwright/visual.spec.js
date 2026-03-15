@@ -184,25 +184,41 @@ test.describe('popup frequency blur', () => {
      * @returns {Promise<void>}
      */
     async function updateGeneralOptions(page, generalSettings) {
-        await page.evaluate((settings) => new Promise((resolve, reject) => {
-            chrome.storage.local.get(['options'], ({options}) => {
-                if (typeof options !== 'string') {
-                    reject(new Error('Options were not loaded from storage.'));
-                    return;
+        for (let attempt = 0; attempt < 3; ++attempt) {
+            await expect.poll(async () => await page.evaluate(() => document.documentElement.dataset.loaded === 'true')).toBe(true);
+            try {
+                const optionsString = /** @type {unknown} */ (await page.evaluate(() => new Promise((resolve, reject) => {
+                    chrome.storage.local.get(['options'], ({options}) => {
+                        if (typeof options !== 'string') {
+                            reject(new Error('Options were not loaded from storage.'));
+                            return;
+                        }
+                        resolve(options);
+                    });
+                })));
+                if (typeof optionsString !== 'string') {
+                    throw new Error('Options were not loaded from storage.');
                 }
 
-                const optionsData = /** @type {import('settings').Options} */ (parseJson(options));
-                Object.assign(optionsData.profiles[0].options.general, settings);
-                chrome.storage.local.set({options: JSON.stringify(optionsData)}, () => {
-                    const error = chrome.runtime.lastError;
-                    if (typeof error?.message === 'string') {
-                        reject(new Error(error.message));
-                        return;
-                    }
-                    resolve(null);
-                });
-            });
-        }), generalSettings);
+                const optionsData = /** @type {import('settings').Options} */ (parseJson(optionsString));
+                Object.assign(optionsData.profiles[0].options.general, generalSettings);
+                await page.evaluate((options) => new Promise((resolve, reject) => {
+                    chrome.storage.local.set({options}, () => {
+                        const error = chrome.runtime.lastError;
+                        if (typeof error?.message === 'string') {
+                            reject(new Error(error.message));
+                            return;
+                        }
+                        resolve(null);
+                    });
+                }), JSON.stringify(optionsData));
+                return;
+            } catch (error) {
+                if (!(error instanceof Error) || !error.message.includes('Execution context was destroyed') || attempt >= 2) {
+                    throw error;
+                }
+            }
+        }
     }
 
     test.beforeEach(async ({page, extensionId}) => {
@@ -247,6 +263,7 @@ test.describe('popup frequency blur', () => {
         const overlay = popupFrame.locator('#popup-frequency-blur-overlay');
         await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('blurred');
         await expect(overlay).toBeVisible();
+        await expect(popupFrame.locator('#popup-frequency-blur-overlay-sublabel')).toHaveText('Test Dictionary · frequency 1');
 
         await popupFrame.locator('.content-outer').hover();
         await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('revealed');

@@ -117,6 +117,14 @@ function getOverlay(window) {
 }
 
 /**
+ * @param {import('jsdom').DOMWindow} window
+ * @returns {string}
+ */
+function getOverlaySublabel(window) {
+    return window.document.querySelector('#popup-frequency-blur-overlay-sublabel')?.textContent ?? '';
+}
+
+/**
  * @param {{enabled?: boolean, dictionary?: string | null, threshold?: number, order?: import('settings').SortFrequencyDictionaryOrder | null, unblurDelay?: number}} [details]
  * @returns {PopupFrequencyBlurOptions}
  */
@@ -200,6 +208,7 @@ describe('PopupFrequencyBlurController', () => {
 
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
         expect(getOverlay(window).hidden).toBe(false);
+        expect(getOverlaySublabel(window)).toBe('Test Dictionary · frequency 1');
     });
 
     test('pointerenter reveals the popup and pointerleave re-blurs it', ({window}) => {
@@ -246,6 +255,27 @@ describe('PopupFrequencyBlurController', () => {
         }
     });
 
+    test('fractional unblur delay rounds up to whole seconds', async ({window}) => {
+        vi.useFakeTimers();
+        try {
+            setupPopupDom(window);
+            const display = new MockDisplay(createOptions({threshold: 1, order: 'ascending', unblurDelay: 1.2}));
+            const controller = createController(display);
+            controller.prepare();
+
+            display.setContent([createTermEntry([{frequency: 1}])]);
+            expect(window.document.querySelector('#popup-frequency-blur-overlay-label')?.textContent).toBe('Hover or wait 2s to reveal');
+
+            await vi.advanceTimersByTimeAsync(200);
+            expect(window.document.querySelector('#popup-frequency-blur-overlay-label')?.textContent).toBe('Hover or wait 1s to reveal');
+
+            await vi.advanceTimersByTimeAsync(1000);
+            expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('revealed');
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
     test('disabled setting keeps overlay hidden even when the term qualifies', ({window}) => {
         setupPopupDom(window);
         const display = new MockDisplay(createOptions({enabled: false, threshold: 1, order: 'ascending'}));
@@ -270,20 +300,52 @@ describe('PopupFrequencyBlurController', () => {
         expect(getOverlay(window).hidden).toBe(true);
     });
 
-    test('selected dictionary without a usable value keeps blur off', ({window}) => {
+    test('parsed display values fall back to numeric frequencies when no numeric token is present', ({window}) => {
+        setupPopupDom(window);
+        const display = new MockDisplay(createOptions({threshold: 4}));
+        const controller = createController(display);
+        controller.prepare();
+
+        display.setContent([createTermEntry([{
+            frequency: 4,
+            displayValue: 'unusable',
+            displayValueParsed: true,
+        }])]);
+
+        expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
+        expect(getOverlaySublabel(window)).toBe('Test Dictionary · frequency 4');
+    });
+
+    test('selected dictionary without any usable values keeps blur off', ({window}) => {
         setupPopupDom(window);
         const display = new MockDisplay(createOptions({threshold: 0}));
         const controller = createController(display);
         controller.prepare();
 
         display.setContent([createTermEntry([{
-            frequency: 0,
+            frequency: Number.NaN,
             displayValue: 'unusable',
             displayValueParsed: true,
         }])]);
 
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('off');
         expect(getOverlay(window).hidden).toBe(true);
+    });
+
+    test('parsed composite display values use minimum values for ascending dictionaries', ({window}) => {
+        setupPopupDom(window);
+        const display = new MockDisplay(createOptions({threshold: 400, order: 'ascending'}));
+        const controller = createController(display);
+        controller.prepare();
+
+        display.setContent([createTermEntry([{
+            frequency: 19291,
+            displayValue: '317, 19291',
+            displayValueParsed: true,
+        }])]);
+
+        expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
+        expect(getOverlaySublabel(window)).toBe('Test Dictionary · frequency 317');
     });
 
     test('non-term content keeps blur off', ({window}) => {
@@ -338,5 +400,21 @@ describe('PopupFrequencyBlurController', () => {
         ])]);
 
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
+    });
+
+    test('parsed composite display values use maximum values for descending dictionaries', ({window}) => {
+        setupPopupDom(window);
+        const display = new MockDisplay(createOptions({threshold: 1000, order: 'descending'}));
+        const controller = createController(display);
+        controller.prepare();
+
+        display.setContent([createTermEntry([{
+            frequency: 317,
+            displayValue: '317, 19291',
+            displayValueParsed: true,
+        }])]);
+
+        expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
+        expect(getOverlaySublabel(window)).toBe('Test Dictionary · frequency 19291');
     });
 });
