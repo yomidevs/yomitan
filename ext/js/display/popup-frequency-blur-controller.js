@@ -48,6 +48,10 @@ export class PopupFrequencyBlurController {
         this._pointerHovered = false;
         /** @type {?number} */
         this._autoRevealTimeout = null;
+        /** @type {?number} */
+        this._autoRevealCountdownInterval = null;
+        /** @type {?number} */
+        this._autoRevealDeadline = null;
         /** @type {boolean} */
         this._autoRevealTriggered = false;
         /** @type {'off'|'blurred'|'revealed'} */
@@ -131,7 +135,7 @@ export class PopupFrequencyBlurController {
         const {dictionary, order, threshold, unblurDelay} = this;
         this._overlayLabel.textContent = (
             Number.isFinite(unblurDelay) && unblurDelay > 0 ?
-            `Hover or wait ${this._formatDelaySeconds(unblurDelay)} to reveal` :
+            `Hover or wait ${this._formatDelaySeconds(this._getOverlayDelaySeconds())} to reveal` :
             'Hover to reveal'
         );
         this._overlaySublabel.textContent = (
@@ -240,8 +244,13 @@ export class PopupFrequencyBlurController {
         if (this._autoRevealTriggered || this._autoRevealTimeout !== null) { return; }
         if (!Number.isFinite(this._unblurDelay) || this._unblurDelay <= 0) { return; }
 
+        this._autoRevealDeadline = Date.now() + (this._unblurDelay * 1000);
+        this._updateOverlayText();
+        this._autoRevealCountdownInterval = window.setInterval(() => {
+            this._updateOverlayText();
+        }, 100);
         this._autoRevealTimeout = window.setTimeout(() => {
-            this._autoRevealTimeout = null;
+            this._clearAutoRevealTimeout();
             this._autoRevealTriggered = true;
             this._updateStateFromContent();
         }, this._unblurDelay * 1000);
@@ -252,6 +261,11 @@ export class PopupFrequencyBlurController {
         if (this._autoRevealTimeout === null) { return; }
         window.clearTimeout(this._autoRevealTimeout);
         this._autoRevealTimeout = null;
+        if (this._autoRevealCountdownInterval !== null) {
+            window.clearInterval(this._autoRevealCountdownInterval);
+            this._autoRevealCountdownInterval = null;
+        }
+        this._autoRevealDeadline = null;
     }
 
     /**
@@ -259,8 +273,19 @@ export class PopupFrequencyBlurController {
      * @returns {string}
      */
     _formatDelaySeconds(delay) {
-        const formattedDelay = (delay % 1 === 0 ? delay.toFixed(0) : `${delay}`);
+        const roundedDelay = Math.ceil(delay * 10) / 10;
+        const formattedDelay = (roundedDelay % 1 === 0 ? roundedDelay.toFixed(0) : roundedDelay.toFixed(1));
         return `${formattedDelay}s`;
+    }
+
+    /**
+     * @returns {number}
+     */
+    _getOverlayDelaySeconds() {
+        if (this._autoRevealDeadline === null) {
+            return this._unblurDelay;
+        }
+        return Math.max((this._autoRevealDeadline - Date.now()) / 1000, 0);
     }
 
     /** @type {?string} */

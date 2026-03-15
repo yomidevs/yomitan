@@ -218,8 +218,12 @@ describe('PopupFrequencyBlurController', () => {
 
             display.setContent([createTermEntry([{frequency: 1}])]);
             expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
+            expect(window.document.querySelector('#popup-frequency-blur-overlay-label')?.textContent).toBe('Hover or wait 2s to reveal');
 
-            await vi.advanceTimersByTimeAsync(2000);
+            await vi.advanceTimersByTimeAsync(1000);
+            expect(window.document.querySelector('#popup-frequency-blur-overlay-label')?.textContent).toBe('Hover or wait 1s to reveal');
+
+            await vi.advanceTimersByTimeAsync(1000);
             expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('revealed');
         } finally {
             vi.useRealTimers();

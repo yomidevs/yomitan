@@ -303,6 +303,7 @@ export class PopupPreviewFrame {
         const frontend = /** @type {Frontend} */ (this._frontend);
 
         try {
+            await frontend.updateOptions();
             await frontend.setTextSource(source);
         } finally {
             source.cleanup();
