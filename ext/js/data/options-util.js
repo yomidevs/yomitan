@@ -587,6 +587,7 @@ export class OptionsUtil {
             this._updateVersion73,
             this._updateVersion74,
             this._updateVersion75,
+            this._updateVersion76,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1845,6 +1846,16 @@ export class OptionsUtil {
             profile.options.general.popupBlurByFrequencyDictionary = null;
             profile.options.general.popupBlurByFrequencyThreshold = 10000;
             profile.options.general.popupBlurByFrequencyOrder = null;
+        }
+    }
+
+    /**
+     *  - Added general.popupBlurByFrequencyUnblurDelay
+     *  @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion76(options) {
+        for (const profile of options.profiles) {
+            profile.options.general.popupBlurByFrequencyUnblurDelay = 0;
         }
     }
 

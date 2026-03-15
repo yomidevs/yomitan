@@ -155,6 +155,7 @@ export type GeneralOptions = {
     popupBlurByFrequencyDictionary: string | null;
     popupBlurByFrequencyThreshold: number;
     popupBlurByFrequencyOrder: SortFrequencyDictionaryOrder | null;
+    popupBlurByFrequencyUnblurDelay: number;
     stickySearchHeader: boolean;
     enableYomitanApi: boolean;
     yomitanApiAllowCssSanitizationBypass: boolean;

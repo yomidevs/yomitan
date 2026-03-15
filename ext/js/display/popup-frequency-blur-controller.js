@@ -31,6 +31,8 @@ export class PopupFrequencyBlurController {
         /** @type {HTMLElement} */
         this._overlay = querySelectorNotNull(document, '#popup-frequency-blur-overlay');
         /** @type {HTMLElement} */
+        this._overlayLabel = querySelectorNotNull(document, '#popup-frequency-blur-overlay-label');
+        /** @type {HTMLElement} */
         this._overlaySublabel = querySelectorNotNull(document, '#popup-frequency-blur-overlay-sublabel');
         /** @type {boolean} */
         this._enabled = false;
@@ -40,8 +42,14 @@ export class PopupFrequencyBlurController {
         this._threshold = 10000;
         /** @type {import('settings').SortFrequencyDictionaryOrder|null} */
         this._order = null;
+        /** @type {number} */
+        this._unblurDelay = 0;
         /** @type {boolean} */
         this._pointerHovered = false;
+        /** @type {?number} */
+        this._autoRevealTimeout = null;
+        /** @type {boolean} */
+        this._autoRevealTriggered = false;
         /** @type {'off'|'blurred'|'revealed'} */
         this._state = 'off';
     }
@@ -74,17 +82,21 @@ export class PopupFrequencyBlurController {
             popupBlurByFrequencyDictionary,
             popupBlurByFrequencyThreshold,
             popupBlurByFrequencyOrder,
+            popupBlurByFrequencyUnblurDelay,
         } = options.general;
         this._enabled = popupBlurByFrequencyEnabled;
         this._dictionary = popupBlurByFrequencyDictionary;
         this._threshold = popupBlurByFrequencyThreshold;
         this._order = popupBlurByFrequencyOrder;
-        this._updateOverlaySublabel();
+        this._unblurDelay = popupBlurByFrequencyUnblurDelay;
+        this._resetAutoReveal();
+        this._updateOverlayText();
         this._updateStateFromContent();
     }
 
     /** */
     _onContentClear() {
+        this._resetAutoReveal();
         this._setState('off');
     }
 
@@ -92,6 +104,7 @@ export class PopupFrequencyBlurController {
      * @param {import('display').EventArgument<'contentUpdateComplete'>} details
      */
     _onContentUpdateComplete({type}) {
+        this._resetAutoReveal();
         if (type !== 'terms') {
             this._setState('off');
             return;
@@ -114,8 +127,13 @@ export class PopupFrequencyBlurController {
     }
 
     /** */
-    _updateOverlaySublabel() {
-        const {dictionary, order, threshold} = this;
+    _updateOverlayText() {
+        const {dictionary, order, threshold, unblurDelay} = this;
+        this._overlayLabel.textContent = (
+            Number.isFinite(unblurDelay) && unblurDelay > 0 ?
+            `Hover or wait ${this._formatDelaySeconds(unblurDelay)} to reveal` :
+            'Hover to reveal'
+        );
         this._overlaySublabel.textContent = (
             dictionary !== null && order !== null && Number.isFinite(threshold) ?
             `${dictionary} · ${order === 'ascending' ? 'rank <=' : 'occurrences >='} ${threshold}` :
@@ -125,7 +143,13 @@ export class PopupFrequencyBlurController {
 
     /** */
     _updateStateFromContent() {
-        this._setState(this._getDesiredState());
+        const desiredState = this._getDesiredState();
+        if (desiredState === 'blurred') {
+            this._scheduleAutoReveal();
+        } else if (desiredState === 'off') {
+            this._clearAutoRevealTimeout();
+        }
+        this._setState(desiredState);
     }
 
     /**
@@ -153,7 +177,7 @@ export class PopupFrequencyBlurController {
         );
         if (!qualifies) { return 'off'; }
 
-        return this._pointerHovered ? 'revealed' : 'blurred';
+        return (this._pointerHovered || this._autoRevealTriggered) ? 'revealed' : 'blurred';
     }
 
     /**
@@ -205,6 +229,40 @@ export class PopupFrequencyBlurController {
         this._overlay.hidden = (state !== 'blurred');
     }
 
+    /** */
+    _resetAutoReveal() {
+        this._autoRevealTriggered = false;
+        this._clearAutoRevealTimeout();
+    }
+
+    /** */
+    _scheduleAutoReveal() {
+        if (this._autoRevealTriggered || this._autoRevealTimeout !== null) { return; }
+        if (!Number.isFinite(this._unblurDelay) || this._unblurDelay <= 0) { return; }
+
+        this._autoRevealTimeout = window.setTimeout(() => {
+            this._autoRevealTimeout = null;
+            this._autoRevealTriggered = true;
+            this._updateStateFromContent();
+        }, this._unblurDelay * 1000);
+    }
+
+    /** */
+    _clearAutoRevealTimeout() {
+        if (this._autoRevealTimeout === null) { return; }
+        window.clearTimeout(this._autoRevealTimeout);
+        this._autoRevealTimeout = null;
+    }
+
+    /**
+     * @param {number} delay
+     * @returns {string}
+     */
+    _formatDelaySeconds(delay) {
+        const formattedDelay = (delay % 1 === 0 ? delay.toFixed(0) : `${delay}`);
+        return `${formattedDelay}s`;
+    }
+
     /** @type {?string} */
     get dictionary() {
         return this._dictionary;
@@ -218,5 +276,10 @@ export class PopupFrequencyBlurController {
     /** @type {number} */
     get threshold() {
         return this._threshold;
+    }
+
+    /** @type {number} */
+    get unblurDelay() {
+        return this._unblurDelay;
     }
 }

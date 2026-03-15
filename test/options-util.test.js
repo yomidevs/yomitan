@@ -315,6 +315,7 @@ function createProfileOptionsUpdatedTestData1() {
             popupBlurByFrequencyDictionary: null,
             popupBlurByFrequencyThreshold: 10000,
             popupBlurByFrequencyOrder: null,
+            popupBlurByFrequencyUnblurDelay: 0,
             stickySearchHeader: false,
             enableYomitanApi: false,
             yomitanApiServer: 'http://127.0.0.1:19633',
@@ -708,7 +709,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 75,
+        version: 76,
         global: {
             database: {
                 prefixWildcardsSupported: false,
@@ -754,8 +755,9 @@ describe('OptionsUtil', () => {
             popupBlurByFrequencyDictionary: null,
             popupBlurByFrequencyThreshold: 10000,
             popupBlurByFrequencyOrder: null,
+            popupBlurByFrequencyUnblurDelay: 0,
         });
-        expect(options.version).toBe(75);
+        expect(options.version).toBe(76);
     });
 
     test('PopupFrequencyBlurVersion75Migration', async () => {
@@ -771,13 +773,27 @@ describe('OptionsUtil', () => {
         delete general.popupBlurByFrequencyOrder;
 
         const optionsUpdated = structuredClone(await optionsUtil.update(options));
-        expect(optionsUpdated.version).toBe(75);
+        expect(optionsUpdated.version).toBe(76);
         expect(optionsUpdated.profiles[0].options.general).toMatchObject({
             popupBlurByFrequencyEnabled: false,
             popupBlurByFrequencyDictionary: null,
             popupBlurByFrequencyThreshold: 10000,
             popupBlurByFrequencyOrder: null,
+            popupBlurByFrequencyUnblurDelay: 0,
         });
+    });
+
+    test('PopupFrequencyBlurUnblurDelayVersion76Migration', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = /** @type {import('settings').Options} */ (structuredClone(createOptionsUpdatedTestData1()));
+        options.version = 75;
+        delete /** @type {import('core').SafeAny} */ (options.profiles[0].options.general).popupBlurByFrequencyUnblurDelay;
+
+        const optionsUpdated = structuredClone(await optionsUtil.update(options));
+        expect(optionsUpdated.version).toBe(76);
+        expect(optionsUpdated.profiles[0].options.general.popupBlurByFrequencyUnblurDelay).toBe(0);
     });
 
     test('PopupFrequencyBlurNullOrderPreserved', async () => {

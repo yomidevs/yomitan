@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {describe, expect} from 'vitest';
+import {describe, expect, vi} from 'vitest';
 import {EventDispatcher} from '../ext/js/core/event-dispatcher.js';
 import {PopupFrequencyBlurController} from '../ext/js/display/popup-frequency-blur-controller.js';
 import {createDomTest} from './fixtures/dom-test.js';
@@ -29,6 +29,7 @@ const test = createDomTest();
  *         popupBlurByFrequencyDictionary: string | null;
  *         popupBlurByFrequencyThreshold: number;
  *         popupBlurByFrequencyOrder: import('settings').SortFrequencyDictionaryOrder | null;
+ *         popupBlurByFrequencyUnblurDelay: number;
  *     };
  * }} PopupFrequencyBlurOptions
  */
@@ -97,7 +98,7 @@ function setupPopupDom(window) {
             <div class="content-sidebar"></div>
             <div id="popup-frequency-blur-overlay" hidden>
                 <div class="popup-frequency-blur-card">
-                    <div class="popup-frequency-blur-card-label">Hover to reveal</div>
+                    <div class="popup-frequency-blur-card-label" id="popup-frequency-blur-overlay-label">Hover to reveal</div>
                     <div class="popup-frequency-blur-card-sublabel" id="popup-frequency-blur-overlay-sublabel"></div>
                 </div>
             </div>
@@ -106,7 +107,7 @@ function setupPopupDom(window) {
 }
 
 /**
- * @param {{enabled?: boolean, dictionary?: string | null, threshold?: number, order?: import('settings').SortFrequencyDictionaryOrder | null}} [details]
+ * @param {{enabled?: boolean, dictionary?: string | null, threshold?: number, order?: import('settings').SortFrequencyDictionaryOrder | null, unblurDelay?: number}} [details]
  * @returns {PopupFrequencyBlurOptions}
  */
 function createOptions(details = {}) {
@@ -115,6 +116,7 @@ function createOptions(details = {}) {
         dictionary = 'Test Dictionary',
         threshold = 1,
         order = 'ascending',
+        unblurDelay = 0,
     } = details;
     return {
         general: {
@@ -122,6 +124,7 @@ function createOptions(details = {}) {
             popupBlurByFrequencyDictionary: dictionary,
             popupBlurByFrequencyThreshold: threshold,
             popupBlurByFrequencyOrder: order,
+            popupBlurByFrequencyUnblurDelay: unblurDelay,
         },
     };
 }
@@ -203,6 +206,24 @@ describe('PopupFrequencyBlurController', () => {
 
         contentOuter.dispatchEvent(new window.Event('pointerleave'));
         expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
+    });
+
+    test('positive unblur delay auto-reveals without hover', async ({window}) => {
+        vi.useFakeTimers();
+        try {
+            setupPopupDom(window);
+            const display = new MockDisplay(createOptions({threshold: 1, order: 'ascending', unblurDelay: 2}));
+            const controller = createController(display);
+            controller.prepare();
+
+            display.setContent([createTermEntry([{frequency: 1}])]);
+            expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('blurred');
+
+            await vi.advanceTimersByTimeAsync(2000);
+            expect(window.document.documentElement.dataset.popupFrequencyBlurState).toBe('revealed');
+        } finally {
+            vi.useRealTimers();
+        }
     });
 
     test('missing selected-dictionary frequency keeps blur off', ({window}) => {

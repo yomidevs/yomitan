@@ -128,6 +128,7 @@
                                     "popupBlurByFrequencyDictionary",
                                     "popupBlurByFrequencyThreshold",
                                     "popupBlurByFrequencyOrder",
+                                    "popupBlurByFrequencyUnblurDelay",
                                     "stickySearchHeader",
                                     "fontFamily",
                                     "fontSize",
@@ -356,6 +357,11 @@
                                         "type": ["string", "null"],
                                         "enum": ["ascending", "descending", null],
                                         "default": null
+                                    },
+                                    "popupBlurByFrequencyUnblurDelay": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "default": 0
                                     },
                                     "stickySearchHeader": {
                                         "type": "boolean",
