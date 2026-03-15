@@ -34,16 +34,46 @@ const test = createDomTest();
  * }} PopupFrequencyBlurOptions
  */
 
+/**
+ * @typedef {{
+ *     databaseUpdated: Record<string, never>;
+ * }} MockApplicationEvents
+ */
+
+/**
+ * @returns {import('dictionary-importer').Summary[]}
+ */
+function createDictionaryInfo() {
+    return [{
+        title: 'Test Dictionary',
+        revision: '1',
+        sequenced: false,
+        version: 3,
+        importDate: 0,
+        prefixWildcardsSupported: false,
+        styles: '',
+        sourceLanguage: 'ja',
+        counts: {
+            terms: {total: 0},
+            termMeta: {total: 0, freq: 1},
+            kanji: {total: 0},
+            kanjiMeta: {total: 0},
+            tagMeta: {total: 0},
+            media: {total: 0},
+        },
+    }];
+}
+
+/**
+ * @augments {EventDispatcher<MockApplicationEvents>}
+ */
 class MockApplication extends EventDispatcher {
     constructor() {
         super();
+        /** @type {{getDictionaryInfo: () => Promise<import('dictionary-importer').Summary[]>, getTermFrequencies: (termReadingList: import('translator').TermReadingList, dictionaries: string[]) => Promise<import('translator').TermFrequencySimple[]>}} */
         this.api = {
-            getDictionaryInfo: vi.fn(async () => [{
-                title: 'Test Dictionary',
-                sourceLanguage: 'ja',
-                counts: {termMeta: {freq: 1}},
-            }]),
-            getTermFrequencies: vi.fn(async () => [
+            getDictionaryInfo: vi.fn(async () => createDictionaryInfo()),
+            getTermFrequencies: vi.fn(async (_termReadingList, _dictionaries) => [
                 {term: '来る', reading: null, dictionary: 'Test Dictionary', hasReading: false, frequency: 1, displayValue: null, displayValueParsed: false},
                 {term: '猫', reading: null, dictionary: 'Test Dictionary', hasReading: false, frequency: 100, displayValue: null, displayValueParsed: false},
             ]),
@@ -60,10 +90,14 @@ class MockSettingsController extends EventDispatcher {
      */
     constructor(options) {
         super();
+        /** @type {MockApplication} */
         this.application = new MockApplication();
+        /** @type {PopupFrequencyBlurOptions} */
         this._options = options;
-        this.setProfileSetting = vi.fn(async () => {});
-        this.modifyProfileSettings = vi.fn(async () => {});
+        /** @type {(path: string, value: unknown) => Promise<import('settings-controller').ModifyResult[]>} */
+        this.setProfileSetting = vi.fn(async (_path, _value) => []);
+        /** @type {(targets: import('settings-modifications').Modification[]) => Promise<import('settings-controller').ModifyResult[]>} */
+        this.modifyProfileSettings = vi.fn(async (_targets) => []);
     }
 
     /** @returns {Promise<import('dictionary-importer').Summary[]>} */
