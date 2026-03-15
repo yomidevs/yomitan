@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {describe, expect, afterAll, test, vi} from 'vitest';
-import {setupDomTest} from './fixtures/dom-test.js';
-import {querySelectorNotNull} from '../ext/js/dom/query-selector.js';
-import {SearchDisplayController} from '../ext/js/display/search-display-controller.js';
-import {Display} from '../ext/js/display/display.js';
-import {DisplayAudio} from '../ext/js/display/display-audio.js';
-import {SearchPersistentStateController} from '../ext/js/display/search-persistent-state-controller.js';
+import {afterAll, describe, expect, test, vi} from 'vitest';
 import {Application} from '../ext/js/application.js';
-import {CrossFrameAPI} from '../ext/js/comm/cross-frame-api.js';
 import {API} from '../ext/js/comm/api.js';
+import {CrossFrameAPI} from '../ext/js/comm/cross-frame-api.js';
+import {DisplayAudio} from '../ext/js/display/display-audio.js';
+import {Display} from '../ext/js/display/display.js';
+import {SearchDisplayController} from '../ext/js/display/search-display-controller.js';
+import {SearchPersistentStateController} from '../ext/js/display/search-persistent-state-controller.js';
 import {DocumentFocusController} from '../ext/js/dom/document-focus-controller.js';
-import {HotkeyHandler} from '../ext/js/input/hotkey-handler.js';
+import {querySelectorNotNull} from '../ext/js/dom/query-selector.js';
 import {WebExtension} from '../ext/js/extension/web-extension.js';
+import {HotkeyHandler} from '../ext/js/input/hotkey-handler.js';
+import {setupDomTest} from './fixtures/dom-test.js';
 
 const documentSearchDisplayControllerEnv = await setupDomTest('ext/search.html');
 
