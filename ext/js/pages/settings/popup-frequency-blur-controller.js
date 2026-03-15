@@ -56,13 +56,13 @@ export class PopupFrequencyBlurController {
         this._getDictionaryInfoToken = token;
         const dictionaries = await this._settingsController.getDictionaryInfo();
         if (this._getDictionaryInfoToken !== token) { return; }
-        this._getDictionaryInfoToken = null;
 
         this._updateDictionaryOptions(dictionaries);
 
         let options = await this._settingsController.getOptions();
         await this._syncSelectedDictionaryOrder(options.general, getTermFrequencyDictionaryTitles(dictionaries));
         if (this._getDictionaryInfoToken !== token) { return; }
+        this._getDictionaryInfoToken = null;
 
         options = await this._settingsController.getOptions();
         const optionsContext = this._settingsController.getOptionsContext();
