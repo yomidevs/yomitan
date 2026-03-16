@@ -98,7 +98,10 @@ function setupPopupDom(window) {
             <div class="content-sidebar"></div>
             <div id="popup-frequency-blur-overlay" hidden>
                 <div class="popup-frequency-blur-card">
-                    <div class="popup-frequency-blur-card-label" id="popup-frequency-blur-overlay-label">Hover to reveal</div>
+                    <div class="popup-frequency-blur-card-header">
+                        <span class="popup-frequency-blur-card-icon icon" data-icon="lock"></span>
+                        <div class="popup-frequency-blur-card-label" id="popup-frequency-blur-overlay-label">Hover to reveal</div>
+                    </div>
                     <div class="popup-frequency-blur-card-sublabel" id="popup-frequency-blur-overlay-sublabel"></div>
                 </div>
             </div>

@@ -264,6 +264,7 @@ test.describe('popup frequency blur', () => {
         await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('blurred');
         await expect(overlay).toBeVisible();
         await expect(popupFrame.locator('#popup-frequency-blur-overlay-sublabel')).toHaveText('Test Dictionary · frequency 1');
+        await expect.soft(popupFrame.locator('.popup-frequency-blur-card')).toHaveScreenshot('popup-frequency-blur-overlay-card.png');
 
         await popupFrame.locator('.content-outer').hover();
         await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('revealed');

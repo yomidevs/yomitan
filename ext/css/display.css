@@ -181,11 +181,6 @@
     --action-button-hover-color: #dddddd;
     --action-button-active-color: #c1c1c1;
 
-    --popup-frequency-blur-card-background-color: rgba(255, 255, 255, 0.92);
-    --popup-frequency-blur-card-border-color: rgba(17, 24, 39, 0.12);
-    --popup-frequency-blur-card-shadow-color: rgba(15, 23, 42, 0.14);
-    --popup-frequency-blur-card-label-color: #111827;
-    --popup-frequency-blur-card-sublabel-color: #4b5563;
 }
 :root[data-theme=dark] {
     /* Colors */
@@ -255,11 +250,6 @@
     --action-button-hover-color: #282828;
     --action-button-active-color: #444444;
 
-    --popup-frequency-blur-card-background-color: rgba(39, 39, 42, 0.92);
-    --popup-frequency-blur-card-border-color: rgba(244, 244, 245, 0.1);
-    --popup-frequency-blur-card-shadow-color: rgba(0, 0, 0, 0.3);
-    --popup-frequency-blur-card-label-color: #fafafa;
-    --popup-frequency-blur-card-sublabel-color: #d4d4d8;
 }
 
 
@@ -483,26 +473,38 @@ a:has(rt) {
 .popup-frequency-blur-card {
     display: flex;
     flex-flow: column nowrap;
+    align-items: stretch;
+    gap: 0.25rem;
+    min-width: 13rem;
+    max-width: min(22rem, 100%);
+    padding: 0.625em 0.75em;
+    border: var(--thin-border-size) solid var(--separator-color1);
+    border-radius: var(--menu-border-radius);
+    background-color: var(--background-color-light);
+    box-shadow: var(--menu-shadow);
+    text-align: left;
+}
+.popup-frequency-blur-card-header {
+    display: flex;
+    flex-flow: row nowrap;
     align-items: center;
-    gap: 0.2rem;
-    min-width: 12rem;
-    max-width: min(24rem, 100%);
-    padding: 0.75rem 0.95rem;
-    border: 1px solid var(--popup-frequency-blur-card-border-color);
-    border-radius: 0.8rem;
-    background-color: var(--popup-frequency-blur-card-background-color);
-    box-shadow: 0 0.8rem 2rem var(--popup-frequency-blur-card-shadow-color);
-    text-align: center;
-    backdrop-filter: blur(0.3rem);
+    gap: 0.5em;
+}
+.popup-frequency-blur-card-icon {
+    flex: 0 0 auto;
+    width: calc(16em / var(--font-size-no-units));
+    height: calc(16em / var(--font-size-no-units));
+    background-color: var(--text-color-light1);
 }
 .popup-frequency-blur-card-label {
-    color: var(--popup-frequency-blur-card-label-color);
-    font-size: 0.95em;
+    color: var(--text-color);
+    font-size: 1em;
     font-weight: 600;
+    line-height: 1.35;
 }
 .popup-frequency-blur-card-sublabel {
-    color: var(--popup-frequency-blur-card-sublabel-color);
-    font-size: 0.78em;
+    color: var(--text-color-light1);
+    font-size: var(--font-size-small);
     line-height: 1.3;
     word-break: break-word;
 }
