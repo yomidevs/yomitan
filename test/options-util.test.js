@@ -548,6 +548,7 @@ function createProfileOptionsUpdatedTestData1() {
             apiKey: '',
             downloadTimeout: 0,
             forceSync: false,
+            noteDupeCheckFirst: false,
         },
         sentenceParsing: {
             scanExtent: 200,
