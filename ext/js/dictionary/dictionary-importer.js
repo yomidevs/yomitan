@@ -2921,17 +2921,21 @@ export class DictionaryImporter {
             const contentEnd = contentStart + contentLength;
             const sequence = sequenceRaw >= 0 ? sequenceRaw : void 0;
             let contentBytes = bytes.subarray(contentStart, contentEnd);
-            if (sharedGlossaryBaseOffset > 0 && isRawTermContentSharedGlossaryBinary(contentBytes)) {
-                contentBytes = rebaseRawTermContentSharedGlossaryBinary(contentBytes, sharedGlossaryBaseOffset);
-            }
+            /** @type {string|null} */
             let contentDictName = null;
-            if (termContentStorageMode === 'raw-bytes' && isRawTermContentSharedGlossaryBinary(contentBytes)) {
-                ++sharedGlossaryRowCount;
-                contentDictName = sharedGlossaryBaseOffset > 0 ?
-                    RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME :
-                    RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME;
+            if (termContentStorageMode === 'raw-bytes' && contentBytes.byteLength > 0) {
+                const contentInfo = this._normalizeArtifactTermContent(contentBytes, sharedGlossaryBaseOffset);
+                contentBytes = contentInfo.contentBytes;
+                contentDictName = contentInfo.contentDictName;
+                if (
+                    contentDictName === RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME ||
+                    contentDictName === RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME
+                ) {
+                    ++sharedGlossaryRowCount;
+                }
+            } else {
+                contentBytes = this._normalizeArtifactTermContentBytes(contentBytes, termContentStorageMode);
             }
-            contentBytes = this._normalizeArtifactTermContentBytes(contentBytes, termContentStorageMode);
             cursor = contentEnd;
             if (streamToChunkHandler) {
                 if (directArtifactChunkImport) {
@@ -3179,6 +3183,51 @@ export class DictionaryImporter {
             );
         } catch (_) {
             return termEntryContentBytes;
+        }
+    }
+
+    /**
+     * @param {Uint8Array} termEntryContentBytes
+     * @param {number} sharedGlossaryBaseOffset
+     * @returns {{contentBytes: Uint8Array, contentDictName: string|null}}
+     */
+    _normalizeArtifactTermContent(termEntryContentBytes, sharedGlossaryBaseOffset = 0) {
+        let contentBytes = termEntryContentBytes;
+        const sharedGlossary = isRawTermContentSharedGlossaryBinary(contentBytes);
+        if (sharedGlossary && sharedGlossaryBaseOffset > 0) {
+            contentBytes = rebaseRawTermContentSharedGlossaryBinary(contentBytes, sharedGlossaryBaseOffset);
+        }
+        if (sharedGlossary) {
+            return {
+                contentBytes,
+                contentDictName: sharedGlossaryBaseOffset > 0 ?
+                    RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME :
+                    RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME,
+            };
+        }
+        if (decodeRawTermContentBinary(contentBytes, this._textDecoder) !== null) {
+            return {contentBytes, contentDictName: 'raw'};
+        }
+        try {
+            const value = /** @type {{rules?: unknown, definitionTags?: unknown, termTags?: unknown, glossary?: unknown}} */ (
+                parseJson(this._textDecoder.decode(contentBytes))
+            );
+            const rules = typeof value.rules === 'string' ? value.rules : '';
+            const definitionTags = typeof value.definitionTags === 'string' ? value.definitionTags : '';
+            const termTags = typeof value.termTags === 'string' ? value.termTags : '';
+            const glossaryJsonBytes = this._textEncoder.encode(JSON.stringify(Array.isArray(value.glossary) ? value.glossary : []));
+            return {
+                contentBytes: encodeRawTermContentBinary(
+                    rules,
+                    definitionTags,
+                    termTags,
+                    glossaryJsonBytes,
+                    this._textEncoder,
+                ),
+                contentDictName: 'raw',
+            };
+        } catch (_) {
+            return {contentBytes, contentDictName: null};
         }
     }
 
