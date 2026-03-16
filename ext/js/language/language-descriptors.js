@@ -33,6 +33,7 @@ import {removeDoubleAcuteAccents} from './el/modern-greek-processors.js';
 import {englishTransforms} from './en/english-transforms.js';
 import {esperantoTransforms} from './eo/esperanto-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
+import {basqueTransforms} from './eu/basque-transforms.js';
 import {apostropheVariants} from './fr/french-text-preprocessors.js';
 import {frenchTransforms} from './fr/french-transforms.js';
 import {irishTransforms} from './ga/irish-transforms.js';
@@ -195,6 +196,14 @@ const languageDescriptors = [
         iso639_3: 'est',
         name: 'Estonian',
         exampleText: 'lugema',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
+        iso: 'eu',
+        iso639_3: 'eus',
+        name: 'Basque',
+        exampleText: 'irakurri',
+        languageTransforms: basqueTransforms,
         textPreprocessors: capitalizationPreprocessors,
     },
     {
