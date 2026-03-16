@@ -84,6 +84,7 @@ Install from the latest GitHub release page:
 - [ ] Yomitan export
 - [ ] Deletion
 - [ ] Lookups
+- [ ] Move GitHub-hosted default dictionaries to CDNs
 - [ ] 64KB chunking of glossaries for compression
 - [ ] Add the ManabiDictionaries custom zstd dictionaries
 
