@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@
 
 import {koreanTransforms} from '../../ext/js/language/ko/korean-transforms.js';
 import {LanguageTransformer} from '../../ext/js/language/language-transformer.js';
-import {testLanguageTransformer} from '../fixtures/language-transformer-test.js';
 import {Hangul} from '../../ext/lib/hangul-js.js';
+import {testLanguageTransformer} from '../fixtures/language-transformer-test.js';
 
 /* eslint-disable @stylistic/no-multi-spaces */
 const tests = [

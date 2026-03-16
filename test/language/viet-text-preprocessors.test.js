@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {normalizeDiacritics} from '../../ext/js/language/vi/viet-text-preprocessors.js';
 import {describe, expect, test} from 'vitest';
+import {normalizeDiacritics} from '../../ext/js/language/vi/viet-text-preprocessors.js';
 
 const testCasesOldStyle = [
     ['hoạ', 'họa'],
