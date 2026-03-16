@@ -26,6 +26,7 @@ const SHARD_DIRECTORY_NAME = 'manabitan-term-records';
 const SHARD_FILE_PREFIX = 'dict-';
 const SHARD_FILE_SUFFIX = '.mbtr';
 const SHARD_FILE_CONTENT_DICT_SEPARATOR = '|';
+const SHARD_FILE_SEGMENT_SEPARATOR = '^';
 const BINARY_MAGIC_TEXT = 'MBTRR11B';
 const PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRR10B';
 const PREVIOUS_PREVIOUS_BINARY_MAGIC_TEXT = 'MBTRREC9';
@@ -57,6 +58,7 @@ const DEFAULT_WRITE_COALESCE_TARGET_BYTES = 4 * 1024 * 1024;
 const LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
 const HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES = 8 * 1024 * 1024;
 const WRITE_COALESCE_MAX_CHUNKS = 512;
+const MAX_SHARD_SEGMENT_FILE_BYTES = 128 * 1024 * 1024;
 
 /**
  * @param {unknown[]} rows
@@ -234,6 +236,8 @@ class DenseIdRecordStore {
  * @property {Promise<void>|null} queuedWritePromise
  * @property {Uint8Array[]} queuedWriteChunks
  * @property {string|null} sharedContentDictName
+ * @property {number} segmentIndex
+ * @property {string} logicalKey
  */
 
 export class TermRecordOpfsStore {
@@ -244,6 +248,8 @@ export class TermRecordOpfsStore {
         this._recordsDirectoryHandle = null;
         /** @type {Map<string, TermRecordShardState>} */
         this._shardStateByFileName = new Map();
+        /** @type {Map<string, TermRecordShardState>} */
+        this._activeAppendShardStateByKey = new Map();
         /** @type {number} */
         this._flushThresholdBytes = this._computeFlushThresholdBytes();
         /** @type {number} */
@@ -285,6 +291,7 @@ export class TermRecordOpfsStore {
         this._rootDirectoryHandle = null;
         this._recordsDirectoryHandle = null;
         this._shardStateByFileName.clear();
+        this._activeAppendShardStateByKey.clear();
         this._invalidShardFileNames = [];
         if (typeof navigator === 'undefined' || !('storage' in navigator) || !('getDirectory' in navigator.storage)) {
             return;
@@ -349,6 +356,7 @@ export class TermRecordOpfsStore {
         this._indexDirty = false;
         this._shardStateByFileName.clear();
         this._invalidShardFileNames = [];
+        this._activeAppendShardStateByKey.clear();
         if (this._recordsDirectoryHandle === null) {
             return;
         }
@@ -1084,18 +1092,32 @@ export class TermRecordOpfsStore {
      */
     async verifyIntegrity(expectedDictionaryNames = null) {
         /** @type {Set<string>} */
-        const expectedFileNames = new Set();
+        const expectedShardKeys = new Set();
         /** @type {Set<string>} */
-        const expectedFileNamesFromRecords = new Set();
+        const expectedShardKeysFromRecords = new Set();
         for (const record of this._recordsById.values()) {
-            const fileName = this._getShardFileName(record.dictionary, record.entryContentDictName);
-            expectedFileNames.add(fileName);
-            expectedFileNamesFromRecords.add(fileName);
+            const shardKey = this._getShardFileName(record.dictionary, record.entryContentDictName);
+            expectedShardKeys.add(shardKey);
+            expectedShardKeysFromRecords.add(shardKey);
         }
         if (Array.isArray(expectedDictionaryNames)) {
             for (const dictionaryName of expectedDictionaryNames) {
                 if (typeof dictionaryName !== 'string' || dictionaryName.length === 0) { continue; }
-                expectedFileNames.add(this._getShardFileName(dictionaryName));
+                expectedShardKeys.add(this._getShardFileName(dictionaryName));
+            }
+        }
+
+        /** @type {Map<string, string[]>} */
+        const actualFilesByShardKey = new Map();
+        for (const fileName of this._shardStateByFileName.keys()) {
+            const shardInfo = this._decodeShardInfoFromShardFileName(fileName);
+            if (shardInfo === null) { continue; }
+            const shardKey = this._getShardFileName(shardInfo.dictionaryName, shardInfo.contentDictName);
+            const existing = actualFilesByShardKey.get(shardKey);
+            if (typeof existing === 'undefined') {
+                actualFilesByShardKey.set(shardKey, [fileName]);
+            } else {
+                existing.push(fileName);
             }
         }
 
@@ -1103,14 +1125,14 @@ export class TermRecordOpfsStore {
         const missingShardFileNames = [];
         /** @type {string[]} */
         const orphanShardFileNames = [];
-        for (const fileName of expectedFileNames) {
-            if (!this._shardStateByFileName.has(fileName)) {
-                missingShardFileNames.push(fileName);
+        for (const shardKey of expectedShardKeys) {
+            if (!actualFilesByShardKey.has(shardKey)) {
+                missingShardFileNames.push(shardKey);
             }
         }
-        for (const fileName of this._shardStateByFileName.keys()) {
-            if (!expectedFileNames.has(fileName)) {
-                orphanShardFileNames.push(fileName);
+        for (const [shardKey, fileNames] of actualFilesByShardKey) {
+            if (!expectedShardKeys.has(shardKey)) {
+                orphanShardFileNames.push(...fileNames);
             }
         }
 
@@ -1130,7 +1152,7 @@ export class TermRecordOpfsStore {
         let rewroteAllShardsFromMemory = false;
         let shouldRewriteFromMemory = false;
         for (const fileName of missingShardFileNames) {
-            if (expectedFileNamesFromRecords.has(fileName)) {
+            if (expectedShardKeysFromRecords.has(fileName)) {
                 shouldRewriteFromMemory = true;
                 break;
             }
@@ -1148,7 +1170,7 @@ export class TermRecordOpfsStore {
             .filter((value) => typeof value === 'string');
 
         const summary = {
-            expectedShardCount: expectedFileNames.size,
+            expectedShardCount: expectedShardKeys.size,
             actualShardCount: this._shardStateByFileName.size,
             missingShardCount: missingShardFileNames.length,
             missingShardFileNames: [...missingShardFileNames].sort(),
@@ -1842,6 +1864,7 @@ export class TermRecordOpfsStore {
         }
         await this._closeAllWritables();
         this._shardStateByFileName.clear();
+        this._activeAppendShardStateByKey.clear();
 
         const existingShardFileNames = await this._listShardFileNames();
         for (const fileName of existingShardFileNames) {
@@ -1879,7 +1902,9 @@ export class TermRecordOpfsStore {
                 fileLength = output.byteLength;
             }
             await writable.close();
-            this._shardStateByFileName.set(fileName, this._createShardState(fileName, fileHandle, fileLength, contentDictName));
+            const state = this._createShardState(fileName, fileHandle, fileLength, contentDictName);
+            this._shardStateByFileName.set(fileName, state);
+            this._setActiveAppendShardState(state);
         }
     }
 
@@ -1910,8 +1935,17 @@ export class TermRecordOpfsStore {
                 continue;
             }
             ++shardFileCount;
-            const state = this._createShardState(name, fileHandle, file.size);
+            const shardInfo = this._decodeShardInfoFromShardFileName(name);
+            const state = this._createShardState(
+                name,
+                fileHandle,
+                file.size,
+                null,
+                shardInfo?.segmentIndex ?? 0,
+                shardInfo === null ? name : this._getShardFileName(shardInfo.dictionaryName, shardInfo.contentDictName),
+            );
             this._shardStateByFileName.set(name, state);
+            this._setActiveAppendShardState(state);
             if (file.size <= 0) {
                 continue;
             }
@@ -2024,15 +2058,27 @@ export class TermRecordOpfsStore {
             return null;
         }
         const normalizedContentDictName = this._normalizeContentDictName(contentDictName);
-        const fileName = this._getShardFileName(dictionaryName, normalizedContentDictName);
-        const existing = this._shardStateByFileName.get(fileName);
+        const logicalKey = this._getShardFileName(dictionaryName, normalizedContentDictName);
+        const existing = this._activeAppendShardStateByKey.get(logicalKey);
         if (typeof existing !== 'undefined') {
-            return existing;
+            if (existing.fileLength < MAX_SHARD_SEGMENT_FILE_BYTES) {
+                return existing;
+            }
+            const nextSegmentIndex = existing.segmentIndex + 1;
+            const nextFileName = this._getShardSegmentFileName(dictionaryName, normalizedContentDictName, nextSegmentIndex);
+            const nextFileHandle = await this._recordsDirectoryHandle.getFileHandle(nextFileName, {create: true});
+            const nextFile = await nextFileHandle.getFile();
+            const created = this._createShardState(nextFileName, nextFileHandle, nextFile.size, normalizedContentDictName, nextSegmentIndex, logicalKey);
+            this._shardStateByFileName.set(nextFileName, created);
+            this._activeAppendShardStateByKey.set(logicalKey, created);
+            return created;
         }
+        const fileName = this._getShardSegmentFileName(dictionaryName, normalizedContentDictName, 0);
         const fileHandle = await this._recordsDirectoryHandle.getFileHandle(fileName, {create: true});
         const file = await fileHandle.getFile();
-        const created = this._createShardState(fileName, fileHandle, file.size, normalizedContentDictName);
+        const created = this._createShardState(fileName, fileHandle, file.size, normalizedContentDictName, 0, logicalKey);
         this._shardStateByFileName.set(fileName, created);
+        this._activeAppendShardStateByKey.set(logicalKey, created);
         return created;
     }
 
@@ -2152,6 +2198,7 @@ export class TermRecordOpfsStore {
                 await this._flushPendingWritesForShard(state);
                 await this._closeShardWritable(state);
                 this._shardStateByFileName.delete(fileName);
+                this._activeAppendShardStateByKey.delete(state.logicalKey);
             }
             try {
                 await this._recordsDirectoryHandle.removeEntry(fileName);
@@ -2166,9 +2213,11 @@ export class TermRecordOpfsStore {
      * @param {FileSystemFileHandle} fileHandle
      * @param {number} fileLength
      * @param {string|null} [sharedContentDictName]
+     * @param {number} [segmentIndex=0]
+     * @param {string|null} [logicalKey=null]
      * @returns {TermRecordShardState}
      */
-    _createShardState(fileName, fileHandle, fileLength, sharedContentDictName = null) {
+    _createShardState(fileName, fileHandle, fileLength, sharedContentDictName = null, segmentIndex = 0, logicalKey = null) {
         return {
             fileName,
             fileHandle,
@@ -2180,6 +2229,8 @@ export class TermRecordOpfsStore {
             queuedWritePromise: null,
             queuedWriteChunks: [],
             sharedContentDictName,
+            segmentIndex,
+            logicalKey: logicalKey ?? fileName,
         };
     }
 
@@ -2336,6 +2387,20 @@ export class TermRecordOpfsStore {
     }
 
     /**
+     * @param {string} dictionaryName
+     * @param {string} [contentDictName='raw']
+     * @param {number} [segmentIndex=0]
+     * @returns {string}
+     */
+    _getShardSegmentFileName(dictionaryName, contentDictName = 'raw', segmentIndex = 0) {
+        const baseFileName = this._getShardFileName(dictionaryName, contentDictName);
+        if (segmentIndex <= 0) {
+            return baseFileName;
+        }
+        return `${baseFileName.slice(0, -SHARD_FILE_SUFFIX.length)}${SHARD_FILE_SEGMENT_SEPARATOR}${segmentIndex}${SHARD_FILE_SUFFIX}`;
+    }
+
+    /**
      * @param {string} fileName
      * @returns {boolean}
      */
@@ -2364,18 +2429,27 @@ export class TermRecordOpfsStore {
 
     /**
      * @param {string} fileName
-     * @returns {{dictionaryName: string, contentDictName: string}|null}
+     * @returns {{dictionaryName: string, contentDictName: string, segmentIndex: number}|null}
      */
     _decodeShardInfoFromShardFileName(fileName) {
         if (!this._isShardFileName(fileName)) {
             return null;
         }
-        const encoded = fileName.slice(SHARD_FILE_PREFIX.length, fileName.length - SHARD_FILE_SUFFIX.length);
+        let encoded = fileName.slice(SHARD_FILE_PREFIX.length, fileName.length - SHARD_FILE_SUFFIX.length);
+        let segmentIndex = 0;
+        const segmentSeparatorIndex = encoded.lastIndexOf(SHARD_FILE_SEGMENT_SEPARATOR);
+        if (segmentSeparatorIndex > 0) {
+            const segmentValue = encoded.slice(segmentSeparatorIndex + SHARD_FILE_SEGMENT_SEPARATOR.length);
+            if (/^[0-9]+$/.test(segmentValue)) {
+                segmentIndex = Number.parseInt(segmentValue, 10);
+                encoded = encoded.slice(0, segmentSeparatorIndex);
+            }
+        }
         const separatorIndex = encoded.indexOf(SHARD_FILE_CONTENT_DICT_SEPARATOR);
         try {
             if (separatorIndex <= 0) {
                 const dictionaryName = decodeURIComponent(encoded);
-                return dictionaryName.length > 0 ? {dictionaryName, contentDictName: 'raw'} : null;
+                return dictionaryName.length > 0 ? {dictionaryName, contentDictName: 'raw', segmentIndex} : null;
             }
             const dictionaryLength = Number.parseInt(encoded.slice(0, separatorIndex), 10);
             if (!Number.isFinite(dictionaryLength) || dictionaryLength < 0) {
@@ -2393,9 +2467,21 @@ export class TermRecordOpfsStore {
             return {
                 dictionaryName,
                 contentDictName: contentDictName.length > 0 ? contentDictName : 'raw',
+                segmentIndex,
             };
         } catch (_) {
             return null;
+        }
+    }
+
+    /**
+     * @param {TermRecordShardState} state
+     * @returns {void}
+     */
+    _setActiveAppendShardState(state) {
+        const existing = this._activeAppendShardStateByKey.get(state.logicalKey);
+        if (typeof existing === 'undefined' || existing.segmentIndex <= state.segmentIndex) {
+            this._activeAppendShardStateByKey.set(state.logicalKey, state);
         }
     }
 
