@@ -2067,16 +2067,28 @@ export class TermRecordOpfsStore {
             const nextSegmentIndex = existing.segmentIndex + 1;
             const nextFileName = this._getShardSegmentFileName(dictionaryName, normalizedContentDictName, nextSegmentIndex);
             const nextFileHandle = await this._recordsDirectoryHandle.getFileHandle(nextFileName, {create: true});
-            const nextFile = await nextFileHandle.getFile();
-            const created = this._createShardState(nextFileName, nextFileHandle, nextFile.size, normalizedContentDictName, nextSegmentIndex, logicalKey);
+            const created = this._createShardState(
+                nextFileName,
+                nextFileHandle,
+                this._importSessionActive ? 0 : (await nextFileHandle.getFile()).size,
+                normalizedContentDictName,
+                nextSegmentIndex,
+                logicalKey,
+            );
             this._shardStateByFileName.set(nextFileName, created);
             this._activeAppendShardStateByKey.set(logicalKey, created);
             return created;
         }
         const fileName = this._getShardSegmentFileName(dictionaryName, normalizedContentDictName, 0);
         const fileHandle = await this._recordsDirectoryHandle.getFileHandle(fileName, {create: true});
-        const file = await fileHandle.getFile();
-        const created = this._createShardState(fileName, fileHandle, file.size, normalizedContentDictName, 0, logicalKey);
+        const created = this._createShardState(
+            fileName,
+            fileHandle,
+            this._importSessionActive ? 0 : (await fileHandle.getFile()).size,
+            normalizedContentDictName,
+            0,
+            logicalKey,
+        );
         this._shardStateByFileName.set(fileName, created);
         this._activeAppendShardStateByKey.set(logicalKey, created);
         return created;
