@@ -19,6 +19,8 @@ import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {safePerformance} from '../core/safe-performance.js';
 
 const FILE_NAME = 'manabitan-term-content.bin';
+const FILE_NAME_SEGMENT_SEPARATOR = '^';
+const MAX_FILE_SEGMENT_BYTES = 128 * 1024 * 1024;
 const READ_PAGE_SIZE_BYTES = 64 * 1024;
 const DEFAULT_READ_PAGE_CACHE_MAX_PAGES = 128;
 const LOW_MEMORY_READ_PAGE_CACHE_MAX_PAGES = 48;
@@ -43,6 +45,8 @@ export class TermContentOpfsStore {
         this._fileHandle = null;
         /** @type {FileSystemWritableFileStream|null} */
         this._writable = null;
+        /** @type {Array<{index: number, fileName: string, fileHandle: FileSystemFileHandle, fileLength: number, startOffset: number, readFile: File|null}>} */
+        this._segmentStates = [];
         /** @type {Uint8Array[]} */
         this._chunks = [];
         /** @type {number[]} */
@@ -63,9 +67,7 @@ export class TermContentOpfsStore {
         this._importSessionActive = false;
         /** @type {boolean} */
         this._loadedForRead = false;
-        /** @type {File|null} */
-        this._readFile = null;
-        /** @type {Map<number, Uint8Array>} */
+        /** @type {Map<string, Uint8Array>} */
         this._readPageCache = new Map();
         /** @type {string} */
         this._lastSliceCacheKey = '';
@@ -101,9 +103,14 @@ export class TermContentOpfsStore {
             return;
         }
         const root = await navigator.storage.getDirectory();
-        this._fileHandle = await root.getFileHandle(FILE_NAME, {create: true});
-        const file = await this._fileHandle.getFile();
-        this._length = file.size;
+        this._segmentStates = await this._loadSegmentStates(root);
+        if (this._segmentStates.length === 0) {
+            const fileHandle = await root.getFileHandle(FILE_NAME, {create: true});
+            const file = await fileHandle.getFile();
+            this._segmentStates.push(this._createSegmentState(0, FILE_NAME, fileHandle, file.size, 0));
+        }
+        this._length = this._computeSegmentedLength();
+        this._syncActiveSegmentState();
         this._chunks = [];
         this._chunkOffsets = [];
         this._invalidateReadState();
@@ -138,7 +145,7 @@ export class TermContentOpfsStore {
             return;
         }
         this._writable = await this._fileHandle.createWritable({keepExistingData: true});
-        await this._writable.seek(this._length);
+        await this._writable.seek(this._getActiveSegmentState()?.fileLength ?? 0);
     }
 
     /**
@@ -240,9 +247,20 @@ export class TermContentOpfsStore {
             this._invalidateReadState();
             return;
         }
-        const writable = await this._fileHandle.createWritable();
+        const root = await navigator.storage.getDirectory();
+        for (const state of await this._loadSegmentStates(root)) {
+            try {
+                await root.removeEntry(state.fileName);
+            } catch (_) {
+                // NOP
+            }
+        }
+        const fileHandle = await root.getFileHandle(FILE_NAME, {create: true});
+        const writable = await fileHandle.createWritable();
         await writable.truncate(0);
         await writable.close();
+        this._segmentStates = [this._createSegmentState(0, FILE_NAME, fileHandle, 0, 0)];
+        this._syncActiveSegmentState();
         this._chunks = [];
         this._chunkOffsets = [];
         this._length = 0;
@@ -360,9 +378,15 @@ export class TermContentOpfsStore {
             return;
         }
         try {
-            const file = await this._fileHandle.getFile();
-            this._length = file.size;
-            this._readFile = file;
+            let startOffset = 0;
+            for (const state of this._segmentStates) {
+                const file = await state.fileHandle.getFile();
+                state.fileLength = file.size;
+                state.startOffset = startOffset;
+                state.readFile = file;
+                startOffset += file.size;
+            }
+            this._length = startOffset;
             this._readPageCache.clear();
             this._loadedForRead = true;
         } catch (error) {
@@ -383,8 +407,7 @@ export class TermContentOpfsStore {
         }
         if (this._writable === null) {
             this._writable = await this._fileHandle.createWritable({keepExistingData: true});
-            const seekOffset = this._length - this._pendingWriteBytes;
-            await this._writable.seek(Math.max(0, seekOffset));
+            await this._writable.seek(this._getActiveSegmentState()?.fileLength ?? 0);
         }
         const chunks = this._pendingWriteChunks;
         this._pendingWriteBytes = 0;
@@ -452,12 +475,12 @@ export class TermContentOpfsStore {
      * @returns {Promise<void>}
      */
     async _writePendingChunksCoalesced(chunks) {
-        if (this._writable === null) { return; }
+        if (this._fileHandle === null) { return; }
         /** @type {Uint8Array[]} */
         let group = [];
         let groupBytes = 0;
         const flushGroup = async (reason = 'final') => {
-            if (group.length === 0 || this._writable === null) {
+            if (group.length === 0) {
                 group = [];
                 groupBytes = 0;
                 return;
@@ -479,7 +502,7 @@ export class TermContentOpfsStore {
             }
             if (group.length === 1) {
                 ++this._writeDrainMetrics.singleChunkWriteCount;
-                await this._writable.write(group[0]);
+                await this._writeChunkToActiveSegment(group[0]);
                 group = [];
                 groupBytes = 0;
                 return;
@@ -502,7 +525,7 @@ export class TermContentOpfsStore {
                 merged.set(chunk, offset);
                 offset += chunk.byteLength;
             }
-            await this._writable.write(merged);
+            await this._writeChunkToActiveSegment(merged);
             group = [];
             groupBytes = 0;
         };
@@ -614,29 +637,27 @@ export class TermContentOpfsStore {
      * @returns {Promise<Uint8Array|null>}
      */
     async _readSliceFromFile(offset, length) {
-        if (this._readFile === null) {
+        if (this._segmentStates.length === 0) {
             return null;
         }
         for (let attempt = 0; attempt < 2; ++attempt) {
             try {
                 const output = new Uint8Array(length);
-                const pageSize = READ_PAGE_SIZE_BYTES;
-                const startPage = Math.floor(offset / pageSize);
-                const endPage = Math.floor((offset + length - 1) / pageSize);
                 let outputOffset = 0;
-                for (let pageIndex = startPage; pageIndex <= endPage; ++pageIndex) {
-                    const page = await this._getReadPage(pageIndex);
-                    if (page === null) {
+                let cursor = offset;
+                while (outputOffset < length) {
+                    const state = this._findSegmentStateForOffset(cursor);
+                    if (state === null || state.readFile === null) {
                         return null;
                     }
-                    const pageStartOffset = pageIndex * pageSize;
-                    const rangeStart = Math.max(offset, pageStartOffset);
-                    const rangeEnd = Math.min(offset + length, pageStartOffset + page.byteLength);
-                    const copyLength = rangeEnd - rangeStart;
-                    if (copyLength <= 0) { continue; }
-                    const pageStart = rangeStart - pageStartOffset;
-                    output.set(page.subarray(pageStart, pageStart + copyLength), outputOffset);
+                    const localOffset = cursor - state.startOffset;
+                    const copyLength = Math.min(length - outputOffset, state.fileLength - localOffset);
+                    if (copyLength <= 0) {
+                        return null;
+                    }
+                    await this._copyFileRangeIntoOutput(state, localOffset, copyLength, output, outputOffset);
                     outputOffset += copyLength;
+                    cursor += copyLength;
                 }
                 return outputOffset === length ? output : null;
             } catch (error) {
@@ -653,44 +674,46 @@ export class TermContentOpfsStore {
     }
 
     /**
+     * @param {{index: number, readFile: File|null, fileLength: number}} state
      * @param {number} pageIndex
      * @returns {Promise<Uint8Array|null>}
      */
-    async _getReadPage(pageIndex) {
-        const cached = this._readPageCache.get(pageIndex);
+    async _getReadPage(state, pageIndex) {
+        const cacheKey = `${state.index}:${pageIndex}`;
+        const cached = this._readPageCache.get(cacheKey);
         if (typeof cached !== 'undefined') {
-            this._touchReadPage(pageIndex, cached);
+            this._touchReadPage(cacheKey, cached);
             return cached;
         }
-        const file = this._readFile;
+        const file = state.readFile;
         if (file === null) {
             return null;
         }
         const pageOffset = pageIndex * READ_PAGE_SIZE_BYTES;
-        if (pageOffset >= this._length) {
+        if (pageOffset >= state.fileLength) {
             return null;
         }
-        const pageEnd = Math.min(this._length, pageOffset + READ_PAGE_SIZE_BYTES);
+        const pageEnd = Math.min(state.fileLength, pageOffset + READ_PAGE_SIZE_BYTES);
         const bytes = new Uint8Array(await file.slice(pageOffset, pageEnd).arrayBuffer());
-        this._setReadPage(pageIndex, bytes);
+        this._setReadPage(cacheKey, bytes);
         return bytes;
     }
 
     /**
-     * @param {number} pageIndex
+     * @param {string} cacheKey
      * @param {Uint8Array} page
      */
-    _touchReadPage(pageIndex, page) {
-        this._readPageCache.delete(pageIndex);
-        this._readPageCache.set(pageIndex, page);
+    _touchReadPage(cacheKey, page) {
+        this._readPageCache.delete(cacheKey);
+        this._readPageCache.set(cacheKey, page);
     }
 
     /**
-     * @param {number} pageIndex
+     * @param {string} cacheKey
      * @param {Uint8Array} page
      */
-    _setReadPage(pageIndex, page) {
-        this._readPageCache.set(pageIndex, page);
+    _setReadPage(cacheKey, page) {
+        this._readPageCache.set(cacheKey, page);
         while (this._readPageCache.size > this._readPageCacheMaxPages) {
             const first = this._readPageCache.keys().next();
             if (first.done) {
@@ -725,7 +748,9 @@ export class TermContentOpfsStore {
     /** */
     _invalidateReadState() {
         this._loadedForRead = false;
-        this._readFile = null;
+        for (const state of this._segmentStates) {
+            state.readFile = null;
+        }
         this._readPageCache.clear();
         this._lastSliceCacheKey = '';
         this._lastSliceCacheValue = null;
@@ -787,7 +812,9 @@ export class TermContentOpfsStore {
             reason: this._asErrorText(error),
             action: 'retry-open-file',
         });
-        this._readFile = null;
+        for (const state of this._segmentStates) {
+            state.readFile = null;
+        }
         this._readPageCache.clear();
         const refreshed = await this._refreshReadFileSnapshot({reacquireHandle: false});
         if (refreshed) {
@@ -812,21 +839,242 @@ export class TermContentOpfsStore {
                     'getDirectory' in navigator.storage
                 ) {
                     const root = await navigator.storage.getDirectory();
-                    this._fileHandle = await root.getFileHandle(FILE_NAME, {create: true});
+                    this._segmentStates = await this._loadSegmentStates(root);
+                    if (this._segmentStates.length === 0) {
+                        const fileHandle = await root.getFileHandle(FILE_NAME, {create: true});
+                        const file = await fileHandle.getFile();
+                        this._segmentStates.push(this._createSegmentState(0, FILE_NAME, fileHandle, file.size, 0));
+                    }
+                    this._syncActiveSegmentState();
                 }
             } catch (_) {
                 // NOP
             }
         }
         try {
-            const file = await this._fileHandle.getFile();
-            this._length = file.size;
-            this._readFile = file;
+            let startOffset = 0;
+            for (const state of this._segmentStates) {
+                const file = await state.fileHandle.getFile();
+                state.fileLength = file.size;
+                state.startOffset = startOffset;
+                state.readFile = file;
+                startOffset += file.size;
+            }
+            this._length = startOffset;
             this._readPageCache.clear();
             this._loadedForRead = true;
             return true;
         } catch (_) {
             return false;
+        }
+    }
+
+    /**
+     * @returns {{index: number, fileName: string, fileHandle: FileSystemFileHandle, fileLength: number, startOffset: number, readFile: File|null}|null}
+     */
+    _getActiveSegmentState() {
+        return this._segmentStates.length > 0 ? this._segmentStates[this._segmentStates.length - 1] : null;
+    }
+
+    /** */
+    _syncActiveSegmentState() {
+        const activeSegment = this._getActiveSegmentState();
+        this._fileHandle = activeSegment?.fileHandle ?? null;
+        this._writable = null;
+    }
+
+    /**
+     * @param {FileSystemDirectoryHandle} root
+     * @returns {Promise<Array<{index: number, fileName: string, fileHandle: FileSystemFileHandle, fileLength: number, startOffset: number, readFile: File|null}>>}
+     */
+    async _loadSegmentStates(root) {
+        const entriesMethod = /** @type {unknown} */ (Reflect.get(root, 'entries'));
+        if (typeof entriesMethod !== 'function') {
+            return [];
+        }
+        const entries = /** @type {() => AsyncIterable<[string, FileSystemHandle]>} */ (entriesMethod).call(root);
+        /** @type {Array<{index: number, fileName: string, fileHandle: FileSystemFileHandle, fileLength: number, startOffset: number, readFile: File|null}>} */
+        const states = [];
+        for await (const [name, handle] of entries) {
+            if (handle.kind !== 'file') { continue; }
+            const fileName = String(name);
+            const index = this._parseSegmentIndexFromFileName(fileName);
+            if (index === null) { continue; }
+            const fileHandle = /** @type {FileSystemFileHandle} */ (handle);
+            let fileLength = 0;
+            try {
+                fileLength = (await fileHandle.getFile()).size;
+            } catch (_) {
+                continue;
+            }
+            states.push(this._createSegmentState(index, fileName, fileHandle, fileLength, 0));
+        }
+        states.sort((a, b) => a.index - b.index);
+        let startOffset = 0;
+        for (const state of states) {
+            state.startOffset = startOffset;
+            startOffset += state.fileLength;
+        }
+        return states;
+    }
+
+    /**
+     * @param {number} index
+     * @param {string} fileName
+     * @param {FileSystemFileHandle} fileHandle
+     * @param {number} fileLength
+     * @param {number} startOffset
+     * @returns {{index: number, fileName: string, fileHandle: FileSystemFileHandle, fileLength: number, startOffset: number, readFile: File|null}}
+     */
+    _createSegmentState(index, fileName, fileHandle, fileLength, startOffset) {
+        return {index, fileName, fileHandle, fileLength, startOffset, readFile: null};
+    }
+
+    /**
+     * @returns {number}
+     */
+    _computeSegmentedLength() {
+        let total = 0;
+        for (const state of this._segmentStates) {
+            state.startOffset = total;
+            total += state.fileLength;
+        }
+        return total;
+    }
+
+    /**
+     * @param {number} index
+     * @returns {string}
+     */
+    _getSegmentFileName(index) {
+        if (index <= 0) {
+            return FILE_NAME;
+        }
+        const suffixIndex = FILE_NAME.lastIndexOf('.');
+        if (suffixIndex < 0) {
+            return `${FILE_NAME}${FILE_NAME_SEGMENT_SEPARATOR}${index}`;
+        }
+        return `${FILE_NAME.slice(0, suffixIndex)}${FILE_NAME_SEGMENT_SEPARATOR}${index}${FILE_NAME.slice(suffixIndex)}`;
+    }
+
+    /**
+     * @param {string} fileName
+     * @returns {number|null}
+     */
+    _parseSegmentIndexFromFileName(fileName) {
+        if (fileName === FILE_NAME) {
+            return 0;
+        }
+        const suffixIndex = FILE_NAME.lastIndexOf('.');
+        if (suffixIndex < 0) {
+            return null;
+        }
+        const prefix = FILE_NAME.slice(0, suffixIndex);
+        const suffix = FILE_NAME.slice(suffixIndex);
+        if (!fileName.startsWith(`${prefix}${FILE_NAME_SEGMENT_SEPARATOR}`) || !fileName.endsWith(suffix)) {
+            return null;
+        }
+        const value = fileName.slice(prefix.length + FILE_NAME_SEGMENT_SEPARATOR.length, fileName.length - suffix.length);
+        return /^[0-9]+$/.test(value) ? Number.parseInt(value, 10) : null;
+    }
+
+    /**
+     * @param {number} offset
+     * @returns {{index: number, fileName: string, fileHandle: FileSystemFileHandle, fileLength: number, startOffset: number, readFile: File|null}|null}
+     */
+    _findSegmentStateForOffset(offset) {
+        let low = 0;
+        let high = this._segmentStates.length - 1;
+        while (low <= high) {
+            const mid = (low + high) >>> 1;
+            const state = this._segmentStates[mid];
+            const start = state.startOffset;
+            const end = start + state.fileLength;
+            if (offset < start) {
+                high = mid - 1;
+            } else if (offset >= end) {
+                low = mid + 1;
+            } else {
+                return state;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {{index: number, fileName: string, fileHandle: FileSystemFileHandle, fileLength: number, startOffset: number, readFile: File|null}} state
+     * @param {number} localOffset
+     * @param {number} length
+     * @param {Uint8Array} output
+     * @param {number} outputOffset
+     * @returns {Promise<void>}
+     */
+    async _copyFileRangeIntoOutput(state, localOffset, length, output, outputOffset) {
+        const pageSize = READ_PAGE_SIZE_BYTES;
+        const startPage = Math.floor(localOffset / pageSize);
+        const endPage = Math.floor((localOffset + length - 1) / pageSize);
+        for (let pageIndex = startPage; pageIndex <= endPage; ++pageIndex) {
+            const page = await this._getReadPage(state, pageIndex);
+            if (page === null) {
+                throw new Error('Missing term-content page');
+            }
+            const pageStartOffset = pageIndex * pageSize;
+            const rangeStart = Math.max(localOffset, pageStartOffset);
+            const rangeEnd = Math.min(localOffset + length, pageStartOffset + page.byteLength);
+            const copyLength = rangeEnd - rangeStart;
+            if (copyLength <= 0) { continue; }
+            const pageStart = rangeStart - pageStartOffset;
+            output.set(page.subarray(pageStart, pageStart + copyLength), outputOffset);
+            outputOffset += copyLength;
+        }
+    }
+
+    /**
+     * @param {number} nextChunkBytes
+     * @returns {Promise<void>}
+     */
+    async _rollActiveSegmentIfNeeded(nextChunkBytes) {
+        const activeSegment = this._getActiveSegmentState();
+        if (activeSegment === null) {
+            return;
+        }
+        if (this._writable === null) {
+            this._writable = await activeSegment.fileHandle.createWritable({keepExistingData: true});
+            await this._writable.seek(activeSegment.fileLength);
+        }
+        if (activeSegment.fileLength <= 0 || (activeSegment.fileLength + nextChunkBytes) <= MAX_FILE_SEGMENT_BYTES) {
+            return;
+        }
+        await this._closeWritable();
+        const root = await navigator.storage.getDirectory();
+        const nextIndex = activeSegment.index + 1;
+        const nextFileName = this._getSegmentFileName(nextIndex);
+        const nextFileHandle = await root.getFileHandle(nextFileName, {create: true});
+        const nextFile = await nextFileHandle.getFile();
+        const nextState = this._createSegmentState(nextIndex, nextFileName, nextFileHandle, nextFile.size, activeSegment.startOffset + activeSegment.fileLength);
+        this._segmentStates.push(nextState);
+        this._syncActiveSegmentState();
+        this._writable = await nextFileHandle.createWritable({keepExistingData: true});
+        await this._writable.seek(nextState.fileLength);
+    }
+
+    /**
+     * @param {Uint8Array} chunk
+     * @returns {Promise<void>}
+     */
+    async _writeChunkToActiveSegment(chunk) {
+        if (chunk.byteLength <= 0) {
+            return;
+        }
+        await this._rollActiveSegmentIfNeeded(chunk.byteLength);
+        if (this._writable === null) {
+            return;
+        }
+        await this._writable.write(chunk);
+        const activeSegment = this._getActiveSegmentState();
+        if (activeSegment !== null) {
+            activeSegment.fileLength += chunk.byteLength;
+            this._length = activeSegment.startOffset + activeSegment.fileLength;
         }
     }
 
