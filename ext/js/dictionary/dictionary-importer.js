@@ -3010,13 +3010,6 @@ export class DictionaryImporter {
                     });
                     importerChunkSinkMs += Math.max(0, Date.now() - tChunkSinkStart);
                     if (directArtifactChunkImport) {
-                        chunkExpressionBytes = createSparseArray(chunkSize);
-                        chunkReadingBytes = createSparseArray(chunkSize);
-                        chunkReadingEqualsExpression = createSparseArray(chunkSize);
-                        chunkScores = createSparseArray(chunkSize);
-                        chunkSequences = createSparseArray(chunkSize);
-                        chunkContentBytes = createSparseArray(chunkSize);
-                        chunkContentDictNames = createSparseArray(chunkSize);
                         chunkRowCount = 0;
                     } else {
                         termList.length = 0;
