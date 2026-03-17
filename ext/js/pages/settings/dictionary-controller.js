@@ -594,6 +594,8 @@ export class DictionaryController {
         /** @type {?HTMLButtonElement} */
         this._checkUpdatesButton = document.querySelector('#dictionary-check-updates');
         /** @type {?HTMLButtonElement} */
+        this._updateAllButton = document.querySelector('#dictionary-update-all');
+        /** @type {?HTMLButtonElement} */
         this._checkIntegrityButton = document.querySelector('#dictionary-check-integrity');
         /** @type {HTMLElement} */
         this._dictionaryEntryContainer = querySelectorNotNull(document, '#dictionary-list');
@@ -609,12 +611,16 @@ export class DictionaryController {
         this._deleteDictionaryModal = null;
         /** @type {?import('./modal.js').Modal} */
         this._updateDictionaryModal = null;
+        /** @type {?import('./modal.js').Modal} */
+        this._updateAllDictionaryModal = null;
         /** @type {HTMLInputElement} */
         this._allCheckbox = querySelectorNotNull(document, '#all-dictionaries-enabled');
         /** @type {?DictionaryExtraInfo} */
         this._extraInfo = null;
         /** @type {import('dictionary-controller.js').DictionaryTask[]} */
         this._dictionaryTaskQueue = [];
+        /** @type {import('dictionary-controller.js').DictionaryTask[]} */
+        this._pendingUpdateTasks = [];
         /** @type {boolean} */
         this._isTaskQueueRunning = false;
         /** @type {(() => void) | null} */
@@ -637,10 +643,13 @@ export class DictionaryController {
         this._noDictionariesEnabledWarnings = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.no-dictionaries-enabled-warning'));
         this._deleteDictionaryModal = this._modalController.getModal('dictionary-confirm-delete');
         this._updateDictionaryModal = this._modalController.getModal('dictionary-confirm-update');
+        this._updateAllDictionaryModal = this._modalController.getModal('dictionary-confirm-update-all');
         /** @type {HTMLButtonElement} */
         const dictionaryDeleteButton = querySelectorNotNull(document, '#dictionary-confirm-delete-button');
         /** @type {HTMLButtonElement} */
         const dictionaryUpdateButton = querySelectorNotNull(document, '#dictionary-confirm-update-button');
+        /** @type {HTMLButtonElement} */
+        const dictionaryUpdateAllButton = querySelectorNotNull(document, '#dictionary-confirm-update-all-button');
 
         /** @type {HTMLButtonElement} */
         const dictionaryMoveButton = querySelectorNotNull(document, '#dictionary-move-button');
@@ -655,6 +664,7 @@ export class DictionaryController {
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
         dictionaryDeleteButton.addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
         dictionaryUpdateButton.addEventListener('click', this._onDictionaryConfirmUpdate.bind(this), false);
+        dictionaryUpdateAllButton.addEventListener('click', this._onDictionaryConfirmUpdateAll.bind(this), false);
 
         dictionaryMoveButton.addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
 
@@ -663,6 +673,9 @@ export class DictionaryController {
 
         if (this._checkUpdatesButton !== null) {
             this._checkUpdatesButton.addEventListener('click', this._onCheckUpdatesButtonClick.bind(this), false);
+        }
+        if (this._updateAllButton !== null) {
+            this._updateAllButton.addEventListener('click', this._onUpdateAllButtonClick.bind(this), false);
         }
         if (this._checkIntegrityButton !== null) {
             this._checkIntegrityButton.addEventListener('click', this._onCheckIntegrityButtonClick.bind(this), false);
@@ -1051,6 +1064,24 @@ export class DictionaryController {
     }
 
     /**
+     * @param {MouseEvent} e
+     */
+    _onDictionaryConfirmUpdateAll(e) {
+        e.preventDefault();
+
+        const modal = /** @type {import('./modal.js').Modal} */ (this._updateAllDictionaryModal);
+        modal.setVisible(false);
+
+        const pendingUpdateTasks = this._pendingUpdateTasks;
+        this._pendingUpdateTasks = [];
+        for (const task of pendingUpdateTasks) {
+            if (task.type !== 'update') { continue; }
+            void this._enqueueTask(task);
+            this._hideUpdatesAvailableButton(task.dictionaryTitle);
+        }
+    }
+
+    /**
      * @param {string} dictionaryTitle
      */
     _hideUpdatesAvailableButton(dictionaryTitle) {
@@ -1076,6 +1107,14 @@ export class DictionaryController {
     _onCheckUpdatesButtonClick(e) {
         e.preventDefault();
         void this._checkForUpdates();
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onUpdateAllButtonClick(e) {
+        e.preventDefault();
+        void this._updateAllDictionaries();
     }
 
     /** */
@@ -1156,12 +1195,48 @@ export class DictionaryController {
             this._checkingUpdates = true;
             this._setButtonsEnabled(false);
 
-            const updateChecks = this._dictionaryEntries.map((entry) => entry.checkForUpdate());
-            const updateCount = (await Promise.all(updateChecks)).reduce((sum, value) => (sum + (value ? 1 : 0)), 0);
+            const updateTasks = await this._getDictionaryUpdateTasks();
+            const updateCount = updateTasks.length;
             if (this._checkUpdatesButton !== null) {
                 hasUpdates = !!updateCount;
                 this._checkUpdatesButton.textContent = hasUpdates ? `${updateCount} update${updateCount > 1 ? 's' : ''}` : 'No updates';
             }
+        } finally {
+            this._setButtonsEnabled(true);
+            if (this._checkUpdatesButton !== null && !hasUpdates) {
+                this._checkUpdatesButton.disabled = true;
+            }
+            this._checkingUpdates = false;
+        }
+    }
+
+    /** */
+    async _updateAllDictionaries() {
+        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isTaskQueueRunning) { return; }
+        const modal = this._updateAllDictionaryModal;
+        if (modal === null) { return; }
+
+        let hasUpdates;
+        try {
+            this._checkingUpdates = true;
+            this._setButtonsEnabled(false);
+
+            const updateTasks = await this._getDictionaryUpdateTasks();
+            const updateCount = updateTasks.length;
+            hasUpdates = (updateCount > 0);
+            if (this._checkUpdatesButton !== null) {
+                this._checkUpdatesButton.textContent = hasUpdates ? `${updateCount} update${updateCount > 1 ? 's' : ''}` : 'No updates';
+            }
+            if (!hasUpdates) {
+                this._pendingUpdateTasks = [];
+                return;
+            }
+
+            this._pendingUpdateTasks = updateTasks;
+            /** @type {HTMLElement} */
+            const countElement = querySelectorNotNull(modal.node, '#dictionary-confirm-update-all-count');
+            countElement.textContent = `${updateCount} ${updateCount === 1 ? 'dictionary' : 'dictionaries'}`;
+            modal.setVisible(true);
         } finally {
             this._setButtonsEnabled(true);
             if (this._checkUpdatesButton !== null && !hasUpdates) {
@@ -1244,6 +1319,24 @@ export class DictionaryController {
         container.insertBefore(fragment, relative);
 
         this._updateDictionaryEntryCount();
+    }
+
+    /**
+     * @returns {Promise<import('dictionary-controller.js').DictionaryTask[]>}
+     */
+    async _getDictionaryUpdateTasks() {
+        const updateChecks = this._dictionaryEntries.map(async (entry) => {
+            if (!await entry.checkForUpdate()) { return null; }
+            return /** @type {import('dictionary-controller.js').DictionaryTask} */ ({
+                type: 'update',
+                dictionaryTitle: entry.dictionaryTitle,
+                downloadUrl: entry.updateDownloadUrl ?? void 0,
+            });
+        });
+
+        return /** @type {import('dictionary-controller.js').DictionaryTask[]} */ (
+            (await Promise.all(updateChecks)).filter((task) => task !== null)
+        );
     }
 
 
