@@ -151,6 +151,11 @@ export type GeneralOptions = {
     termDisplayMode: TermDisplayMode;
     sortFrequencyDictionary: string | null;
     sortFrequencyDictionaryOrder: SortFrequencyDictionaryOrder;
+    popupBlurByFrequencyEnabled: boolean;
+    popupBlurByFrequencyDictionary: string | null;
+    popupBlurByFrequencyThreshold: number;
+    popupBlurByFrequencyOrder: SortFrequencyDictionaryOrder;
+    popupBlurByFrequencyUnblurDelay: number;
     stickySearchHeader: boolean;
     enableYomitanApi: boolean;
     yomitanApiAllowCssSanitizationBypass: boolean;

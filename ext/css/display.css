@@ -375,6 +375,7 @@ a:has(rt) {
 .content {
     flex: 1 1 auto;
     position: relative;
+    transition: filter 0.125s ease-in-out, opacity 0.125s ease-in-out;
 }
 .content-scroll {
     position: absolute;
@@ -434,6 +435,7 @@ a:has(rt) {
     display: flex;
     flex-flow: row nowrap;
     overflow: hidden;
+    position: relative;
     align-items: stretch;
     align-content: stretch;
     justify-content: center;
@@ -447,6 +449,62 @@ a:has(rt) {
     z-index: 10;
     position: relative;
     display: none;
+    transition: filter 0.125s ease-in-out, opacity 0.125s ease-in-out;
+}
+:root[data-popup-frequency-blur-state=blurred] .content,
+:root[data-popup-frequency-blur-state=blurred] .content-sidebar {
+    filter: blur(0.5rem);
+    opacity: 0.72;
+}
+.popup-frequency-blur-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+    padding: 1rem;
+    pointer-events: none;
+}
+.popup-frequency-blur-overlay:not([hidden]) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.popup-frequency-blur-card {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    gap: 0.25rem;
+    min-width: 13rem;
+    max-width: min(22rem, 100%);
+    padding: 0.625em 0.75em;
+    border: var(--thin-border-size) solid var(--separator-color1);
+    border-radius: var(--menu-border-radius);
+    background-color: var(--background-color-light);
+    box-shadow: var(--menu-shadow);
+    text-align: left;
+}
+.popup-frequency-blur-card-header {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 0.5em;
+}
+.popup-frequency-blur-card-icon {
+    flex: 0 0 auto;
+    width: calc(16em / var(--font-size-no-units));
+    height: calc(16em / var(--font-size-no-units));
+    background-color: var(--text-color-light1);
+}
+.popup-frequency-blur-card-label {
+    color: var(--text-color);
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1.35;
+}
+.popup-frequency-blur-card-sublabel {
+    color: var(--text-color-light1);
+    font-size: var(--font-size-small);
+    line-height: 1.3;
+    word-break: break-word;
 }
 :root[data-has-navigation-previous=true] .content-sidebar,
 :root[data-has-navigation-next=true] .content-sidebar,

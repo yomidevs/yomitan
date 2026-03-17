@@ -24,6 +24,7 @@ import {DisplayAudio} from './display-audio.js';
 import {DisplayProfileSelection} from './display-profile-selection.js';
 import {DisplayResizer} from './display-resizer.js';
 import {Display} from './display.js';
+import {PopupFrequencyBlurController} from './popup-frequency-blur-controller.js';
 
 await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
@@ -46,6 +47,9 @@ await Application.main(true, async (application) => {
 
     const displayResizer = new DisplayResizer(display);
     displayResizer.prepare();
+
+    const popupFrequencyBlurController = new PopupFrequencyBlurController(display);
+    popupFrequencyBlurController.prepare();
 
     display.initializeState();
 
