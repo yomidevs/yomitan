@@ -23,6 +23,7 @@ import {toError} from '../../core/to-error.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {
     applyImportedDictionarySettings,
+    createDefaultDictionarySettings,
     updateDictionaryAnkiFieldTemplates,
 } from '../../dictionary/dictionary-update-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -666,6 +667,10 @@ export class DictionaryImportController {
         }
 
         try {
+            if (profilesDictionarySettings === null || Object.keys(profilesDictionarySettings).length === 0) {
+                return await this._addDictionarySettings(summary, optionsFull);
+            }
+
             applyImportedDictionarySettings(optionsFull, summary, profilesDictionarySettings, this._settingsController.profileIndex);
             updateDictionaryAnkiFieldTemplates(optionsFull, profilesDictionarySettings, summary.title);
             await this._settingsController.setAllSettings(optionsFull);
@@ -673,6 +678,35 @@ export class DictionaryImportController {
         } catch (error) {
             return [toError(error)];
         }
+    }
+
+    /**
+     * Fresh imports still need the incremental settings write path so the
+     * dictionary refresh flow does not race in and re-add the entry disabled.
+     * @param {import('dictionary-importer').Summary} summary
+     * @param {import('settings').Options} optionsFull
+     * @returns {Promise<Error[]>}
+     */
+    async _addDictionarySettings(summary, optionsFull) {
+        const {title, sequenced, styles} = summary;
+        const profileIndex = this._settingsController.profileIndex;
+
+        /** @type {import('settings-modifications').Modification[]} */
+        const targets = [];
+        const profileCount = optionsFull.profiles.length;
+        for (let i = 0; i < profileCount; ++i) {
+            const {options} = optionsFull.profiles[i];
+            const enabled = profileIndex === i;
+            const defaultSettings = createDefaultDictionarySettings(title, enabled, styles);
+            const path1 = `profiles[${i}].options.dictionaries`;
+            targets.push({action: 'push', path: path1, items: [defaultSettings]});
+
+            if (sequenced && options.general.mainDictionary === '') {
+                const path2 = `profiles[${i}].options.general.mainDictionary`;
+                targets.push({action: 'set', path: path2, value: title});
+            }
+        }
+        return await this._modifyGlobalSettings(targets);
     }
 
     /**
