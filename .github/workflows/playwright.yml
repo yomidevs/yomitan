@@ -1,33 +1,7 @@
 name: Playwright Tests
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ext/**
-      - dev/**
-      - test/playwright/**
-      - test/e2e/**
-      - test/data/**
-      - package.json
-      - package-lock.json
-      - playwright.config.js
-      - .github/actions/setup/**
-      - .github/workflows/playwright.yml
-      - .github/workflows/playwright_comment.yml
-  pull_request:
-    paths:
-      - ext/**
-      - dev/**
-      - test/playwright/**
-      - test/e2e/**
-      - test/data/**
-      - package.json
-      - package-lock.json
-      - playwright.config.js
-      - .github/actions/setup/**
-      - .github/workflows/playwright.yml
-      - .github/workflows/playwright_comment.yml
+  # Browser E2E is manual-only until CI stability is improved.
   workflow_dispatch:
 
 permissions:

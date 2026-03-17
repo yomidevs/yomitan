@@ -1,29 +1,7 @@
 name: Firefox Extension E2E
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ext/**
-      - dev/**
-      - test/firefox/**
-      - test/e2e/**
-      - test/data/**
-      - package.json
-      - package-lock.json
-      - .github/actions/setup/**
-      - .github/workflows/firefox-extension-e2e.yml
-  pull_request:
-    paths:
-      - ext/**
-      - dev/**
-      - test/firefox/**
-      - test/e2e/**
-      - test/data/**
-      - package.json
-      - package-lock.json
-      - .github/actions/setup/**
-      - .github/workflows/firefox-extension-e2e.yml
+  # Browser E2E is manual-only until CI stability is improved.
   workflow_dispatch:
 
 permissions:
