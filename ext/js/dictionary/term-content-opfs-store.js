@@ -349,12 +349,19 @@ export class TermContentOpfsStore {
                     this._pendingWriteBytes += chunk.byteLength;
                     this._pendingWriteChunks.push(chunk);
                 }
+                const shouldDrainDuringImport = (
+                    this._importSessionActive &&
+                    this._importStorageMode === 'raw-bytes' &&
+                    this._pendingWriteBytes >= this._writeCoalesceTargetBytes
+                );
                 if (!this._importSessionActive || this._pendingWriteBytes >= this._flushThresholdBytes) {
                     await this._flushPendingWrites();
                     if (!this._importSessionActive) {
                         await this._awaitQueuedWrites();
                         await this._closeWritable();
                     }
+                } else if (shouldDrainDuringImport) {
+                    await this._flushPendingWrites();
                 }
             }
         }
