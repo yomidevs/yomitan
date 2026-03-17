@@ -979,20 +979,6 @@
             }
         ]
     },
-    "simple": {
-        "frequency": [],
-        "grammar": [],
-        "kanji": [],
-        "pronunciation": [],
-        "terms": [
-            {
-                "name": "wty-simple-en",
-                "description": "Simple English to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
-                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/simple/en/wty-simple-en.zip"
-            }
-        ]
-    },
     "sl": {
         "frequency": [],
         "grammar": [],
