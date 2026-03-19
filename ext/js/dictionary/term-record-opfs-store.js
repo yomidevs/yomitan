@@ -58,7 +58,7 @@ const DEFAULT_WRITE_COALESCE_TARGET_BYTES = 4 * 1024 * 1024;
 const LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
 const HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES = 8 * 1024 * 1024;
 const WRITE_COALESCE_MAX_CHUNKS = 512;
-const MAX_SHARD_SEGMENT_FILE_BYTES = 128 * 1024 * 1024;
+const MAX_SHARD_SEGMENT_FILE_BYTES = 512 * 1024 * 1024;
 
 /**
  * @param {unknown[]} rows
@@ -830,15 +830,20 @@ export class TermRecordOpfsStore {
      * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
      * @param {number[]} contentOffsets
      * @param {number[]} contentLengths
-     * @param {(string|null)[]} contentDictNames
+     * @param {string | (string|null)[]} contentDictNames
      * @returns {Promise<{buildRecordsMs: number, encodeMs: number, appendWriteMs: number}>}
      */
     async appendBatchFromArtifactChunkResolvedContent(chunk, contentOffsets, contentLengths, contentDictNames) {
         const count = chunk.rowCount;
         if (count <= 0) { return {buildRecordsMs: 0, encodeMs: 0, appendWriteMs: 0}; }
-        if (contentOffsets.length < count || contentLengths.length < count || contentDictNames.length < count) {
+        if (
+            contentOffsets.length < count ||
+            contentLengths.length < count ||
+            (Array.isArray(contentDictNames) && contentDictNames.length < count)
+        ) {
             throw new Error('appendBatchFromArtifactChunkResolvedContent content arrays are smaller than row count');
         }
+        const uniformContentDictName = Array.isArray(contentDictNames) ? null : (contentDictNames ?? 'raw');
         const tBuildStart = safePerformance.now();
         const firstId = this._nextId;
         this._recordsById.ensureCapacity(firstId + count - 1);
@@ -846,6 +851,7 @@ export class TermRecordOpfsStore {
         for (let i = 0; i < count; ++i) {
             const id = this._nextId++;
             const sequenceValue = chunk.sequenceList[i];
+            const entryContentDictName = uniformContentDictName ?? (contentDictNames[i] ?? 'raw');
             /** @type {TermRecord} */
             const record = {
                 id,
@@ -855,7 +861,7 @@ export class TermRecordOpfsStore {
                 readingBytes: chunk.readingEqualsExpressionList[i] === true ? void 0 : chunk.readingBytesList[i],
                 entryContentOffset: contentOffsets[i],
                 entryContentLength: contentLengths[i],
-                entryContentDictName: contentDictNames[i] ?? 'raw',
+                entryContentDictName,
                 score: chunk.scoreList[i] ?? 0,
                 sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
             };
@@ -870,7 +876,22 @@ export class TermRecordOpfsStore {
         const buildRecordsMs = safePerformance.now() - tBuildStart;
         let encodeMs = 0;
         let appendWriteMs = 0;
-        const firstContentDictName = contentDictNames[0] ?? 'raw';
+        const firstContentDictName = uniformContentDictName ?? (contentDictNames[0] ?? 'raw');
+        if (uniformContentDictName !== null) {
+            const state = await this._getOrCreateShardState(chunk.dictionary, uniformContentDictName);
+            if (state === null) { return {buildRecordsMs, encodeMs, appendWriteMs}; }
+            const metrics = await this._encodeAndAppendArtifactChunkForState(
+                state,
+                chunk,
+                firstId,
+                contentOffsets,
+                contentLengths,
+                chunk.termRecordPreinternedPlan ?? null,
+            );
+            encodeMs += metrics.encodeMs;
+            appendWriteMs += metrics.appendWriteMs;
+            return {buildRecordsMs, encodeMs, appendWriteMs};
+        }
         let singleContentDictName = true;
         for (let i = 1; i < count; ++i) {
             if ((contentDictNames[i] ?? 'raw') !== firstContentDictName) {

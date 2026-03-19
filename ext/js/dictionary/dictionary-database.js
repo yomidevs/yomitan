@@ -63,6 +63,7 @@ const HIGH_MEMORY_TERM_BULK_ADD_STAGING_MAX_ROWS = 10240;
 const TERM_CONTENT_STORAGE_MODE_BASELINE = 'baseline';
 const TERM_CONTENT_STORAGE_MODE_RAW_BYTES = 'raw-bytes';
 const DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES = 4 * 1024 * 1024;
+const LARGE_ARTIFACT_FIXED_PACK_MIN_TOTAL_ROWS = 2_000_000;
 
 /**
  * @param {string} value
@@ -121,6 +122,40 @@ function packContentChunksIntoSlabs(chunks, targetBytes) {
         startIndex = endIndex;
     }
     return {packedChunks, sourceChunkIndices, sourceChunkLocalOffsets};
+}
+
+/**
+ * @param {Uint8Array[]} chunks
+ * @param {number} targetBytes
+ * @param {number} fixedChunkBytes
+ * @returns {{packedChunks: Uint8Array[], packedRowStarts: number[], packedRowCounts: number[]}}
+ */
+function packFixedSizeContentChunksIntoSlabs(chunks, targetBytes, fixedChunkBytes) {
+    /** @type {Uint8Array[]} */
+    const packedChunks = [];
+    /** @type {number[]} */
+    const packedRowStarts = [];
+    /** @type {number[]} */
+    const packedRowCounts = [];
+    if (chunks.length === 0 || fixedChunkBytes <= 0) {
+        return {packedChunks, packedRowStarts, packedRowCounts};
+    }
+    const rowsPerPackedChunk = Math.max(1, Math.floor(targetBytes / fixedChunkBytes));
+    for (let startIndex = 0; startIndex < chunks.length;) {
+        const endIndex = Math.min(chunks.length, startIndex + rowsPerPackedChunk);
+        const rowCount = endIndex - startIndex;
+        const packed = new Uint8Array(rowCount * fixedChunkBytes);
+        let offset = 0;
+        for (let i = startIndex; i < endIndex; ++i) {
+            packed.set(chunks[i], offset);
+            offset += fixedChunkBytes;
+        }
+        packedChunks.push(packed);
+        packedRowStarts.push(startIndex);
+        packedRowCounts.push(rowCount);
+        startIndex = endIndex;
+    }
+    return {packedChunks, packedRowStarts, packedRowCounts};
 }
 
 /**
@@ -2951,7 +2986,7 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
+     * @param {{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
      * @returns {Promise<void>}
      */
     async _bulkAddArtifactTermsChunkWithoutContentDedup(chunk) {
@@ -2989,43 +3024,91 @@ export class DictionaryDatabase {
             const contentOffsets = new Array(count);
             /** @type {number[]} */
             const contentLengths = new Array(count);
-            /** @type {(string|null)[]} */
-            const contentDictNames = new Array(count);
+            /** @type {string | null} */
+            let uniformContentDictName = null;
+            /** @type {(string|null)[] | null} */
+            let contentDictNames = null;
             const contentChunks = chunk.contentBytesList;
             const tContentAppendStart = safePerformance.now();
             if (this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) {
-                const {packedChunks, sourceChunkIndices, sourceChunkLocalOffsets} = packContentChunksIntoSlabs(
-                    contentChunks,
-                    this._rawTermContentPackTargetBytes,
+                const firstContentLength = contentChunks[0]?.byteLength ?? 0;
+                let useFixedSizePacking = (
+                    firstContentLength > 0 &&
+                    (chunk.dictionaryTotalRows ?? 0) >= LARGE_ARTIFACT_FIXED_PACK_MIN_TOTAL_ROWS
                 );
-                /** @type {number[]} */
-                const packedOffsets = new Array(packedChunks.length);
-                /** @type {number[]} */
-                const packedLengths = new Array(packedChunks.length);
-                await this._termContentStore.appendBatchToArrays(packedChunks, packedOffsets, packedLengths);
-                for (let i = 0; i < count; ++i) {
-                    const packedIndex = sourceChunkIndices[i];
-                    contentOffsets[i] = packedOffsets[packedIndex] + sourceChunkLocalOffsets[i];
-                    contentLengths[i] = contentChunks[i].byteLength;
+                for (let i = 1; i < count && useFixedSizePacking; ++i) {
+                    if (contentChunks[i].byteLength !== firstContentLength) {
+                        useFixedSizePacking = false;
+                    }
+                }
+                if (useFixedSizePacking) {
+                    const {packedChunks, packedRowStarts, packedRowCounts} = packFixedSizeContentChunksIntoSlabs(
+                        contentChunks,
+                        this._rawTermContentPackTargetBytes,
+                        firstContentLength,
+                    );
+                    /** @type {number[]} */
+                    const packedOffsets = new Array(packedChunks.length);
+                    /** @type {number[]} */
+                    const packedLengths = new Array(packedChunks.length);
+                    await this._termContentStore.appendBatchToArrays(packedChunks, packedOffsets, packedLengths);
+                    for (let packedIndex = 0; packedIndex < packedChunks.length; ++packedIndex) {
+                        const baseOffset = packedOffsets[packedIndex];
+                        const rowStart = packedRowStarts[packedIndex];
+                        const rowCount = packedRowCounts[packedIndex];
+                        for (let localIndex = 0; localIndex < rowCount; ++localIndex) {
+                            const rowIndex = rowStart + localIndex;
+                            contentOffsets[rowIndex] = baseOffset + (localIndex * firstContentLength);
+                            contentLengths[rowIndex] = firstContentLength;
+                        }
+                    }
+                } else {
+                    const {packedChunks, sourceChunkIndices, sourceChunkLocalOffsets} = packContentChunksIntoSlabs(
+                        contentChunks,
+                        this._rawTermContentPackTargetBytes,
+                    );
+                    /** @type {number[]} */
+                    const packedOffsets = new Array(packedChunks.length);
+                    /** @type {number[]} */
+                    const packedLengths = new Array(packedChunks.length);
+                    await this._termContentStore.appendBatchToArrays(packedChunks, packedOffsets, packedLengths);
+                    for (let i = 0; i < count; ++i) {
+                        const packedIndex = sourceChunkIndices[i];
+                        contentOffsets[i] = packedOffsets[packedIndex] + sourceChunkLocalOffsets[i];
+                        contentLengths[i] = contentChunks[i].byteLength;
+                    }
                 }
             } else {
                 await this._termContentStore.appendBatchToArrays(contentChunks, contentOffsets, contentLengths);
             }
             for (let i = 0; i < count; ++i) {
                 const explicitContentDictName = chunk.contentDictNameList[i];
+                /** @type {string|null} */
+                let resolvedContentDictName;
                 if (
                     this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
                     typeof explicitContentDictName === 'string' &&
                     explicitContentDictName.length > 0
                 ) {
-                    contentDictNames[i] = explicitContentDictName;
+                    resolvedContentDictName = explicitContentDictName;
                 } else if (
                     this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
                     isRawTermContentBinary(contentChunks[i])
                 ) {
-                    contentDictNames[i] = RAW_TERM_CONTENT_DICT_NAME;
+                    resolvedContentDictName = RAW_TERM_CONTENT_DICT_NAME;
                 } else {
-                    contentDictNames[i] = 'raw';
+                    resolvedContentDictName = 'raw';
+                }
+                if (i === 0) {
+                    uniformContentDictName = resolvedContentDictName;
+                    continue;
+                }
+                if (contentDictNames === null && resolvedContentDictName !== uniformContentDictName) {
+                    contentDictNames = new Array(count);
+                    contentDictNames.fill(uniformContentDictName, 0, i);
+                }
+                if (contentDictNames !== null) {
+                    contentDictNames[i] = resolvedContentDictName;
                 }
             }
             contentAppendMs += safePerformance.now() - tContentAppendStart;
@@ -3033,7 +3116,7 @@ export class DictionaryDatabase {
                 chunk,
                 contentOffsets,
                 contentLengths,
-                contentDictNames,
+                contentDictNames ?? uniformContentDictName ?? 'raw',
             );
             termRecordBuildMs += metrics.buildRecordsMs;
             termRecordEncodeMs += metrics.encodeMs;
