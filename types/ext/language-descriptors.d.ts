@@ -70,6 +70,7 @@ type AlphabeticDiacriticsProcessor = {
  * Any new language should be added to this object.
  */
 type AllTextProcessors = {
+    xxx: Record<string, never>;
     aii: {
         pre: {
             removeSyriacScriptDiacritics: TextProcessor;
