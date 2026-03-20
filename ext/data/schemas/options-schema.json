@@ -124,6 +124,11 @@
                                     "termDisplayMode",
                                     "sortFrequencyDictionary",
                                     "sortFrequencyDictionaryOrder",
+                                    "popupBlurByFrequencyEnabled",
+                                    "popupBlurByFrequencyDictionary",
+                                    "popupBlurByFrequencyThreshold",
+                                    "popupBlurByFrequencyOrder",
+                                    "popupBlurByFrequencyUnblurDelay",
                                     "stickySearchHeader",
                                     "fontFamily",
                                     "fontSize",
@@ -335,6 +340,28 @@
                                         "type": "string",
                                         "enum": ["ascending", "descending"],
                                         "default": "descending"
+                                    },
+                                    "popupBlurByFrequencyEnabled": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "popupBlurByFrequencyDictionary": {
+                                        "type": ["string", "null"],
+                                        "default": null
+                                    },
+                                    "popupBlurByFrequencyThreshold": {
+                                        "type": "number",
+                                        "default": 10000
+                                    },
+                                    "popupBlurByFrequencyOrder": {
+                                        "type": "string",
+                                        "enum": ["ascending", "descending"],
+                                        "default": "descending"
+                                    },
+                                    "popupBlurByFrequencyUnblurDelay": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "default": 0
                                     },
                                     "stickySearchHeader": {
                                         "type": "boolean",

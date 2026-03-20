@@ -19,6 +19,7 @@ import {readFileSync} from 'fs';
 import path from 'path';
 import {pathToFileURL} from 'url';
 import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
+import {parseJson} from '../../ext/js/core/json.js';
 import {expect, root, test} from './playwright-util.js';
 
 test.beforeEach(async ({context}) => {
@@ -173,4 +174,93 @@ test.describe('popup', () => {
             await expect.soft(page).toHaveScreenshot(test_name + '.png');
         });
     }
+});
+test.describe('popup frequency blur', () => {
+    const popupFrequencyBlurTestsPath = path.join(root, 'test/data/html/popup-frequency-blur.html');
+
+    /**
+     * @param {import('@playwright/test').Page} page
+     * @param {Partial<import('settings').ProfileOptions['general']>} generalSettings
+     * @returns {Promise<void>}
+     */
+    async function updateGeneralOptions(page, generalSettings) {
+        const optionsString = /** @type {unknown} */ (await page.evaluate(() => new Promise((resolve, reject) => {
+            chrome.storage.local.get(['options'], ({options}) => {
+                if (typeof options !== 'string') {
+                    reject(new Error('Options were not loaded from storage.'));
+                    return;
+                }
+                resolve(options);
+            });
+        })));
+        if (typeof optionsString !== 'string') {
+            throw new Error('Options were not loaded from storage.');
+        }
+
+        const optionsData = /** @type {import('settings').Options} */ (parseJson(optionsString));
+        Object.assign(optionsData.profiles[0].options.general, generalSettings);
+        await page.evaluate((options) => new Promise((resolve, reject) => {
+            chrome.storage.local.set({options}, () => {
+                const error = chrome.runtime.lastError;
+                if (typeof error?.message === 'string') {
+                    reject(new Error(error.message));
+                    return;
+                }
+                resolve(null);
+            });
+        }), JSON.stringify(optionsData));
+    }
+
+    test.beforeEach(async ({page, extensionId}) => {
+        console.log('Open settings');
+        await page.goto(`chrome-extension://${extensionId}/settings.html`);
+        await expect.poll(async () => await page.evaluate(() => document.documentElement.dataset.loaded === 'true')).toBe(true);
+        await expect(page.locator('id=dictionaries')).toBeVisible();
+
+        const dictionary = await createDictionaryArchiveData(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
+        await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
+            name: 'valid-dictionary1.zip',
+            mimeType: 'application/x-zip',
+            buffer: Buffer.from(dictionary),
+        });
+        await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 1 * 60 * 1000});
+        await updateGeneralOptions(page, {
+            popupBlurByFrequencyEnabled: true,
+            popupBlurByFrequencyDictionary: 'Test Dictionary',
+            popupBlurByFrequencyThreshold: 1,
+            popupBlurByFrequencyOrder: 'descending',
+            popupBlurByFrequencyUnblurDelay: 0,
+        });
+
+        console.log('Open popup-frequency-blur.html');
+        await page.goto(pathToFileURL(popupFrequencyBlurTestsPath).toString());
+        await page.setViewportSize({width: 900, height: 700});
+        await expect(page.locator('#term-common')).toBeVisible();
+        await page.keyboard.down('Shift');
+    });
+
+    test.afterEach(async ({page}) => {
+        await page.keyboard.up('Shift');
+    });
+
+    test('qualifying popup starts blurred, reveals on hover, and blurs again on leave', async ({page}) => {
+        const popupFramePromise = page.waitForEvent('frameattached', {timeout: 10000});
+
+        await page.locator('#term-common').hover();
+
+        const popupFrame = await popupFramePromise;
+        const overlay = popupFrame.locator('#popup-frequency-blur-overlay');
+        await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('blurred');
+        await expect(overlay).toBeVisible();
+        await expect(popupFrame.locator('#popup-frequency-blur-overlay-sublabel')).toHaveText('Test Dictionary · frequency 1');
+        await expect.soft(popupFrame.locator('.popup-frequency-blur-card')).toHaveScreenshot('popup-frequency-blur-overlay-card.png');
+
+        await popupFrame.locator('.content-outer').hover();
+        await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('revealed');
+        await expect(overlay).toBeHidden();
+
+        await page.locator('#outside-hover-target').hover();
+        await expect.poll(async () => await popupFrame.evaluate(() => document.documentElement.dataset.popupFrequencyBlurState)).toBe('blurred');
+        await expect(overlay).toBeVisible();
+    });
 });
