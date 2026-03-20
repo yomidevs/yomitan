@@ -17,7 +17,7 @@
         "freq": 6
       },
       "media": {
-        "total": 6
+        "total": 2
       },
       "tagMeta": {
         "total": 15
@@ -41,7 +41,7 @@
         "terms": 34,
         "termMeta": 40,
         "tagMeta": 15,
-        "media": 6
+        "media": 2
       }
     ],
     "total": {
@@ -50,7 +50,7 @@
       "terms": 34,
       "termMeta": 40,
       "tagMeta": 15,
-      "media": 6
+      "media": 2
     }
   },
   "tests": {

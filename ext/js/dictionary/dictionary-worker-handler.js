@@ -88,6 +88,17 @@ export class DictionaryWorkerHandler {
     async _importDictionary({details, archiveContent}, onProgress) {
         const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
         try {
+            if (
+                typeof dictionaryDatabase.usesFallbackStorage === 'function' &&
+                dictionaryDatabase.usesFallbackStorage()
+            ) {
+                const diagnostics = (
+                    typeof dictionaryDatabase.getOpenStorageDiagnostics === 'function' ?
+                        dictionaryDatabase.getOpenStorageDiagnostics() :
+                        null
+                );
+                throw new Error(`OPFS is required for dictionary import. diagnostics=${JSON.stringify(diagnostics)}`);
+            }
             const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
             const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
             return {
