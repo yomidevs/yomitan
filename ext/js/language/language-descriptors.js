@@ -77,6 +77,12 @@ const capitalizationPreprocessors = {
 /** @type {import('language-descriptors').LanguageDescriptorAny[]} */
 const languageDescriptors = [
     {
+        iso: 'xxx',
+        iso639_3: 'xxx',
+        name: 'Any / Unknown',
+        exampleText: '???',
+    },
+    {
         iso: 'aii',
         iso639_3: 'aii',
         name: 'Assyrian Neo-Aramaic',
