@@ -68,6 +68,7 @@ export type GlobalOptions = {
 
 export type GlobalDatabaseOptions = {
     prefixWildcardsSupported: boolean;
+    autoUpdateDictionariesOnStartup: boolean;
 };
 
 export type Profile = {

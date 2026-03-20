@@ -586,6 +586,7 @@ export class OptionsUtil {
             this._updateVersion72,
             this._updateVersion73,
             this._updateVersion74,
+            this._updateVersion75,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -602,6 +603,7 @@ export class OptionsUtil {
         options.global = {
             database: {
                 prefixWildcardsSupported: false,
+                autoUpdateDictionariesOnStartup: false,
             },
         };
     }
@@ -1829,6 +1831,14 @@ export class OptionsUtil {
      */
     async _updateVersion74(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v74.handlebars');
+    }
+
+    /**
+     *  - Added global.database.autoUpdateDictionariesOnStartup
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion75(options) {
+        options.global.database.autoUpdateDictionariesOnStartup = false;
     }
 
     /**
