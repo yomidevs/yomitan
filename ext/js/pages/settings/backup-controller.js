@@ -586,6 +586,12 @@ export class BackupController {
     }
 
     /**
+     * Exports the database using chunked IDB cursors to avoid OOM on large databases.
+     * dexie-export-import's db.export() wraps the entire export in a single read
+     * transaction, which forces the IDB engine to hold snapshot data for every row
+     * in memory until the transaction completes. This custom implementation uses
+     * one transaction per chunk, allowing the browser to release memory between reads.
+     * Periodic Blob merging further reduces heap pressure.
      * @param {string} databaseName
      * @returns {Promise<Blob>}
      */
@@ -594,13 +600,166 @@ export class BackupController {
         const DexieConstructor = /** @type {import('dexie').DexieConstructor} */ (/** @type {unknown} */ (Dexie));
         const db = new DexieConstructor(databaseName);
         await db.open();
-        /** @type {unknown} */
-        // @ts-expect-error - The export function is declared as an extension which has no type information.
-        const blob = await db.export({
-            progressCallback: this._databaseExportProgressCallback.bind(this),
+
+        try {
+            const idb = db.backendDB();
+
+            /** @type {{name: string, schema: string, rowCount: number}[]} */
+            const tableMetadata = [];
+            let totalRows = 0;
+            for (const table of db.tables) {
+                const count = await table.count();
+                const primKeySrc = table.schema.primKey.src;
+                const indexSrcs = table.schema.indexes.map((idx) => idx.src);
+                const schemaStr = indexSrcs.length > 0 ? `${primKeySrc},${indexSrcs.join(',')}` : primKeySrc;
+                tableMetadata.push({name: table.name, schema: schemaStr, rowCount: count});
+                totalRows += count;
+            }
+
+            /** @type {(string|Blob)[]} */
+            const blobParts = [];
+            let accumulatedSize = 0;
+            const FLUSH_THRESHOLD = 50 * 1024 * 1024;
+
+            /** @param {string} str */
+            const addPart = (str) => {
+                blobParts.push(str);
+                accumulatedSize += str.length * 2;
+                if (accumulatedSize >= FLUSH_THRESHOLD) {
+                    const merged = new Blob(blobParts);
+                    blobParts.length = 0;
+                    blobParts.push(merged);
+                    accumulatedSize = 0;
+                }
+            };
+
+            addPart(`{"formatName":"dexie","formatVersion":1,"data":{"databaseName":${JSON.stringify(databaseName)},"databaseVersion":${db.verno},"tables":${JSON.stringify(tableMetadata)},"data":[`);
+
+            let completedRows = 0;
+            const CHUNK_SIZE = 2000;
+
+            for (let tableIndex = 0; tableIndex < db.tables.length; tableIndex++) {
+                const table = db.tables[tableIndex];
+                if (tableIndex > 0) { addPart(','); }
+
+                const inbound = table.schema.primKey.keyPath !== null;
+                addPart(`{"tableName":${JSON.stringify(table.name)},"inbound":${inbound},"rows":[`);
+
+                let isFirstChunk = true;
+                /** @type {IDBValidKey|null} */
+                let lastKey = null;
+
+                for (;;) {
+                    const {rows, keys, done} = await this._readChunkFromIDB(idb, table.name, lastKey, CHUNK_SIZE);
+                    if (rows.length > 0) {
+                        const encoded = rows.map((row, i) => {
+                            const processed = this._encodeExportRow(row);
+                            return inbound ? processed : [keys[i], processed];
+                        });
+                        const json = JSON.stringify(encoded);
+                        const rowsJson = json.slice(1, -1);
+
+                        if (rowsJson.length > 0) {
+                            if (!isFirstChunk) { addPart(','); }
+                            addPart(rowsJson);
+                            isFirstChunk = false;
+                        }
+
+                        completedRows += rows.length;
+                        this._databaseExportProgressCallback({totalRows, completedRows, done: false});
+                    }
+                    if (done) { break; }
+                    lastKey = keys[keys.length - 1];
+                }
+
+                addPart(']}');
+            }
+
+            addPart(']}}');
+            this._databaseExportProgressCallback({totalRows, completedRows, done: true});
+
+            return new Blob(blobParts, {type: 'application/json'});
+        } finally {
+            db.close();
+        }
+    }
+
+    /**
+     * @param {IDBDatabase} idb
+     * @param {string} storeName
+     * @param {IDBValidKey|null} afterKey
+     * @param {number} limit
+     * @returns {Promise<{rows: unknown[], keys: IDBValidKey[], done: boolean}>}
+     */
+    _readChunkFromIDB(idb, storeName, afterKey, limit) {
+        return new Promise((resolve, reject) => {
+            const tx = idb.transaction(storeName, 'readonly');
+            const store = tx.objectStore(storeName);
+            const range = afterKey !== null ?
+                IDBKeyRange.lowerBound(afterKey, true) :
+                null;
+            /** @type {IDBRequest<IDBCursorWithValue|null>} */
+            const request = store.openCursor(range);
+            /** @type {unknown[]} */
+            const rows = [];
+            /** @type {IDBValidKey[]} */
+            const keys = [];
+
+            request.onsuccess = (e) => {
+                const cursor = /** @type {IDBRequest<IDBCursorWithValue|null>} */ (e.target).result;
+                if (cursor && rows.length < limit) {
+                    rows.push(cursor.value);
+                    keys.push(cursor.key);
+                    cursor.continue();
+                } else {
+                    resolve({rows, keys, done: cursor === null});
+                }
+            };
+            request.onerror = () => reject(request.error);
+            tx.onerror = () => reject(tx.error);
         });
-        db.close();
-        return /** @type {Blob} */ (blob);
+    }
+
+    /**
+     * @param {unknown} row
+     * @returns {unknown}
+     */
+    _encodeExportRow(row) {
+        if (typeof row !== 'object' || row === null) { return row; }
+        /** @type {Record<string, string>|null} */
+        let types = null;
+        /** @type {Record<string, unknown>} */
+        const result = {};
+
+        for (const [key, value] of Object.entries(row)) {
+            if (value instanceof ArrayBuffer) {
+                result[key] = this._arrayBufferToBase64(value);
+                if (types === null) { types = {}; }
+                types[key] = 'arraybuffer';
+            } else {
+                result[key] = value;
+            }
+        }
+
+        if (types !== null) {
+            result.$types = types;
+            return result;
+        }
+        return row;
+    }
+
+    /**
+     * @param {ArrayBuffer} buffer
+     * @returns {string}
+     */
+    _arrayBufferToBase64(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        const chunkSize = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+            binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+        }
+        return btoa(binary);
     }
 
     /** */
@@ -622,8 +781,7 @@ export class BackupController {
             const token = {};
             this._settingsExportDatabaseToken = token;
             const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
-            const data = await this._exportDatabase(this._dictionariesDatabaseName);
-            const blob = new Blob([data], {type: 'application/json'});
+            const blob = await this._exportDatabase(this._dictionariesDatabaseName);
             this._saveBlob(blob, fileName);
         } catch (error) {
             log.log(error);
