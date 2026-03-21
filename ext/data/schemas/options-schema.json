@@ -1001,7 +1001,8 @@
                                     "noteGuiMode",
                                     "apiKey",
                                     "downloadTimeout",
-                                    "forceSync"
+                                    "forceSync",
+                                    "noteDupeCheckFirst"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -1175,6 +1176,10 @@
                                         "minimum": 0
                                     },
                                     "forceSync": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "noteDupeCheckFirst": {
                                         "type": "boolean",
                                         "default": false
                                     }

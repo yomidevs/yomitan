@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025  Yomitan Authors
+ * Copyright (C) 2024-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {convertVariants} from '../../../lib/kanji-processor.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {
     collapseEmphaticSequences as collapseEmphaticSequencesFunction,
@@ -26,7 +27,6 @@ import {
     normalizeCJKCompatibilityCharacters as normalizeCJKCompatibilityCharactersFunction,
     normalizeCombiningCharacters as normalizeCombiningCharactersFunction,
 } from './japanese.js';
-import {convertVariants} from '../../../lib/kanji-processor.js';
 
 /** @type {import('language').TextProcessor} */
 export const convertHalfWidthCharacters = {

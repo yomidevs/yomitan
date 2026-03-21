@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025  Yomitan Authors
+ * Copyright (C) 2024-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ type AlphabeticDiacriticsProcessor = {
  * Any new language should be added to this object.
  */
 type AllTextProcessors = {
+    xxx: Record<string, never>;
     aii: {
         pre: {
             removeSyriacScriptDiacritics: TextProcessor;
@@ -128,6 +129,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     et: {
+        pre: CapitalizationPreprocessors;
+    };
+    eu: {
         pre: CapitalizationPreprocessors;
     };
     fa: {
