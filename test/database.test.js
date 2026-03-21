@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {BlobWriter, TextReader, ZipWriter} from '@zip.js/zip.js';
 import {IDBFactory, IDBKeyRange} from 'fake-indexeddb';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
@@ -41,6 +42,22 @@ vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 async function createTestDictionaryArchiveData(dictionary, dictionaryName) {
     const dictionaryDirectory = join(dirname, 'data', 'dictionaries', dictionary);
     return await createDictionaryArchiveData(dictionaryDirectory, dictionaryName);
+}
+
+/**
+ * Creates a dictionary zip archive with raw file contents, bypassing JSON parse/re-serialize.
+ * This allows testing with intentionally malformed JSON that parseJson would reject.
+ * @param {Record<string, string>} files Map of filename to raw string content
+ * @returns {Promise<ArrayBuffer>}
+ */
+async function createRawDictionaryArchiveData(files) {
+    const zipFileWriter = new BlobWriter();
+    const zipWriter = new ZipWriter(zipFileWriter, {level: 0});
+    for (const [fileName, content] of Object.entries(files)) {
+        await zipWriter.add(fileName, new TextReader(content));
+    }
+    const blob = await zipWriter.close();
+    return await blob.arrayBuffer();
 }
 
 /**
@@ -158,6 +175,12 @@ describe('Database', () => {
             {name: 'invalid-dictionary4'},
             {name: 'invalid-dictionary5'},
             {name: 'invalid-dictionary6'},
+            {name: 'invalid-dictionary7'},
+            {name: 'invalid-dictionary8'},
+            {name: 'invalid-dictionary9'},
+            {name: 'invalid-dictionary10'},
+            {name: 'invalid-dictionary11'},
+            {name: 'invalid-dictionary12'},
         ];
         describe.each(invalidDictionaries)('Invalid dictionary: $name', ({name}) => {
             test('Has invalid data', async ({expect}) => {
@@ -169,6 +192,41 @@ describe('Database', () => {
                 /** @type {import('dictionary-importer').ImportDetails} */
                 const detaultImportDetails = {prefixWildcardsSupported: false, yomitanVersion: '0.0.0.0'};
                 await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary has invalid data');
+                await dictionaryDatabase.close();
+            });
+        });
+    });
+    describe('Invalid raw dictionaries', () => {
+        const indexJson = JSON.stringify({title: 'Raw Test', format: 3, revision: 'test', sequenced: true});
+        const validEntry = '["打","だ","n","n",1,["definition"],1,""]';
+        const rawInvalidDictionaries = [
+            {name: 'missing comma between entries', termBank: `[${validEntry}${validEntry}]`},
+            {name: 'leading comma', termBank: `[,${validEntry}]`},
+            {name: 'double comma', termBank: `[${validEntry},,${validEntry}]`},
+            {name: 'trailing garbage after array', termBank: `[${validEntry}]garbage`},
+            {name: 'leading garbage before array', termBank: `garbage[${validEntry}]`},
+            {name: 'concatenated arrays', termBank: `[${validEntry}][${validEntry}]`},
+            {name: 'empty file', termBank: ''},
+            {name: 'whitespace only', termBank: '   '},
+            {name: 'just a number', termBank: '123'},
+            {name: 'just a string', termBank: '"hello"'},
+            {name: 'just null', termBank: 'null'},
+            {name: 'unclosed array', termBank: `[${validEntry}`},
+            {name: 'unclosed entry', termBank: '[["a","b"'},
+        ];
+        describe.each(rawInvalidDictionaries)('Raw invalid: $name', ({termBank}) => {
+            test('Has invalid data', async ({expect}) => {
+                const dictionaryDatabase = new DictionaryDatabase();
+                await dictionaryDatabase.prepare();
+
+                const testDictionarySource = await createRawDictionaryArchiveData({
+                    'index.json': indexJson,
+                    'term_bank_1.json': termBank,
+                });
+
+                /** @type {import('dictionary-importer').ImportDetails} */
+                const importDetails = {prefixWildcardsSupported: false, yomitanVersion: '0.0.0.0'};
+                await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, importDetails)).rejects.toThrow('Dictionary has invalid data');
                 await dictionaryDatabase.close();
             });
         });
