@@ -794,11 +794,22 @@ export class DictionaryImporter {
                 !this._skipMediaImport &&
                 hasArchiveImageMediaFiles
             );
+            /** @type {[string, import('@zip.js/zip.js').Entry][]} */
+            const artifactArchiveImageFileEntries = (
+                useMediaPipeline &&
+                (useTermArtifactFiles || usePackedTermArtifact) &&
+                termArtifactManifest?.includesMediaFiles === true
+            ) ?
+                [...fileMap.entries()].filter(([path]) => getImageMediaTypeFromFileName(path) !== null) :
+                [];
+            const artifactDirectMediaImport = artifactArchiveImageFileEntries.length > 0;
+            const useTermMediaRequirements = useMediaPipeline && !artifactDirectMediaImport;
             this._logImport(
                 `media pipeline enabled=${String(useMediaPipeline)} skipMediaImport=${String(this._skipMediaImport)} ` +
-                `hasArchiveImageMediaFiles=${String(hasArchiveImageMediaFiles)}`,
+                `hasArchiveImageMediaFiles=${String(hasArchiveImageMediaFiles)} ` +
+                `artifactDirectMediaImport=${String(artifactDirectMediaImport)}`,
             );
-            const uniqueMediaPaths = useMediaPipeline ? new Set() : null;
+            const uniqueMediaPaths = useTermMediaRequirements ? new Set() : null;
             const termFileProgressAllowance = bulkAddProgressAllowance * 2;
             const step4ArtifactPreloadMs = (
                 packedTermArtifactPreloadMs +
@@ -809,6 +820,79 @@ export class DictionaryImporter {
             let step4ArtifactMetadataRebaseMs = 0;
             let step4ArtifactMetadataAppendMs = 0;
             const step4SharedGlossaryAppendMs = sharedGlossaryArtifactAppendMs;
+            /**
+             * @returns {Promise<void>}
+             */
+            const importArtifactArchiveMediaFiles = async () => {
+                if (!artifactDirectMediaImport) {
+                    return;
+                }
+                /** @type {import('dictionary-importer').ImportRequirementContext} */
+                const context = {fileMap, media: new Map()};
+                /** @type {import('dictionary-database').DatabaseTermEntry} */
+                const syntheticEntry = {
+                    dictionary: dictionaryTitle,
+                    expression: '',
+                    reading: '',
+                    definitionTags: '',
+                    rules: '',
+                    score: 0,
+                    glossary: EMPTY_TERM_GLOSSARY,
+                };
+                const chunkSize = Math.max(this._mediaResolutionConcurrency * 64, 256);
+                const skipArtifactImageMetadata = artifactArchiveImageFileEntries.length >= 4096;
+                for (let i = 0; i < artifactArchiveImageFileEntries.length; i += chunkSize) {
+                    const chunkEntries = artifactArchiveImageFileEntries.slice(i, i + chunkSize);
+                    const tMediaResolveStart = Date.now();
+                    await this._runWithConcurrencyLimit(chunkEntries, this._mediaResolutionConcurrency, async ([path]) => {
+                        if (!skipArtifactImageMetadata) {
+                            await this._getImageMedia(context, path, syntheticEntry);
+                            return;
+                        }
+                        if (context.media.has(path)) {
+                            return;
+                        }
+                        const file = fileMap.get(path);
+                        if (typeof file === 'undefined') {
+                            throw new Error(`Could not find image at path ${JSON.stringify(path)} in ${dictionaryTitle}`);
+                        }
+                        const mediaType = getImageMediaTypeFromFileName(path);
+                        if (mediaType === null) {
+                            throw new Error(`Could not determine media type for image path ${JSON.stringify(path)} in ${dictionaryTitle}`);
+                        }
+                        const bytes = await this._getData(file, new Uint8ArrayWriter());
+                        const content = (
+                            bytes.byteOffset === 0 &&
+                            bytes.byteLength === bytes.buffer.byteLength
+                        ) ?
+                            bytes.buffer :
+                            bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+                        this._imageMetadataByPath.set(path, {mediaType, width: 0, height: 0});
+                        context.media.set(path, {
+                            dictionary: dictionaryTitle,
+                            path,
+                            mediaType,
+                            width: 0,
+                            height: 0,
+                            content,
+                        });
+                    });
+                    const tMediaResolved = Date.now();
+                    const media = [...context.media.values()];
+                    context.media.clear();
+                    const tMediaWriteStart = Date.now();
+                    await bulkAdd('media', media, {trackProgress: false});
+                    const tMediaWriteEnd = Date.now();
+                    step4TimingBreakdown.mediaResolveMs += Math.max(0, tMediaResolved - tMediaResolveStart);
+                    step4TimingBreakdown.mediaWriteMs += Math.max(0, tMediaWriteEnd - tMediaWriteStart);
+                    counts.media.total += media.length;
+                    this._logImport(
+                        `artifact media batch ${i}-${i + chunkEntries.length}/${artifactArchiveImageFileEntries.length} ` +
+                        `rows=${media.length} resolve=${tMediaResolved - tMediaResolveStart}ms ` +
+                        `write=${tMediaWriteEnd - tMediaWriteStart}ms`,
+                    );
+                }
+            };
             /**
              * @param {number} startIndex
              * @param {number} processedRows
@@ -854,11 +938,11 @@ export class DictionaryImporter {
                 let termRecordEncodeMs = 0;
                 let termRecordWriteMs = 0;
                 let termsVtabInsertMs = 0;
-                if (directArtifactChunk !== null && useMediaPipeline) {
+                if (directArtifactChunk !== null && useTermMediaRequirements) {
                     throw new Error('Direct artifact chunk import does not support media requirements');
                 }
 
-                if (useMediaPipeline && requirements !== null && uniqueMediaPaths !== null) {
+                if (useTermMediaRequirements && requirements !== null && uniqueMediaPaths !== null) {
                     /** @type {import('dictionary-importer').ImportRequirement[]} */
                     const alreadyAddedRequirements = [];
                     /** @type {import('dictionary-importer').ImportRequirement[]} */
@@ -914,7 +998,7 @@ export class DictionaryImporter {
                     media = [];
                 }
 
-                if (useMediaPipeline) {
+                if (useTermMediaRequirements) {
                     const tSerializationStart = Date.now();
                     this._prepareTermImportSerialization(termList, enableTermEntryContentDedup);
                     serializationMs += Math.max(0, Date.now() - tSerializationStart);
@@ -958,6 +1042,7 @@ export class DictionaryImporter {
                     termsVtabInsertMs,
                 };
             };
+            await importArtifactArchiveMediaFiles();
             for (let termFileIndex = 0; termFileIndex < activeTermFiles.length; ++termFileIndex) {
                 const termFile = activeTermFiles[termFileIndex];
                 const tTermFile = Date.now();
@@ -989,7 +1074,7 @@ export class DictionaryImporter {
                          * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}} streamProgress
                          * @returns {Promise<void>}
                          */
-                        const directArtifactChunkImport = !enableTermEntryContentDedup && !useMediaPipeline;
+                        const directArtifactChunkImport = !enableTermEntryContentDedup && !useTermMediaRequirements;
                         /**
                          * @param {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} termListChunk
                          * @param {import('dictionary-importer').ImportRequirement[]|null} requirementsChunk
@@ -1108,7 +1193,7 @@ export class DictionaryImporter {
                             version,
                             dictionaryTitle,
                             prefixWildcardsSupported,
-                            useMediaPipeline,
+                            useTermMediaRequirements,
                             enableTermEntryContentDedup,
                             termContentStorageMode,
                             async (termListChunk, requirementsChunk, streamProgress) => {
@@ -1194,7 +1279,7 @@ export class DictionaryImporter {
                         version,
                         dictionaryTitle,
                         prefixWildcardsSupported,
-                        useMediaPipeline,
+                        useTermMediaRequirements,
                         enableTermEntryContentDedup,
                         termContentStorageMode,
                     );
