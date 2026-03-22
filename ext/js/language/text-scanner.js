@@ -651,7 +651,6 @@ export class TextScanner extends EventDispatcher {
      * @returns {boolean|void}
      */
     _onMouseUp(e) {
-        this._scanTimerClear();
         switch (e.button) {
             case 3: // Back
             case 4: // Forward
