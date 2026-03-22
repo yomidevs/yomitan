@@ -341,8 +341,14 @@ export class TermRecordOpfsStore {
         if (!this._importSessionActive && !this._hasPendingShardWrites()) {
             return;
         }
-        this._importSessionActive = false;
-        await this._flushPendingWrites();
+        const wasImportSessionActive = this._importSessionActive;
+        if (wasImportSessionActive) {
+            await this._flushPendingWrites();
+            this._importSessionActive = false;
+        } else {
+            this._importSessionActive = false;
+            await this._flushPendingWrites();
+        }
         await this._awaitQueuedWrites();
         await this._closeAllWritables();
         this._deferIndexBuild = false;
