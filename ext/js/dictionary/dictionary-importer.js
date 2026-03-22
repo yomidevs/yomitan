@@ -512,10 +512,12 @@ export class DictionaryImporter {
         const tArchiveStart = Date.now();
         /** @type {import('dictionary-importer').ArchiveFileMap} */
         let fileMap;
+        /** @type {ZipReader<Uint8ArrayReader>|null} */
+        let archiveReader = null;
         /** @type {import('dictionary-data').Index} */
         let index;
         try {
-            fileMap = await this._getFilesFromArchive(archiveContent);
+            ({fileMap, zipReader: archiveReader} = await this._getFilesFromArchive(archiveContent));
             index = await this._readAndValidateIndex(fileMap);
         } catch (e) {
             recordPhaseTiming('archive-and-index', tArchiveStart, {ok: false});
@@ -726,6 +728,7 @@ export class DictionaryImporter {
         this._setProgressInterval(100);
 
         let importSuccess = false;
+        let preloadedStyles = null;
 
         /** @type {import('dictionary-importer').SummaryCounts} */
         const counts = {
@@ -748,6 +751,26 @@ export class DictionaryImporter {
         let sharedGlossaryArtifactBaseOffset = 0;
         let sharedGlossaryArtifactAppendMs = 0;
         const tImportBanksStart = Date.now();
+
+        const closeArchiveReader = async () => {
+            if (archiveReader === null) { return; }
+            try {
+                await archiveReader.close();
+            } finally {
+                archiveReader = null;
+            }
+        };
+
+        if (packedTermArtifactBytes !== null && usePrunedArtifactAuxFastPath) {
+            const stylesFile = fileMap.get('styles.css');
+            if (typeof stylesFile !== 'undefined') {
+                preloadedStyles = await this._getData(stylesFile, new TextWriter());
+            }
+            fileMap.clear();
+            await closeArchiveReader();
+            archiveContent = null;
+            this._logImport('released source archive after packed artifact preload');
+        }
 
         try {
             await dictionaryDatabase.startBulkImport();
@@ -1313,12 +1336,20 @@ export class DictionaryImporter {
             const tFinalizeDescriptorStart = Date.now();
 
             const stylesFileName = 'styles.css';
-            const stylesFile = fileMap.get(stylesFileName);
-            if (typeof stylesFile !== 'undefined') {
-                styles = await this._getData(stylesFile, new TextWriter());
+            if (typeof preloadedStyles === 'string') {
+                styles = preloadedStyles;
                 const cssErrors = this._validateCss(styles);
                 if (cssErrors.length > 0) {
                     throw cssErrors[0];
+                }
+            } else {
+                const stylesFile = fileMap.get(stylesFileName);
+                if (typeof stylesFile !== 'undefined') {
+                    styles = await this._getData(stylesFile, new TextWriter());
+                    const cssErrors = this._validateCss(styles);
+                    if (cssErrors.length > 0) {
+                        throw cssErrors[0];
+                    }
                 }
             }
             recordPhaseTiming('finalize-descriptor', tFinalizeDescriptorStart, {
@@ -1331,6 +1362,7 @@ export class DictionaryImporter {
                 ok: false,
             });
         } finally {
+            await closeArchiveReader();
             this._setProgressInterval(previousProgressInterval);
             const tBulkFinalizationStart = Date.now();
             /** @type {{commitMs?: number, termContentEndImportSessionMs?: number, termRecordEndImportSessionMs?: number, termsVirtualTableSyncMs?: number, createIndexesMs?: number, createIndexesCheckpointCount?: number, cacheResetMs?: number, runtimePragmasMs?: number, totalMs?: number}|null} */
@@ -1390,7 +1422,7 @@ export class DictionaryImporter {
 
     /**
      * @param {ArrayBuffer} archiveContent
-     * @returns {Promise<import('dictionary-importer').ArchiveFileMap>}
+     * @returns {Promise<{fileMap: import('dictionary-importer').ArchiveFileMap, zipReader: ZipReader<Uint8ArrayReader>}>}
      */
     async _getFilesFromArchive(archiveContent) {
         const zipFileReader = new Uint8ArrayReader(new Uint8Array(archiveContent));
@@ -1401,7 +1433,7 @@ export class DictionaryImporter {
         for (const entry of zipEntries) {
             fileMap.set(entry.filename, entry);
         }
-        return fileMap;
+        return {fileMap, zipReader};
     }
 
     /**
