@@ -240,6 +240,21 @@ class DenseIdRecordStore {
  * @property {string} logicalKey
  */
 
+/**
+ * @typedef {object} PendingArtifactReloadPlan
+ * @property {string} dictionary
+ * @property {number} firstId
+ * @property {number} rowCount
+ * @property {Uint8Array[]} expressionBytesList
+ * @property {Uint8Array[]} readingBytesList
+ * @property {boolean[]} readingEqualsExpressionList
+ * @property {number[]} contentOffsets
+ * @property {number[]} contentLengths
+ * @property {string | (string|null)[]} contentDictNames
+ * @property {number[]} scoreList
+ * @property {(number|undefined)[]} sequenceList
+ */
+
 export class TermRecordOpfsStore {
     constructor() {
         /** @type {FileSystemDirectoryHandle|null} */
@@ -270,6 +285,8 @@ export class TermRecordOpfsStore {
         this._reloadFromShardsAfterImport = false;
         /** @type {Set<string>} */
         this._reloadShardLogicalKeysAfterImport = new Set();
+        /** @type {PendingArtifactReloadPlan[]} */
+        this._pendingArtifactReloadPlansAfterImport = [];
         /** @type {TextEncoder} */
         this._textEncoder = new TextEncoder();
         /** @type {TextDecoder} */
@@ -294,6 +311,7 @@ export class TermRecordOpfsStore {
         this._indexDirty = false;
         this._reloadFromShardsAfterImport = false;
         this._reloadShardLogicalKeysAfterImport.clear();
+        this._pendingArtifactReloadPlansAfterImport = [];
         this._rootDirectoryHandle = null;
         this._recordsDirectoryHandle = null;
         this._shardStateByFileName.clear();
@@ -323,6 +341,7 @@ export class TermRecordOpfsStore {
         this._indexDirty = true;
         this._reloadFromShardsAfterImport = false;
         this._reloadShardLogicalKeysAfterImport.clear();
+        this._pendingArtifactReloadPlansAfterImport = [];
         this._indexByDictionary.clear();
         this._queuedWriteBudgetBytes = this._computeQueuedWriteBudgetBytes();
         for (const state of this._shardStateByFileName.values()) {
@@ -357,6 +376,7 @@ export class TermRecordOpfsStore {
             this._reloadFromShardsAfterImport = false;
             this._indexDirty = false;
             this._reloadShardLogicalKeysAfterImport.clear();
+            this._pendingArtifactReloadPlansAfterImport = [];
             return;
         }
         if (this._indexDirty) {
@@ -380,6 +400,7 @@ export class TermRecordOpfsStore {
         this._invalidShardFileNames = [];
         this._activeAppendShardStateByKey.clear();
         this._reloadShardLogicalKeysAfterImport.clear();
+        this._pendingArtifactReloadPlansAfterImport = [];
         if (this._recordsDirectoryHandle === null) {
             return;
         }
@@ -874,6 +895,19 @@ export class TermRecordOpfsStore {
         if (skipRecordMaterialization) {
             this._nextId += count;
             this._reloadFromShardsAfterImport = true;
+            this._pendingArtifactReloadPlansAfterImport.push({
+                dictionary: chunk.dictionary,
+                firstId,
+                rowCount: count,
+                expressionBytesList: chunk.expressionBytesList,
+                readingBytesList: chunk.readingBytesList,
+                readingEqualsExpressionList: chunk.readingEqualsExpressionList,
+                contentOffsets,
+                contentLengths,
+                contentDictNames,
+                scoreList: chunk.scoreList,
+                sequenceList: chunk.sequenceList,
+            });
         } else {
             this._recordsById.ensureCapacity(firstId + count - 1);
             const existingIndex = this._deferIndexBuild ? void 0 : this._indexByDictionary.get(chunk.dictionary);
@@ -2581,6 +2615,10 @@ export class TermRecordOpfsStore {
      * @returns {Promise<void>}
      */
     async _reloadTouchedShardsAfterImport() {
+        if (this._pendingArtifactReloadPlansAfterImport.length > 0) {
+            this._reloadTouchedArtifactChunksAfterImport();
+            return;
+        }
         if (this._reloadShardLogicalKeysAfterImport.size === 0) {
             this._indexByDictionary.clear();
             return;
@@ -2622,6 +2660,51 @@ export class TermRecordOpfsStore {
                 continue;
             }
             this._loadBinary(content, this._decodeDictionaryNameFromShardFileName(state.fileName));
+        }
+    }
+
+    /**
+     * @returns {void}
+     */
+    _reloadTouchedArtifactChunksAfterImport() {
+        if (this._reloadShardLogicalKeysAfterImport.size === 0) {
+            this._indexByDictionary.clear();
+            return;
+        }
+
+        for (const id of this._recordsById.keys()) {
+            const record = this._recordsById.get(id);
+            if (typeof record === 'undefined') { continue; }
+            const logicalKey = this._getShardFileName(record.dictionary, record.entryContentDictName);
+            if (this._reloadShardLogicalKeysAfterImport.has(logicalKey)) {
+                this._recordsById.delete(id);
+            }
+        }
+
+        this._indexByDictionary.clear();
+
+        for (const plan of this._pendingArtifactReloadPlansAfterImport) {
+            const {dictionary, firstId, rowCount} = plan;
+            const uniformContentDictName = Array.isArray(plan.contentDictNames) ? null : (plan.contentDictNames ?? 'raw');
+            for (let i = 0; i < rowCount; ++i) {
+                const id = firstId + i;
+                const sequenceValue = plan.sequenceList[i];
+                const entryContentDictName = uniformContentDictName ?? (plan.contentDictNames[i] ?? 'raw');
+                /** @type {TermRecord} */
+                const record = {
+                    id,
+                    dictionary,
+                    readingEqualsExpression: plan.readingEqualsExpressionList[i] === true,
+                    expressionBytes: plan.expressionBytesList[i],
+                    readingBytes: plan.readingEqualsExpressionList[i] === true ? void 0 : plan.readingBytesList[i],
+                    entryContentOffset: plan.contentOffsets[i],
+                    entryContentLength: plan.contentLengths[i],
+                    entryContentDictName,
+                    score: plan.scoreList[i] ?? 0,
+                    sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
+                };
+                this._recordsById.set(id, record);
+            }
         }
     }
 
