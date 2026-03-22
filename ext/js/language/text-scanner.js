@@ -651,6 +651,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {boolean|void}
      */
     _onMouseUp(e) {
+        this._scanTimerClear();
         switch (e.button) {
             case 3: // Back
             case 4: // Forward
@@ -1497,7 +1498,8 @@ export class TextScanner extends EventDispatcher {
             if (!types.has(pointerType)) { continue; }
             if (this._setHasAll(modifiersSet, include) && (exclude.length === 0 || !this._setHasAll(modifiersSet, exclude))) {
                 if (include.length > 0) {
-                    return this._createInputInfo(input, pointerType, eventType, false, modifiers, modifierKeys);
+                    const isMiddleMouseOnly = include.every((v) => v === 'mouse2');
+                    return this._createInputInfo(input, pointerType, eventType, isMiddleMouseOnly, modifiers, modifierKeys);
                 } else if (fallbackIndex < 0) {
                     fallbackIndex = i;
                 }
