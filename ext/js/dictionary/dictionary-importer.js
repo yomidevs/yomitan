@@ -68,6 +68,7 @@ const TERM_BANK_ARTIFACT_MAGIC_V2 = 'MBTB0002';
 const TERM_BANK_ARTIFACT_MAGIC_BYTES = TERM_BANK_ARTIFACT_MAGIC_V1.length;
 const TERM_BANK_ARTIFACT_MANIFEST_FILE = 'manabitan-import-artifact.json';
 const TERM_BANK_PACKED_ARTIFACT_FILE = 'manabitan-term-banks-packed.bin';
+const TERM_BANK_PACKED_MEDIA_ARTIFACT_FILE = 'manabitan-media-packed.bin';
 const TERM_BANK_SHARED_GLOSSARY_ARTIFACT_FILE = 'manabitan-term-glossary-shared.bin';
 const TERM_ARTIFACT_PRELOAD_CONCURRENCY = 4;
 const HEX_BYTE_TABLE = Array.from({length: 256}, (_, i) => i.toString(16).padStart(2, '0'));
@@ -597,6 +598,12 @@ export class DictionaryImporter {
         ) ?
             fileMap.get(termArtifactManifest.packedFileName) :
             fileMap.get(TERM_BANK_PACKED_ARTIFACT_FILE);
+        const packedMediaArtifactEntry = (
+            termArtifactManifest !== null &&
+            typeof termArtifactManifest.packedMediaFileName === 'string'
+        ) ?
+            fileMap.get(termArtifactManifest.packedMediaFileName) :
+            fileMap.get(TERM_BANK_PACKED_MEDIA_ARTIFACT_FILE);
         const sharedGlossaryArtifactEntry = (
             termArtifactManifest !== null &&
             typeof termArtifactManifest.sharedGlossaryFileName === 'string'
@@ -610,10 +617,13 @@ export class DictionaryImporter {
         /** @type {Uint8Array|null} */
         let packedTermArtifactBytes = null;
         /** @type {Uint8Array|null} */
+        let packedMediaArtifactBytes = null;
+        /** @type {Uint8Array|null} */
         let sharedGlossaryArtifactBytes = null;
         /** @type {Map<string, Uint8Array>|null} */
         let preloadedTermArtifactBytes = null;
         let packedTermArtifactPreloadMs = 0;
+        let packedMediaArtifactPreloadMs = 0;
         let termArtifactPreloadMs = 0;
         let sharedGlossaryArtifactPreloadMs = 0;
         if (useTermArtifactFiles || typeof packedTermArtifactEntry !== 'undefined') {
@@ -652,6 +662,17 @@ export class DictionaryImporter {
             sharedGlossaryArtifactBytes = await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (sharedGlossaryArtifactEntry), new Uint8ArrayWriter());
             sharedGlossaryArtifactPreloadMs = Math.max(0, Date.now() - tSharedGlossaryReadStart);
             this._logImport(`shared glossary artifact preload ${sharedGlossaryArtifactPreloadMs}ms bytes=${sharedGlossaryArtifactBytes.byteLength}`);
+        }
+        if (
+            packedMediaArtifactBytes === null &&
+            termArtifactManifest !== null &&
+            termArtifactManifest.packedMediaEntries.length > 0 &&
+            typeof packedMediaArtifactEntry !== 'undefined'
+        ) {
+            const tPackedMediaReadStart = Date.now();
+            packedMediaArtifactBytes = await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedMediaArtifactEntry), new Uint8ArrayWriter());
+            packedMediaArtifactPreloadMs = Math.max(0, Date.now() - tPackedMediaReadStart);
+            this._logImport(`packed media artifact preload ${packedMediaArtifactPreloadMs}ms bytes=${packedMediaArtifactBytes.byteLength}`);
         }
         const useCompressedSharedGlossaryArtifact = termArtifactManifest?.termContentMode === RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME;
         if (
@@ -794,13 +815,27 @@ export class DictionaryImporter {
                 !this._skipMediaImport &&
                 hasArchiveImageMediaFiles
             );
-            /** @type {[string, import('@zip.js/zip.js').Entry][]} */
+            /** @type {Array<{path: string, mediaType: string, packedOffset?: number, packedLength?: number, fileEntry?: import('@zip.js/zip.js').Entry}>} */
             const artifactArchiveImageFileEntries = (
                 useMediaPipeline &&
                 (useTermArtifactFiles || usePackedTermArtifact) &&
                 termArtifactManifest?.includesMediaFiles === true
             ) ?
-                [...fileMap.entries()].filter(([path]) => getImageMediaTypeFromFileName(path) !== null) :
+                (
+                    termArtifactManifest !== null &&
+                    termArtifactManifest.packedMediaEntries.length > 0 &&
+                    packedMediaArtifactBytes instanceof Uint8Array
+                ) ?
+                    termArtifactManifest.packedMediaEntries :
+                    [...fileMap.entries()]
+                        .map(([path, fileEntry]) => {
+                            const mediaType = getImageMediaTypeFromFileName(path);
+                            if (mediaType === null) {
+                                return null;
+                            }
+                            return {path, mediaType, fileEntry};
+                        })
+                        .filter((value) => value !== null) :
                 [];
             const artifactDirectMediaImport = artifactArchiveImageFileEntries.length > 0;
             const useTermMediaRequirements = useMediaPipeline && !artifactDirectMediaImport;
@@ -813,6 +848,7 @@ export class DictionaryImporter {
             const termFileProgressAllowance = bulkAddProgressAllowance * 2;
             const step4ArtifactPreloadMs = (
                 packedTermArtifactPreloadMs +
+                packedMediaArtifactPreloadMs +
                 termArtifactPreloadMs +
                 sharedGlossaryArtifactPreloadMs
             );
@@ -844,36 +880,63 @@ export class DictionaryImporter {
                 for (let i = 0; i < artifactArchiveImageFileEntries.length; i += chunkSize) {
                     const chunkEntries = artifactArchiveImageFileEntries.slice(i, i + chunkSize);
                     const tMediaResolveStart = Date.now();
-                    await this._runWithConcurrencyLimit(chunkEntries, this._mediaResolutionConcurrency, async ([path]) => {
-                        if (!skipArtifactImageMetadata) {
+                    await this._runWithConcurrencyLimit(chunkEntries, this._mediaResolutionConcurrency, async ({path, mediaType, packedOffset, packedLength, fileEntry}) => {
+                        if (
+                            !skipArtifactImageMetadata &&
+                            !(packedMediaArtifactBytes instanceof Uint8Array && Number.isInteger(packedOffset) && Number.isInteger(packedLength))
+                        ) {
                             await this._getImageMedia(context, path, syntheticEntry);
                             return;
                         }
                         if (context.media.has(path)) {
                             return;
                         }
-                        const file = fileMap.get(path);
-                        if (typeof file === 'undefined') {
-                            throw new Error(`Could not find image at path ${JSON.stringify(path)} in ${dictionaryTitle}`);
+                        /** @type {ArrayBuffer} */
+                        let content;
+                        let width = 0;
+                        let height = 0;
+                        if (
+                            packedMediaArtifactBytes instanceof Uint8Array &&
+                            Number.isInteger(packedOffset) &&
+                            Number.isInteger(packedLength)
+                        ) {
+                            const start = /** @type {number} */ (packedOffset);
+                            const end = start + /** @type {number} */ (packedLength);
+                            const bytes = packedMediaArtifactBytes.subarray(start, end);
+                            content = (
+                                bytes.byteOffset === 0 &&
+                                bytes.byteLength === bytes.buffer.byteLength
+                            ) ?
+                                bytes.buffer :
+                                bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+                        } else {
+                            const file = fileEntry ?? fileMap.get(path);
+                            if (typeof file === 'undefined') {
+                                throw new Error(`Could not find image at path ${JSON.stringify(path)} in ${dictionaryTitle}`);
+                            }
+                            const bytes = await this._getData(file, new Uint8ArrayWriter());
+                            content = (
+                                bytes.byteOffset === 0 &&
+                                bytes.byteLength === bytes.buffer.byteLength
+                            ) ?
+                                bytes.buffer :
+                                bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
                         }
-                        const mediaType = getImageMediaTypeFromFileName(path);
-                        if (mediaType === null) {
-                            throw new Error(`Could not determine media type for image path ${JSON.stringify(path)} in ${dictionaryTitle}`);
+                        if (!skipArtifactImageMetadata) {
+                            try {
+                                ({content, width, height} = await this._mediaLoader.getImageDetails(content, mediaType));
+                            } catch (_) {
+                                width = 0;
+                                height = 0;
+                            }
                         }
-                        const bytes = await this._getData(file, new Uint8ArrayWriter());
-                        const content = (
-                            bytes.byteOffset === 0 &&
-                            bytes.byteLength === bytes.buffer.byteLength
-                        ) ?
-                            bytes.buffer :
-                            bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-                        this._imageMetadataByPath.set(path, {mediaType, width: 0, height: 0});
+                        this._imageMetadataByPath.set(path, {mediaType, width, height});
                         context.media.set(path, {
                             dictionary: dictionaryTitle,
                             path,
                             mediaType,
-                            width: 0,
-                            height: 0,
+                            width,
+                            height,
                             content,
                         });
                     });
@@ -2363,7 +2426,7 @@ export class DictionaryImporter {
 
     /**
      * @param {import('dictionary-importer').ArchiveFileMap} fileMap
-     * @returns {Promise<{termBanksByArtifact: Map<string, {packedOffset: number, packedLength: number, rows: number|null}>, packedFileName: string|null, sharedGlossaryFileName: string|null, sharedGlossaryPackedOffset: number|null, sharedGlossaryPackedLength: number|null, sharedGlossaryCompression: string|null, sharedGlossaryUncompressedLength: number|null, termContentMode: string|null, prunedAuxFiles: boolean, includesMediaFiles: boolean}|null>}
+     * @returns {Promise<{termBanksByArtifact: Map<string, {packedOffset: number, packedLength: number, rows: number|null}>, packedFileName: string|null, packedMediaFileName: string|null, packedMediaEntries: Array<{path: string, packedOffset: number, packedLength: number, mediaType: string}>, sharedGlossaryFileName: string|null, sharedGlossaryPackedOffset: number|null, sharedGlossaryPackedLength: number|null, sharedGlossaryCompression: string|null, sharedGlossaryUncompressedLength: number|null, termContentMode: string|null, prunedAuxFiles: boolean, includesMediaFiles: boolean}|null>}
      */
     async _readTermArtifactManifest(fileMap) {
         const manifestEntry = fileMap.get(TERM_BANK_ARTIFACT_MANIFEST_FILE);
@@ -2372,7 +2435,7 @@ export class DictionaryImporter {
         }
         let manifest;
         try {
-            manifest = /** @type {{termBanks?: Array<{artifact?: unknown, packedOffset?: unknown, packedLength?: unknown, rows?: unknown}>, packedTermArtifact?: {file?: unknown}|null, sharedGlossaryArtifact?: {file?: unknown, packedOffset?: unknown, packedLength?: unknown, compression?: unknown, uncompressedBytes?: unknown}|null, termContentMode?: unknown, prunedAuxFiles?: unknown, includesMediaFiles?: unknown}|null} */ (
+            manifest = /** @type {{termBanks?: Array<{artifact?: unknown, packedOffset?: unknown, packedLength?: unknown, rows?: unknown}>, packedTermArtifact?: {file?: unknown}|null, mediaArtifact?: {file?: unknown, entries?: Array<{path?: unknown, packedOffset?: unknown, packedLength?: unknown, mediaType?: unknown}>|null}|null, sharedGlossaryArtifact?: {file?: unknown, packedOffset?: unknown, packedLength?: unknown, compression?: unknown, uncompressedBytes?: unknown}|null, termContentMode?: unknown, prunedAuxFiles?: unknown, includesMediaFiles?: unknown}|null} */ (
                 parseJson(await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (manifestEntry), new TextWriter()))
             );
         } catch (_) {
@@ -2400,6 +2463,31 @@ export class DictionaryImporter {
         ) ?
             manifest.packedTermArtifact.file :
             null;
+        const packedMediaFileName = (
+            typeof manifest.mediaArtifact === 'object' &&
+            manifest.mediaArtifact !== null &&
+            typeof manifest.mediaArtifact.file === 'string'
+        ) ?
+            manifest.mediaArtifact.file :
+            null;
+        /** @type {Array<{path: string, packedOffset: number, packedLength: number, mediaType: string}>} */
+        const packedMediaEntries = [];
+        const mediaEntries = (
+            typeof manifest.mediaArtifact === 'object' &&
+            manifest.mediaArtifact !== null &&
+            Array.isArray(manifest.mediaArtifact.entries)
+        ) ?
+            manifest.mediaArtifact.entries :
+            [];
+        for (const mediaEntry of mediaEntries) {
+            if (!(typeof mediaEntry === 'object' && mediaEntry !== null)) { continue; }
+            const path = typeof mediaEntry.path === 'string' ? mediaEntry.path : null;
+            const packedOffset = Number.isInteger(mediaEntry.packedOffset) ? /** @type {number} */ (mediaEntry.packedOffset) : -1;
+            const packedLength = Number.isInteger(mediaEntry.packedLength) ? /** @type {number} */ (mediaEntry.packedLength) : -1;
+            const mediaType = typeof mediaEntry.mediaType === 'string' ? mediaEntry.mediaType : null;
+            if (path === null || mediaType === null || packedOffset < 0 || packedLength <= 0) { continue; }
+            packedMediaEntries.push({path, packedOffset, packedLength, mediaType});
+        }
         const sharedGlossaryFileName = (
             typeof manifest.sharedGlossaryArtifact === 'object' &&
             manifest.sharedGlossaryArtifact !== null &&
@@ -2442,6 +2530,8 @@ export class DictionaryImporter {
         return {
             termBanksByArtifact,
             packedFileName,
+            packedMediaFileName,
+            packedMediaEntries,
             sharedGlossaryFileName,
             sharedGlossaryPackedOffset,
             sharedGlossaryPackedLength,
