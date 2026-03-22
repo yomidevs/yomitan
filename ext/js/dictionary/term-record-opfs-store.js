@@ -2209,7 +2209,10 @@ export class TermRecordOpfsStore {
         if (this._importSessionActive) {
             this._queueWriteChunksForShard(state, chunks);
             if (state.queuedWriteBytes >= this._queuedWriteBudgetBytes) {
-                await this._awaitQueuedWritesForShard(state);
+                const rotated = await this._rotateActiveShardSegmentAfterQueuePressure(state);
+                if (!rotated) {
+                    await this._awaitQueuedWritesForShard(state);
+                }
             }
             return;
         }
@@ -2251,6 +2254,38 @@ export class TermRecordOpfsStore {
             return;
         }
         await promise;
+    }
+
+    /**
+     * @param {TermRecordShardState} state
+     * @returns {Promise<boolean>}
+     */
+    async _rotateActiveShardSegmentAfterQueuePressure(state) {
+        const logicalKey = state.logicalKey;
+        if (logicalKey === null) {
+            return false;
+        }
+        const active = this._activeAppendShardStateByKey.get(logicalKey);
+        if (active !== state) {
+            return false;
+        }
+        const nextSegmentIndex = state.segmentIndex + 1;
+        const nextFileName = this._getShardSegmentFileName(state.dictionaryName, state.sharedContentDictName ?? 'raw', nextSegmentIndex);
+        const nextFileHandle = await this._recordsDirectoryHandle?.getFileHandle(nextFileName, {create: true});
+        if (typeof nextFileHandle === 'undefined') {
+            return false;
+        }
+        const created = this._createShardState(
+            nextFileName,
+            nextFileHandle,
+            0,
+            state.sharedContentDictName,
+            nextSegmentIndex,
+            logicalKey,
+        );
+        this._shardStateByFileName.set(nextFileName, created);
+        this._activeAppendShardStateByKey.set(logicalKey, created);
+        return true;
     }
 
     /**
