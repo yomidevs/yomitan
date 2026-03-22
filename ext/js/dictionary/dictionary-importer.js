@@ -787,10 +787,11 @@ export class DictionaryImporter {
                 }
                 sharedGlossaryArtifactAppendMs = Math.max(0, Date.now() - tSharedGlossaryAppendStart);
             }
-            const hasArchiveImageMediaFiles = usePrunedArtifactAuxFastPath ? false : this._archiveHasImageMediaFiles(fileMap);
+            const hasArchiveImageMediaFiles =
+                this._archiveHasImageMediaFiles(fileMap) ||
+                termArtifactManifest?.includesMediaFiles === true;
             const useMediaPipeline = (
                 !this._skipMediaImport &&
-                !useTermArtifactFiles &&
                 hasArchiveImageMediaFiles
             );
             this._logImport(
@@ -2277,7 +2278,7 @@ export class DictionaryImporter {
 
     /**
      * @param {import('dictionary-importer').ArchiveFileMap} fileMap
-     * @returns {Promise<{termBanksByArtifact: Map<string, {packedOffset: number, packedLength: number, rows: number|null}>, packedFileName: string|null, sharedGlossaryFileName: string|null, sharedGlossaryPackedOffset: number|null, sharedGlossaryPackedLength: number|null, sharedGlossaryCompression: string|null, sharedGlossaryUncompressedLength: number|null, termContentMode: string|null, prunedAuxFiles: boolean}|null>}
+     * @returns {Promise<{termBanksByArtifact: Map<string, {packedOffset: number, packedLength: number, rows: number|null}>, packedFileName: string|null, sharedGlossaryFileName: string|null, sharedGlossaryPackedOffset: number|null, sharedGlossaryPackedLength: number|null, sharedGlossaryCompression: string|null, sharedGlossaryUncompressedLength: number|null, termContentMode: string|null, prunedAuxFiles: boolean, includesMediaFiles: boolean}|null>}
      */
     async _readTermArtifactManifest(fileMap) {
         const manifestEntry = fileMap.get(TERM_BANK_ARTIFACT_MANIFEST_FILE);
@@ -2286,7 +2287,7 @@ export class DictionaryImporter {
         }
         let manifest;
         try {
-            manifest = /** @type {{termBanks?: Array<{artifact?: unknown, packedOffset?: unknown, packedLength?: unknown, rows?: unknown}>, packedTermArtifact?: {file?: unknown}|null, sharedGlossaryArtifact?: {file?: unknown, packedOffset?: unknown, packedLength?: unknown, compression?: unknown, uncompressedBytes?: unknown}|null, termContentMode?: unknown, prunedAuxFiles?: unknown}|null} */ (
+            manifest = /** @type {{termBanks?: Array<{artifact?: unknown, packedOffset?: unknown, packedLength?: unknown, rows?: unknown}>, packedTermArtifact?: {file?: unknown}|null, sharedGlossaryArtifact?: {file?: unknown, packedOffset?: unknown, packedLength?: unknown, compression?: unknown, uncompressedBytes?: unknown}|null, termContentMode?: unknown, prunedAuxFiles?: unknown, includesMediaFiles?: unknown}|null} */ (
                 parseJson(await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (manifestEntry), new TextWriter()))
             );
         } catch (_) {
@@ -2352,6 +2353,7 @@ export class DictionaryImporter {
         const termContentModeValue = manifest.termContentMode;
         const termContentMode = typeof termContentModeValue === 'string' ? termContentModeValue : null;
         const prunedAuxFiles = manifest.prunedAuxFiles === true;
+        const includesMediaFiles = manifest.includesMediaFiles === true;
         return {
             termBanksByArtifact,
             packedFileName,
@@ -2362,6 +2364,7 @@ export class DictionaryImporter {
             sharedGlossaryUncompressedLength,
             termContentMode,
             prunedAuxFiles,
+            includesMediaFiles,
         };
     }
 
