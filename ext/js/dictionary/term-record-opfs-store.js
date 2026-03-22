@@ -58,7 +58,7 @@ const DEFAULT_WRITE_COALESCE_TARGET_BYTES = 4 * 1024 * 1024;
 const LOW_MEMORY_WRITE_COALESCE_TARGET_BYTES = 1024 * 1024;
 const HIGH_MEMORY_WRITE_COALESCE_TARGET_BYTES = 8 * 1024 * 1024;
 const WRITE_COALESCE_MAX_CHUNKS = 512;
-const MAX_SHARD_SEGMENT_FILE_BYTES = 512 * 1024 * 1024;
+const MAX_SHARD_SEGMENT_FILE_BYTES = 1024 * 1024 * 1024;
 
 /**
  * @param {unknown[]} rows
@@ -266,6 +266,10 @@ export class TermRecordOpfsStore {
         this._deferIndexBuild = false;
         /** @type {boolean} */
         this._indexDirty = false;
+        /** @type {boolean} */
+        this._reloadFromShardsAfterImport = false;
+        /** @type {Set<string>} */
+        this._reloadShardLogicalKeysAfterImport = new Set();
         /** @type {TextEncoder} */
         this._textEncoder = new TextEncoder();
         /** @type {TextDecoder} */
@@ -288,6 +292,8 @@ export class TermRecordOpfsStore {
         this._nextId = 1;
         this._deferIndexBuild = false;
         this._indexDirty = false;
+        this._reloadFromShardsAfterImport = false;
+        this._reloadShardLogicalKeysAfterImport.clear();
         this._rootDirectoryHandle = null;
         this._recordsDirectoryHandle = null;
         this._shardStateByFileName.clear();
@@ -315,6 +321,8 @@ export class TermRecordOpfsStore {
         this._importSessionActive = true;
         this._deferIndexBuild = true;
         this._indexDirty = true;
+        this._reloadFromShardsAfterImport = false;
+        this._reloadShardLogicalKeysAfterImport.clear();
         this._indexByDictionary.clear();
         this._queuedWriteBudgetBytes = this._computeQueuedWriteBudgetBytes();
         for (const state of this._shardStateByFileName.values()) {
@@ -338,10 +346,18 @@ export class TermRecordOpfsStore {
         await this._awaitQueuedWrites();
         await this._closeAllWritables();
         this._deferIndexBuild = false;
+        if (this._reloadFromShardsAfterImport) {
+            await this._reloadTouchedShardsAfterImport();
+            this._reloadFromShardsAfterImport = false;
+            this._indexDirty = false;
+            this._reloadShardLogicalKeysAfterImport.clear();
+            return;
+        }
         if (this._indexDirty) {
             this._indexByDictionary.clear();
             this._indexDirty = false;
         }
+        this._reloadShardLogicalKeysAfterImport.clear();
     }
 
     /**
@@ -357,6 +373,7 @@ export class TermRecordOpfsStore {
         this._shardStateByFileName.clear();
         this._invalidShardFileNames = [];
         this._activeAppendShardStateByKey.clear();
+        this._reloadShardLogicalKeysAfterImport.clear();
         if (this._recordsDirectoryHandle === null) {
             return;
         }
@@ -846,38 +863,47 @@ export class TermRecordOpfsStore {
         const uniformContentDictName = Array.isArray(contentDictNames) ? null : (contentDictNames ?? 'raw');
         const tBuildStart = safePerformance.now();
         const firstId = this._nextId;
-        this._recordsById.ensureCapacity(firstId + count - 1);
-        const existingIndex = this._deferIndexBuild ? void 0 : this._indexByDictionary.get(chunk.dictionary);
-        for (let i = 0; i < count; ++i) {
-            const id = this._nextId++;
-            const sequenceValue = chunk.sequenceList[i];
-            const entryContentDictName = uniformContentDictName ?? (contentDictNames[i] ?? 'raw');
-            /** @type {TermRecord} */
-            const record = {
-                id,
-                dictionary: chunk.dictionary,
-                readingEqualsExpression: chunk.readingEqualsExpressionList[i] === true,
-                expressionBytes: chunk.expressionBytesList[i],
-                readingBytes: chunk.readingEqualsExpressionList[i] === true ? void 0 : chunk.readingBytesList[i],
-                entryContentOffset: contentOffsets[i],
-                entryContentLength: contentLengths[i],
-                entryContentDictName,
-                score: chunk.scoreList[i] ?? 0,
-                sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
-            };
-            this._recordsById.set(id, record);
-            if (typeof existingIndex !== 'undefined') {
-                this._addRecordToDictionaryIndex(existingIndex, record);
+        const firstContentDictName = uniformContentDictName ?? (contentDictNames[0] ?? 'raw');
+        const skipRecordMaterialization = this._importSessionActive && this._deferIndexBuild;
+        if (skipRecordMaterialization) {
+            this._nextId += count;
+            this._reloadFromShardsAfterImport = true;
+        } else {
+            this._recordsById.ensureCapacity(firstId + count - 1);
+            const existingIndex = this._deferIndexBuild ? void 0 : this._indexByDictionary.get(chunk.dictionary);
+            for (let i = 0; i < count; ++i) {
+                const id = this._nextId++;
+                const sequenceValue = chunk.sequenceList[i];
+                const entryContentDictName = uniformContentDictName ?? (contentDictNames[i] ?? 'raw');
+                /** @type {TermRecord} */
+                const record = {
+                    id,
+                    dictionary: chunk.dictionary,
+                    readingEqualsExpression: chunk.readingEqualsExpressionList[i] === true,
+                    expressionBytes: chunk.expressionBytesList[i],
+                    readingBytes: chunk.readingEqualsExpressionList[i] === true ? void 0 : chunk.readingBytesList[i],
+                    entryContentOffset: contentOffsets[i],
+                    entryContentLength: contentLengths[i],
+                    entryContentDictName,
+                    score: chunk.scoreList[i] ?? 0,
+                    sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
+                };
+                this._recordsById.set(id, record);
+                if (typeof existingIndex !== 'undefined') {
+                    this._addRecordToDictionaryIndex(existingIndex, record);
+                }
             }
-        }
-        if (this._deferIndexBuild) {
-            this._indexDirty = true;
+            if (this._deferIndexBuild) {
+                this._indexDirty = true;
+            }
         }
         const buildRecordsMs = safePerformance.now() - tBuildStart;
         let encodeMs = 0;
         let appendWriteMs = 0;
-        const firstContentDictName = uniformContentDictName ?? (contentDictNames[0] ?? 'raw');
         if (uniformContentDictName !== null) {
+            if (skipRecordMaterialization) {
+                this._reloadShardLogicalKeysAfterImport.add(this._getShardFileName(chunk.dictionary, uniformContentDictName));
+            }
             const state = await this._getOrCreateShardState(chunk.dictionary, uniformContentDictName);
             if (state === null) { return {buildRecordsMs, encodeMs, appendWriteMs}; }
             const metrics = await this._encodeAndAppendArtifactChunkForState(
@@ -887,6 +913,7 @@ export class TermRecordOpfsStore {
                 contentOffsets,
                 contentLengths,
                 chunk.termRecordPreinternedPlan ?? null,
+                uniformContentDictName,
             );
             encodeMs += metrics.encodeMs;
             appendWriteMs += metrics.appendWriteMs;
@@ -900,6 +927,9 @@ export class TermRecordOpfsStore {
             }
         }
         if (singleContentDictName) {
+            if (skipRecordMaterialization) {
+                this._reloadShardLogicalKeysAfterImport.add(this._getShardFileName(chunk.dictionary, firstContentDictName));
+            }
             const state = await this._getOrCreateShardState(chunk.dictionary, firstContentDictName);
             if (state === null) { return {buildRecordsMs, encodeMs, appendWriteMs}; }
             const metrics = await this._encodeAndAppendArtifactChunkForState(
@@ -909,6 +939,7 @@ export class TermRecordOpfsStore {
                 contentOffsets,
                 contentLengths,
                 chunk.termRecordPreinternedPlan ?? null,
+                firstContentDictName,
             );
             encodeMs += metrics.encodeMs;
             appendWriteMs += metrics.appendWriteMs;
@@ -916,6 +947,9 @@ export class TermRecordOpfsStore {
         }
         for (let runStart = 0; runStart < count;) {
             const contentDictName = contentDictNames[runStart] ?? 'raw';
+            if (skipRecordMaterialization) {
+                this._reloadShardLogicalKeysAfterImport.add(this._getShardFileName(chunk.dictionary, contentDictName));
+            }
             let runEnd = runStart + 1;
             while (runEnd < count && (contentDictNames[runEnd] ?? 'raw') === contentDictName) {
                 ++runEnd;
@@ -944,6 +978,7 @@ export class TermRecordOpfsStore {
                 contentOffsets.slice(runStart, runEnd),
                 contentLengths.slice(runStart, runEnd),
                 chunkSlice.termRecordPreinternedPlan ?? null,
+                contentDictName,
             );
             encodeMs += metrics.encodeMs;
             appendWriteMs += metrics.appendWriteMs;
@@ -977,12 +1012,12 @@ export class TermRecordOpfsStore {
      * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} [preinternedPlan]
      * @returns {Promise<{encodeMs: number, appendWriteMs: number}>}
      */
-    async _encodeAndAppendArtifactChunkForState(state, chunk, firstId, contentOffsets, contentLengths, preinternedPlan = null) {
+    async _encodeAndAppendArtifactChunkForState(state, chunk, firstId, contentOffsets, contentLengths, preinternedPlan = null, contentDictName = 'raw') {
         const tEncodeStart = safePerformance.now();
         const encodedChunk = await this._encodeArtifactChunkRecords(chunk, contentOffsets, contentLengths, preinternedPlan);
         const encodeMs = safePerformance.now() - tEncodeStart;
         const tAppendStart = safePerformance.now();
-        await this._appendEncodedChunk(state, encodedChunk, firstId, chunk.rowCount);
+        await this._appendEncodedChunk(state, encodedChunk, firstId, chunk.rowCount, contentDictName);
         const appendWriteMs = safePerformance.now() - tAppendStart;
         return {encodeMs, appendWriteMs};
     }
@@ -1754,10 +1789,10 @@ export class TermRecordOpfsStore {
      * @param {number} count
      * @returns {Promise<void>}
      */
-    async _appendEncodedChunk(state, chunk, firstId, count) {
+    async _appendEncodedChunk(state, chunk, firstId, count, contentDictNameOverride = null) {
         if (chunk.byteLength <= 0) { return; }
         const firstRecord = this._recordsById.get(firstId) ?? null;
-        const contentDictName = firstRecord?.entryContentDictName ?? 'raw';
+        const contentDictName = contentDictNameOverride ?? firstRecord?.entryContentDictName ?? 'raw';
         if (state.sharedContentDictName === null) {
             state.sharedContentDictName = contentDictName;
         } else if (state.sharedContentDictName !== contentDictName) {
@@ -2534,6 +2569,54 @@ export class TermRecordOpfsStore {
             this._addToIndex(record);
         }
         this._indexDirty = false;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _reloadTouchedShardsAfterImport() {
+        if (this._reloadShardLogicalKeysAfterImport.size === 0) {
+            this._indexByDictionary.clear();
+            return;
+        }
+
+        for (const id of this._recordsById.keys()) {
+            const record = this._recordsById.get(id);
+            if (typeof record === 'undefined') { continue; }
+            const logicalKey = this._getShardFileName(record.dictionary, record.entryContentDictName);
+            if (this._reloadShardLogicalKeysAfterImport.has(logicalKey)) {
+                this._recordsById.delete(id);
+            }
+        }
+
+        this._indexByDictionary.clear();
+
+        /** @type {TermRecordShardState[]} */
+        const statesToReload = [];
+        for (const state of this._shardStateByFileName.values()) {
+            if (this._reloadShardLogicalKeysAfterImport.has(state.logicalKey)) {
+                statesToReload.push(state);
+            }
+        }
+        statesToReload.sort((a, b) => a.fileName.localeCompare(b.fileName));
+
+        for (const state of statesToReload) {
+            let file;
+            try {
+                file = await state.fileHandle.getFile();
+            } catch (_) {
+                continue;
+            }
+            state.fileLength = file.size;
+            if (file.size <= 0) {
+                continue;
+            }
+            const content = new Uint8Array(await file.arrayBuffer());
+            if (!this._isBinaryFormat(content)) {
+                continue;
+            }
+            this._loadBinary(content, this._decodeDictionaryNameFromShardFileName(state.fileName));
+        }
     }
 
     /**
