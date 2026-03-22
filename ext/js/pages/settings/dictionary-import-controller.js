@@ -1552,7 +1552,11 @@ export class DictionaryImportController {
         const maxImportAttempts = 6;
         for (let attempt = 1; ; ++attempt) {
             try {
-                const archiveContentAttempt = new Uint8Array(archiveContentBytes).buffer;
+                const archiveContentAttempt = (
+                    attempt === 1 ?
+                        archiveContent :
+                        await this._readFile(file)
+                );
                 importResult = /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}} */ (
                     await dictionaryWorker.importDictionary(
                         archiveContentAttempt,
