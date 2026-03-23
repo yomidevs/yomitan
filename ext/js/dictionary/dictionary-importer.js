@@ -627,7 +627,28 @@ export class DictionaryImporter {
         let packedMediaArtifactPreloadMs = 0;
         let termArtifactPreloadMs = 0;
         let sharedGlossaryArtifactPreloadMs = 0;
-        if (useTermArtifactFiles || typeof packedTermArtifactEntry !== 'undefined') {
+        const useParallelPackedArtifactPreload = (
+            termArtifactManifest !== null &&
+            termArtifactManifest.packedMediaEntries.length >= 100000 &&
+            typeof packedTermArtifactEntry !== 'undefined' &&
+            typeof packedMediaArtifactEntry !== 'undefined'
+        );
+        if (useParallelPackedArtifactPreload) {
+            const tParallelPackedArtifactReadStart = Date.now();
+            const [parallelPackedTermArtifactBytes, parallelPackedMediaArtifactBytes] = await Promise.all([
+                this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedTermArtifactEntry), new Uint8ArrayWriter()),
+                this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedMediaArtifactEntry), new Uint8ArrayWriter()),
+            ]);
+            packedTermArtifactBytes = parallelPackedTermArtifactBytes;
+            packedMediaArtifactBytes = parallelPackedMediaArtifactBytes;
+            const parallelPackedArtifactPreloadMs = Math.max(0, Date.now() - tParallelPackedArtifactReadStart);
+            packedTermArtifactPreloadMs = parallelPackedArtifactPreloadMs;
+            packedMediaArtifactPreloadMs = 0;
+            this._logImport(
+                `parallel packed artifact preload ${parallelPackedArtifactPreloadMs}ms ` +
+                `termBytes=${packedTermArtifactBytes.byteLength} mediaBytes=${packedMediaArtifactBytes.byteLength}`,
+            );
+        } else if (useTermArtifactFiles || typeof packedTermArtifactEntry !== 'undefined') {
             if (typeof packedTermArtifactEntry !== 'undefined') {
                 const tPackedArtifactReadStart = Date.now();
                 packedTermArtifactBytes = await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedTermArtifactEntry), new Uint8ArrayWriter());
@@ -665,6 +686,7 @@ export class DictionaryImporter {
             this._logImport(`shared glossary artifact preload ${sharedGlossaryArtifactPreloadMs}ms bytes=${sharedGlossaryArtifactBytes.byteLength}`);
         }
         if (
+            !useParallelPackedArtifactPreload &&
             packedMediaArtifactBytes === null &&
             termArtifactManifest !== null &&
             termArtifactManifest.packedMediaEntries.length > 0 &&
