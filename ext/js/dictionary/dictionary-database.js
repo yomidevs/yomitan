@@ -2128,14 +2128,13 @@ export class DictionaryDatabase {
                 const bind = [];
                 for (let j = 0; j < chunkCount; ++j) {
                     const row = items[i + j];
-                    valueRows.push('(?, ?, ?, ?, ?, ?, ?, ?)');
+                    valueRows.push('(?, ?, ?, ?, ?, x\'\', ?, ?)');
                     bind.push(
                         row.dictionary,
                         row.path,
                         row.mediaType,
                         row.width,
                         row.height,
-                        EMPTY_MEDIA_CONTENT_BUFFER,
                         typeof row.contentOffset === 'number' ? row.contentOffset : 0,
                         typeof row.contentLength === 'number' ? row.contentLength : 0,
                     );
