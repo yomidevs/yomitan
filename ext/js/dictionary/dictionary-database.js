@@ -5154,7 +5154,7 @@ export class DictionaryDatabase {
     _applyImportPragmas() {
         const db = this._requireDb();
         db.exec('PRAGMA journal_mode = WAL');
-        db.exec('PRAGMA synchronous = NORMAL');
+        db.exec('PRAGMA synchronous = OFF');
         db.exec('PRAGMA temp_store = MEMORY');
         db.exec('PRAGMA foreign_keys = OFF');
         db.exec('PRAGMA cache_size = -131072');
