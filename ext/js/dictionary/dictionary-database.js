@@ -64,6 +64,8 @@ const TERM_CONTENT_STORAGE_MODE_BASELINE = 'baseline';
 const TERM_CONTENT_STORAGE_MODE_RAW_BYTES = 'raw-bytes';
 const DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES = 4 * 1024 * 1024;
 const LARGE_ARTIFACT_FIXED_PACK_MIN_TOTAL_ROWS = 2_000_000;
+const EXTERNAL_MEDIA_BULK_INSERT_BATCH_SIZE = 256;
+const EMPTY_MEDIA_CONTENT_BUFFER = new ArrayBuffer(0);
 
 /**
  * @param {string} value
@@ -2104,6 +2106,55 @@ export class DictionaryDatabase {
     async appendMediaContentBytes(bytes) {
         const spans = await this._termContentStore.appendBatch([bytes]);
         return spans.length > 0 ? spans[0] : {offset: 0, length: 0};
+    }
+
+    /**
+     * @param {import('dictionary-database').MediaDataArrayBufferContent[]} items
+     * @returns {Promise<void>}
+     */
+    async bulkAddExternalMediaRows(items) {
+        const db = this._requireDb();
+        if (items.length === 0) { return; }
+        const useLocalTransaction = !this._bulkImportTransactionOpen;
+        if (useLocalTransaction) {
+            await this._beginImmediateTransaction(db);
+        }
+        try {
+            for (let i = 0, ii = items.length; i < ii; i += EXTERNAL_MEDIA_BULK_INSERT_BATCH_SIZE) {
+                const chunkCount = Math.min(EXTERNAL_MEDIA_BULK_INSERT_BATCH_SIZE, ii - i);
+                /** @type {string[]} */
+                const valueRows = [];
+                /** @type {import('@sqlite.org/sqlite-wasm').Bindable[]} */
+                const bind = [];
+                for (let j = 0; j < chunkCount; ++j) {
+                    const row = items[i + j];
+                    valueRows.push('(?, ?, ?, ?, ?, ?, ?, ?)');
+                    bind.push(
+                        row.dictionary,
+                        row.path,
+                        row.mediaType,
+                        row.width,
+                        row.height,
+                        EMPTY_MEDIA_CONTENT_BUFFER,
+                        typeof row.contentOffset === 'number' ? row.contentOffset : 0,
+                        typeof row.contentLength === 'number' ? row.contentLength : 0,
+                    );
+                }
+                const sql = 'INSERT INTO media(dictionary, path, mediaType, width, height, content, contentOffset, contentLength) VALUES ' + valueRows.join(',');
+                const stmt = this._getCachedStatement(sql);
+                stmt.reset(true);
+                stmt.bind(bind);
+                stmt.step();
+            }
+            if (useLocalTransaction) {
+                db.exec('COMMIT');
+            }
+        } catch (e) {
+            if (useLocalTransaction) {
+                try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+            }
+            throw e;
+        }
     }
 
     /**

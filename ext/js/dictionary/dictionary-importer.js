@@ -74,6 +74,7 @@ const TERM_ARTIFACT_PRELOAD_CONCURRENCY = 4;
 const HEX_BYTE_TABLE = Array.from({length: 256}, (_, i) => i.toString(16).padStart(2, '0'));
 /** @type {import('dictionary-data').TermGlossary[]} */
 const EMPTY_TERM_GLOSSARY = [];
+const EMPTY_ARRAY_BUFFER = new ArrayBuffer(0);
 Object.freeze(EMPTY_TERM_GLOSSARY);
 
 /**
@@ -912,7 +913,7 @@ export class DictionaryImporter {
                             Number.isInteger(packedOffset) &&
                             Number.isInteger(packedLength)
                         ) {
-                            content = new ArrayBuffer(0);
+                            content = EMPTY_ARRAY_BUFFER;
                             contentOffset = packedMediaBaseSpan.offset + /** @type {number} */ (packedOffset);
                             contentLength = /** @type {number} */ (packedLength);
                         } else if (
@@ -966,7 +967,11 @@ export class DictionaryImporter {
                     const media = [...context.media.values()];
                     context.media.clear();
                     const tMediaWriteStart = Date.now();
-                    await bulkAdd('media', media, {trackProgress: false});
+                    if (useExternalPackedMediaStorage) {
+                        await dictionaryDatabase.bulkAddExternalMediaRows(media);
+                    } else {
+                        await bulkAdd('media', media, {trackProgress: false});
+                    }
                     const tMediaWriteEnd = Date.now();
                     step4TimingBreakdown.mediaResolveMs += Math.max(0, tMediaResolved - tMediaResolveStart);
                     step4TimingBreakdown.mediaWriteMs += Math.max(0, tMediaWriteEnd - tMediaWriteStart);
