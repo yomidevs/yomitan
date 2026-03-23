@@ -371,6 +371,13 @@ export class TermRecordOpfsStore {
         await this._awaitQueuedWrites();
         await this._closeAllWritables();
         this._deferIndexBuild = false;
+        if (this._reloadFromShardsAfterImport && this._pendingArtifactReloadPlansAfterImport.length > 0) {
+            this._indexByDictionary.clear();
+            this._indexDirty = false;
+            this._reloadFromShardsAfterImport = false;
+            this._reloadShardLogicalKeysAfterImport.clear();
+            return;
+        }
         if (this._reloadFromShardsAfterImport) {
             await this._reloadTouchedShardsAfterImport();
             this._reloadFromShardsAfterImport = false;
@@ -419,6 +426,7 @@ export class TermRecordOpfsStore {
      * @returns {number}
      */
     get size() {
+        this._ensurePendingArtifactReloadPlansApplied();
         return this._recordsById.size;
     }
 
@@ -426,6 +434,7 @@ export class TermRecordOpfsStore {
      * @returns {boolean}
      */
     isEmpty() {
+        this._ensurePendingArtifactReloadPlansApplied();
         return this._recordsById.size === 0;
     }
 
@@ -1067,6 +1076,7 @@ export class TermRecordOpfsStore {
      * @returns {Promise<number>}
      */
     async deleteByDictionary(dictionaryName) {
+        this._ensurePendingArtifactReloadPlansApplied();
         let deletedCount = 0;
         const ids = [...this._recordsById.keys()];
         for (const id of ids) {
@@ -1085,6 +1095,7 @@ export class TermRecordOpfsStore {
      * @returns {Map<number, TermRecord>}
      */
     getByIds(ids) {
+        this._ensurePendingArtifactReloadPlansApplied();
         /** @type {Map<number, TermRecord>} */
         const result = new Map();
         for (const id of ids) {
@@ -1100,6 +1111,7 @@ export class TermRecordOpfsStore {
      * @returns {number[]}
      */
     getAllIds() {
+        this._ensurePendingArtifactReloadPlansApplied();
         return [...this._recordsById.keys()].sort((a, b) => a - b);
     }
 
@@ -1108,6 +1120,7 @@ export class TermRecordOpfsStore {
      * @returns {{expression: Map<string, number[]>, reading: Map<string, number[]>, expressionReverse: Map<string, number[]>, readingReverse: Map<string, number[]>, pair: Map<string, number[]>, sequence: Map<number, number[]>}}
      */
     getDictionaryIndex(dictionaryName) {
+        this._ensurePendingArtifactReloadPlansApplied();
         this._ensureIndexesReady();
         const existing = this._indexByDictionary.get(dictionaryName);
         if (typeof existing !== 'undefined') {
@@ -1166,6 +1179,7 @@ export class TermRecordOpfsStore {
      * @returns {TermRecord|undefined}
      */
     getById(id) {
+        this._ensurePendingArtifactReloadPlansApplied();
         return this._recordsById.get(id);
     }
 
@@ -1187,6 +1201,7 @@ export class TermRecordOpfsStore {
      * }>}
      */
     async verifyIntegrity(expectedDictionaryNames = null) {
+        this._ensurePendingArtifactReloadPlansApplied();
         /** @type {Set<string>} */
         const expectedShardKeys = new Set();
         /** @type {Set<string>} */
@@ -2630,11 +2645,24 @@ export class TermRecordOpfsStore {
 
     /** */
     _ensureIndexesReady() {
+        this._ensurePendingArtifactReloadPlansApplied();
         if (!this._indexDirty) {
             return;
         }
         this._indexByDictionary.clear();
         this._indexDirty = false;
+    }
+
+    /** */
+    _ensurePendingArtifactReloadPlansApplied() {
+        if (this._pendingArtifactReloadPlansAfterImport.length <= 0) {
+            return;
+        }
+        this._reloadTouchedArtifactChunksAfterImport();
+        this._reloadFromShardsAfterImport = false;
+        this._reloadShardLogicalKeysAfterImport.clear();
+        this._pendingArtifactReloadPlansAfterImport = [];
+        this._indexDirty = true;
     }
 
     /** */
