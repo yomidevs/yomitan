@@ -839,10 +839,16 @@ export class DictionaryImporter {
                 [];
             const artifactDirectMediaImport = artifactArchiveImageFileEntries.length > 0;
             const useTermMediaRequirements = useMediaPipeline && !artifactDirectMediaImport;
+            const useExternalPackedMediaStorage = (
+                artifactDirectMediaImport &&
+                packedMediaArtifactBytes instanceof Uint8Array &&
+                artifactArchiveImageFileEntries.length >= 32768
+            );
             this._logImport(
                 `media pipeline enabled=${String(useMediaPipeline)} skipMediaImport=${String(this._skipMediaImport)} ` +
                 `hasArchiveImageMediaFiles=${String(hasArchiveImageMediaFiles)} ` +
-                `artifactDirectMediaImport=${String(artifactDirectMediaImport)}`,
+                `artifactDirectMediaImport=${String(artifactDirectMediaImport)} ` +
+                `externalPackedMediaStorage=${String(useExternalPackedMediaStorage)}`,
             );
             const uniqueMediaPaths = useTermMediaRequirements ? new Set() : null;
             const termFileProgressAllowance = bulkAddProgressAllowance * 2;
@@ -877,6 +883,9 @@ export class DictionaryImporter {
                 };
                 const chunkSize = Math.max(this._mediaResolutionConcurrency * 64, 256);
                 const skipArtifactImageMetadata = artifactArchiveImageFileEntries.length >= 4096;
+                const packedMediaBaseSpan = useExternalPackedMediaStorage ?
+                    await dictionaryDatabase.appendMediaContentBytes(packedMediaArtifactBytes) :
+                    null;
                 for (let i = 0; i < artifactArchiveImageFileEntries.length; i += chunkSize) {
                     const chunkEntries = artifactArchiveImageFileEntries.slice(i, i + chunkSize);
                     const tMediaResolveStart = Date.now();
@@ -895,7 +904,18 @@ export class DictionaryImporter {
                         let content;
                         let width = 0;
                         let height = 0;
+                        let contentOffset = 0;
+                        let contentLength = 0;
                         if (
+                            packedMediaBaseSpan !== null &&
+                            packedMediaArtifactBytes instanceof Uint8Array &&
+                            Number.isInteger(packedOffset) &&
+                            Number.isInteger(packedLength)
+                        ) {
+                            content = new ArrayBuffer(0);
+                            contentOffset = packedMediaBaseSpan.offset + /** @type {number} */ (packedOffset);
+                            contentLength = /** @type {number} */ (packedLength);
+                        } else if (
                             packedMediaArtifactBytes instanceof Uint8Array &&
                             Number.isInteger(packedOffset) &&
                             Number.isInteger(packedLength)
@@ -938,6 +958,8 @@ export class DictionaryImporter {
                             width,
                             height,
                             content,
+                            contentOffset,
+                            contentLength,
                         });
                     });
                     const tMediaResolved = Date.now();

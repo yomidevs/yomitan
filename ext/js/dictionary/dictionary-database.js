@@ -1573,13 +1573,13 @@ export class DictionaryDatabase {
                 bind[pathKey] = path;
                 conditions.push(`(dictionary = ${dictionaryKey} AND path = ${pathKey})`);
             }
-            const sql = `SELECT dictionary, path, mediaType, width, height, content FROM media WHERE ${conditions.join(' OR ')}`;
+            const sql = `SELECT dictionary, path, mediaType, width, height, content, contentOffset, contentLength FROM media WHERE ${conditions.join(' OR ')}`;
             const stmt = this._getCachedStatement(sql);
             stmt.reset(true);
             stmt.bind(bind);
             while (stmt.step()) {
                 const row = /** @type {import('core').SafeAny} */ (stmt.get({}));
-                const converted = this._deserializeMediaRow(row);
+                const converted = await this._deserializeMediaRow(row);
                 const itemIndexes = mediaRequestIndexes.get(`${converted.dictionary}\u001f${converted.path}`);
                 if (typeof itemIndexes === 'undefined') { continue; }
                 for (const itemIndex of itemIndexes) {
@@ -2098,6 +2098,15 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {Uint8Array} bytes
+     * @returns {Promise<{offset: number, length: number}>}
+     */
+    async appendMediaContentBytes(bytes) {
+        const spans = await this._termContentStore.appendBatch([bytes]);
+        return spans.length > 0 ? spans[0] : {offset: 0, length: 0};
+    }
+
+    /**
      * @param {{table: string, columnsSql: string, rowPlaceholderSql: string, batchSize: number, bindRow: (item: unknown) => import('@sqlite.org/sqlite-wasm').Bindable[]}} descriptor
      * @param {unknown[]} items
      * @param {number} start
@@ -2200,12 +2209,21 @@ export class DictionaryDatabase {
             case 'media':
                 return {
                     table: 'media',
-                    columnsSql: 'dictionary, path, mediaType, width, height, content',
-                    rowPlaceholderSql: '(?, ?, ?, ?, ?, ?)',
+                    columnsSql: 'dictionary, path, mediaType, width, height, content, contentOffset, contentLength',
+                    rowPlaceholderSql: '(?, ?, ?, ?, ?, ?, ?, ?)',
                     batchSize: 8,
                     bindRow: (item) => {
                         const row = /** @type {import('dictionary-database').MediaDataArrayBufferContent} */ (item);
-                        return [row.dictionary, row.path, row.mediaType, row.width, row.height, row.content];
+                        return [
+                            row.dictionary,
+                            row.path,
+                            row.mediaType,
+                            row.width,
+                            row.height,
+                            row.content,
+                            typeof row.contentOffset === 'number' ? row.contentOffset : 0,
+                            typeof row.contentLength === 'number' ? row.contentLength : 0,
+                        ];
                     },
                 };
             default:
@@ -3370,7 +3388,9 @@ export class DictionaryDatabase {
                 mediaType TEXT NOT NULL,
                 width INTEGER NOT NULL,
                 height INTEGER NOT NULL,
-                content BLOB NOT NULL
+                content BLOB NOT NULL,
+                contentOffset INTEGER NOT NULL DEFAULT 0,
+                contentLength INTEGER NOT NULL DEFAULT 0
             );
 
             CREATE TABLE IF NOT EXISTS sharedGlossaryArtifacts (
@@ -3383,6 +3403,7 @@ export class DictionaryDatabase {
         `);
         await this._ensureTermsVirtualTable();
         await this._migrateTermsContentSchema();
+        await this._migrateMediaSchema();
         if (!this._enableSqliteSecondaryIndexes) {
             for (const dropIndexSql of this._createDropIndexesSql()) {
                 db.exec(dropIndexSql);
@@ -3820,6 +3841,20 @@ export class DictionaryDatabase {
         }
     }
 
+    /** */
+    async _migrateMediaSchema() {
+        const db = this._requireDb();
+        const mediaTableInfo = db.selectObjects('PRAGMA table_info(media)');
+        const hasContentOffset = mediaTableInfo.some((row) => this._asString(row.name) === 'contentOffset');
+        const hasContentLength = mediaTableInfo.some((row) => this._asString(row.name) === 'contentLength');
+        if (!hasContentOffset) {
+            db.exec('ALTER TABLE media ADD COLUMN contentOffset INTEGER NOT NULL DEFAULT 0');
+        }
+        if (!hasContentLength) {
+            db.exec('ALTER TABLE media ADD COLUMN contentLength INTEGER NOT NULL DEFAULT 0');
+        }
+    }
+
     /**
      * Best effort cleanup for old IndexedDB storage from pre-sqlite builds.
      */
@@ -3942,7 +3977,7 @@ export class DictionaryDatabase {
                 };
             case 'media':
                 return {
-                    sql: 'INSERT INTO media(dictionary, path, mediaType, width, height, content) VALUES($dictionary, $path, $mediaType, $width, $height, $content)',
+                    sql: 'INSERT INTO media(dictionary, path, mediaType, width, height, content, contentOffset, contentLength) VALUES($dictionary, $path, $mediaType, $width, $height, $content, $contentOffset, $contentLength)',
                     bind: (item) => {
                         const row = /** @type {import('dictionary-database').MediaDataArrayBufferContent} */ (item);
                         return {
@@ -3952,6 +3987,8 @@ export class DictionaryDatabase {
                             $width: row.width,
                             $height: row.height,
                             $content: row.content,
+                            $contentOffset: typeof row.contentOffset === 'number' ? row.contentOffset : 0,
+                            $contentLength: typeof row.contentLength === 'number' ? row.contentLength : 0,
                         };
                     },
                 };
@@ -4670,14 +4707,28 @@ export class DictionaryDatabase {
      * @param {import('core').SafeAny} row
      * @returns {import('dictionary-database').MediaDataArrayBufferContent}
      */
-    _deserializeMediaRow(row) {
+    async _deserializeMediaRow(row) {
+        const contentOffset = this._asNumber(row.contentOffset, 0);
+        const contentLength = this._asNumber(row.contentLength, 0);
+        let content = this._toArrayBuffer(row.content);
+        if (contentLength > 0 && content.byteLength === 0) {
+            const contentBytes = await this._termContentStore.readSlice(contentOffset, contentLength);
+            content = (
+                contentBytes.byteOffset === 0 &&
+                contentBytes.byteLength === contentBytes.buffer.byteLength
+            ) ?
+                contentBytes.buffer :
+                contentBytes.buffer.slice(contentBytes.byteOffset, contentBytes.byteOffset + contentBytes.byteLength);
+        }
         return {
             dictionary: this._asString(row.dictionary),
             path: this._asString(row.path),
             mediaType: this._asString(row.mediaType),
             width: this._asNumber(row.width, 0),
             height: this._asNumber(row.height, 0),
-            content: this._toArrayBuffer(row.content),
+            content,
+            contentOffset,
+            contentLength,
         };
     }
 
