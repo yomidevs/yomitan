@@ -174,13 +174,18 @@ export function rebaseRawTermContentSharedGlossaryBinary(bytes, baseOffset) {
     if (!isRawTermContentSharedGlossaryBinary(bytes) || baseOffset === 0) {
         return bytes;
     }
-    const header = decodeRawTermContentSharedGlossaryHeader(bytes, new TextDecoder());
-    if (header === null) {
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const rulesLength = view.getUint32(4, true);
+    const definitionTagsLength = view.getUint32(8, true);
+    const termTagsLength = view.getUint32(12, true);
+    const totalLength = RAW_TERM_CONTENT_SHARED_GLOSSARY_HEADER_BYTES + rulesLength + definitionTagsLength + termTagsLength;
+    if (totalLength !== bytes.byteLength) {
         return bytes;
     }
     const rebasedBytes = Uint8Array.from(bytes);
-    const view = new DataView(rebasedBytes.buffer, rebasedBytes.byteOffset, rebasedBytes.byteLength);
-    view.setBigUint64(16, BigInt(header.glossaryOffset + baseOffset), true);
+    const rebasedView = new DataView(rebasedBytes.buffer, rebasedBytes.byteOffset, rebasedBytes.byteLength);
+    const glossaryOffset = Number(rebasedView.getBigUint64(16, true));
+    rebasedView.setBigUint64(16, BigInt(glossaryOffset + baseOffset), true);
     return rebasedBytes;
 }
 
