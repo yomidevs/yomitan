@@ -629,7 +629,7 @@ export class DictionaryImporter {
         let sharedGlossaryArtifactPreloadMs = 0;
         const useParallelPackedArtifactPreload = (
             termArtifactManifest !== null &&
-            termArtifactManifest.packedMediaEntries.length >= 8192 &&
+            termArtifactManifest.packedMediaEntries.length >= 100000 &&
             typeof packedTermArtifactEntry !== 'undefined' &&
             typeof packedMediaArtifactEntry !== 'undefined'
         );
