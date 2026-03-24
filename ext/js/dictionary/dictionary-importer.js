@@ -906,11 +906,15 @@ export class DictionaryImporter {
                 };
                 const chunkSize = Math.max(this._mediaResolutionConcurrency * 64, 256);
                 const skipArtifactImageMetadata = this._skipImageMetadata || artifactArchiveImageFileEntries.length >= 4096;
+                let packedMediaBytesForDirectImport = packedMediaArtifactBytes;
                 const packedMediaBaseSpan = useExternalPackedMediaStorage ?
-                    await dictionaryDatabase.appendMediaContentBytes(packedMediaArtifactBytes) :
+                    await dictionaryDatabase.appendMediaContentBytes(packedMediaBytesForDirectImport) :
                     null;
                 if (packedMediaBaseSpan !== null) {
                     await dictionaryDatabase.flushMediaContentImportWrites();
+                    if (skipArtifactImageMetadata) {
+                        packedMediaBytesForDirectImport = null;
+                    }
                 }
                 for (let i = 0; i < artifactArchiveImageFileEntries.length; i += chunkSize) {
                     const chunkEntries = artifactArchiveImageFileEntries.slice(i, i + chunkSize);
@@ -918,7 +922,7 @@ export class DictionaryImporter {
                     await this._runWithConcurrencyLimit(chunkEntries, this._mediaResolutionConcurrency, async ({path, mediaType, packedOffset, packedLength, fileEntry}) => {
                         if (
                             !skipArtifactImageMetadata &&
-                            !(packedMediaArtifactBytes instanceof Uint8Array && Number.isInteger(packedOffset) && Number.isInteger(packedLength))
+                            !(packedMediaBytesForDirectImport instanceof Uint8Array && Number.isInteger(packedOffset) && Number.isInteger(packedLength))
                         ) {
                             await this._getImageMedia(context, path, syntheticEntry);
                             return;
@@ -934,7 +938,6 @@ export class DictionaryImporter {
                         let contentLength = 0;
                         if (
                             packedMediaBaseSpan !== null &&
-                            packedMediaArtifactBytes instanceof Uint8Array &&
                             Number.isInteger(packedOffset) &&
                             Number.isInteger(packedLength)
                         ) {
@@ -942,13 +945,13 @@ export class DictionaryImporter {
                             contentOffset = packedMediaBaseSpan.offset + /** @type {number} */ (packedOffset);
                             contentLength = /** @type {number} */ (packedLength);
                         } else if (
-                            packedMediaArtifactBytes instanceof Uint8Array &&
+                            packedMediaBytesForDirectImport instanceof Uint8Array &&
                             Number.isInteger(packedOffset) &&
                             Number.isInteger(packedLength)
                         ) {
                             const start = /** @type {number} */ (packedOffset);
                             const end = start + /** @type {number} */ (packedLength);
-                            const bytes = packedMediaArtifactBytes.subarray(start, end);
+                            const bytes = packedMediaBytesForDirectImport.subarray(start, end);
                             content = (
                                 bytes.byteOffset === 0 &&
                                 bytes.byteLength === bytes.buffer.byteLength
