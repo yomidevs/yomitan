@@ -2148,8 +2148,14 @@ export class DictionaryImporter {
                 throw createError('Could not find image');
             }
 
-            // Load file content
-            let content = await (await this._getData(file, new BlobWriter())).arrayBuffer();
+            // Load file content without staging through Blob.
+            const bytes = await this._getData(file, new Uint8ArrayWriter());
+            let content = (
+                bytes.byteOffset === 0 &&
+                bytes.byteLength === bytes.buffer.byteLength
+            ) ?
+                bytes.buffer :
+                bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
 
             const mediaType = getImageMediaTypeFromFileName(path);
             if (mediaType === null) {
