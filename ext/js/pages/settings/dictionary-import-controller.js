@@ -1538,12 +1538,12 @@ export class DictionaryImportController {
         });
 
         const readStartTime = safePerformance.now();
-        const archiveContent = await this._readFile(file);
-        const archiveContentBytes = new Uint8Array(archiveContent);
+        const archiveContent = file;
         const readEndTime = safePerformance.now();
-        log.log(`[ImportTiming] [${dictionaryTitle}] read archive ${formatDurationMs(readEndTime - readStartTime)}`);
+        log.log(`[ImportTiming] [${dictionaryTitle}] prepared archive handle ${formatDurationMs(readEndTime - readStartTime)}`);
         recordLocalPhase('read-archive', readStartTime, readEndTime, {
-            sizeBytes: archiveContentBytes.byteLength,
+            sizeBytes: file.size,
+            source: 'file-handle',
         });
 
         const workerImportStartTime = safePerformance.now();
@@ -1555,7 +1555,7 @@ export class DictionaryImportController {
                 const archiveContentAttempt = (
                     attempt === 1 ?
                         archiveContent :
-                        await this._readFile(file)
+                        file
                 );
                 importResult = /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}} */ (
                     await dictionaryWorker.importDictionary(

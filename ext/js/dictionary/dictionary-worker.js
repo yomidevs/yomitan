@@ -34,16 +34,17 @@ export class DictionaryWorker {
     }
 
     /**
-     * @param {ArrayBuffer} archiveContent
+     * @param {ArrayBuffer|Blob} archiveContent
      * @param {import('dictionary-importer').ImportDetails} details
      * @param {?import('dictionary-worker').ImportProgressCallback} onProgress
      * @returns {Promise<import('dictionary-importer').ImportResult>}
      */
     importDictionary(archiveContent, details, onProgress) {
+        const transfer = (archiveContent instanceof ArrayBuffer) ? [archiveContent] : [];
         return this._invoke(
             'importDictionary',
             {details, archiveContent},
-            [archiveContent],
+            transfer,
             onProgress,
             this._formatImportDictionaryResult.bind(this),
         );

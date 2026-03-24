@@ -17,6 +17,7 @@
  */
 
 import {
+    BlobReader as BlobReader0,
     BlobWriter as BlobWriter0,
     TextWriter as TextWriter0,
     Uint8ArrayReader as Uint8ArrayReader0,
@@ -44,6 +45,7 @@ import {decompress as zstdDecompress} from '../../lib/zstd-wasm.js';
 import {compareRevisions} from './dictionary-data-util.js';
 import {consumeLastTermBankWasmParseProfile, parseTermBankWithWasmChunks} from './term-bank-wasm-parser.js';
 
+const BlobReader = /** @type {typeof import('@zip.js/zip.js').BlobReader} */ (/** @type {unknown} */ (BlobReader0));
 const BlobWriter = /** @type {typeof import('@zip.js/zip.js').BlobWriter} */ (/** @type {unknown} */ (BlobWriter0));
 const TextWriter = /** @type {typeof import('@zip.js/zip.js').TextWriter} */ (/** @type {unknown} */ (TextWriter0));
 const Uint8ArrayReader = /** @type {typeof import('@zip.js/zip.js').Uint8ArrayReader} */ (/** @type {unknown} */ (Uint8ArrayReader0));
@@ -1625,11 +1627,15 @@ export class DictionaryImporter {
     }
 
     /**
-     * @param {ArrayBuffer} archiveContent
-     * @returns {Promise<{fileMap: import('dictionary-importer').ArchiveFileMap, zipReader: ZipReader<Uint8ArrayReader>}>}
+     * @param {ArrayBuffer|Blob} archiveContent
+     * @returns {Promise<{fileMap: import('dictionary-importer').ArchiveFileMap, zipReader: ZipReader<BlobReader|Uint8ArrayReader>}>}
      */
     async _getFilesFromArchive(archiveContent) {
-        const zipFileReader = new Uint8ArrayReader(new Uint8Array(archiveContent));
+        const zipFileReader = (
+            archiveContent instanceof Blob ?
+                new BlobReader(archiveContent) :
+                new Uint8ArrayReader(new Uint8Array(archiveContent))
+        );
         const zipReader = new ZipReader(zipFileReader);
         const zipEntries = await zipReader.getEntries();
         /** @type {import('dictionary-importer').ArchiveFileMap} */
