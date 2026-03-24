@@ -905,7 +905,7 @@ export class DictionaryImporter {
                     glossary: EMPTY_TERM_GLOSSARY,
                 };
                 const chunkSize = Math.max(this._mediaResolutionConcurrency * 64, 256);
-                const skipArtifactImageMetadata = artifactArchiveImageFileEntries.length >= 4096;
+                const skipArtifactImageMetadata = this._skipImageMetadata || artifactArchiveImageFileEntries.length >= 4096;
                 const packedMediaBaseSpan = useExternalPackedMediaStorage ?
                     await dictionaryDatabase.appendMediaContentBytes(packedMediaArtifactBytes) :
                     null;
