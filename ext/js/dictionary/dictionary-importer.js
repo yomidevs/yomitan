@@ -909,6 +909,9 @@ export class DictionaryImporter {
                 const packedMediaBaseSpan = useExternalPackedMediaStorage ?
                     await dictionaryDatabase.appendMediaContentBytes(packedMediaArtifactBytes) :
                     null;
+                if (packedMediaBaseSpan !== null) {
+                    await dictionaryDatabase.flushMediaContentImportWrites();
+                }
                 for (let i = 0; i < artifactArchiveImageFileEntries.length; i += chunkSize) {
                     const chunkEntries = artifactArchiveImageFileEntries.slice(i, i + chunkSize);
                     const tMediaResolveStart = Date.now();

@@ -176,6 +176,15 @@ export class TermContentOpfsStore {
     }
 
     /**
+     * Drains queued import-session writes without ending the import session.
+     * @returns {Promise<void>}
+     */
+    async flushImportWrites() {
+        await this._flushPendingWrites();
+        await this._awaitQueuedWrites();
+    }
+
+    /**
      * @returns {{flushPendingWritesMs: number, awaitQueuedWritesMs: number, closeWritableMs: number, totalMs: number, drainCycleCount: number, writeCallCount: number, singleChunkWriteCount: number, mergedWriteCount: number, totalWriteBytes: number, mergedWriteBytes: number, maxWriteBytes: number, mergedGroupChunkCount: number, maxMergedGroupChunkCount: number, flushDueToBytesCount: number, flushDueToChunkCount: number, flushFinalGroupCount: number, writeCoalesceTargetBytes: number, writeCoalesceMaxChunks: number}|null}
      */
     getLastEndImportSessionMetrics() {

@@ -2109,6 +2109,13 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @returns {Promise<void>}
+     */
+    async flushMediaContentImportWrites() {
+        await this._termContentStore.flushImportWrites();
+    }
+
+    /**
      * @param {import('dictionary-database').MediaDataArrayBufferContent[]} items
      * @returns {Promise<void>}
      */
