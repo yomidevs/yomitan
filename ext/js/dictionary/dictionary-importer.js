@@ -865,7 +865,7 @@ export class DictionaryImporter {
             const useExternalPackedMediaStorage = (
                 artifactDirectMediaImport &&
                 packedMediaArtifactBytes instanceof Uint8Array &&
-                artifactArchiveImageFileEntries.length >= 8192
+                artifactArchiveImageFileEntries.length >= 2048
             );
             this._logImport(
                 `media pipeline enabled=${String(useMediaPipeline)} skipMediaImport=${String(this._skipMediaImport)} ` +
