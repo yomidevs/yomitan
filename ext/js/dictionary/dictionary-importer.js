@@ -621,6 +621,8 @@ export class DictionaryImporter {
         let packedTermArtifactBytes = null;
         /** @type {Uint8Array|null} */
         let packedMediaArtifactBytes = null;
+        /** @type {Blob|null} */
+        let packedMediaArtifactBlob = null;
         /** @type {Uint8Array|null} */
         let sharedGlossaryArtifactBytes = null;
         /** @type {Map<string, Uint8Array>|null} */
@@ -690,14 +692,27 @@ export class DictionaryImporter {
         if (
             !useParallelPackedArtifactPreload &&
             packedMediaArtifactBytes === null &&
+            packedMediaArtifactBlob === null &&
             termArtifactManifest !== null &&
             termArtifactManifest.packedMediaEntries.length > 0 &&
             typeof packedMediaArtifactEntry !== 'undefined'
         ) {
             const tPackedMediaReadStart = Date.now();
-            packedMediaArtifactBytes = await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedMediaArtifactEntry), new Uint8ArrayWriter());
+            const usePackedMediaBlobPreload =
+                this._skipImageMetadata &&
+                termArtifactManifest.packedMediaEntries.length >= 8192;
+            if (usePackedMediaBlobPreload) {
+                packedMediaArtifactBlob = await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedMediaArtifactEntry), new BlobWriter());
+            } else {
+                packedMediaArtifactBytes = await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedMediaArtifactEntry), new Uint8ArrayWriter());
+            }
             packedMediaArtifactPreloadMs = Math.max(0, Date.now() - tPackedMediaReadStart);
-            this._logImport(`packed media artifact preload ${packedMediaArtifactPreloadMs}ms bytes=${packedMediaArtifactBytes.byteLength}`);
+            this._logImport(
+                `packed media artifact preload ${packedMediaArtifactPreloadMs}ms bytes=${
+                    packedMediaArtifactBytes instanceof Uint8Array ? packedMediaArtifactBytes.byteLength :
+                    (packedMediaArtifactBlob instanceof Blob ? packedMediaArtifactBlob.size : 0)
+                }`,
+            );
         }
         const useCompressedSharedGlossaryArtifact = termArtifactManifest?.termContentMode === RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME;
         if (
@@ -849,7 +864,7 @@ export class DictionaryImporter {
                 (
                     termArtifactManifest !== null &&
                     termArtifactManifest.packedMediaEntries.length > 0 &&
-                    packedMediaArtifactBytes instanceof Uint8Array
+                    (packedMediaArtifactBytes instanceof Uint8Array || packedMediaArtifactBlob instanceof Blob)
                 ) ?
                     termArtifactManifest.packedMediaEntries :
                     [...fileMap.entries()]
@@ -866,7 +881,7 @@ export class DictionaryImporter {
             const useTermMediaRequirements = useMediaPipeline && !artifactDirectMediaImport;
             const useExternalPackedMediaStorage = (
                 artifactDirectMediaImport &&
-                packedMediaArtifactBytes instanceof Uint8Array &&
+                (packedMediaArtifactBytes instanceof Uint8Array || packedMediaArtifactBlob instanceof Blob) &&
                 artifactArchiveImageFileEntries.length >= 2048
             );
             this._logImport(
@@ -909,13 +924,19 @@ export class DictionaryImporter {
                 const chunkSize = Math.max(this._mediaResolutionConcurrency * 64, 256);
                 const skipArtifactImageMetadata = this._skipImageMetadata || artifactArchiveImageFileEntries.length >= 4096;
                 let packedMediaBytesForDirectImport = packedMediaArtifactBytes;
+                let packedMediaBlobForDirectImport = packedMediaArtifactBlob;
                 const packedMediaBaseSpan = useExternalPackedMediaStorage ?
-                    await dictionaryDatabase.appendMediaContentBytes(packedMediaBytesForDirectImport) :
+                    (
+                        packedMediaBlobForDirectImport instanceof Blob ?
+                            await dictionaryDatabase.appendMediaContentBlob(packedMediaBlobForDirectImport) :
+                            await dictionaryDatabase.appendMediaContentBytes(/** @type {Uint8Array} */ (packedMediaBytesForDirectImport))
+                    ) :
                     null;
                 if (packedMediaBaseSpan !== null) {
                     await dictionaryDatabase.flushMediaContentImportWrites();
                     if (skipArtifactImageMetadata) {
                         packedMediaBytesForDirectImport = null;
+                        packedMediaBlobForDirectImport = null;
                     }
                 }
                 for (let i = 0; i < artifactArchiveImageFileEntries.length; i += chunkSize) {

@@ -305,6 +305,32 @@ export class TermContentOpfsStore {
     }
 
     /**
+     * @param {Blob} blob
+     * @returns {Promise<{offset: number, length: number}>}
+     */
+    async appendBlob(blob) {
+        const length = blob.size;
+        const offset = this._length;
+        if (length <= 0) {
+            return {offset, length: 0};
+        }
+        if (this._fileHandle === null) {
+            const bytes = new Uint8Array(await blob.arrayBuffer());
+            const spans = await this.appendBatch([bytes]);
+            return spans.length > 0 ? spans[0] : {offset, length: bytes.byteLength};
+        }
+        this._invalidateReadState();
+        if (this._pendingWriteBytes > 0 || this._pendingWriteChunks.length > 0) {
+            await this._flushPendingWrites();
+        }
+        if (this._queuedWritePromise !== null) {
+            await this._awaitQueuedWrites();
+        }
+        await this._writeBlobToActiveSegments(blob);
+        return {offset, length};
+    }
+
+    /**
      * @param {Uint8Array[]} chunks
      * @param {number[]} offsets
      * @param {number[]} lengths
@@ -1091,6 +1117,51 @@ export class TermContentOpfsStore {
         if (activeSegment !== null) {
             activeSegment.fileLength += chunk.byteLength;
             this._length = activeSegment.startOffset + activeSegment.fileLength;
+        }
+    }
+
+    /**
+     * @param {Blob} blob
+     * @returns {Promise<void>}
+     */
+    async _writeBlobToActiveSegments(blob) {
+        let blobOffset = 0;
+        while (blobOffset < blob.size) {
+            const activeSegment = this._getActiveSegmentState();
+            if (activeSegment === null) {
+                return;
+            }
+            if (activeSegment.fileLength >= MAX_FILE_SEGMENT_BYTES) {
+                await this._rollActiveSegmentIfNeeded(1);
+                continue;
+            }
+            const remainingInSegment = MAX_FILE_SEGMENT_BYTES - activeSegment.fileLength;
+            const chunkSize = Math.min(remainingInSegment, blob.size - blobOffset);
+            if (chunkSize <= 0) {
+                await this._rollActiveSegmentIfNeeded(1);
+                continue;
+            }
+            await this._rollActiveSegmentIfNeeded(chunkSize);
+            if (this._writable === null) {
+                return;
+            }
+            const chunk = blob.slice(blobOffset, blobOffset + chunkSize);
+            ++this._writeDrainMetrics.writeCallCount;
+            ++this._writeDrainMetrics.singleChunkWriteCount;
+            this._writeDrainMetrics.totalWriteBytes += chunkSize;
+            if (chunkSize > this._writeDrainMetrics.maxWriteBytes) {
+                this._writeDrainMetrics.maxWriteBytes = chunkSize;
+            }
+            if (this._writeDrainMetrics.minWriteBytes === 0 || chunkSize < this._writeDrainMetrics.minWriteBytes) {
+                this._writeDrainMetrics.minWriteBytes = chunkSize;
+            }
+            await this._writable.write(chunk);
+            const currentActiveSegment = this._getActiveSegmentState();
+            if (currentActiveSegment !== null) {
+                currentActiveSegment.fileLength += chunkSize;
+                this._length = currentActiveSegment.startOffset + currentActiveSegment.fileLength;
+            }
+            blobOffset += chunkSize;
         }
     }
 

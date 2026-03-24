@@ -2109,6 +2109,14 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {Blob} blob
+     * @returns {Promise<{offset: number, length: number}>}
+     */
+    async appendMediaContentBlob(blob) {
+        return await this._termContentStore.appendBlob(blob);
+    }
+
+    /**
      * @returns {Promise<void>}
      */
     async flushMediaContentImportWrites() {
