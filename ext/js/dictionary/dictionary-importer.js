@@ -1184,6 +1184,10 @@ export class DictionaryImporter {
                 };
             };
             await importArtifactArchiveMediaFiles();
+            if (useExternalPackedMediaStorage && this._skipImageMetadata) {
+                packedMediaArtifactBytes = null;
+                packedMediaArtifactBlob = null;
+            }
             for (let termFileIndex = 0; termFileIndex < activeTermFiles.length; ++termFileIndex) {
                 const termFile = activeTermFiles[termFileIndex];
                 const tTermFile = Date.now();
