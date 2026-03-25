@@ -28,7 +28,9 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryController} from './dictionary-controller.js';
 
 const OPFS_REQUIRED_USER_MESSAGE = 'Manabitan requires OPFS storage support. Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension.';
-const OFFSCREEN_IMPORT_MIN_ARCHIVE_BYTES = 256 * 1024 * 1024;
+const OFFSCREEN_IMPORT_SMALL_ARCHIVE_MIN_BYTES = 32 * 1024 * 1024;
+const OFFSCREEN_IMPORT_SMALL_ARCHIVE_MAX_BYTES = 96 * 1024 * 1024;
+const OFFSCREEN_IMPORT_LARGE_ARCHIVE_MIN_BYTES = 256 * 1024 * 1024;
 
 /**
  * @param {number} valueMs
@@ -379,7 +381,7 @@ export class DictionaryImportController {
      * @returns {Promise<(import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}) | null>}
      */
     async _tryImportDictionaryOffscreen(archiveContent, details, onProgress) {
-        if (!(archiveContent instanceof Blob) || archiveContent.size < OFFSCREEN_IMPORT_MIN_ARCHIVE_BYTES) {
+        if (!(archiveContent instanceof Blob) || !this._shouldUseOffscreenImport(archiveContent.size)) {
             return null;
         }
         if (!('serviceWorker' in navigator)) { return null; }
@@ -431,6 +433,35 @@ export class DictionaryImportController {
             channel.port1.close();
             return null;
         }
+    }
+
+    /**
+     * @param {number} archiveSizeBytes
+     * @returns {boolean}
+     */
+    _shouldUseOffscreenImport(archiveSizeBytes) {
+        if (!Number.isFinite(archiveSizeBytes) || archiveSizeBytes <= 0) {
+            return false;
+        }
+        /** @type {number|null} */
+        let memoryGiB = null;
+        try {
+            const rawValue = /** @type {unknown} */ (Reflect.get(globalThis.navigator ?? {}, 'deviceMemory'));
+            if (typeof rawValue === 'number' && Number.isFinite(rawValue) && rawValue > 0) {
+                memoryGiB = rawValue;
+            }
+        } catch (_) {
+            // NOP
+        }
+        return (
+            (
+                archiveSizeBytes >= OFFSCREEN_IMPORT_SMALL_ARCHIVE_MIN_BYTES &&
+                archiveSizeBytes <= OFFSCREEN_IMPORT_SMALL_ARCHIVE_MAX_BYTES &&
+                memoryGiB !== null &&
+                memoryGiB <= 8
+            ) ||
+            archiveSizeBytes >= OFFSCREEN_IMPORT_LARGE_ARCHIVE_MIN_BYTES
+        );
     }
 
     /** */
