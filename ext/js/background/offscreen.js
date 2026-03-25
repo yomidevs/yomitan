@@ -71,6 +71,7 @@ export class Offscreen {
         /** @type {import('offscreen').McApiMap} */
         this._mcApiMap = createApiMap([
             ['connectToDatabaseWorker', this._connectToDatabaseWorkerHandler.bind(this)],
+            ['importDictionaryOffscreen', this._importDictionaryOffscreenHandler.bind(this)],
         ]);
 
         /** @type {?Promise<void>} */
@@ -316,6 +317,19 @@ export class Offscreen {
             return;
         }
         await this._invokeDictionaryWorker('connectToDatabaseWorker', {}, [ports[0]]);
+    }
+
+    /** @type {import('offscreen').McApiHandler<'importDictionaryOffscreen'>} */
+    async _importDictionaryOffscreenHandler({archiveContent, details}, ports) {
+        if (ports.length === 0) {
+            throw new Error('Offscreen import response port missing');
+        }
+        try {
+            await this._invokeDictionaryWorker('importDictionaryOffscreen', {archiveContent, details}, [ports[0]]);
+        } catch (error) {
+            ports[0].postMessage({type: 'error', error: ExtensionError.serialize(error)});
+            ports[0].close();
+        }
     }
 
     /** @type {import('offscreen').ApiHandler<'sanitizeCSSOffscreen'>} */

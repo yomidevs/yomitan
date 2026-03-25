@@ -187,6 +187,13 @@ type McApiSurface = {
         params: void;
         return: void;
     };
+    importDictionaryOffscreen: {
+        params: {
+            archiveContent: Blob;
+            details: DictionaryImporter.ImportDetails;
+        };
+        return: void;
+    };
     dummy: {
         params: void;
         return: void;

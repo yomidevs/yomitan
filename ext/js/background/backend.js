@@ -216,6 +216,7 @@ export class Backend {
         /** @type {import('api').PmApiMap} */
         this._pmApiMap = createApiMap([
             ['connectToDatabaseWorker', this._onPmConnectToDatabaseWorker.bind(this)],
+            ['importDictionaryOffscreen', this._onPmImportDictionaryOffscreen.bind(this)],
             ['registerOffscreenPort',   this._onPmApiRegisterOffscreenPort.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
@@ -303,6 +304,24 @@ export class Backend {
         if (ports !== null && ports.length > 0) {
             await this._ensureDictionaryDatabaseReady();
             await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
+        }
+    }
+
+    /** @type {import('api').PmApiHandler<'importDictionaryOffscreen'>} */
+    async _onPmImportDictionaryOffscreen({archiveContent, details}, ports) {
+        const responsePort = ports !== null && ports.length > 0 ? ports[0] : null;
+        try {
+            if (this._offscreen === null) {
+                throw new Error('Offscreen import is unavailable');
+            }
+            if (responsePort === null) {
+                throw new Error('Offscreen import response port missing');
+            }
+            await this._offscreen.prepare();
+            this._offscreen.sendMessageViaPort({action: 'importDictionaryOffscreen', params: {archiveContent, details}}, [responsePort]);
+        } catch (error) {
+            responsePort?.postMessage({type: 'error', error: ExtensionError.serialize(error)});
+            responsePort?.close();
         }
     }
 

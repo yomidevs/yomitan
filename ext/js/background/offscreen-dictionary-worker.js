@@ -20,6 +20,8 @@ import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {arrayBufferToBase64, base64ToArrayBuffer} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {DictionaryImporter} from '../dictionary/dictionary-importer.js';
+import {DictionaryImporterMediaLoader} from '../dictionary/dictionary-importer-media-loader.js';
 import {Translator} from '../language/translator.js';
 
 /**
@@ -37,6 +39,8 @@ class OffscreenDictionaryWorkerHandler {
         this._prepareDatabasePromise = null;
         /** @type {boolean} */
         this._databaseSuspended = false;
+        /** @type {DictionaryImporterMediaLoader} */
+        this._mediaLoader = new DictionaryImporterMediaLoader();
     }
 
     /** */
@@ -108,6 +112,80 @@ class OffscreenDictionaryWorkerHandler {
     _assertDatabaseAvailable(action) {
         if (this._databaseSuspended) {
             throw new Error(`Cannot execute ${action}: dictionary database access is suspended while import is in progress`);
+        }
+    }
+
+    /**
+     * @param {MessagePort[]} ports
+     * @returns {MessagePort}
+     * @throws {Error}
+     */
+    _getRequiredResponsePort(ports) {
+        if (ports.length === 0) {
+            throw new Error('Offscreen import response port missing');
+        }
+        return ports[0];
+    }
+
+    /**
+     * @param {MessagePort} port
+     * @param {unknown} progress
+     */
+    _postImportProgress(port, progress) {
+        port.postMessage({type: 'progress', progress});
+    }
+
+    /**
+     * @param {MessagePort} port
+     * @param {unknown} result
+     */
+    _postImportComplete(port, result) {
+        port.postMessage({type: 'complete', result});
+    }
+
+    /**
+     * @param {MessagePort} port
+     * @param {unknown} error
+     */
+    _postImportError(port, error) {
+        port.postMessage({
+            type: 'error',
+            error: ExtensionError.serialize(error),
+        });
+    }
+
+    /**
+     * @param {import('dictionary-importer').ImportDetails} details
+     * @param {ArrayBuffer|Blob|null} archiveContent
+     * @param {MessagePort} port
+     * @returns {Promise<void>}
+     */
+    async _importDictionaryOffscreen(details, archiveContent, port) {
+        this._assertDatabaseAvailable('importDictionaryOffscreen');
+        await this._ensureDatabasePrepared();
+        const dictionaryImporter = new DictionaryImporter(this._mediaLoader, this._postImportProgress.bind(this, port));
+        try {
+            const importPayload = await dictionaryImporter.importDictionary(this._dictionaryDatabase, archiveContent, details);
+            const {result, errors, debug} = importPayload;
+            this._postImportComplete(port, {
+                result,
+                errors: errors.map((error) => ExtensionError.serialize(error)),
+                debug: {
+                    usesFallbackStorage: this._dictionaryDatabase.usesFallbackStorage(),
+                    openStorageDiagnostics: (
+                        typeof this._dictionaryDatabase.getOpenStorageDiagnostics === 'function' ?
+                            this._dictionaryDatabase.getOpenStorageDiagnostics() :
+                            null
+                    ),
+                    useImportSession: Reflect.get(details, 'useImportSession') === true,
+                    finalizeImportSession: Reflect.get(details, 'finalizeImportSession') === true,
+                    importerDebug: debug ?? null,
+                },
+            });
+        } catch (error) {
+            this._postImportError(port, error);
+        } finally {
+            port.close();
         }
     }
 
@@ -236,6 +314,13 @@ class OffscreenDictionaryWorkerHandler {
                 );
             case 'clearDatabaseCachesOffscreen':
                 this._translator.clearDatabaseCaches();
+                return;
+            case 'importDictionaryOffscreen':
+                await this._importDictionaryOffscreen(
+                    /** @type {import('dictionary-importer').ImportDetails} */ (params.details),
+                    /** @type {ArrayBuffer|Blob|null} */ (params.archiveContent ?? null),
+                    this._getRequiredResponsePort(ports),
+                );
                 return;
             case 'connectToDatabaseWorker':
                 this._assertDatabaseAvailable(action);

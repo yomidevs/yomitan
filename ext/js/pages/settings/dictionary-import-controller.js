@@ -28,6 +28,7 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryController} from './dictionary-controller.js';
 
 const OPFS_REQUIRED_USER_MESSAGE = 'Manabitan requires OPFS storage support. Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension.';
+const OFFSCREEN_IMPORT_MIN_ARCHIVE_BYTES = 256 * 1024 * 1024;
 
 /**
  * @param {number} valueMs
@@ -369,6 +370,67 @@ export class DictionaryImportController {
             return;
         }
         dictionaryWorker.destroy();
+    }
+
+    /**
+     * @param {File} archiveContent
+     * @param {import('dictionary-importer').ImportDetails} details
+     * @param {?import('dictionary-worker').ImportProgressCallback} onProgress
+     * @returns {Promise<(import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}) | null>}
+     */
+    async _tryImportDictionaryOffscreen(archiveContent, details, onProgress) {
+        if (!(archiveContent instanceof Blob) || archiveContent.size < OFFSCREEN_IMPORT_MIN_ARCHIVE_BYTES) {
+            return null;
+        }
+        if (!('serviceWorker' in navigator)) { return null; }
+        const serviceWorkerReady = await navigator.serviceWorker.ready.catch(() => null);
+        const serviceWorker = serviceWorkerReady?.active ?? null;
+        if (serviceWorker === null) { return null; }
+        const channel = new MessageChannel();
+        const resultPromise = new Promise((resolve, reject) => {
+            channel.port1.onmessage = (event) => {
+                const eventData = /** @type {unknown} */ (event.data);
+                /** @type {{type?: string, progress?: unknown, result?: unknown, error?: import('core').SerializedError}|null} */
+                let data = null;
+                if (
+                    typeof eventData === 'object' &&
+                    eventData !== null &&
+                    !Array.isArray(eventData)
+                ) {
+                    data = /** @type {{type?: string, progress?: unknown, result?: unknown, error?: import('core').SerializedError}} */ (eventData);
+                }
+                switch (data?.type) {
+                    case 'progress':
+                        onProgress?.(/** @type {import('dictionary-importer').ProgressData} */ (data.progress));
+                        return;
+                    case 'complete':
+                        channel.port1.close();
+                        resolve(data.result ?? null);
+                        return;
+                    case 'error':
+                        channel.port1.close();
+                        reject(new Error('Offscreen import failed'));
+                        return;
+                    default:
+                        return;
+                }
+            };
+            channel.port1.onmessageerror = () => {
+                channel.port1.close();
+                reject(new Error('Offscreen import response channel failed'));
+            };
+        });
+        serviceWorker.postMessage({
+            action: 'importDictionaryOffscreen',
+            params: {archiveContent, details},
+        }, [channel.port2]);
+        try {
+            return /** @type {(import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}) | null} */ (await resultPromise);
+        } catch (error) {
+            log.log(`[ImportTiming] offscreen import unavailable, falling back to local worker: ${toError(error).message}`);
+            channel.port1.close();
+            return null;
+        }
     }
 
     /** */
@@ -1552,18 +1614,21 @@ export class DictionaryImportController {
         const maxImportAttempts = 6;
         for (let attempt = 1; ; ++attempt) {
             try {
-                const archiveContentAttempt = (
+                const detailsAttempt = {
+                    ...importDetails,
+                    ...(useImportSession ? {useImportSession: true, finalizeImportSession} : {}),
+                };
+                const archiveContentAttempt = (attempt === 1 ? archiveContent : file);
+                const offscreenImportResult = (
                     attempt === 1 ?
-                        archiveContent :
-                        file
+                        await this._tryImportDictionaryOffscreen(archiveContentAttempt, detailsAttempt, onProgress) :
+                        null
                 );
                 importResult = /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}} */ (
+                    offscreenImportResult ??
                     await dictionaryWorker.importDictionary(
                         archiveContentAttempt,
-                        {
-                            ...importDetails,
-                            ...(useImportSession ? {useImportSession: true, finalizeImportSession} : {}),
-                        },
+                        detailsAttempt,
                         onProgress,
                     )
                 );

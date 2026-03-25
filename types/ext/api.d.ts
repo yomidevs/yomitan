@@ -503,6 +503,13 @@ type PmApiSurface = {
         params: void;
         return: void;
     };
+    importDictionaryOffscreen: {
+        params: {
+            archiveContent: Blob;
+            details: DictionaryImporter.ImportDetails;
+        };
+        return: void;
+    };
     registerDatabasePort: {
         params: void;
         return: void;
