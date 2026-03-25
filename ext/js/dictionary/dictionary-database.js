@@ -65,7 +65,6 @@ const TERM_CONTENT_STORAGE_MODE_RAW_BYTES = 'raw-bytes';
 const DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES = 4 * 1024 * 1024;
 const LARGE_ARTIFACT_FIXED_PACK_MIN_TOTAL_ROWS = 2_000_000;
 const EXTERNAL_MEDIA_BULK_INSERT_BATCH_SIZE = 256;
-const EMPTY_MEDIA_CONTENT_BUFFER = new ArrayBuffer(0);
 
 /**
  * @param {string} value
@@ -4043,17 +4042,23 @@ export class DictionaryDatabase {
             case 'media':
                 return {
                     sql: 'INSERT INTO media(dictionary, path, mediaType, width, height, content, contentOffset, contentLength) VALUES($dictionary, $path, $mediaType, $width, $height, $content, $contentOffset, $contentLength)',
-                    bind: (item) => {
-                        const row = /** @type {import('dictionary-database').MediaDataArrayBufferContent} */ (item);
+                    /**
+                     * @param {import('dictionary-database').MediaDataArrayBufferContent} row
+                     * @returns {{$dictionary: string, $path: string, $mediaType: string, $width: number, $height: number, $content: ArrayBuffer, $contentOffset: number, $contentLength: number}}
+                     */
+                    bind: (row) => {
+                        const source = /** @type {{dictionary: string, path: string, mediaType: string, width: number, height: number, content: ArrayBuffer, contentOffset?: unknown, contentLength?: unknown}} */ (row);
+                        const contentOffset = typeof source.contentOffset === 'number' ? source.contentOffset : 0;
+                        const contentLength = typeof source.contentLength === 'number' ? source.contentLength : 0;
                         return {
-                            $dictionary: row.dictionary,
-                            $path: row.path,
-                            $mediaType: row.mediaType,
-                            $width: row.width,
-                            $height: row.height,
-                            $content: row.content,
-                            $contentOffset: typeof row.contentOffset === 'number' ? row.contentOffset : 0,
-                            $contentLength: typeof row.contentLength === 'number' ? row.contentLength : 0,
+                            $dictionary: source.dictionary,
+                            $path: source.path,
+                            $mediaType: source.mediaType,
+                            $width: source.width,
+                            $height: source.height,
+                            $content: source.content,
+                            $contentOffset: contentOffset,
+                            $contentLength: contentLength,
                         };
                     },
                 };
@@ -4770,7 +4775,7 @@ export class DictionaryDatabase {
 
     /**
      * @param {import('core').SafeAny} row
-     * @returns {import('dictionary-database').MediaDataArrayBufferContent}
+     * @returns {Promise<import('dictionary-database').MediaDataArrayBufferContent>}
      */
     async _deserializeMediaRow(row) {
         const contentOffset = this._asNumber(row.contentOffset, 0);

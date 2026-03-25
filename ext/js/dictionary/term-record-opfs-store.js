@@ -1059,6 +1059,7 @@ export class TermRecordOpfsStore {
      * @param {number[]} contentOffsets
      * @param {number[]} contentLengths
      * @param {import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null} [preinternedPlan]
+     * @param {string} [contentDictName='raw']
      * @returns {Promise<{encodeMs: number, appendWriteMs: number}>}
      */
     async _encodeAndAppendArtifactChunkForState(state, chunk, firstId, contentOffsets, contentLengths, preinternedPlan = null, contentDictName = 'raw') {
@@ -1842,6 +1843,7 @@ export class TermRecordOpfsStore {
      * @param {Uint8Array} chunk
      * @param {number} firstId
      * @param {number} count
+     * @param {string|null} [contentDictNameOverride=null]
      * @returns {Promise<void>}
      */
     async _appendEncodedChunk(state, chunk, firstId, count, contentDictNameOverride = null) {
@@ -2285,7 +2287,10 @@ export class TermRecordOpfsStore {
             return false;
         }
         const nextSegmentIndex = state.segmentIndex + 1;
-        const nextFileName = this._getShardSegmentFileName(state.dictionaryName, state.sharedContentDictName ?? 'raw', nextSegmentIndex);
+        const decodedShardInfo = this._decodeShardInfoFromShardFileName(state.logicalKey ?? state.fileName);
+        const dictionaryName = decodedShardInfo?.dictionaryName ?? this._decodeShardInfoFromShardFileName(state.fileName)?.dictionaryName ?? '';
+        const sharedContentDictName = String(state.sharedContentDictName ?? 'raw');
+        const nextFileName = this._getShardSegmentFileName(dictionaryName, sharedContentDictName, nextSegmentIndex);
         const nextFileHandle = await this._recordsDirectoryHandle?.getFileHandle(nextFileName, {create: true});
         if (typeof nextFileHandle === 'undefined') {
             return false;

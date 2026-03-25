@@ -30,6 +30,8 @@ export type MediaDataBase<TContentType = unknown> = {
     width: number;
     height: number;
     content: TContentType;
+    contentOffset?: number;
+    contentLength?: number;
 };
 
 export type MediaDataArrayBufferContent = MediaDataBase<ArrayBuffer>;

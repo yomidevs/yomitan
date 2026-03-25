@@ -58,7 +58,7 @@ export type Events = {
     };
     downloadDictionaryFromUrl: {
         url: string;
-        onDownloadDone: ((file: File|null) => void) | null;
+        onDownloadDone: ((file: File | null) => void) | null;
     };
     dictionaryEnabled: Record<string, never>;
     scanInputsChanged: {

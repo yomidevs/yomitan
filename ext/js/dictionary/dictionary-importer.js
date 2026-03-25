@@ -398,7 +398,7 @@ export class DictionaryImporter {
 
     /**
      * @param {import('./dictionary-database.js').DictionaryDatabase} dictionaryDatabase
-     * @param {ArrayBuffer} archiveContent
+     * @param {ArrayBuffer|Blob|null} archiveContent
      * @param {import('dictionary-importer').ImportDetails} details
      * @returns {Promise<import('dictionary-importer').ImportResult>}
      */
@@ -516,11 +516,14 @@ export class DictionaryImporter {
         const tArchiveStart = Date.now();
         /** @type {import('dictionary-importer').ArchiveFileMap} */
         let fileMap;
-        /** @type {ZipReader<Uint8ArrayReader>|null} */
+        /** @type {import('@zip.js/zip.js').ZipReader<import('@zip.js/zip.js').BlobReader|import('@zip.js/zip.js').Uint8ArrayReader>|null} */
         let archiveReader = null;
         /** @type {import('dictionary-data').Index} */
         let index;
         try {
+            if (archiveContent === null) {
+                throw new Error('Archive content is no longer available');
+            }
             ({fileMap, zipReader: archiveReader} = await this._getFilesFromArchive(archiveContent));
             index = await this._readAndValidateIndex(fileMap);
         } catch (e) {
@@ -709,8 +712,9 @@ export class DictionaryImporter {
             packedMediaArtifactPreloadMs = Math.max(0, Date.now() - tPackedMediaReadStart);
             this._logImport(
                 `packed media artifact preload ${packedMediaArtifactPreloadMs}ms bytes=${
-                    packedMediaArtifactBytes instanceof Uint8Array ? packedMediaArtifactBytes.byteLength :
-                    (packedMediaArtifactBlob instanceof Blob ? packedMediaArtifactBlob.size : 0)
+                    packedMediaArtifactBytes instanceof Uint8Array ?
+                        packedMediaArtifactBytes.byteLength :
+                        (packedMediaArtifactBlob instanceof Blob ? packedMediaArtifactBlob.size : 0)
                 }`,
             );
         }
@@ -829,7 +833,6 @@ export class DictionaryImporter {
             }
             fileMap.clear();
             await closeArchiveReader();
-            archiveContent = null;
             this._logImport('released source archive after packed artifact preload');
         }
 
@@ -856,27 +859,31 @@ export class DictionaryImporter {
                 hasArchiveImageMediaFiles
             );
             /** @type {Array<{path: string, mediaType: string, packedOffset?: number, packedLength?: number, fileEntry?: import('@zip.js/zip.js').Entry}>} */
-            const artifactArchiveImageFileEntries = (
-                useMediaPipeline &&
-                (useTermArtifactFiles || usePackedTermArtifact) &&
-                termArtifactManifest?.includesMediaFiles === true
-            ) ?
-                (
+            const artifactArchiveImageFileEntries = (() => {
+                if (
+                    !useMediaPipeline ||
+                    !(useTermArtifactFiles || usePackedTermArtifact) ||
+                    termArtifactManifest?.includesMediaFiles !== true
+                ) {
+                    return [];
+                }
+                if (
                     termArtifactManifest !== null &&
                     termArtifactManifest.packedMediaEntries.length > 0 &&
                     (packedMediaArtifactBytes instanceof Uint8Array || packedMediaArtifactBlob instanceof Blob)
-                ) ?
-                    termArtifactManifest.packedMediaEntries :
-                    [...fileMap.entries()]
-                        .map(([path, fileEntry]) => {
-                            const mediaType = getImageMediaTypeFromFileName(path);
-                            if (mediaType === null) {
-                                return null;
-                            }
-                            return {path, mediaType, fileEntry};
-                        })
-                        .filter((value) => value !== null) :
-                [];
+                ) {
+                    return termArtifactManifest.packedMediaEntries;
+                }
+                return [...fileMap.entries()]
+                    .map(([path, fileEntry]) => {
+                        const mediaType = getImageMediaTypeFromFileName(path);
+                        if (mediaType === null) {
+                            return null;
+                        }
+                        return {path, mediaType, fileEntry};
+                    })
+                    .filter((value) => value !== null);
+            })();
             const artifactDirectMediaImport = artifactArchiveImageFileEntries.length > 0;
             const useTermMediaRequirements = useMediaPipeline && !artifactDirectMediaImport;
             const useExternalPackedMediaStorage = (
@@ -1018,11 +1025,9 @@ export class DictionaryImporter {
                     const media = [...context.media.values()];
                     context.media.clear();
                     const tMediaWriteStart = Date.now();
-                    if (useExternalPackedMediaStorage) {
-                        await dictionaryDatabase.bulkAddExternalMediaRows(media);
-                    } else {
-                        await bulkAdd('media', media, {trackProgress: false});
-                    }
+                    await (useExternalPackedMediaStorage ?
+                        dictionaryDatabase.bulkAddExternalMediaRows(media) :
+                        bulkAdd('media', media, {trackProgress: false}));
                     const tMediaWriteEnd = Date.now();
                     step4TimingBreakdown.mediaResolveMs += Math.max(0, tMediaResolved - tMediaResolveStart);
                     step4TimingBreakdown.mediaWriteMs += Math.max(0, tMediaWriteEnd - tMediaWriteStart);
@@ -1653,7 +1658,7 @@ export class DictionaryImporter {
 
     /**
      * @param {ArrayBuffer|Blob} archiveContent
-     * @returns {Promise<{fileMap: import('dictionary-importer').ArchiveFileMap, zipReader: ZipReader<BlobReader|Uint8ArrayReader>}>}
+     * @returns {Promise<{fileMap: import('dictionary-importer').ArchiveFileMap, zipReader: import('@zip.js/zip.js').ZipReader<import('@zip.js/zip.js').BlobReader|import('@zip.js/zip.js').Uint8ArrayReader>}>}
      */
     async _getFilesFromArchive(archiveContent) {
         const zipFileReader = (
@@ -1661,7 +1666,7 @@ export class DictionaryImporter {
                 new BlobReader(archiveContent) :
                 new Uint8ArrayReader(new Uint8Array(archiveContent))
         );
-        const zipReader = new ZipReader(zipFileReader);
+        const zipReader = /** @type {import('@zip.js/zip.js').ZipReader<import('@zip.js/zip.js').BlobReader|import('@zip.js/zip.js').Uint8ArrayReader>} */ (new ZipReader(zipFileReader));
         const zipEntries = await zipReader.getEntries();
         /** @type {import('dictionary-importer').ArchiveFileMap} */
         const fileMap = new Map();

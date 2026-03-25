@@ -279,15 +279,16 @@ function createTermArtifactPayload(dictionaryImporter, version, dictionaryTitle,
             const glossaryKey = JSON.stringify(entry.glossary);
             let span = /** @type {{offset: number, length: number}|undefined} */ (sharedGlossarySpanByKey?.get(glossaryKey));
             if (typeof span === 'undefined') {
-                const offset = sharedGlossaryBytes.reduce((sum, chunk) => (sum + chunk.byteLength), 0);
+                const sharedGlossaryChunks = /** @type {Uint8Array[]} */ (sharedGlossaryBytes ?? []);
+                const offset = sharedGlossaryChunks.reduce((sum, chunk) => (sum + chunk.byteLength), 0);
                 span = {offset, length: glossaryBytes.byteLength};
                 sharedGlossarySpanByKey?.set(glossaryKey, span);
-                sharedGlossaryBytes?.push(glossaryBytes);
+                sharedGlossaryChunks.push(glossaryBytes);
             }
             return encodeRawTermContentSharedGlossaryBinary(
                 entry.rules,
-                entry.definitionTags,
-                entry.termTags,
+                entry.definitionTags ?? '',
+                entry.termTags ?? '',
                 span.offset,
                 span.length,
                 textEncoder,
@@ -832,7 +833,7 @@ describe('Database', () => {
                 expect.soft(info[0]?.importSuccess).toBe(true);
 
                 const counts = await dictionaryDatabase.getDictionaryCounts(['Artifact Raw Dictionary'], true);
-                expect.soft(counts.total.terms).toBeGreaterThan(0);
+                expect.soft(counts.total?.terms ?? 0).toBeGreaterThan(0);
 
                 const titles = new Map([
                     ['Artifact Raw Dictionary', {alias: 'Artifact Raw Dictionary', allowSecondarySearches: false}],
@@ -865,7 +866,7 @@ describe('Database', () => {
                 expect.soft(info[0]?.importSuccess).toBe(true);
 
                 const counts = await dictionaryDatabase.getDictionaryCounts(['Artifact Raw V4 Dictionary'], true);
-                expect.soft(counts.total.terms).toBeGreaterThan(0);
+                expect.soft(counts.total?.terms ?? 0).toBeGreaterThan(0);
 
                 const titles = new Map([
                     ['Artifact Raw V4 Dictionary', {alias: 'Artifact Raw V4 Dictionary', allowSecondarySearches: false}],
@@ -1464,7 +1465,7 @@ describe('Database', () => {
             expect.soft(afterInfo).toStrictEqual([]);
             const counts = await dictionaryDatabase.getDictionaryCounts([], true);
             expect.soft(counts.total).toStrictEqual({kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0});
-            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(3);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(4);
             await dictionaryDatabase.close();
         });
 
@@ -1495,7 +1496,7 @@ describe('Database', () => {
 
             const afterInfo = await dictionaryDatabase.getDictionaryInfo();
             expect.soft(afterInfo).toStrictEqual([]);
-            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(3);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(4);
             expect.soft(v2Summary).toStrictEqual({migration: 'schema-v2-noop'});
             await dictionaryDatabase.close();
         });
@@ -1523,7 +1524,7 @@ describe('Database', () => {
             const info = await dictionaryDatabase.getDictionaryInfo();
             expect.soft(info.length).toBe(1);
             expect.soft(info[0]?.importSuccess).toBe(true);
-            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(3);
+            expect.soft(Number(db.selectValue('PRAGMA user_version'))).toBe(4);
             await dictionaryDatabase.close();
         });
 

@@ -69,6 +69,14 @@ describe('TermContentOpfsStore', () => {
         };
         Reflect.set(store, '_fileHandle', fileHandle);
         Reflect.set(store, '_readFile', unreadableFile);
+        Reflect.set(store, '_segmentStates', [{
+            index: 0,
+            fileName: 'manabitan-term-content.bin',
+            fileHandle,
+            fileLength: bytes.byteLength,
+            startOffset: 0,
+            readFile: unreadableFile,
+        }]);
         Reflect.set(store, '_loadedForRead', true);
         Reflect.set(store, '_length', bytes.byteLength);
 
@@ -98,6 +106,14 @@ describe('TermContentOpfsStore', () => {
         };
         Reflect.set(store, '_fileHandle', fileHandle);
         Reflect.set(store, '_readFile', unreadableFile);
+        Reflect.set(store, '_segmentStates', [{
+            index: 0,
+            fileName: 'manabitan-term-content.bin',
+            fileHandle,
+            fileLength: bytes.byteLength,
+            startOffset: 0,
+            readFile: unreadableFile,
+        }]);
         Reflect.set(store, '_loadedForRead', true);
         Reflect.set(store, '_length', bytes.byteLength);
 

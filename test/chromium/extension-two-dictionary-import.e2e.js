@@ -1206,6 +1206,35 @@ async function findOverlapLookupTerm(page, expectedDictionaryNames, candidates) 
     };
 }
 
+async function findOverlapLookupTermOnSearchPage(page, expectedDictionaryNames, candidates, timeoutMs = 6000) {
+    /** @type {Array<{term: string, expectedCounts: Record<string, number>, observedCounts: Record<string, number>, noResultsVisible: boolean, entriesTextPreview: string}>} */
+    const probes = [];
+    const normalizedCandidates = [...new Set(
+        (Array.isArray(candidates) ? candidates : [])
+            .map((value) => String(value || '').trim())
+            .filter((value) => value.length > 0),
+    )];
+    for (const term of normalizedCandidates) {
+        const snapshot = await searchTermAndGetDictionaryHitCounts(page, term, expectedDictionaryNames, timeoutMs);
+        probes.push({
+            term,
+            expectedCounts: snapshot.expectedCounts,
+            observedCounts: snapshot.observedCounts,
+            noResultsVisible: snapshot.noResultsVisible,
+            entriesTextPreview: snapshot.entriesTextPreview,
+        });
+        if (expectedDictionaryNames.every((name) => Number(snapshot.expectedCounts?.[name] ?? 0) >= 1)) {
+            return {ok: true, term, snapshot, probes};
+        }
+    }
+    return {
+        ok: false,
+        term: normalizedCandidates[0] ?? '暗記',
+        snapshot: probes[probes.length - 1] ?? null,
+        probes,
+    };
+}
+
 async function setEnabledDictionaries(page, dictionaryNames) {
     const result = await evalSendMessage(page, 'setEnabledDictionaries', dictionaryNames);
     if (!(result && result.ok === true)) {
@@ -1699,6 +1728,25 @@ async function searchTermAndGetDictionaryHitCounts(page, term, expectedDictionar
     return lastResult;
 }
 
+async function waitForSearchTermDictionaryHitCounts(page, term, expectedDictionaryNames, timeoutMs = 15000, submitMode = 'enter') {
+    const deadline = safePerformance.now() + timeoutMs;
+    /** @type {{expectedCounts: Record<string, number>, observedCounts: Record<string, number>, noResultsVisible: boolean, entriesTextPreview: string}|null} */
+    let lastResult = null;
+    while (safePerformance.now() < deadline) {
+        lastResult = await searchTermAndGetDictionaryHitCounts(page, term, expectedDictionaryNames, Math.min(2000, Math.max(250, deadline - safePerformance.now())), submitMode);
+        if (expectedDictionaryNames.every((name) => Number(lastResult?.expectedCounts?.[name] ?? 0) >= 1)) {
+            return lastResult;
+        }
+        await page.waitForTimeout(250);
+    }
+    return lastResult ?? {
+        expectedCounts: Object.fromEntries(expectedDictionaryNames.map((name) => [name, 0])),
+        observedCounts: {},
+        noResultsVisible: false,
+        entriesTextPreview: '',
+    };
+}
+
 async function waitForVisiblePopupFrameHandle(page, timeoutMs = 6000) {
     const deadline = safePerformance.now() + timeoutMs;
     while (safePerformance.now() < deadline) {
@@ -2179,9 +2227,28 @@ async function main() {
             processSampler,
         );
 
+        const concurrentWarmupReadyStart = safePerformance.now();
+        const concurrentWarmupReadyProfile = await runPhaseProfile(cdpSession, async () => {
+            return await waitForSearchTermDictionaryHitCounts(concurrentSearchPage, '暗記', ['JMdict'], 60000);
+        });
+        const concurrentWarmupReadyEnd = safePerformance.now();
+        if (Number(concurrentWarmupReadyProfile.result?.expectedCounts?.JMdict ?? 0) < 1) {
+            fail(`Dedicated JMdict lookup tab did not become lookup-ready before probe discovery: ${JSON.stringify(concurrentWarmupReadyProfile.result ?? null)}`);
+        }
+        await addReportPhase(
+            report,
+            concurrentSearchPage,
+            'Warm up dedicated concurrent lookup tab after enabling JMdict',
+            `Dedicated search tab confirmed JMdict lookup readiness on a known probe term before concurrent verification: ${JSON.stringify(concurrentWarmupReadyProfile.result ?? null)}`,
+            concurrentWarmupReadyStart,
+            concurrentWarmupReadyEnd,
+            concurrentWarmupReadyProfile,
+            processSampler,
+        );
+
         const concurrentProbeTermStart = safePerformance.now();
         const concurrentProbeTermProfile = await runPhaseProfile(cdpSession, async () => {
-            return await findOverlapLookupTerm(page, ['JMdict'], [...jmdictProbeTerms, ...lookupProbeCandidates]);
+            return await findOverlapLookupTermOnSearchPage(concurrentSearchPage, ['JMdict'], [...jmdictProbeTerms, ...lookupProbeCandidates]);
         });
         const concurrentProbeTermEnd = safePerformance.now();
         if (!(concurrentProbeTermProfile.result && concurrentProbeTermProfile.result.ok === true)) {
@@ -2201,17 +2268,17 @@ async function main() {
 
         const concurrentBackendReadyStart = safePerformance.now();
         const concurrentBackendReadyProfile = await runPhaseProfile(cdpSession, async () => {
-            return await waitForBackendDictionaryReady(concurrentSearchPage, ['JMdict'], concurrentProbeTerm, 60000, true);
+            return await searchTermAndGetDictionaryHitCounts(concurrentSearchPage, concurrentProbeTerm, ['JMdict'], 60000);
         });
         const concurrentBackendReadyEnd = safePerformance.now();
-        if (!(concurrentBackendReadyProfile.result && concurrentBackendReadyProfile.result.ok === true)) {
-            fail(`JMdict lookup backend did not become ready before concurrent import verification: ${JSON.stringify(concurrentBackendReadyProfile.result?.diagnostics ?? null)}`);
+        if (Number(concurrentBackendReadyProfile.result?.expectedCounts?.JMdict ?? 0) < 1) {
+            fail(`JMdict lookup backend did not become ready before concurrent import verification: ${JSON.stringify(concurrentBackendReadyProfile.result ?? null)}`);
         }
         await addReportPhase(
             report,
             concurrentSearchPage,
             'Wait for JMdict lookup backend readiness before concurrent import',
-            `Dedicated search tab confirmed JMdict lookup backend readiness before Jitendex import: ${JSON.stringify(concurrentBackendReadyProfile.result?.diagnostics ?? null)}`,
+            `Dedicated search tab confirmed JMdict lookup backend readiness before Jitendex import: ${JSON.stringify(concurrentBackendReadyProfile.result ?? null)}`,
             concurrentBackendReadyStart,
             concurrentBackendReadyEnd,
             concurrentBackendReadyProfile,
@@ -2220,7 +2287,7 @@ async function main() {
 
         const baselineConcurrentSearchStart = safePerformance.now();
         const baselineConcurrentLookupProfile = await runPhaseProfile(cdpSession, async () => {
-            return await evalSendMessage(concurrentSearchPage, 'backendDiagnostics', concurrentProbeTerm);
+            return await searchTermAndGetDictionaryHitCounts(concurrentSearchPage, concurrentProbeTerm, ['JMdict'], 6000);
         });
         const baselineConcurrentLookup = baselineConcurrentLookupProfile.result;
         const baselineConcurrentSearchEnd = safePerformance.now();
@@ -2234,7 +2301,7 @@ async function main() {
             baselineConcurrentLookupProfile,
             processSampler,
         );
-        if (!Array.isArray(baselineConcurrentLookup?.termDictionaryNames) || !baselineConcurrentLookup.termDictionaryNames.some((name) => matchesDictionaryName(String(name), 'JMdict'))) {
+        if (Number(baselineConcurrentLookup?.expectedCounts?.JMdict ?? 0) < 1) {
             fail(`Expected baseline JMdict lookup backend before Jitendex import; saw ${JSON.stringify(baselineConcurrentLookup)}`);
         }
 
@@ -2268,7 +2335,7 @@ async function main() {
         await page.waitForTimeout(700);
         const searchDuringImportStart = safePerformance.now();
         const searchDuringImportProfile = await runPhaseProfile(cdpSession, async () => {
-            return await evalSendMessage(concurrentSearchPage, 'backendDiagnostics', concurrentProbeTerm);
+            return await searchTermAndGetDictionaryHitCounts(concurrentSearchPage, concurrentProbeTerm, ['JMdict'], 6000);
         });
         const searchDuringImportLookup = searchDuringImportProfile.result;
         const searchDuringImportEnd = safePerformance.now();
@@ -2282,7 +2349,7 @@ async function main() {
             searchDuringImportProfile,
             processSampler,
         );
-        if (!Array.isArray(searchDuringImportLookup?.termDictionaryNames) || !searchDuringImportLookup.termDictionaryNames.some((name) => matchesDictionaryName(String(name), 'JMdict'))) {
+        if (Number(searchDuringImportLookup?.expectedCounts?.JMdict ?? 0) < 1) {
             fail(`Expected JMdict lookup backend to remain available during Jitendex import; saw ${JSON.stringify(searchDuringImportLookup)}`);
         }
 
@@ -2486,7 +2553,7 @@ async function main() {
         await page.waitForTimeout(700);
         const searchDuringUpdateStart = safePerformance.now();
         const searchDuringUpdateProfile = await runPhaseProfile(cdpSession, async () => {
-            return await evalSendMessage(concurrentSearchPage, 'backendDiagnostics', readinessTerm);
+            return await searchTermAndGetDictionaryHitCounts(concurrentSearchPage, readinessTerm, ['JMdict'], 6000);
         });
         const searchDuringUpdateLookup = searchDuringUpdateProfile.result;
         const searchDuringUpdateEnd = safePerformance.now();
@@ -2500,7 +2567,7 @@ async function main() {
             searchDuringUpdateProfile,
             processSampler,
         );
-        if (!Array.isArray(searchDuringUpdateLookup?.termDictionaryNames) || !searchDuringUpdateLookup.termDictionaryNames.some((name) => matchesDictionaryName(String(name), 'JMdict'))) {
+        if (Number(searchDuringUpdateLookup?.expectedCounts?.JMdict ?? 0) < 1) {
             fail(`Expected JMdict lookup backend to remain available during JMdict update; saw ${JSON.stringify(searchDuringUpdateLookup)}`);
         }
 
