@@ -267,18 +267,14 @@ export class Translator {
                     if (!existingEntryInfo) {
                         continue;
                     }
-                    const {existingEntry, existingIndex} = existingEntryInfo;
+                    const {existingEntry} = existingEntryInfo;
 
                     const existingTransformedLength = existingEntry.headwords[0].sources[0].transformedText.length;
                     if (transformedText.length < existingTransformedLength) {
                         continue;
                     }
-                    if (transformedText.length > existingTransformedLength) {
-                        dictionaryEntries.splice(existingIndex, 1, this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading));
-                    } else {
-                        this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
-                        this._mergeTextProcessorRuleChains(existingEntry, textProcessorRuleChainCandidates);
-                    }
+                    this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
+                    this._mergeTextProcessorRuleChains(existingEntry, textProcessorRuleChainCandidates);
                 } else {
                     const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading);
                     dictionaryEntries.push(dictionaryEntry);
