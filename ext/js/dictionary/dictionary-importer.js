@@ -703,7 +703,7 @@ export class DictionaryImporter {
             const tPackedMediaReadStart = Date.now();
             const usePackedMediaBlobPreload =
                 this._skipImageMetadata &&
-                termArtifactManifest.packedMediaEntries.length >= 8192;
+                termArtifactManifest.packedMediaEntries.length >= 2048;
             if (usePackedMediaBlobPreload) {
                 packedMediaArtifactBlob = await this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedMediaArtifactEntry), new BlobWriter());
             } else {
