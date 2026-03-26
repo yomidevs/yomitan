@@ -1066,7 +1066,7 @@ export class DictionaryImporter {
             };
             /**
              * @param {{filename: string}} termFile
-             * @param {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} termChunk
+             * @param {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} termChunk
              * @param {import('dictionary-importer').ImportRequirement[]|null} requirements
              * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}|null} streamedProgress
              * @param {number} streamedProgressStartIndex
@@ -1074,7 +1074,7 @@ export class DictionaryImporter {
              */
             const processTermChunk = async (termFile, termChunk, requirements, streamedProgress = null, streamedProgressStartIndex = 0) => {
                 const trackProgress = streamedProgress === null;
-                /** @type {{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}|null} */
+                /** @type {{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}|null} */
                 const directArtifactChunk = Array.isArray(termChunk) ? null : termChunk;
                 /** @type {import('dictionary-database').DatabaseTermEntry[]} */
                 const termList = Array.isArray(termChunk) ? termChunk : [];
@@ -1229,7 +1229,7 @@ export class DictionaryImporter {
                          */
                         const directArtifactChunkImport = !enableTermEntryContentDedup && !useTermMediaRequirements;
                         /**
-                         * @param {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} termListChunk
+                         * @param {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} termListChunk
                          * @param {import('dictionary-importer').ImportRequirement[]|null} requirementsChunk
                          * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}} streamProgress
                          * @returns {Promise<void>}
@@ -3155,6 +3155,8 @@ export class DictionaryImporter {
         /** @type {number[]|Uint32Array} */
         let termRecordReadingIndexes = [];
         let chunkRowCount = 0;
+        /** @type {string|null|undefined} */
+        let chunkUniformContentDictName = void 0;
         if (directArtifactChunkImport) {
             chunkExpressionBytes = createSparseArray(chunkSize);
             chunkReadingBytes = createSparseArray(chunkSize);
@@ -3285,6 +3287,11 @@ export class DictionaryImporter {
                     chunkSequences[chunkRowCount] = sequence;
                     chunkContentBytes[chunkRowCount] = contentBytes;
                     chunkContentDictNames[chunkRowCount] = contentDictName;
+                    if (chunkRowCount === 0) {
+                        chunkUniformContentDictName = contentDictName;
+                    } else if (chunkUniformContentDictName !== void 0 && contentDictName !== chunkUniformContentDictName) {
+                        chunkUniformContentDictName = void 0;
+                    }
                     ++chunkRowCount;
                 } else {
                     /** @type {import('dictionary-database').DatabaseTermEntry} */
@@ -3333,6 +3340,7 @@ export class DictionaryImporter {
                             sequenceList: chunkSequences,
                             contentBytesList: chunkContentBytes,
                             contentDictNameList: chunkContentDictNames,
+                            uniformContentDictName: chunkUniformContentDictName,
                             termRecordPreinternedPlan,
                         } :
                         termList;
@@ -3357,6 +3365,7 @@ export class DictionaryImporter {
                     termRecordPlanBuilder = directArtifactChunkImport ? null : createArtifactTermRecordPreinternedPlanBuilder();
                     termRecordExpressionIndexes = [];
                     termRecordReadingIndexes = [];
+                    chunkUniformContentDictName = void 0;
                 }
             } else {
                 /** @type {import('dictionary-database').DatabaseTermEntry} */
@@ -3405,6 +3414,7 @@ export class DictionaryImporter {
                     sequenceList: chunkSequences.slice(0, streamedRowCount),
                     contentBytesList: chunkContentBytes.slice(0, streamedRowCount),
                     contentDictNameList: chunkContentDictNames.slice(0, streamedRowCount),
+                    uniformContentDictName: chunkUniformContentDictName,
                     termRecordPreinternedPlan,
                 } :
                 termList;

@@ -3068,7 +3068,7 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
+     * @param {{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
      * @returns {Promise<void>}
      */
     async _bulkAddArtifactTermsChunkWithoutContentDedup(chunk) {
@@ -3163,34 +3163,38 @@ export class DictionaryDatabase {
             } else {
                 await this._termContentStore.appendBatchToArrays(contentChunks, contentOffsets, contentLengths);
             }
-            for (let i = 0; i < count; ++i) {
-                const explicitContentDictName = chunk.contentDictNameList[i];
-                /** @type {string|null} */
-                let resolvedContentDictName;
-                if (
-                    this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
-                    typeof explicitContentDictName === 'string' &&
-                    explicitContentDictName.length > 0
-                ) {
-                    resolvedContentDictName = explicitContentDictName;
-                } else if (
-                    this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
-                    isRawTermContentBinary(contentChunks[i])
-                ) {
-                    resolvedContentDictName = RAW_TERM_CONTENT_DICT_NAME;
-                } else {
-                    resolvedContentDictName = 'raw';
-                }
-                if (i === 0) {
-                    uniformContentDictName = resolvedContentDictName;
-                    continue;
-                }
-                if (contentDictNames === null && resolvedContentDictName !== uniformContentDictName) {
-                    contentDictNames = new Array(count);
-                    contentDictNames.fill(uniformContentDictName, 0, i);
-                }
-                if (contentDictNames !== null) {
-                    contentDictNames[i] = resolvedContentDictName;
+            if (typeof chunk.uniformContentDictName !== 'undefined') {
+                uniformContentDictName = chunk.uniformContentDictName ?? 'raw';
+            } else {
+                for (let i = 0; i < count; ++i) {
+                    const explicitContentDictName = chunk.contentDictNameList[i];
+                    /** @type {string|null} */
+                    let resolvedContentDictName;
+                    if (
+                        this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
+                        typeof explicitContentDictName === 'string' &&
+                        explicitContentDictName.length > 0
+                    ) {
+                        resolvedContentDictName = explicitContentDictName;
+                    } else if (
+                        this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES &&
+                        isRawTermContentBinary(contentChunks[i])
+                    ) {
+                        resolvedContentDictName = RAW_TERM_CONTENT_DICT_NAME;
+                    } else {
+                        resolvedContentDictName = 'raw';
+                    }
+                    if (i === 0) {
+                        uniformContentDictName = resolvedContentDictName;
+                        continue;
+                    }
+                    if (contentDictNames === null && resolvedContentDictName !== uniformContentDictName) {
+                        contentDictNames = new Array(count);
+                        contentDictNames.fill(uniformContentDictName, 0, i);
+                    }
+                    if (contentDictNames !== null) {
+                        contentDictNames[i] = resolvedContentDictName;
+                    }
                 }
             }
             contentAppendMs += safePerformance.now() - tContentAppendStart;
