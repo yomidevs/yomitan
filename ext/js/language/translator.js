@@ -267,14 +267,21 @@ export class Translator {
                     if (!existingEntryInfo) {
                         continue;
                     }
-                    const {existingEntry} = existingEntryInfo;
+                    const {existingEntry, existingIndex} = existingEntryInfo;
 
-                    const existingTransformedLength = existingEntry.headwords[0].sources[0].transformedText.length;
+                    const existingTransformedText = existingEntry.headwords[0].sources[0].transformedText;
+                    const existingTransformedLength = existingTransformedText.length;
                     if (transformedText.length < existingTransformedLength) {
                         continue;
                     }
-                    this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
-                    this._mergeTextProcessorRuleChains(existingEntry, textProcessorRuleChainCandidates);
+                    if (transformedText.length > existingTransformedLength) {
+                        if (originalText !== existingTransformedText) {
+                            dictionaryEntries.splice(existingIndex, 1, this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading));
+                        }
+                    } else {
+                        this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
+                        this._mergeTextProcessorRuleChains(existingEntry, textProcessorRuleChainCandidates);
+                    }
                 } else {
                     const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading);
                     dictionaryEntries.push(dictionaryEntry);
