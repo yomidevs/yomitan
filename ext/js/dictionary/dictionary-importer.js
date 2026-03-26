@@ -851,12 +851,14 @@ export class DictionaryImporter {
                 }
                 sharedGlossaryArtifactAppendMs = Math.max(0, Date.now() - tSharedGlossaryAppendStart);
             }
-            const hasArchiveImageMediaFiles =
-                this._archiveHasImageMediaFiles(fileMap) ||
-                termArtifactManifest?.includesMediaFiles === true;
+            const hasArchiveImageMediaFiles = this._archiveHasImageMediaFiles(fileMap);
+            const hasUsableArtifactMediaFiles = (
+                termArtifactManifest?.includesMediaFiles === true &&
+                termArtifactManifest.packedMediaEntries.length > 0
+            );
             const useMediaPipeline = (
                 !this._skipMediaImport &&
-                hasArchiveImageMediaFiles
+                (hasArchiveImageMediaFiles || hasUsableArtifactMediaFiles)
             );
             /** @type {Array<{path: string, mediaType: string, packedOffset?: number, packedLength?: number, fileEntry?: import('@zip.js/zip.js').Entry}>} */
             const artifactArchiveImageFileEntries = (() => {
@@ -894,6 +896,7 @@ export class DictionaryImporter {
             this._logImport(
                 `media pipeline enabled=${String(useMediaPipeline)} skipMediaImport=${String(this._skipMediaImport)} ` +
                 `hasArchiveImageMediaFiles=${String(hasArchiveImageMediaFiles)} ` +
+                `hasUsableArtifactMediaFiles=${String(hasUsableArtifactMediaFiles)} ` +
                 `artifactDirectMediaImport=${String(artifactDirectMediaImport)} ` +
                 `externalPackedMediaStorage=${String(useExternalPackedMediaStorage)}`,
             );
