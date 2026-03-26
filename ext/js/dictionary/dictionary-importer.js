@@ -931,7 +931,7 @@ export class DictionaryImporter {
                     score: 0,
                     glossary: EMPTY_TERM_GLOSSARY,
                 };
-                const chunkSize = Math.max(this._mediaResolutionConcurrency * 64, 256);
+                const chunkSize = Math.max(this._mediaResolutionConcurrency * 128, 512);
                 const skipArtifactImageMetadata = this._skipImageMetadata || artifactArchiveImageFileEntries.length >= 4096;
                 let packedMediaBytesForDirectImport = packedMediaArtifactBytes;
                 let packedMediaBlobForDirectImport = packedMediaArtifactBlob;
