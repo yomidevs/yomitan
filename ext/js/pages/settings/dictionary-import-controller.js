@@ -1974,6 +1974,23 @@ export class DictionaryImportController {
 
             if (profilesDictionarySettings === null || typeof profilesDictionarySettings[profileId] === 'undefined') {
                 targets.push({action: 'push', path: path1, items: [defaultSettings]});
+                if (options.general.mainDictionary === summary.sourceTitle) {
+                    targets.push({
+                        action: 'set',
+                        path: `profiles[${i}].options.general.mainDictionary`,
+                        value: title,
+                    });
+                } else if (sequenced && options.general.mainDictionary === '') {
+                    const path2 = `profiles[${i}].options.general.mainDictionary`;
+                    targets.push({action: 'set', path: path2, value: title});
+                }
+                if (options.general.sortFrequencyDictionary === summary.sourceTitle) {
+                    targets.push({
+                        action: 'set',
+                        path: `profiles[${i}].options.general.sortFrequencyDictionary`,
+                        value: title,
+                    });
+                }
             } else {
                 const {index, alias, name, ...currentSettings} = profilesDictionarySettings[profileId];
                 const newAlias = alias === name ? title : alias;
@@ -2010,11 +2027,6 @@ export class DictionaryImportController {
                     });
                 }
                 continue;
-            }
-
-            if (sequenced && options.general.mainDictionary === '') {
-                const path2 = `profiles[${i}].options.general.mainDictionary`;
-                targets.push({action: 'set', path: path2, value: title});
             }
         }
         return await this._modifyGlobalSettings(targets);

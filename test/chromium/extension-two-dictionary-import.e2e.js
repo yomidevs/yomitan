@@ -965,6 +965,10 @@ async function evalSendMessage(page, expression, arg = null) {
                 id: String(profile?.id || ''),
                 mainDictionary: String(profile?.options?.general?.mainDictionary || ''),
                 sortFrequencyDictionary: String(profile?.options?.general?.sortFrequencyDictionary || ''),
+                enabledDictionaryNames: (profile?.options?.dictionaries || [])
+                    .filter((row) => row?.enabled === true)
+                    .map((row) => String(row?.name || '').trim())
+                    .filter((value) => value.length > 0),
             }));
             return {
                 dictionaryInfo,
@@ -2634,7 +2638,9 @@ async function main() {
                 if (
                     String(before?.id || '') !== String(after?.id || '') ||
                     String(before?.mainDictionary || '') !== String(after?.mainDictionary || '') ||
-                    String(before?.sortFrequencyDictionary || '') !== String(after?.sortFrequencyDictionary || '')
+                    String(before?.sortFrequencyDictionary || '') !== String(after?.sortFrequencyDictionary || '') ||
+                    JSON.stringify(Array.isArray(before?.enabledDictionaryNames) ? before.enabledDictionaryNames : []) !==
+                        JSON.stringify(Array.isArray(after?.enabledDictionaryNames) ? after.enabledDictionaryNames : [])
                 ) {
                     throw new Error(`Profile selector state changed across restart. before=${JSON.stringify(profileSelectorStateBeforeRestart)} after=${JSON.stringify(profileSelectorStateAfterRestart)}`);
                 }

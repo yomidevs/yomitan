@@ -184,6 +184,7 @@ export class DictionaryWorkerHandler {
             const cleanupTransientReplacementTitles = async (activeDictionaryDatabase) => {
                 const transientTitleCandidates = new Set();
                 const transientTitlePattern = /\[(?:update-staging|cutover|replaced) [^\]]+\]/;
+                const replacementFamilyPrefix = replacementDictionaryTitle !== null ? `${replacementDictionaryTitle} [` : null;
                 if (dictionaryTitleOverride !== null && transientTitlePattern.test(dictionaryTitleOverride)) {
                     transientTitleCandidates.add(dictionaryTitleOverride);
                 }
@@ -195,7 +196,13 @@ export class DictionaryWorkerHandler {
                         typeof Reflect.get(dictionaryInfo, 'title') === 'string'
                     ) ? Reflect.get(dictionaryInfo, 'title').trim() : '';
                     if (title.length === 0) { continue; }
-                    if (transientTitlePattern.test(title)) {
+                    if (
+                        transientTitlePattern.test(title) &&
+                        (
+                            title === dictionaryTitleOverride ||
+                            (replacementFamilyPrefix !== null && title.startsWith(replacementFamilyPrefix))
+                        )
+                    ) {
                         transientTitleCandidates.add(title);
                     }
                 }
@@ -214,7 +221,7 @@ export class DictionaryWorkerHandler {
                     if (transientTitleCandidates.has(title)) {
                         return true;
                     }
-                    return transientTitlePattern.test(title);
+                    return replacementFamilyPrefix !== null && title.startsWith(replacementFamilyPrefix) && transientTitlePattern.test(title);
                 });
             };
             const importOnce = async (activeDictionaryDatabase) => {
