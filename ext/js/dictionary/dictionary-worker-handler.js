@@ -259,6 +259,13 @@ export class DictionaryWorkerHandler {
             } catch (error) {
                 const canRetryReadonlyImport = isReadonlyError(error) && (!useImportSession || finalizeImportSession);
                 if (!canRetryReadonlyImport) {
+                    if (replacementDictionaryTitle !== null || dictionaryTitleOverride !== null) {
+                        try {
+                            await cleanupTransientReplacementTitles(dictionaryDatabase);
+                        } catch (_) {
+                            // NOP - preserve the original failure.
+                        }
+                    }
                     throw error;
                 }
                 try {

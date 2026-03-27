@@ -1155,8 +1155,6 @@ export class TermRecordOpfsStore {
             this._indexDirty = false;
             return renamedCount;
         }
-
-        await this._deleteShardByDictionary(toName);
         const sourceStates = [...this._shardStateByFileName.values()]
             .filter((state) => this._decodeDictionaryNameFromShardFileName(state.fileName) === fromName)
             .sort((a, b) => a.fileName.localeCompare(b.fileName));
@@ -1172,7 +1170,20 @@ export class TermRecordOpfsStore {
             const shardInfo = this._decodeShardInfoFromShardFileName(state.fileName);
             if (shardInfo === null) { continue; }
             const nextFileName = this._getShardSegmentFileName(toName, shardInfo.contentDictName, shardInfo.segmentIndex);
+            if (this._shardStateByFileName.has(nextFileName)) {
+                throw new Error(`Target shard file already exists for dictionary rename: ${nextFileName}`);
+            }
             const nextFileHandle = await this._recordsDirectoryHandle.getFileHandle(nextFileName, {create: true});
+            try {
+                const nextFile = await nextFileHandle.getFile();
+                if (nextFile.size > 0) {
+                    throw new Error(`Target shard file already contains data for dictionary rename: ${nextFileName}`);
+                }
+            } catch (e) {
+                if (e instanceof Error && /already contains data|already exists/.test(e.message)) {
+                    throw e;
+                }
+            }
             renamePlans.push({
                 state,
                 shardInfo,

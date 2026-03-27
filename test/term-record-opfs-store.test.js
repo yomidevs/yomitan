@@ -158,4 +158,51 @@ describe('TermRecordOpfsStore', () => {
         expect(shardStateByFileName.has(oldFileName)).toBe(true);
         expect(shardStateByFileName.has(newFileName)).toBe(false);
     });
+
+    test('replaceDictionaryName preserves existing target shard files when rename cannot start cleanly', async () => {
+        const store = new TermRecordOpfsStore();
+        const recordsById = Reflect.get(store, '_recordsById');
+        const shardStateByFileName = Reflect.get(store, '_shardStateByFileName');
+        const activeAppendShardStateByKey = Reflect.get(store, '_activeAppendShardStateByKey');
+        const oldFileName = store._getShardSegmentFileName('JMdict staging', 'raw', 0);
+        const oldLogicalKey = store._getShardFileName('JMdict staging', 'raw');
+        const newFileName = store._getShardSegmentFileName('JMdict [2026-02-26]', 'raw', 0);
+        const newLogicalKey = store._getShardFileName('JMdict [2026-02-26]', 'raw');
+        const fileBytesByName = new Map([
+            [oldFileName, new Uint8Array([1, 2, 3, 4])],
+            [newFileName, new Uint8Array([5, 6, 7, 8])],
+        ]);
+        const recordsDirectoryHandle = createFakeDirectoryHandle(fileBytesByName);
+        const oldFileHandle = await recordsDirectoryHandle.getFileHandle(oldFileName, {create: false});
+        const newFileHandle = await recordsDirectoryHandle.getFileHandle(newFileName, {create: false});
+        const oldShardState = store._createShardState(oldFileName, oldFileHandle, 4, 'raw', 0, oldLogicalKey);
+        const newShardState = store._createShardState(newFileName, newFileHandle, 4, 'raw', 0, newLogicalKey);
+
+        Reflect.set(store, '_recordsDirectoryHandle', recordsDirectoryHandle);
+        shardStateByFileName.set(oldFileName, oldShardState);
+        shardStateByFileName.set(newFileName, newShardState);
+        activeAppendShardStateByKey.set(oldLogicalKey, oldShardState);
+        activeAppendShardStateByKey.set(newLogicalKey, newShardState);
+        recordsById.set(1, {
+            id: 1,
+            dictionary: 'JMdict staging',
+            expression: '暗記',
+            reading: 'あんき',
+            expressionReverse: null,
+            readingReverse: null,
+            entryContentOffset: 0,
+            entryContentLength: 4,
+            entryContentDictName: 'raw',
+            score: 0,
+            sequence: null,
+        });
+
+        await expect(store.replaceDictionaryName('JMdict staging', 'JMdict [2026-02-26]')).rejects.toThrow(/Target shard file already exists/);
+
+        expect(recordsById.get(1)?.dictionary).toBe('JMdict staging');
+        expect(Array.from(fileBytesByName.get(oldFileName) ?? [])).toStrictEqual([1, 2, 3, 4]);
+        expect(Array.from(fileBytesByName.get(newFileName) ?? [])).toStrictEqual([5, 6, 7, 8]);
+        expect(shardStateByFileName.has(oldFileName)).toBe(true);
+        expect(shardStateByFileName.has(newFileName)).toBe(true);
+    });
 });

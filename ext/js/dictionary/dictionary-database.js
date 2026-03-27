@@ -52,6 +52,7 @@ import {TermContentOpfsStore} from './term-content-opfs-store.js';
 import {TermRecordOpfsStore} from './term-record-opfs-store.js';
 
 const CURRENT_DICTIONARY_SCHEMA_VERSION = 4;
+const TRANSIENT_UPDATE_TITLE_PATTERN = /\[(?:update-staging|cutover|replaced) [^\]]+\]/;
 const TERM_ENTRY_CONTENT_CACHE_MAX_ENTRIES = 4096;
 const DEFAULT_STATEMENT_CACHE_MAX_ENTRIES = 256;
 const LOW_MEMORY_STATEMENT_CACHE_MAX_ENTRIES = 128;
@@ -2152,6 +2153,10 @@ export class DictionaryDatabase {
             ) ?
                 /** @type {unknown} */ (Reflect.get(summary, 'importSuccess')) :
                 void 0;
+            if (title.length > 0 && TRANSIENT_UPDATE_TITLE_PATTERN.test(title)) {
+                dictionaryTitlesToDelete.add(title);
+                continue;
+            }
             if (summary !== null && importSuccess !== false) {
                 continue;
             }

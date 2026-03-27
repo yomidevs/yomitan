@@ -1452,6 +1452,14 @@ describe('Database', () => {
                     $summaryJson: JSON.stringify({title: 'Broken Flag', revision: '1', version: 3, importSuccess: false}),
                 },
             });
+            db.exec({
+                sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
+                bind: {
+                    $title: 'Healthy [cutover abc123]',
+                    $version: 3,
+                    $summaryJson: JSON.stringify({title: 'Healthy [cutover abc123]', revision: '1', version: 3, importSuccess: true}),
+                },
+            });
 
             const originalDeleteDictionary = dictionaryDatabase.deleteDictionary.bind(dictionaryDatabase);
             const deleteDictionarySpy = vi.spyOn(dictionaryDatabase, 'deleteDictionary').mockImplementation(async (title, deleteStepSize, onProgress) => {
@@ -1468,9 +1476,9 @@ describe('Database', () => {
                 }
                 const summary = await Promise.resolve(cleanupMethod.call(dictionaryDatabase));
                 expect.soft(summary).toStrictEqual({
-                    scannedCount: 4,
-                    removedCount: 2,
-                    removedTitles: ['Broken Parse'],
+                    scannedCount: 5,
+                    removedCount: 3,
+                    removedTitles: ['Broken Parse', 'Healthy [cutover abc123]'],
                     removedEmptyTitleRows: 1,
                     failedCount: 1,
                     failedTitles: ['Broken Flag'],
