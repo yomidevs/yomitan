@@ -205,4 +205,39 @@ describe('TermRecordOpfsStore', () => {
         expect(shardStateByFileName.has(oldFileName)).toBe(true);
         expect(shardStateByFileName.has(newFileName)).toBe(true);
     });
+
+    test('cleanupShardFilesByDictionaryPredicate removes transient shard files and state', async () => {
+        const store = new TermRecordOpfsStore();
+        const shardStateByFileName = Reflect.get(store, '_shardStateByFileName');
+        const activeAppendShardStateByKey = Reflect.get(store, '_activeAppendShardStateByKey');
+        const transientFileName = store._getShardSegmentFileName('JMdict [cutover abc123]', 'raw', 0);
+        const transientLogicalKey = store._getShardFileName('JMdict [cutover abc123]', 'raw');
+        const liveFileName = store._getShardSegmentFileName('JMdict', 'raw', 0);
+        const liveLogicalKey = store._getShardFileName('JMdict', 'raw');
+        const fileBytesByName = new Map([
+            [transientFileName, new Uint8Array([1, 2, 3])],
+            [liveFileName, new Uint8Array([4, 5, 6])],
+        ]);
+        const recordsDirectoryHandle = createFakeDirectoryHandle(fileBytesByName);
+        const transientFileHandle = await recordsDirectoryHandle.getFileHandle(transientFileName, {create: false});
+        const liveFileHandle = await recordsDirectoryHandle.getFileHandle(liveFileName, {create: false});
+        const transientState = store._createShardState(transientFileName, transientFileHandle, 3, 'raw', 0, transientLogicalKey);
+        const liveState = store._createShardState(liveFileName, liveFileHandle, 3, 'raw', 0, liveLogicalKey);
+
+        Reflect.set(store, '_recordsDirectoryHandle', recordsDirectoryHandle);
+        shardStateByFileName.set(transientFileName, transientState);
+        shardStateByFileName.set(liveFileName, liveState);
+        activeAppendShardStateByKey.set(transientLogicalKey, transientState);
+        activeAppendShardStateByKey.set(liveLogicalKey, liveState);
+
+        const removed = await store.cleanupShardFilesByDictionaryPredicate((dictionaryName) => /\[cutover /.test(dictionaryName));
+
+        expect(removed).toStrictEqual([transientFileName]);
+        expect(fileBytesByName.has(transientFileName)).toBe(false);
+        expect(fileBytesByName.has(liveFileName)).toBe(true);
+        expect(shardStateByFileName.has(transientFileName)).toBe(false);
+        expect(shardStateByFileName.has(liveFileName)).toBe(true);
+        expect(activeAppendShardStateByKey.has(transientLogicalKey)).toBe(false);
+        expect(activeAppendShardStateByKey.has(liveLogicalKey)).toBe(true);
+    });
 });

@@ -183,8 +183,12 @@ export class DictionaryWorkerHandler {
                 null;
             const cleanupTransientReplacementTitles = async (activeDictionaryDatabase) => {
                 const transientTitleCandidates = new Set();
+                const transientReplacementPrefixes = [];
                 if (dictionaryTitleOverride !== null) {
                     transientTitleCandidates.add(dictionaryTitleOverride);
+                }
+                if (replacementDictionaryTitle !== null) {
+                    transientReplacementPrefixes.push(`${replacementDictionaryTitle} [`);
                 }
                 const dictionaryInfos = await activeDictionaryDatabase.getDictionaryInfo();
                 for (const dictionaryInfo of dictionaryInfos) {
@@ -216,6 +220,19 @@ export class DictionaryWorkerHandler {
                         // NOP - best effort cleanup before retry.
                     }
                 }
+                await activeDictionaryDatabase.cleanupTransientTermRecordShards((dictionaryName) => {
+                    const title = String(dictionaryName || '').trim();
+                    if (title.length === 0) {
+                        return false;
+                    }
+                    if (transientTitleCandidates.has(title)) {
+                        return true;
+                    }
+                    if (/\[(?:update-staging|cutover|replaced) [^\]]+\]/.test(title)) {
+                        return transientReplacementPrefixes.some((prefix) => title.startsWith(prefix));
+                    }
+                    return false;
+                });
             };
             const importOnce = async (activeDictionaryDatabase) => {
                 const importPayload = await dictionaryImporter.importDictionary(activeDictionaryDatabase, archiveContent, details);

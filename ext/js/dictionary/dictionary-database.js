@@ -2053,6 +2053,14 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {(dictionaryName: string) => boolean} predicate
+     * @returns {Promise<string[]>}
+     */
+    async cleanupTransientTermRecordShards(predicate) {
+        return await this._termRecordStore.cleanupShardFilesByDictionaryPredicate(predicate);
+    }
+
+    /**
      * @returns {Promise<Array<{
      *   id: number,
      *   titleColumn: string,

@@ -316,27 +316,7 @@ export class TermRecordOpfsStore {
         if (typeof chromeRuntime?.runtime === 'object' && chromeRuntime.runtime !== null) {
             return true;
         }
-        const navigatorValue = /** @type {Navigator|undefined} */ (Reflect.get(globalThis, 'navigator'));
-        if (typeof navigatorValue === 'undefined') {
-            return false;
-        }
-        const userAgentData = /** @type {{brands?: Array<{brand?: string}>}|undefined} */ (/** @type {unknown} */ (navigatorValue.userAgentData));
-        if (Array.isArray(userAgentData?.brands)) {
-            const brands = userAgentData.brands
-                .map((entry) => String(entry?.brand || '').toLowerCase())
-                .filter((value) => value.length > 0);
-            if (brands.some((brand) => brand.includes('chrom') || brand.includes('edge') || brand.includes('edg'))) {
-                return true;
-            }
-            if (brands.some((brand) => brand.includes('firefox'))) {
-                return false;
-            }
-        }
-        const userAgent = String(navigatorValue.userAgent || '').toLowerCase();
-        if (userAgent.includes('firefox')) {
-            return false;
-        }
-        return userAgent.includes('chrome') || userAgent.includes('chromium') || userAgent.includes('edg/');
+        return false;
     }
 
     /**
@@ -1261,6 +1241,38 @@ export class TermRecordOpfsStore {
         }
 
         return renamedCount;
+    }
+
+    /**
+     * @param {(dictionaryName: string) => boolean} predicate
+     * @returns {Promise<string[]>}
+     */
+    async cleanupShardFilesByDictionaryPredicate(predicate) {
+        if (this._recordsDirectoryHandle === null) {
+            return [];
+        }
+        const removedFileNames = [];
+        const fileNames = await this._listShardFileNames();
+        for (const fileName of fileNames) {
+            const dictionaryName = this._decodeDictionaryNameFromShardFileName(fileName);
+            if (!predicate(dictionaryName)) {
+                continue;
+            }
+            const state = this._shardStateByFileName.get(fileName);
+            if (typeof state !== 'undefined') {
+                await this._flushPendingWritesForShard(state);
+                await this._closeShardWritable(state);
+                this._shardStateByFileName.delete(fileName);
+                this._activeAppendShardStateByKey.delete(state.logicalKey);
+            }
+            try {
+                await this._recordsDirectoryHandle.removeEntry(fileName);
+                removedFileNames.push(fileName);
+            } catch (_) {
+                // NOP
+            }
+        }
+        return removedFileNames;
     }
 
     /**
