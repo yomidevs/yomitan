@@ -3711,7 +3711,19 @@ async function main() {
             let restartPersistenceError = '';
             let restartPersistenceResult = null;
             try {
-                await evalSendMessage(page, 'configureRestartProfileMatrix');
+                const configureRestartProfileStart = safePerformance.now();
+                const configureRestartProfileResult = await evalSendMessage(page, 'configureRestartProfileMatrix');
+                const configureRestartProfileEnd = safePerformance.now();
+                await addReportPhase(
+                    report,
+                    page,
+                    'Configure restart profile matrix',
+                    `Prepared richer multi-profile enabled/disabled dictionary state before restart verification: ${JSON.stringify(configureRestartProfileResult)}`,
+                    configureRestartProfileStart,
+                    configureRestartProfileEnd,
+                    null,
+                    processSampler,
+                );
                 const expectedPostRestartTitles = focusedUpdateOnlyMode ? [updatedJmdictTitle] : ['Jitendex', updatedJmdictTitle];
                 restartPersistenceResult = await relaunchAndVerifyPersistence({
                     expectedInstalledTitles: expectedPostRestartTitles,

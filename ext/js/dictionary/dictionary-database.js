@@ -1026,8 +1026,15 @@ export class DictionaryDatabase {
         const fromTitle = `${fromDictionaryTitle}`.trim();
         const toTitle = `${toDictionaryTitle}`.trim();
         const replacedTitle = typeof replacedDictionaryTitle === 'string' ? replacedDictionaryTitle.trim() : null;
+        const explicitTransientSessionToken = (
+            summaryOverride &&
+            typeof summaryOverride === 'object' &&
+            !Array.isArray(summaryOverride) &&
+            typeof Reflect.get(summaryOverride, 'updateSessionToken') === 'string' &&
+            Reflect.get(summaryOverride, 'updateSessionToken').trim().length > 0
+        ) ? Reflect.get(summaryOverride, 'updateSessionToken').trim() : null;
         const matchTransientToken = fromTitle.match(/\[(?:update-staging|cutover|replaced) ([^\]]+)\]$/);
-        const transientSessionToken = matchTransientToken ? matchTransientToken[1] : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+        const transientSessionToken = explicitTransientSessionToken ?? (matchTransientToken ? matchTransientToken[1] : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`);
         if (fromTitle.length === 0 || toTitle.length === 0) {
             throw new Error('Dictionary titles must be non-empty');
         }
@@ -1059,6 +1066,7 @@ export class DictionaryDatabase {
             fromTitle,
             toTitle,
             replacedTitle,
+            transientSessionToken,
             beforeDeleteRows: snapshotRows(),
         };
 
@@ -1252,8 +1260,17 @@ export class DictionaryDatabase {
             }
             try {
                 await forceCleanupTransientDictionaryTitle(temporaryReplacedTitle);
-            } catch (_) {
-                // Best-effort cleanup. The new live dictionary is already in place.
+            } catch (e) {
+                const cleanupMessage = e instanceof Error ? e.message : String(e);
+                this._lastReplaceDictionaryTitleDebug = {
+                    ...(this._lastReplaceDictionaryTitleDebug ?? {}),
+                    postCutoverCleanupWarning: {
+                        title: temporaryReplacedTitle,
+                        message: cleanupMessage,
+                        rows: snapshotRows(),
+                    },
+                };
+                log.warn(new Error(`Post-cutover transient cleanup failed for ${temporaryReplacedTitle}: ${cleanupMessage}`));
             }
             this._lastReplaceDictionaryTitleDebug = {
                 ...(this._lastReplaceDictionaryTitleDebug ?? {}),

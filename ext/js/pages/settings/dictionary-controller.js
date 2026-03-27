@@ -1404,6 +1404,7 @@ export class DictionaryController {
             importDetailsOverrides: {
                 dictionaryTitleOverride: stagedDictionaryTitle,
                 replacementDictionaryTitle: dictionaryTitle,
+                updateSessionToken: importToken,
                 useImportSession: false,
                 finalizeImportSession: false,
             },

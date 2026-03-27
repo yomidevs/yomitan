@@ -1822,7 +1822,14 @@ export class DictionaryImportController {
             result.title !== sourceDictionaryTitle
         ) {
             const replacementStartTime = safePerformance.now();
-            const replacementSummary = {...result, title: sourceDictionaryTitle};
+            const replacementSummary = {
+                ...result,
+                title: sourceDictionaryTitle,
+                updateSessionToken: (
+                    typeof importDetails.updateSessionToken === 'string' &&
+                    importDetails.updateSessionToken.trim().length > 0
+                ) ? importDetails.updateSessionToken.trim() : null,
+            };
             await this._settingsController.application.api.replaceDictionaryTitle({
                 fromDictionaryTitle: result.title,
                 toDictionaryTitle: sourceDictionaryTitle,
