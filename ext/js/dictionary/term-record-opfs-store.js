@@ -1078,6 +1078,88 @@ export class TermRecordOpfsStore {
     }
 
     /**
+     * @param {string} fromDictionaryName
+     * @param {string} toDictionaryName
+     * @returns {Promise<number>}
+     */
+    async replaceDictionaryName(fromDictionaryName, toDictionaryName) {
+        const fromName = `${fromDictionaryName}`.trim();
+        const toName = `${toDictionaryName}`.trim();
+        if (fromName.length === 0 || toName.length === 0 || fromName === toName) {
+            return 0;
+        }
+
+        this._ensurePendingArtifactReloadPlansApplied();
+        await this._flushPendingWrites();
+        await this._awaitQueuedWrites();
+        await this._closeAllWritables();
+
+        let renamedCount = 0;
+        for (const id of this._recordsById.keys()) {
+            const record = this._recordsById.get(id);
+            if (typeof record === 'undefined' || record.dictionary !== fromName) { continue; }
+            record.dictionary = toName;
+            ++renamedCount;
+        }
+        if (renamedCount === 0) {
+            return 0;
+        }
+
+        this._indexByDictionary.delete(fromName);
+        this._indexByDictionary.delete(toName);
+        this._indexDirty = false;
+
+        if (this._recordsDirectoryHandle === null) {
+            return renamedCount;
+        }
+
+        await this._deleteShardByDictionary(toName);
+        const sourceStates = [...this._shardStateByFileName.values()]
+            .filter((state) => this._decodeDictionaryNameFromShardFileName(state.fileName) === fromName)
+            .sort((a, b) => a.fileName.localeCompare(b.fileName));
+        for (const state of sourceStates) {
+            let file;
+            try {
+                file = await state.fileHandle.getFile();
+            } catch (_) {
+                continue;
+            }
+            const shardInfo = this._decodeShardInfoFromShardFileName(state.fileName);
+            if (shardInfo === null) { continue; }
+            const nextFileName = this._getShardSegmentFileName(toName, shardInfo.contentDictName, shardInfo.segmentIndex);
+            const nextFileHandle = await this._recordsDirectoryHandle.getFileHandle(nextFileName, {create: true});
+            const writable = await nextFileHandle.createWritable();
+            try {
+                await writable.truncate(0);
+                if (file.size > 0) {
+                    await writable.write(await file.arrayBuffer());
+                }
+            } finally {
+                await writable.close();
+            }
+            try {
+                await this._recordsDirectoryHandle.removeEntry(state.fileName);
+            } catch (_) {
+                // NOP
+            }
+            this._shardStateByFileName.delete(state.fileName);
+            this._activeAppendShardStateByKey.delete(state.logicalKey);
+            const nextState = this._createShardState(
+                nextFileName,
+                nextFileHandle,
+                file.size,
+                shardInfo.contentDictName,
+                shardInfo.segmentIndex,
+                this._getShardFileName(toName, shardInfo.contentDictName),
+            );
+            this._shardStateByFileName.set(nextFileName, nextState);
+            this._setActiveAppendShardState(nextState);
+        }
+
+        return renamedCount;
+    }
+
+    /**
      * @param {Iterable<number>} ids
      * @returns {Map<number, TermRecord>}
      */

@@ -163,7 +163,7 @@ function isOpfsUnavailableMessage(message) {
 
 /**
  * @param {string} message
- * @returns {'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'}
+ * @returns {'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'readonly-race'|'unknown'}
  */
 function classifyImportOpenFailure(message) {
     const text = message.toLowerCase();
@@ -194,6 +194,13 @@ function classifyImportOpenFailure(message) {
         text.includes('unable to open database file')
     ) {
         return 'transient-open-race';
+    }
+    if (
+        text.includes('sqlite_readonly') ||
+        text.includes('readonly database') ||
+        text.includes('attempt to write a readonly database')
+    ) {
+        return 'readonly-race';
     }
     return 'unknown';
 }
@@ -1646,11 +1653,35 @@ export class DictionaryImportController {
         /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}} */
         let importResult;
         const maxImportAttempts = 6;
+        const cleanupStagedDictionaryBeforeRetry = async () => {
+            const stagedDictionaryTitle = (
+                typeof importDetails.dictionaryTitleOverride === 'string' &&
+                importDetails.dictionaryTitleOverride.trim().length > 0
+            ) ?
+                importDetails.dictionaryTitleOverride.trim() :
+                null;
+            if (stagedDictionaryTitle === null) { return; }
+            try {
+                await this._settingsController.application.api.deleteDictionaryByTitle(stagedDictionaryTitle);
+            } catch (_) {
+                // NOP - best effort cleanup before retry.
+            }
+        };
         for (let attempt = 1; ; ++attempt) {
             try {
+                const useImportSessionAttempt = (
+                    typeof importDetails.useImportSession === 'boolean' ?
+                        importDetails.useImportSession :
+                        useImportSession
+                );
+                const finalizeImportSessionAttempt = (
+                    typeof importDetails.finalizeImportSession === 'boolean' ?
+                        importDetails.finalizeImportSession :
+                        finalizeImportSession
+                );
                 const detailsAttempt = {
                     ...importDetails,
-                    ...(useImportSession ? {useImportSession: true, finalizeImportSession} : {}),
+                    ...(useImportSessionAttempt ? {useImportSession: true, finalizeImportSession: finalizeImportSessionAttempt} : {}),
                 };
                 const archiveContentAttempt = (attempt === 1 ? archiveContent : file);
                 const offscreenImportResult = (
@@ -1669,11 +1700,16 @@ export class DictionaryImportController {
             } catch (error) {
                 const message = (error instanceof Error) ? error.message : String(error);
                 const failureClass = classifyImportOpenFailure(message);
-                const isRetryableThrown = (failureClass === 'lock-contention' || failureClass === 'transient-open-race');
+                const isRetryableThrown = (
+                    failureClass === 'lock-contention' ||
+                    failureClass === 'transient-open-race' ||
+                    failureClass === 'readonly-race'
+                );
                 if (!isRetryableThrown || attempt >= maxImportAttempts) {
                     throw error;
                 }
                 log.log(`[ImportTiming] [${dictionaryTitle}] retrying import after transient open failure (${failureClass}) attempt ${attempt}`);
+                await cleanupStagedDictionaryBeforeRetry();
                 await new Promise((resolve) => {
                     setTimeout(resolve, getImportRetryDelayMs(attempt));
                 });
@@ -1682,12 +1718,17 @@ export class DictionaryImportController {
             const retryableImportError = Array.isArray(importResult.errors) && importResult.errors.some((error) => {
                 const message = (error instanceof Error) ? error.message : String(error);
                 const failureClass = classifyImportOpenFailure(message);
-                return (failureClass === 'lock-contention' || failureClass === 'transient-open-race');
+                return (
+                    failureClass === 'lock-contention' ||
+                    failureClass === 'transient-open-race' ||
+                    failureClass === 'readonly-race'
+                );
             });
             if (!retryableImportError || attempt >= maxImportAttempts) {
                 break;
             }
             log.log(`[ImportTiming] [${dictionaryTitle}] retrying import after transient open failure in importer result (attempt ${attempt})`);
+            await cleanupStagedDictionaryBeforeRetry();
             await new Promise((resolve) => {
                 setTimeout(resolve, getImportRetryDelayMs(attempt));
             });

@@ -1096,7 +1096,7 @@ export class DictionaryDatabase {
                 $version: this._asNumber(Reflect.get(nextSummary, 'version'), 0),
                 $summaryJson: JSON.stringify(nextSummary),
             }});
-            for (const table of ['terms', 'termMeta', 'kanji', 'kanjiMeta', 'tagMeta', 'media', 'sharedGlossaryArtifacts']) {
+            for (const table of ['termMeta', 'kanji', 'kanjiMeta', 'tagMeta', 'media', 'sharedGlossaryArtifacts']) {
                 db.exec({sql: `UPDATE ${table} SET dictionary = $toTitle WHERE dictionary = $fromTitle`, bind: {$fromTitle: fromTitle, $toTitle: toTitle}});
             }
             db.exec('COMMIT');
@@ -1109,13 +1109,7 @@ export class DictionaryDatabase {
             afterRenameRows: snapshotRows(),
         };
 
-        await this._termRecordStore.deleteByDictionary(fromTitle);
-        await this._termRecordStore.beginImportSession();
-        try {
-            await this._appendTermRecordsFromTermsTableByDictionary(toTitle);
-        } finally {
-            await this._termRecordStore.endImportSession();
-        }
+        await this._termRecordStore.replaceDictionaryName(fromTitle, toTitle);
         this._lastReplaceDictionaryTitleDebug = {
             ...(this._lastReplaceDictionaryTitleDebug ?? {}),
             afterTermRecordRebuildRows: snapshotRows(),
