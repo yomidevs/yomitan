@@ -128,6 +128,8 @@ const maxReportLogLinesRaw = Number.parseInt(process.env.MANABITAN_CHROMIUM_E2E_
 const maxReportLogLines = Number.isFinite(maxReportLogLinesRaw) && maxReportLogLinesRaw > 0 ? maxReportLogLinesRaw : 1000;
 const quickImportBenchmarkMode = parseBooleanEnv(process.env.MANABITAN_E2E_IMPORT_BENCH_QUICK, false);
 const stopAfterIsolatedProbes = parseBooleanEnv(process.env.MANABITAN_E2E_STOP_AFTER_ISOLATED_PROBES, false);
+const stopAfterUpdate = parseBooleanEnv(process.env.MANABITAN_E2E_STOP_AFTER_UPDATE, false);
+const verifyRestartPersistence = parseBooleanEnv(process.env.MANABITAN_E2E_VERIFY_RESTART_PERSISTENCE, true);
 const concurrentDbOpenPressureEnabled = (
     !quickImportBenchmarkMode &&
     parseBooleanEnv(process.env.MANABITAN_E2E_DB_OPEN_PRESSURE, true)
@@ -2412,6 +2414,7 @@ async function main() {
     let processSampler = null;
     let extensionDir = null;
     let userDataDir = null;
+    let page = null;
 
     try {
         if (browserFlavor === 'edge') {
@@ -2444,6 +2447,8 @@ async function main() {
         const runHeadless = (process.env.MANABITAN_CHROMIUM_HEADLESS ?? '1').trim() === '1';
         const hideWindow = (process.env.MANABITAN_CHROMIUM_HIDE_WINDOW ?? (process.platform === 'darwin' ? '1' : '0')).trim() === '1';
         const allowHeadedFallback = (process.env.MANABITAN_CHROMIUM_ALLOW_HEADED_FALLBACK ?? '1').trim() === '1';
+        let currentHeadless = runHeadless;
+        let currentHideWindow = hideWindow;
         /**
          * @param {boolean} headless
          * @param {boolean} hideWindowForHeaded
@@ -2470,6 +2475,54 @@ async function main() {
                 ...launchOptions,
             });
         };
+        /**
+         * @param {import('@playwright/test').Page} targetPage
+         * @returns {void}
+         */
+        const attachPageLogging = (targetPage) => {
+            targetPage.on('console', (message) => {
+                const text = message.text();
+                appendLog(report, `console:${message.type()}`, text);
+            });
+            targetPage.on('pageerror', (error) => {
+                appendLog(report, 'pageerror', errorMessage(error));
+            });
+        };
+        /**
+         * @param {import('@playwright/test').Page} targetPage
+         * @returns {Promise<import('@playwright/test').CDPSession|null>}
+         */
+        const createCdpSessionForPage = async (targetPage) => {
+            try {
+                const nextCdpSession = await context.newCDPSession(targetPage);
+                await nextCdpSession.send('Profiler.enable');
+                await nextCdpSession.send('Performance.enable');
+                return nextCdpSession;
+            } catch (_) {
+                return null;
+            }
+        };
+        /**
+         * @returns {Promise<string>}
+         */
+        const relaunchPersistentContext = async () => {
+            if (context !== null) {
+                try { await context.close(); } catch (_) {}
+            }
+            if (processSampler !== null) {
+                await processSampler.stop();
+            }
+            context = await launchContext(currentHeadless, currentHideWindow);
+            const relaunchedExtensionId = await discoverExtensionId(context, userDataDir, extensionDir);
+            page = context.pages()[0] ?? await context.newPage();
+            attachPageLogging(page);
+            const browserProcess = context.browser()?.process?.();
+            const browserPidFromPlaywright = (browserProcess && typeof browserProcess.pid === 'number') ? browserProcess.pid : null;
+            const browserPid = browserPidFromPlaywright ?? await findChromiumPidByProfileDir(userDataDir);
+            processSampler = startProcessSampler(browserPid);
+            cdpSession = await createCdpSessionForPage(page);
+            return `chrome-extension://${relaunchedExtensionId}`;
+        };
         let extensionId = '';
         let launchModeLabel = runHeadless ? 'headless' : (hideWindow ? 'headed-hidden' : 'headed-visible');
         try {
@@ -2486,32 +2539,22 @@ async function main() {
             }
             context = await launchContext(false, true);
             extensionId = await discoverExtensionId(context, userDataDir, extensionDir);
+            currentHeadless = false;
+            currentHideWindow = true;
             launchModeLabel = 'headed-hidden-fallback';
         }
         report.launchMode = launchModeLabel;
         appendLog(report, 'info', `${browserFlavor} launch mode: ${launchModeLabel}`);
         const extensionBaseUrl = `chrome-extension://${extensionId}`;
-        const page = context.pages()[0] ?? await context.newPage();
+        page = context.pages()[0] ?? await context.newPage();
         /** @type {import('@playwright/test').Page|null} */
         let concurrentSearchPage = null;
-        page.on('console', (message) => {
-            const text = message.text();
-            appendLog(report, `console:${message.type()}`, text);
-        });
-        page.on('pageerror', (error) => {
-            appendLog(report, 'pageerror', errorMessage(error));
-        });
+        attachPageLogging(page);
         const browserProcess = context.browser()?.process?.();
         const browserPidFromPlaywright = (browserProcess && typeof browserProcess.pid === 'number') ? browserProcess.pid : null;
         const browserPid = browserPidFromPlaywright ?? await findChromiumPidByProfileDir(userDataDir);
         processSampler = startProcessSampler(browserPid);
-        try {
-            cdpSession = await context.newCDPSession(page);
-            await cdpSession.send('Profiler.enable');
-            await cdpSession.send('Performance.enable');
-        } catch (_) {
-            cdpSession = null;
-        }
+        cdpSession = await createCdpSessionForPage(page);
 
         const settingsOpenStart = safePerformance.now();
         await page.goto(`${extensionBaseUrl}/settings.html?popup-preview=false`);
@@ -2917,99 +2960,101 @@ async function main() {
             fail(`Expected baseline JMdict lookup backend before Jitendex import; saw ${JSON.stringify(baselineConcurrentLookup)}`);
         }
 
-        const jitendexImportTriggerStart = safePerformance.now();
-        const jitendexImportTriggerProfile = await runPhaseProfile(cdpSession, async () => {
-            await page.setInputFiles('#dictionary-import-file-input', [cachedDictionaries.jitendexPath]);
-        });
-        const jitendexImportTriggerEnd = safePerformance.now();
-        await addReportPhase(
-            report,
-            page,
-            'Import Jitendex via file input',
-            `Triggered Jitendex import using cached archive ${cachedDictionaries.jitendexPath}`,
-            jitendexImportTriggerStart,
-            jitendexImportTriggerEnd,
-            jitendexImportTriggerProfile,
-            processSampler,
-        );
-        let concurrentDbPressurePromise = null;
-        let concurrentDbPressureStart = 0;
-        if (concurrentDbOpenPressureEnabled) {
-            concurrentDbPressureStart = safePerformance.now();
-            concurrentDbPressurePromise = runPhaseProfile(cdpSession, async () => {
-                return await evalSendMessage(page, 'concurrentDbPressure', {
-                    durationMs: 15000,
-                    batchDelayMs: 35,
-                    parallelism: 6,
-                });
+        if (!stopAfterUpdate) {
+            const jitendexImportTriggerStart = safePerformance.now();
+            const jitendexImportTriggerProfile = await runPhaseProfile(cdpSession, async () => {
+                await page.setInputFiles('#dictionary-import-file-input', [cachedDictionaries.jitendexPath]);
             });
-        }
-        await page.waitForTimeout(700);
-        const searchDuringImportStart = safePerformance.now();
-        const searchDuringImportProfile = await runPhaseProfile(cdpSession, async () => {
-            return await searchTermAndGetDictionaryHitCounts(concurrentSearchPage, concurrentProbeTerm, ['JMdict'], 6000);
-        });
-        const searchDuringImportLookup = searchDuringImportProfile.result;
-        const searchDuringImportEnd = safePerformance.now();
-        await addReportPhase(
-            report,
-            concurrentSearchPage,
-            'Verify JMdict lookup backend during Jitendex import',
-            `While Jitendex import was in progress, dedicated search tab resolved backend diagnostics: ${JSON.stringify(searchDuringImportLookup)}`,
-            searchDuringImportStart,
-            searchDuringImportEnd,
-            searchDuringImportProfile,
-            processSampler,
-        );
-        if (Number(searchDuringImportLookup?.expectedCounts?.JMdict ?? 0) < 1) {
-            fail(`Expected JMdict lookup backend to remain available during Jitendex import; saw ${JSON.stringify(searchDuringImportLookup)}`);
-        }
-
-        const jitendexImportDebug = await recordImportProgress(
-            'Jitendex',
-            'Waited for progress clear for Jitendex import after the concurrent-search check',
-            async (onStepChange) => {
-                await waitForImportCompletion(page, 'Jitendex', 300000, onStepChange);
-            },
-        );
-        if (!(jitendexImportDebug && jitendexImportDebug.hasResult === true && typeof jitendexImportDebug.resultTitle === 'string' && jitendexImportDebug.resultTitle.includes('Jitendex'))) {
-            fail(`Jitendex import did not finish with expected debug payload: ${JSON.stringify(jitendexImportDebug)}`);
-        }
-        const verifyJitendexContentStart = safePerformance.now();
-        const verifyJitendexContentProfile = await runPhaseProfile(cdpSession, async () => {
-            return await waitForBackendDictionaryContentIntegrity(page, ['Jitendex'], jitendexLookupProbeCandidates, 15000);
-        });
-        const verifyJitendexContentEnd = safePerformance.now();
-        await addReportPhase(
-            report,
-            page,
-            'Verify Jitendex backend content integrity after import',
-            `Checked that imported Jitendex term-content spans are readable and in bounds before broader post-import verification: ${JSON.stringify(verifyJitendexContentProfile.result ?? null)}`,
-            verifyJitendexContentStart,
-            verifyJitendexContentEnd,
-            verifyJitendexContentProfile,
-            processSampler,
-        );
-        if (!(verifyJitendexContentProfile.result && verifyJitendexContentProfile.result.ok === true)) {
-            fail(`Jitendex backend content integrity failed after import. diagnostics=${JSON.stringify(verifyJitendexContentProfile.result ?? null)}`);
-        }
-        if (concurrentDbPressurePromise !== null) {
-            const concurrentDbPressureEnd = safePerformance.now();
-            const concurrentDbPressureProfile = await concurrentDbPressurePromise;
-            const concurrentDbPressureResult = concurrentDbPressureProfile.result;
+            const jitendexImportTriggerEnd = safePerformance.now();
             await addReportPhase(
                 report,
                 page,
-                'Concurrent DB-open pressure during JMdict import',
-                `Ran parallel termsFind/getDictionaryCounts/deleteDictionaryByTitle requests during JMdict import to classify DB contention: ${JSON.stringify(concurrentDbPressureResult)}`,
-                concurrentDbPressureStart,
-                concurrentDbPressureEnd,
-                concurrentDbPressureProfile,
+                'Import Jitendex via file input',
+                `Triggered Jitendex import using cached archive ${cachedDictionaries.jitendexPath}`,
+                jitendexImportTriggerStart,
+                jitendexImportTriggerEnd,
+                jitendexImportTriggerProfile,
                 processSampler,
             );
-            const sqliteCantopenCount = Number(concurrentDbPressureResult?.sqliteCantopenCount ?? 0);
-            if (Number.isFinite(sqliteCantopenCount) && sqliteCantopenCount > 0) {
-                fail(`Concurrent DB pressure observed SQLITE_CANTOPEN failures during import: ${JSON.stringify(concurrentDbPressureResult)}`);
+            let concurrentDbPressurePromise = null;
+            let concurrentDbPressureStart = 0;
+            if (concurrentDbOpenPressureEnabled) {
+                concurrentDbPressureStart = safePerformance.now();
+                concurrentDbPressurePromise = runPhaseProfile(cdpSession, async () => {
+                    return await evalSendMessage(page, 'concurrentDbPressure', {
+                        durationMs: 15000,
+                        batchDelayMs: 35,
+                        parallelism: 6,
+                    });
+                });
+            }
+            await page.waitForTimeout(700);
+            const searchDuringImportStart = safePerformance.now();
+            const searchDuringImportProfile = await runPhaseProfile(cdpSession, async () => {
+                return await searchTermAndGetDictionaryHitCounts(concurrentSearchPage, concurrentProbeTerm, ['JMdict'], 6000);
+            });
+            const searchDuringImportLookup = searchDuringImportProfile.result;
+            const searchDuringImportEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                concurrentSearchPage,
+                'Verify JMdict lookup backend during Jitendex import',
+                `While Jitendex import was in progress, dedicated search tab resolved backend diagnostics: ${JSON.stringify(searchDuringImportLookup)}`,
+                searchDuringImportStart,
+                searchDuringImportEnd,
+                searchDuringImportProfile,
+                processSampler,
+            );
+            if (Number(searchDuringImportLookup?.expectedCounts?.JMdict ?? 0) < 1) {
+                fail(`Expected JMdict lookup backend to remain available during Jitendex import; saw ${JSON.stringify(searchDuringImportLookup)}`);
+            }
+
+            const jitendexImportDebug = await recordImportProgress(
+                'Jitendex',
+                'Waited for progress clear for Jitendex import after the concurrent-search check',
+                async (onStepChange) => {
+                    await waitForImportCompletion(page, 'Jitendex', 300000, onStepChange);
+                },
+            );
+            if (!(jitendexImportDebug && jitendexImportDebug.hasResult === true && typeof jitendexImportDebug.resultTitle === 'string' && jitendexImportDebug.resultTitle.includes('Jitendex'))) {
+                fail(`Jitendex import did not finish with expected debug payload: ${JSON.stringify(jitendexImportDebug)}`);
+            }
+            const verifyJitendexContentStart = safePerformance.now();
+            const verifyJitendexContentProfile = await runPhaseProfile(cdpSession, async () => {
+                return await waitForBackendDictionaryContentIntegrity(page, ['Jitendex'], jitendexLookupProbeCandidates, 15000);
+            });
+            const verifyJitendexContentEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                page,
+                'Verify Jitendex backend content integrity after import',
+                `Checked that imported Jitendex term-content spans are readable and in bounds before broader post-import verification: ${JSON.stringify(verifyJitendexContentProfile.result ?? null)}`,
+                verifyJitendexContentStart,
+                verifyJitendexContentEnd,
+                verifyJitendexContentProfile,
+                processSampler,
+            );
+            if (!(verifyJitendexContentProfile.result && verifyJitendexContentProfile.result.ok === true)) {
+                fail(`Jitendex backend content integrity failed after import. diagnostics=${JSON.stringify(verifyJitendexContentProfile.result ?? null)}`);
+            }
+            if (concurrentDbPressurePromise !== null) {
+                const concurrentDbPressureEnd = safePerformance.now();
+                const concurrentDbPressureProfile = await concurrentDbPressurePromise;
+                const concurrentDbPressureResult = concurrentDbPressureProfile.result;
+                await addReportPhase(
+                    report,
+                    page,
+                    'Concurrent DB-open pressure during JMdict import',
+                    `Ran parallel termsFind/getDictionaryCounts/deleteDictionaryByTitle requests during JMdict import to classify DB contention: ${JSON.stringify(concurrentDbPressureResult)}`,
+                    concurrentDbPressureStart,
+                    concurrentDbPressureEnd,
+                    concurrentDbPressureProfile,
+                    processSampler,
+                );
+                const sqliteCantopenCount = Number(concurrentDbPressureResult?.sqliteCantopenCount ?? 0);
+                if (Number.isFinite(sqliteCantopenCount) && sqliteCantopenCount > 0) {
+                    fail(`Concurrent DB pressure observed SQLITE_CANTOPEN failures during import: ${JSON.stringify(concurrentDbPressureResult)}`);
+                }
             }
         }
 
@@ -3053,15 +3098,16 @@ async function main() {
             enableImportedDictionariesProfile,
             processSampler,
         );
+        const updatePhaseLookupDictionaries = stopAfterUpdate ? ['JMdict'] : expectedLookupDictionaries;
         const installedTitles = [
             ...(Array.isArray(enableImportedDictionariesProfile.result?.installedTitles) ? enableImportedDictionariesProfile.result.installedTitles : []),
             ...(Array.isArray(postImportDiagnostics?.installedTitles) ? postImportDiagnostics.installedTitles : []),
         ];
         const resolvedJmdictTitle = resolveInstalledDictionaryTitle(installedTitles, 'JMdict') ?? 'JMdict';
-        await setEnabledDictionaries(page, expectedLookupDictionaries);
+        await setEnabledDictionaries(page, updatePhaseLookupDictionaries);
         const overlapProbeStart = safePerformance.now();
         const overlapProbeProfile = await runPhaseProfile(cdpSession, async () => {
-            return await findOverlapLookupTerm(page, expectedLookupDictionaries, lookupProbeCandidates);
+            return await findOverlapLookupTerm(page, updatePhaseLookupDictionaries, lookupProbeCandidates);
         });
         const overlapProbeEnd = safePerformance.now();
         const hasOverlapLookupTerm = overlapProbeProfile.result && overlapProbeProfile.result.ok === true;
@@ -3071,7 +3117,7 @@ async function main() {
             page,
             'Discover overlap lookup term',
             hasOverlapLookupTerm ?
-                `Selected lookup term "${overlapLookupTerm}" that resolves to ${expectedLookupDictionaries.join(' + ')}. probes=${JSON.stringify(overlapProbeProfile.result?.probes ?? [])}` :
+                `Selected lookup term "${overlapLookupTerm}" that resolves to ${updatePhaseLookupDictionaries.join(' + ')}. probes=${JSON.stringify(overlapProbeProfile.result?.probes ?? [])}` :
                 `Could not find dual-dictionary overlap term; probing dictionaries in isolated mode. probes=${JSON.stringify(overlapProbeProfile.result?.probes ?? [])}`,
             overlapProbeStart,
             overlapProbeEnd,
@@ -3081,7 +3127,7 @@ async function main() {
         if (!hasOverlapLookupTerm) {
             /** @type {string[]} */
             const isolatedLookupUnavailable = [];
-            for (const dictionaryName of expectedLookupDictionaries) {
+            for (const dictionaryName of updatePhaseLookupDictionaries) {
                 const isolatedEnableStart = safePerformance.now();
                 const isolatedEnableProfile = await runPhaseProfile(cdpSession, async () => {
                     await setEnabledDictionaries(page, [dictionaryName]);
@@ -3105,7 +3151,7 @@ async function main() {
             }
             const restoreDictionariesStart = safePerformance.now();
             const restoreDictionariesProfile = await runPhaseProfile(cdpSession, async () => {
-                return await setEnabledDictionaries(page, expectedLookupDictionaries);
+                return await setEnabledDictionaries(page, updatePhaseLookupDictionaries);
             });
             const restoreDictionariesEnd = safePerformance.now();
             await addReportPhase(
@@ -3118,8 +3164,8 @@ async function main() {
                 restoreDictionariesProfile,
                 processSampler,
             );
-            if (isolatedLookupUnavailable.length >= expectedLookupDictionaries.length) {
-                fail(`Unable to find lookup terms for any isolated dictionary in ${expectedLookupDictionaries.join(' + ')}. unavailable=${JSON.stringify(isolatedLookupUnavailable)}`);
+            if (isolatedLookupUnavailable.length >= updatePhaseLookupDictionaries.length) {
+                fail(`Unable to find lookup terms for any isolated dictionary in ${updatePhaseLookupDictionaries.join(' + ')}. unavailable=${JSON.stringify(isolatedLookupUnavailable)}`);
             }
             if (isolatedLookupUnavailable.length > 0) {
                 report.logs.push(
@@ -3138,11 +3184,11 @@ async function main() {
 
         const backendReadyStart = safePerformance.now();
         const backendReadyProfile = await runPhaseProfile(cdpSession, async () => {
-            return await waitForBackendDictionaryReady(page, expectedLookupDictionaries, readinessTerm, 60000, hasOverlapLookupTerm);
+            return await waitForBackendDictionaryReady(page, updatePhaseLookupDictionaries, readinessTerm, 60000, hasOverlapLookupTerm);
         });
         const backendReadyEnd = safePerformance.now();
         if (!(backendReadyProfile.result && backendReadyProfile.result.ok === true)) {
-            fail(`Backend dictionary readiness did not stabilize for ${expectedLookupDictionaries.join(' + ')} within timeout using term "${readinessTerm}". diagnostics=${JSON.stringify(backendReadyProfile.result?.diagnostics ?? null)}`);
+            fail(`Backend dictionary readiness did not stabilize for ${updatePhaseLookupDictionaries.join(' + ')} within timeout using term "${readinessTerm}". diagnostics=${JSON.stringify(backendReadyProfile.result?.diagnostics ?? null)}`);
         }
         await addReportPhase(
             report,
@@ -3316,13 +3362,84 @@ async function main() {
             await openInstalledDictionariesModal(page);
         });
         const verifyListStart = safePerformance.now();
-        const installedTitlesResult = await waitForInstalledDictionaryTitles(page, 30000);
+        const expectedInstalledAfterUpdate = stopAfterUpdate ? [updatedJmdictTitle] : ['Jitendex', updatedJmdictTitle];
+        const installedTitlesResult = await waitForInstalledDictionarySet(page, expectedInstalledAfterUpdate, 30000);
         const installedTitlesText = installedTitlesResult.titles.join(', ');
         if (!installedTitlesResult.ok) {
             verificationErrors.push(`Installed dictionary list missing expected dictionaries: ${installedTitlesText}`);
         }
         const verifyListEnd = safePerformance.now();
-        await addReportPhase(report, page, 'Verify installed dictionaries list', `Expected Jitendex + JMdict in installed dictionaries modal. observed="${installedTitlesText}"`, verifyListStart, verifyListEnd, verifyListProfile, processSampler);
+        await addReportPhase(report, page, 'Verify installed dictionaries list', `Expected ${expectedInstalledAfterUpdate.join(' + ')} in installed dictionaries modal. observed="${installedTitlesText}"`, verifyListStart, verifyListEnd, verifyListProfile, processSampler);
+
+        if (verifyRestartPersistence) {
+            const restartPersistenceStart = safePerformance.now();
+            let restartPersistenceError = '';
+            let restartPersistenceResult = null;
+            try {
+                if (concurrentSearchPage !== null) {
+                    try { await concurrentSearchPage.close(); } catch (_) {}
+                    concurrentSearchPage = null;
+                }
+                const restartedExtensionBaseUrl = await relaunchPersistentContext();
+                const expectedPostRestartTitles = stopAfterUpdate ? [updatedJmdictTitle] : ['Jitendex', updatedJmdictTitle];
+                await page.goto(`${restartedExtensionBaseUrl}/settings.html?popup-preview=false`);
+                await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30000});
+                await openInstalledDictionariesModal(page);
+                const restartedInstalledTitles = await getInstalledDictionaryTitles(page);
+                const installSetResult = {
+                    ok: expectedPostRestartTitles.every((expectedTitle) => restartedInstalledTitles.some((title) => matchesDictionaryName(title, expectedTitle))),
+                    titles: restartedInstalledTitles,
+                };
+                if (!installSetResult.ok) {
+                    throw new Error(`Installed dictionary set did not persist across restart. titles=${JSON.stringify(restartedInstalledTitles)} expected=${JSON.stringify(expectedPostRestartTitles)}`);
+                }
+                await evalSendMessage(page, 'enableInstalledDictionaries');
+                const backendReadyAfterRestart = await waitForBackendDictionaryReady(page, expectedPostRestartTitles, readinessTerm, 60000, false);
+                if (!(backendReadyAfterRestart && backendReadyAfterRestart.ok === true)) {
+                    throw new Error(`Backend dictionary readiness did not persist across restart. diagnostics=${JSON.stringify(backendReadyAfterRestart?.diagnostics ?? null)}`);
+                }
+                await page.goto(`${restartedExtensionBaseUrl}/search.html`);
+                await page.waitForSelector('#search-textbox', {state: 'attached', timeout: 30000});
+                const searchAfterRestart = await searchTermAndGetDictionaryHitCounts(page, readinessTerm, updatePhaseLookupDictionaries, 20000);
+                const missingRestartLookupDictionaries = updatePhaseLookupDictionaries.filter((dictionaryName) => (
+                    Number(searchAfterRestart.expectedCounts?.[dictionaryName] ?? 0) < 1
+                ));
+                if (missingRestartLookupDictionaries.length > 0) {
+                    throw new Error(`Search after restart did not include both dictionaries. result=${JSON.stringify(searchAfterRestart)}`);
+                }
+                restartPersistenceResult = {
+                    installedTitles: restartedInstalledTitles,
+                    backendDiagnostics: backendReadyAfterRestart?.diagnostics ?? null,
+                    searchResult: searchAfterRestart,
+                };
+            } catch (e) {
+                restartPersistenceError = errorMessage(e);
+                verificationErrors.push(`Restart persistence verification failed: ${restartPersistenceError}`);
+            }
+            const restartPersistenceEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                page,
+                'Verify restart persistence after update',
+                restartPersistenceError.length > 0 ?
+                    `Restart persistence verification failed: ${restartPersistenceError}` :
+                    `Relaunched ${browserFlavor} with the same extension profile after update and verified installed dictionaries plus search/backend persistence: ${JSON.stringify(restartPersistenceResult)}`,
+                restartPersistenceStart,
+                restartPersistenceEnd,
+                null,
+                processSampler,
+            );
+        }
+
+        if (stopAfterUpdate) {
+            if (verificationErrors.length > 0) {
+                fail(`Verification failures (${verificationErrors.length}): ${verificationErrors.join(' | ')}`);
+            }
+            report.status = 'success';
+            appendLog(report, 'info', 'Stopped after update verification by MANABITAN_E2E_STOP_AFTER_UPDATE=1.');
+            console.log(`${e2eLogTag} PASS: Stopped after update verification by MANABITAN_E2E_STOP_AFTER_UPDATE=1.`);
+            return;
+        }
 
         const openSearchStart = safePerformance.now();
         let searchReady = false;
