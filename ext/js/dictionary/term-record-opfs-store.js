@@ -1251,13 +1251,17 @@ export class TermRecordOpfsStore {
         if (this._recordsDirectoryHandle === null) {
             return [];
         }
+        this._ensurePendingArtifactReloadPlansApplied();
         const removedFileNames = [];
+        /** @type {Set<string>} */
+        const removedDictionaryNames = new Set();
         const fileNames = await this._listShardFileNames();
         for (const fileName of fileNames) {
             const dictionaryName = this._decodeDictionaryNameFromShardFileName(fileName);
             if (!predicate(dictionaryName)) {
                 continue;
             }
+            removedDictionaryNames.add(dictionaryName);
             const state = this._shardStateByFileName.get(fileName);
             if (typeof state !== 'undefined') {
                 await this._flushPendingWritesForShard(state);
@@ -1271,6 +1275,17 @@ export class TermRecordOpfsStore {
             } catch (_) {
                 // NOP
             }
+        }
+        if (removedDictionaryNames.size > 0) {
+            for (const id of [...this._recordsById.keys()]) {
+                const record = this._recordsById.get(id);
+                if (typeof record === 'undefined' || !removedDictionaryNames.has(record.dictionary)) {
+                    continue;
+                }
+                this._recordsById.delete(id);
+            }
+            this._indexByDictionary.clear();
+            this._indexDirty = false;
         }
         return removedFileNames;
     }

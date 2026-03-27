@@ -1114,6 +1114,37 @@ export class DictionaryDatabase {
                 [`${debugKey}AfterTermRecordRows`]: snapshotRows(),
             };
         };
+        const forceCleanupTransientDictionaryTitle = async (dictionaryTitle) => {
+            const title = `${dictionaryTitle}`.trim();
+            if (title.length === 0) { return; }
+            try {
+                await this.deleteDictionary(title, 1000, () => {});
+                return;
+            } catch (_) {
+                // Fall through to direct transient cleanup.
+            }
+            const db = this._requireDb();
+            await this.cleanupTransientTermRecordShards((dictionaryName) => String(dictionaryName || '').trim() === title);
+            await this._beginImmediateTransaction(db);
+            try {
+                for (const [table, keyColumn] of [
+                    ['kanji', 'dictionary'],
+                    ['kanjiMeta', 'dictionary'],
+                    ['termMeta', 'dictionary'],
+                    ['tagMeta', 'dictionary'],
+                    ['media', 'dictionary'],
+                    ['sharedGlossaryArtifacts', 'dictionary'],
+                    ['dictionaries', 'title'],
+                ]) {
+                    db.exec({sql: `DELETE FROM ${table} WHERE ${keyColumn} = $value`, bind: {$value: title}});
+                }
+                db.exec('COMMIT');
+            } catch (e) {
+                try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+                throw e;
+            }
+            await this._cleanupTermContentAfterDictionaryDelete();
+        };
         const summaryRow = getSummaryRowByTitle(fromTitle);
         if (!(summaryRow && typeof summaryRow === 'object')) {
             throw new Error(`Dictionary title not found for replacement: ${fromTitle}`);
@@ -1181,7 +1212,7 @@ export class DictionaryDatabase {
                 throw e;
             }
             try {
-                await this.deleteDictionary(temporaryReplacedTitle, 1000, () => {});
+                await forceCleanupTransientDictionaryTitle(temporaryReplacedTitle);
             } catch (_) {
                 // Best-effort cleanup. The new live dictionary is already in place.
             }

@@ -208,6 +208,8 @@ describe('TermRecordOpfsStore', () => {
 
     test('cleanupShardFilesByDictionaryPredicate removes transient shard files and state', async () => {
         const store = new TermRecordOpfsStore();
+        const recordsById = Reflect.get(store, '_recordsById');
+        const indexByDictionary = Reflect.get(store, '_indexByDictionary');
         const shardStateByFileName = Reflect.get(store, '_shardStateByFileName');
         const activeAppendShardStateByKey = Reflect.get(store, '_activeAppendShardStateByKey');
         const transientFileName = store._getShardSegmentFileName('JMdict [cutover abc123]', 'raw', 0);
@@ -229,6 +231,34 @@ describe('TermRecordOpfsStore', () => {
         shardStateByFileName.set(liveFileName, liveState);
         activeAppendShardStateByKey.set(transientLogicalKey, transientState);
         activeAppendShardStateByKey.set(liveLogicalKey, liveState);
+        recordsById.set(1, {
+            id: 1,
+            dictionary: 'JMdict [cutover abc123]',
+            expression: '一',
+            reading: 'いち',
+            expressionReverse: null,
+            readingReverse: null,
+            entryContentOffset: 0,
+            entryContentLength: 3,
+            entryContentDictName: 'raw',
+            score: 0,
+            sequence: null,
+        });
+        recordsById.set(2, {
+            id: 2,
+            dictionary: 'JMdict',
+            expression: '二',
+            reading: 'に',
+            expressionReverse: null,
+            readingReverse: null,
+            entryContentOffset: 0,
+            entryContentLength: 3,
+            entryContentDictName: 'raw',
+            score: 0,
+            sequence: null,
+        });
+        indexByDictionary.set('JMdict [cutover abc123]', {expression: new Map(), reading: new Map(), expressionReverse: new Map(), readingReverse: new Map(), pair: new Map(), sequence: new Map()});
+        indexByDictionary.set('JMdict', {expression: new Map(), reading: new Map(), expressionReverse: new Map(), readingReverse: new Map(), pair: new Map(), sequence: new Map()});
 
         const removed = await store.cleanupShardFilesByDictionaryPredicate((dictionaryName) => /\[cutover /.test(dictionaryName));
 
@@ -239,5 +269,8 @@ describe('TermRecordOpfsStore', () => {
         expect(shardStateByFileName.has(liveFileName)).toBe(true);
         expect(activeAppendShardStateByKey.has(transientLogicalKey)).toBe(false);
         expect(activeAppendShardStateByKey.has(liveLogicalKey)).toBe(true);
+        expect(recordsById.get(1)).toBeUndefined();
+        expect(recordsById.get(2)?.dictionary).toBe('JMdict');
+        expect(indexByDictionary.size).toBe(0);
     });
 });

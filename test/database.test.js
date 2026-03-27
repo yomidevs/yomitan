@@ -1235,9 +1235,58 @@ describe('Database', () => {
                 const info = await dictionaryDatabase.getDictionaryInfo();
                 const titles = info.map(({title}) => title);
                 expect.soft(titles.some((title) => title === 'Live Dictionary')).toBe(true);
-                expect.soft(titles.some((title) => title.includes('[cutover '))).toBe(true);
+                expect.soft(titles.some((title) => title.includes('[cutover '))).toBe(false);
             } finally {
                 replaceDictionaryNameSpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
+        }, 15000);
+
+        test('Removes the temporary replaced dictionary when post-cutover delete fails', async ({expect}) => {
+            const liveDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1', 'Live Dictionary');
+            const stagedDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1', 'Live Dictionary');
+            const stagedDictionaryTitle = 'Live Dictionary [update-staging cleanup-test]';
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const dictionaryImporter = createDictionaryImporter(expect);
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                liveDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                stagedDictionarySource,
+                {
+                    prefixWildcardsSupported: true,
+                    yomitanVersion: '0.0.0.0',
+                    dictionaryTitleOverride: stagedDictionaryTitle,
+                },
+            );
+
+            const originalDeleteDictionary = dictionaryDatabase.deleteDictionary.bind(dictionaryDatabase);
+            const deleteDictionarySpy = vi.spyOn(dictionaryDatabase, 'deleteDictionary').mockImplementation(async (title, deleteStepSize, onProgress) => {
+                if (typeof title === 'string' && title.includes('[replaced ') && !title.includes('[retry-ok]')) {
+                    throw new Error('Injected replaced-title delete failure');
+                }
+                await originalDeleteDictionary(title, deleteStepSize, onProgress);
+            });
+
+            try {
+                await dictionaryDatabase.replaceDictionaryTitle(
+                    stagedDictionaryTitle,
+                    'Live Dictionary',
+                    {title: 'Live Dictionary', sourceTitle: 'Live Dictionary'},
+                    'Live Dictionary',
+                );
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                const titles = info.map(({title}) => title);
+                expect.soft(titles).toStrictEqual(['Live Dictionary']);
+                expect.soft(titles.some((title) => title.includes('[replaced '))).toBe(false);
+            } finally {
+                deleteDictionarySpy.mockRestore();
                 await dictionaryDatabase.close();
             }
         }, 15000);

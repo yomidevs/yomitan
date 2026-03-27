@@ -2561,6 +2561,8 @@ async function main() {
             searchChecks,
             ensureNoStagedTitles = false,
         }) => {
+            const preRestartDiagnostics = await evalSendMessage(page, 'backendDiagnostics', backendReadyTerm);
+            const sortFrequencyDictionaryBeforeRestart = String(preRestartDiagnostics?.profileSortFrequencyDictionary || '').trim();
             if (concurrentSearchPage !== null) {
                 try { await concurrentSearchPage.close(); } catch (_) {}
                 concurrentSearchPage = null;
@@ -2598,6 +2600,9 @@ async function main() {
                 throw new Error(`Main dictionary selection did not persist across restart. mainDictionary=${JSON.stringify(mainDictionaryAfterRestart)} expectedDictionaryNames=${JSON.stringify(backendReadyDictionaryNames)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
             }
             const sortFrequencyDictionaryAfterRestart = String(preVerificationDiagnostics?.profileSortFrequencyDictionary || '').trim();
+            if (sortFrequencyDictionaryBeforeRestart.length > 0 && sortFrequencyDictionaryAfterRestart.length === 0) {
+                throw new Error(`Sort frequency dictionary selection was cleared across restart. before=${JSON.stringify(sortFrequencyDictionaryBeforeRestart)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
+            }
             if (
                 sortFrequencyDictionaryAfterRestart.length > 0 &&
                 !backendReadyDictionaryNames.some((expectedTitle) => matchesDictionaryName(sortFrequencyDictionaryAfterRestart, expectedTitle))
