@@ -183,12 +183,9 @@ export class DictionaryWorkerHandler {
                 null;
             const cleanupTransientReplacementTitles = async (activeDictionaryDatabase) => {
                 const transientTitleCandidates = new Set();
-                const transientReplacementPrefixes = [];
-                if (dictionaryTitleOverride !== null) {
+                const transientTitlePattern = /\[(?:update-staging|cutover|replaced) [^\]]+\]/;
+                if (dictionaryTitleOverride !== null && transientTitlePattern.test(dictionaryTitleOverride)) {
                     transientTitleCandidates.add(dictionaryTitleOverride);
-                }
-                if (replacementDictionaryTitle !== null) {
-                    transientReplacementPrefixes.push(`${replacementDictionaryTitle} [`);
                 }
                 const dictionaryInfos = await activeDictionaryDatabase.getDictionaryInfo();
                 for (const dictionaryInfo of dictionaryInfos) {
@@ -198,19 +195,8 @@ export class DictionaryWorkerHandler {
                         typeof Reflect.get(dictionaryInfo, 'title') === 'string'
                     ) ? Reflect.get(dictionaryInfo, 'title').trim() : '';
                     if (title.length === 0) { continue; }
-                    if (/\[(?:update-staging|cutover|replaced) [^\]]+\]/.test(title)) {
-                        if (
-                            dictionaryTitleOverride !== null && title === dictionaryTitleOverride
-                        ) {
-                            transientTitleCandidates.add(title);
-                            continue;
-                        }
-                        if (
-                            replacementDictionaryTitle !== null &&
-                            title.startsWith(`${replacementDictionaryTitle} [`)
-                        ) {
-                            transientTitleCandidates.add(title);
-                        }
+                    if (transientTitlePattern.test(title)) {
+                        transientTitleCandidates.add(title);
                     }
                 }
                 for (const transientTitle of transientTitleCandidates) {
@@ -225,21 +211,10 @@ export class DictionaryWorkerHandler {
                     if (title.length === 0) {
                         return false;
                     }
-                    if (/\[(?:update-staging|cutover|replaced) [^\]]+\]/.test(title)) {
-                        if (dictionaryTitleOverride !== null && title.startsWith(`${dictionaryTitleOverride.split(' [')[0]} [`)) {
-                            return true;
-                        }
-                        if (replacementDictionaryTitle !== null && title.startsWith(`${replacementDictionaryTitle} [`)) {
-                            return true;
-                        }
-                    }
                     if (transientTitleCandidates.has(title)) {
                         return true;
                     }
-                    if (/\[(?:update-staging|cutover|replaced) [^\]]+\]/.test(title)) {
-                        return transientReplacementPrefixes.some((prefix) => title.startsWith(prefix));
-                    }
-                    return false;
+                    return transientTitlePattern.test(title);
                 });
             };
             const importOnce = async (activeDictionaryDatabase) => {

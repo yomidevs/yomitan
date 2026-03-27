@@ -1117,34 +1117,43 @@ export class DictionaryDatabase {
         const forceCleanupTransientDictionaryTitle = async (dictionaryTitle) => {
             const title = `${dictionaryTitle}`.trim();
             if (title.length === 0) { return; }
+            /** @type {unknown} */
+            let originalDeleteError = null;
             try {
                 await this.deleteDictionary(title, 1000, () => {});
                 return;
-            } catch (_) {
+            } catch (e) {
+                originalDeleteError = e;
                 // Fall through to direct transient cleanup.
             }
-            const db = this._requireDb();
-            await this._termRecordStore.deleteByDictionary(title);
-            await this.cleanupTransientTermRecordShards((dictionaryName) => String(dictionaryName || '').trim() === title);
-            await this._beginImmediateTransaction(db);
             try {
-                for (const [table, keyColumn] of [
-                    ['kanji', 'dictionary'],
-                    ['kanjiMeta', 'dictionary'],
-                    ['termMeta', 'dictionary'],
-                    ['tagMeta', 'dictionary'],
-                    ['media', 'dictionary'],
-                    ['sharedGlossaryArtifacts', 'dictionary'],
-                    ['dictionaries', 'title'],
-                ]) {
-                    db.exec({sql: `DELETE FROM ${table} WHERE ${keyColumn} = $value`, bind: {$value: title}});
+                const db = this._requireDb();
+                await this._termRecordStore.deleteByDictionary(title);
+                await this.cleanupTransientTermRecordShards((dictionaryName) => String(dictionaryName || '').trim() === title);
+                await this._beginImmediateTransaction(db);
+                try {
+                    for (const [table, keyColumn] of [
+                        ['kanji', 'dictionary'],
+                        ['kanjiMeta', 'dictionary'],
+                        ['termMeta', 'dictionary'],
+                        ['tagMeta', 'dictionary'],
+                        ['media', 'dictionary'],
+                        ['sharedGlossaryArtifacts', 'dictionary'],
+                        ['dictionaries', 'title'],
+                    ]) {
+                        db.exec({sql: `DELETE FROM ${table} WHERE ${keyColumn} = $value`, bind: {$value: title}});
+                    }
+                    db.exec('COMMIT');
+                } catch (e) {
+                    try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+                    throw e;
                 }
-                db.exec('COMMIT');
-            } catch (e) {
-                try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
-                throw e;
+                await this._cleanupTermContentAfterDictionaryDelete();
+            } catch (fallbackError) {
+                const originalMessage = originalDeleteError instanceof Error ? originalDeleteError.message : String(originalDeleteError);
+                const fallbackMessage = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
+                throw new Error(`Failed transient dictionary cleanup for ${title}. deleteDictionary error=${originalMessage}; fallback cleanup error=${fallbackMessage}`);
             }
-            await this._cleanupTermContentAfterDictionaryDelete();
         };
         const summaryRow = getSummaryRowByTitle(fromTitle);
         if (!(summaryRow && typeof summaryRow === 'object')) {

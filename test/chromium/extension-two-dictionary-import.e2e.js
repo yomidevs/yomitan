@@ -914,6 +914,7 @@ async function evalSendMessage(page, expression, arg = null) {
         if (expression === 'backendDiagnostics') {
             const term = String(arg || '打');
             const options0 = await send('optionsGet', {optionsContext: {index: 0}});
+            const optionsFull = await send('optionsGetFull', undefined);
             const dictionaryInfo = await send('getDictionaryInfo', undefined);
             const installedTitles = (Array.isArray(dictionaryInfo) ? dictionaryInfo : [])
                 .map((row) => String(row?.title || '').trim())
@@ -960,6 +961,11 @@ async function evalSendMessage(page, expression, arg = null) {
                 text: term,
                 dictionaryNames: enabledInstalledExactMatches,
             });
+            const profileSelectorState = (optionsFull?.profiles || []).map((profile) => ({
+                id: String(profile?.id || ''),
+                mainDictionary: String(profile?.options?.general?.mainDictionary || ''),
+                sortFrequencyDictionary: String(profile?.options?.general?.sortFrequencyDictionary || ''),
+            }));
             return {
                 dictionaryInfo,
                 installedTitles,
@@ -970,6 +976,7 @@ async function evalSendMessage(page, expression, arg = null) {
                 profileLanguage: String(options0?.general?.language || ''),
                 profileMainDictionary: String(options0?.general?.mainDictionary || ''),
                 profileSortFrequencyDictionary: String(options0?.general?.sortFrequencyDictionary || ''),
+                profileSelectorState,
                 profileResultOutputMode: String(options0?.general?.resultOutputMode || ''),
                 termResultCount: termLookupDefault.termResultCount,
                 termDictionaryNames: termLookupDefault.termDictionaryNames,
@@ -2564,6 +2571,7 @@ async function main() {
             const preRestartDiagnostics = await evalSendMessage(page, 'backendDiagnostics', backendReadyTerm);
             const mainDictionaryBeforeRestart = String(preRestartDiagnostics?.profileMainDictionary || '').trim();
             const sortFrequencyDictionaryBeforeRestart = String(preRestartDiagnostics?.profileSortFrequencyDictionary || '').trim();
+            const profileSelectorStateBeforeRestart = Array.isArray(preRestartDiagnostics?.profileSelectorState) ? preRestartDiagnostics.profileSelectorState : [];
             if (concurrentSearchPage !== null) {
                 try { await concurrentSearchPage.close(); } catch (_) {}
                 concurrentSearchPage = null;
@@ -2584,6 +2592,7 @@ async function main() {
                 throw new Error(`Transient update dictionaries remained after restart: ${JSON.stringify(transientTitles)}`);
             }
             const preVerificationDiagnostics = await evalSendMessage(page, 'backendDiagnostics', backendReadyTerm);
+            const profileSelectorStateAfterRestart = Array.isArray(preVerificationDiagnostics?.profileSelectorState) ? preVerificationDiagnostics.profileSelectorState : [];
             const enabledDictionaryNames = Array.isArray(preVerificationDiagnostics?.enabledDictionaryNames) ?
                 preVerificationDiagnostics.enabledDictionaryNames.map((value) => String(value || '').trim()).filter((value) => value.length > 0) :
                 [];
@@ -2615,6 +2624,20 @@ async function main() {
                 !backendReadyDictionaryNames.some((expectedTitle) => matchesDictionaryName(sortFrequencyDictionaryAfterRestart, expectedTitle))
             ) {
                 throw new Error(`Sort frequency dictionary selection did not persist across restart. sortFrequencyDictionary=${JSON.stringify(sortFrequencyDictionaryAfterRestart)} expectedDictionaryNames=${JSON.stringify(backendReadyDictionaryNames)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
+            }
+            if (profileSelectorStateBeforeRestart.length !== profileSelectorStateAfterRestart.length) {
+                throw new Error(`Profile selector state count changed across restart. before=${JSON.stringify(profileSelectorStateBeforeRestart)} after=${JSON.stringify(profileSelectorStateAfterRestart)}`);
+            }
+            for (let i = 0; i < profileSelectorStateBeforeRestart.length; ++i) {
+                const before = profileSelectorStateBeforeRestart[i];
+                const after = profileSelectorStateAfterRestart[i];
+                if (
+                    String(before?.id || '') !== String(after?.id || '') ||
+                    String(before?.mainDictionary || '') !== String(after?.mainDictionary || '') ||
+                    String(before?.sortFrequencyDictionary || '') !== String(after?.sortFrequencyDictionary || '')
+                ) {
+                    throw new Error(`Profile selector state changed across restart. before=${JSON.stringify(profileSelectorStateBeforeRestart)} after=${JSON.stringify(profileSelectorStateAfterRestart)}`);
+                }
             }
             const backendReadyAfterRestart = await waitForBackendDictionaryReady(page, backendReadyDictionaryNames, backendReadyTerm, 60000, false);
             if (!(backendReadyAfterRestart && backendReadyAfterRestart.ok === true)) {
