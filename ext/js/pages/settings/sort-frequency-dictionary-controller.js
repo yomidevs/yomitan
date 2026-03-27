@@ -57,11 +57,12 @@ export class SortFrequencyDictionaryController {
         this._getDictionaryInfoToken = token;
         const dictionaries = await this._settingsController.getDictionaryInfo();
         if (this._getDictionaryInfoToken !== token) { return; }
-        this._getDictionaryInfoToken = null;
 
         this._updateDictionaryOptions(dictionaries);
 
         const options = await this._settingsController.getOptions();
+        if (this._getDictionaryInfoToken !== token) { return; }
+        this._getDictionaryInfoToken = null;
         const optionsContext = this._settingsController.getOptionsContext();
         this._onOptionsChanged({options, optionsContext});
     }

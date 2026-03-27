@@ -2955,14 +2955,14 @@ export class Backend {
      * @param {import('backend').DatabaseUpdateType} type
      * @param {import('backend').DatabaseUpdateCause} cause
      */
-    _triggerDatabaseUpdated(type, cause) {
+    async _triggerDatabaseUpdated(type, cause) {
         void this._translator.clearDatabaseCaches();
         if (type === 'dictionary') {
             if (this._dictionaryImportModeActive) {
                 this._deferredDictionaryRefreshDuringImport = true;
                 reportDiagnostics('dictionary-refresh-deferred-during-import', {cause});
             } else {
-                void this._refreshDictionaryDatabaseAfterUpdate();
+                await this._refreshDictionaryDatabaseAfterUpdate();
             }
         }
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationDatabaseUpdated', params: {type, cause}});

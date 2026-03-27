@@ -191,11 +191,6 @@ export class DictionaryWorkerHandler {
                 const transientSessionToken = Array.isArray(transientTokenMatch) && typeof transientTokenMatch[1] === 'string' && transientTokenMatch[1].length > 0 ?
                     transientTokenMatch[1] :
                     null;
-                const replacementFamilyPrefix = replacementDictionaryTitle !== null ? `${replacementDictionaryTitle} [` : null;
-                const stagingFamilyPrefix = (
-                    dictionaryTitleOverride !== null &&
-                    transientTitlePattern.test(dictionaryTitleOverride)
-                ) ? `${dictionaryTitleOverride.split(' [')[0]} [` : null;
                 if (dictionaryTitleOverride !== null && transientTitlePattern.test(dictionaryTitleOverride)) {
                     transientTitleCandidates.add(dictionaryTitleOverride);
                 }
@@ -207,13 +202,17 @@ export class DictionaryWorkerHandler {
                         typeof Reflect.get(dictionaryInfo, 'title') === 'string'
                     ) ? Reflect.get(dictionaryInfo, 'title').trim() : '';
                     if (title.length === 0) { continue; }
+                    const infoToken = (
+                        dictionaryInfo &&
+                        typeof dictionaryInfo === 'object' &&
+                        typeof Reflect.get(dictionaryInfo, 'updateSessionToken') === 'string'
+                    ) ? Reflect.get(dictionaryInfo, 'updateSessionToken').trim() : '';
                     if (
                         transientTitlePattern.test(title) &&
                         (
                             title === dictionaryTitleOverride ||
-                            (transientSessionToken !== null && title.endsWith(` ${transientSessionToken}]`)) ||
-                            (replacementFamilyPrefix !== null && title.startsWith(replacementFamilyPrefix)) ||
-                            (stagingFamilyPrefix !== null && title.startsWith(stagingFamilyPrefix))
+                            (transientSessionToken !== null && infoToken === transientSessionToken) ||
+                            (transientSessionToken !== null && title.endsWith(` ${transientSessionToken}]`))
                         )
                     ) {
                         transientTitleCandidates.add(title);
@@ -235,9 +234,8 @@ export class DictionaryWorkerHandler {
                         return true;
                     }
                     return transientTitlePattern.test(title) && (
-                        (transientSessionToken !== null && title.endsWith(` ${transientSessionToken}]`)) ||
-                        (replacementFamilyPrefix !== null && title.startsWith(replacementFamilyPrefix)) ||
-                        (stagingFamilyPrefix !== null && title.startsWith(stagingFamilyPrefix))
+                        transientSessionToken !== null &&
+                        title.endsWith(` ${transientSessionToken}]`)
                     );
                 });
             };
