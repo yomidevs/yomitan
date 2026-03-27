@@ -184,6 +184,13 @@ export class DictionaryWorkerHandler {
             const cleanupTransientReplacementTitles = async (activeDictionaryDatabase) => {
                 const transientTitleCandidates = new Set();
                 const transientTitlePattern = /\[(?:update-staging|cutover|replaced) [^\]]+\]/;
+                const transientTokenMatch = (
+                    dictionaryTitleOverride !== null &&
+                    transientTitlePattern.test(dictionaryTitleOverride)
+                ) ? dictionaryTitleOverride.match(/\[(?:update-staging|cutover|replaced) ([^\]]+)\]$/) : null;
+                const transientSessionToken = Array.isArray(transientTokenMatch) && typeof transientTokenMatch[1] === 'string' && transientTokenMatch[1].length > 0 ?
+                    transientTokenMatch[1] :
+                    null;
                 const replacementFamilyPrefix = replacementDictionaryTitle !== null ? `${replacementDictionaryTitle} [` : null;
                 const stagingFamilyPrefix = (
                     dictionaryTitleOverride !== null &&
@@ -204,6 +211,7 @@ export class DictionaryWorkerHandler {
                         transientTitlePattern.test(title) &&
                         (
                             title === dictionaryTitleOverride ||
+                            (transientSessionToken !== null && title.endsWith(` ${transientSessionToken}]`)) ||
                             (replacementFamilyPrefix !== null && title.startsWith(replacementFamilyPrefix)) ||
                             (stagingFamilyPrefix !== null && title.startsWith(stagingFamilyPrefix))
                         )
@@ -227,6 +235,7 @@ export class DictionaryWorkerHandler {
                         return true;
                     }
                     return transientTitlePattern.test(title) && (
+                        (transientSessionToken !== null && title.endsWith(` ${transientSessionToken}]`)) ||
                         (replacementFamilyPrefix !== null && title.startsWith(replacementFamilyPrefix)) ||
                         (stagingFamilyPrefix !== null && title.startsWith(stagingFamilyPrefix))
                     );

@@ -127,6 +127,36 @@ function packContentChunksIntoSlabs(chunks, targetBytes) {
 }
 
 /**
+ * @param {string} title
+ * @returns {{stage: string, token: string}|null}
+ */
+function parseTransientUpdateTitleInfo(title) {
+    const match = `${title}`.trim().match(/\[(update-staging|cutover|replaced) ([^\]]+)\]$/);
+    if (match === null) { return null; }
+    const [, stage, token] = match;
+    if (typeof stage !== 'string' || typeof token !== 'string' || token.length === 0) {
+        return null;
+    }
+    return {stage, token};
+}
+
+/**
+ * @param {string} title
+ * @param {unknown} summary
+ * @returns {boolean}
+ */
+function isRecognizedTransientUpdateTitle(title, summary) {
+    const transientInfo = parseTransientUpdateTitleInfo(title);
+    if (transientInfo === null) { return false; }
+    if (!(typeof summary === 'object' && summary !== null && !Array.isArray(summary))) {
+        return false;
+    }
+    const summaryToken = typeof Reflect.get(summary, 'updateSessionToken') === 'string' ? Reflect.get(summary, 'updateSessionToken').trim() : '';
+    const summaryStage = typeof Reflect.get(summary, 'transientUpdateStage') === 'string' ? Reflect.get(summary, 'transientUpdateStage').trim() : '';
+    return summaryToken === transientInfo.token && summaryStage === transientInfo.stage;
+}
+
+/**
  * @param {Uint8Array[]} chunks
  * @param {number} targetBytes
  * @param {number} fixedChunkBytes
@@ -1087,6 +1117,11 @@ export class DictionaryDatabase {
                     (parsedSummary !== null ? {...parsedSummary, title} : {title, version: this._asNumber(Reflect.get(summaryRow, 'version'), 0)})
             );
         };
+        const buildTransientSummaryForTitle = (summaryRow, title, stage, summaryValue = null) => ({
+            ...buildSummaryForTitle(summaryRow, title, summaryValue),
+            transientUpdateStage: stage,
+            updateSessionToken: transientSessionToken,
+        });
         const renameDictionaryData = async (sourceTitle, targetTitle, summaryValue, debugKey) => {
             const db = this._requireDb();
             const summaryRow = getSummaryRowByTitle(sourceTitle);
@@ -1127,7 +1162,19 @@ export class DictionaryDatabase {
         const forceCleanupTransientDictionaryTitle = async (dictionaryTitle) => {
             const title = `${dictionaryTitle}`.trim();
             if (title.length === 0) { return; }
-            if (!TRANSIENT_UPDATE_TITLE_PATTERN.test(title)) {
+            const summaryRow = getSummaryRowByTitle(title);
+            const parsedSummary = (() => {
+                if (!(summaryRow && typeof summaryRow === 'object')) { return null; }
+                const summaryJson = this._asString(Reflect.get(summaryRow, 'summaryJson'));
+                if (summaryJson.length === 0) { return null; }
+                try {
+                    const value = parseJson(summaryJson);
+                    return (typeof value === 'object' && value !== null && !Array.isArray(value)) ? value : null;
+                } catch (_) {
+                    return null;
+                }
+            })();
+            if (!isRecognizedTransientUpdateTitle(title, parsedSummary)) {
                 throw new Error(`Refusing fallback cleanup for non-transient dictionary title: ${title}`);
             }
             /** @type {unknown} */
@@ -1201,7 +1248,7 @@ export class DictionaryDatabase {
         if (replacedTitle !== null && replacedTitle.length > 0 && replacedTitle === toTitle && replacedTitle !== fromTitle) {
             const temporaryCutoverTitle = `${toTitle} [cutover ${transientSessionToken}]`;
             const temporaryReplacedTitle = `${replacedTitle} [replaced ${transientSessionToken}]`;
-            const temporarySummary = buildSummaryForTitle(summaryRow, temporaryCutoverTitle, summaryOverride);
+            const temporarySummary = buildTransientSummaryForTitle(summaryRow, temporaryCutoverTitle, 'cutover', summaryOverride);
             await renameDictionaryData(fromTitle, temporaryCutoverTitle, temporarySummary, 'afterTemporaryCutoverRows');
             activeFromTitle = temporaryCutoverTitle;
             let replacedDictionaryMovedAside = false;
@@ -1213,7 +1260,7 @@ export class DictionaryDatabase {
                 await renameDictionaryData(
                     replacedTitle,
                     temporaryReplacedTitle,
-                    buildSummaryForTitle(replacedSummaryRow, temporaryReplacedTitle, null),
+                    buildTransientSummaryForTitle(replacedSummaryRow, temporaryReplacedTitle, 'replaced', null),
                     'afterTemporaryReplacedRows',
                 );
                 replacedDictionaryMovedAside = true;
@@ -2248,7 +2295,7 @@ export class DictionaryDatabase {
             ) ?
                 /** @type {unknown} */ (Reflect.get(summary, 'importSuccess')) :
                 void 0;
-            if (title.length > 0 && TRANSIENT_UPDATE_TITLE_PATTERN.test(title)) {
+            if (title.length > 0 && isRecognizedTransientUpdateTitle(title, summary)) {
                 dictionaryTitlesToDelete.add(title);
                 continue;
             }

@@ -1506,7 +1506,22 @@ describe('Database', () => {
                 bind: {
                     $title: 'Healthy [cutover abc123]',
                     $version: 3,
-                    $summaryJson: JSON.stringify({title: 'Healthy [cutover abc123]', revision: '1', version: 3, importSuccess: true}),
+                    $summaryJson: JSON.stringify({
+                        title: 'Healthy [cutover abc123]',
+                        revision: '1',
+                        version: 3,
+                        importSuccess: true,
+                        transientUpdateStage: 'cutover',
+                        updateSessionToken: 'abc123',
+                    }),
+                },
+            });
+            db.exec({
+                sql: 'INSERT INTO dictionaries(title, version, summaryJson) VALUES ($title, $version, $summaryJson)',
+                bind: {
+                    $title: 'Legit [cutover abc123]',
+                    $version: 3,
+                    $summaryJson: JSON.stringify({title: 'Legit [cutover abc123]', revision: '1', version: 3, importSuccess: true}),
                 },
             });
 
@@ -1525,7 +1540,7 @@ describe('Database', () => {
                 }
                 const summary = await Promise.resolve(cleanupMethod.call(dictionaryDatabase));
                 expect.soft(summary).toStrictEqual({
-                    scannedCount: 5,
+                    scannedCount: 6,
                     removedCount: 3,
                     removedTitles: ['Broken Parse', 'Healthy [cutover abc123]'],
                     removedEmptyTitleRows: 1,
@@ -1535,7 +1550,7 @@ describe('Database', () => {
                 });
 
                 const remainingTitles = db.selectObjects('SELECT title FROM dictionaries ORDER BY title ASC').map((row) => row.title);
-                expect.soft(remainingTitles).toStrictEqual(['Broken Flag', 'Healthy']);
+                expect.soft(remainingTitles).toStrictEqual(['Broken Flag', 'Healthy', 'Legit [cutover abc123]']);
             } finally {
                 deleteDictionarySpy.mockRestore();
                 await dictionaryDatabase.close();

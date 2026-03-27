@@ -821,6 +821,15 @@ export class DictionaryImporter {
         if (sourceDictionaryTitle !== dictionaryTitle) {
             summary.sourceTitle = sourceDictionaryTitle;
         }
+        if (
+            typeof details.dictionaryTitleOverride === 'string' &&
+            /\[update-staging [^\]]+\]$/.test(details.dictionaryTitleOverride) &&
+            typeof details.updateSessionToken === 'string' &&
+            details.updateSessionToken.trim().length > 0
+        ) {
+            summary.transientUpdateStage = 'update-staging';
+            summary.updateSessionToken = details.updateSessionToken.trim();
+        }
         const dictionarySummaryPrimaryKey = await dictionaryDatabase.addWithResult('dictionaries', summary);
         let styles = '';
         let importFailed = false;
@@ -1670,6 +1679,15 @@ export class DictionaryImporter {
         summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         if (sourceDictionaryTitle !== dictionaryTitle) {
             summary.sourceTitle = sourceDictionaryTitle;
+        }
+        if (
+            typeof details.dictionaryTitleOverride === 'string' &&
+            /\[update-staging [^\]]+\]$/.test(details.dictionaryTitleOverride) &&
+            typeof details.updateSessionToken === 'string' &&
+            details.updateSessionToken.trim().length > 0
+        ) {
+            summary.transientUpdateStage = 'update-staging';
+            summary.updateSessionToken = details.updateSessionToken.trim();
         }
         const tSummaryUpdateStart = Date.now();
         await dictionaryDatabase.bulkUpdate('dictionaries', [{data: summary, primaryKey: dictionarySummaryPrimaryKey}], 0, 1);

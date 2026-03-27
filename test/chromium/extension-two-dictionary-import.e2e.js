@@ -1210,13 +1210,33 @@ async function evalSendMessage(page, expression, arg = null) {
             nextOptions.profiles.forEach((profile, index) => {
                 if (!profile?.options) { return; }
                 const rows = Array.isArray(profile.options.dictionaries) ? profile.options.dictionaries : [];
-                profile.options.dictionaries = rows.map((row, rowIndex) => ({
-                    ...row,
-                    enabled: index === 0 ? row?.enabled === true : rowIndex === 0,
-                }));
-                if (profile.options.general && typeof profile.options.general === 'object') {
-                    profile.options.general.mainDictionary = index === 0 ? primaryTitle : secondaryTitle;
-                    profile.options.general.sortFrequencyDictionary = index === 0 ? secondaryTitle : primaryTitle;
+                if (index > 0) {
+                    profile.options.dictionaries = rows.map((row, rowIndex) => ({
+                        ...row,
+                        enabled: rowIndex === 0,
+                    }));
+                }
+                if (profile.options.general && typeof profile.options.general === 'object' && index > 0) {
+                    if (typeof profile.options.general.mainDictionary !== 'string' || profile.options.general.mainDictionary.length === 0) {
+                        profile.options.general.mainDictionary = secondaryTitle;
+                    }
+                    if (
+                        (profile.options.general.sortFrequencyDictionary === null || profile.options.general.sortFrequencyDictionary === '') &&
+                        primaryTitle.length > 0
+                    ) {
+                        profile.options.general.sortFrequencyDictionary = primaryTitle;
+                    }
+                }
+                if (profile.options.general && typeof profile.options.general === 'object' && index === 0) {
+                    if (typeof profile.options.general.mainDictionary !== 'string' || profile.options.general.mainDictionary.length === 0) {
+                        profile.options.general.mainDictionary = primaryTitle;
+                    }
+                    if (
+                        (profile.options.general.sortFrequencyDictionary === null || profile.options.general.sortFrequencyDictionary === '') &&
+                        secondaryTitle.length > 0
+                    ) {
+                        profile.options.general.sortFrequencyDictionary = secondaryTitle;
+                    }
                 }
             });
             await send('setAllSettings', {value: nextOptions, source: 'chromium-e2e-restart-profile-matrix'});
