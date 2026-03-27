@@ -965,6 +965,10 @@ async function evalSendMessage(page, expression, arg = null) {
                 id: String(profile?.id || ''),
                 mainDictionary: String(profile?.options?.general?.mainDictionary || ''),
                 sortFrequencyDictionary: String(profile?.options?.general?.sortFrequencyDictionary || ''),
+                dictionaryRows: (profile?.options?.dictionaries || []).map((row) => ({
+                    name: String(row?.name || '').trim(),
+                    enabled: row?.enabled === true,
+                })),
                 enabledDictionaryNames: (profile?.options?.dictionaries || [])
                     .filter((row) => row?.enabled === true)
                     .map((row) => String(row?.name || '').trim())
@@ -2577,6 +2581,13 @@ async function main() {
                     .map((value) => String(value || '').trim())
                     .filter((value) => value.length > 0),
             )].sort((a, b) => a.localeCompare(b));
+            const normalizeDictionaryRows = (rows) => (Array.isArray(rows) ? rows : [])
+                .map((row) => ({
+                    name: String(row?.name || '').trim(),
+                    enabled: row?.enabled === true,
+                }))
+                .filter((row) => row.name.length > 0)
+                .sort((a, b) => a.name.localeCompare(b.name) || Number(a.enabled) - Number(b.enabled));
             const preRestartDiagnostics = await evalSendMessage(page, 'backendDiagnostics', backendReadyTerm);
             const mainDictionaryBeforeRestart = String(preRestartDiagnostics?.profileMainDictionary || '').trim();
             const sortFrequencyDictionaryBeforeRestart = String(preRestartDiagnostics?.profileSortFrequencyDictionary || '').trim();
@@ -2644,6 +2655,8 @@ async function main() {
                     String(before?.id || '') !== String(after?.id || '') ||
                     String(before?.mainDictionary || '') !== String(after?.mainDictionary || '') ||
                     String(before?.sortFrequencyDictionary || '') !== String(after?.sortFrequencyDictionary || '') ||
+                    JSON.stringify(normalizeDictionaryRows(before?.dictionaryRows)) !==
+                        JSON.stringify(normalizeDictionaryRows(after?.dictionaryRows)) ||
                     JSON.stringify(normalizeNameSet(before?.enabledDictionaryNames)) !==
                         JSON.stringify(normalizeNameSet(after?.enabledDictionaryNames))
                 ) {

@@ -2015,7 +2015,10 @@ export class DictionaryImportController {
                     }],
                     deleteCount: 0,
                 });
-                if (options.general.mainDictionary === name) {
+                if (
+                    options.general.mainDictionary === name ||
+                    (selectorSourceTitle !== null && options.general.mainDictionary === selectorSourceTitle)
+                ) {
                     targets.push({
                         action: 'set',
                         path: `profiles[${i}].options.general.mainDictionary`,
@@ -2028,7 +2031,10 @@ export class DictionaryImportController {
                         value: title,
                     });
                 }
-                if (options.general.sortFrequencyDictionary === name) {
+                if (
+                    options.general.sortFrequencyDictionary === name ||
+                    (selectorSourceTitle !== null && options.general.sortFrequencyDictionary === selectorSourceTitle)
+                ) {
                     targets.push({
                         action: 'set',
                         path: `profiles[${i}].options.general.sortFrequencyDictionary`,

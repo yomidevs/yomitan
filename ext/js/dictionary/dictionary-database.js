@@ -1128,6 +1128,14 @@ export class DictionaryDatabase {
             }
             try {
                 const db = this._requireDb();
+                this._lastReplaceDictionaryTitleDebug = {
+                    ...(this._lastReplaceDictionaryTitleDebug ?? {}),
+                    forcedCleanupStart: {
+                        title,
+                        originalDeleteError: originalDeleteError instanceof Error ? originalDeleteError.message : String(originalDeleteError),
+                        rows: snapshotRows(),
+                    },
+                };
                 await this._termRecordStore.deleteByDictionary(title);
                 await this.cleanupTransientTermRecordShards((dictionaryName) => String(dictionaryName || '').trim() === title);
                 await this._beginImmediateTransaction(db);
@@ -1149,9 +1157,25 @@ export class DictionaryDatabase {
                     throw e;
                 }
                 await this._cleanupTermContentAfterDictionaryDelete();
+                this._lastReplaceDictionaryTitleDebug = {
+                    ...(this._lastReplaceDictionaryTitleDebug ?? {}),
+                    forcedCleanupEnd: {
+                        title,
+                        rows: snapshotRows(),
+                    },
+                };
             } catch (fallbackError) {
                 const originalMessage = originalDeleteError instanceof Error ? originalDeleteError.message : String(originalDeleteError);
                 const fallbackMessage = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
+                this._lastReplaceDictionaryTitleDebug = {
+                    ...(this._lastReplaceDictionaryTitleDebug ?? {}),
+                    forcedCleanupFailure: {
+                        title,
+                        originalDeleteError: originalMessage,
+                        fallbackError: fallbackMessage,
+                        rows: snapshotRows(),
+                    },
+                };
                 throw new Error(`Failed transient dictionary cleanup for ${title}. deleteDictionary error=${originalMessage}; fallback cleanup error=${fallbackMessage}`);
             }
         };
