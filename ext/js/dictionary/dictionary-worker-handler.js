@@ -172,20 +172,56 @@ export class DictionaryWorkerHandler {
             ) ?
                 Reflect.get(details, 'dictionaryTitleOverride').trim() :
                 null;
+            const replacementDictionaryTitle = (
+                typeof details === 'object' &&
+                details !== null &&
+                !Array.isArray(details) &&
+                typeof Reflect.get(details, 'replacementDictionaryTitle') === 'string' &&
+                Reflect.get(details, 'replacementDictionaryTitle').trim().length > 0
+            ) ?
+                Reflect.get(details, 'replacementDictionaryTitle').trim() :
+                null;
+            const cleanupTransientReplacementTitles = async (activeDictionaryDatabase) => {
+                const transientTitleCandidates = new Set();
+                if (dictionaryTitleOverride !== null) {
+                    transientTitleCandidates.add(dictionaryTitleOverride);
+                }
+                const dictionaryInfos = await activeDictionaryDatabase.getDictionaryInfo();
+                for (const dictionaryInfo of dictionaryInfos) {
+                    const title = (
+                        dictionaryInfo &&
+                        typeof dictionaryInfo === 'object' &&
+                        typeof Reflect.get(dictionaryInfo, 'title') === 'string'
+                    ) ? Reflect.get(dictionaryInfo, 'title').trim() : '';
+                    if (title.length === 0) { continue; }
+                    if (/\[(?:update-staging|cutover|replaced) [^\]]+\]/.test(title)) {
+                        if (
+                            dictionaryTitleOverride !== null && title === dictionaryTitleOverride
+                        ) {
+                            transientTitleCandidates.add(title);
+                            continue;
+                        }
+                        if (
+                            replacementDictionaryTitle !== null &&
+                            title.startsWith(`${replacementDictionaryTitle} [`)
+                        ) {
+                            transientTitleCandidates.add(title);
+                        }
+                    }
+                }
+                for (const transientTitle of transientTitleCandidates) {
+                    try {
+                        await activeDictionaryDatabase.deleteDictionary(transientTitle, 1000, () => {});
+                    } catch (_) {
+                        // NOP - best effort cleanup before retry.
+                    }
+                }
+            };
             const importOnce = async (activeDictionaryDatabase) => {
                 const importPayload = await dictionaryImporter.importDictionary(activeDictionaryDatabase, archiveContent, details);
                 let {result, errors} = importPayload;
                 const importerDebug = (typeof importPayload === 'object' && importPayload !== null && !Array.isArray(importPayload)) ?
                     (/** @type {import('dictionary-importer').ImportDebug|null} */ (Reflect.get(importPayload, 'debug') ?? null)) :
-                    null;
-                const replacementDictionaryTitle = (
-                    typeof details === 'object' &&
-                    details !== null &&
-                    !Array.isArray(details) &&
-                    typeof Reflect.get(details, 'replacementDictionaryTitle') === 'string' &&
-                    Reflect.get(details, 'replacementDictionaryTitle').trim().length > 0
-                ) ?
-                    Reflect.get(details, 'replacementDictionaryTitle').trim() :
                     null;
                 const sourceDictionaryTitle = (
                     result !== null &&
@@ -238,13 +274,7 @@ export class DictionaryWorkerHandler {
                     this._importSessionDictionaryDatabase = retryDictionaryDatabase;
                 }
                 try {
-                    if (dictionaryTitleOverride !== null) {
-                        try {
-                            await retryDictionaryDatabase.deleteDictionary(dictionaryTitleOverride, 1000, () => {});
-                        } catch (_) {
-                            // NOP - best effort cleanup before retry.
-                        }
-                    }
+                    await cleanupTransientReplacementTitles(retryDictionaryDatabase);
                     ({result, errors, importerDebug} = await importOnce(retryDictionaryDatabase));
                 } finally {
                     if (!useImportSession) {

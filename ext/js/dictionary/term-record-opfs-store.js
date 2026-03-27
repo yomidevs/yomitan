@@ -305,10 +305,22 @@ export class TermRecordOpfsStore {
      * @returns {boolean}
      */
     _shouldDisableWasmEncoderByDefault() {
-        if (typeof navigator === 'undefined') {
+        if (typeof globalThis === 'undefined') {
             return false;
         }
-        const userAgentData = /** @type {{brands?: Array<{brand?: string}>}|undefined} */ (/** @type {unknown} */ (navigator.userAgentData));
+        const browserRuntime = /** @type {{runtime?: {getBrowserInfo?: (() => Promise<unknown>)}}|undefined} */ (Reflect.get(globalThis, 'browser'));
+        if (typeof browserRuntime?.runtime?.getBrowserInfo === 'function') {
+            return false;
+        }
+        const chromeRuntime = /** @type {{runtime?: unknown}|undefined} */ (Reflect.get(globalThis, 'chrome'));
+        if (typeof chromeRuntime?.runtime === 'object' && chromeRuntime.runtime !== null) {
+            return true;
+        }
+        const navigatorValue = /** @type {Navigator|undefined} */ (Reflect.get(globalThis, 'navigator'));
+        if (typeof navigatorValue === 'undefined') {
+            return false;
+        }
+        const userAgentData = /** @type {{brands?: Array<{brand?: string}>}|undefined} */ (/** @type {unknown} */ (navigatorValue.userAgentData));
         if (Array.isArray(userAgentData?.brands)) {
             const brands = userAgentData.brands
                 .map((entry) => String(entry?.brand || '').toLowerCase())
@@ -320,7 +332,7 @@ export class TermRecordOpfsStore {
                 return false;
             }
         }
-        const userAgent = String(navigator.userAgent || '').toLowerCase();
+        const userAgent = String(navigatorValue.userAgent || '').toLowerCase();
         if (userAgent.includes('firefox')) {
             return false;
         }

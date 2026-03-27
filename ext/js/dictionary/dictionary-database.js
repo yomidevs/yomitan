@@ -1121,21 +1121,85 @@ export class DictionaryDatabase {
         let activeFromTitle = fromTitle;
         if (replacedTitle !== null && replacedTitle.length > 0 && replacedTitle === toTitle && replacedTitle !== fromTitle) {
             const temporaryCutoverTitle = `${toTitle} [cutover ${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}]`;
+            const temporaryReplacedTitle = `${replacedTitle} [replaced ${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}]`;
             const temporarySummary = buildSummaryForTitle(summaryRow, temporaryCutoverTitle, summaryOverride);
             await renameDictionaryData(fromTitle, temporaryCutoverTitle, temporarySummary, 'afterTemporaryCutoverRows');
             activeFromTitle = temporaryCutoverTitle;
-        }
+            let replacedDictionaryMovedAside = false;
+            try {
+                const replacedSummaryRow = getSummaryRowByTitle(replacedTitle);
+                if (!(replacedSummaryRow && typeof replacedSummaryRow === 'object')) {
+                    throw new Error(`Dictionary title not found for replacement delete stage: ${replacedTitle}`);
+                }
+                await renameDictionaryData(
+                    replacedTitle,
+                    temporaryReplacedTitle,
+                    buildSummaryForTitle(replacedSummaryRow, temporaryReplacedTitle, null),
+                    'afterTemporaryReplacedRows',
+                );
+                replacedDictionaryMovedAside = true;
+                this._lastReplaceDictionaryTitleDebug = {
+                    ...(this._lastReplaceDictionaryTitleDebug ?? {}),
+                    afterDeleteRows: snapshotRows(),
+                };
 
-        if (replacedTitle !== null && replacedTitle.length > 0 && replacedTitle !== activeFromTitle) {
-            await this.deleteDictionary(replacedTitle, 1000, () => {});
-        }
-        this._lastReplaceDictionaryTitleDebug = {
-            ...(this._lastReplaceDictionaryTitleDebug ?? {}),
-            afterDeleteRows: snapshotRows(),
-        };
+                const finalSummary = buildSummaryForTitle(summaryRow, toTitle, summaryOverride);
+                await renameDictionaryData(activeFromTitle, toTitle, finalSummary, 'afterRenameRows');
+            } catch (e) {
+                if (replacedDictionaryMovedAside) {
+                    try {
+                        const movedAsideSummaryRow = getSummaryRowByTitle(temporaryReplacedTitle);
+                        if (movedAsideSummaryRow && typeof movedAsideSummaryRow === 'object') {
+                            await renameDictionaryData(
+                                temporaryReplacedTitle,
+                                replacedTitle,
+                                buildSummaryForTitle(movedAsideSummaryRow, replacedTitle, null),
+                                'afterRestoreReplacedRows',
+                            );
+                        }
+                    } catch (_) {
+                        // NOP - preserve the original failure, but leave debug breadcrumbs.
+                    }
+                }
+                if (activeFromTitle !== fromTitle) {
+                    try {
+                        const stagedSummaryRow = getSummaryRowByTitle(activeFromTitle);
+                        if (stagedSummaryRow && typeof stagedSummaryRow === 'object') {
+                            await renameDictionaryData(
+                                activeFromTitle,
+                                fromTitle,
+                                buildSummaryForTitle(stagedSummaryRow, fromTitle, summaryOverride),
+                                'afterRestoreStagedRows',
+                            );
+                            activeFromTitle = fromTitle;
+                        }
+                    } catch (_) {
+                        // NOP - preserve the original failure, but leave debug breadcrumbs.
+                    }
+                }
+                throw e;
+            }
+            try {
+                await this.deleteDictionary(temporaryReplacedTitle, 1000, () => {});
+            } catch (_) {
+                // Best-effort cleanup. The new live dictionary is already in place.
+            }
+            this._lastReplaceDictionaryTitleDebug = {
+                ...(this._lastReplaceDictionaryTitleDebug ?? {}),
+                afterDeleteRows: snapshotRows(),
+            };
+        } else {
+            if (replacedTitle !== null && replacedTitle.length > 0 && replacedTitle !== activeFromTitle) {
+                await this.deleteDictionary(replacedTitle, 1000, () => {});
+            }
+            this._lastReplaceDictionaryTitleDebug = {
+                ...(this._lastReplaceDictionaryTitleDebug ?? {}),
+                afterDeleteRows: snapshotRows(),
+            };
 
-        const finalSummary = buildSummaryForTitle(summaryRow, toTitle, summaryOverride);
-        await renameDictionaryData(activeFromTitle, toTitle, finalSummary, 'afterRenameRows');
+            const finalSummary = buildSummaryForTitle(summaryRow, toTitle, summaryOverride);
+            await renameDictionaryData(activeFromTitle, toTitle, finalSummary, 'afterRenameRows');
+        }
 
         this._termsVirtualTableDirty = true;
         this._termEntryContentCache.clear();

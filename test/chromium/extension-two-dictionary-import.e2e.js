@@ -2535,8 +2535,8 @@ async function main() {
          * @param {string[]} titles
          * @returns {string[]}
          */
-        const getStagedUpdateTitles = (titles) => (
-            titles.filter((title) => /\[update-staging [^\]]+\]/.test(String(title || '')))
+        const getTransientUpdateTitles = (titles) => (
+            titles.filter((title) => /\[(?:update-staging|cutover|replaced) [^\]]+\]/.test(String(title || '')))
         );
         /**
          * @param {{
@@ -2576,9 +2576,9 @@ async function main() {
             if (!hasExpectedInstalledSet) {
                 throw new Error(`Installed dictionary set did not persist across restart. titles=${JSON.stringify(restartedInstalledTitles)} expected=${JSON.stringify(expectedInstalledTitles)}`);
             }
-            const stagedTitles = getStagedUpdateTitles(restartedInstalledTitles);
-            if (ensureNoStagedTitles && stagedTitles.length > 0) {
-                throw new Error(`Staged update dictionaries remained after restart: ${JSON.stringify(stagedTitles)}`);
+            const transientTitles = getTransientUpdateTitles(restartedInstalledTitles);
+            if (ensureNoStagedTitles && transientTitles.length > 0) {
+                throw new Error(`Transient update dictionaries remained after restart: ${JSON.stringify(transientTitles)}`);
             }
             const preVerificationDiagnostics = await evalSendMessage(page, 'backendDiagnostics', backendReadyTerm);
             const enabledDictionaryNames = Array.isArray(preVerificationDiagnostics?.enabledDictionaryNames) ?
@@ -2593,9 +2593,9 @@ async function main() {
             const mainDictionaryAfterRestart = String(preVerificationDiagnostics?.profileMainDictionary || '').trim();
             if (
                 mainDictionaryAfterRestart.length === 0 ||
-                !expectedInstalledTitles.some((expectedTitle) => matchesDictionaryName(mainDictionaryAfterRestart, expectedTitle))
+                !backendReadyDictionaryNames.some((expectedTitle) => matchesDictionaryName(mainDictionaryAfterRestart, expectedTitle))
             ) {
-                throw new Error(`Main dictionary selection did not persist across restart. mainDictionary=${JSON.stringify(mainDictionaryAfterRestart)} expectedInstalledTitles=${JSON.stringify(expectedInstalledTitles)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
+                throw new Error(`Main dictionary selection did not persist across restart. mainDictionary=${JSON.stringify(mainDictionaryAfterRestart)} expectedDictionaryNames=${JSON.stringify(backendReadyDictionaryNames)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
             }
             const backendReadyAfterRestart = await waitForBackendDictionaryReady(page, backendReadyDictionaryNames, backendReadyTerm, 60000, false);
             if (!(backendReadyAfterRestart && backendReadyAfterRestart.ok === true)) {
@@ -2625,7 +2625,7 @@ async function main() {
             return {
                 extensionBaseUrl: restartedExtensionBaseUrl,
                 installedTitles: restartedInstalledTitles,
-                stagedTitles,
+                stagedTitles: transientTitles,
                 preVerificationDiagnostics,
                 backendDiagnostics: backendReadyAfterRestart?.diagnostics ?? null,
                 searchChecks: searchResults,
