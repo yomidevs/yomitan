@@ -1124,6 +1124,7 @@ export class DictionaryDatabase {
                 // Fall through to direct transient cleanup.
             }
             const db = this._requireDb();
+            await this._termRecordStore.deleteByDictionary(title);
             await this.cleanupTransientTermRecordShards((dictionaryName) => String(dictionaryName || '').trim() === title);
             await this._beginImmediateTransaction(db);
             try {

@@ -225,6 +225,14 @@ export class DictionaryWorkerHandler {
                     if (title.length === 0) {
                         return false;
                     }
+                    if (/\[(?:update-staging|cutover|replaced) [^\]]+\]/.test(title)) {
+                        if (dictionaryTitleOverride !== null && title.startsWith(`${dictionaryTitleOverride.split(' [')[0]} [`)) {
+                            return true;
+                        }
+                        if (replacementDictionaryTitle !== null && title.startsWith(`${replacementDictionaryTitle} [`)) {
+                            return true;
+                        }
+                    }
                     if (transientTitleCandidates.has(title)) {
                         return true;
                     }

@@ -2562,6 +2562,7 @@ async function main() {
             ensureNoStagedTitles = false,
         }) => {
             const preRestartDiagnostics = await evalSendMessage(page, 'backendDiagnostics', backendReadyTerm);
+            const mainDictionaryBeforeRestart = String(preRestartDiagnostics?.profileMainDictionary || '').trim();
             const sortFrequencyDictionaryBeforeRestart = String(preRestartDiagnostics?.profileSortFrequencyDictionary || '').trim();
             if (concurrentSearchPage !== null) {
                 try { await concurrentSearchPage.close(); } catch (_) {}
@@ -2599,9 +2600,15 @@ async function main() {
             ) {
                 throw new Error(`Main dictionary selection did not persist across restart. mainDictionary=${JSON.stringify(mainDictionaryAfterRestart)} expectedDictionaryNames=${JSON.stringify(backendReadyDictionaryNames)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
             }
+            if (mainDictionaryBeforeRestart.length > 0 && mainDictionaryAfterRestart !== mainDictionaryBeforeRestart) {
+                throw new Error(`Main dictionary selection changed across restart. before=${JSON.stringify(mainDictionaryBeforeRestart)} after=${JSON.stringify(mainDictionaryAfterRestart)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
+            }
             const sortFrequencyDictionaryAfterRestart = String(preVerificationDiagnostics?.profileSortFrequencyDictionary || '').trim();
             if (sortFrequencyDictionaryBeforeRestart.length > 0 && sortFrequencyDictionaryAfterRestart.length === 0) {
                 throw new Error(`Sort frequency dictionary selection was cleared across restart. before=${JSON.stringify(sortFrequencyDictionaryBeforeRestart)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
+            }
+            if (sortFrequencyDictionaryBeforeRestart.length > 0 && sortFrequencyDictionaryAfterRestart !== sortFrequencyDictionaryBeforeRestart) {
+                throw new Error(`Sort frequency dictionary selection changed across restart. before=${JSON.stringify(sortFrequencyDictionaryBeforeRestart)} after=${JSON.stringify(sortFrequencyDictionaryAfterRestart)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
             }
             if (
                 sortFrequencyDictionaryAfterRestart.length > 0 &&
