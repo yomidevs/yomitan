@@ -1028,6 +1028,10 @@ export class DictionaryDatabase {
         if (fromTitle.length === 0 || toTitle.length === 0) {
             throw new Error('Dictionary titles must be non-empty');
         }
+        const getSummaryRowByTitle = (title) => {
+            const db = this._requireDb();
+            return db.selectObject('SELECT id, version, summaryJson FROM dictionaries WHERE title = $title ORDER BY id DESC LIMIT 1', {$title: title});
+        };
         const snapshotRows = () => {
             const snapshotDb = this._requireDb();
             return snapshotDb.selectObjects('SELECT id, title, version, summaryJson FROM dictionaries ORDER BY id ASC').map((row) => {
@@ -1055,7 +1059,74 @@ export class DictionaryDatabase {
             beforeDeleteRows: snapshotRows(),
         };
 
-        if (replacedTitle !== null && replacedTitle.length > 0 && replacedTitle !== fromTitle) {
+        const buildSummaryForTitle = (summaryRow, title, summaryValue = null) => {
+            const parsedSummary = (() => {
+                const summaryJson = this._asString(Reflect.get(summaryRow, 'summaryJson'));
+                if (summaryJson.length === 0) { return null; }
+                try {
+                    const value = parseJson(summaryJson);
+                    return (typeof value === 'object' && value !== null && !Array.isArray(value)) ? value : null;
+                } catch (_) {
+                    return null;
+                }
+            })();
+            return (
+                summaryValue && typeof summaryValue === 'object' && !Array.isArray(summaryValue) ?
+                    {...summaryValue, title} :
+                    (parsedSummary !== null ? {...parsedSummary, title} : {title, version: this._asNumber(Reflect.get(summaryRow, 'version'), 0)})
+            );
+        };
+        const renameDictionaryData = async (sourceTitle, targetTitle, summaryValue, debugKey) => {
+            const db = this._requireDb();
+            const summaryRow = getSummaryRowByTitle(sourceTitle);
+            if (!(summaryRow && typeof summaryRow === 'object')) {
+                throw new Error(`Dictionary title not found for replacement: ${sourceTitle}`);
+            }
+            const summaryId = this._asNumber(Reflect.get(summaryRow, 'id'), -1);
+            if (summaryId < 0) {
+                throw new Error(`Invalid dictionary row id for replacement: ${sourceTitle}`);
+            }
+            const nextSummary = buildSummaryForTitle(summaryRow, targetTitle, summaryValue);
+            await this._beginImmediateTransaction(db);
+            try {
+                db.exec({sql: 'UPDATE dictionaries SET title = $toTitle, version = $version, summaryJson = $summaryJson WHERE id = $id', bind: {
+                    $id: summaryId,
+                    $toTitle: targetTitle,
+                    $version: this._asNumber(Reflect.get(nextSummary, 'version'), 0),
+                    $summaryJson: JSON.stringify(nextSummary),
+                }});
+                for (const table of ['termMeta', 'kanji', 'kanjiMeta', 'tagMeta', 'media', 'sharedGlossaryArtifacts']) {
+                    db.exec({sql: `UPDATE ${table} SET dictionary = $toTitle WHERE dictionary = $fromTitle`, bind: {$fromTitle: sourceTitle, $toTitle: targetTitle}});
+                }
+                db.exec('COMMIT');
+            } catch (e) {
+                try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+                throw e;
+            }
+            this._lastReplaceDictionaryTitleDebug = {
+                ...(this._lastReplaceDictionaryTitleDebug ?? {}),
+                [debugKey]: snapshotRows(),
+            };
+            await this._termRecordStore.replaceDictionaryName(sourceTitle, targetTitle);
+            this._lastReplaceDictionaryTitleDebug = {
+                ...(this._lastReplaceDictionaryTitleDebug ?? {}),
+                [`${debugKey}AfterTermRecordRows`]: snapshotRows(),
+            };
+        };
+        const summaryRow = getSummaryRowByTitle(fromTitle);
+        if (!(summaryRow && typeof summaryRow === 'object')) {
+            throw new Error(`Dictionary title not found for replacement: ${fromTitle}`);
+        }
+
+        let activeFromTitle = fromTitle;
+        if (replacedTitle !== null && replacedTitle.length > 0 && replacedTitle === toTitle && replacedTitle !== fromTitle) {
+            const temporaryCutoverTitle = `${toTitle} [cutover ${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}]`;
+            const temporarySummary = buildSummaryForTitle(summaryRow, temporaryCutoverTitle, summaryOverride);
+            await renameDictionaryData(fromTitle, temporaryCutoverTitle, temporarySummary, 'afterTemporaryCutoverRows');
+            activeFromTitle = temporaryCutoverTitle;
+        }
+
+        if (replacedTitle !== null && replacedTitle.length > 0 && replacedTitle !== activeFromTitle) {
             await this.deleteDictionary(replacedTitle, 1000, () => {});
         }
         this._lastReplaceDictionaryTitleDebug = {
@@ -1063,57 +1134,9 @@ export class DictionaryDatabase {
             afterDeleteRows: snapshotRows(),
         };
 
-        const db = this._requireDb();
-        const summaryRow = db.selectObject('SELECT id, version, summaryJson FROM dictionaries WHERE title = $title ORDER BY id DESC LIMIT 1', {$title: fromTitle});
-        if (!(summaryRow && typeof summaryRow === 'object')) {
-            throw new Error(`Dictionary title not found for replacement: ${fromTitle}`);
-        }
-        const summaryId = this._asNumber(Reflect.get(summaryRow, 'id'), -1);
-        if (summaryId < 0) {
-            throw new Error(`Invalid dictionary row id for replacement: ${fromTitle}`);
-        }
-        const parsedSummary = (() => {
-            const summaryJson = this._asString(Reflect.get(summaryRow, 'summaryJson'));
-            if (summaryJson.length === 0) { return null; }
-            try {
-                const value = parseJson(summaryJson);
-                return (typeof value === 'object' && value !== null && !Array.isArray(value)) ? value : null;
-            } catch (_) {
-                return null;
-            }
-        })();
-        const nextSummary = (
-            summaryOverride && typeof summaryOverride === 'object' && !Array.isArray(summaryOverride) ?
-                {...summaryOverride, title: toTitle} :
-                (parsedSummary !== null ? {...parsedSummary, title: toTitle} : {title: toTitle, version: this._asNumber(Reflect.get(summaryRow, 'version'), 0)})
-        );
+        const finalSummary = buildSummaryForTitle(summaryRow, toTitle, summaryOverride);
+        await renameDictionaryData(activeFromTitle, toTitle, finalSummary, 'afterRenameRows');
 
-        await this._beginImmediateTransaction(db);
-        try {
-            db.exec({sql: 'UPDATE dictionaries SET title = $toTitle, version = $version, summaryJson = $summaryJson WHERE id = $id', bind: {
-                $id: summaryId,
-                $toTitle: toTitle,
-                $version: this._asNumber(Reflect.get(nextSummary, 'version'), 0),
-                $summaryJson: JSON.stringify(nextSummary),
-            }});
-            for (const table of ['termMeta', 'kanji', 'kanjiMeta', 'tagMeta', 'media', 'sharedGlossaryArtifacts']) {
-                db.exec({sql: `UPDATE ${table} SET dictionary = $toTitle WHERE dictionary = $fromTitle`, bind: {$fromTitle: fromTitle, $toTitle: toTitle}});
-            }
-            db.exec('COMMIT');
-        } catch (e) {
-            try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
-            throw e;
-        }
-        this._lastReplaceDictionaryTitleDebug = {
-            ...(this._lastReplaceDictionaryTitleDebug ?? {}),
-            afterRenameRows: snapshotRows(),
-        };
-
-        await this._termRecordStore.replaceDictionaryName(fromTitle, toTitle);
-        this._lastReplaceDictionaryTitleDebug = {
-            ...(this._lastReplaceDictionaryTitleDebug ?? {}),
-            afterTermRecordRebuildRows: snapshotRows(),
-        };
         this._termsVirtualTableDirty = true;
         this._termEntryContentCache.clear();
         this._termEntryContentIdByHash.clear();

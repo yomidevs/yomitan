@@ -292,13 +292,39 @@ export class TermRecordOpfsStore {
         /** @type {TextDecoder} */
         this._textDecoder = new TextDecoder();
         /** @type {boolean} */
-        // The wasm encoder currently emits corrupted entryContent offsets on Chromium import paths.
-        // Prefer the JS encoder for correctness until the wasm path is fixed.
-        this._wasmEncoderUnavailable = true;
+        // The wasm encoder currently emits corrupted entryContent offsets on Chromium-family import paths.
+        // Keep the JS fallback there for correctness, but allow the faster path on other runtimes.
+        this._wasmEncoderUnavailable = this._shouldDisableWasmEncoderByDefault();
         /** @type {string[]} */
         this._invalidShardFileNames = [];
         /** @type {number} */
         this._writeCoalesceTargetBytes = this._computeWriteCoalesceTargetBytes();
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    _shouldDisableWasmEncoderByDefault() {
+        if (typeof navigator === 'undefined') {
+            return false;
+        }
+        const userAgentData = /** @type {{brands?: Array<{brand?: string}>}|undefined} */ (/** @type {unknown} */ (navigator.userAgentData));
+        if (Array.isArray(userAgentData?.brands)) {
+            const brands = userAgentData.brands
+                .map((entry) => String(entry?.brand || '').toLowerCase())
+                .filter((value) => value.length > 0);
+            if (brands.some((brand) => brand.includes('chrom') || brand.includes('edge') || brand.includes('edg'))) {
+                return true;
+            }
+            if (brands.some((brand) => brand.includes('firefox'))) {
+                return false;
+            }
+        }
+        const userAgent = String(navigator.userAgent || '').toLowerCase();
+        if (userAgent.includes('firefox')) {
+            return false;
+        }
+        return userAgent.includes('chrome') || userAgent.includes('chromium') || userAgent.includes('edg/');
     }
 
     /**

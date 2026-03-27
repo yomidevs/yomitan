@@ -1196,6 +1196,52 @@ describe('Database', () => {
             }
         }, 15000);
 
+        test('Preserves the live dictionary when staged title cutover fails before delete', async ({expect}) => {
+            const liveDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1', 'Live Dictionary');
+            const stagedDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1', 'Live Dictionary');
+            const stagedDictionaryTitle = 'Live Dictionary [update-staging cutover-test]';
+            const dictionaryDatabase = new DictionaryDatabase();
+            await dictionaryDatabase.prepare();
+
+            const dictionaryImporter = createDictionaryImporter(expect);
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                liveDictionarySource,
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
+            );
+            await dictionaryImporter.importDictionary(
+                dictionaryDatabase,
+                stagedDictionarySource,
+                {
+                    prefixWildcardsSupported: true,
+                    yomitanVersion: '0.0.0.0',
+                    dictionaryTitleOverride: stagedDictionaryTitle,
+                },
+            );
+
+            // eslint-disable-next-line no-underscore-dangle
+            const replaceDictionaryNameSpy = vi.spyOn(dictionaryDatabase._termRecordStore, 'replaceDictionaryName').mockImplementationOnce(async () => {
+                throw new Error('Injected staged cutover failure');
+            });
+
+            try {
+                await expect.soft(dictionaryDatabase.replaceDictionaryTitle(
+                    stagedDictionaryTitle,
+                    'Live Dictionary',
+                    {title: 'Live Dictionary', sourceTitle: 'Live Dictionary'},
+                    'Live Dictionary',
+                )).rejects.toThrow('Injected staged cutover failure');
+
+                const info = await dictionaryDatabase.getDictionaryInfo();
+                const titles = info.map(({title}) => title);
+                expect.soft(titles.some((title) => title === 'Live Dictionary')).toBe(true);
+                expect.soft(titles.some((title) => title.includes('[cutover '))).toBe(true);
+            } finally {
+                replaceDictionaryNameSpy.mockRestore();
+                await dictionaryDatabase.close();
+            }
+        }, 15000);
+
         test('Cleans incomplete dictionaries during prepare', async ({expect}) => {
             const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
             const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);

@@ -2580,7 +2580,23 @@ async function main() {
             if (ensureNoStagedTitles && stagedTitles.length > 0) {
                 throw new Error(`Staged update dictionaries remained after restart: ${JSON.stringify(stagedTitles)}`);
             }
-            await evalSendMessage(page, 'enableInstalledDictionaries');
+            const preVerificationDiagnostics = await evalSendMessage(page, 'backendDiagnostics', backendReadyTerm);
+            const enabledDictionaryNames = Array.isArray(preVerificationDiagnostics?.enabledDictionaryNames) ?
+                preVerificationDiagnostics.enabledDictionaryNames.map((value) => String(value || '').trim()).filter((value) => value.length > 0) :
+                [];
+            const missingEnabledDictionaryNames = backendReadyDictionaryNames.filter((expectedTitle) => (
+                !enabledDictionaryNames.some((title) => matchesDictionaryName(title, expectedTitle))
+            ));
+            if (missingEnabledDictionaryNames.length > 0) {
+                throw new Error(`Enabled dictionary state did not persist across restart. enabled=${JSON.stringify(enabledDictionaryNames)} missing=${JSON.stringify(missingEnabledDictionaryNames)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
+            }
+            const mainDictionaryAfterRestart = String(preVerificationDiagnostics?.profileMainDictionary || '').trim();
+            if (
+                mainDictionaryAfterRestart.length === 0 ||
+                !expectedInstalledTitles.some((expectedTitle) => matchesDictionaryName(mainDictionaryAfterRestart, expectedTitle))
+            ) {
+                throw new Error(`Main dictionary selection did not persist across restart. mainDictionary=${JSON.stringify(mainDictionaryAfterRestart)} expectedInstalledTitles=${JSON.stringify(expectedInstalledTitles)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
+            }
             const backendReadyAfterRestart = await waitForBackendDictionaryReady(page, backendReadyDictionaryNames, backendReadyTerm, 60000, false);
             if (!(backendReadyAfterRestart && backendReadyAfterRestart.ok === true)) {
                 throw new Error(`Backend dictionary readiness did not persist across restart. diagnostics=${JSON.stringify(backendReadyAfterRestart?.diagnostics ?? null)}`);
@@ -2610,6 +2626,7 @@ async function main() {
                 extensionBaseUrl: restartedExtensionBaseUrl,
                 installedTitles: restartedInstalledTitles,
                 stagedTitles,
+                preVerificationDiagnostics,
                 backendDiagnostics: backendReadyAfterRestart?.diagnostics ?? null,
                 searchChecks: searchResults,
             };
