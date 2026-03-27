@@ -69,6 +69,7 @@
             <button type="button" class="low-emphasis danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Delete All</button>
             <button type="button" class="low-emphasis dictionary-database-mutating-input advanced-only" id="dictionary-check-integrity">Check Integrity</button>
             <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-updates">Check for Updates</button>
+            <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-update-all">Update All</button>
             <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-button">Import</button>
             <button type="button" data-modal-action="hide">Close</button>
         </div>
@@ -143,6 +144,26 @@
         <div class="modal-footer">
             <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
             <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-update-button">Update</button>
+        </div>
+    </div></div>
+
+    <div id="dictionary-confirm-update-all-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Confirm Dictionary Updates</div></div>
+        <div class="modal-body">
+            <p>Are you sure you want to update <strong id="dictionary-confirm-update-all-count"></strong>?</p>
+            <section>
+                Updating dictionaries involves:
+                <ul>
+                    <li>Deleting the installed version</li>
+                    <li>Downloading the latest version </li>
+                    <li>Importing the latest version</li>
+                </ul>
+                <p class="warning-text">Especially for large dictionaries, this process can take a while, and downloading will use your network.</p>
+            </section>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-update-all-button">Update All</button>
         </div>
     </div></div>
 
