@@ -969,6 +969,7 @@ async function evalSendMessage(page, expression, arg = null) {
                 enabledInstalledExactMatches,
                 profileLanguage: String(options0?.general?.language || ''),
                 profileMainDictionary: String(options0?.general?.mainDictionary || ''),
+                profileSortFrequencyDictionary: String(options0?.general?.sortFrequencyDictionary || ''),
                 profileResultOutputMode: String(options0?.general?.resultOutputMode || ''),
                 termResultCount: termLookupDefault.termResultCount,
                 termDictionaryNames: termLookupDefault.termDictionaryNames,
@@ -1202,7 +1203,10 @@ async function evalSendMessage(page, expression, arg = null) {
                     }
                 }
                 if (profile.options?.general && typeof profile.options.general === 'object') {
-                    profile.options.general.mainDictionary = enabledNames[0] || '';
+                    const mainDictionary = String(profile.options.general.mainDictionary || '').trim();
+                    if (mainDictionary.length > 0 && !enabledNames.includes(mainDictionary)) {
+                        profile.options.general.mainDictionary = '';
+                    }
                     const sortFrequency = profile.options.general.sortFrequencyDictionary;
                     if (typeof sortFrequency === 'string' && sortFrequency.length > 0 && !enabledNames.includes(sortFrequency)) {
                         profile.options.general.sortFrequencyDictionary = null;
@@ -2592,6 +2596,13 @@ async function main() {
                 !backendReadyDictionaryNames.some((expectedTitle) => matchesDictionaryName(mainDictionaryAfterRestart, expectedTitle))
             ) {
                 throw new Error(`Main dictionary selection did not persist across restart. mainDictionary=${JSON.stringify(mainDictionaryAfterRestart)} expectedDictionaryNames=${JSON.stringify(backendReadyDictionaryNames)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
+            }
+            const sortFrequencyDictionaryAfterRestart = String(preVerificationDiagnostics?.profileSortFrequencyDictionary || '').trim();
+            if (
+                sortFrequencyDictionaryAfterRestart.length > 0 &&
+                !backendReadyDictionaryNames.some((expectedTitle) => matchesDictionaryName(sortFrequencyDictionaryAfterRestart, expectedTitle))
+            ) {
+                throw new Error(`Sort frequency dictionary selection did not persist across restart. sortFrequencyDictionary=${JSON.stringify(sortFrequencyDictionaryAfterRestart)} expectedDictionaryNames=${JSON.stringify(backendReadyDictionaryNames)} diagnostics=${JSON.stringify(preVerificationDiagnostics)}`);
             }
             const backendReadyAfterRestart = await waitForBackendDictionaryReady(page, backendReadyDictionaryNames, backendReadyTerm, 60000, false);
             if (!(backendReadyAfterRestart && backendReadyAfterRestart.ok === true)) {
