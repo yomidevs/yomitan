@@ -1132,22 +1132,27 @@ export class TermRecordOpfsStore {
         await this._awaitQueuedWrites();
         await this._closeAllWritables();
 
-        let renamedCount = 0;
+        const recordIdsToRename = [];
         for (const id of this._recordsById.keys()) {
             const record = this._recordsById.get(id);
             if (typeof record === 'undefined' || record.dictionary !== fromName) { continue; }
-            record.dictionary = toName;
-            ++renamedCount;
+            recordIdsToRename.push(id);
         }
+        const renamedCount = recordIdsToRename.length;
         if (renamedCount === 0) {
             return 0;
         }
 
-        this._indexByDictionary.delete(fromName);
-        this._indexByDictionary.delete(toName);
-        this._indexDirty = false;
-
         if (this._recordsDirectoryHandle === null) {
+            for (const id of recordIdsToRename) {
+                const record = this._recordsById.get(id);
+                if (typeof record !== 'undefined') {
+                    record.dictionary = toName;
+                }
+            }
+            this._indexByDictionary.delete(fromName);
+            this._indexByDictionary.delete(toName);
+            this._indexDirty = false;
             return renamedCount;
         }
 
@@ -1155,6 +1160,8 @@ export class TermRecordOpfsStore {
         const sourceStates = [...this._shardStateByFileName.values()]
             .filter((state) => this._decodeDictionaryNameFromShardFileName(state.fileName) === fromName)
             .sort((a, b) => a.fileName.localeCompare(b.fileName));
+        /** @type {Array<{state: TermRecordShardState, shardInfo: NonNullable<ReturnType<TermRecordOpfsStore['_decodeShardInfoFromShardFileName']>>, nextFileName: string, nextFileHandle: FileSystemFileHandle, bytes: ArrayBuffer, fileSize: number}>} */
+        const renamePlans = [];
         for (const state of sourceStates) {
             let file;
             try {
@@ -1166,31 +1173,79 @@ export class TermRecordOpfsStore {
             if (shardInfo === null) { continue; }
             const nextFileName = this._getShardSegmentFileName(toName, shardInfo.contentDictName, shardInfo.segmentIndex);
             const nextFileHandle = await this._recordsDirectoryHandle.getFileHandle(nextFileName, {create: true});
-            const writable = await nextFileHandle.createWritable();
+            renamePlans.push({
+                state,
+                shardInfo,
+                nextFileName,
+                nextFileHandle,
+                bytes: await file.arrayBuffer(),
+                fileSize: file.size,
+            });
+        }
+        const writeShardBytes = async (fileHandle, bytes) => {
+            const writable = await fileHandle.createWritable();
             try {
                 await writable.truncate(0);
-                if (file.size > 0) {
-                    await writable.write(await file.arrayBuffer());
+                if (bytes.byteLength > 0) {
+                    await writable.write(bytes);
                 }
             } finally {
                 await writable.close();
             }
-            try {
-                await this._recordsDirectoryHandle.removeEntry(state.fileName);
-            } catch (_) {
-                // NOP
+        };
+        /** @type {typeof renamePlans} */
+        const createdPlans = [];
+        /** @type {typeof renamePlans} */
+        const removedPlans = [];
+        try {
+            for (const plan of renamePlans) {
+                await writeShardBytes(plan.nextFileHandle, plan.bytes);
+                createdPlans.push(plan);
             }
-            this._shardStateByFileName.delete(state.fileName);
-            this._activeAppendShardStateByKey.delete(state.logicalKey);
+            for (const plan of renamePlans) {
+                await this._recordsDirectoryHandle.removeEntry(plan.state.fileName);
+                removedPlans.push(plan);
+            }
+        } catch (e) {
+            for (const plan of removedPlans.slice().reverse()) {
+                try {
+                    const restoredHandle = await this._recordsDirectoryHandle.getFileHandle(plan.state.fileName, {create: true});
+                    await writeShardBytes(restoredHandle, plan.bytes);
+                } catch (_) {
+                    // NOP - preserve original failure.
+                }
+            }
+            for (const plan of createdPlans.slice().reverse()) {
+                try {
+                    await this._recordsDirectoryHandle.removeEntry(plan.nextFileName);
+                } catch (_) {
+                    // NOP - preserve original failure.
+                }
+            }
+            throw e;
+        }
+
+        for (const id of recordIdsToRename) {
+            const record = this._recordsById.get(id);
+            if (typeof record !== 'undefined') {
+                record.dictionary = toName;
+            }
+        }
+        this._indexByDictionary.delete(fromName);
+        this._indexByDictionary.delete(toName);
+        this._indexDirty = false;
+        for (const plan of renamePlans) {
+            this._shardStateByFileName.delete(plan.state.fileName);
+            this._activeAppendShardStateByKey.delete(plan.state.logicalKey);
             const nextState = this._createShardState(
-                nextFileName,
-                nextFileHandle,
-                file.size,
-                shardInfo.contentDictName,
-                shardInfo.segmentIndex,
-                this._getShardFileName(toName, shardInfo.contentDictName),
+                plan.nextFileName,
+                plan.nextFileHandle,
+                plan.fileSize,
+                plan.shardInfo.contentDictName,
+                plan.shardInfo.segmentIndex,
+                this._getShardFileName(toName, plan.shardInfo.contentDictName),
             );
-            this._shardStateByFileName.set(nextFileName, nextState);
+            this._shardStateByFileName.set(plan.nextFileName, nextState);
             this._setActiveAppendShardState(nextState);
         }
 

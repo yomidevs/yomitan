@@ -1098,6 +1098,7 @@ export class DictionaryDatabase {
                 for (const table of ['termMeta', 'kanji', 'kanjiMeta', 'tagMeta', 'media', 'sharedGlossaryArtifacts']) {
                     db.exec({sql: `UPDATE ${table} SET dictionary = $toTitle WHERE dictionary = $fromTitle`, bind: {$fromTitle: sourceTitle, $toTitle: targetTitle}});
                 }
+                await this._termRecordStore.replaceDictionaryName(sourceTitle, targetTitle);
                 db.exec('COMMIT');
             } catch (e) {
                 try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
@@ -1107,7 +1108,6 @@ export class DictionaryDatabase {
                 ...(this._lastReplaceDictionaryTitleDebug ?? {}),
                 [debugKey]: snapshotRows(),
             };
-            await this._termRecordStore.replaceDictionaryName(sourceTitle, targetTitle);
             this._lastReplaceDictionaryTitleDebug = {
                 ...(this._lastReplaceDictionaryTitleDebug ?? {}),
                 [`${debugKey}AfterTermRecordRows`]: snapshotRows(),

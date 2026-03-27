@@ -18,7 +18,7 @@
 import {describe, expect, test} from 'vitest';
 import {TermRecordOpfsStore} from '../ext/js/dictionary/term-record-opfs-store.js';
 
-function createFakeDirectoryHandle(fileBytesByName) {
+function createFakeDirectoryHandle(fileBytesByName, {removeEntryFailures = new Map()} = {}) {
     return {
         async getFileHandle(name, {create} = {create: false}) {
             if (!fileBytesByName.has(name)) {
@@ -60,6 +60,11 @@ function createFakeDirectoryHandle(fileBytesByName) {
             };
         },
         async removeEntry(name) {
+            const failuresRemaining = removeEntryFailures.get(name) ?? 0;
+            if (failuresRemaining > 0) {
+                removeEntryFailures.set(name, failuresRemaining - 1);
+                throw new Error(`Injected removeEntry failure for ${name}`);
+            }
             fileBytesByName.delete(name);
         },
         async *entries() {
@@ -110,5 +115,47 @@ describe('TermRecordOpfsStore', () => {
         expect(Array.from(fileBytesByName.get(newFileName) ?? [])).toStrictEqual([1, 2, 3, 4]);
         expect(shardStateByFileName.has(oldFileName)).toBe(false);
         expect(shardStateByFileName.has(newFileName)).toBe(true);
+    });
+
+    test('replaceDictionaryName restores original shard files and records when source removal fails', async () => {
+        const store = new TermRecordOpfsStore();
+        const recordsById = Reflect.get(store, '_recordsById');
+        const shardStateByFileName = Reflect.get(store, '_shardStateByFileName');
+        const activeAppendShardStateByKey = Reflect.get(store, '_activeAppendShardStateByKey');
+        const oldFileName = store._getShardSegmentFileName('JMdict staging', 'raw', 0);
+        const oldLogicalKey = store._getShardFileName('JMdict staging', 'raw');
+        const fileBytesByName = new Map([[oldFileName, new Uint8Array([9, 8, 7, 6])]]);
+        const recordsDirectoryHandle = createFakeDirectoryHandle(fileBytesByName, {
+            removeEntryFailures: new Map([[oldFileName, 1]]),
+        });
+        const fileHandle = await recordsDirectoryHandle.getFileHandle(oldFileName, {create: false});
+        const shardState = store._createShardState(oldFileName, fileHandle, 4, 'raw', 0, oldLogicalKey);
+
+        Reflect.set(store, '_recordsDirectoryHandle', recordsDirectoryHandle);
+        shardStateByFileName.set(oldFileName, shardState);
+        activeAppendShardStateByKey.set(oldLogicalKey, shardState);
+        recordsById.set(1, {
+            id: 1,
+            dictionary: 'JMdict staging',
+            expression: '暗記',
+            reading: 'あんき',
+            expressionReverse: null,
+            readingReverse: null,
+            entryContentOffset: 0,
+            entryContentLength: 4,
+            entryContentDictName: 'raw',
+            score: 0,
+            sequence: null,
+        });
+
+        await expect(store.replaceDictionaryName('JMdict staging', 'JMdict [2026-02-26]')).rejects.toThrow(/Injected removeEntry failure/);
+
+        const newFileName = store._getShardSegmentFileName('JMdict [2026-02-26]', 'raw', 0);
+        expect(recordsById.get(1)?.dictionary).toBe('JMdict staging');
+        expect(fileBytesByName.has(oldFileName)).toBe(true);
+        expect(fileBytesByName.has(newFileName)).toBe(false);
+        expect(Array.from(fileBytesByName.get(oldFileName) ?? [])).toStrictEqual([9, 8, 7, 6]);
+        expect(shardStateByFileName.has(oldFileName)).toBe(true);
+        expect(shardStateByFileName.has(newFileName)).toBe(false);
     });
 });
