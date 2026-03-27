@@ -3529,9 +3529,11 @@ async function main() {
             const deleteJmdictBeforeBatchProfile = await runPhaseProfile(cdpSession, async () => {
                 await page.goto(`${extensionBaseUrl}/settings.html?popup-preview=false`);
                 await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30000});
+                const installedTitles = await getInstalledDictionaryTitles(page);
+                const installedJmdictTitle = resolveInstalledDictionaryTitle(installedTitles, 'JMdict') ?? 'JMdict';
                 await openInstalledDictionariesModal(page);
-                await requestDictionaryDeleteFromInstalledModal(page, 'JMdict');
-                return await waitForDictionaryDeleteCompletion(page, 'JMdict', ['Jitendex'], 240000);
+                await requestDictionaryDeleteFromInstalledModal(page, installedJmdictTitle);
+                return await waitForDictionaryDeleteCompletion(page, installedJmdictTitle, ['Jitendex'], 240000);
             });
             const deleteJmdictBeforeBatchEnd = safePerformance.now();
             await addReportPhase(
