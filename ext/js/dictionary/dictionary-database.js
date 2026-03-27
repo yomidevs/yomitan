@@ -1026,6 +1026,8 @@ export class DictionaryDatabase {
         const fromTitle = `${fromDictionaryTitle}`.trim();
         const toTitle = `${toDictionaryTitle}`.trim();
         const replacedTitle = typeof replacedDictionaryTitle === 'string' ? replacedDictionaryTitle.trim() : null;
+        const matchTransientToken = fromTitle.match(/\[(?:update-staging|cutover|replaced) ([^\]]+)\]$/);
+        const transientSessionToken = matchTransientToken ? matchTransientToken[1] : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
         if (fromTitle.length === 0 || toTitle.length === 0) {
             throw new Error('Dictionary titles must be non-empty');
         }
@@ -1117,6 +1119,9 @@ export class DictionaryDatabase {
         const forceCleanupTransientDictionaryTitle = async (dictionaryTitle) => {
             const title = `${dictionaryTitle}`.trim();
             if (title.length === 0) { return; }
+            if (!TRANSIENT_UPDATE_TITLE_PATTERN.test(title)) {
+                throw new Error(`Refusing fallback cleanup for non-transient dictionary title: ${title}`);
+            }
             /** @type {unknown} */
             let originalDeleteError = null;
             try {
@@ -1186,8 +1191,8 @@ export class DictionaryDatabase {
 
         let activeFromTitle = fromTitle;
         if (replacedTitle !== null && replacedTitle.length > 0 && replacedTitle === toTitle && replacedTitle !== fromTitle) {
-            const temporaryCutoverTitle = `${toTitle} [cutover ${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}]`;
-            const temporaryReplacedTitle = `${replacedTitle} [replaced ${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}]`;
+            const temporaryCutoverTitle = `${toTitle} [cutover ${transientSessionToken}]`;
+            const temporaryReplacedTitle = `${replacedTitle} [replaced ${transientSessionToken}]`;
             const temporarySummary = buildSummaryForTitle(summaryRow, temporaryCutoverTitle, summaryOverride);
             await renameDictionaryData(fromTitle, temporaryCutoverTitle, temporarySummary, 'afterTemporaryCutoverRows');
             activeFromTitle = temporaryCutoverTitle;

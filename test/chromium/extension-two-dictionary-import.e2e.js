@@ -1190,6 +1190,38 @@ async function evalSendMessage(page, expression, arg = null) {
                 profileScanningInputs: (updatedOptions?.profiles || []).map((profile) => profile?.options?.scanning?.inputs ?? null),
             };
         }
+        if (expression === 'configureRestartProfileMatrix') {
+            const optionsFull = await send('optionsGetFull', undefined);
+            const nextOptions = structuredClone(optionsFull);
+            if (!Array.isArray(nextOptions.profiles) || nextOptions.profiles.length === 0) {
+                throw new Error('No profiles available for restart profile matrix');
+            }
+            if (nextOptions.profiles.length === 1) {
+                const baseProfile = structuredClone(nextOptions.profiles[0]);
+                baseProfile.id = `${String(baseProfile.id || 'profile')}-restart-matrix`;
+                baseProfile.name = `${String(baseProfile.name || 'Profile')} Restart Matrix`;
+                nextOptions.profiles.push(baseProfile);
+            }
+            const installedTitles = (await send('getDictionaryInfo', undefined))
+                .map((row) => String(row?.title || '').trim())
+                .filter((value) => value.length > 0);
+            const primaryTitle = installedTitles[0] || '';
+            const secondaryTitle = installedTitles[1] || primaryTitle;
+            nextOptions.profiles.forEach((profile, index) => {
+                if (!profile?.options) { return; }
+                const rows = Array.isArray(profile.options.dictionaries) ? profile.options.dictionaries : [];
+                profile.options.dictionaries = rows.map((row, rowIndex) => ({
+                    ...row,
+                    enabled: index === 0 ? row?.enabled === true : rowIndex === 0,
+                }));
+                if (profile.options.general && typeof profile.options.general === 'object') {
+                    profile.options.general.mainDictionary = index === 0 ? primaryTitle : secondaryTitle;
+                    profile.options.general.sortFrequencyDictionary = index === 0 ? secondaryTitle : primaryTitle;
+                }
+            });
+            await send('setAllSettings', {value: nextOptions, source: 'chromium-e2e-restart-profile-matrix'});
+            return {ok: true, profileCount: nextOptions.profiles.length};
+        }
         if (expression === 'setEnabledDictionaries') {
             const targetNames = (Array.isArray(arg) ? arg : [])
                 .map((value) => String(value || '').trim())
@@ -3679,6 +3711,7 @@ async function main() {
             let restartPersistenceError = '';
             let restartPersistenceResult = null;
             try {
+                await evalSendMessage(page, 'configureRestartProfileMatrix');
                 const expectedPostRestartTitles = focusedUpdateOnlyMode ? [updatedJmdictTitle] : ['Jitendex', updatedJmdictTitle];
                 restartPersistenceResult = await relaunchAndVerifyPersistence({
                     expectedInstalledTitles: expectedPostRestartTitles,
