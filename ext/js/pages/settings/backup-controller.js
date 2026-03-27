@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Dexie} from '../../../lib/dexie.js';
 import {ThemeController} from '../../app/theme-controller.js';
 import {parseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
@@ -53,10 +52,8 @@ export class BackupController {
         /** @type {?OptionsUtil} */
         this._optionsUtil = null;
 
-        /** @type {string} */
-        this._dictionariesDatabaseName = 'dict';
         /** @type {?import('core').TokenObject} */
-        this._settingsExportDatabaseToken = null;
+        this._settingsDatabaseOperationToken = null;
 
         try {
             this._optionsUtil = new OptionsUtil();
@@ -89,6 +86,9 @@ export class BackupController {
         this._addNodeEventListener('#settings-export-db-button', 'click', this._onSettingsExportDatabaseClick.bind(this), false);
         this._addNodeEventListener('#settings-import-db-button', 'click', this._onSettingsImportDatabaseClick.bind(this), false);
         this._addNodeEventListener('#settings-import-db', 'change', this._onSettingsImportDatabaseChange.bind(this), false);
+        this._addNodeEventListener('#settings-migrate-legacy-indexeddb-button', 'click', this._onSettingsMigrateLegacyIndexedDbClick.bind(this), false);
+        this._settingsController.application.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        await this._updateLegacyIndexedDbMigrationUi();
     }
 
     // Private
@@ -567,106 +567,141 @@ export class BackupController {
     }
 
     /**
-     * @param {{totalRows: number, completedRows: number, done: boolean}} details
+     * @param {string} message
+     * @param {string} [color]
+     * @param {boolean} [hide]
      */
-    _databaseExportProgressCallback({totalRows, completedRows, done}) {
-        log.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
+    _setDatabaseExportImportStatus(message, color = '#4169e1', hide = false) {
         /** @type {HTMLElement} */
         const messageSettingsContainer = querySelectorNotNull(document, '#db-ops-progress-report-container');
         messageSettingsContainer.style.display = 'block';
         /** @type {HTMLElement} */
         const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
-        messageContainer.style.display = 'block';
-        messageContainer.textContent = `Export Progress: ${completedRows} of ${totalRows} rows completed`;
-
-        if (done) {
-            log.log('Done exporting.');
+        if (hide) {
             messageContainer.style.display = 'none';
+            return;
+        }
+        messageContainer.style.display = 'block';
+        messageContainer.style.color = color;
+        messageContainer.textContent = message;
+    }
+
+    /**
+     * @param {import('api').LegacyIndexedDbMigrationReason} reason
+     * @returns {{message: string, color: string, enabled: boolean}}
+     */
+    _getLegacyIndexedDbMigrationUiState(reason) {
+        switch (reason) {
+            case 'available':
+                return {
+                    message: 'Legacy IndexedDB dictionary data was found and the current SQLite dictionary database is empty. You can try the experimental migration.',
+                    color: '#8B6508',
+                    enabled: true,
+                };
+            case 'indexeddb-unavailable':
+                return {
+                    message: 'IndexedDB is unavailable in this context, so the experimental migration cannot run here.',
+                    color: '#8B0000',
+                    enabled: false,
+                };
+            case 'legacy-database-empty':
+                return {
+                    message: 'A legacy IndexedDB dictionary database was found, but it does not contain any dictionaries to migrate.',
+                    color: '#666666',
+                    enabled: false,
+                };
+            case 'sqlite-not-empty':
+                return {
+                    message: 'The current SQLite dictionary database already contains dictionaries. This experimental migration only runs when the SQLite dictionary database is empty.',
+                    color: '#8B0000',
+                    enabled: false,
+                };
+            default:
+                return {
+                    message: 'No legacy IndexedDB dictionary database was detected.',
+                    color: '#666666',
+                    enabled: false,
+                };
+        }
+    }
+
+    /** */
+    async _updateLegacyIndexedDbMigrationUi() {
+        const button = document.querySelector('#settings-migrate-legacy-indexeddb-button');
+        const statusNode = document.querySelector('#settings-legacy-indexeddb-migration-status');
+        if (!(button instanceof HTMLButtonElement) || !(statusNode instanceof HTMLElement)) {
+            return;
+        }
+
+        try {
+            const status = await this._settingsController.application.api.getLegacyIndexedDbMigrationStatus();
+            const {message, color, enabled} = this._getLegacyIndexedDbMigrationUiState(status.reason);
+            statusNode.textContent = message;
+            statusNode.style.color = color;
+            button.disabled = !enabled || this._settingsDatabaseOperationToken !== null;
+        } catch (error) {
+            log.error(error);
+            statusNode.textContent = 'Unable to determine whether a legacy IndexedDB dictionary database is available.';
+            statusNode.style.color = '#8B0000';
+            button.disabled = true;
+        }
+    }
+
+    /** */
+    _clearDatabaseOperationError() {
+        const errorMessageContainer = document.querySelector('#db-ops-error-report');
+        if (errorMessageContainer instanceof HTMLElement) {
+            errorMessageContainer.style.display = 'none';
         }
     }
 
     /**
-     * @param {string} databaseName
-     * @returns {Promise<Blob>}
+     * @returns {Promise<ArrayBuffer>}
      */
-    async _exportDatabase(databaseName) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const DexieConstructor = /** @type {import('dexie').DexieConstructor} */ (/** @type {unknown} */ (Dexie));
-        const db = new DexieConstructor(databaseName);
-        await db.open();
-        /** @type {unknown} */
-        // @ts-expect-error - The export function is declared as an extension which has no type information.
-        const blob = await db.export({
-            progressCallback: this._databaseExportProgressCallback.bind(this),
-        });
-        db.close();
-        return /** @type {Blob} */ (blob);
+    async _exportDatabase() {
+        return await this._settingsController.application.api.exportDictionaryDatabase();
     }
 
     /** */
     async _onSettingsExportDatabaseClick() {
-        if (this._settingsExportDatabaseToken !== null) {
+        if (this._settingsDatabaseOperationToken !== null) {
             // An existing import or export is in progress.
             this._databaseExportImportErrorMessage('An export or import operation is already in progress. Please wait till it is over.', true);
             return;
         }
 
-        /** @type {HTMLElement} */
-        const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
-        errorMessageContainer.style.display = 'none';
+        this._clearDatabaseOperationError();
 
         const date = new Date(Date.now());
         const pageExitPrevention = this._settingsController.preventPageExit();
         try {
             /** @type {import('core').TokenObject} */
             const token = {};
-            this._settingsExportDatabaseToken = token;
-            const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
-            const data = await this._exportDatabase(this._dictionariesDatabaseName);
-            const blob = new Blob([data], {type: 'application/json'});
+            this._settingsDatabaseOperationToken = token;
+            await this._updateLegacyIndexedDbMigrationUi();
+            this._setDatabaseExportImportStatus('Exporting dictionary collection...');
+            const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.sqlite3`;
+            const data = await this._exportDatabase();
+            const blob = new Blob([data], {type: 'application/octet-stream'});
             this._saveBlob(blob, fileName);
+            this._setDatabaseExportImportStatus('Done exporting dictionary collection.', '#006633');
         } catch (error) {
             log.log(error);
+            this._setDatabaseExportImportStatus('', '#4169e1', true);
             this._databaseExportImportErrorMessage('Errors encountered while exporting. Please try again. Restart the browser if it continues to fail.');
         } finally {
             pageExitPrevention.end();
-            this._settingsExportDatabaseToken = null;
-        }
-    }
-
-    // Importing Dictionaries Database
-
-    /**
-     * @param {{totalRows: number, completedRows: number, done: boolean}} details
-     */
-    _databaseImportProgressCallback({totalRows, completedRows, done}) {
-        log.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
-        /** @type {HTMLElement} */
-        const messageSettingsContainer = querySelectorNotNull(document, '#db-ops-progress-report-container');
-        messageSettingsContainer.style.display = 'block';
-        /** @type {HTMLElement} */
-        const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
-        messageContainer.style.display = 'block';
-        messageContainer.style.color = '#4169e1';
-        messageContainer.textContent = `Import Progress: ${completedRows} of ${totalRows} rows completed`;
-
-        if (done) {
-            log.log('Done importing.');
-            messageContainer.style.color = '#006633';
-            messageContainer.textContent = 'Done importing. You will need to re-enable the dictionaries and refresh afterward. If you run into issues, please restart the browser. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.';
+            this._settingsDatabaseOperationToken = null;
+            await this._updateLegacyIndexedDbMigrationUi();
         }
     }
 
     /**
-     * @param {string} _databaseName
      * @param {File} file
      */
-    async _importDatabase(_databaseName, file) {
-        await this._settingsController.application.api.purgeDatabase();
-        await Dexie.import(file, {
-            progressCallback: this._databaseImportProgressCallback.bind(this),
-        });
-        void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+    async _importDatabase(file) {
+        const content = await this._readFileArrayBuffer(file);
+        await this._settingsController.application.api.importDictionaryDatabase(content);
         this._settingsController.application.triggerStorageChanged();
     }
 
@@ -681,15 +716,13 @@ export class BackupController {
      * @param {Event} e
      */
     async _onSettingsImportDatabaseChange(e) {
-        if (this._settingsExportDatabaseToken !== null) {
+        if (this._settingsDatabaseOperationToken !== null) {
             // An existing import or export is in progress.
             this._databaseExportImportErrorMessage('An export or import operation is already in progress. Please wait till it is over.', true);
             return;
         }
 
-        /** @type {HTMLElement} */
-        const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
-        errorMessageContainer.style.display = 'none';
+        this._clearDatabaseOperationError();
 
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
         const files = element.files;
@@ -701,17 +734,76 @@ export class BackupController {
         try {
             /** @type {import('core').TokenObject} */
             const token = {};
-            this._settingsExportDatabaseToken = token;
-            await this._importDatabase(this._dictionariesDatabaseName, file);
+            this._settingsDatabaseOperationToken = token;
+            await this._updateLegacyIndexedDbMigrationUi();
+            this._setDatabaseExportImportStatus('Importing dictionary collection...');
+            await this._importDatabase(file);
+            this._setDatabaseExportImportStatus(
+                'Done importing. You will need to re-enable the dictionaries and refresh afterward. If you run into issues, please restart the browser. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.',
+                '#006633',
+            );
         } catch (error) {
             log.log(error);
-            /** @type {HTMLElement} */
-            const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
-            messageContainer.style.color = 'red';
+            this._setDatabaseExportImportStatus('', '#4169e1', true);
             this._databaseExportImportErrorMessage('Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.');
         } finally {
             pageExitPrevention.end();
-            this._settingsExportDatabaseToken = null;
+            this._settingsDatabaseOperationToken = null;
+            await this._updateLegacyIndexedDbMigrationUi();
         }
+    }
+
+    /** */
+    async _onSettingsMigrateLegacyIndexedDbClick() {
+        if (this._settingsDatabaseOperationToken !== null) {
+            this._databaseExportImportErrorMessage('An export, import, or migration operation is already in progress. Please wait until it finishes.', true);
+            return;
+        }
+
+        this._clearDatabaseOperationError();
+
+        const pageExitPrevention = this._settingsController.preventPageExit();
+        try {
+            const status = await this._settingsController.application.api.getLegacyIndexedDbMigrationStatus();
+            if (!status.migrationAvailable) {
+                const {message} = this._getLegacyIndexedDbMigrationUiState(status.reason);
+                this._databaseExportImportErrorMessage(message, true);
+                await this._updateLegacyIndexedDbMigrationUi();
+                return;
+            }
+
+            /** @type {import('core').TokenObject} */
+            const token = {};
+            this._settingsDatabaseOperationToken = token;
+            await this._updateLegacyIndexedDbMigrationUi();
+            this._setDatabaseExportImportStatus('Running experimental legacy IndexedDB migration...');
+
+            const result = await this._settingsController.application.api.migrateLegacyIndexedDb();
+            if (result.result !== 'migrated') {
+                const {message} = this._getLegacyIndexedDbMigrationUiState(result.reason ?? 'legacy-database-missing');
+                this._setDatabaseExportImportStatus('', '#4169e1', true);
+                this._databaseExportImportErrorMessage(message);
+                return;
+            }
+
+            this._settingsController.application.triggerStorageChanged();
+            this._setDatabaseExportImportStatus(
+                `Done migrating ${result.totalRows} legacy IndexedDB rows into SQLite. Review your dictionaries and export a backup if everything looks correct.`,
+                '#006633',
+            );
+        } catch (error) {
+            log.log(error);
+            this._setDatabaseExportImportStatus('', '#4169e1', true);
+            this._databaseExportImportErrorMessage('Encountered errors while running the experimental migration. Please restart the browser and verify your dictionaries before trying again.');
+        } finally {
+            pageExitPrevention.end();
+            this._settingsDatabaseOperationToken = null;
+            await this._updateLegacyIndexedDbMigrationUi();
+        }
+    }
+
+    /** */
+    _onDatabaseUpdated() {
+        void this._updateLegacyIndexedDbMigrationUi();
     }
 }

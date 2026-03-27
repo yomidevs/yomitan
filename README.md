@@ -98,7 +98,7 @@ Feel free to join us on the [Yomitan Discord](https://discord.gg/YkQrXW6TXF).
 
 ## Building Yomitan
 
-1. Install [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/).
+1. Install [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/). You also need a wasm32-capable compiler such as `clang` or `zig` on `PATH` to build the bundled dictionary wasm assets. If needed, set `YOMITAN_CLANG` or `CLANG` to the compiler binary you want Yomitan to use.
 
 2. Run `npm ci` to set up the environment.
 

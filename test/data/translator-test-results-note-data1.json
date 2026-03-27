@@ -7454,10 +7454,8 @@
             {
               "type": "image",
               "path": "image.gif",
-              "width": 100,
-              "height": 100,
-              "preferredWidth": 350,
-              "preferredHeight": 350,
+              "width": 350,
+              "height": 350,
               "description": "gazou definition 2",
               "pixelated": true
             }
@@ -13704,10 +13702,8 @@
             {
               "type": "image",
               "path": "image.gif",
-              "width": 100,
-              "height": 100,
-              "preferredWidth": 350,
-              "preferredHeight": 350,
+              "width": 350,
+              "height": 350,
               "description": "gazou definition 2",
               "pixelated": true
             }
