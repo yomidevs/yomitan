@@ -311,6 +311,11 @@ function createProfileOptionsUpdatedTestData1() {
             termDisplayMode: 'ruby',
             sortFrequencyDictionary: null,
             sortFrequencyDictionaryOrder: 'descending',
+            popupBlurByFrequencyEnabled: false,
+            popupBlurByFrequencyDictionary: null,
+            popupBlurByFrequencyThreshold: 10000,
+            popupBlurByFrequencyOrder: 'descending',
+            popupBlurByFrequencyUnblurDelay: 0,
             stickySearchHeader: false,
             enableYomitanApi: false,
             yomitanApiServer: 'http://127.0.0.1:19633',
@@ -705,7 +710,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 74,
+        version: 75,
         global: {
             database: {
                 prefixWildcardsSupported: false,
@@ -739,6 +744,35 @@ describe('OptionsUtil', () => {
         const optionsUpdated = structuredClone(await optionsUtil.update(options));
         const optionsExpected = createOptionsUpdatedTestData1();
         expect(optionsUpdated).toStrictEqual(optionsExpected);
+    });
+
+    test('PopupFrequencyBlurVersion75MigrationUsesDefaultsAndStaysDecoupled', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = /** @type {import('settings').Options} */ (structuredClone(createOptionsUpdatedTestData1()));
+        options.version = 74;
+        const general = /** @type {import('core').SafeAny} */ (options.profiles[0].options.general);
+        general.sortFrequencyDictionary = 'Sort Dictionary';
+        general.sortFrequencyDictionaryOrder = 'ascending';
+        delete general.popupBlurByFrequencyEnabled;
+        delete general.popupBlurByFrequencyDictionary;
+        delete general.popupBlurByFrequencyThreshold;
+        delete general.popupBlurByFrequencyOrder;
+        delete general.popupBlurByFrequencyUnblurDelay;
+
+        const optionsUpdated = structuredClone(await optionsUtil.update(options));
+        const defaultGeneral = optionsUtil.getDefault().profiles[0].options.general;
+        expect(optionsUpdated.version).toBe(75);
+        expect(optionsUpdated.profiles[0].options.general).toMatchObject({
+            popupBlurByFrequencyEnabled: defaultGeneral.popupBlurByFrequencyEnabled,
+            popupBlurByFrequencyDictionary: defaultGeneral.popupBlurByFrequencyDictionary,
+            popupBlurByFrequencyThreshold: defaultGeneral.popupBlurByFrequencyThreshold,
+            popupBlurByFrequencyOrder: defaultGeneral.popupBlurByFrequencyOrder,
+            popupBlurByFrequencyUnblurDelay: defaultGeneral.popupBlurByFrequencyUnblurDelay,
+            sortFrequencyDictionary: 'Sort Dictionary',
+            sortFrequencyDictionaryOrder: 'ascending',
+        });
     });
 
     test('CumulativeFieldTemplatesUpdates', async () => {

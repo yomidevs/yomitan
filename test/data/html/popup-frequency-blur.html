@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Popup Frequency Blur Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 48px;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+            color: #0f172a;
+        }
+
+        main {
+            display: grid;
+            gap: 24px;
+            max-width: 720px;
+        }
+
+        #outside-hover-target {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 48px;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            background-color: rgba(255, 255, 255, 0.75);
+        }
+
+        .target-card {
+            display: grid;
+            gap: 6px;
+            padding: 20px 24px;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        .target-label {
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .hovertarget {
+            display: inline-block;
+            font-size: 48px;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div id="outside-hover-target">Leave popup</div>
+        <div class="target-card">
+            <div class="target-label">Should blur in occurrence-based mode at threshold 1</div>
+            <div class="hovertarget" id="term-common">打</div>
+        </div>
+    </main>
+</body>
+</html>
