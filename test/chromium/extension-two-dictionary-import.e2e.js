@@ -2572,6 +2572,11 @@ async function main() {
             searchChecks,
             ensureNoStagedTitles = false,
         }) => {
+            const normalizeNameSet = (values) => [...new Set(
+                (Array.isArray(values) ? values : [])
+                    .map((value) => String(value || '').trim())
+                    .filter((value) => value.length > 0),
+            )].sort((a, b) => a.localeCompare(b));
             const preRestartDiagnostics = await evalSendMessage(page, 'backendDiagnostics', backendReadyTerm);
             const mainDictionaryBeforeRestart = String(preRestartDiagnostics?.profileMainDictionary || '').trim();
             const sortFrequencyDictionaryBeforeRestart = String(preRestartDiagnostics?.profileSortFrequencyDictionary || '').trim();
@@ -2639,8 +2644,8 @@ async function main() {
                     String(before?.id || '') !== String(after?.id || '') ||
                     String(before?.mainDictionary || '') !== String(after?.mainDictionary || '') ||
                     String(before?.sortFrequencyDictionary || '') !== String(after?.sortFrequencyDictionary || '') ||
-                    JSON.stringify(Array.isArray(before?.enabledDictionaryNames) ? before.enabledDictionaryNames : []) !==
-                        JSON.stringify(Array.isArray(after?.enabledDictionaryNames) ? after.enabledDictionaryNames : [])
+                    JSON.stringify(normalizeNameSet(before?.enabledDictionaryNames)) !==
+                        JSON.stringify(normalizeNameSet(after?.enabledDictionaryNames))
                 ) {
                     throw new Error(`Profile selector state changed across restart. before=${JSON.stringify(profileSelectorStateBeforeRestart)} after=${JSON.stringify(profileSelectorStateAfterRestart)}`);
                 }

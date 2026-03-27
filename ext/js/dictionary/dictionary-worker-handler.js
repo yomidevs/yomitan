@@ -185,6 +185,10 @@ export class DictionaryWorkerHandler {
                 const transientTitleCandidates = new Set();
                 const transientTitlePattern = /\[(?:update-staging|cutover|replaced) [^\]]+\]/;
                 const replacementFamilyPrefix = replacementDictionaryTitle !== null ? `${replacementDictionaryTitle} [` : null;
+                const stagingFamilyPrefix = (
+                    dictionaryTitleOverride !== null &&
+                    transientTitlePattern.test(dictionaryTitleOverride)
+                ) ? `${dictionaryTitleOverride.split(' [')[0]} [` : null;
                 if (dictionaryTitleOverride !== null && transientTitlePattern.test(dictionaryTitleOverride)) {
                     transientTitleCandidates.add(dictionaryTitleOverride);
                 }
@@ -200,7 +204,8 @@ export class DictionaryWorkerHandler {
                         transientTitlePattern.test(title) &&
                         (
                             title === dictionaryTitleOverride ||
-                            (replacementFamilyPrefix !== null && title.startsWith(replacementFamilyPrefix))
+                            (replacementFamilyPrefix !== null && title.startsWith(replacementFamilyPrefix)) ||
+                            (stagingFamilyPrefix !== null && title.startsWith(stagingFamilyPrefix))
                         )
                     ) {
                         transientTitleCandidates.add(title);
@@ -221,7 +226,10 @@ export class DictionaryWorkerHandler {
                     if (transientTitleCandidates.has(title)) {
                         return true;
                     }
-                    return replacementFamilyPrefix !== null && title.startsWith(replacementFamilyPrefix) && transientTitlePattern.test(title);
+                    return transientTitlePattern.test(title) && (
+                        (replacementFamilyPrefix !== null && title.startsWith(replacementFamilyPrefix)) ||
+                        (stagingFamilyPrefix !== null && title.startsWith(stagingFamilyPrefix))
+                    );
                 });
             };
             const importOnce = async (activeDictionaryDatabase) => {

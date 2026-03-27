@@ -1950,6 +1950,15 @@ export class DictionaryImportController {
      */
     async _addDictionarySettings(summary, profilesDictionarySettings) {
         const {title, sequenced, styles} = summary;
+        const sourceTitle = (
+            typeof summary.sourceTitle === 'string' &&
+            summary.sourceTitle.trim().length > 0
+        ) ? summary.sourceTitle.trim() : null;
+        const replacedTitle = (
+            typeof summary.replacedDictionaryTitle === 'string' &&
+            summary.replacedDictionaryTitle.trim().length > 0
+        ) ? summary.replacedDictionaryTitle.trim() : null;
+        const selectorSourceTitle = sourceTitle ?? replacedTitle;
         let optionsFull;
         // Workaround Firefox bug sometimes causing getOptionsFull to fail
         for (let i = 0, success = false; (i < 10) && (success === false); i++) {
@@ -1974,7 +1983,7 @@ export class DictionaryImportController {
 
             if (profilesDictionarySettings === null || typeof profilesDictionarySettings[profileId] === 'undefined') {
                 targets.push({action: 'push', path: path1, items: [defaultSettings]});
-                if (options.general.mainDictionary === summary.sourceTitle) {
+                if (selectorSourceTitle !== null && options.general.mainDictionary === selectorSourceTitle) {
                     targets.push({
                         action: 'set',
                         path: `profiles[${i}].options.general.mainDictionary`,
@@ -1984,7 +1993,7 @@ export class DictionaryImportController {
                     const path2 = `profiles[${i}].options.general.mainDictionary`;
                     targets.push({action: 'set', path: path2, value: title});
                 }
-                if (options.general.sortFrequencyDictionary === summary.sourceTitle) {
+                if (selectorSourceTitle !== null && options.general.sortFrequencyDictionary === selectorSourceTitle) {
                     targets.push({
                         action: 'set',
                         path: `profiles[${i}].options.general.sortFrequencyDictionary`,
