@@ -129,7 +129,11 @@ const maxReportLogLines = Number.isFinite(maxReportLogLinesRaw) && maxReportLogL
 const quickImportBenchmarkMode = parseBooleanEnv(process.env.MANABITAN_E2E_IMPORT_BENCH_QUICK, false);
 const stopAfterIsolatedProbes = parseBooleanEnv(process.env.MANABITAN_E2E_STOP_AFTER_ISOLATED_PROBES, false);
 const stopAfterUpdate = parseBooleanEnv(process.env.MANABITAN_E2E_STOP_AFTER_UPDATE, false);
+const stopAfterCrashRecovery = parseBooleanEnv(process.env.MANABITAN_E2E_STOP_AFTER_CRASH_RECOVERY, false);
+const focusedUpdateOnlyMode = stopAfterUpdate || stopAfterCrashRecovery;
 const verifyRestartPersistence = parseBooleanEnv(process.env.MANABITAN_E2E_VERIFY_RESTART_PERSISTENCE, true);
+const verifyBatchRestartPersistence = parseBooleanEnv(process.env.MANABITAN_E2E_VERIFY_BATCH_RESTART_PERSISTENCE, true);
+const verifyCrashRecoveryDuringUpdate = parseBooleanEnv(process.env.MANABITAN_E2E_VERIFY_CRASH_RECOVERY_DURING_UPDATE, true);
 const concurrentDbOpenPressureEnabled = (
     !quickImportBenchmarkMode &&
     parseBooleanEnv(process.env.MANABITAN_E2E_DB_OPEN_PRESSURE, true)
@@ -2428,7 +2432,11 @@ async function main() {
         }
         await ensureFreshChromeDevBuild(defaultZipPath);
         extensionDir = await extractExtensionZip(defaultZipPath);
-        userDataDir = await mkdtemp(path.join(os.tmpdir(), 'manabitan-chromium-profile-'));
+        const profileIterationTag = String(process.env.MANABITAN_E2E_PROFILE_ITERATION_TAG || '').trim().replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '');
+        const profilePrefix = profileIterationTag.length > 0 ?
+            `manabitan-chromium-profile-${profileIterationTag}-` :
+            'manabitan-chromium-profile-';
+        userDataDir = await mkdtemp(path.join(os.tmpdir(), profilePrefix));
 
         const cacheWarmupStart = safePerformance.now();
         const cachedDictionaries = await ensureRealDictionaryCache();
@@ -2522,6 +2530,122 @@ async function main() {
             processSampler = startProcessSampler(browserPid);
             cdpSession = await createCdpSessionForPage(page);
             return `chrome-extension://${relaunchedExtensionId}`;
+        };
+        /**
+         * @param {string[]} titles
+         * @returns {string[]}
+         */
+        const getStagedUpdateTitles = (titles) => (
+            titles.filter((title) => /\[update-staging [^\]]+\]/.test(String(title || '')))
+        );
+        /**
+         * @param {{
+         *   expectedInstalledTitles: string[],
+         *   backendReadyDictionaryNames: string[],
+         *   backendReadyTerm: string,
+         *   searchChecks: Array<{label: string, term: string, dictionaryNames: string[]}>,
+         *   ensureNoStagedTitles?: boolean,
+         * }} options
+         * @returns {Promise<{
+         *   extensionBaseUrl: string,
+         *   installedTitles: string[],
+         *   stagedTitles: string[],
+         *   backendDiagnostics: unknown,
+         *   searchChecks: Array<{label: string, term: string, dictionaryNames: string[], result: unknown}>,
+         * }>}
+         */
+        const relaunchAndVerifyPersistence = async ({
+            expectedInstalledTitles,
+            backendReadyDictionaryNames,
+            backendReadyTerm,
+            searchChecks,
+            ensureNoStagedTitles = false,
+        }) => {
+            if (concurrentSearchPage !== null) {
+                try { await concurrentSearchPage.close(); } catch (_) {}
+                concurrentSearchPage = null;
+            }
+            const restartedExtensionBaseUrl = await relaunchPersistentContext();
+            await page.goto(`${restartedExtensionBaseUrl}/settings.html?popup-preview=false`);
+            await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30000});
+            await openInstalledDictionariesModal(page);
+            const restartedInstalledTitles = await getInstalledDictionaryTitles(page);
+            const hasExpectedInstalledSet = expectedInstalledTitles.every((expectedTitle) => (
+                restartedInstalledTitles.some((title) => matchesDictionaryName(title, expectedTitle))
+            ));
+            if (!hasExpectedInstalledSet) {
+                throw new Error(`Installed dictionary set did not persist across restart. titles=${JSON.stringify(restartedInstalledTitles)} expected=${JSON.stringify(expectedInstalledTitles)}`);
+            }
+            const stagedTitles = getStagedUpdateTitles(restartedInstalledTitles);
+            if (ensureNoStagedTitles && stagedTitles.length > 0) {
+                throw new Error(`Staged update dictionaries remained after restart: ${JSON.stringify(stagedTitles)}`);
+            }
+            await evalSendMessage(page, 'enableInstalledDictionaries');
+            const backendReadyAfterRestart = await waitForBackendDictionaryReady(page, backendReadyDictionaryNames, backendReadyTerm, 60000, false);
+            if (!(backendReadyAfterRestart && backendReadyAfterRestart.ok === true)) {
+                throw new Error(`Backend dictionary readiness did not persist across restart. diagnostics=${JSON.stringify(backendReadyAfterRestart?.diagnostics ?? null)}`);
+            }
+            /** @type {Array<{label: string, term: string, dictionaryNames: string[], result: unknown}>} */
+            const searchResults = [];
+            if (Array.isArray(searchChecks) && searchChecks.length > 0) {
+                await page.goto(`${restartedExtensionBaseUrl}/search.html`);
+                await page.waitForSelector('#search-textbox', {state: 'attached', timeout: 30000});
+                for (const searchCheck of searchChecks) {
+                    const searchResult = await searchTermAndGetDictionaryHitCounts(page, searchCheck.term, searchCheck.dictionaryNames, 20000);
+                    const missingDictionaryNames = searchCheck.dictionaryNames.filter((dictionaryName) => (
+                        Number(searchResult.expectedCounts?.[dictionaryName] ?? 0) < 1
+                    ));
+                    if (missingDictionaryNames.length > 0) {
+                        throw new Error(`Search after restart did not include expected dictionaries for ${searchCheck.label}. missing=${JSON.stringify(missingDictionaryNames)} result=${JSON.stringify(searchResult)}`);
+                    }
+                    searchResults.push({
+                        label: searchCheck.label,
+                        term: searchCheck.term,
+                        dictionaryNames: searchCheck.dictionaryNames,
+                        result: searchResult,
+                    });
+                }
+            }
+            return {
+                extensionBaseUrl: restartedExtensionBaseUrl,
+                installedTitles: restartedInstalledTitles,
+                stagedTitles,
+                backendDiagnostics: backendReadyAfterRestart?.diagnostics ?? null,
+                searchChecks: searchResults,
+            };
+        };
+        /**
+         * @param {string} warmupTerm
+         * @returns {Promise<{
+         *   page: import('@playwright/test').Page,
+         *   backendReady: unknown,
+         *   searchReady: unknown,
+         *   searchDebug: unknown,
+         * }>}
+         */
+        const openConcurrentSearchPageAndWarm = async (warmupTerm) => {
+            const concurrentSearchPagePromise = context.waitForEvent('page', {timeout: 30000});
+            await page.evaluate(() => {
+                window.open(chrome.runtime.getURL('search.html'), '_blank', 'noopener');
+            });
+            concurrentSearchPage = await concurrentSearchPagePromise;
+            await concurrentSearchPage.waitForLoadState('domcontentloaded');
+            await waitForSearchPageInitialized(concurrentSearchPage, 30000);
+            const backendReady = await waitForBackendDictionaryReady(concurrentSearchPage, ['JMdict'], warmupTerm, 60000, true);
+            if (!(backendReady && backendReady.ok === true)) {
+                throw new Error(`Concurrent search backend readiness failed: ${JSON.stringify(backendReady)}`);
+            }
+            const searchReady = await waitForSearchPageLookupReady(concurrentSearchPage, extensionBaseUrl, warmupTerm, ['JMdict'], 30000, 'button');
+            if (!(searchReady && searchReady.ok === true)) {
+                throw new Error(`Concurrent search warmup failed: ${JSON.stringify(searchReady)}`);
+            }
+            const searchDebug = await getSearchPageDebugState(concurrentSearchPage);
+            return {
+                page: concurrentSearchPage,
+                backendReady,
+                searchReady,
+                searchDebug,
+            };
         };
         let extensionId = '';
         let launchModeLabel = runHeadless ? 'headless' : (hideWindow ? 'headed-hidden' : 'headed-visible');
@@ -2960,7 +3084,7 @@ async function main() {
             fail(`Expected baseline JMdict lookup backend before Jitendex import; saw ${JSON.stringify(baselineConcurrentLookup)}`);
         }
 
-        if (!stopAfterUpdate) {
+        if (!focusedUpdateOnlyMode) {
             const jitendexImportTriggerStart = safePerformance.now();
             const jitendexImportTriggerProfile = await runPhaseProfile(cdpSession, async () => {
                 await page.setInputFiles('#dictionary-import-file-input', [cachedDictionaries.jitendexPath]);
@@ -3098,7 +3222,7 @@ async function main() {
             enableImportedDictionariesProfile,
             processSampler,
         );
-        const updatePhaseLookupDictionaries = stopAfterUpdate ? ['JMdict'] : expectedLookupDictionaries;
+        const updatePhaseLookupDictionaries = focusedUpdateOnlyMode ? ['JMdict'] : expectedLookupDictionaries;
         const installedTitles = [
             ...(Array.isArray(enableImportedDictionariesProfile.result?.installedTitles) ? enableImportedDictionariesProfile.result.installedTitles : []),
             ...(Array.isArray(postImportDiagnostics?.installedTitles) ? postImportDiagnostics.installedTitles : []),
@@ -3202,6 +3326,102 @@ async function main() {
             backendReadyProfile,
             processSampler,
         );
+
+        if (verifyCrashRecoveryDuringUpdate) {
+            const crashRecoveryStart = safePerformance.now();
+            let crashRecoveryError = '';
+            let crashRecoveryResult = null;
+            try {
+                const crashRecoveryUpdateTriggerProfile = await runPhaseProfile(cdpSession, async () => {
+                    await page.evaluate(({dictionaryTitle, downloadUrl}) => {
+                        const modal = document.querySelector('#dictionary-confirm-update-modal');
+                        const button = document.querySelector('#dictionary-confirm-update-button');
+                        if (!(modal instanceof HTMLElement) || !(button instanceof HTMLElement)) {
+                            throw new Error('Update modal/button missing');
+                        }
+                        modal.dataset.dictionaryTitle = dictionaryTitle;
+                        modal.dataset.downloadUrl = downloadUrl;
+                        button.click();
+                    }, {
+                        dictionaryTitle: resolvedJmdictTitle,
+                        downloadUrl: `${localServer.baseUrl}/dictionaries/jmdict-slow.zip`,
+                    });
+                });
+                await page.waitForTimeout(700);
+                const crashRecoveryLookupProfile = await runPhaseProfile(cdpSession, async () => {
+                    return await searchTermAndGetDictionaryHitCounts(concurrentSearchPage, readinessTerm, ['JMdict'], 6000);
+                });
+                if (Number(crashRecoveryLookupProfile.result?.expectedCounts?.JMdict ?? 0) < 1) {
+                    throw new Error(`Expected JMdict lookup backend to remain available during crash-recovery update preflight; saw ${JSON.stringify(crashRecoveryLookupProfile.result)}`);
+                }
+                const crashRecoveryPhase = await waitForImportProgressPhase(page, /Step 4 of 5: Importing data/i, 60000);
+                if (!(crashRecoveryPhase && crashRecoveryPhase.ok === true)) {
+                    throw new Error(`Slow JMdict update did not reach active import phase before crash recovery. result=${JSON.stringify(crashRecoveryPhase)}`);
+                }
+                const restartVerification = await relaunchAndVerifyPersistence({
+                    expectedInstalledTitles: [resolvedJmdictTitle],
+                    backendReadyDictionaryNames: [resolvedJmdictTitle],
+                    backendReadyTerm: readinessTerm,
+                    searchChecks: [{
+                        label: 'JMdict after mid-update crash',
+                        term: readinessTerm,
+                        dictionaryNames: ['JMdict'],
+                    }],
+                    ensureNoStagedTitles: true,
+                });
+                const reopenConcurrentSearchStart = safePerformance.now();
+                await page.goto(`${restartVerification.extensionBaseUrl}/settings.html?popup-preview=false`);
+                await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30000});
+                const reopenConcurrentSearchProfile = await runPhaseProfile(cdpSession, async () => {
+                    return await openConcurrentSearchPageAndWarm(concurrentProbeTerm);
+                });
+                const reopenConcurrentSearchEnd = safePerformance.now();
+                await addReportPhase(
+                    report,
+                    concurrentSearchPage,
+                    'Restore concurrent lookup tab after update crash recovery',
+                    `Reopened concurrent search tab after simulated browser crash during staged update: ${JSON.stringify({
+                        backendReady: reopenConcurrentSearchProfile.result?.backendReady ?? null,
+                        searchReady: reopenConcurrentSearchProfile.result?.searchReady ?? null,
+                        searchDebug: reopenConcurrentSearchProfile.result?.searchDebug ?? null,
+                    })}`,
+                    reopenConcurrentSearchStart,
+                    reopenConcurrentSearchEnd,
+                    reopenConcurrentSearchProfile,
+                    processSampler,
+                );
+                crashRecoveryResult = {
+                    trigger: crashRecoveryUpdateTriggerProfile.result ?? null,
+                    preflightLookup: crashRecoveryLookupProfile.result ?? null,
+                    importPhase: crashRecoveryPhase,
+                    restartVerification,
+                };
+            } catch (e) {
+                crashRecoveryError = errorMessage(e);
+            }
+            const crashRecoveryEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                page,
+                'Verify crash recovery during staged JMdict update',
+                crashRecoveryError.length > 0 ?
+                    `Crash recovery verification failed: ${crashRecoveryError}` :
+                    `Forced a browser restart during JMdict update Step 4 and verified the live dictionary remained usable with no staged-title leftovers: ${JSON.stringify(crashRecoveryResult)}`,
+                crashRecoveryStart,
+                crashRecoveryEnd,
+                null,
+                processSampler,
+            );
+            if (crashRecoveryError.length > 0) {
+                fail(`Crash recovery verification failed: ${crashRecoveryError}`);
+            }
+            if (stopAfterCrashRecovery) {
+                report.status = 'success';
+                appendLog(report, 'info', 'Stopped after crash recovery verification by MANABITAN_E2E_STOP_AFTER_CRASH_RECOVERY=1.');
+                console.log(`${e2eLogTag} PASS: Stopped after crash recovery verification by MANABITAN_E2E_STOP_AFTER_CRASH_RECOVERY=1.`);
+                return;
+            }
+        }
 
         const updateTriggerStart = safePerformance.now();
         const updateTriggerProfile = await runPhaseProfile(cdpSession, async () => {
@@ -3362,7 +3582,7 @@ async function main() {
             await openInstalledDictionariesModal(page);
         });
         const verifyListStart = safePerformance.now();
-        const expectedInstalledAfterUpdate = stopAfterUpdate ? [updatedJmdictTitle] : ['Jitendex', updatedJmdictTitle];
+        const expectedInstalledAfterUpdate = focusedUpdateOnlyMode ? [updatedJmdictTitle] : ['Jitendex', updatedJmdictTitle];
         const installedTitlesResult = await waitForInstalledDictionarySet(page, expectedInstalledAfterUpdate, 30000);
         const installedTitlesText = installedTitlesResult.titles.join(', ');
         if (!installedTitlesResult.ok) {
@@ -3376,42 +3596,17 @@ async function main() {
             let restartPersistenceError = '';
             let restartPersistenceResult = null;
             try {
-                if (concurrentSearchPage !== null) {
-                    try { await concurrentSearchPage.close(); } catch (_) {}
-                    concurrentSearchPage = null;
-                }
-                const restartedExtensionBaseUrl = await relaunchPersistentContext();
-                const expectedPostRestartTitles = stopAfterUpdate ? [updatedJmdictTitle] : ['Jitendex', updatedJmdictTitle];
-                await page.goto(`${restartedExtensionBaseUrl}/settings.html?popup-preview=false`);
-                await page.waitForSelector('#dictionary-import-file-input', {state: 'attached', timeout: 30000});
-                await openInstalledDictionariesModal(page);
-                const restartedInstalledTitles = await getInstalledDictionaryTitles(page);
-                const installSetResult = {
-                    ok: expectedPostRestartTitles.every((expectedTitle) => restartedInstalledTitles.some((title) => matchesDictionaryName(title, expectedTitle))),
-                    titles: restartedInstalledTitles,
-                };
-                if (!installSetResult.ok) {
-                    throw new Error(`Installed dictionary set did not persist across restart. titles=${JSON.stringify(restartedInstalledTitles)} expected=${JSON.stringify(expectedPostRestartTitles)}`);
-                }
-                await evalSendMessage(page, 'enableInstalledDictionaries');
-                const backendReadyAfterRestart = await waitForBackendDictionaryReady(page, expectedPostRestartTitles, readinessTerm, 60000, false);
-                if (!(backendReadyAfterRestart && backendReadyAfterRestart.ok === true)) {
-                    throw new Error(`Backend dictionary readiness did not persist across restart. diagnostics=${JSON.stringify(backendReadyAfterRestart?.diagnostics ?? null)}`);
-                }
-                await page.goto(`${restartedExtensionBaseUrl}/search.html`);
-                await page.waitForSelector('#search-textbox', {state: 'attached', timeout: 30000});
-                const searchAfterRestart = await searchTermAndGetDictionaryHitCounts(page, readinessTerm, updatePhaseLookupDictionaries, 20000);
-                const missingRestartLookupDictionaries = updatePhaseLookupDictionaries.filter((dictionaryName) => (
-                    Number(searchAfterRestart.expectedCounts?.[dictionaryName] ?? 0) < 1
-                ));
-                if (missingRestartLookupDictionaries.length > 0) {
-                    throw new Error(`Search after restart did not include both dictionaries. result=${JSON.stringify(searchAfterRestart)}`);
-                }
-                restartPersistenceResult = {
-                    installedTitles: restartedInstalledTitles,
-                    backendDiagnostics: backendReadyAfterRestart?.diagnostics ?? null,
-                    searchResult: searchAfterRestart,
-                };
+                const expectedPostRestartTitles = focusedUpdateOnlyMode ? [updatedJmdictTitle] : ['Jitendex', updatedJmdictTitle];
+                restartPersistenceResult = await relaunchAndVerifyPersistence({
+                    expectedInstalledTitles: expectedPostRestartTitles,
+                    backendReadyDictionaryNames: expectedPostRestartTitles,
+                    backendReadyTerm: readinessTerm,
+                    searchChecks: [{
+                        label: 'post-update restart search',
+                        term: readinessTerm,
+                        dictionaryNames: updatePhaseLookupDictionaries,
+                    }],
+                });
             } catch (e) {
                 restartPersistenceError = errorMessage(e);
                 verificationErrors.push(`Restart persistence verification failed: ${restartPersistenceError}`);
@@ -3769,6 +3964,50 @@ async function main() {
                 enableExtendedDictionariesProfile,
                 processSampler,
             );
+            if (verifyBatchRestartPersistence) {
+                const batchRestartPersistenceStart = safePerformance.now();
+                let batchRestartPersistenceError = '';
+                let batchRestartPersistenceResult = null;
+                try {
+                    const jmnedictRestartTerm = String(jmnedictProbeTerms[0] || extendedLookupProbeCandidates[0] || readinessTerm);
+                    batchRestartPersistenceResult = await relaunchAndVerifyPersistence({
+                        expectedInstalledTitles: extendedLookupDictionaries,
+                        backendReadyDictionaryNames: extendedLookupDictionaries,
+                        backendReadyTerm: readinessTerm,
+                        searchChecks: [
+                            {
+                                label: 'post-batch JMdict + Jitendex restart search',
+                                term: readinessTerm,
+                                dictionaryNames: expectedLookupDictionaries,
+                            },
+                            {
+                                label: 'post-batch JMnedict restart search',
+                                term: jmnedictRestartTerm,
+                                dictionaryNames: ['JMnedict'],
+                            },
+                        ],
+                    });
+                } catch (e) {
+                    batchRestartPersistenceError = errorMessage(e);
+                    verificationErrors.push(`Batch restart persistence verification failed: ${batchRestartPersistenceError}`);
+                }
+                const batchRestartPersistenceEnd = safePerformance.now();
+                await addReportPhase(
+                    report,
+                    page,
+                    'Verify restart persistence after multi-file import',
+                    batchRestartPersistenceError.length > 0 ?
+                        `Batch restart persistence verification failed: ${batchRestartPersistenceError}` :
+                        `Relaunched ${browserFlavor} after the JMdict + JMnedict batch import and re-verified installed dictionaries plus restart lookups: ${JSON.stringify(batchRestartPersistenceResult)}`,
+                    batchRestartPersistenceStart,
+                    batchRestartPersistenceEnd,
+                    null,
+                    processSampler,
+                );
+                if (batchRestartPersistenceError.length > 0) {
+                    fail(`Batch restart persistence verification failed: ${batchRestartPersistenceError}`);
+                }
+            }
             const enableTextScanningStart = safePerformance.now();
             const enableTextScanningProfile = await runPhaseProfile(cdpSession, async () => {
                 return await evalSendMessage(page, 'enableTextScanning');
