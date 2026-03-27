@@ -1434,7 +1434,7 @@ export class DictionaryController {
         /** @type {import('core').DeferredPromiseDetails<void>} */
         const {promise: dictionariesUpdatePromise, resolve} = deferPromise();
         this._onDictionariesUpdate = resolve;
-        void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'delete');
+        await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'delete');
         await dictionariesUpdatePromise;
         this._onDictionariesUpdate = null;
     }

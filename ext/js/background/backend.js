@@ -1223,7 +1223,7 @@ export class Backend {
         }
         await this._ensureDictionaryDatabaseReady();
         await this._dictionaryDatabase.purge();
-        this._triggerDatabaseUpdated('dictionary', 'purge');
+        await this._triggerDatabaseUpdated('dictionary', 'purge');
     }
 
     /** @type {import('api').ApiHandler<'exportDictionaryDatabase'>} */
@@ -1237,7 +1237,7 @@ export class Backend {
     async _onApiImportDictionaryDatabase({content}) {
         await this._ensureDictionaryDatabaseReady();
         await this._dictionaryDatabase.importDatabase(base64ToArrayBuffer(content));
-        this._triggerDatabaseUpdated('dictionary', 'import');
+        await this._triggerDatabaseUpdated('dictionary', 'import');
     }
 
     /** @type {import('api').ApiHandler<'getMedia'>} */
@@ -1307,8 +1307,8 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'triggerDatabaseUpdated'>} */
-    _onApiTriggerDatabaseUpdated({type, cause}) {
-        this._triggerDatabaseUpdated(type, cause);
+    async _onApiTriggerDatabaseUpdated({type, cause}) {
+        await this._triggerDatabaseUpdated(type, cause);
     }
 
     /** @type {import('api').ApiHandler<'testMecab'>} */
