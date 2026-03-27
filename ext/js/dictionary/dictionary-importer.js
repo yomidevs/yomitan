@@ -32,6 +32,7 @@ import {getFileExtensionFromImageMediaType, getImageMediaTypeFromFileName} from 
 import {
     decodeRawTermContentBinary,
     encodeRawTermContentBinary,
+    RAW_TERM_CONTENT_DICT_NAME,
     RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME,
     RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME,
     isRawTermContentSharedGlossaryBinary,
@@ -541,7 +542,14 @@ export class DictionaryImporter {
         });
         this._logImport(`archive+index ${Date.now() - tArchiveStart}ms files=${fileMap.size}`);
 
-        const dictionaryTitle = index.title;
+        const sourceDictionaryTitle = index.title;
+        const dictionaryTitleOverride = (
+            typeof details.dictionaryTitleOverride === 'string' &&
+            details.dictionaryTitleOverride.trim().length > 0
+        ) ?
+            details.dictionaryTitleOverride.trim() :
+            null;
+        const dictionaryTitle = dictionaryTitleOverride ?? sourceDictionaryTitle;
         const version = /** @type {import('dictionary-data').IndexVersion} */ (index.version);
 
         // Verify database is not already imported
@@ -810,6 +818,9 @@ export class DictionaryImporter {
         let summaryDetails = {prefixWildcardsSupported, counts, styles: '', yomitanVersion, importSuccess};
 
         let summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
+        if (sourceDictionaryTitle !== dictionaryTitle) {
+            summary.sourceTitle = sourceDictionaryTitle;
+        }
         const dictionarySummaryPrimaryKey = await dictionaryDatabase.addWithResult('dictionaries', summary);
         let styles = '';
         let importFailed = false;
@@ -1626,6 +1637,17 @@ export class DictionaryImporter {
                 Object.assign(bulkFinalizationPhaseDetails, bulkFinalizationDetails);
             }
             recordPhaseTiming('bulk-finalization', tBulkFinalizationStart, bulkFinalizationPhaseDetails);
+            if (!importFailed) {
+                try {
+                    const directIntegrity = await dictionaryDatabase.debugSampleTermContentIntegrity(dictionaryTitle, 8);
+                    recordPhaseTiming('post-finalization-integrity-sample', Date.now(), directIntegrity);
+                } catch (e) {
+                    recordPhaseTiming('post-finalization-integrity-sample', Date.now(), {
+                        ok: false,
+                        error: toError(e).message,
+                    });
+                }
+            }
             dictionaryDatabase.setImportDebugLogging(false);
         }
 
@@ -1646,6 +1668,9 @@ export class DictionaryImporter {
         importSuccess = true;
         summaryDetails = {prefixWildcardsSupported, counts, styles, yomitanVersion, importSuccess};
         summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
+        if (sourceDictionaryTitle !== dictionaryTitle) {
+            summary.sourceTitle = sourceDictionaryTitle;
+        }
         const tSummaryUpdateStart = Date.now();
         await dictionaryDatabase.bulkUpdate('dictionaries', [{data: summary, primaryKey: dictionarySummaryPrimaryKey}], 0, 1);
         recordPhaseTiming('write-summary', tSummaryUpdateStart, {ok: true});
@@ -2207,11 +2232,13 @@ export class DictionaryImporter {
             let width = 0;
             let height = 0;
             if (!this._skipImageMetadata) {
-                // Decode image only when metadata extraction is explicitly enabled.
+                // Keep imports resilient when a browser/runtime cannot decode a specific image variant.
+                // The media payload can still be stored and resolved later even without dimensions.
                 try {
                     ({content, width, height} = await this._mediaLoader.getImageDetails(content, mediaType));
-                } catch (e) {
-                    throw createError('Could not load image');
+                } catch (_) {
+                    width = 0;
+                    height = 0;
                 }
             }
 
@@ -2329,6 +2356,7 @@ export class DictionaryImporter {
             const contentBytes = encodeRawTermContentBinary(entry.rules, definitionTags, termTags, glossaryJsonBytes, this._textEncoder);
             [hash1, hash2] = this._hashEntryContentBytesPair(contentBytes);
             entry.termEntryContentBytes = contentBytes;
+            entry.termEntryContentDictName = RAW_TERM_CONTENT_DICT_NAME;
             entry.termEntryContentRawGlossaryJsonBytes = void 0;
         } else {
             const contentBytes = this._textEncoder.encode(this._createTermEntryContentJson(entry.rules, definitionTags, termTags, glossaryJson));
@@ -3550,7 +3578,7 @@ export class DictionaryImporter {
             };
         }
         if (decodeRawTermContentBinary(contentBytes, this._textDecoder) !== null) {
-            return {contentBytes, contentDictName: 'raw'};
+            return {contentBytes, contentDictName: RAW_TERM_CONTENT_DICT_NAME};
         }
         try {
             const value = /** @type {{rules?: unknown, definitionTags?: unknown, termTags?: unknown, glossary?: unknown}} */ (
@@ -3568,7 +3596,7 @@ export class DictionaryImporter {
                     glossaryJsonBytes,
                     this._textEncoder,
                 ),
-                contentDictName: 'raw',
+                contentDictName: RAW_TERM_CONTENT_DICT_NAME,
             };
         } catch (_) {
             return {contentBytes, contentDictName: null};

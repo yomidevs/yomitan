@@ -36,6 +36,24 @@ const dictionaryCacheDir = path.join(root, 'builds', 'e2e-dictionary-cache');
 const wagahaiHtmlPath = path.join(root, 'test', 'firefox', 'data', 'wagahai-neko.html');
 const fallbackJmdictUrl = 'https://github.com/yomidevs/jmdict-yomitan/releases/latest/download/JMdict_english.zip';
 const execFileAsync = promisify(execFile);
+const expectedLookupDictionaries = ['Jitendex', 'JMdict'];
+const extendedLookupDictionaries = ['Jitendex', 'JMdict', 'JMnedict'];
+const lookupWords = ['暗記', '名前', '日本', '学生', '食べる', '見る', '言う', '行く', '水', '猫'];
+const jmdictProbeTerms = ['打', '日本', '食べる', '見る', '水', '猫', '名前'];
+
+/**
+ * @param {string} observedName
+ * @param {string} expectedName
+ * @returns {boolean}
+ */
+function matchesDictionaryName(observedName, expectedName) {
+    const observed = String(observedName || '').trim();
+    const expected = String(expectedName || '').trim();
+    if (observed.length === 0 || expected.length === 0) { return false; }
+    if (observed === expected) { return true; }
+    if (observed.startsWith(`${expected} `) || observed.startsWith(`${expected}.`)) { return true; }
+    return observed.includes(expected);
+}
 
 /**
  * @param {number} value
@@ -282,7 +300,7 @@ async function endPageProfilePhase(driver) {
 }
 
 /**
- * @returns {Promise<{jitendexUrl: string, jmdictUrl: string}>}
+ * @returns {Promise<{jitendexUrl: string, jmnedictUrl: string, jmdictUrl: string}>}
  */
 async function loadRecommendedDictionaryUrls() {
     const recommendedPath = path.join(root, 'ext', 'data', 'recommended-dictionaries.json');
@@ -301,11 +319,12 @@ async function loadRecommendedDictionaryUrls() {
         return '';
     };
     const jitendexUrl = findDownloadUrl('Jitendex');
+    const jmnedictUrl = findDownloadUrl('JMnedict');
     const jmdictUrl = findDownloadUrl('JMdict') || fallbackJmdictUrl;
-    if (jitendexUrl.length === 0 || jmdictUrl.length === 0) {
-        fail(`Unable to resolve recommended dictionary URLs from ext/data/recommended-dictionaries.json (jitendex="${jitendexUrl}", jmdict="${jmdictUrl}")`);
+    if (jitendexUrl.length === 0 || jmnedictUrl.length === 0 || jmdictUrl.length === 0) {
+        fail(`Unable to resolve recommended dictionary URLs from ext/data/recommended-dictionaries.json (jitendex="${jitendexUrl}", jmnedict="${jmnedictUrl}", jmdict="${jmdictUrl}")`);
     }
-    return {jitendexUrl, jmdictUrl};
+    return {jitendexUrl, jmnedictUrl, jmdictUrl};
 }
 
 /**
@@ -332,25 +351,72 @@ async function ensureCachedDownload(url, outputPath) {
 }
 
 /**
- * @returns {Promise<{jitendexPath: string, jmdictPath: string, jitendexUrl: string, jmdictUrl: string}>}
+ * @returns {Promise<{jitendexPath: string, jmnedictPath: string, jmdictPath: string, jitendexUrl: string, jmnedictUrl: string, jmdictUrl: string}>}
  */
 async function ensureRealDictionaryCache() {
     await mkdir(dictionaryCacheDir, {recursive: true});
-    const {jitendexUrl, jmdictUrl} = await loadRecommendedDictionaryUrls();
+    const {jitendexUrl, jmnedictUrl, jmdictUrl} = await loadRecommendedDictionaryUrls();
     const jitendexPath = path.join(dictionaryCacheDir, 'jitendex-yomitan.zip');
+    const jmnedictPath = path.join(dictionaryCacheDir, 'JMnedict.zip');
     const jmdictPath = path.join(dictionaryCacheDir, 'JMdict.zip');
     await ensureCachedDownload(jitendexUrl, jitendexPath);
+    await ensureCachedDownload(jmnedictUrl, jmnedictPath);
     await ensureCachedDownload(jmdictUrl, jmdictPath);
-    return {jitendexPath, jmdictPath, jitendexUrl, jmdictUrl};
+    return {jitendexPath, jmnedictPath, jmdictPath, jitendexUrl, jmnedictUrl, jmdictUrl};
 }
 
 /**
- * @param {{jitendexPath: string, jmdictPath: string}} paths
+ * @param {string} zipPath
+ * @param {number} maxTerms
+ * @returns {Promise<string[]>}
+ */
+async function loadDictionaryProbeTermsFromArchive(zipPath, maxTerms = 80) {
+    const maxTermsSafe = Number.isFinite(maxTerms) ? Math.max(8, Math.trunc(maxTerms)) : 80;
+    /** @type {string[]} */
+    const terms = [];
+    const seen = new Set();
+    const hasJapanese = (value) => /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/u.test(value);
+    for (let bankIndex = 1; bankIndex <= 12 && terms.length < maxTermsSafe; ++bankIndex) {
+        let stdout = '';
+        try {
+            ({stdout} = await execFileAsync('unzip', ['-p', zipPath, `term_bank_${String(bankIndex)}.json`], {
+                maxBuffer: 32 * 1024 * 1024,
+            }));
+        } catch (_) {
+            continue;
+        }
+        let rows;
+        try {
+            rows = parseJson(stdout);
+        } catch (_) {
+            continue;
+        }
+        if (!Array.isArray(rows)) {
+            continue;
+        }
+        for (const row of rows) {
+            const term = String(Array.isArray(row) ? row[0] : '').trim();
+            if (term.length === 0 || term.length > 20 || !hasJapanese(term) || seen.has(term)) {
+                continue;
+            }
+            seen.add(term);
+            terms.push(term);
+            if (terms.length >= maxTermsSafe) {
+                break;
+            }
+        }
+    }
+    return terms;
+}
+
+/**
+ * @param {{jitendexPath: string, jmnedictPath: string, jmdictPath: string}} paths
  * @returns {Promise<{baseUrl: string, close: () => Promise<void>}>}
  */
 async function startE2ELocalServer(paths) {
     const wagahaiHtml = await readFile(wagahaiHtmlPath);
     const jitendexZip = await readFile(paths.jitendexPath);
+    const jmnedictZip = await readFile(paths.jmnedictPath);
     const jmdictZip = await readFile(paths.jmdictPath);
     /**
      * @param {import('node:http').ServerResponse} response
@@ -404,6 +470,15 @@ async function startE2ELocalServer(paths) {
                 'Content-Length': String(jmdictZip.byteLength),
             });
             response.end(jmdictZip);
+            return;
+        }
+        if (requestUrl === '/dictionaries/jmnedict.zip') {
+            response.writeHead(200, {
+                ...headers,
+                'Content-Type': 'application/zip',
+                'Content-Length': String(jmnedictZip.byteLength),
+            });
+            response.end(jmnedictZip);
             return;
         }
         if (requestUrl === '/dictionaries/jmdict-slow.zip') {
@@ -860,6 +935,72 @@ async function waitForImportWithPhaseScreenshots(driver, report, dictionaryName,
 
 /**
  * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {RegExp|string} pattern
+ * @param {number} [timeoutMs]
+ * @returns {Promise<{ok: boolean, label: string, error: string|null}>}
+ */
+async function waitForImportProgressPhase(driver, pattern, timeoutMs = 30_000) {
+    const regex = pattern instanceof RegExp ? pattern : new RegExp(String(pattern));
+    const deadline = safePerformance.now() + timeoutMs;
+    let lastLabel = '';
+    while (safePerformance.now() < deadline) {
+        lastLabel = await getImportProgressLabel(driver);
+        if (regex.test(lastLabel)) {
+            return {ok: true, label: lastLabel, error: null};
+        }
+        const errorText = await getDictionaryErrorText(driver);
+        if (errorText.length > 0) {
+            return {ok: false, label: lastLabel, error: errorText};
+        }
+        await driver.sleep(200);
+    }
+    return {ok: false, label: lastLabel, error: `Timed out waiting for import progress phase ${String(regex)}`};
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string} settingsWindowHandle
+ * @param {string} lookupWindowHandle
+ * @param {RegExp|string} phasePattern
+ * @param {string} term
+ * @param {string[]} expectedDictionaryNames
+ * @param {number} [iterationCount]
+ * @returns {Promise<{phaseState: {ok: boolean, label: string, error: string|null}, iterations: Array<Record<string, unknown>>}>}
+ */
+async function verifyLookupRemainsResponsiveDuringImportPhase(driver, settingsWindowHandle, lookupWindowHandle, phasePattern, term, expectedDictionaryNames, iterationCount = 3) {
+    await driver.switchTo().window(settingsWindowHandle);
+    const phaseState = await waitForImportProgressPhase(driver, phasePattern, 45_000);
+    if (phaseState.ok !== true) {
+        throw new Error(`Import phase gate did not reach ${String(phasePattern)}: ${JSON.stringify(phaseState)}`);
+    }
+    /** @type {Array<Record<string, unknown>>} */
+    const iterations = [];
+    for (let i = 0; i < iterationCount; ++i) {
+        await driver.switchTo().window(lookupWindowHandle);
+        const iterationStart = safePerformance.now();
+        const counts = await searchTermAndGetDictionaryHitCounts(driver, term, expectedDictionaryNames, 20_000);
+        const iterationEnd = safePerformance.now();
+        iterations.push({
+            iteration: i + 1,
+            label: phaseState.label,
+            durationMs: Math.max(0, iterationEnd - iterationStart),
+            counts,
+        });
+        for (const dictionaryName of expectedDictionaryNames) {
+            if ((counts[dictionaryName] ?? 0) < 1) {
+                throw new Error(`Lookup dropped dictionary ${dictionaryName} during active import phase: ${JSON.stringify({phaseState, iterations})}`);
+            }
+        }
+        if (i + 1 < iterationCount) {
+            await driver.sleep(400);
+        }
+    }
+    await driver.switchTo().window(settingsWindowHandle);
+    return {phaseState, iterations};
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
  * @returns {Promise<string>}
  * @throws {Error}
  */
@@ -1074,6 +1215,29 @@ async function openSearchPageInNewTab(driver, extensionBaseUrl) {
 
 /**
  * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string[]} filePaths
+ * @returns {Promise<void>}
+ */
+async function importDictionariesViaFileInput(driver, filePaths) {
+    const normalizedPaths = (Array.isArray(filePaths) ? filePaths : [])
+        .map((value) => String(value || '').trim())
+        .filter((value) => value.length > 0);
+    if (normalizedPaths.length === 0) {
+        throw new Error('No dictionary file paths were provided for multi-file import');
+    }
+    const fileInput = await driver.findElement(By.css('#dictionary-import-file-input'));
+    await driver.executeScript(`
+        const input = arguments[0];
+        if (!(input instanceof HTMLElement)) {
+            throw new Error('Dictionary import input not found');
+        }
+        input.scrollIntoView({block: 'center', inline: 'nearest'});
+    `, fileInput);
+    await fileInput.sendKeys(normalizedPaths.join('\n'));
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
  * @param {string} term
  * @param {string[]} expectedDictionaryNames
  * @param {number} [timeoutMs]
@@ -1166,6 +1330,35 @@ async function searchTermAndGetDictionaryHitCounts(driver, term, expectedDiction
 
 /**
  * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string[]} expectedDictionaryNames
+ * @param {string[]} candidates
+ * @param {number} [timeoutMs]
+ * @returns {Promise<{ok: boolean, term: string, probes: Array<{term: string, counts: Record<string, number>}>}>}
+ */
+async function findLookupProbeTerm(driver, expectedDictionaryNames, candidates, timeoutMs = 12_000) {
+    const normalizedCandidates = [...new Set(
+        (Array.isArray(candidates) ? candidates : [])
+            .map((value) => String(value || '').trim())
+            .filter((value) => value.length > 0),
+    )];
+    /** @type {Array<{term: string, counts: Record<string, number>}>} */
+    const probes = [];
+    for (const term of normalizedCandidates) {
+        const counts = await searchTermAndGetDictionaryHitCounts(driver, term, expectedDictionaryNames, timeoutMs);
+        probes.push({term, counts});
+        if (expectedDictionaryNames.every((name) => Number(counts[name] || 0) >= 1)) {
+            return {ok: true, term, probes};
+        }
+    }
+    return {
+        ok: false,
+        term: normalizedCandidates[0] ?? '東京',
+        probes,
+    };
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
  * @returns {Promise<Record<string, unknown>>}
  */
 async function getSearchPageDiagnostics(driver) {
@@ -1198,9 +1391,10 @@ async function getSearchPageDiagnostics(driver) {
  * @param {string} pageUrl
  * @param {string} targetSelector
  * @param {string[]} expectedDictionaryNames
- * @returns {Promise<string>}
+ * @param {{label?: string, moveAwayOffsetX?: number, moveToOffsetX?: number, moveToOffsetY?: number, pauseAfterMoveMs?: number, popupTimeoutMs?: number}|null} [motionProfile]
+ * @returns {Promise<{popupText: string, hasDictionaryEntries: boolean, noResultsVisible: boolean, noDictionariesVisible: boolean, entriesTextPreview: string, usedModifier: string|null}>}
  */
-async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictionaryNames) {
+async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictionaryNames, motionProfile = null) {
     await driver.get(pageUrl);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const targetElement = /** @type {import('selenium-webdriver').WebElement} */ (await driver.wait(until.elementLocated(By.css(targetSelector)), 30_000));
@@ -1211,19 +1405,28 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
         }
     `, targetElement);
     const moveOrigin = /** @type {import('selenium-webdriver').WebElement} */ (targetElement);
+    const moveAwayOffsetX = Number.isFinite(Number(motionProfile?.moveAwayOffsetX)) ? Number(motionProfile?.moveAwayOffsetX) : -12;
+    const moveToOffsetX = Number.isFinite(Number(motionProfile?.moveToOffsetX)) ? Number(motionProfile?.moveToOffsetX) : 10;
+    const moveToOffsetY = Number.isFinite(Number(motionProfile?.moveToOffsetY)) ? Number(motionProfile?.moveToOffsetY) : 2;
+    const pauseAfterMoveMs = Number.isFinite(Number(motionProfile?.pauseAfterMoveMs)) ? Math.max(0, Number(motionProfile?.pauseAfterMoveMs)) : 0;
+    const popupTimeoutMs = Number.isFinite(Number(motionProfile?.popupTimeoutMs)) ? Math.max(1200, Number(motionProfile?.popupTimeoutMs)) : 5000;
     /** @type {Array<string|null>} */
     const modifierCandidates = [Key.SHIFT, Key.ALT, Key.CONTROL, null];
     let popupVisible = false;
+    let usedModifier = null;
     for (const modifier of modifierCandidates) {
         if (modifier !== null) {
             await driver.actions({async: true}).keyDown(modifier).perform();
         }
         try {
-            await driver.actions({async: true}).move({origin: moveOrigin, x: -12, y: -8}).perform();
             await driver.actions({async: true})
+                .move({origin: moveOrigin, x: moveAwayOffsetX, y: -8})
                 .move({origin: moveOrigin, x: 2, y: 2})
-                .move({origin: moveOrigin, x: 10, y: 2, duration: 220})
+                .move({origin: moveOrigin, x: moveToOffsetX, y: moveToOffsetY, duration: 220})
                 .perform();
+            if (pauseAfterMoveMs > 0) {
+                await driver.sleep(pauseAfterMoveMs);
+            }
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const visibleWithModifier = await driver.wait(async () => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -1232,9 +1435,12 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
                     if (await frame.isDisplayed()) { return true; }
                 }
                 return false;
-            }, 5_000).then(() => true, () => false);
+            }, popupTimeoutMs).then(() => true, () => false);
             popupVisible = Boolean(visibleWithModifier);
-            if (popupVisible) { break; }
+            if (popupVisible) {
+                usedModifier = modifier;
+                break;
+            }
         } finally {
             if (modifier !== null) {
                 await driver.actions({async: true}).keyUp(modifier).perform();
@@ -1258,13 +1464,34 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
             fail('No visible yomitan popup iframe found');
         }
         await driver.switchTo().frame(popupFrame);
-        await driver.wait(until.elementLocated(By.css('#dictionary-entries')), 30_000);
+        await driver.wait(until.elementLocated(By.css('#dictionary-entries, #no-results, #no-dictionaries')), 30_000);
         const popupText = String(await (await driver.findElement(By.css('body'))).getText());
+        // Selenium executeScript return value is untyped (`any`).
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const popupState = await driver.executeScript(`
+            const dictionaryEntries = document.querySelector('#dictionary-entries');
+            const noResults = document.querySelector('#no-results');
+            const noDictionaries = document.querySelector('#no-dictionaries');
+            const entriesText = dictionaryEntries instanceof HTMLElement ? (dictionaryEntries.textContent || '').replaceAll(/\\s+/g, ' ').trim() : '';
+            return {
+                hasDictionaryEntries: dictionaryEntries instanceof HTMLElement && entriesText.length > 0,
+                noResultsVisible: noResults instanceof HTMLElement ? !noResults.hidden : false,
+                noDictionariesVisible: noDictionaries instanceof HTMLElement ? !noDictionaries.hidden : false,
+                entriesTextPreview: entriesText.slice(0, 200),
+            };
+        `);
         await driver.switchTo().defaultContent();
         if (!expectedDictionaryNames.every((name) => popupText.includes(name))) {
             fail(`Expected hover popup to include dictionaries ${JSON.stringify(expectedDictionaryNames)}, saw: "${popupText.slice(0, 420)}"`);
         }
-        return popupText;
+        return {
+            popupText,
+            hasDictionaryEntries: popupState?.hasDictionaryEntries === true,
+            noResultsVisible: popupState?.noResultsVisible === true,
+            noDictionariesVisible: popupState?.noDictionariesVisible === true,
+            entriesTextPreview: String(popupState?.entriesTextPreview || ''),
+            usedModifier,
+        };
     } finally {
         await driver.switchTo().defaultContent();
     }
@@ -1301,6 +1528,9 @@ async function getBackendLookupDiagnostics(driver, term) {
         (async () => {
             const term = arguments[0];
             const dictionaryInfo = await send('getDictionaryInfo', undefined);
+            const installedTitles = (Array.isArray(dictionaryInfo) ? dictionaryInfo : [])
+                .map((row) => String(row?.title || '').trim())
+                .filter((value) => value.length > 0);
             const termsFind = await send('termsFind', {
                 text: term,
                 details: {primaryReading: ''},
@@ -1334,8 +1564,20 @@ async function getBackendLookupDiagnostics(driver, term) {
                         [],
                 })) :
                 null;
+            const enabledInstalledExactMatches = Array.isArray(optionsFull?.profiles?.[0]?.options?.dictionaries) ?
+                optionsFull.profiles[0].options.dictionaries
+                    .filter((dictionary) => dictionary?.enabled === true)
+                    .map((dictionary) => String(dictionary?.name || '').trim())
+                    .filter((name) => name.length > 0 && installedTitles.includes(name)) :
+                [];
+            const debugLookupState = await send('debugDictionaryLookupState', {
+                text: term,
+                dictionaryNames: [...new Set(enabledInstalledExactMatches)],
+            });
             done({
                 dictionaryInfo,
+                installedTitles,
+                debugLookupState,
                 termResultCount: Array.isArray(termsFind?.dictionaryEntries) ? termsFind.dictionaryEntries.length : null,
                 termDictionaryNames: [...termDictionaryNamesSet],
                 profileDictionaries,
@@ -1348,6 +1590,98 @@ async function getBackendLookupDiagnostics(driver, term) {
         return /** @type {Record<string, unknown>} */ (diagnostics);
     }
     return {error: `Unexpected diagnostics payload: ${String(diagnostics)}`};
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @param {string[]} dictionaryNames
+ * @param {string[]} candidates
+ * @param {number} timeoutMs
+ * @returns {Promise<{ok: boolean, reason?: string, probes: Array<Record<string, unknown>>}>}
+ */
+async function waitForBackendDictionaryContentIntegrity(driver, dictionaryNames, candidates, timeoutMs = 15_000) {
+    const deadline = safePerformance.now() + timeoutMs;
+    /** @type {Array<Record<string, unknown>>} */
+    let lastProbes = [];
+    while (safePerformance.now() < deadline) {
+        /** @type {string[]} */
+        let installedTitles = [];
+        /** @type {string[]} */
+        let targetDictionaryNames = dictionaryNames;
+        /** @type {Array<Record<string, unknown>>} */
+        const probes = [];
+        for (const term of candidates) {
+            const diagnostics = await getBackendLookupDiagnostics(driver, term);
+            const diagnosticsInstalledTitles = Array.isArray(diagnostics.installedTitles) ?
+                diagnostics.installedTitles.map((value) => String(value || '').trim()).filter((value) => value.length > 0) :
+                [];
+            if (diagnosticsInstalledTitles.length > 0) {
+                installedTitles = diagnosticsInstalledTitles;
+                const resolvedNames = dictionaryNames.flatMap((expectedName) => (
+                    installedTitles.filter((title) => matchesDictionaryName(title, expectedName))
+                ));
+                targetDictionaryNames = [...new Set(resolvedNames.length > 0 ? resolvedNames : dictionaryNames)];
+            }
+            const debugLookupState = diagnostics.debugLookupState;
+            const store = (debugLookupState && typeof debugLookupState === 'object' && !Array.isArray(debugLookupState)) ?
+                debugLookupState.termContentStoreDebugState :
+                null;
+            const totalLength = Number(store?.totalLength ?? -1);
+            const rowSample = Array.isArray(debugLookupState?.rowSample) ? debugLookupState.rowSample : [];
+            let inBoundsRowCount = 0;
+            let outOfBoundsRowCount = 0;
+            let glossaryReadyRowCount = 0;
+            let readablePreviewRowCount = 0;
+            for (const row of rowSample) {
+                const rowDictionary = String(row?.dictionary || '').trim();
+                if (
+                    targetDictionaryNames.length > 0 &&
+                    rowDictionary.length > 0 &&
+                    !targetDictionaryNames.some((name) => matchesDictionaryName(rowDictionary, name))
+                ) {
+                    continue;
+                }
+                const offset = Number(row?.rawEntryContentOffset ?? -1);
+                const length = Number(row?.rawEntryContentLength ?? -1);
+                const glossaryLength = Number(row?.glossaryLength ?? 0);
+                const preview = String(row?.rawContentPreview ?? '');
+                if (Number.isFinite(offset) && Number.isFinite(length) && offset >= 0 && length > 0 && Number.isFinite(totalLength) && totalLength > 0) {
+                    if ((offset + length) <= totalLength) {
+                        ++inBoundsRowCount;
+                    } else {
+                        ++outOfBoundsRowCount;
+                    }
+                }
+                if (glossaryLength > 0) {
+                    ++glossaryReadyRowCount;
+                }
+                if (preview.length > 0 && preview !== '<read-null>' && preview !== '<read-failed>') {
+                    ++readablePreviewRowCount;
+                }
+            }
+            probes.push({
+                term,
+                dictionaryNames: targetDictionaryNames,
+                requestedDictionaryNames: dictionaryNames,
+                totalLength: Number.isFinite(totalLength) ? totalLength : null,
+                rowSampleCount: rowSample.length,
+                inBoundsRowCount,
+                outOfBoundsRowCount,
+                glossaryReadyRowCount,
+                readablePreviewRowCount,
+                diagnostics,
+            });
+            if (outOfBoundsRowCount > 0) {
+                return {ok: false, reason: 'out-of-bounds-entry-content-offsets', probes};
+            }
+            if (glossaryReadyRowCount > 0 || readablePreviewRowCount > 0) {
+                return {ok: true, probes};
+            }
+        }
+        lastProbes = probes;
+        await driver.sleep(500);
+    }
+    return {ok: false, reason: 'no-readable-entry-content', probes: lastProbes};
 }
 
 /**
@@ -1484,6 +1818,117 @@ async function checkBackendApiAvailability(driver) {
 }
 
 /**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @returns {Promise<{ok: boolean, error: string|null}>}
+ */
+async function purgeBackendDatabase(driver) {
+    // Selenium executeAsyncScript return value is untyped (`any`).
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const result = await driver.executeAsyncScript(`
+        const done = arguments[arguments.length - 1];
+        const send = (action, params) => new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({action, params}, (response) => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || String(runtimeError)));
+                    return;
+                }
+                if (response && typeof response === 'object' && 'error' in response) {
+                    reject(new Error(JSON.stringify(response.error)));
+                    return;
+                }
+                resolve(response && typeof response === 'object' ? response.result : response);
+            });
+        });
+        (async () => {
+            await send('purgeDatabase', undefined);
+            const optionsFull = await send('optionsGetFull', undefined);
+            const nextOptions = structuredClone(optionsFull);
+            for (const profile of nextOptions.profiles || []) {
+                if (!profile?.options) { continue; }
+                profile.options.dictionaries = [];
+            }
+            await send('setAllSettings', {value: nextOptions, source: 'firefox-e2e-purge'});
+            done({ok: true, error: null});
+        })().catch((e) => {
+            done({
+                ok: false,
+                error: String(e && e.message ? e.message : e),
+            });
+        });
+    `);
+    if (!(typeof result === 'object' && result !== null && !Array.isArray(result))) {
+        return {ok: false, error: `Unexpected purge payload: ${String(result)}`};
+    }
+    const record = /** @type {Record<string, unknown>} */ (result);
+    return {
+        ok: record.ok === true,
+        error: typeof record.error === 'string' ? record.error : null,
+    };
+}
+
+/**
+ * @param {import('selenium-webdriver').ThenableWebDriver} driver
+ * @returns {Promise<Record<string, unknown>>}
+ */
+async function configureHoverTestOptions(driver) {
+    // Selenium executeAsyncScript return value is untyped (`any`).
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const result = await driver.executeAsyncScript(`
+        const done = arguments[arguments.length - 1];
+        const send = (action, params) => new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({action, params}, (response) => {
+                const runtimeError = chrome.runtime.lastError;
+                if (runtimeError) {
+                    reject(new Error(runtimeError.message || String(runtimeError)));
+                    return;
+                }
+                if (response && typeof response === 'object' && 'error' in response) {
+                    reject(new Error(JSON.stringify(response.error)));
+                    return;
+                }
+                resolve(response && typeof response === 'object' ? response.result : response);
+            });
+        });
+        (async () => {
+            const optionsFull = await send('optionsGetFull', undefined);
+            const nextOptions = structuredClone(optionsFull);
+            for (const profile of nextOptions.profiles || []) {
+                if (!(profile && profile.options)) { continue; }
+                if (profile.options.general && typeof profile.options.general === 'object') {
+                    profile.options.general.enable = true;
+                    profile.options.general.usePopupShadowDom = false;
+                }
+                if (profile.options.scanning && typeof profile.options.scanning === 'object') {
+                    profile.options.scanning.delay = 0;
+                    profile.options.scanning.hidePopupOnCursorExit = false;
+                    profile.options.scanning.hidePopupOnCursorExitDelay = 0;
+                    profile.options.scanning.scanWithoutMousemove = true;
+                }
+            }
+            await send('setAllSettings', {value: nextOptions, source: 'firefox-e2e-hover-config'});
+            const updatedOptions = await send('optionsGetFull', undefined);
+            done({
+                ok: true,
+                profileGeneralEnable: (updatedOptions?.profiles || []).map((profile) => Boolean(profile?.options?.general?.enable)),
+                profileUsePopupShadowDom: (updatedOptions?.profiles || []).map((profile) => Boolean(profile?.options?.general?.usePopupShadowDom)),
+                profileScanningDelay: (updatedOptions?.profiles || []).map((profile) => Number(profile?.options?.scanning?.delay ?? -1)),
+                profileScanWithoutMousemove: (updatedOptions?.profiles || []).map((profile) => Boolean(profile?.options?.scanning?.scanWithoutMousemove)),
+            });
+        })().catch((e) => {
+            done({
+                ok: false,
+                error: String(e && e.message ? e.message : e),
+            });
+        });
+    `);
+    if (!(typeof result === 'object' && result !== null && !Array.isArray(result))) {
+        return {ok: false, error: `Unexpected hover config payload: ${String(result)}`};
+    }
+    return /** @type {Record<string, unknown>} */ (result);
+}
+
+/**
  * @returns {Promise<void>}
  * @throws {Error}
  */
@@ -1568,8 +2013,14 @@ async function main() {
     try {
         const cacheWarmupStart = safePerformance.now();
         const cachedDictionaries = await ensureRealDictionaryCache();
+        const jitendexArchiveProbeTerms = await loadDictionaryProbeTermsFromArchive(cachedDictionaries.jitendexPath, 80);
+        const jmdictArchiveProbeTerms = await loadDictionaryProbeTermsFromArchive(cachedDictionaries.jmdictPath, 80);
+        const jmnedictArchiveProbeTerms = await loadDictionaryProbeTermsFromArchive(cachedDictionaries.jmnedictPath, 80);
+        const jitendexLookupProbeCandidates = [...new Set([...lookupWords, ...jitendexArchiveProbeTerms])];
+        const extendedLookupProbeCandidates = [...new Set([...lookupWords, ...jitendexArchiveProbeTerms, ...jmdictProbeTerms, ...jmdictArchiveProbeTerms, ...jmnedictArchiveProbeTerms])];
         localServer = await startE2ELocalServer({
             jitendexPath: cachedDictionaries.jitendexPath,
+            jmnedictPath: cachedDictionaries.jmnedictPath,
             jmdictPath: cachedDictionaries.jmdictPath,
         });
         const cacheWarmupEnd = safePerformance.now();
@@ -1592,8 +2043,22 @@ async function main() {
         await ensurePageProfiler(driver);
         const settingsOpenEnd = safePerformance.now();
         await addReportPhase(report, driver, 'Open settings page', 'Settings loaded and dictionary import controls visible', settingsOpenStart, settingsOpenEnd);
-        // Selenium launches Firefox with a fresh profile for this run, so there is
-        // no prior dictionary DB state to purge here.
+        const resetStateStart = safePerformance.now();
+        const resetState = await purgeBackendDatabase(driver);
+        const resetStateEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Reset dictionary settings',
+            resetState.ok ?
+                'Purged backend dictionary database and cleared profile dictionary enablement state before import' :
+                `Backend purge failed: ${String(resetState.error || 'unknown error')}`,
+            resetStateStart,
+            resetStateEnd,
+        );
+        if (!resetState.ok) {
+            fail(`Backend purge failed before Firefox import flow: ${String(resetState.error || 'unknown error')}`);
+        }
         // Selenium executeScript return value is untyped (`any`).
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const runtimeDiagnostics = await driver.executeAsyncScript(`
@@ -1715,6 +2180,25 @@ async function main() {
             jitendexProfileStart,
             jitendexProfileEnd,
         );
+        const verifyJitendexContentStart = safePerformance.now();
+        const verifyJitendexContentProfile = await waitForBackendDictionaryContentIntegrity(
+            driver,
+            ['Jitendex'],
+            jitendexLookupProbeCandidates,
+            15_000,
+        );
+        const verifyJitendexContentEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Verify Jitendex backend content integrity after import',
+            `Checked that imported Jitendex term-content spans are readable and in bounds before opening the concurrent search tab: ${JSON.stringify(verifyJitendexContentProfile)}`,
+            verifyJitendexContentStart,
+            verifyJitendexContentEnd,
+        );
+        if (!(verifyJitendexContentProfile.ok === true)) {
+            fail(`Jitendex backend content integrity failed after import. diagnostics=${JSON.stringify(verifyJitendexContentProfile)}`);
+        }
         const jitendexSettleStart = safePerformance.now();
         await driver.sleep(2_000);
         const jitendexSettleEnd = safePerformance.now();
@@ -1810,6 +2294,25 @@ async function main() {
             postImportDiagnosticsStart,
             postImportDiagnosticsEnd,
         );
+        const verifyJmdictContentStart = safePerformance.now();
+        const verifyJmdictContentProfile = await waitForBackendDictionaryContentIntegrity(
+            driver,
+            ['JMdict'],
+            [...jmdictProbeTerms, ...lookupWords],
+            15_000,
+        );
+        const verifyJmdictContentEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Verify JMdict backend content integrity after import',
+            `Checked that imported JMdict term-content spans are readable and in bounds before later UI verification: ${JSON.stringify(verifyJmdictContentProfile)}`,
+            verifyJmdictContentStart,
+            verifyJmdictContentEnd,
+        );
+        if (!(verifyJmdictContentProfile.ok === true)) {
+            fail(`JMdict backend content integrity failed after import. diagnostics=${JSON.stringify(verifyJmdictContentProfile)}`);
+        }
         const dictionaryInfoEntries = getDictionaryInfoEntries(postImportDiagnostics);
         const dictionaryInfoHealth = summarizeDictionaryInfoHealth(dictionaryInfoEntries);
         const termResultCount = Number(postImportDiagnostics.termResultCount || 0);
@@ -1924,6 +2427,26 @@ async function main() {
             fail(`Expected installed dictionaries to remain searchable during Jitendex update; saw ${JSON.stringify(searchDuringUpdateCounts)} diagnostics=${JSON.stringify(updateDiagnostics)}`);
         }
 
+        const searchDuringActiveUpdateImportStart = safePerformance.now();
+        const searchDuringActiveUpdateImportResult = await verifyLookupRemainsResponsiveDuringImportPhase(
+            driver,
+            settingsWindowHandle,
+            searchWindowHandle,
+            /Step 4 of 5: Importing data/i,
+            '暗記',
+            ['Jitendex', 'JMdict'],
+            4,
+        );
+        const searchDuringActiveUpdateImportEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Verify search during active Jitendex update import step',
+            `While the update UI was in Step 4 import processing, dedicated search tab kept returning Jitendex + JMdict results: ${JSON.stringify(searchDuringActiveUpdateImportResult)}`,
+            searchDuringActiveUpdateImportStart,
+            searchDuringActiveUpdateImportEnd,
+        );
+
         await driver.switchTo().window(settingsWindowHandle);
         const updateProfileStart = safePerformance.now();
         await beginPageProfilePhase(driver);
@@ -1941,6 +2464,25 @@ async function main() {
             updateProfileStart,
             updateProfileEnd,
         );
+        const verifyUpdatedJitendexContentStart = safePerformance.now();
+        const verifyUpdatedJitendexContentProfile = await waitForBackendDictionaryContentIntegrity(
+            driver,
+            ['Jitendex'],
+            jitendexLookupProbeCandidates,
+            15_000,
+        );
+        const verifyUpdatedJitendexContentEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Verify Jitendex backend content integrity after update',
+            `Checked that Jitendex term-content spans remain readable and in bounds after the slow update path: ${JSON.stringify(verifyUpdatedJitendexContentProfile)}`,
+            verifyUpdatedJitendexContentStart,
+            verifyUpdatedJitendexContentEnd,
+        );
+        if (!(verifyUpdatedJitendexContentProfile.ok === true)) {
+            fail(`Jitendex backend content integrity failed after update. diagnostics=${JSON.stringify(verifyUpdatedJitendexContentProfile)}`);
+        }
 
         const searchOpenStart = safePerformance.now();
         await closeModalIfOpen(driver, '#dictionaries-modal');
@@ -1962,12 +2504,12 @@ async function main() {
 
         const searchVerifyStart = safePerformance.now();
         const searchTerm = '暗記';
-        let dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, ['Jitendex', 'JMdict'], 20_000);
+        let dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, expectedLookupDictionaries, 20_000);
         if ((dictionaryHitCounts.Jitendex ?? 0) < 1 || (dictionaryHitCounts.JMdict ?? 0) < 1) {
             // Retry once after a hard refresh: Firefox extension search page can be flaky in CI.
             await driver.navigate().refresh();
             await driver.wait(until.elementLocated(By.css('#search-textbox')), 30_000);
-            dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, ['Jitendex', 'JMdict'], 20_000);
+            dictionaryHitCounts = await searchTermAndGetDictionaryHitCounts(driver, searchTerm, expectedLookupDictionaries, 20_000);
         }
         if ((dictionaryHitCounts.Jitendex ?? 0) < 1 || (dictionaryHitCounts.JMdict ?? 0) < 1) {
             const searchDiagnostics = await getSearchPageDiagnostics(driver);
@@ -1986,7 +2528,6 @@ async function main() {
             await addReportPhase(report, driver, 'Verify search results include both dictionaries', `Searched ${searchTerm} and observed dictionary hit counts: ${JSON.stringify(dictionaryHitCounts)}`, searchVerifyStart, searchVerifyEnd);
         }
 
-        const lookupWords = ['暗記', '名前', '日本', '学生', '食べる', '見る', '言う', '行く', '水', '猫'];
         const lookupChars = lookupWords.map((word) => String([...word][0] || '').trim()).filter((value) => value.length > 0);
         /** @type {Array<Record<string, unknown>>} */
         const lookupProfiles = [];
@@ -1994,7 +2535,7 @@ async function main() {
             const lookupStart = safePerformance.now();
             await beginPageProfilePhase(driver);
             const sampler = startFirefoxResourceSampler(firefoxPid);
-            const lookupCounts = await searchTermAndGetDictionaryHitCounts(driver, lookupChar, ['Jitendex', 'JMdict'], 4_000);
+            const lookupCounts = await searchTermAndGetDictionaryHitCounts(driver, lookupChar, expectedLookupDictionaries, 4_000);
             const lookupDiagnostics = await getSearchPageDiagnostics(driver);
             const resourceSummary = await sampler.stop();
             const pageSummary = await endPageProfilePhase(driver);
@@ -2033,6 +2574,193 @@ async function main() {
             drillDownStart,
             drillDownEnd,
         );
+
+        const multiImportOpenStart = safePerformance.now();
+        await driver.get(`${extensionBaseUrl}/settings.html?popup-preview=false`);
+        await driver.wait(until.elementLocated(By.css('#dictionary-import-file-input')), 30_000);
+        const multiImportOpenEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Return to settings for multi-file import stress',
+            'Returned to settings and located the hidden multi-file import input for batch import stress.',
+            multiImportOpenStart,
+            multiImportOpenEnd,
+        );
+        const multiImportTriggerStart = safePerformance.now();
+        await importDictionariesViaFileInput(driver, [cachedDictionaries.jmdictPath, cachedDictionaries.jmnedictPath]);
+        const multiImportTriggerEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Trigger multi-file dictionary import stress',
+            `Triggered a single multi-file import selection with ${JSON.stringify([cachedDictionaries.jmdictPath, cachedDictionaries.jmnedictPath])} to stress update + new-dictionary import handling in one batch.`,
+            multiImportTriggerStart,
+            multiImportTriggerEnd,
+        );
+        const multiImportProfileStart = safePerformance.now();
+        await beginPageProfilePhase(driver);
+        const multiImportSampler = startFirefoxResourceSampler(firefoxPid);
+        await waitForImportWithPhaseScreenshots(driver, report, 'JMdict + JMnedict batch import', '3 installed, 3 enabled', 300_000);
+        const multiImportResourceSummary = await multiImportSampler.stop();
+        const multiImportPageSummary = await endPageProfilePhase(driver);
+        const multiImportProfileEnd = safePerformance.now();
+        const multiImportDebug = await getLastImportDebug(driver);
+        await addReportPhase(
+            report,
+            driver,
+            'Multi-file import resource profile',
+            `${formatResourceSummary(multiImportResourceSummary)} longTasks={count:${String(multiImportPageSummary.longTaskCount)},totalMs:${multiImportPageSummary.longTaskTotalMs.toFixed(1)},peakMs:${multiImportPageSummary.longTaskPeakMs.toFixed(1)}} topMeasures=${JSON.stringify(multiImportPageSummary.topMeasures)} topLongTasks=${JSON.stringify(multiImportPageSummary.topLongTasks)} importDebug=${JSON.stringify(multiImportDebug)}`,
+            multiImportProfileStart,
+            multiImportProfileEnd,
+        );
+        const verifyBatchContentStart = safePerformance.now();
+        const verifyBatchJmdictContent = await waitForBackendDictionaryContentIntegrity(
+            driver,
+            ['JMdict'],
+            extendedLookupProbeCandidates,
+            15_000,
+        );
+        const verifyBatchJmnedictContent = await waitForBackendDictionaryContentIntegrity(
+            driver,
+            ['JMnedict'],
+            extendedLookupProbeCandidates,
+            15_000,
+        );
+        const verifyBatchContentEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Verify backend content integrity after multi-file import',
+            `Checked that JMdict and JMnedict term-content spans are readable and in bounds after batch import. jmdict=${JSON.stringify(verifyBatchJmdictContent)} jmnedict=${JSON.stringify(verifyBatchJmnedictContent)}`,
+            verifyBatchContentStart,
+            verifyBatchContentEnd,
+        );
+        if (!(verifyBatchJmdictContent.ok === true)) {
+            fail(`JMdict backend content integrity failed after multi-file import. diagnostics=${JSON.stringify(verifyBatchJmdictContent)}`);
+        }
+        if (!(verifyBatchJmnedictContent.ok === true)) {
+            fail(`JMnedict backend content integrity failed after multi-file import. diagnostics=${JSON.stringify(verifyBatchJmnedictContent)}`);
+        }
+
+        const verifyTripleStart = safePerformance.now();
+        await closeModalIfOpen(driver, '#recommended-dictionaries-modal');
+        const tripleModalTrigger = await openInstalledDictionariesModal(driver);
+        const tripleVerifyDeadline = safePerformance.now() + 60_000;
+        let tripleModalText = '';
+        while (safePerformance.now() < tripleVerifyDeadline) {
+            // Selenium executeScript return value is untyped (`any`).
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const modalText = await driver.executeScript(`
+                const dictionariesModal = document.querySelector('#dictionaries-modal');
+                const recommendedModal = document.querySelector('#recommended-dictionaries-modal');
+                if (!(dictionariesModal instanceof HTMLElement) || dictionariesModal.hidden) { return ''; }
+                if (recommendedModal instanceof HTMLElement && !recommendedModal.hidden) { return ''; }
+                const dictionaryList = dictionariesModal.querySelector('#dictionary-list');
+                if (!(dictionaryList instanceof HTMLElement)) { return ''; }
+                return (dictionaryList.textContent || '').trim();
+            `);
+            if (typeof modalText === 'string') {
+                tripleModalText = modalText;
+                if (extendedLookupDictionaries.every((name) => tripleModalText.includes(name))) {
+                    break;
+                }
+            }
+            await driver.sleep(250);
+        }
+        if (!extendedLookupDictionaries.every((name) => tripleModalText.includes(name))) {
+            fail(`Expected installed dictionary modal text to contain ${extendedLookupDictionaries.join(', ')} after multi-file import; saw "${tripleModalText.slice(0, 300)}"`);
+        }
+        const verifyTripleEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Verify installed dictionaries after multi-file import',
+            `Opened dictionaries modal via ${tripleModalTrigger} and confirmed dictionary list text includes ${extendedLookupDictionaries.join(' + ')} after multi-file import.`,
+            verifyTripleStart,
+            verifyTripleEnd,
+        );
+
+        const hoverConfigStart = safePerformance.now();
+        const hoverConfigResult = await configureHoverTestOptions(driver);
+        const hoverConfigEnd = safePerformance.now();
+        await addReportPhase(
+            report,
+            driver,
+            'Enable text scanning for hover stress',
+            `Configured hover test profile options before Wagahai verification: ${JSON.stringify(hoverConfigResult)}`,
+            hoverConfigStart,
+            hoverConfigEnd,
+        );
+        if (hoverConfigResult.ok !== true) {
+            fail(`Failed to configure hover test options: ${JSON.stringify(hoverConfigResult)}`);
+        }
+
+        const hoverSpeedStressStart = safePerformance.now();
+        await closeModalIfOpen(driver, '#dictionaries-modal');
+        await beginPageProfilePhase(driver);
+        const hoverSpeedSampler = startFirefoxResourceSampler(firefoxPid);
+        const hoverSpeedTargets = ['#target-word', '#target-cat', '#target-name', '#target-kotoba', '#target-born', '#target-mitou'];
+        const motionProfiles = [
+            {label: 'slow', moveAwayOffsetX: -18, moveToOffsetX: 12, moveToOffsetY: 2, pauseAfterMoveMs: 80, popupTimeoutMs: 5400},
+            {label: 'medium', moveAwayOffsetX: -12, moveToOffsetX: 10, moveToOffsetY: 2, pauseAfterMoveMs: 20, popupTimeoutMs: 5000},
+            {label: 'fast', moveAwayOffsetX: -6, moveToOffsetX: 8, moveToOffsetY: 1, pauseAfterMoveMs: 0, popupTimeoutMs: 4400},
+        ];
+        /** @type {Array<Record<string, unknown>>} */
+        const hoverSpeedIterations = [];
+        let hoverSpeedStressError = '';
+        try {
+            for (let i = 0; i < 18; ++i) {
+                const selector = hoverSpeedTargets[i % hoverSpeedTargets.length];
+                const motionProfile = motionProfiles[i % motionProfiles.length];
+                const iterationStart = safePerformance.now();
+                const hoverResult = await hoverLookupOnPage(
+                    driver,
+                    `${localServer.baseUrl}/wagahai-neko.html`,
+                    selector,
+                    expectedLookupDictionaries,
+                    motionProfile,
+                );
+                const iterationEnd = safePerformance.now();
+                const hasDictionaryResult = hoverResult.hasDictionaryEntries === true && /jmdict|jitendex/i.test(hoverResult.popupText);
+                hoverSpeedIterations.push({
+                    iteration: i + 1,
+                    selector,
+                    speed: motionProfile.label,
+                    usedModifier: hoverResult.usedModifier,
+                    durationMs: Math.max(0, iterationEnd - iterationStart),
+                    hasDictionaryEntries: hoverResult.hasDictionaryEntries,
+                    noResultsVisible: hoverResult.noResultsVisible,
+                    noDictionariesVisible: hoverResult.noDictionariesVisible,
+                    hasDictionaryResult,
+                    entriesTextPreview: hoverResult.entriesTextPreview,
+                });
+                if (!hasDictionaryResult) {
+                    throw new Error(
+                        `Hover iteration ${String(i + 1)} (${selector}, ${motionProfile.label}) did not show dictionary results. ` +
+                        `entries=${JSON.stringify(hoverResult.entriesTextPreview)} popup=${JSON.stringify(hoverResult.popupText.slice(0, 200))} ` +
+                        `noResults=${String(hoverResult.noResultsVisible)} noDictionaries=${String(hoverResult.noDictionariesVisible)}`,
+                    );
+                }
+            }
+        } catch (e) {
+            hoverSpeedStressError = errorMessage(e);
+            fail(`Hover-speed stress after multi-file import failed: ${hoverSpeedStressError}`);
+        } finally {
+            const hoverSpeedResourceSummary = await hoverSpeedSampler.stop();
+            const hoverSpeedPageSummary = await endPageProfilePhase(driver);
+            const hoverSpeedStressEnd = safePerformance.now();
+            await addReportPhase(
+                report,
+                driver,
+                'Verify hover lookup responsiveness at varying speeds',
+                hoverSpeedStressError.length > 0 ?
+                    `Hover-speed stress failed: ${hoverSpeedStressError}` :
+                    `${formatResourceSummary(hoverSpeedResourceSummary)} longTasks={count:${String(hoverSpeedPageSummary.longTaskCount)},totalMs:${hoverSpeedPageSummary.longTaskTotalMs.toFixed(1)},peakMs:${hoverSpeedPageSummary.longTaskPeakMs.toFixed(1)}} topMeasures=${JSON.stringify(hoverSpeedPageSummary.topMeasures)} topLongTasks=${JSON.stringify(hoverSpeedPageSummary.topLongTasks)} iterations=${JSON.stringify(hoverSpeedIterations)}`,
+                hoverSpeedStressStart,
+                hoverSpeedStressEnd,
+            );
+        }
 
         const hoverLookupStart = safePerformance.now();
         const hoverTargets = ['#target-word', '#target-cat', '#target-name', '#target-kotoba', '#target-born', '#target-mitou'];
@@ -2083,7 +2811,7 @@ async function main() {
         try {
             await driver.get(`${extensionBaseUrl}/search.html?query=${encodeURIComponent(postHoverSearchTerm)}&type=terms&wildcards=off`);
             await driver.wait(until.elementLocated(By.css('#search-textbox')), 30_000);
-            postHoverHitCounts = await searchTermAndGetDictionaryHitCounts(driver, postHoverSearchTerm, ['Jitendex', 'JMdict'], 20_000, 'button');
+            postHoverHitCounts = await searchTermAndGetDictionaryHitCounts(driver, postHoverSearchTerm, expectedLookupDictionaries, 20_000, 'button');
             if ((postHoverHitCounts.Jitendex ?? 0) < 1 || (postHoverHitCounts.JMdict ?? 0) < 1) {
                 const searchDiagnostics = await getSearchPageDiagnostics(driver);
                 throw new Error(`Counts=${JSON.stringify(postHoverHitCounts)} diagnostics=${JSON.stringify(searchDiagnostics)}`);

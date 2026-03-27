@@ -110,6 +110,10 @@ export class Frontend {
         this._isPointerOverPopup = false;
         /** @type {?import('settings').OptionsContext} */
         this._optionsContextOverride = null;
+        /** @type {number} */
+        this._debugSearchSuccessCount = 0;
+        /** @type {number} */
+        this._debugSearchEmptyCount = 0;
 
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('application').ApiMap} */
@@ -158,6 +162,7 @@ export class Frontend {
      * Prepares the instance for use.
      */
     async prepare() {
+        this._updatePageDebugState({prepareStarted: true});
         await this.updateOptions();
         try {
             const {zoomFactor} = await this._application.api.getZoom();
@@ -199,6 +204,7 @@ export class Frontend {
 
         this._prepareSiteSpecific();
         this._updateContentScale();
+        this._updatePageDebugState({prepared: true});
         this._signalFrontendReady(null);
     }
 
@@ -382,6 +388,7 @@ export class Frontend {
      * @returns {void}
      */
     _onTextScannerClear() {
+        this._updatePageDebugState({lastSearchState: 'cleared'});
         this._clearSelection(false);
     }
 
@@ -389,6 +396,13 @@ export class Frontend {
      * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
     _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo: {eventType, detail: inputInfoDetail}, textSource, optionsContext, detail, pageTheme}) {
+        this._debugSearchSuccessCount += 1;
+        this._updatePageDebugState({
+            lastSearchState: 'success',
+            lastSearchEventType: eventType,
+            lastSearchResultCount: dictionaryEntries.length,
+            searchSuccessCount: this._debugSearchSuccessCount,
+        });
         this._stopClearSelectionDelayed();
         let focus = (eventType === 'mouseMove');
         if (typeof inputInfoDetail === 'object' && inputInfoDetail !== null) {
@@ -400,6 +414,11 @@ export class Frontend {
 
     /** */
     _onSearchEmpty() {
+        this._debugSearchEmptyCount += 1;
+        this._updatePageDebugState({
+            lastSearchState: 'empty',
+            searchEmptyCount: this._debugSearchEmptyCount,
+        });
         const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
         if (scanningOptions.autoHideResults) {
             void this._clearSelectionDelayed(scanningOptions.hideDelay, false, false);
@@ -410,6 +429,10 @@ export class Frontend {
      * @param {import('text-scanner').EventArgument<'searchError'>} details
      */
     _onSearchError({error, textSource, inputInfo: {passive}}) {
+        this._updatePageDebugState({
+            lastSearchState: 'error',
+            lastSearchError: error instanceof Error ? error.message : `${error}`,
+        });
         if (this._application.webExtension.unloaded) {
             if (textSource !== null && !passive) {
                 this._showExtensionUnloaded(textSource);
@@ -569,6 +592,13 @@ export class Frontend {
             scanResolution: scanningOptions.scanResolution,
         });
         this._updateTextScannerEnabled();
+        this._updatePageDebugState({
+            optionsLoaded: true,
+            generalEnabled: options.general.enable,
+            scanningDelay: scanningOptions.delay,
+            scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
+            popupWindow: options.general.usePopupWindow,
+        });
 
         if (this._pageType !== 'web') {
             const excludeSelectors = ['.scan-disable', '.scan-disable *'];
@@ -849,6 +879,7 @@ export class Frontend {
         const enabled = (this._options !== null && this._options.general.enable && !this._disabledOverride);
         if (enabled === this._textScanner.isEnabled()) { return; }
         this._textScanner.setEnabled(enabled);
+        this._updatePageDebugState({scannerEnabled: enabled});
         if (this._textScannerHasBeenEnabled) {
             this._clearSelection(true);
         }
@@ -898,6 +929,7 @@ export class Frontend {
      * @param {?number} targetFrameId
      */
     _signalFrontendReady(targetFrameId) {
+        this._updatePageDebugState({frontendReadyBroadcasted: true});
         /** @type {import('application').ApiMessageNoFrameId<'frontendReady'>} */
         const message = {action: 'frontendReady', params: {frameId: this._application.frameId}};
         if (targetFrameId === null) {
@@ -1050,5 +1082,22 @@ export class Frontend {
         const {GoogleDocsUtil} = await import('../accessibility/google-docs-util.js');
         const googleDocsUtil = new GoogleDocsUtil();
         this._textSourceGenerator.registerGetRangeFromPointHandler(googleDocsUtil.getRangeFromPoint.bind(googleDocsUtil));
+    }
+
+    /**
+     * @param {Record<string, string|number|boolean|null|undefined>} values
+     * @returns {void}
+     */
+    _updatePageDebugState(values) {
+        const {documentElement} = document;
+        if (documentElement === null) { return; }
+        for (const [key, value] of Object.entries(values)) {
+            const datasetKey = `manabitan${key.slice(0, 1).toUpperCase()}${key.slice(1)}`;
+            if (value === null || typeof value === 'undefined') {
+                delete documentElement.dataset[datasetKey];
+            } else {
+                documentElement.dataset[datasetKey] = `${value}`;
+            }
+        }
     }
 }

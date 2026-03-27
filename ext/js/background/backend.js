@@ -128,6 +128,8 @@ export class Backend {
         this._searchPopupTabCreatePromise = null;
         /** @type {?Promise<void>} */
         this._dictionaryRefreshPromise = null;
+        /** @type {boolean} */
+        this._dictionaryRefreshQueued = false;
         /** @type {?Promise<void>} */
         this._dictionaryDatabasePreparePromise = null;
 
@@ -188,7 +190,10 @@ export class Backend {
             ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)],
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
             ['deleteDictionaryByTitle',      this._onApiDeleteDictionaryByTitle.bind(this)],
+            ['replaceDictionaryTitle',       this._onApiReplaceDictionaryTitle.bind(this)],
             ['getDictionaryCounts',          this._onApiGetDictionaryCounts.bind(this)],
+            ['debugDictionaryLookupState',   this._onApiDebugDictionaryLookupState.bind(this)],
+            ['debugDictionaryStorageState',  this._onApiDebugDictionaryStorageState.bind(this)],
             ['setDictionaryImportMode',      this._onApiSetDictionaryImportMode.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
             ['exportDictionaryDatabase',     this._onApiExportDictionaryDatabase.bind(this)],
@@ -1095,6 +1100,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getDictionaryInfo'>} */
     async _onApiGetDictionaryInfo() {
+        await this._awaitDictionaryRefreshSettled();
         await this._ensureDictionaryDatabaseReady();
         return await this._dictionaryDatabase.getDictionaryInfo();
     }
@@ -1105,10 +1111,100 @@ export class Backend {
         await this._dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, () => {});
     }
 
+    async _onApiReplaceDictionaryTitle({fromDictionaryTitle, toDictionaryTitle, summary, replacedDictionaryTitle}) {
+        await this._ensureDictionaryDatabaseReady();
+        await this._dictionaryDatabase.replaceDictionaryTitle(
+            fromDictionaryTitle,
+            toDictionaryTitle,
+            (typeof summary === 'object' && summary !== null && !Array.isArray(summary)) ? summary : null,
+            typeof replacedDictionaryTitle === 'string' ? replacedDictionaryTitle : null,
+        );
+    }
+
     /** @type {import('api').ApiHandler<'getDictionaryCounts'>} */
     async _onApiGetDictionaryCounts({dictionaryNames, getTotal}) {
+        await this._awaitDictionaryRefreshSettled();
         await this._ensureDictionaryDatabaseReady();
         return await this._dictionaryDatabase.getDictionaryCounts(dictionaryNames, getTotal);
+    }
+
+    async _onApiDebugDictionaryLookupState({text, dictionaryNames}) {
+        await this._awaitDictionaryRefreshSettled();
+        await this._ensureDictionaryDatabaseReady();
+        if (this._offscreen !== null) {
+            const normalizedText = typeof text === 'string' ? text : '';
+            const normalizedDictionaryNames = Array.isArray(dictionaryNames) ? dictionaryNames : [];
+            const [localState, offscreenState] = await Promise.all([
+                this._debugDictionaryLookupStateLocal(
+                    normalizedText,
+                    normalizedDictionaryNames,
+                ),
+                this._offscreen.sendMessagePromise({
+                    action: 'debugDictionaryLookupStateOffscreen',
+                    params: {text: normalizedText, dictionaryNames: normalizedDictionaryNames},
+                }),
+            ]);
+            return {
+                ok: Boolean(localState?.ok) && Boolean(offscreenState?.ok),
+                text: normalizedText,
+                dictionaryNames: normalizedDictionaryNames,
+                localState,
+                offscreenState,
+            };
+        }
+        return await this._debugDictionaryLookupStateLocal(
+            typeof text === 'string' ? text : '',
+            Array.isArray(dictionaryNames) ? dictionaryNames : [],
+        );
+    }
+
+    async _onApiDebugDictionaryStorageState() {
+        await this._awaitDictionaryRefreshSettled();
+        await this._ensureDictionaryDatabaseReady();
+        const rowsMethod = /** @type {unknown} */ (Reflect.get(this._dictionaryDatabase, 'debugGetDictionaryRows'));
+        const dictionaryRows = (typeof rowsMethod === 'function') ?
+            await /** @type {() => Promise<unknown>} */ (rowsMethod).call(this._dictionaryDatabase) :
+            null;
+        const offscreenDictionaryRows = (this._offscreen !== null) ? (() => this._offscreen.sendMessagePromise({
+            action: 'debugDictionaryStorageStateOffscreen',
+            params: {},
+        }))() : null;
+        const offscreenDictionaryRowsResult = (offscreenDictionaryRows !== null) ? await offscreenDictionaryRows : null;
+        return {
+            dictionaryRows: Array.isArray(dictionaryRows) ? dictionaryRows : [],
+            offscreenDictionaryRows: Array.isArray(offscreenDictionaryRowsResult?.dictionaryRows) ? offscreenDictionaryRowsResult.dictionaryRows : [],
+            offscreenLastReplaceDictionaryTitleDebug: (
+                offscreenDictionaryRowsResult !== null &&
+                typeof offscreenDictionaryRowsResult === 'object' &&
+                !Array.isArray(offscreenDictionaryRowsResult)
+            ) ? (offscreenDictionaryRowsResult.lastReplaceDictionaryTitleDebug ?? null) : null,
+            offscreenStartupCleanupIncompleteImportsSummary: (
+                offscreenDictionaryRowsResult !== null &&
+                typeof offscreenDictionaryRowsResult === 'object' &&
+                !Array.isArray(offscreenDictionaryRowsResult)
+            ) ? (offscreenDictionaryRowsResult.startupCleanupIncompleteImportsSummary ?? null) : null,
+            offscreenStartupCleanupMissingTermRecordShardsSummary: (
+                offscreenDictionaryRowsResult !== null &&
+                typeof offscreenDictionaryRowsResult === 'object' &&
+                !Array.isArray(offscreenDictionaryRowsResult)
+            ) ? (offscreenDictionaryRowsResult.startupCleanupMissingTermRecordShardsSummary ?? null) : null,
+            offscreenTermRecordShardFileNames: (
+                offscreenDictionaryRowsResult !== null &&
+                typeof offscreenDictionaryRowsResult === 'object' &&
+                !Array.isArray(offscreenDictionaryRowsResult) &&
+                Array.isArray(offscreenDictionaryRowsResult.termRecordShardFileNames)
+            ) ? offscreenDictionaryRowsResult.termRecordShardFileNames : [],
+        };
+    }
+
+    async _awaitDictionaryRefreshSettled() {
+        while (this._dictionaryRefreshPromise !== null) {
+            try {
+                await this._dictionaryRefreshPromise;
+            } catch (_) {
+                // NOP
+            }
+        }
     }
 
     /** @type {import('api').ApiHandler<'setDictionaryImportMode'>} */
@@ -1118,6 +1214,13 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'purgeDatabase'>} */
     async _onApiPurgeDatabase() {
+        if (this._offscreen !== null) {
+            try {
+                await this._offscreen.sendMessagePromise({action: 'databasePurgeOffscreen', params: {}});
+            } catch (e) {
+                log.error(e);
+            }
+        }
         await this._ensureDictionaryDatabaseReady();
         await this._dictionaryDatabase.purge();
         this._triggerDatabaseUpdated('dictionary', 'purge');
@@ -2877,51 +2980,73 @@ export class Backend {
         }
         const dictionaryDatabase = this._dictionaryDatabase;
         const refreshConnectionMethod = /** @type {unknown} */ (Reflect.get(dictionaryDatabase, 'refreshConnection'));
-        if (typeof refreshConnectionMethod === 'function') {
+        let rerunRefresh = false;
+        do {
+            rerunRefresh = false;
+            const refreshOffscreenPromise = (async () => {
+                if (this._offscreen === null) {
+                    return;
+                }
+                try {
+                    await this._offscreen.sendMessagePromise({action: 'databaseRefreshOffscreen', params: {}});
+                    await this._offscreen.sendMessagePromise({action: 'clearDatabaseCachesOffscreen', params: {}});
+                } catch (e) {
+                    log.error(e);
+                }
+            })();
             if (this._dictionaryRefreshPromise !== null) {
+                this._dictionaryRefreshQueued = true;
+                await refreshOffscreenPromise;
                 await this._dictionaryRefreshPromise;
-                return;
+                continue;
+            }
+            if (typeof refreshConnectionMethod === 'function') {
+                this._dictionaryRefreshPromise = (async () => {
+                    try {
+                        await /** @type {() => Promise<void>} */ (refreshConnectionMethod).call(dictionaryDatabase);
+                    } catch (e) {
+                        log.error(e);
+                    }
+                })();
+                try {
+                    await refreshOffscreenPromise;
+                    await this._dictionaryRefreshPromise;
+                } finally {
+                    this._dictionaryRefreshPromise = null;
+                    rerunRefresh = this._dictionaryRefreshQueued;
+                    this._dictionaryRefreshQueued = false;
+                }
+                continue;
+            }
+            if (!(
+                'isPrepared' in dictionaryDatabase &&
+                typeof dictionaryDatabase.isPrepared === 'function' &&
+                dictionaryDatabase.isPrepared()
+            )) {
+                await refreshOffscreenPromise;
+                rerunRefresh = this._dictionaryRefreshQueued;
+                this._dictionaryRefreshQueued = false;
+                continue;
             }
             this._dictionaryRefreshPromise = (async () => {
                 try {
-                    await /** @type {() => Promise<void>} */ (refreshConnectionMethod).call(dictionaryDatabase);
+                    if ('close' in dictionaryDatabase && typeof dictionaryDatabase.close === 'function') {
+                        await dictionaryDatabase.close();
+                    }
+                    await dictionaryDatabase.prepare();
                 } catch (e) {
                     log.error(e);
                 }
             })();
             try {
+                await refreshOffscreenPromise;
                 await this._dictionaryRefreshPromise;
             } finally {
                 this._dictionaryRefreshPromise = null;
+                rerunRefresh = this._dictionaryRefreshQueued;
+                this._dictionaryRefreshQueued = false;
             }
-            return;
-        }
-        if (!(
-            'isPrepared' in dictionaryDatabase &&
-            typeof dictionaryDatabase.isPrepared === 'function' &&
-            dictionaryDatabase.isPrepared()
-        )) {
-            return;
-        }
-        if (this._dictionaryRefreshPromise !== null) {
-            await this._dictionaryRefreshPromise;
-            return;
-        }
-        this._dictionaryRefreshPromise = (async () => {
-            try {
-                if ('close' in dictionaryDatabase && typeof dictionaryDatabase.close === 'function') {
-                    await dictionaryDatabase.close();
-                }
-                await dictionaryDatabase.prepare();
-            } catch (e) {
-                log.error(e);
-            }
-        })();
-        try {
-            await this._dictionaryRefreshPromise;
-        } finally {
-            this._dictionaryRefreshPromise = null;
-        }
+        } while (rerunRefresh);
     }
 
     /**
@@ -3530,6 +3655,113 @@ export class Backend {
         } finally {
             this._dictionaryDatabasePreparePromise = null;
         }
+    }
+
+    async _debugDictionaryLookupStateLocal(text, dictionaryNames) {
+        const database = this._dictionaryDatabase;
+        const ensureIndex = Reflect.get(database, '_ensureDirectTermIndex');
+        const fetchTermRowsByIds = Reflect.get(database, '_fetchTermRowsByIds');
+        if (typeof ensureIndex !== 'function' || typeof fetchTermRowsByIds !== 'function') {
+            return {
+                ok: false,
+                reason: 'debug lookup unavailable',
+                text,
+                dictionaryNames,
+            };
+        }
+        /** @type {Map<number, {dictionary: string, matchSource: string}>} */
+        const ids = new Map();
+        /** @type {Array<Record<string, unknown>>} */
+        const directHits = [];
+        const getRecordById = Reflect.get(database, '_termRecordStore')?.getById?.bind(Reflect.get(database, '_termRecordStore'));
+        const termContentStore = Reflect.get(database, '_termContentStore');
+        const readSlice = Reflect.get(termContentStore, 'readSlice');
+        const getLastReadErrorDetails = Reflect.get(termContentStore, 'getLastReadErrorDetails');
+        const getDebugState = Reflect.get(termContentStore, 'getDebugState');
+        const textDecoder = new TextDecoder();
+        for (const dictionaryNameRaw of dictionaryNames) {
+            const dictionaryName = String(dictionaryNameRaw || '').trim();
+            if (dictionaryName.length === 0) { continue; }
+            const index = ensureIndex.call(database, dictionaryName);
+            const expressionIds = Array.isArray(index?.expression?.get?.(text)) ? index.expression.get(text) : [];
+            const readingIds = Array.isArray(index?.reading?.get?.(text)) ? index.reading.get(text) : [];
+            for (const id of expressionIds) {
+                if (typeof id === 'number' && id > 0 && !ids.has(id)) {
+                    ids.set(id, {dictionary: dictionaryName, matchSource: 'expression'});
+                }
+            }
+            for (const id of readingIds) {
+                if (typeof id === 'number' && id > 0 && !ids.has(id)) {
+                    ids.set(id, {dictionary: dictionaryName, matchSource: 'reading'});
+                }
+            }
+            directHits.push({
+                dictionary: dictionaryName,
+                expressionHitCount: expressionIds.length,
+                readingHitCount: readingIds.length,
+                firstExpressionIds: expressionIds.slice(0, 5),
+                firstReadingIds: readingIds.slice(0, 5),
+            });
+        }
+        const rowsById = await fetchTermRowsByIds.call(database, ids.keys());
+        const rows = [];
+        for (const [id, match] of ids) {
+            const row = rowsById.get(id);
+            const rawRecord = typeof getRecordById === 'function' ? getRecordById(id) : null;
+            let rawContentPreview = null;
+            let readErrorDetails = null;
+            if (
+                rawRecord &&
+                typeof rawRecord.entryContentOffset === 'number' &&
+                rawRecord.entryContentOffset >= 0 &&
+                typeof rawRecord.entryContentLength === 'number' &&
+                rawRecord.entryContentLength > 0 &&
+                typeof readSlice === 'function'
+            ) {
+                try {
+                    const bytes = await readSlice.call(
+                        termContentStore,
+                        rawRecord.entryContentOffset,
+                        Math.min(rawRecord.entryContentLength, 120),
+                    );
+                    if (!(bytes instanceof Uint8Array)) {
+                        rawContentPreview = '<read-null>';
+                        readErrorDetails = typeof getLastReadErrorDetails === 'function' ?
+                            getLastReadErrorDetails.call(termContentStore) :
+                            null;
+                    } else {
+                        rawContentPreview = textDecoder.decode(bytes).replaceAll(/\s+/g, ' ').slice(0, 120);
+                    }
+                } catch (_) {
+                    rawContentPreview = '<read-failed>';
+                    readErrorDetails = typeof getLastReadErrorDetails === 'function' ?
+                        getLastReadErrorDetails.call(termContentStore) :
+                        null;
+                }
+            }
+            rows.push({
+                id,
+                dictionary: row?.dictionary ?? match.dictionary,
+                matchSource: match.matchSource,
+                expression: row?.expression ?? '',
+                reading: row?.reading ?? '',
+                glossaryLength: Array.isArray(row?.glossary) ? row.glossary.length : null,
+                rawEntryContentOffset: rawRecord?.entryContentOffset ?? null,
+                rawEntryContentLength: rawRecord?.entryContentLength ?? null,
+                rawEntryContentDictName: rawRecord?.entryContentDictName ?? null,
+                rawContentPreview,
+                readErrorDetails,
+            });
+            if (rows.length >= 10) { break; }
+        }
+        return {
+            ok: true,
+            text,
+            dictionaryNames,
+            directHits,
+            rowSample: rows,
+            termContentStoreDebugState: typeof getDebugState === 'function' ? getDebugState.call(termContentStore) : null,
+        };
     }
 
     /**

@@ -257,6 +257,17 @@ export class API {
     }
 
     /**
+     * @param {import('api').ApiParam<'replaceDictionaryTitle', 'fromDictionaryTitle'>} fromDictionaryTitle
+     * @param {import('api').ApiParam<'replaceDictionaryTitle', 'toDictionaryTitle'>} toDictionaryTitle
+     * @param {import('api').ApiParam<'replaceDictionaryTitle', 'summary'>} summary
+     * @param {import('api').ApiParam<'replaceDictionaryTitle', 'replacedDictionaryTitle'>} replacedDictionaryTitle
+     * @returns {Promise<import('api').ApiReturn<'replaceDictionaryTitle'>>}
+     */
+    replaceDictionaryTitle({fromDictionaryTitle, toDictionaryTitle, summary, replacedDictionaryTitle}) {
+        return this._invoke('replaceDictionaryTitle', {fromDictionaryTitle, toDictionaryTitle, summary, replacedDictionaryTitle});
+    }
+
+    /**
      * @param {import('api').ApiParam<'getDictionaryCounts', 'dictionaryNames'>} dictionaryNames
      * @param {import('api').ApiParam<'getDictionaryCounts', 'getTotal'>} getTotal
      * @returns {Promise<import('api').ApiReturn<'getDictionaryCounts'>>}

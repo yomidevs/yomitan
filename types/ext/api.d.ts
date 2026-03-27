@@ -295,6 +295,15 @@ type ApiSurface = {
         };
         return: void;
     };
+    replaceDictionaryTitle: {
+        params: {
+            fromDictionaryTitle: string;
+            toDictionaryTitle: string;
+            summary: DictionaryImporter.Summary | null;
+            replacedDictionaryTitle: string | null;
+        };
+        return: void;
+    };
     getDictionaryCounts: {
         params: {
             dictionaryNames: string[];

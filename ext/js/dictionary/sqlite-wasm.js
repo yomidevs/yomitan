@@ -418,7 +418,7 @@ export async function openOpfsDatabase(caller = 'unknown') {
     const tryOpenWasmfsPersistent = () => {
         const persistentPaths = getWasmfsDatabasePaths(sqlite3);
         for (const dbPath of persistentPaths) {
-            for (const flags of ['cw', 'c']) {
+            for (const flags of ['cw']) {
                 try {
                     return new sqlite3.oo1.DB(dbPath, flags);
                 } catch (error) {
@@ -435,7 +435,7 @@ export async function openOpfsDatabase(caller = 'unknown') {
     const tryOpenViaUri = () => {
         for (const dbPath of getDatabasePaths()) {
             const uri = `file:${dbPath}?vfs=opfs`;
-            for (const flags of ['cw', 'c']) {
+            for (const flags of ['cw']) {
                 try {
                     return new sqlite3.oo1.DB(uri, flags);
                 } catch (error) {
@@ -452,7 +452,7 @@ export async function openOpfsDatabase(caller = 'unknown') {
     const tryOpenViaSahpoolUri = () => {
         for (const dbPath of getDatabasePaths()) {
             const uri = `file:${dbPath}?vfs=${OPFS_SAHPOOL_VFS_NAME}`;
-            for (const flags of ['cw', 'c']) {
+            for (const flags of ['cw']) {
                 try {
                     return new sqlite3.oo1.DB(uri, flags);
                 } catch (error) {
@@ -501,7 +501,7 @@ export async function openOpfsDatabase(caller = 'unknown') {
          */
         const tryOpen = () => {
             for (const dbPath of getDatabasePaths()) {
-                for (const flags of ['cw', 'c']) {
+                for (const flags of ['cw']) {
                     try {
                         return new OpfsDb(dbPath, flags);
                     } catch (error) {

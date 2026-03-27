@@ -332,6 +332,9 @@ export class Popup extends EventDispatcher {
      */
     async showContent(details, displayDetails) {
         if (this._optionsContext === null) { throw new Error('Options not assigned'); }
+        this._updateHostPageDebugState({
+            popupShowAttemptCount: this._incrementHostDebugCounter('popupShowAttemptCount'),
+        });
 
         const {optionsContext, sourceRects, writingMode} = details;
         if (optionsContext !== null) {
@@ -522,9 +525,44 @@ export class Popup extends EventDispatcher {
     async _injectInnerWrapper() {
         try {
             await this._injectInner();
+            this._updateHostPageDebugState({
+                popupInjected: true,
+                popupConnected: this._frameConnected,
+                popupSecureFrameUrl: this._useSecureFrameUrl,
+                popupFallbackToInsecureFrameUrl: false,
+                popupLastInjectError: null,
+            });
             return true;
         } catch (e) {
             this._resetFrame();
+            this._updateHostPageDebugState({
+                popupInjected: false,
+                popupConnected: false,
+                popupLastInjectError: e instanceof Error ? e.message : `${e}`,
+            });
+            if (this._useSecureFrameUrl) {
+                try {
+                    this._useSecureFrameUrl = false;
+                    await this._injectInner();
+                    this._updateHostPageDebugState({
+                        popupInjected: true,
+                        popupConnected: this._frameConnected,
+                        popupSecureFrameUrl: this._useSecureFrameUrl,
+                        popupFallbackToInsecureFrameUrl: true,
+                        popupLastInjectError: null,
+                    });
+                    return true;
+                } catch (fallbackError) {
+                    this._resetFrame();
+                    this._updateHostPageDebugState({
+                        popupInjected: false,
+                        popupConnected: false,
+                        popupLastInjectError: fallbackError instanceof Error ? fallbackError.message : `${fallbackError}`,
+                    });
+                    if (fallbackError instanceof PopupError && fallbackError.source === this) { return false; }
+                    throw fallbackError;
+                }
+            }
             if (e instanceof PopupError && e.source === this) { return false; } // Passive error
             throw e;
         }
@@ -742,6 +780,7 @@ export class Popup extends EventDispatcher {
      */
     _setVisible(visible) {
         this._visible.defaultValue = visible;
+        this._updateHostPageDebugState({popupVisible: visible});
     }
 
     /**
@@ -751,7 +790,38 @@ export class Popup extends EventDispatcher {
         if (this._visibleValue === value) { return; }
         this._visibleValue = value;
         this._frame.style.setProperty('visibility', value ? 'visible' : 'hidden', 'important');
+        this._updateHostPageDebugState({popupVisibleValue: value});
         void this._invokeSafe('displayVisibilityChanged', {value});
+    }
+
+    /**
+     * @param {string} counterName
+     * @returns {number}
+     */
+    _incrementHostDebugCounter(counterName) {
+        const {documentElement} = document;
+        if (documentElement === null) { return 1; }
+        const datasetKey = `manabitan${counterName.slice(0, 1).toUpperCase()}${counterName.slice(1)}`;
+        const currentValueRaw = documentElement.dataset[datasetKey];
+        const currentValue = Number.parseInt(`${currentValueRaw ?? '0'}`, 10);
+        return (Number.isFinite(currentValue) ? currentValue : 0) + 1;
+    }
+
+    /**
+     * @param {Record<string, string|number|boolean|null|undefined>} values
+     * @returns {void}
+     */
+    _updateHostPageDebugState(values) {
+        const {documentElement} = document;
+        if (documentElement === null) { return; }
+        for (const [key, value] of Object.entries(values)) {
+            const datasetKey = `manabitan${key.slice(0, 1).toUpperCase()}${key.slice(1)}`;
+            if (value === null || typeof value === 'undefined') {
+                delete documentElement.dataset[datasetKey];
+            } else {
+                documentElement.dataset[datasetKey] = `${value}`;
+            }
+        }
     }
 
     /**

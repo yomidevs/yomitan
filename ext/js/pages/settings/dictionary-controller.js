@@ -1394,10 +1394,21 @@ export class DictionaryController {
             throw new Error(`Failed to download replacement dictionary for ${dictionaryTitle}`);
         }
 
-        await this._deleteDictionary(dictionaryTitle);
         /** @type {import('core').DeferredPromiseDetails<void>} */
         const {promise: importPromise, resolve} = deferPromise();
-        this._settingsController.trigger('importDictionaryFromFile', {files: [downloadedFile], profilesDictionarySettings, onImportDone: resolve});
+        const importToken = Math.random().toString(36).slice(2, 10);
+        const stagedDictionaryTitle = `${dictionaryTitle} [update-staging ${importToken}]`;
+        this._settingsController.trigger('importDictionaryFromFile', {
+            files: [downloadedFile],
+            profilesDictionarySettings,
+            importDetailsOverrides: {
+                dictionaryTitleOverride: stagedDictionaryTitle,
+                replacementDictionaryTitle: dictionaryTitle,
+                useImportSession: false,
+                finalizeImportSession: false,
+            },
+            onImportDone: resolve,
+        });
         await importPromise;
     }
 

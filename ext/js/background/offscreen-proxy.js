@@ -216,6 +216,25 @@ export class DictionaryDatabaseProxy {
     }
 
     /**
+     * @param {string} fromDictionaryTitle
+     * @param {string} toDictionaryTitle
+     * @param {import('dictionary-importer').Summary|null} [summaryOverride]
+     * @param {string|null} [replacedDictionaryTitle]
+     * @returns {Promise<void>}
+     */
+    async replaceDictionaryTitle(fromDictionaryTitle, toDictionaryTitle, summaryOverride = null, replacedDictionaryTitle = null) {
+        await this._offscreen.sendMessagePromise({
+            action: 'replaceDictionaryTitleOffscreen',
+            params: {
+                fromDictionaryTitle,
+                toDictionaryTitle,
+                summaryOverride,
+                replacedDictionaryTitle,
+            },
+        });
+    }
+
+    /**
      * @param {string[]} dictionaryNames
      * @param {boolean} getTotal
      * @returns {Promise<import('dictionary-database').DictionaryCounts>}

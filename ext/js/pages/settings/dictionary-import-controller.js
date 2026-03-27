@@ -953,15 +953,15 @@ export class DictionaryImportController {
     /**
      * @param {import('settings-controller').EventArgument<'importDictionaryFromUrl'>} details
      */
-    _onEventImportDictionaryFromUrl({url, profilesDictionarySettings, onImportDone}) {
-        void this.importFilesFromURLs(url, profilesDictionarySettings, onImportDone);
+    _onEventImportDictionaryFromUrl({url, profilesDictionarySettings, onImportDone, importDetailsOverrides}) {
+        void this.importFilesFromURLs(url, profilesDictionarySettings, onImportDone, importDetailsOverrides ?? null);
     }
 
     /**
      * @param {import('settings-controller').EventArgument<'importDictionaryFromFile'>} details
      */
-    _onEventImportDictionaryFromFile({files, profilesDictionarySettings, onImportDone}) {
-        void this.importFiles(files, profilesDictionarySettings, onImportDone);
+    _onEventImportDictionaryFromFile({files, profilesDictionarySettings, onImportDone, importDetailsOverrides}) {
+        void this.importFiles(files, profilesDictionarySettings, onImportDone, importDetailsOverrides ?? null);
     }
 
     /**
@@ -1165,7 +1165,7 @@ export class DictionaryImportController {
      * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      * @param {import('settings-controller').ImportDictionaryDoneCallback} onImportDone
      */
-    async importFilesFromURLs(text, profilesDictionarySettings, onImportDone) {
+    async importFilesFromURLs(text, profilesDictionarySettings, onImportDone, importDetailsOverrides = null) {
         const urls = text.split('\n');
 
         const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), urls.length);
@@ -1175,6 +1175,7 @@ export class DictionaryImportController {
             profilesDictionarySettings,
             onImportDone,
             importProgressTracker,
+            importDetailsOverrides,
         );
     }
 
@@ -1183,13 +1184,14 @@ export class DictionaryImportController {
      * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      * @param {import('settings-controller').ImportDictionaryDoneCallback} onImportDone
      */
-    async importFiles(files, profilesDictionarySettings, onImportDone) {
+    async importFiles(files, profilesDictionarySettings, onImportDone, importDetailsOverrides = null) {
         const importProgressTracker = new ImportProgressTracker(this._getFileImportSteps(), files.length);
         void this._importDictionaries(
             this._arrayToAsyncGenerator(files),
             profilesDictionarySettings,
             onImportDone,
             importProgressTracker,
+            importDetailsOverrides,
         );
     }
 
@@ -1364,7 +1366,7 @@ export class DictionaryImportController {
      * @param {import('settings-controller').ImportDictionaryDoneCallback} onImportDone
      * @param {ImportProgressTracker} importProgressTracker
      */
-    async _importDictionaries(dictionaries, profilesDictionarySettings, onImportDone, importProgressTracker) {
+    async _importDictionaries(dictionaries, profilesDictionarySettings, onImportDone, importProgressTracker, importDetailsOverrides = null) {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
@@ -1415,6 +1417,7 @@ export class DictionaryImportController {
                 debugImportLogging,
                 enableTermEntryContentDedup,
                 termContentStorageMode,
+                ...(importDetailsOverrides && typeof importDetailsOverrides === 'object' && !Array.isArray(importDetailsOverrides) ? importDetailsOverrides : {}),
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -1760,17 +1763,76 @@ export class DictionaryImportController {
             return errorsWithOpfsRequirement;
         }
 
+        const replacementDictionaryTitle = (
+            typeof importDetails.replacementDictionaryTitle === 'string' &&
+            importDetails.replacementDictionaryTitle.trim().length > 0
+        ) ?
+            importDetails.replacementDictionaryTitle.trim() :
+            null;
+        const sourceDictionaryTitle = (
+            typeof result.sourceTitle === 'string' &&
+            result.sourceTitle.trim().length > 0
+        ) ?
+            result.sourceTitle.trim() :
+            String(result.title || '').trim();
+        if (
+            replacementDictionaryTitle !== null &&
+            sourceDictionaryTitle.length > 0 &&
+            result.title !== sourceDictionaryTitle
+        ) {
+            const replacementStartTime = safePerformance.now();
+            const replacementSummary = {...result, title: sourceDictionaryTitle};
+            await this._settingsController.application.api.replaceDictionaryTitle({
+                fromDictionaryTitle: result.title,
+                toDictionaryTitle: sourceDictionaryTitle,
+                replacedDictionaryTitle: replacementDictionaryTitle,
+                summary: replacementSummary,
+            });
+            result.title = sourceDictionaryTitle;
+            result.sourceTitle = sourceDictionaryTitle;
+            const replacementEndTime = safePerformance.now();
+            recordLocalPhase('replace-imported-dictionary-title', replacementStartTime, replacementEndTime, {
+                replacedDictionaryTitle: replacementDictionaryTitle,
+                sourceDictionaryTitle,
+            });
+        } else if (replacementDictionaryTitle !== null && sourceDictionaryTitle.length > 0) {
+            localPhaseTimings.push({
+                phase: 'replace-imported-dictionary-title',
+                elapsedMs: 0,
+                details: {
+                    skipped: true,
+                    alreadyAppliedInWorker: true,
+                    replacedDictionaryTitle: replacementDictionaryTitle,
+                    sourceDictionaryTitle,
+                },
+            });
+        }
+
+        const shouldAddDictionarySettings = (
+            replacementDictionaryTitle === null ||
+            sourceDictionaryTitle !== replacementDictionaryTitle
+        );
         const addSettingsStartTime = safePerformance.now();
-        const errors2 = await this._addDictionarySettings(result, profilesDictionarySettings);
+        const errors2 = shouldAddDictionarySettings ? await this._addDictionarySettings(result, profilesDictionarySettings) : [];
         const addSettingsEndTime = safePerformance.now();
         log.log(`[ImportTiming] [${dictionaryTitle}] add dictionary settings ${formatDurationMs(addSettingsEndTime - addSettingsStartTime)}`);
         recordLocalPhase('add-dictionary-settings', addSettingsStartTime, addSettingsEndTime, {
             settingsErrorCount: errors2.length,
+            skipped: !shouldAddDictionarySettings,
         });
+        if (replacementDictionaryTitle !== null && shouldAddDictionarySettings) {
+            const removeOldSettingsStartTime = safePerformance.now();
+            await this._removeDictionarySettingsByName(replacementDictionaryTitle);
+            const removeOldSettingsEndTime = safePerformance.now();
+            recordLocalPhase('remove-replaced-dictionary-settings', removeOldSettingsStartTime, removeOldSettingsEndTime, {
+                removedDictionaryTitle: replacementDictionaryTitle,
+            });
+        }
         this._recordImportDebugSnapshot({
             dictionaryTitle,
             hasResult: true,
             resultTitle: result.title || null,
+            sourceTitle: sourceDictionaryTitle || null,
             errorCount: Array.isArray(errors) ? errors.length : -1,
             addSettingsErrorCount: errors2.length,
             fallbackDatabaseContentBase64Length: null,
@@ -1798,7 +1860,7 @@ export class DictionaryImportController {
         }
 
         // Only runs if updating a dictionary
-        if (profilesDictionarySettings !== null) {
+        if (profilesDictionarySettings !== null && shouldAddDictionarySettings) {
             const profileUpdateStartTime = safePerformance.now();
             const options = await this._settingsController.getOptionsFull();
             const {profiles} = options;
@@ -1894,6 +1956,33 @@ export class DictionaryImportController {
             }
         }
         return await this._modifyGlobalSettings(targets);
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     * @returns {Promise<void>}
+     */
+    async _removeDictionarySettingsByName(dictionaryTitle) {
+        const optionsFull = await this._settingsController.getOptionsFull();
+        const {profiles} = optionsFull;
+        /** @type {import('settings-modifications').Modification[]} */
+        const targets = [];
+        for (let i = 0, ii = profiles.length; i < ii; ++i) {
+            const {options: {dictionaries}} = profiles[i];
+            for (let j = dictionaries.length - 1; j >= 0; --j) {
+                if (dictionaries[j].name !== dictionaryTitle) { continue; }
+                targets.push({
+                    action: 'splice',
+                    path: `profiles[${i}].options.dictionaries`,
+                    start: j,
+                    deleteCount: 1,
+                    items: [],
+                });
+            }
+        }
+        if (targets.length > 0) {
+            await this._modifyGlobalSettings(targets);
+        }
     }
 
     /**

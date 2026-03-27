@@ -224,12 +224,55 @@ class OffscreenDictionaryWorkerHandler {
                 await this._ensureDatabasePrepared();
                 await this._dictionaryDatabase.deleteDictionary(/** @type {string} */ (params.dictionaryTitle ?? ''), 1000, () => {});
                 return;
+            case 'replaceDictionaryTitleOffscreen':
+                this._assertDatabaseAvailable(action);
+                await this._ensureDatabasePrepared();
+                await this._dictionaryDatabase.replaceDictionaryTitle(
+                    /** @type {string} */ (params.fromDictionaryTitle ?? ''),
+                    /** @type {string} */ (params.toDictionaryTitle ?? ''),
+                    /** @type {import('dictionary-importer').Summary|null} */ (params.summaryOverride ?? null),
+                    /** @type {string|null} */ (params.replacedDictionaryTitle ?? null),
+                );
+                return;
             case 'getDictionaryCountsOffscreen':
                 this._assertDatabaseAvailable(action);
                 await this._ensureDatabasePrepared();
                 return await this._dictionaryDatabase.getDictionaryCounts(
                     /** @type {string[]} */ (params.dictionaryNames ?? []),
                     params.getTotal === true,
+                );
+            case 'debugDictionaryStorageStateOffscreen':
+                this._assertDatabaseAvailable(action);
+                await this._ensureDatabasePrepared();
+                return {
+                    dictionaryRows: await this._dictionaryDatabase.debugGetDictionaryRows(),
+                    lastReplaceDictionaryTitleDebug: (
+                        typeof this._dictionaryDatabase.getLastReplaceDictionaryTitleDebug === 'function' ?
+                            this._dictionaryDatabase.getLastReplaceDictionaryTitleDebug() :
+                            null
+                    ),
+                    startupCleanupIncompleteImportsSummary: (
+                        typeof this._dictionaryDatabase.getStartupCleanupIncompleteImportsSummary === 'function' ?
+                            this._dictionaryDatabase.getStartupCleanupIncompleteImportsSummary() :
+                            null
+                    ),
+                    startupCleanupMissingTermRecordShardsSummary: (
+                        typeof this._dictionaryDatabase.getStartupCleanupMissingTermRecordShardsSummary === 'function' ?
+                            this._dictionaryDatabase.getStartupCleanupMissingTermRecordShardsSummary() :
+                            null
+                    ),
+                    termRecordShardFileNames: (
+                        typeof this._dictionaryDatabase._termRecordStore?.getShardFileNames === 'function' ?
+                            this._dictionaryDatabase._termRecordStore.getShardFileNames() :
+                            []
+                    ),
+                };
+            case 'debugDictionaryLookupStateOffscreen':
+                this._assertDatabaseAvailable(action);
+                await this._ensureDatabasePrepared();
+                return await this._debugDictionaryLookupState(
+                    /** @type {string} */ (params.text ?? ''),
+                    /** @type {string[]} */ (params.dictionaryNames ?? []),
                 );
             case 'databasePurgeOffscreen':
                 this._assertDatabaseAvailable(action);
@@ -332,6 +375,150 @@ class OffscreenDictionaryWorkerHandler {
             default:
                 throw new Error(`Unknown action: ${action}`);
         }
+    }
+
+    async _debugDictionaryLookupState(text, dictionaryNames) {
+        const ensureIndex = Reflect.get(this._dictionaryDatabase, '_ensureDirectTermIndex');
+        const fetchTermRowsByIds = Reflect.get(this._dictionaryDatabase, '_fetchTermRowsByIds');
+        const requireDb = Reflect.get(this._dictionaryDatabase, '_requireDb');
+        if (typeof ensureIndex !== 'function' || typeof fetchTermRowsByIds !== 'function') {
+            return {ok: false, reason: 'debug lookup unavailable', text, dictionaryNames};
+        }
+        /** @type {Map<number, {dictionary: string, matchSource: string}>} */
+        const ids = new Map();
+        /** @type {Array<Record<string, unknown>>} */
+        const directHits = [];
+        const termRecordStore = Reflect.get(this._dictionaryDatabase, '_termRecordStore');
+        const getRecordById = Reflect.get(termRecordStore, 'getById');
+        const termContentStore = Reflect.get(this._dictionaryDatabase, '_termContentStore');
+        const readSlice = Reflect.get(termContentStore, 'readSlice');
+        const getLastReadErrorDetails = Reflect.get(termContentStore, 'getLastReadErrorDetails');
+        const getDebugState = Reflect.get(termContentStore, 'getDebugState');
+        const textDecoder = new TextDecoder();
+        const sqlRowsByKey = new Map();
+        if (typeof requireDb === 'function') {
+            try {
+                const db = requireDb.call(this._dictionaryDatabase);
+                for (const dictionaryNameRaw of dictionaryNames) {
+                    const dictionaryName = String(dictionaryNameRaw || '').trim();
+                    if (dictionaryName.length === 0) { continue; }
+                    const rows = /** @type {Array<Record<string, unknown>>} */ (db.selectObjects(
+                        `
+                            SELECT
+                                dictionary,
+                                expression,
+                                reading,
+                                entryContentId,
+                                entryContentOffset,
+                                entryContentLength
+                            FROM terms
+                            WHERE dictionary = $dictionary AND (expression = $text OR reading = $text)
+                            LIMIT 10
+                        `,
+                        {$dictionary: dictionaryName, $text: text},
+                    ));
+                    for (const row of rows) {
+                        const key = `${String(row.dictionary ?? '')}\u0000${String(row.expression ?? '')}\u0000${String(row.reading ?? '')}`;
+                        if (!sqlRowsByKey.has(key)) {
+                            sqlRowsByKey.set(key, {
+                                dictionary: row.dictionary ?? null,
+                                expression: row.expression ?? null,
+                                reading: row.reading ?? null,
+                                entryContentId: row.entryContentId ?? null,
+                                entryContentOffset: row.entryContentOffset ?? null,
+                                entryContentLength: row.entryContentLength ?? null,
+                            });
+                        }
+                    }
+                }
+            } catch (_) {
+                // NOP
+            }
+        }
+        for (const dictionaryNameRaw of dictionaryNames) {
+            const dictionaryName = String(dictionaryNameRaw || '').trim();
+            if (dictionaryName.length === 0) { continue; }
+            const index = ensureIndex.call(this._dictionaryDatabase, dictionaryName);
+            const expressionIds = Array.isArray(index?.expression?.get?.(text)) ? index.expression.get(text) : [];
+            const readingIds = Array.isArray(index?.reading?.get?.(text)) ? index.reading.get(text) : [];
+            for (const id of expressionIds) {
+                if (typeof id === 'number' && id > 0 && !ids.has(id)) {
+                    ids.set(id, {dictionary: dictionaryName, matchSource: 'expression'});
+                }
+            }
+            for (const id of readingIds) {
+                if (typeof id === 'number' && id > 0 && !ids.has(id)) {
+                    ids.set(id, {dictionary: dictionaryName, matchSource: 'reading'});
+                }
+            }
+            directHits.push({
+                dictionary: dictionaryName,
+                expressionHitCount: expressionIds.length,
+                readingHitCount: readingIds.length,
+                firstExpressionIds: expressionIds.slice(0, 5),
+                firstReadingIds: readingIds.slice(0, 5),
+            });
+        }
+        const rowsById = await fetchTermRowsByIds.call(this._dictionaryDatabase, ids.keys());
+        const rowSample = [];
+        for (const [id, match] of ids) {
+            const row = rowsById.get(id);
+            const rawRecord = (typeof getRecordById === 'function') ? getRecordById.call(termRecordStore, id) : null;
+            let rawContentPreview = null;
+            let readErrorDetails = null;
+            if (
+                rawRecord &&
+                typeof rawRecord.entryContentOffset === 'number' &&
+                rawRecord.entryContentOffset >= 0 &&
+                typeof rawRecord.entryContentLength === 'number' &&
+                rawRecord.entryContentLength > 0 &&
+                typeof readSlice === 'function'
+            ) {
+                try {
+                    const bytes = await readSlice.call(
+                        termContentStore,
+                        rawRecord.entryContentOffset,
+                        Math.min(rawRecord.entryContentLength, 120),
+                    );
+                    if (!(bytes instanceof Uint8Array)) {
+                        rawContentPreview = '<read-null>';
+                        readErrorDetails = typeof getLastReadErrorDetails === 'function' ?
+                            getLastReadErrorDetails.call(termContentStore) :
+                            null;
+                    } else {
+                        rawContentPreview = textDecoder.decode(bytes).replaceAll(/\s+/g, ' ').slice(0, 120);
+                    }
+                } catch (_) {
+                    rawContentPreview = '<read-failed>';
+                    readErrorDetails = typeof getLastReadErrorDetails === 'function' ?
+                        getLastReadErrorDetails.call(termContentStore) :
+                        null;
+                }
+            }
+            rowSample.push({
+                id,
+                dictionary: row?.dictionary ?? match.dictionary,
+                matchSource: match.matchSource,
+                expression: row?.expression ?? '',
+                reading: row?.reading ?? '',
+                glossaryLength: Array.isArray(row?.glossary) ? row.glossary.length : null,
+                rawEntryContentOffset: rawRecord?.entryContentOffset ?? null,
+                rawEntryContentLength: rawRecord?.entryContentLength ?? null,
+                rawEntryContentDictName: rawRecord?.entryContentDictName ?? null,
+                sqlTermRow: sqlRowsByKey.get(`${String(row?.dictionary ?? match.dictionary)}\u0000${String(row?.expression ?? '')}\u0000${String(row?.reading ?? '')}`) ?? null,
+                rawContentPreview,
+                readErrorDetails,
+            });
+            if (rowSample.length >= 10) { break; }
+        }
+        return {
+            ok: true,
+            text,
+            dictionaryNames,
+            directHits,
+            rowSample,
+            termContentStoreDebugState: typeof getDebugState === 'function' ? getDebugState.call(termContentStore) : null,
+        };
     }
 }
 

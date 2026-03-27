@@ -53,7 +53,10 @@ export class Offscreen {
             ['databaseSetSuspendedOffscreen',  this._setDatabaseSuspendedHandler.bind(this)],
             ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
             ['deleteDictionaryOffscreen',      this._deleteDictionaryHandler.bind(this)],
+            ['replaceDictionaryTitleOffscreen', this._replaceDictionaryTitleHandler.bind(this)],
             ['getDictionaryCountsOffscreen',   this._getDictionaryCountsHandler.bind(this)],
+            ['debugDictionaryStorageStateOffscreen', this._debugDictionaryStorageStateHandler.bind(this)],
+            ['debugDictionaryLookupStateOffscreen', this._debugDictionaryLookupStateHandler.bind(this)],
             ['databasePurgeOffscreen',         this._purgeDatabaseHandler.bind(this)],
             ['databaseGetMediaOffscreen',      this._getMediaHandler.bind(this)],
             ['databaseExportOffscreen',        this._exportDatabaseHandler.bind(this)],
@@ -251,9 +254,27 @@ export class Offscreen {
         await this._invokeDictionaryWorker('deleteDictionaryOffscreen', {dictionaryTitle});
     }
 
+    /** @type {import('offscreen').ApiHandler<'replaceDictionaryTitleOffscreen'>} */
+    async _replaceDictionaryTitleHandler({fromDictionaryTitle, toDictionaryTitle, summaryOverride, replacedDictionaryTitle}) {
+        await this._invokeDictionaryWorker('replaceDictionaryTitleOffscreen', {
+            fromDictionaryTitle,
+            toDictionaryTitle,
+            summaryOverride,
+            replacedDictionaryTitle,
+        });
+    }
+
     /** @type {import('offscreen').ApiHandler<'getDictionaryCountsOffscreen'>} */
     async _getDictionaryCountsHandler({dictionaryNames, getTotal}) {
         return await this._invokeDictionaryWorker('getDictionaryCountsOffscreen', {dictionaryNames, getTotal});
+    }
+
+    async _debugDictionaryStorageStateHandler() {
+        return await this._invokeDictionaryWorker('debugDictionaryStorageStateOffscreen', {});
+    }
+
+    async _debugDictionaryLookupStateHandler({text, dictionaryNames}) {
+        return await this._invokeDictionaryWorker('debugDictionaryLookupStateOffscreen', {text, dictionaryNames});
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseGetMediaOffscreen'>} */

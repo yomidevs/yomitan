@@ -21,6 +21,11 @@ import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {Frontend} from './frontend.js';
 import {PopupFactory} from './popup-factory.js';
 
+const {documentElement} = document;
+if (documentElement !== null) {
+    documentElement.dataset.manabitanContentScriptLoaded = 'true';
+}
+
 await Application.main(false, async (application) => {
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
@@ -42,4 +47,7 @@ await Application.main(false, async (application) => {
         hotkeyHandler,
     });
     await frontend.prepare();
+    if (documentElement !== null) {
+        documentElement.dataset.manabitanContentScriptPrepared = 'true';
+    }
 });

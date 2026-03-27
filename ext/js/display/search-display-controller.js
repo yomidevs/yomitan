@@ -23,6 +23,17 @@ import {querySelectorNotNull} from '../dom/query-selector.js';
 import {isComposing} from '../language/ime-utilities.js';
 import {convertToKana, convertToKanaIME} from '../language/ja/japanese-wanakana.js';
 
+function updateSearchDebugState(patch) {
+    const state = (typeof globalThis.__manabitanSearchDebug === 'object' && globalThis.__manabitanSearchDebug !== null) ?
+        globalThis.__manabitanSearchDebug :
+        {};
+    globalThis.__manabitanSearchDebug = {
+        ...state,
+        ...patch,
+        updatedAt: Date.now(),
+    };
+}
+
 export class SearchDisplayController {
     /**
      * @param {import('./display.js').Display} display
@@ -87,6 +98,58 @@ export class SearchDisplayController {
     /** */
     async prepare() {
         await this._display.updateOptions();
+        updateSearchDebugState({
+            controllerPrepared: false,
+            prepareStarted: true,
+        });
+        window.addEventListener('manabitan-e2e-trigger-search', (event) => {
+            const detail = (event instanceof CustomEvent && typeof event.detail === 'object' && event.detail !== null) ? event.detail : {};
+            const query = String(detail.query ?? '');
+            const animate = Boolean(detail.animate ?? true);
+            const historyMode = typeof detail.historyMode === 'string' ? detail.historyMode : 'new';
+            const lookup = Boolean(detail.lookup ?? true);
+            const flags = Array.isArray(detail.flags) ? detail.flags : null;
+            updateSearchDebugState({
+                debugEventTriggerSearch: {
+                    query,
+                    animate,
+                    historyMode,
+                    lookup,
+                },
+            });
+            this._queryInput.value = query;
+            this._updateSearchHeight(true);
+            this._search(animate, historyMode, lookup, flags);
+        });
+        globalThis.__manabitanSearchDebugApi = {
+            triggerSearch: (query, {animate = true, historyMode = 'new', lookup = true, flags = null} = {}) => {
+                try {
+                    updateSearchDebugState({
+                        debugApiTriggerSearch: {
+                            query: String(query ?? ''),
+                            animate: Boolean(animate),
+                            historyMode,
+                            lookup: Boolean(lookup),
+                        },
+                    });
+                    this._queryInput.value = String(query ?? '');
+                    this._updateSearchHeight(true);
+                    this._search(Boolean(animate), historyMode, Boolean(lookup), Array.isArray(flags) ? flags : null);
+                    return {
+                        ok: true,
+                        query: this._queryInput.value,
+                    };
+                } catch (error) {
+                    updateSearchDebugState({
+                        debugApiTriggerSearchError: error instanceof Error ? error.message : String(error),
+                    });
+                    return {
+                        ok: false,
+                        error: error instanceof Error ? error.message : String(error),
+                    };
+                }
+            },
+        };
 
         this._searchPersistentStateController.on('modeChange', this._onModeChange.bind(this));
 
@@ -124,6 +187,11 @@ export class SearchDisplayController {
         if (displayOptions !== null) {
             await this._onDisplayOptionsUpdated({options: displayOptions});
         }
+        updateSearchDebugState({
+            controllerPrepared: true,
+            prepareCompleted: true,
+            mode: this._searchPersistentStateController.mode,
+        });
     }
 
     /**
@@ -218,6 +286,12 @@ export class SearchDisplayController {
      * @param {import('display').EventArgument<'contentUpdateStart'>} details
      */
     _onContentUpdateStart({type, query}) {
+        updateSearchDebugState({
+            lastContentUpdateStart: {
+                type,
+                query: typeof query === 'string' ? query : '',
+            },
+        });
         let animate = false;
         let valid = false;
         let showBackButton = false;
@@ -298,6 +372,10 @@ export class SearchDisplayController {
      */
     _onSearch(e) {
         e.preventDefault();
+        updateSearchDebugState({
+            lastSearchTrigger: 'button',
+            lastSearchTriggerAt: Date.now(),
+        });
         this._search(true, 'new', true, null);
     }
 
@@ -344,6 +422,12 @@ export class SearchDisplayController {
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
     _onExternalSearchUpdate({text, animate}) {
+        updateSearchDebugState({
+            lastExternalSearchUpdate: {
+                text,
+                animate,
+            },
+        });
         void this._updateSearchFromClipboard(text, animate, false);
     }
 
@@ -613,6 +697,15 @@ export class SearchDisplayController {
         this._updateSearchText();
 
         const query = this._queryInput.value;
+        updateSearchDebugState({
+            lastSearchRequest: {
+                animate,
+                historyMode,
+                lookup,
+                flags,
+                query,
+            },
+        });
         const depth = this._display.depth;
         const url = window.location.href;
         const documentTitle = document.title;

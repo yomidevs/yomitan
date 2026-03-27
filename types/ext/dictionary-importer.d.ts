@@ -56,6 +56,8 @@ export type ImportDetails = {
     existingDatabaseContentBase64?: string;
     useImportSession?: boolean;
     finalizeImportSession?: boolean;
+    dictionaryTitleOverride?: string;
+    replacementDictionaryTitle?: string;
     forceMemoryOnly?: boolean;
     skipImageMetadata?: boolean;
     skipMediaImport?: boolean;

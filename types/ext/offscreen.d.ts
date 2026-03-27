@@ -55,12 +55,35 @@ type ApiSurface = {
         };
         return: void;
     };
+    replaceDictionaryTitleOffscreen: {
+        params: {
+            fromDictionaryTitle: string;
+            toDictionaryTitle: string;
+            summaryOverride: DictionaryImporter.Summary | null;
+            replacedDictionaryTitle: string | null;
+        };
+        return: void;
+    };
     getDictionaryCountsOffscreen: {
         params: {
             dictionaryNames: string[];
             getTotal: boolean;
         };
         return: DictionaryDatabase.DictionaryCounts;
+    };
+    debugDictionaryStorageStateOffscreen: {
+        params: void;
+        return: {
+            dictionaryRows: Array<{
+                id: number;
+                titleColumn: string;
+                versionColumn: number;
+                summaryJsonLength: number;
+                summaryParseOk: boolean;
+                summaryTitle: string | null;
+                summaryImportSuccess: boolean | null;
+            }>;
+        };
     };
     databasePurgeOffscreen: {
         params: void;

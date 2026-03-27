@@ -292,7 +292,9 @@ export class TermRecordOpfsStore {
         /** @type {TextDecoder} */
         this._textDecoder = new TextDecoder();
         /** @type {boolean} */
-        this._wasmEncoderUnavailable = false;
+        // The wasm encoder currently emits corrupted entryContent offsets on Chromium import paths.
+        // Prefer the JS encoder for correctness until the wasm path is fixed.
+        this._wasmEncoderUnavailable = true;
         /** @type {string[]} */
         this._invalidShardFileNames = [];
         /** @type {number} */
@@ -379,11 +381,8 @@ export class TermRecordOpfsStore {
             return;
         }
         if (this._reloadFromShardsAfterImport) {
-            await this._reloadTouchedShardsAfterImport();
-            this._reloadFromShardsAfterImport = false;
+            this._indexByDictionary.clear();
             this._indexDirty = false;
-            this._reloadShardLogicalKeysAfterImport.clear();
-            this._pendingArtifactReloadPlansAfterImport = [];
             return;
         }
         if (this._indexDirty) {
@@ -900,23 +899,10 @@ export class TermRecordOpfsStore {
         const tBuildStart = safePerformance.now();
         const firstId = this._nextId;
         const firstContentDictName = uniformContentDictName ?? (contentDictNames[0] ?? 'raw');
-        const skipRecordMaterialization = this._importSessionActive && this._deferIndexBuild;
+        const skipRecordMaterialization = false;
         if (skipRecordMaterialization) {
             this._nextId += count;
             this._reloadFromShardsAfterImport = true;
-            this._pendingArtifactReloadPlansAfterImport.push({
-                dictionary: chunk.dictionary,
-                firstId,
-                rowCount: count,
-                expressionBytesList: chunk.expressionBytesList,
-                readingBytesList: chunk.readingBytesList,
-                readingEqualsExpressionList: chunk.readingEqualsExpressionList,
-                contentOffsets,
-                contentLengths,
-                contentDictNames,
-                scoreList: chunk.scoreList,
-                sequenceList: chunk.sequenceList,
-            });
         } else {
             this._recordsById.ensureCapacity(firstId + count - 1);
             const existingIndex = this._deferIndexBuild ? void 0 : this._indexByDictionary.get(chunk.dictionary);
@@ -1160,6 +1146,13 @@ export class TermRecordOpfsStore {
         }
         this._indexByDictionary.set(dictionaryName, created);
         return created;
+    }
+
+    /**
+     * @returns {string[]}
+     */
+    getShardFileNames() {
+        return [...this._shardStateByFileName.keys()].sort((a, b) => a.localeCompare(b));
     }
 
     /**
@@ -1963,9 +1956,35 @@ export class TermRecordOpfsStore {
         }
         try {
             await state.writable.close();
+        } catch (error) {
+            if (!this._isClosingWritableStreamError(error)) {
+                throw error;
+            }
         } finally {
             state.writable = null;
         }
+    }
+
+    /**
+     * @param {unknown} error
+     * @returns {boolean}
+     */
+    _isClosingWritableStreamError(error) {
+        const message = (error instanceof Error) ? error.message : String(error);
+        return (
+            message.includes('closing writable stream') ||
+            message.includes('closed or closing stream')
+        );
+    }
+
+    /**
+     * @param {TermRecordShardState} state
+     * @param {number} seekOffset
+     * @returns {Promise<void>}
+     */
+    async _reopenShardWritable(state, seekOffset) {
+        state.writable = await state.fileHandle.createWritable({keepExistingData: true});
+        await state.writable.seek(Math.max(0, seekOffset));
     }
 
     /**
@@ -2337,10 +2356,38 @@ export class TermRecordOpfsStore {
         if (state.writable === null) {
             return;
         }
+        let writtenBytes = 0;
         for (const chunk of chunks) {
             if (chunk.byteLength <= 0) { continue; }
-            await state.writable.write(chunk);
+            try {
+                await state.writable.write(chunk);
+                writtenBytes += chunk.byteLength;
+            } catch (error) {
+                if (!this._isClosingWritableStreamError(error)) {
+                    throw error;
+                }
+                state.writable = null;
+                const seekOffset = state.fileLength - this._sumChunkByteLength(chunks) + writtenBytes;
+                await this._reopenShardWritable(state, seekOffset);
+                if (state.writable === null) {
+                    throw error;
+                }
+                await state.writable.write(chunk);
+                writtenBytes += chunk.byteLength;
+            }
         }
+    }
+
+    /**
+     * @param {Uint8Array[]} chunks
+     * @returns {number}
+     */
+    _sumChunkByteLength(chunks) {
+        let total = 0;
+        for (const chunk of chunks) {
+            total += chunk.byteLength;
+        }
+        return total;
     }
 
     /**
@@ -2660,14 +2707,13 @@ export class TermRecordOpfsStore {
 
     /** */
     _ensurePendingArtifactReloadPlansApplied() {
-        if (this._pendingArtifactReloadPlansAfterImport.length <= 0) {
-            return;
+        if (this._pendingArtifactReloadPlansAfterImport.length > 0) {
+            this._reloadTouchedArtifactChunksAfterImport();
+            this._reloadFromShardsAfterImport = false;
+            this._reloadShardLogicalKeysAfterImport.clear();
+            this._pendingArtifactReloadPlansAfterImport = [];
+            this._indexDirty = true;
         }
-        this._reloadTouchedArtifactChunksAfterImport();
-        this._reloadFromShardsAfterImport = false;
-        this._reloadShardLogicalKeysAfterImport.clear();
-        this._pendingArtifactReloadPlansAfterImport = [];
-        this._indexDirty = true;
     }
 
     /** */

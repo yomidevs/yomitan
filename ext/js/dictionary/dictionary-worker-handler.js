@@ -159,24 +159,112 @@ export class DictionaryWorkerHandler {
         }
         try {
             const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
+            const isReadonlyError = (error) => {
+                const message = (error instanceof Error) ? error.message : String(error);
+                return /readonly database|SQLITE_READONLY/i.test(message);
+            };
+            const dictionaryTitleOverride = (
+                typeof details === 'object' &&
+                details !== null &&
+                !Array.isArray(details) &&
+                typeof Reflect.get(details, 'dictionaryTitleOverride') === 'string' &&
+                Reflect.get(details, 'dictionaryTitleOverride').trim().length > 0
+            ) ?
+                Reflect.get(details, 'dictionaryTitleOverride').trim() :
+                null;
+            const importOnce = async (activeDictionaryDatabase) => {
+                const importPayload = await dictionaryImporter.importDictionary(activeDictionaryDatabase, archiveContent, details);
+                let {result, errors} = importPayload;
+                const importerDebug = (typeof importPayload === 'object' && importPayload !== null && !Array.isArray(importPayload)) ?
+                    (/** @type {import('dictionary-importer').ImportDebug|null} */ (Reflect.get(importPayload, 'debug') ?? null)) :
+                    null;
+                const replacementDictionaryTitle = (
+                    typeof details === 'object' &&
+                    details !== null &&
+                    !Array.isArray(details) &&
+                    typeof Reflect.get(details, 'replacementDictionaryTitle') === 'string' &&
+                    Reflect.get(details, 'replacementDictionaryTitle').trim().length > 0
+                ) ?
+                    Reflect.get(details, 'replacementDictionaryTitle').trim() :
+                    null;
+                const sourceDictionaryTitle = (
+                    result !== null &&
+                    typeof result === 'object' &&
+                    !Array.isArray(result) &&
+                    typeof Reflect.get(result, 'sourceTitle') === 'string' &&
+                    Reflect.get(result, 'sourceTitle').trim().length > 0
+                ) ?
+                    Reflect.get(result, 'sourceTitle').trim() :
+                    ((result !== null && typeof result?.title === 'string') ? result.title.trim() : '');
+                if (
+                    result !== null &&
+                    replacementDictionaryTitle !== null &&
+                    sourceDictionaryTitle.length > 0 &&
+                    result.title !== sourceDictionaryTitle
+                ) {
+                    await activeDictionaryDatabase.replaceDictionaryTitle(
+                        result.title,
+                        sourceDictionaryTitle,
+                        {...result, title: sourceDictionaryTitle},
+                        replacementDictionaryTitle,
+                    );
+                    result.title = sourceDictionaryTitle;
+                    result.sourceTitle = sourceDictionaryTitle;
+                }
+                return {result, errors, importerDebug};
+            };
+
             let result;
             let errors;
             /** @type {import('dictionary-importer').ImportDebug|null} */
             let importerDebug = null;
             try {
-                const importPayload = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
-                ({result, errors} = importPayload);
-                importerDebug = (typeof importPayload === 'object' && importPayload !== null && !Array.isArray(importPayload)) ?
-                    (/** @type {import('dictionary-importer').ImportDebug|null} */ (Reflect.get(importPayload, 'debug') ?? null)) :
-                    null;
+                ({result, errors, importerDebug} = await importOnce(dictionaryDatabase));
             } catch (error) {
-                const diagnostics = (
-                    typeof dictionaryDatabase.getOpenStorageDiagnostics === 'function' ?
-                        dictionaryDatabase.getOpenStorageDiagnostics() :
-                        openStorageDiagnostics
-                );
-                const message = (error instanceof Error) ? error.message : String(error);
-                throw new Error(`Dictionary import failed: ${message}. workerStorageDiagnostics=${JSON.stringify(diagnostics)}`);
+                const canRetryReadonlyImport = isReadonlyError(error) && (!useImportSession || finalizeImportSession);
+                if (!canRetryReadonlyImport) {
+                    throw error;
+                }
+                try {
+                    await dictionaryDatabase.close();
+                } catch (_) {
+                    // NOP
+                }
+                if (this._importSessionDictionaryDatabase === dictionaryDatabase) {
+                    this._importSessionDictionaryDatabase = null;
+                }
+                const retryDictionaryDatabase = await this._getPreparedDictionaryDatabase();
+                if (useImportSession) {
+                    this._importSessionDictionaryDatabase = retryDictionaryDatabase;
+                }
+                try {
+                    if (dictionaryTitleOverride !== null) {
+                        try {
+                            await retryDictionaryDatabase.deleteDictionary(dictionaryTitleOverride, 1000, () => {});
+                        } catch (_) {
+                            // NOP - best effort cleanup before retry.
+                        }
+                    }
+                    ({result, errors, importerDebug} = await importOnce(retryDictionaryDatabase));
+                } finally {
+                    if (!useImportSession) {
+                        await retryDictionaryDatabase.close();
+                    } else if (finalizeImportSession) {
+                        await retryDictionaryDatabase.close();
+                        this._importSessionDictionaryDatabase = null;
+                    }
+                }
+                return {
+                    result,
+                    errors: errors.map((error2) => ExtensionError.serialize(error2)),
+                    debug: {
+                        usesFallbackStorage,
+                        openStorageDiagnostics,
+                        useImportSession,
+                        finalizeImportSession,
+                        importerDebug,
+                    },
+                };
             }
             return {
                 result,
@@ -193,7 +281,7 @@ export class DictionaryWorkerHandler {
             if (useImportSession && finalizeImportSession && this._importSessionDictionaryDatabase !== null) {
                 await this._importSessionDictionaryDatabase.close();
                 this._importSessionDictionaryDatabase = null;
-            } else if (!useImportSession) {
+            } else if (!useImportSession && dictionaryDatabase.isPrepared()) {
                 await dictionaryDatabase.close();
             }
         }
