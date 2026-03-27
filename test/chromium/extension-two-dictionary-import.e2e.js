@@ -1105,10 +1105,6 @@ async function evalSendMessage(page, expression, arg = null) {
                 }
                 profile.options.dictionaries = nextDictionaries;
                 if (profile.options?.general && typeof profile.options.general === 'object') {
-                    const currentMain = String(profile.options.general.mainDictionary || '').trim();
-                    if (currentMain.length === 0 || !installedTitles.includes(currentMain)) {
-                        profile.options.general.mainDictionary = installedTitles[0] ?? '';
-                    }
                     const sortFrequency = profile.options.general.sortFrequencyDictionary;
                     if (typeof sortFrequency === 'string' && sortFrequency.length > 0 && !installedTitles.includes(sortFrequency)) {
                         profile.options.general.sortFrequencyDictionary = null;

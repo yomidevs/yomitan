@@ -1989,6 +1989,27 @@ export class DictionaryImportController {
                     }],
                     deleteCount: 0,
                 });
+                if (options.general.mainDictionary === name) {
+                    targets.push({
+                        action: 'set',
+                        path: `profiles[${i}].options.general.mainDictionary`,
+                        value: title,
+                    });
+                } else if (sequenced && options.general.mainDictionary === '') {
+                    targets.push({
+                        action: 'set',
+                        path: `profiles[${i}].options.general.mainDictionary`,
+                        value: title,
+                    });
+                }
+                if (options.general.sortFrequencyDictionary === name) {
+                    targets.push({
+                        action: 'set',
+                        path: `profiles[${i}].options.general.sortFrequencyDictionary`,
+                        value: title,
+                    });
+                }
+                continue;
             }
 
             if (sequenced && options.general.mainDictionary === '') {
@@ -2009,7 +2030,8 @@ export class DictionaryImportController {
         /** @type {import('settings-modifications').Modification[]} */
         const targets = [];
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
-            const {options: {dictionaries}} = profiles[i];
+            const {options} = profiles[i];
+            const {dictionaries, general} = options;
             for (let j = dictionaries.length - 1; j >= 0; --j) {
                 if (dictionaries[j].name !== dictionaryTitle) { continue; }
                 targets.push({
@@ -2018,6 +2040,20 @@ export class DictionaryImportController {
                     start: j,
                     deleteCount: 1,
                     items: [],
+                });
+            }
+            if (general.mainDictionary === dictionaryTitle) {
+                targets.push({
+                    action: 'set',
+                    path: `profiles[${i}].options.general.mainDictionary`,
+                    value: '',
+                });
+            }
+            if (general.sortFrequencyDictionary === dictionaryTitle) {
+                targets.push({
+                    action: 'set',
+                    path: `profiles[${i}].options.general.sortFrequencyDictionary`,
+                    value: null,
                 });
             }
         }
