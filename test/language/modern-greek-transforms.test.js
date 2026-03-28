@@ -25,7 +25,7 @@ const tests = [
         valid: true,
         tests: [
             {term: 'ρώτησε', source: 'ξαναρώτησε', rule: 'v', reasons: ['ξανα-']},
-            {term: 'ανθίζω', source: 'ξανανθίζω',  rule: 'v', reasons: ['ξανα-']},
+            {term: 'ανθίζω', source: 'ξανανθίζω', rule: 'v', reasons: ['ξανα-']},
             {term: 'έβαλε', source: 'ξανάβαλε', rule: 'v', reasons: ['ξανα-']},
             {term: 'άρχισε', source: 'ξανάρχισε', rule: 'v', reasons: ['ξανα-']},
             {term: 'είπα', source: 'ξανάπα', rule: 'v', reasons: ['ξανα-']},
