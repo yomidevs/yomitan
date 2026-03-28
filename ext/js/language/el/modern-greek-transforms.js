@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025  Yomitan Authors
+ * Copyright (C) 2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ export const modernGreekTransforms = {
                 prefixInflection('ξανά', 'ά', [], ['v']), // ξανάρχισε > άρχισε
                 prefixInflection('ξανάπα', 'είπα', [], ['v']), // edge case
                 {
-                    // ξαναπάς > πας, ξαναλές > λες
+                    // ξαναπάς > πας, ξαναλές > λες, ξαναφάς > φας, ξαναδεί > δει
                     type: 'other',
                     isInflected: /^ξανα/,
                     // cf. import {removeAlphabeticDiacritics} from '../text-processors.js';
