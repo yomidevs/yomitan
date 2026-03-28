@@ -32,17 +32,14 @@ export const modernGreekTransforms = {
         'ξανα-': {
             name: 'ξανα-',
             rules: [
+                // conditionIn is left empty because most likely the ξανα- form is not in the dictionary
                 prefixInflection('ξανα', '', [], ['v']), // ξαναρώτησε > ρώτησε
                 prefixInflection('ξανα', 'α', [], ['v']), // ξανανθίζω > ανθίζω
                 prefixInflection('ξανά', 'έ', [], ['v']), // ξανάβαλε > έβαλε
                 prefixInflection('ξανά', 'ά', [], ['v']), // ξανάρχισε > άρχισε
                 prefixInflection('ξανάπα', 'είπα', [], ['v']), // edge case
-                // ξαναπάς > πας, ξαναλές > λες
-                // ... tough, since πας is not recognized as a verb (πηγαίνω is)
-                // Two options:
-                // * populate non-lemmas with POS info (@kty)
-                // * propagate until we find some POS info πας > πηγαίνω
                 {
+                    // ξαναπάς > πας, ξαναλές > λες
                     type: 'other',
                     isInflected: /^ξανα/,
                     // cf. import {removeAlphabeticDiacritics} from '../text-processors.js';
