@@ -1279,8 +1279,14 @@ export class Backend {
     /** @type {import('api').ApiHandler<'setAllSettings'>} */
     async _onApiSetAllSettings({value, source}) {
         this._optionsUtil.validate(value);
+        const previousOptions = this._options;
         this._options = clone(value);
-        await this._saveOptions(source);
+        try {
+            await this._saveOptions(source);
+        } catch (e) {
+            this._options = previousOptions;
+            throw e;
+        }
     }
 
     /** @type {import('api').ApiHandlerNoExtraArgs<'getOrCreateSearchPopup'>} */

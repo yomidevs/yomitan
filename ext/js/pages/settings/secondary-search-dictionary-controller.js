@@ -54,14 +54,15 @@ export class SecondarySearchDictionaryController {
         this._getDictionaryInfoToken = token;
         const dictionaries = await this._settingsController.getDictionaryInfo();
         if (this._getDictionaryInfoToken !== token) { return; }
-        this._getDictionaryInfoToken = null;
 
         this._dictionaryInfoMap.clear();
         for (const entry of dictionaries) {
             this._dictionaryInfoMap.set(entry.title, entry);
         }
 
-        await this._onDictionarySettingsReordered();
+        await this._onDictionarySettingsReordered(token);
+        if (this._getDictionaryInfoToken !== token) { return; }
+        this._getDictionaryInfoToken = null;
     }
 
     /**
@@ -110,8 +111,9 @@ export class SecondarySearchDictionaryController {
     }
 
     /** */
-    async _onDictionarySettingsReordered() {
+    async _onDictionarySettingsReordered(token = null) {
         const options = await this._settingsController.getOptions();
+        if (token !== null && this._getDictionaryInfoToken !== token) { return; }
         const optionsContext = this._settingsController.getOptionsContext();
         this._onOptionsChanged({options, optionsContext});
     }

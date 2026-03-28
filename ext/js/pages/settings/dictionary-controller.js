@@ -899,7 +899,8 @@ export class DictionaryController {
         if (this._databaseStateToken !== token) { return; }
         this._dictionaries = dictionaries;
 
-        await this._updateEntries();
+        await this._updateEntries(token);
+        if (this._databaseStateToken !== token) { return; }
 
         if (this._onDictionariesUpdate) {
             this._onDictionariesUpdate();
@@ -915,7 +916,7 @@ export class DictionaryController {
     }
 
     /** */
-    async _updateEntries() {
+    async _updateEntries(token = null) {
         const dictionaries = this._dictionaries;
         if (dictionaries === null) { return; }
         this._updateMainDictionarySelectOptions(dictionaries);
@@ -939,8 +940,10 @@ export class DictionaryController {
         }
 
         await DictionaryController.ensureDictionarySettings(this._settingsController, dictionaries, void 0, true, false);
+        if (token !== null && this._databaseStateToken !== token) { return; }
 
         const options = await this._settingsController.getOptions();
+        if (token !== null && this._databaseStateToken !== token) { return; }
         this._updateDictionariesEnabledWarnings(options);
 
         /** @type {Map<string, import('dictionary-importer').Summary>} */
@@ -1448,7 +1451,7 @@ export class DictionaryController {
         /** @type {import('settings-modifications').Modification[]} */
         const targets = [];
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
-            const {options: {dictionaries}} = profiles[i];
+            const {options: {dictionaries, general}} = profiles[i];
             for (let j = 0, jj = dictionaries.length; j < jj; ++j) {
                 if (dictionaries[j].name !== dictionaryTitle) { continue; }
                 const path = `profiles[${i}].options.dictionaries`;
@@ -1458,6 +1461,20 @@ export class DictionaryController {
                     start: j,
                     deleteCount: 1,
                     items: [],
+                });
+            }
+            if (general.mainDictionary === dictionaryTitle) {
+                targets.push({
+                    action: 'set',
+                    path: `profiles[${i}].options.general.mainDictionary`,
+                    value: '',
+                });
+            }
+            if (general.sortFrequencyDictionary === dictionaryTitle) {
+                targets.push({
+                    action: 'set',
+                    path: `profiles[${i}].options.general.sortFrequencyDictionary`,
+                    value: null,
                 });
             }
         }
