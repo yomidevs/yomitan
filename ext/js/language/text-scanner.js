@@ -45,6 +45,7 @@ export class TextScanner extends EventDispatcher {
         searchOnClick = false,
         searchOnClickOnly = false,
         textSourceGenerator,
+        browser = null,
     }) {
         super();
         /** @type {import('../comm/api.js').API} */
@@ -79,7 +80,7 @@ export class TextScanner extends EventDispatcher {
         /** @type {?string} */
         this._language = null;
         /** @type {?import('environment').Browser} */
-        this._browser = null;
+        this._browser = browser;
 
         /** @type {?import('text-scanner').InputInfo} */
         this._inputInfoCurrent = null;
@@ -221,10 +222,7 @@ export class TextScanner extends EventDispatcher {
     set language(value) { this._language = value; }
 
     /** */
-    async prepare() {
-        const {browser} = await this._api.getEnvironmentInfo();
-        this._browser = browser;
-
+    prepare() {
         this._isPrepared = true;
         this.setEnabled(this._enabled);
     }

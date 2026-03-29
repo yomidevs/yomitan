@@ -69,6 +69,7 @@ export class QueryParser extends EventDispatcher {
             searchKanji: false,
             searchOnClick: true,
             textSourceGenerator,
+            browser: null,
         });
         /** @type {?(import('../language/ja/japanese-wanakana.js'))} */
         this._japaneseWanakanaModule = null;
