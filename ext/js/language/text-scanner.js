@@ -78,6 +78,8 @@ export class TextScanner extends EventDispatcher {
         this._touchExcludeSelector = null;
         /** @type {?string} */
         this._language = null;
+        /** @type {?import('environment').Browser} */
+        this._browser = null;
 
         /** @type {?import('text-scanner').InputInfo} */
         this._inputInfoCurrent = null;
@@ -219,7 +221,10 @@ export class TextScanner extends EventDispatcher {
     set language(value) { this._language = value; }
 
     /** */
-    prepare() {
+    async prepare() {
+        const {browser} = await this._api.getEnvironmentInfo();
+        this._browser = browser;
+
         this._isPrepared = true;
         this.setEnabled(this._enabled);
     }
@@ -782,7 +787,7 @@ export class TextScanner extends EventDispatcher {
 
         const languageNotNull = this._language !== null ? this._language : '';
         const selection = window.getSelection();
-        if (selection !== null && isPointInSelection(x, y, selection, languageNotNull)) {
+        if (selection !== null && isPointInSelection(x, y, selection, languageNotNull, this._browser)) {
             return;
         }
 
@@ -1339,6 +1344,7 @@ export class TextScanner extends EventDispatcher {
                 deepContentScan: this._deepContentScan,
                 normalizeCssZoom: this._normalizeCssZoom,
                 language: this._language,
+                browser: this._browser,
             });
             if (textSource !== null) {
                 try {
