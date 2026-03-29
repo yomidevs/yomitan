@@ -30,6 +30,7 @@ import {normalizeRadicalCharacters} from './CJK-util.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
 import {removeDoubleAcuteAccents} from './el/modern-greek-processors.js';
+import {modernGreekTransforms} from './el/modern-greek-transforms.js';
 import {englishTransforms} from './en/english-transforms.js';
 import {esperantoTransforms} from './eo/esperanto-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
@@ -172,6 +173,7 @@ const languageDescriptors = [
             ...capitalizationPreprocessors,
             removeDoubleAcuteAccents,
         },
+        languageTransforms: modernGreekTransforms,
     },
     {
         iso: 'en',
