@@ -150,9 +150,9 @@ type AllTextProcessors = {
     ga: {
         pre: CapitalizationPreprocessors;
     };
-	gd: {
-		pre: CapitalizationPreprocessors;
-	};
+    gd: {
+        pre: CapitalizationPreprocessors;
+    };
     grc: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor & {
             convertLatinToGreek: TextProcessor;
