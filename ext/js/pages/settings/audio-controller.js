@@ -17,8 +17,12 @@
  */
 
 import {EventDispatcher} from '../../core/event-dispatcher.js';
-import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
+import {
+    getDataTransmissionConsentStateFromOptionsFull,
+    isDataTransmissionConsentRequiredBrowser,
+    normalizeDataTransmissionConsentState,
+} from '../../data/data-transmission-consent-util.js';
 import {AudioSystem} from '../../media/audio-system.js';
 
 /**
@@ -49,6 +53,14 @@ export class AudioController extends EventDispatcher {
         this._voices = [];
         /** @type {string} */
         this._language = 'ja';
+        /** @type {?HTMLButtonElement} */
+        this._audioEnableConsentButton = null;
+        /** @type {'unknown'|'accepted'|'declined'} */
+        this._dataTransmissionConsentState = 'unknown';
+        /** @type {import('core').TokenObject} */
+        this._consentStateToken = {};
+        /** @type {?import('./modal.js').Modal} */
+        this._firefoxDataTransmissionModal = null;
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
@@ -69,6 +81,8 @@ export class AudioController extends EventDispatcher {
     /** */
     async prepare() {
         this._audioSystem.prepare();
+        this._audioEnableConsentButton = /** @type {HTMLButtonElement} */ (document.querySelector('#audio-enable-consent-button'));
+        this._firefoxDataTransmissionModal = this._modalController.getModal('firefox-data-transmission-consent');
 
         this._audioSourceContainer.textContent = '';
         /** @type {HTMLButtonElement} */
@@ -80,6 +94,7 @@ export class AudioController extends EventDispatcher {
         audioSourceMoveButton.addEventListener('click', this._onAudioSourceMoveButtonClick.bind(this), false);
 
         this._audioSourceAddButton.addEventListener('click', this._onAddAudioSource.bind(this), false);
+        this._audioEnableConsentButton?.addEventListener('click', this._onAudioEnableConsentClick.bind(this), false);
 
         this._audioSystem.on('voiceschanged', this._updateTextToSpeechVoices.bind(this));
         this._updateTextToSpeechVoices();
@@ -91,6 +106,7 @@ export class AudioController extends EventDispatcher {
         const options = await this._settingsController.getOptions();
         const optionsContext = this._settingsController.getOptionsContext();
         this._onOptionsChanged({options, optionsContext});
+        void this._refreshDataTransmissionConsentState();
     }
 
     /**
@@ -176,6 +192,39 @@ export class AudioController extends EventDispatcher {
         for (let i = 0, ii = sources.length; i < ii; ++i) {
             this._createAudioSourceEntry(i, sources[i]);
         }
+
+        void this._refreshDataTransmissionConsentState();
+    }
+
+    /** */
+    _onAudioEnableConsentClick() {
+        if (!isDataTransmissionConsentRequiredBrowser(document.documentElement.dataset.browser)) { return; }
+        this._firefoxDataTransmissionModal?.setVisible(true);
+    }
+
+    /** */
+    async _refreshDataTransmissionConsentState() {
+        if (!isDataTransmissionConsentRequiredBrowser(document.documentElement.dataset.browser)) {
+            this._setDataTransmissionConsentState('accepted');
+            return;
+        }
+        const token = {};
+        this._consentStateToken = token;
+        try {
+            const optionsFull = await this._settingsController.getOptionsFull();
+            if (this._consentStateToken !== token) { return; }
+            this._setDataTransmissionConsentState(getDataTransmissionConsentStateFromOptionsFull(optionsFull));
+        } catch (_e) {
+            // NOP
+        }
+    }
+
+    /**
+     * @param {unknown} value
+     */
+    _setDataTransmissionConsentState(value) {
+        this._dataTransmissionConsentState = normalizeDataTransmissionConsentState(value);
+        document.documentElement.dataset.audioConsentState = this._dataTransmissionConsentState;
     }
 
     /** */

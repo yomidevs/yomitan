@@ -24,7 +24,7 @@ const DICTIONARY_DB_FILE_ALT = 'dict.sqlite3';
 const OPFS_SAHPOOL_VFS_NAME = 'opfs-sahpool';
 
 let lastOpenUsedFallbackStorage = false;
-/** @type {{mode: string, caller: string, runtimeContext: ReturnType<typeof getRuntimeContextDiagnostics>|null, forceFallback: boolean, opfsReadyTimeoutMs: number, opfsReadyWait: {attempts: number, elapsedMs: number, ready: boolean}|null, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasInstallOpfsSAHPoolVfs: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null, openFailureClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'|null, attempts?: Array<{strategy: string, target: string, flags: string, error: string, errorClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'}>, lastError?: string|null}} */
+/** @type {{mode: string, caller: string, runtimeContext: ReturnType<typeof getRuntimeContextDiagnostics>|null, forceFallback: boolean, opfsReadyTimeoutMs: number, opfsReadyWait: {attempts: number, elapsedMs: number, ready: boolean}|null, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasInstallOpfsSAHPoolVfs: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null, opfsSahpoolInstallAttempted: boolean, opfsSahpoolInstallResult: string|null, opfsSahpoolInstallError: string|null, openFailureClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'|null, attempts?: Array<{strategy: string, target: string, flags: string, error: string, errorClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'}>, lastError?: string|null}} */
 let lastOpenStorageDiagnostics = {
     mode: 'unknown',
     caller: 'unknown',
@@ -40,6 +40,9 @@ let lastOpenStorageDiagnostics = {
     hasOpfsSahpoolVfs: false,
     opfsVfsPtr: null,
     opfsSahpoolVfsPtr: null,
+    opfsSahpoolInstallAttempted: false,
+    opfsSahpoolInstallResult: null,
+    opfsSahpoolInstallError: null,
     openFailureClass: null,
     attempts: [],
     lastError: null,
@@ -333,6 +336,9 @@ export async function openOpfsDatabase(caller = 'unknown') {
         hasOpfsSahpoolVfs: capability.hasOpfsSahpoolVfs,
         opfsVfsPtr: capability.opfsVfsPtr,
         opfsSahpoolVfsPtr: capability.opfsSahpoolVfsPtr,
+        opfsSahpoolInstallAttempted: false,
+        opfsSahpoolInstallResult: null,
+        opfsSahpoolInstallError: null,
         openFailureClass: null,
         attempts: [],
         lastError: null,
@@ -469,19 +475,31 @@ export async function openOpfsDatabase(caller = 'unknown') {
     const ensureOpfsSahpoolVfs = async () => {
         const findVfs2 = sqlite3?.capi?.sqlite3_vfs_find;
         if (typeof findVfs2 === 'function' && isNonZeroPointer(findVfs2(OPFS_SAHPOOL_VFS_NAME))) {
+            lastOpenStorageDiagnostics.opfsSahpoolInstallAttempted = false;
+            lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'already-registered';
+            lastOpenStorageDiagnostics.opfsSahpoolInstallError = null;
             return true;
         }
         if (typeof installOpfsSAHPoolVfs !== 'function') {
+            lastOpenStorageDiagnostics.opfsSahpoolInstallAttempted = false;
+            lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'unavailable';
+            lastOpenStorageDiagnostics.opfsSahpoolInstallError = null;
             return false;
         }
         if (opfsSahpoolInstallPromise === null) {
             opfsSahpoolInstallPromise = (async () => {
+                lastOpenStorageDiagnostics.opfsSahpoolInstallAttempted = true;
                 try {
                     await /** @type {(opts: {name?: string}) => Promise<unknown>} */ (installOpfsSAHPoolVfs)({
                         name: OPFS_SAHPOOL_VFS_NAME,
                     });
+                    lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'installed';
+                    lastOpenStorageDiagnostics.opfsSahpoolInstallError = null;
                     return true;
                 } catch (error) {
+                    const message = (error instanceof Error) ? error.message : String(error);
+                    lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'failed';
+                    lastOpenStorageDiagnostics.opfsSahpoolInstallError = message;
                     pushAttemptError('install-opfs-sahpool-vfs', OPFS_SAHPOOL_VFS_NAME, '-', error);
                     return false;
                 }
@@ -490,7 +508,11 @@ export async function openOpfsDatabase(caller = 'unknown') {
         const installed = await opfsSahpoolInstallPromise;
         syncCapabilityIntoDiagnostics();
         if (typeof findVfs2 === 'function') {
-            return isNonZeroPointer(findVfs2(OPFS_SAHPOOL_VFS_NAME));
+            const available = isNonZeroPointer(findVfs2(OPFS_SAHPOOL_VFS_NAME));
+            if (!available && installed && lastOpenStorageDiagnostics.opfsSahpoolInstallResult === 'installed') {
+                lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'installed-but-unregistered';
+            }
+            return available;
         }
         return installed;
     };

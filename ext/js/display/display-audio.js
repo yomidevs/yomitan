@@ -19,16 +19,26 @@
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {
+    getDataTransmissionConsentStateFromOptionsFull,
+    getDataTransmissionConsentUpdateTargets,
+    isDataTransmissionConsentRequiredBrowser,
+    normalizeDataTransmissionConsentState,
+} from '../data/data-transmission-consent-util.js';
 import {getRequiredAudioSourceList} from '../media/audio-downloader.js';
 import {AudioSystem} from '../media/audio-system.js';
+import {toError} from '../core/to-error.js';
 
 export class DisplayAudio {
     /**
      * @param {import('./display.js').Display} display
+     * @param {?import('../pages/settings/modal-controller.js').ModalController} [modalController]
      */
-    constructor(display) {
+    constructor(display, modalController = null) {
         /** @type {import('./display.js').Display} */
         this._display = display;
+        /** @type {?import('../pages/settings/modal-controller.js').ModalController} */
+        this._modalController = modalController;
         /** @type {?import('display-audio').GenericAudio} */
         this._audioPlaying = null;
         /** @type {AudioSystem} */
@@ -71,12 +81,32 @@ export class DisplayAudio {
         ]);
         /** @type {?boolean} */
         this._enableDefaultAudioSources = null;
+        /** @type {boolean} */
+        this._dataTransmissionConsentRequired = false;
+        /** @type {'unknown'|'accepted'|'declined'} */
+        this._dataTransmissionConsentState = 'unknown';
+        /** @type {import('core').TokenObject} */
+        this._consentStateToken = {};
+        /** @type {?import('../pages/settings/modal.js').Modal} */
+        this._firefoxDataTransmissionModal = null;
+        /** @type {?HTMLButtonElement} */
+        this._acceptDataTransmissionButton = null;
+        /** @type {?HTMLButtonElement} */
+        this._declineDataTransmissionButton = null;
+        /** @type {?import('./display-notification.js').DisplayNotification} */
+        this._notification = null;
+        /** @type {?import('core').Timeout} */
+        this._notificationHideTimer = null;
+        /** @type {number} */
+        this._notificationHideTimeout = 5000;
         /** @type {(event: MouseEvent) => void} */
         this._onAudioPlayButtonClickBind = this._onAudioPlayButtonClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
         this._onAudioPlayButtonContextMenuBind = this._onAudioPlayButtonContextMenu.bind(this);
         /** @type {(event: import('popup-menu').MenuCloseEvent) => void} */
         this._onAudioPlayMenuCloseClickBind = this._onAudioPlayMenuCloseClick.bind(this);
+        /** @type {(event: MouseEvent) => void} */
+        this._onEnableAudioButtonClickBind = this._onEnableAudioButtonClick.bind(this);
     }
 
     /** @type {number} */
@@ -91,6 +121,9 @@ export class DisplayAudio {
     /** */
     prepare() {
         this._audioSystem.prepare();
+        this._dataTransmissionConsentRequired = isDataTransmissionConsentRequiredBrowser(document.documentElement.dataset.browser);
+        this._firefoxDataTransmissionModal = this._modalController?.getModal('firefox-data-transmission-consent') ?? null;
+        this._prepareDataTransmissionConsentModal();
         /* eslint-disable @stylistic/no-multi-spaces */
         this._display.hotkeyHandler.registerActions([
             ['playAudio',           this._onHotkeyActionPlayAudio.bind(this)],
@@ -105,10 +138,12 @@ export class DisplayAudio {
         this._display.on('contentUpdateEntry', this._onContentUpdateEntry.bind(this));
         this._display.on('contentUpdateComplete', this._onContentUpdateComplete.bind(this));
         this._display.on('frameVisibilityChange', this._onFrameVisibilityChange.bind(this));
+        this._display.application.on('optionsUpdated', this._onApplicationOptionsUpdated.bind(this));
         const options = this._display.getOptions();
         if (options !== null) {
             this._onOptionsUpdated({options});
         }
+        void this._refreshDataTransmissionConsentState();
     }
 
     /** */
@@ -131,6 +166,10 @@ export class DisplayAudio {
      * @param {?string} [sourceType]
      */
     async playAudio(dictionaryEntryIndex, headwordIndex, sourceType = null) {
+        if (!this._canPlayAudio()) {
+            this._showDataTransmissionConsentModal();
+            return;
+        }
         let sources = this._audioSources;
         if (sourceType !== null) {
             sources = [];
@@ -178,7 +217,7 @@ export class DisplayAudio {
             general: {language},
             audio: {enabled, autoPlay, fallbackSoundType, volume, sources, enableDefaultAudioSources},
         } = options;
-        this._autoPlay = enabled && autoPlay;
+        this._autoPlay = enabled && autoPlay && this._canPlayAudio();
         this._fallbackSoundType = fallbackSoundType;
         this._playbackVolume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume / 100)) : 1;
         this._enableDefaultAudioSources = enableDefaultAudioSources;
@@ -197,9 +236,16 @@ export class DisplayAudio {
         }
 
         const data = document.documentElement.dataset;
-        data.audioEnabled = enabled.toString();
+        data.audioEnabled = (enabled && this._canPlayAudio()).toString();
+        data.audioConsentRequired = this._dataTransmissionConsentRequired.toString();
+        data.audioConsentState = this._dataTransmissionConsentState;
 
         this._cache.clear();
+    }
+
+    /** */
+    _onApplicationOptionsUpdated() {
+        void this._refreshDataTransmissionConsentState();
     }
 
     /** */
@@ -215,6 +261,9 @@ export class DisplayAudio {
      */
     _onContentUpdateEntry({element}) {
         const eventListeners = this._eventListeners;
+        for (const button of element.querySelectorAll('.action-button[data-action=enable-audio]')) {
+            eventListeners.addEventListener(button, 'click', this._onEnableAudioButtonClickBind, false);
+        }
         for (const button of element.querySelectorAll('.action-button[data-action=play-audio]')) {
             eventListeners.addEventListener(button, 'click', this._onAudioPlayButtonClickBind, false);
             eventListeners.addEventListener(button, 'contextmenu', this._onAudioPlayButtonContextMenuBind, false);
@@ -224,7 +273,7 @@ export class DisplayAudio {
 
     /** */
     _onContentUpdateComplete() {
-        if (!this._autoPlay || !this._display.frameVisible) { return; }
+        if (!this._autoPlay || !this._display.frameVisible || !this._canPlayAudio()) { return; }
 
         this.clearAutoPlayTimer();
 
@@ -330,6 +379,133 @@ export class DisplayAudio {
         } else {
             void this.playAudio(dictionaryEntryIndex, headwordIndex);
         }
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onEnableAudioButtonClick(e) {
+        e.preventDefault();
+        this._showDataTransmissionConsentModal();
+    }
+
+    /** */
+    _prepareDataTransmissionConsentModal() {
+        if (this._firefoxDataTransmissionModal === null) { return; }
+        this._acceptDataTransmissionButton = /** @type {HTMLButtonElement} */ (querySelectorNotNull(document, '#accept-data-transmission'));
+        this._declineDataTransmissionButton = /** @type {HTMLButtonElement} */ (querySelectorNotNull(document, '#decline-data-transmission'));
+        this._acceptDataTransmissionButton.addEventListener('click', this._onAcceptDataTransmission.bind(this), false);
+        this._declineDataTransmissionButton.addEventListener('click', this._onDeclineDataTransmission.bind(this), false);
+    }
+
+    /** */
+    async _refreshDataTransmissionConsentState() {
+        const token = {};
+        this._consentStateToken = token;
+        try {
+            const optionsFull = await this._display.application.api.optionsGetFull();
+            if (this._consentStateToken !== token) { return; }
+            this._setDataTransmissionConsentState(getDataTransmissionConsentStateFromOptionsFull(optionsFull));
+        } catch (_e) {
+            // NOP
+        }
+    }
+
+    /**
+     * @param {unknown} value
+     */
+    _setDataTransmissionConsentState(value) {
+        this._dataTransmissionConsentState = normalizeDataTransmissionConsentState(value);
+        this._syncAudioConsentDataset();
+    }
+
+    /** */
+    _syncAudioConsentDataset() {
+        const data = document.documentElement.dataset;
+        data.audioConsentRequired = this._dataTransmissionConsentRequired.toString();
+        data.audioConsentState = this._dataTransmissionConsentState;
+        const enabled = this._display.getOptions()?.audio.enabled === true;
+        data.audioEnabled = (enabled && this._canPlayAudio()).toString();
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    _canPlayAudio() {
+        return !this._dataTransmissionConsentRequired || this._dataTransmissionConsentState === 'accepted';
+    }
+
+    /** */
+    _showDataTransmissionConsentModal() {
+        this._firefoxDataTransmissionModal?.setVisible(true);
+    }
+
+    /** */
+    async _onAcceptDataTransmission() {
+        await this._updateDataTransmissionConsent('accepted', true);
+    }
+
+    /** */
+    async _onDeclineDataTransmission() {
+        await this._updateDataTransmissionConsent('declined', false);
+    }
+
+    /**
+     * @param {'accepted'|'declined'} state
+     * @param {boolean} audioEnabled
+     */
+    async _updateDataTransmissionConsent(state, audioEnabled) {
+        const optionsContext = this._display.getOptionsContext();
+        try {
+            const results = await this._display.application.api.modifySettings(
+                getDataTransmissionConsentUpdateTargets(state, audioEnabled, optionsContext),
+                'display-audio',
+            );
+            for (const {error} of results) {
+                if (typeof error !== 'undefined') {
+                    throw toError(error);
+                }
+            }
+            this._setDataTransmissionConsentState(state);
+        } catch (_e) {
+            this._showNotification('Failed to update audio consent. Check extension settings and try again.', true);
+        }
+    }
+
+    /**
+     * @param {string} message
+     * @param {boolean} autoClose
+     */
+    _showNotification(message, autoClose) {
+        if (this._notification === null) {
+            this._notification = this._display.createNotification(false);
+            this._notification.node.addEventListener('click', this._onNotificationClick.bind(this), false);
+        }
+        this._notification.setContent(message);
+        this._notification.open();
+        this._stopHideNotificationTimer();
+        if (autoClose) {
+            this._notificationHideTimer = setTimeout(this._onNotificationHideTimeout.bind(this), this._notificationHideTimeout);
+        }
+    }
+
+    /** */
+    _stopHideNotificationTimer() {
+        if (this._notificationHideTimer !== null) {
+            clearTimeout(this._notificationHideTimer);
+            this._notificationHideTimer = null;
+        }
+    }
+
+    /** */
+    _onNotificationHideTimeout() {
+        this._notificationHideTimer = null;
+        this._notification?.close(true);
+    }
+
+    /** */
+    _onNotificationClick() {
+        this._stopHideNotificationTimer();
     }
 
     /**

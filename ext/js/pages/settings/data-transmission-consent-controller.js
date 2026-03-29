@@ -16,6 +16,7 @@
  */
 
 import {querySelectorNotNull} from '../../dom/query-selector.js';
+import {getDataTransmissionConsentUpdateTargets} from '../../data/data-transmission-consent-util.js';
 import {ModalController} from './modal-controller.js';
 
 export class DataTransmissionConsentController {
@@ -44,9 +45,6 @@ export class DataTransmissionConsentController {
 
             this._acceptDataTransmissionButton.addEventListener('click', this._onAccept.bind(this));
             this._declineDataTransmissionButton.addEventListener('click', this._onDecline.bind(this));
-
-            const options = await this._settingsController.getOptionsFull();
-            firefoxDataTransmissionModal?.setVisible(!options.global.dataTransmissionConsentShown);
         }
     }
 
@@ -54,12 +52,15 @@ export class DataTransmissionConsentController {
 
     /** */
     async _onAccept() {
-        await this._settingsController.setGlobalSetting('global.dataTransmissionConsentShown', true);
+        await this._settingsController.modifySettings(
+            getDataTransmissionConsentUpdateTargets('accepted', true, this._settingsController.getOptionsContext()),
+        );
     }
 
     /** */
     async _onDecline() {
-        await this._settingsController.setGlobalSetting('global.dataTransmissionConsentShown', true);
-        await this._settingsController.setProfileSetting('audio.enabled', false);
+        await this._settingsController.modifySettings(
+            getDataTransmissionConsentUpdateTargets('declined', false, this._settingsController.getOptionsContext()),
+        );
     }
 }

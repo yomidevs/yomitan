@@ -27,7 +27,7 @@ import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryController} from './dictionary-controller.js';
 
-const OPFS_REQUIRED_USER_MESSAGE = 'Manabitan requires OPFS storage support. Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension.';
+const OPFS_REQUIRED_USER_MESSAGE = 'Manabitan requires OPFS storage support.';
 const OFFSCREEN_IMPORT_SMALL_ARCHIVE_MIN_BYTES = 32 * 1024 * 1024;
 const OFFSCREEN_IMPORT_SMALL_ARCHIVE_MAX_BYTES = 96 * 1024 * 1024;
 const OFFSCREEN_IMPORT_LARGE_ARCHIVE_MIN_BYTES = 256 * 1024 * 1024;
@@ -163,6 +163,85 @@ function isOpfsUnavailableMessage(message) {
 
 /**
  * @param {string} message
+ * @returns {string}
+ */
+function getOpfsUnavailableUserMessage(message) {
+    const base = OPFS_REQUIRED_USER_MESSAGE;
+    const userAgent = typeof navigator?.userAgent === 'string' ? navigator.userAgent : '';
+    const isFirefoxRuntime = /Firefox\//i.test(userAgent);
+    const storageValue = /** @type {Record<string, unknown>} */ (Reflect.get(navigator ?? {}, 'storage') ?? {});
+    const hasStorageGetDirectoryFallback = typeof Reflect.get(storageValue, 'getDirectory') === 'function';
+    const hasSharedArrayBufferFallback = typeof Reflect.get(globalThis, 'SharedArrayBuffer') === 'function';
+    const hasAtomicsFallback = typeof Reflect.get(globalThis, 'Atomics') === 'object' && Reflect.get(globalThis, 'Atomics') !== null;
+    const crossOriginIsolatedValue = Reflect.get(globalThis, 'crossOriginIsolated');
+    const crossOriginIsolatedFallback = typeof crossOriginIsolatedValue === 'boolean' ? crossOriginIsolatedValue : null;
+    const formatFallbackDiagnostics = () => (
+        `Runtime diagnostics: storage.getDirectory=${String(hasStorageGetDirectoryFallback)}, ` +
+        `SharedArrayBuffer=${String(hasSharedArrayBufferFallback)}, ` +
+        `Atomics=${String(hasAtomicsFallback)}, ` +
+        `crossOriginIsolated=${String(crossOriginIsolatedFallback)}.`
+    );
+    const diagnosticsMatch = message.match(/diagnostics=(\{.*\})/);
+    if (diagnosticsMatch === null) {
+        if (isFirefoxRuntime) {
+            return `${base} This Firefox extension runtime is missing the storage or isolation features required for SQLite + OPFS. This is usually an extension security limitation, not a missing permission. ${formatFallbackDiagnostics()}`;
+        }
+        return `${base} Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension. ${formatFallbackDiagnostics()}`;
+    }
+    try {
+        const diagnostics = parseJson(diagnosticsMatch[1]);
+        if (!(typeof diagnostics === 'object' && diagnostics !== null && !Array.isArray(diagnostics))) {
+            if (isFirefoxRuntime) {
+                return `${base} This Firefox extension runtime is missing the storage or isolation features required for SQLite + OPFS. This is usually an extension security limitation, not a missing permission. ${formatFallbackDiagnostics()}`;
+            }
+            return `${base} Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension. ${formatFallbackDiagnostics()}`;
+        }
+        const runtimeContext = Reflect.get(diagnostics, 'runtimeContext');
+        const mode = typeof Reflect.get(diagnostics, 'mode') === 'string' ? Reflect.get(diagnostics, 'mode') : 'unknown';
+        const hasStorageGetDirectory = typeof Reflect.get(runtimeContext ?? {}, 'hasStorageGetDirectory') === 'boolean' ? Reflect.get(runtimeContext ?? {}, 'hasStorageGetDirectory') : null;
+        const hasSharedArrayBuffer = typeof Reflect.get(runtimeContext ?? {}, 'hasSharedArrayBuffer') === 'boolean' ? Reflect.get(runtimeContext ?? {}, 'hasSharedArrayBuffer') : null;
+        const hasAtomics = typeof Reflect.get(runtimeContext ?? {}, 'hasAtomics') === 'boolean' ? Reflect.get(runtimeContext ?? {}, 'hasAtomics') : null;
+        const crossOriginIsolated = typeof Reflect.get(runtimeContext ?? {}, 'crossOriginIsolated') === 'boolean' ? Reflect.get(runtimeContext ?? {}, 'crossOriginIsolated') : null;
+        const opfsSahpoolInstallResult = typeof Reflect.get(diagnostics, 'opfsSahpoolInstallResult') === 'string' ? Reflect.get(diagnostics, 'opfsSahpoolInstallResult') : null;
+        const opfsSahpoolInstallError = typeof Reflect.get(diagnostics, 'opfsSahpoolInstallError') === 'string' ? Reflect.get(diagnostics, 'opfsSahpoolInstallError') : null;
+        const opfsSahpoolVfs = typeof Reflect.get(diagnostics, 'hasOpfsSahpoolVfs') === 'boolean' ? Reflect.get(diagnostics, 'hasOpfsSahpoolVfs') : null;
+        const attempts = Array.isArray(Reflect.get(diagnostics, 'attempts')) ? Reflect.get(diagnostics, 'attempts') : [];
+        const lastSahpoolOpenError = attempts
+            .filter((attempt) => typeof Reflect.get(attempt ?? {}, 'strategy') === 'string' && Reflect.get(attempt ?? {}, 'strategy') === 'uri-opfs-sahpool')
+            .map((attempt) => typeof Reflect.get(attempt ?? {}, 'error') === 'string' ? Reflect.get(attempt ?? {}, 'error') : '')
+            .filter((value) => value.length > 0)
+            .at(-1) ?? null;
+        const runtimeUserAgent = typeof Reflect.get(runtimeContext ?? {}, 'userAgent') === 'string' ? Reflect.get(runtimeContext ?? {}, 'userAgent') : '';
+        const isFirefoxRuntimeFromDiagnostics = /Firefox\//i.test(runtimeUserAgent) || isFirefoxRuntime;
+        let reason = 'Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension.';
+        if (isFirefoxRuntimeFromDiagnostics) {
+            if (hasStorageGetDirectory !== true) {
+                reason = 'This Firefox runtime does not expose the required OPFS API to the extension. Make sure you loaded the current Firefox build and reload the extension.';
+            } else if (hasSharedArrayBuffer !== true || hasAtomics !== true || crossOriginIsolated !== true) {
+                reason = 'This Firefox extension runtime is missing the isolation features required for SQLite + OPFS. This is a browser extension security limitation, not a missing permission.';
+            } else {
+                reason = 'This Firefox extension runtime still rejected the OPFS backend even though the basic APIs are present. Reload the extension, and if it persists, use the standard Firefox build or a Chromium-based build.';
+            }
+        } else if (hasStorageGetDirectory !== true) {
+            reason = 'This browser runtime does not expose the required OPFS API to the extension. Update the browser and reload the extension.';
+        } else if (hasSharedArrayBuffer !== true || hasAtomics !== true || crossOriginIsolated !== true) {
+            reason = 'This extension runtime is missing the isolation features required for SQLite + OPFS. Reload the extension or use a runtime with SharedArrayBuffer support.';
+        }
+        let sahpoolDetails = '';
+        if (opfsSahpoolInstallResult !== null || opfsSahpoolVfs !== null || opfsSahpoolInstallError !== null || lastSahpoolOpenError !== null) {
+            sahpoolDetails = ` opfs-sahpool: install=${String(opfsSahpoolInstallResult)}, vfs=${String(opfsSahpoolVfs)}, installError=${String(opfsSahpoolInstallError)}, openError=${String(lastSahpoolOpenError)}.`;
+        }
+        return `${base} ${reason} Runtime diagnostics: mode=${mode}, storage.getDirectory=${String(hasStorageGetDirectory)}, SharedArrayBuffer=${String(hasSharedArrayBuffer)}, Atomics=${String(hasAtomics)}, crossOriginIsolated=${String(crossOriginIsolated)}.${sahpoolDetails}`;
+    } catch (_) {
+        if (isFirefoxRuntime) {
+            return `${base} This Firefox extension runtime is missing the storage or isolation features required for SQLite + OPFS. This is usually an extension security limitation, not a missing permission. ${formatFallbackDiagnostics()}`;
+        }
+        return `${base} Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension. ${formatFallbackDiagnostics()}`;
+    }
+}
+
+/**
+ * @param {string} message
  * @returns {'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'readonly-race'|'unknown'}
  */
 function classifyImportOpenFailure(message) {
@@ -287,11 +366,11 @@ export class DictionaryImportController {
             ],
             [
                 'OPFS is required',
-                OPFS_REQUIRED_USER_MESSAGE,
+                getOpfsUnavailableUserMessage('OPFS is required'),
             ],
             [
                 'no such vfs: opfs',
-                OPFS_REQUIRED_USER_MESSAGE,
+                getOpfsUnavailableUserMessage('no such vfs: opfs'),
             ],
         ];
         /** @type {string[]} */
@@ -766,7 +845,9 @@ export class DictionaryImportController {
         } catch (error) {
             const e = toError(error);
             if (isOpfsUnavailableMessage(e.message)) {
-                throw new Error(OPFS_REQUIRED_USER_MESSAGE);
+                diagnostics.push(`installedQuery=opfs-unavailable:${e.message}`);
+                this._setRecommendedDiagnostics(diagnostics.join('\n'));
+                throw new Error(getOpfsUnavailableUserMessage(e.message));
             }
             log.warn(`[recommended-dictionaries] getDictionaryInfo failed; continuing with empty installed set. ${e.message}`);
             diagnostics.push(`installedQuery=failed:${e.message}`);
@@ -2185,6 +2266,10 @@ export class DictionaryImportController {
      */
     _errorToString(error) {
         const errorMessage = error.toString();
+
+        if (isOpfsUnavailableMessage(errorMessage)) {
+            return getOpfsUnavailableUserMessage(errorMessage);
+        }
 
         for (const [match, newErrorString] of this._errorToStringOverrides) {
             if (errorMessage.includes(match)) {

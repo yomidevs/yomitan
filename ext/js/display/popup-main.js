@@ -19,6 +19,7 @@
 import {Application} from '../application.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {ModalController} from '../pages/settings/modal-controller.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
 import {DisplayProfileSelection} from './display-profile-selection.js';
@@ -35,7 +36,14 @@ await Application.main(true, async (application) => {
     const display = new Display(application, 'popup', documentFocusController, hotkeyHandler);
     await display.prepare();
 
-    const displayAudio = new DisplayAudio(display);
+    const {browser} = await application.api.getEnvironmentInfo();
+    let modalController = null;
+    if (browser === 'firefox' || browser === 'firefox-mobile') {
+        modalController = new ModalController(['settings-modals']);
+        await modalController.prepare();
+    }
+
+    const displayAudio = new DisplayAudio(display, modalController);
     displayAudio.prepare();
 
     const displayAnki = new DisplayAnki(display, displayAudio);

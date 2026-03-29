@@ -86,7 +86,11 @@ try {
             const display = new Display(application, 'search', documentFocusController, hotkeyHandler);
             await display.prepare();
 
-            const displayAudio = new DisplayAudio(display);
+            const {browser} = await application.api.getEnvironmentInfo();
+            const modalController = new ModalController((browser === 'firefox' || browser === 'firefox-mobile') ? ['settings-modals'] : []);
+            await modalController.prepare();
+
+            const displayAudio = new DisplayAudio(display, modalController);
             displayAudio.prepare();
 
             const displayAnki = new DisplayAnki(display, displayAudio);
@@ -94,9 +98,6 @@ try {
 
             const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
             await searchDisplayController.prepare();
-
-            const modalController = new ModalController([]);
-            await modalController.prepare();
 
             const settingsController = new SettingsController(application);
             await settingsController.prepare();

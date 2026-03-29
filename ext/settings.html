@@ -308,6 +308,7 @@
                         <span class="storage-use-infinite" hidden>
                             Manabitan is permitted unlimited storage.
                         </span>
+                        <div id="storage-runtime-check" class="storage-runtime-check"></div>
                     </div>
                 </div>
                 <div class="settings-item-right">
@@ -1572,10 +1573,22 @@
         <div class="heading-container-left"><h2 id="audio"><a href="#audio">Audio</a></h2></div>
     </div>
     <div class="settings-group">
-        <div class="settings-item"><div class="settings-item-inner">
+        <div class="settings-item" id="audio-enable-consent-item" data-show-for-browser="firefox firefox-mobile"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Enable audio playback for terms</div>
                 <div class="settings-item-description">Show a clickable speaker icon next to search results.</div>
+                <div class="settings-item-description">
+                    Audio playback requires consent before Manabitan can contact your configured audio provider<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <button type="button" id="audio-enable-consent-button">Enable Audio</button>
+            </div>
+        </div></div>
+        <div class="settings-item" id="audio-enabled-toggle-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Enable audio playback for terms</div>
+                <div class="settings-item-description">Enable or disable the speaker icon after consent has been granted.</div>
                 <div class="settings-item-description">
                     This option may send term, reading, and/or language outside of Manabitan to fetch audio<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
                 </div>

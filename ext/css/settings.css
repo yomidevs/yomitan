@@ -219,6 +219,17 @@ pre {
     color: var(--text-color);
 }
 
+.storage-runtime-check {
+    margin-top: 0.75em;
+    padding: 0.6em 0.75em;
+    border-radius: 0.35em;
+    border: var(--thin-border-size) solid var(--separator-color1);
+    background-color: var(--input-background-color);
+    font-size: 0.9em;
+    white-space: pre-wrap;
+    color: var(--text-color);
+}
+
 
 /* Headings */
 h1 {
@@ -686,6 +697,17 @@ a.settings-item.settings-item-button {
 }
 .settings-item[data-invalid=true] .settings-item-invalid-indicator {
     display: block;
+}
+
+:root[data-browser=firefox][data-audio-consent-state=accepted] #audio-enable-consent-item,
+:root[data-browser=firefox-mobile][data-audio-consent-state=accepted] #audio-enable-consent-item {
+    display: none;
+}
+:root[data-browser=firefox][data-audio-consent-state=unknown] #audio-enabled-toggle-item,
+:root[data-browser=firefox][data-audio-consent-state=declined] #audio-enabled-toggle-item,
+:root[data-browser=firefox-mobile][data-audio-consent-state=unknown] #audio-enabled-toggle-item,
+:root[data-browser=firefox-mobile][data-audio-consent-state=declined] #audio-enabled-toggle-item {
+    display: none;
 }
 
 

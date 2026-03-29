@@ -45,6 +45,8 @@ export class StorageController {
         this._storageUseValidNodes = null;
         /** @type {?NodeListOf<HTMLElement>} */
         this._storageUseInvalidNodes = null;
+        /** @type {HTMLElement|null} */
+        this._storageRuntimeCheckNode = null;
     }
 
     /** */
@@ -56,6 +58,7 @@ export class StorageController {
         this._storageUseInfiniteNodes = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.storage-use-infinite'));
         this._storageUseValidNodes = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.storage-use-valid'));
         this._storageUseInvalidNodes = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.storage-use-invalid'));
+        this._storageRuntimeCheckNode = document.querySelector('#storage-runtime-check');
         /** @type {HTMLButtonElement} */
         const storageRefreshButton = querySelectorNotNull(document, '#storage-refresh');
 
@@ -114,9 +117,32 @@ export class StorageController {
             this._setElementsVisible(this._storageUseValidNodes, valid);
             this._setElementsVisible(this._storageUseInvalidNodes, !valid);
             this._setElementsVisible(this._storageUseExhaustWarnNodes, storageIsLow);
+            this._updateRuntimeCheck();
         } finally {
             this._isUpdating = false;
         }
+    }
+
+    /** */
+    _updateRuntimeCheck() {
+        if (this._storageRuntimeCheckNode === null) { return; }
+        const userAgent = typeof navigator.userAgent === 'string' ? navigator.userAgent : '';
+        const browserLabel = /Firefox\//i.test(userAgent) ? 'Firefox runtime' : 'Extension runtime';
+        const storageValue = /** @type {Record<string, unknown>} */ (Reflect.get(navigator, 'storage') ?? {});
+        const crossOriginIsolatedValue = Reflect.get(globalThis, 'crossOriginIsolated');
+        const crossOriginIsolated = typeof crossOriginIsolatedValue === 'boolean' ? crossOriginIsolatedValue : null;
+        const hasStorageGetDirectory = typeof Reflect.get(storageValue, 'getDirectory') === 'function';
+        const hasSharedArrayBuffer = typeof Reflect.get(globalThis, 'SharedArrayBuffer') === 'function';
+        const hasAtomics = typeof Reflect.get(globalThis, 'Atomics') === 'object' && Reflect.get(globalThis, 'Atomics') !== null;
+        const dictionaryBackendUsable = hasStorageGetDirectory && hasSharedArrayBuffer && hasAtomics && crossOriginIsolated === true;
+        this._storageRuntimeCheckNode.textContent = (
+            `${browserLabel} check:\n` +
+            `dictionary backend usable=${String(dictionaryBackendUsable)}\n` +
+            `storage.getDirectory=${String(hasStorageGetDirectory)}\n` +
+            `SharedArrayBuffer=${String(hasSharedArrayBuffer)}\n` +
+            `Atomics=${String(hasAtomics)}\n` +
+            `crossOriginIsolated=${String(crossOriginIsolated)}`
+        );
     }
 
     // Private

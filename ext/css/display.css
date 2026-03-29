@@ -741,6 +741,22 @@ button.action-button:active:not(:disabled) {
     background-color: var(--action-button-active-color);
     box-shadow: none;
 }
+button.action-button[data-action=enable-audio] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: var(--thin-border-size) solid var(--medium-border-color);
+    border-radius: 0.25em;
+    padding: 0.2em 0.55em;
+    min-height: calc(var(--action-button-size) + var(--action-button-padding) * 2);
+}
+.action-button-text {
+    display: block;
+    font-size: 0.8em;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+}
 
 .icon[data-icon=view-note] { background-image: url('/images/view-note.svg'); }
 .icon[data-icon=view-note-learning] { background-image: url('/images/view-note-learning.svg'); }
@@ -771,6 +787,9 @@ button.action-button:active:not(:disabled) {
     background-color: var(--text-color);
 }
 :root[data-result-output-mode=merge] .entry[data-type=term] .actions>button.action-button[data-action=play-audio] {
+    display: none;
+}
+:root[data-result-output-mode=merge] .entry[data-type=term] .actions>button.action-button[data-action=enable-audio] {
     display: none;
 }
 .action-button-badge {
@@ -1194,7 +1213,15 @@ button.action-button:active:not(:disabled) {
     left: 0;
     bottom: 0.5em;
 }
+:root[data-result-output-mode=merge] .headword-list .headword-details>.action-button[data-action=enable-audio] {
+    position: absolute;
+    left: 0;
+    bottom: 0.5em;
+}
 :root:not([data-result-output-mode=merge]) .headword-list .headword-details>.action-button[data-action=play-audio] {
+    display: none;
+}
+:root:not([data-result-output-mode=merge]) .headword-list .headword-details>.action-button[data-action=enable-audio] {
     display: none;
 }
 
@@ -2039,6 +2066,10 @@ button.footer-notification-close-button {
 }
 
 :root[data-audio-enabled=false] .action-button[data-action=play-audio] {
+    display: none;
+}
+:root[data-audio-consent-required=false] .action-button[data-action=enable-audio],
+:root[data-audio-consent-required=true][data-audio-consent-state=accepted] .action-button[data-action=enable-audio] {
     display: none;
 }
 :root[data-glossary-layout-mode^=compact] .definition-tag-list,

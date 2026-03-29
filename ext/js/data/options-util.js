@@ -1832,6 +1832,26 @@ export class OptionsUtil {
     }
 
     /**
+     *  - Added global.dataTransmissionConsentState
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion75(options) {
+        const consentShown = options.global.dataTransmissionConsentShown === true;
+        let consentState = 'unknown';
+        if (consentShown) {
+            let hasEnabledAudioProfile = false;
+            for (const profile of options.profiles) {
+                if (profile?.options?.audio?.enabled === true) {
+                    hasEnabledAudioProfile = true;
+                    break;
+                }
+            }
+            consentState = (hasEnabledAudioProfile ? 'accepted' : 'declined');
+        }
+        options.global.dataTransmissionConsentState = consentState;
+    }
+
+    /**
      * @param {string} url
      * @returns {Promise<chrome.tabs.Tab>}
      */

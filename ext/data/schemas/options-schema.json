@@ -1388,7 +1388,8 @@
             "type": "object",
             "required": [
                 "database",
-                "dataTransmissionConsentShown"
+                "dataTransmissionConsentShown",
+                "dataTransmissionConsentState"
             ],
             "properties": {
                 "database": {
@@ -1406,6 +1407,11 @@
                 "dataTransmissionConsentShown": {
                     "type": "boolean",
                     "default": false
+                },
+                "dataTransmissionConsentState": {
+                    "type": "string",
+                    "enum": ["unknown", "accepted", "declined"],
+                    "default": "unknown"
                 }
             }
         }
