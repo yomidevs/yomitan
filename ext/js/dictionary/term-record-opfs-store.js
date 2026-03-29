@@ -18,7 +18,11 @@
 import {parseJson} from '../core/json.js';
 import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 import {safePerformance} from '../core/safe-performance.js';
-import {RAW_TERM_CONTENT_DICT_NAME, RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME} from './raw-term-content.js';
+import {
+    RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME,
+    RAW_TERM_CONTENT_DICT_NAME,
+    RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME,
+} from './raw-term-content.js';
 import {encodeTermRecordArtifactChunkWithWasmPreinterned, encodeTermRecordsWithWasm, encodeTermRecordsWithWasmPreinterned} from './term-record-wasm-encoder.js';
 
 const LEGACY_FILE_NAME = 'manabitan-term-records.ndjson';
@@ -104,14 +108,15 @@ function sliceTermRecordPreinternedPlan(plan, start, count) {
     return {
         stringLengths: plan.stringLengths,
         stringsBuffer: plan.stringsBuffer,
-        expressionIndexes: plan.expressionIndexes.slice(start, end),
-        readingIndexes: plan.readingIndexes.slice(start, end),
+        expressionIndexes: plan.expressionIndexes.subarray(start, end),
+        readingIndexes: plan.readingIndexes.subarray(start, end),
     };
 }
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW = 0;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2 = 1;
 const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3 = 2;
-const ENTRY_CONTENT_DICT_NAME_CODE_JMDICT = 3;
+const ENTRY_CONTENT_DICT_NAME_CODE_RAW_V4 = 3;
+const ENTRY_CONTENT_DICT_NAME_CODE_JMDICT = 4;
 const ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM = 0xff;
 const ENTRY_CONTENT_LENGTH_U16_NULL = 0xffff;
 const ENTRY_CONTENT_LENGTH_EXTENDED_U16 = 0xfffe;
@@ -285,6 +290,10 @@ export class TermRecordOpfsStore {
         this._reloadFromShardsAfterImport = false;
         /** @type {Set<string>} */
         this._reloadShardLogicalKeysAfterImport = new Set();
+        /** @type {Set<string>} */
+        this._loadedDictionaryNames = new Set();
+        /** @type {boolean} */
+        this._allShardContentsLoaded = false;
         /** @type {PendingArtifactReloadPlan[]} */
         this._pendingArtifactReloadPlansAfterImport = [];
         /** @type {TextEncoder} */
@@ -331,6 +340,8 @@ export class TermRecordOpfsStore {
         this._indexDirty = false;
         this._reloadFromShardsAfterImport = false;
         this._reloadShardLogicalKeysAfterImport.clear();
+        this._loadedDictionaryNames.clear();
+        this._allShardContentsLoaded = false;
         this._pendingArtifactReloadPlansAfterImport = [];
         this._rootDirectoryHandle = null;
         this._recordsDirectoryHandle = null;
@@ -344,9 +355,12 @@ export class TermRecordOpfsStore {
         this._rootDirectoryHandle = rootDirectoryHandle;
         this._recordsDirectoryHandle = await rootDirectoryHandle.getDirectoryHandle(SHARD_DIRECTORY_NAME, {create: true});
 
-        const shardFileCount = await this._loadShardFiles();
+        const shardFileCount = await this._loadShardFiles(false);
         await (shardFileCount === 0 ? this._migrateLegacyMonolithicIfPresent() : this._deleteLegacyMonolithicIfPresent());
-        await this.verifyIntegrity();
+        if (shardFileCount === 0) {
+            await this.verifyIntegrity();
+            this._allShardContentsLoaded = true;
+        }
     }
 
     /**
@@ -361,6 +375,8 @@ export class TermRecordOpfsStore {
         this._indexDirty = true;
         this._reloadFromShardsAfterImport = false;
         this._reloadShardLogicalKeysAfterImport.clear();
+        this._loadedDictionaryNames.clear();
+        this._allShardContentsLoaded = false;
         this._pendingArtifactReloadPlansAfterImport = [];
         this._indexByDictionary.clear();
         this._queuedWriteBudgetBytes = this._computeQueuedWriteBudgetBytes();
@@ -424,6 +440,8 @@ export class TermRecordOpfsStore {
         this._invalidShardFileNames = [];
         this._activeAppendShardStateByKey.clear();
         this._reloadShardLogicalKeysAfterImport.clear();
+        this._loadedDictionaryNames.clear();
+        this._allShardContentsLoaded = false;
         this._pendingArtifactReloadPlansAfterImport = [];
         if (this._recordsDirectoryHandle === null) {
             return;
@@ -482,6 +500,7 @@ export class TermRecordOpfsStore {
                 sequence: row.sequence,
             };
             this._recordsById.set(id, record);
+            this._loadedDictionaryNames.add(record.dictionary);
             const shardFileName = this._getShardFileName(record.dictionary, record.entryContentDictName);
             const shardRecords = recordsByShard.get(shardFileName);
             if (typeof shardRecords === 'undefined') {
@@ -546,6 +565,7 @@ export class TermRecordOpfsStore {
                 sequence: row[14],
             };
             this._recordsById.set(id, record);
+            this._loadedDictionaryNames.add(dictionary);
             if (i === start) {
                 singleDictionaryName = dictionary;
                 singleContentDictName = record.entryContentDictName;
@@ -643,6 +663,7 @@ export class TermRecordOpfsStore {
                 sequence: typeof row.sequence === 'number' ? row.sequence : null,
             };
             this._recordsById.set(id, record);
+            this._loadedDictionaryNames.add(dictionary);
             if (i === start) {
                 singleDictionaryName = dictionary;
                 singleContentDictName = record.entryContentDictName;
@@ -743,6 +764,7 @@ export class TermRecordOpfsStore {
                 sequence: typeof row.sequence === 'number' ? row.sequence : null,
             };
             this._recordsById.set(id, record);
+            this._loadedDictionaryNames.add(dictionary);
             if (i === 0) {
                 singleDictionaryName = dictionary;
                 singleContentDictName = record.entryContentDictName;
@@ -917,10 +939,15 @@ export class TermRecordOpfsStore {
         const tBuildStart = safePerformance.now();
         const firstId = this._nextId;
         const firstContentDictName = uniformContentDictName ?? (contentDictNames[0] ?? 'raw');
-        const skipRecordMaterialization = false;
+        const skipRecordMaterialization = (
+            this._importSessionActive &&
+            (chunk.dictionaryTotalRows ?? count) >= 1_000_000
+        );
         if (skipRecordMaterialization) {
             this._nextId += count;
             this._reloadFromShardsAfterImport = true;
+            this._loadedDictionaryNames.delete(chunk.dictionary);
+            this._allShardContentsLoaded = false;
         } else {
             this._recordsById.ensureCapacity(firstId + count - 1);
             const existingIndex = this._deferIndexBuild ? void 0 : this._indexByDictionary.get(chunk.dictionary);
@@ -942,6 +969,7 @@ export class TermRecordOpfsStore {
                     sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
                 };
                 this._recordsById.set(id, record);
+                this._loadedDictionaryNames.add(chunk.dictionary);
                 if (typeof existingIndex !== 'undefined') {
                     this._addRecordToDictionaryIndex(existingIndex, record);
                 }
@@ -1082,6 +1110,8 @@ export class TermRecordOpfsStore {
      */
     async deleteByDictionary(dictionaryName) {
         this._ensurePendingArtifactReloadPlansApplied();
+        this._loadedDictionaryNames.delete(dictionaryName);
+        this._allShardContentsLoaded = false;
         let deletedCount = 0;
         const ids = [...this._recordsById.keys()];
         for (const id of ids) {
@@ -1108,6 +1138,9 @@ export class TermRecordOpfsStore {
         }
 
         this._ensurePendingArtifactReloadPlansApplied();
+        this._loadedDictionaryNames.delete(fromName);
+        this._loadedDictionaryNames.delete(toName);
+        this._allShardContentsLoaded = false;
         await this._flushPendingWrites();
         await this._awaitQueuedWrites();
         await this._closeAllWritables();
@@ -1252,6 +1285,7 @@ export class TermRecordOpfsStore {
             return [];
         }
         this._ensurePendingArtifactReloadPlansApplied();
+        this._allShardContentsLoaded = false;
         const removedFileNames = [];
         /** @type {Set<string>} */
         const removedDictionaryNames = new Set();
@@ -1277,6 +1311,9 @@ export class TermRecordOpfsStore {
             }
         }
         if (removedDictionaryNames.size > 0) {
+            for (const dictionaryName of removedDictionaryNames) {
+                this._loadedDictionaryNames.delete(dictionaryName);
+            }
             for (const id of [...this._recordsById.keys()]) {
                 const record = this._recordsById.get(id);
                 if (typeof record === 'undefined' || !removedDictionaryNames.has(record.dictionary)) {
@@ -1391,6 +1428,66 @@ export class TermRecordOpfsStore {
     }
 
     /**
+     * @param {Iterable<string>} dictionaryNames
+     * @returns {Promise<void>}
+     */
+    async ensureDictionariesLoaded(dictionaryNames) {
+        this._ensurePendingArtifactReloadPlansApplied();
+        if (this._recordsDirectoryHandle === null) {
+            return;
+        }
+        /** @type {Set<string>} */
+        const pending = new Set();
+        for (const dictionaryName of dictionaryNames) {
+            const name = `${dictionaryName}`.trim();
+            if (name.length === 0 || this._loadedDictionaryNames.has(name)) {
+                continue;
+            }
+            pending.add(name);
+        }
+        if (pending.size === 0) {
+            return;
+        }
+        /** @type {TermRecordShardState[]} */
+        const statesToLoad = [];
+        for (const state of this._shardStateByFileName.values()) {
+            const dictionaryName = this._decodeDictionaryNameFromShardFileName(state.fileName);
+            if (pending.has(dictionaryName)) {
+                statesToLoad.push(state);
+            }
+        }
+        statesToLoad.sort((a, b) => a.fileName.localeCompare(b.fileName));
+        for (const state of statesToLoad) {
+            await this._loadShardStateContents(state);
+        }
+        for (const dictionaryName of pending) {
+            this._loadedDictionaryNames.add(dictionaryName);
+        }
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async ensureAllDictionariesLoaded() {
+        this._ensurePendingArtifactReloadPlansApplied();
+        if (this._allShardContentsLoaded || this._recordsDirectoryHandle === null) {
+            return;
+        }
+        /** @type {TermRecordShardState[]} */
+        const statesToLoad = [...this._shardStateByFileName.values()].sort((a, b) => a.fileName.localeCompare(b.fileName));
+        for (const state of statesToLoad) {
+            await this._loadShardStateContents(state);
+        }
+        for (const state of this._shardStateByFileName.values()) {
+            const dictionaryName = this._decodeDictionaryNameFromShardFileName(state.fileName);
+            if (dictionaryName.length > 0) {
+                this._loadedDictionaryNames.add(dictionaryName);
+            }
+        }
+        this._allShardContentsLoaded = true;
+    }
+
+    /**
      * @param {string[]|null} [expectedDictionaryNames]
      * @returns {Promise<{
      *   expectedShardCount: number,
@@ -1409,6 +1506,24 @@ export class TermRecordOpfsStore {
      */
     async verifyIntegrity(expectedDictionaryNames = null) {
         this._ensurePendingArtifactReloadPlansApplied();
+        if (!this._allShardContentsLoaded && this._recordsById.size === 0) {
+            const summary = {
+                expectedShardCount: 0,
+                actualShardCount: this._shardStateByFileName.size,
+                missingShardCount: 0,
+                missingShardFileNames: [],
+                missingDictionaryNames: [],
+                orphanShardCount: 0,
+                orphanShardFileNames: [],
+                orphanDictionaryNames: [],
+                removedOrphanShardCount: 0,
+                invalidShardPayloadCount: this._invalidShardFileNames.length,
+                invalidShardFileNames: [...this._invalidShardFileNames].sort(),
+                rewroteAllShardsFromMemory: false,
+            };
+            reportDiagnostics('term-record-shard-integrity-summary', summary);
+            return summary;
+        }
         /** @type {Set<string>} */
         const expectedShardKeys = new Set();
         /** @type {Set<string>} */
@@ -1790,6 +1905,8 @@ export class TermRecordOpfsStore {
                 return RAW_TERM_CONTENT_DICT_NAME;
             case ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3:
                 return RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME;
+            case ENTRY_CONTENT_DICT_NAME_CODE_RAW_V4:
+                return RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME;
             case ENTRY_CONTENT_DICT_NAME_CODE_JMDICT:
                 return 'jmdict';
             case ENTRY_CONTENT_DICT_NAME_CODE_CUSTOM:
@@ -1812,6 +1929,8 @@ export class TermRecordOpfsStore {
                 return {meta: ENTRY_CONTENT_DICT_NAME_CODE_RAW_V2, bytes: null};
             case RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME:
                 return {meta: ENTRY_CONTENT_DICT_NAME_CODE_RAW_V3, bytes: null};
+            case RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME:
+                return {meta: ENTRY_CONTENT_DICT_NAME_CODE_RAW_V4, bytes: null};
             case 'jmdict':
                 return {meta: ENTRY_CONTENT_DICT_NAME_CODE_JMDICT, bytes: null};
             default: {
@@ -2256,7 +2375,7 @@ export class TermRecordOpfsStore {
     /**
      * @returns {Promise<number>}
      */
-    async _loadShardFiles() {
+    async _loadShardFiles(materializeRecords = true) {
         if (this._recordsDirectoryHandle === null) {
             return 0;
         }
@@ -2291,27 +2410,48 @@ export class TermRecordOpfsStore {
             );
             this._shardStateByFileName.set(name, state);
             this._setActiveAppendShardState(state);
-            if (file.size <= 0) {
+            if (!materializeRecords || file.size <= 0) {
                 continue;
             }
-            const arrayBuffer = await file.arrayBuffer();
-            const content = new Uint8Array(arrayBuffer);
-            if (this._isBinaryFormat(content)) {
-                this._loadBinary(content, this._decodeDictionaryNameFromShardFileName(name));
-                continue;
-            }
-            // Invalid shard payloads are discarded so they cannot poison future reads.
-            this._invalidShardFileNames.push(name);
-            this._shardStateByFileName.delete(name);
-            if (this._recordsDirectoryHandle !== null) {
-                try {
-                    await this._recordsDirectoryHandle.removeEntry(name);
-                } catch (_) {
-                    // NOP
-                }
-            }
+            await this._loadShardStateContents(state, file);
         }
         return shardFileCount;
+    }
+
+    /**
+     * @param {TermRecordShardState} state
+     * @param {File|null} [existingFile=null]
+     * @returns {Promise<void>}
+     */
+    async _loadShardStateContents(state, existingFile = null) {
+        let file = existingFile;
+        if (file === null) {
+            try {
+                file = await state.fileHandle.getFile();
+            } catch (_) {
+                return;
+            }
+        }
+        state.fileLength = file.size;
+        if (file.size <= 0) {
+            return;
+        }
+        const arrayBuffer = await file.arrayBuffer();
+        const content = new Uint8Array(arrayBuffer);
+        if (this._isBinaryFormat(content)) {
+            this._loadBinary(content, this._decodeDictionaryNameFromShardFileName(state.fileName));
+            return;
+        }
+        this._invalidShardFileNames.push(state.fileName);
+        this._shardStateByFileName.delete(state.fileName);
+        this._activeAppendShardStateByKey.delete(state.logicalKey);
+        if (this._recordsDirectoryHandle !== null) {
+            try {
+                await this._recordsDirectoryHandle.removeEntry(state.fileName);
+            } catch (_) {
+                // NOP
+            }
+        }
     }
 
     /**

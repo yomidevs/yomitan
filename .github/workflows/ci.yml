@@ -180,10 +180,10 @@ jobs:
           const report = JSON.parse(fs.readFileSync(path, 'utf8'));
           const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
           const opfsReady = runtime !== null && (
-            runtime.hasOpfsDbCtor === true &&
-            runtime.hasOpfsImportDb === true &&
             runtime.hasStorageGetDirectory === true &&
-            (typeof runtime.opfsVfsPtr === 'number' ? runtime.opfsVfsPtr > 0 : runtime.opfsVfsPtr !== null)
+            runtime.hasCreateSyncAccessHandle === true &&
+            runtime.hasOpfsSahpoolVfs === true &&
+            runtime.openStorageMode === 'opfs-sahpool'
           );
           if (report.status !== 'success') {
             console.error(`Chromium extension E2E status is not success: ${String(report.status)}`);
@@ -230,10 +230,10 @@ jobs:
             return `removed=${String(removedCount)}, failed=${String(failedCount)}`;
           };
           const opfsReady = runtime ? (
-            runtime.hasOpfsDbCtor === true &&
-            runtime.hasOpfsImportDb === true &&
             runtime.hasStorageGetDirectory === true &&
-            (typeof runtime.opfsVfsPtr === 'number' ? runtime.opfsVfsPtr > 0 : runtime.opfsVfsPtr !== null)
+            runtime.hasCreateSyncAccessHandle === true &&
+            runtime.hasOpfsSahpoolVfs === true &&
+            runtime.openStorageMode === 'opfs-sahpool'
           ) : null;
           const top = [...phases].sort((a, b) => Number(b.durationMs || 0) - Number(a.durationMs || 0)).slice(0, 5);
           const lines = [
@@ -307,10 +307,10 @@ jobs:
           const report = JSON.parse(fs.readFileSync(path, 'utf8'));
           const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
           const opfsReady = runtime !== null && (
-            runtime.hasOpfsDbCtor === true &&
-            runtime.hasOpfsImportDb === true &&
             runtime.hasStorageGetDirectory === true &&
-            (typeof runtime.opfsVfsPtr === 'number' ? runtime.opfsVfsPtr > 0 : runtime.opfsVfsPtr !== null)
+            runtime.hasCreateSyncAccessHandle === true &&
+            runtime.hasOpfsSahpoolVfs === true &&
+            runtime.openStorageMode === 'opfs-sahpool'
           );
           if (report.status !== 'success') {
             console.error(`Edge extension E2E status is not success: ${String(report.status)}`);
@@ -357,10 +357,10 @@ jobs:
             return `removed=${String(removedCount)}, failed=${String(failedCount)}`;
           };
           const opfsReady = runtime ? (
-            runtime.hasOpfsDbCtor === true &&
-            runtime.hasOpfsImportDb === true &&
             runtime.hasStorageGetDirectory === true &&
-            (typeof runtime.opfsVfsPtr === 'number' ? runtime.opfsVfsPtr > 0 : runtime.opfsVfsPtr !== null)
+            runtime.hasCreateSyncAccessHandle === true &&
+            runtime.hasOpfsSahpoolVfs === true &&
+            runtime.openStorageMode === 'opfs-sahpool'
           ) : null;
           const top = [...phases].sort((a, b) => Number(b.durationMs || 0) - Number(a.durationMs || 0)).slice(0, 5);
           const lines = [

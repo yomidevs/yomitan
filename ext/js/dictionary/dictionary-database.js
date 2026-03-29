@@ -51,7 +51,7 @@ import {decompress as zstdDecompress} from '../../lib/zstd-wasm.js';
 import {TermContentOpfsStore} from './term-content-opfs-store.js';
 import {TermRecordOpfsStore} from './term-record-opfs-store.js';
 
-const CURRENT_DICTIONARY_SCHEMA_VERSION = 4;
+const CURRENT_DICTIONARY_SCHEMA_VERSION = 5;
 const TRANSIENT_UPDATE_TITLE_PATTERN = /\[(?:update-staging|cutover|replaced) [^\]]+\]/;
 const TERM_ENTRY_CONTENT_CACHE_MAX_ENTRIES = 4096;
 const DEFAULT_STATEMENT_CACHE_MAX_ENTRIES = 256;
@@ -165,9 +165,7 @@ function isRecognizedTransientUpdateTitle(title, summary) {
 function packFixedSizeContentChunksIntoSlabs(chunks, targetBytes, fixedChunkBytes) {
     /** @type {Uint8Array[]} */
     const packedChunks = [];
-    /** @type {number[]} */
     const packedRowStarts = [];
-    /** @type {number[]} */
     const packedRowCounts = [];
     if (chunks.length === 0 || fixedChunkBytes <= 0) {
         return {packedChunks, packedRowStarts, packedRowCounts};
@@ -491,6 +489,7 @@ export class DictionaryDatabase {
         const logicalStoreState = this._termContentStore.getDebugState();
         const logicalTotalLength = this._asNumber(logicalStoreState?.totalLength, -1);
         await this._termContentStore.ensureLoadedForRead();
+        await this._termRecordStore.ensureDictionariesLoaded([dictionaryName]);
         const persistedStoreState = this._termContentStore.getDebugState();
         const persistedTotalLength = this._asNumber(persistedStoreState?.totalLength, -1);
         const index = this._termRecordStore.getDictionaryIndex(dictionaryName);
@@ -988,6 +987,7 @@ export class DictionaryDatabase {
 
         /** @type {number[]} */
         const counts = [];
+        await this._termRecordStore.ensureDictionariesLoaded([dictionaryName]);
         const termCount = this._termRecordStore.getDictionaryIndex(dictionaryName).expression.size > 0 ?
             [...this._termRecordStore.getDictionaryIndex(dictionaryName).expression.values()].reduce((sum, list) => sum + list.length, 0) :
             0;
@@ -1535,6 +1535,17 @@ export class DictionaryDatabase {
     }
 
     /**
+     * @param {Iterable<string>} dictionaryNames
+     * @returns {Promise<void>}
+     */
+    async _ensureDirectTermIndexesLoaded(dictionaryNames) {
+        await this._termRecordStore.ensureDictionariesLoaded(dictionaryNames);
+        for (const dictionaryName of dictionaryNames) {
+            this._ensureDirectTermIndex(dictionaryName);
+        }
+    }
+
+    /**
      * @param {import('dictionary-database').DictionarySet} dictionaries
      * @returns {string[]}
      */
@@ -1579,6 +1590,7 @@ export class DictionaryDatabase {
         /** @type {import('dictionary-database').TermEntry[]} */
         const results = [];
         const dictionaryNames = this._getDictionaryNames(dictionaries);
+        await this._ensureDirectTermIndexesLoaded(dictionaryNames);
 
         /** @type {('expression'|'reading'|'expressionReverse'|'readingReverse')[]} */
         const columns = (matchType === 'suffix') ? ['expressionReverse', 'readingReverse'] : ['expression', 'reading'];
@@ -1757,6 +1769,7 @@ export class DictionaryDatabase {
         /** @type {import('dictionary-database').TermEntry[]} */
         const results = [];
         const dictionaryNames = this._getDictionaryNames(dictionaries);
+        await this._ensureDirectTermIndexesLoaded(dictionaryNames);
         /** @type {Map<string, number[]>} */
         const termReadingIndexes = new Map();
         for (let itemIndex = 0; itemIndex < termList.length; ++itemIndex) {
@@ -1834,6 +1847,7 @@ export class DictionaryDatabase {
             return [];
         }
         const dictionaryNames = [...new Set(items.map((item) => item.dictionary))];
+        await this._ensureDirectTermIndexesLoaded(dictionaryNames);
         const sequenceValues = [...new Set(items.map((item) => this._asNumber(item.query, -1)).filter((value) => value >= 0))];
         /** @type {Map<number, number[]>} */
         const idMatches = new Map();
@@ -2440,6 +2454,11 @@ export class DictionaryDatabase {
     async getDictionaryCounts(dictionaryNames, getTotal) {
         const db = this._requireDb();
         const tables = ['kanji', 'kanjiMeta', 'termMeta', 'tagMeta', 'media'];
+        if (getTotal) {
+            await this._termRecordStore.ensureAllDictionariesLoaded();
+        } else {
+            await this._termRecordStore.ensureDictionariesLoaded(dictionaryNames);
+        }
 
         /** @type {import('dictionary-database').DictionaryCountGroup[]} */
         const counts = [];
@@ -2533,7 +2552,7 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
+     * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentHash1List?: number[], contentHash2List?: number[], contentDictNameList: ((string|null)[]|null), termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null, uniformContentDictName?: string|null}} chunk
      * @returns {Promise<void>}
      */
     async bulkAddArtifactTermsChunk(chunk) {
@@ -2548,7 +2567,14 @@ export class DictionaryDatabase {
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
         if (this._enableTermEntryContentDedup) {
-            throw new Error('bulkAddArtifactTermsChunk requires content dedup to be disabled');
+            const hasHashArrays = Array.isArray(chunk.contentHash1List) && Array.isArray(chunk.contentHash2List);
+            if (hasHashArrays) {
+                await this._bulkAddArtifactTermsChunkWithContentDedup(chunk);
+                return;
+            }
+            const rows = this._materializeArtifactChunkTermEntries(chunk);
+            await this._bulkAddTerms(rows, 0, rows.length);
+            return;
         }
         const rows = this._materializeArtifactChunkTermEntries(chunk);
         await this._bulkAddTermsWithoutContentDedup(rows, 0, rows.length);
@@ -2562,7 +2588,7 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[]}} chunk
+     * @param {{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: ((string|null)[]|null)}} chunk
      * @returns {import('dictionary-database').DatabaseTermEntry[]}
      */
     _materializeArtifactChunkTermEntries(chunk) {
@@ -2591,7 +2617,7 @@ export class DictionaryDatabase {
                 score: chunk.scoreList[i] ?? 0,
                 sequence: typeof chunk.sequenceList[i] === 'number' ? chunk.sequenceList[i] : null,
                 termEntryContentBytes: chunk.contentBytesList[i],
-                termEntryContentDictName: chunk.contentDictNameList[i] ?? null,
+                termEntryContentDictName: Array.isArray(chunk.contentDictNameList) ? (chunk.contentDictNameList[i] ?? null) : null,
             };
         }
         return rows;
@@ -3724,7 +3750,7 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
+     * @param {{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: ((string|null)[]|null), uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
      * @returns {Promise<void>}
      */
     async _bulkAddArtifactTermsChunkWithoutContentDedup(chunk) {
@@ -3823,7 +3849,7 @@ export class DictionaryDatabase {
                 uniformContentDictName = chunk.uniformContentDictName ?? 'raw';
             } else {
                 for (let i = 0; i < count; ++i) {
-                    const explicitContentDictName = chunk.contentDictNameList[i];
+                    const explicitContentDictName = Array.isArray(chunk.contentDictNameList) ? chunk.contentDictNameList[i] : null;
                     /** @type {string|null} */
                     let resolvedContentDictName;
                     if (
@@ -3859,6 +3885,171 @@ export class DictionaryDatabase {
                 contentOffsets,
                 contentLengths,
                 contentDictNames ?? uniformContentDictName ?? 'raw',
+            );
+            termRecordBuildMs += metrics.buildRecordsMs;
+            termRecordEncodeMs += metrics.encodeMs;
+            termRecordWriteMs += metrics.appendWriteMs;
+            termRecordInternMs += metrics.internMs ?? 0;
+            termRecordPackLengthsMs += metrics.packLengthsMs ?? 0;
+            termRecordHeapCopyMs += metrics.heapCopyMs ?? 0;
+            termRecordWasmEncodeMs += metrics.wasmEncodeMs ?? 0;
+            const deferVirtualTableWrite = this._deferTermsVirtualTableSync || this._bulkImportDepth > 0;
+            if (deferVirtualTableWrite) {
+                this._termsVirtualTableDirty = true;
+            } else {
+                const tTermsVtabInsertStart = safePerformance.now();
+                await this._insertTermRowsIntoVirtualTable(count);
+                termsVtabInsertMs += safePerformance.now() - tTermsVtabInsertStart;
+            }
+            if (useLocalTransaction) {
+                this._requireDb().exec('COMMIT');
+            }
+            this._lastBulkAddTermsMetrics = {
+                contentAppendMs,
+                termRecordBuildMs,
+                termRecordEncodeMs,
+                termRecordWriteMs,
+                termsVtabInsertMs,
+                termRecordInternMs,
+                termRecordPackLengthsMs,
+                termRecordHeapCopyMs,
+                termRecordWasmEncodeMs,
+            };
+        } catch (e) {
+            if (useLocalTransaction) {
+                try { this._requireDb().exec('ROLLBACK'); } catch (_) { /* NOP */ }
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * @param {{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentHash1List: number[], contentHash2List: number[], contentDictNameList: ((string|null)[]|null), uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} chunk
+     * @returns {Promise<void>}
+     */
+    async _bulkAddArtifactTermsChunkWithContentDedup(chunk) {
+        const useLocalTransaction = !this._bulkImportTransactionOpen;
+        const count = chunk.rowCount;
+        if (count <= 0) {
+            this._lastBulkAddTermsMetrics = {
+                contentAppendMs: 0,
+                termRecordBuildMs: 0,
+                termRecordEncodeMs: 0,
+                termRecordWriteMs: 0,
+                termsVtabInsertMs: 0,
+                termRecordInternMs: 0,
+                termRecordPackLengthsMs: 0,
+                termRecordHeapCopyMs: 0,
+                termRecordWasmEncodeMs: 0,
+            };
+            return;
+        }
+        if (chunk.contentHash1List.length < count || chunk.contentHash2List.length < count) {
+            throw new Error('Artifact chunk content hash arrays are smaller than row count');
+        }
+        let contentAppendMs = 0;
+        let termRecordBuildMs = 0;
+        let termRecordEncodeMs = 0;
+        let termRecordWriteMs = 0;
+        let termsVtabInsertMs = 0;
+        let termRecordInternMs = 0;
+        let termRecordPackLengthsMs = 0;
+        let termRecordHeapCopyMs = 0;
+        let termRecordWasmEncodeMs = 0;
+
+        if (useLocalTransaction) {
+            await this._beginImmediateTransaction(this._requireDb());
+        }
+        try {
+            /** @type {number[]} */
+            const contentOffsets = new Array(count);
+            /** @type {number[]} */
+            const contentLengths = new Array(count);
+            /** @type {(string|null)[]} */
+            const resolvedContentDictNames = new Array(count);
+            /** @type {Map<number, Map<number, number>>} */
+            const pendingContentIndexByHashPair = new Map();
+            /** @type {Uint8Array[]} */
+            const pendingContentBytes = [];
+            /** @type {number[]} */
+            const pendingContentHash1s = [];
+            /** @type {number[]} */
+            const pendingContentHash2s = [];
+            /** @type {(string|null)[]} */
+            const pendingContentDictNames = [];
+            /** @type {number[]} */
+            const pendingRowToUniqueIndex = new Array(count);
+            const explicitContentDictNames = Array.isArray(chunk.contentDictNameList) ? chunk.contentDictNameList : null;
+            const uniformContentDictName = typeof chunk.uniformContentDictName !== 'undefined' ? (chunk.uniformContentDictName ?? null) : null;
+            const tContentAppendStart = safePerformance.now();
+            for (let i = 0; i < count; ++i) {
+                const hash1 = chunk.contentHash1List[i] >>> 0;
+                const hash2 = chunk.contentHash2List[i] >>> 0;
+                const existingMeta = this._getTermEntryContentMetaByHashPair(hash1, hash2);
+                if (typeof existingMeta !== 'undefined') {
+                    contentOffsets[i] = existingMeta.offset;
+                    contentLengths[i] = existingMeta.length;
+                    resolvedContentDictNames[i] = existingMeta.dictName;
+                    pendingRowToUniqueIndex[i] = -1;
+                    continue;
+                }
+                let byHash2 = pendingContentIndexByHashPair.get(hash1);
+                if (typeof byHash2 === 'undefined') {
+                    byHash2 = new Map();
+                    pendingContentIndexByHashPair.set(hash1, byHash2);
+                }
+                let pendingIndex = byHash2.get(hash2);
+                if (typeof pendingIndex !== 'number') {
+                    pendingIndex = pendingContentBytes.length;
+                    byHash2.set(hash2, pendingIndex);
+                    pendingContentBytes.push(chunk.contentBytesList[i]);
+                    pendingContentHash1s.push(hash1);
+                    pendingContentHash2s.push(hash2);
+                    pendingContentDictNames.push(
+                        explicitContentDictNames !== null ?
+                            (explicitContentDictNames[i] ?? null) :
+                            uniformContentDictName
+                    );
+                }
+                pendingRowToUniqueIndex[i] = pendingIndex;
+            }
+            if (pendingContentBytes.length > 0) {
+                const compressionDictName = resolveTermContentZstdDictName(chunk.dictionary);
+                const storageChunks = this._createTermContentStorageChunks(
+                    pendingContentBytes,
+                    compressionDictName,
+                    pendingContentDictNames,
+                );
+                const spans = await this._termContentStore.appendBatch(storageChunks.storedChunks);
+                for (let i = 0; i < count; ++i) {
+                    const pendingIndex = pendingRowToUniqueIndex[i];
+                    if (pendingIndex < 0) { continue; }
+                    const storedChunkIndex = storageChunks.entryToStoredChunkIndexes[pendingIndex];
+                    const span = spans[storedChunkIndex];
+                    contentOffsets[i] = span.offset;
+                    contentLengths[i] = span.length;
+                    resolvedContentDictNames[i] = storageChunks.contentDictNames[pendingIndex] ?? 'raw';
+                }
+                for (let i = 0; i < pendingContentBytes.length; ++i) {
+                    const storedChunkIndex = storageChunks.entryToStoredChunkIndexes[i];
+                    const span = spans[storedChunkIndex];
+                    this._cacheTermEntryContentMeta(
+                        null,
+                        span.offset,
+                        span.length,
+                        storageChunks.contentDictNames[i],
+                        0,
+                        pendingContentHash1s[i],
+                        pendingContentHash2s[i],
+                    );
+                }
+            }
+            contentAppendMs += safePerformance.now() - tContentAppendStart;
+            const metrics = await this._termRecordStore.appendBatchFromArtifactChunkResolvedContent(
+                chunk,
+                contentOffsets,
+                contentLengths,
+                resolvedContentDictNames,
             );
             termRecordBuildMs += metrics.buildRecordsMs;
             termRecordEncodeMs += metrics.encodeMs;
@@ -4187,6 +4378,8 @@ export class DictionaryDatabase {
                 return await this._wipeDictionaryDataForSchemaMigration('reset-dictionary-data-for-raw-v3');
             case 4:
                 return await this._wipeDictionaryDataForSchemaMigration('reset-dictionary-data-for-raw-v4');
+            case 5:
+                return await this._wipeDictionaryDataForSchemaMigration('reset-dictionary-data-for-opfs-sahpool');
             default:
                 throw new Error(`Unhandled dictionary schema migration target version: ${version}`);
         }

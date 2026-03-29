@@ -17,6 +17,7 @@
 
 import {describe, expect, test} from 'vitest';
 import {TermRecordOpfsStore} from '../ext/js/dictionary/term-record-opfs-store.js';
+import {RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME} from '../ext/js/dictionary/raw-term-content.js';
 
 function createFakeDirectoryHandle(fileBytesByName, {removeEntryFailures = new Map()} = {}) {
     return {
@@ -76,6 +77,16 @@ function createFakeDirectoryHandle(fileBytesByName, {removeEntryFailures = new M
 }
 
 describe('TermRecordOpfsStore', () => {
+    test('encodes and decodes raw-v4 entry content dict names without falling back to custom strings', () => {
+        const store = new TermRecordOpfsStore();
+        const {meta, bytes} = store._encodeEntryContentDictNameMeta(RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME);
+        const decoded = store._decodeEntryContentDictName(meta, new Uint8Array(), 0, 0);
+
+        expect(meta & 0xff).not.toBe(0xff);
+        expect(bytes).toBeNull();
+        expect(decoded).toBe(RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME);
+    });
+
     test('replaceDictionaryName renames shard files and in-memory records', async () => {
         const store = new TermRecordOpfsStore();
         const recordsById = Reflect.get(store, '_recordsById');

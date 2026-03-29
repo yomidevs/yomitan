@@ -257,13 +257,16 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'replaceDictionaryTitle', 'fromDictionaryTitle'>} fromDictionaryTitle
-     * @param {import('api').ApiParam<'replaceDictionaryTitle', 'toDictionaryTitle'>} toDictionaryTitle
-     * @param {import('api').ApiParam<'replaceDictionaryTitle', 'summary'>} summary
-     * @param {import('api').ApiParam<'replaceDictionaryTitle', 'replacedDictionaryTitle'>} replacedDictionaryTitle
+     * @param {import('api').ApiParams<'replaceDictionaryTitle'>} details
      * @returns {Promise<import('api').ApiReturn<'replaceDictionaryTitle'>>}
      */
-    replaceDictionaryTitle({fromDictionaryTitle, toDictionaryTitle, summary, replacedDictionaryTitle}) {
+    replaceDictionaryTitle(details) {
+        const {
+            fromDictionaryTitle,
+            toDictionaryTitle,
+            summary,
+            replacedDictionaryTitle,
+        } = details;
         return this._invoke('replaceDictionaryTitle', {fromDictionaryTitle, toDictionaryTitle, summary, replacedDictionaryTitle});
     }
 
@@ -455,6 +458,63 @@ export class API {
      */
     heartbeat() {
         return this._invoke('heartbeat', void 0);
+    }
+
+    /**
+     * @param {Blob} archiveContent
+     * @param {import('dictionary-importer').ImportDetails} details
+     * @param {?import('dictionary-worker').ImportProgressCallback} onProgress
+     * @returns {Promise<unknown>}
+     */
+    importDictionaryOffscreen(archiveContent, details, onProgress) {
+        const channel = new MessageChannel();
+        return new Promise((resolve, reject) => {
+            channel.port1.onmessage = (event) => {
+                const eventData = /** @type {unknown} */ (event.data);
+                const data = (
+                    typeof eventData === 'object' &&
+                    eventData !== null &&
+                    !Array.isArray(eventData)
+                ) ? /** @type {{type?: string, progress?: unknown, result?: unknown, error?: import('core').SerializedError}} */ (eventData) : null;
+                switch (data?.type) {
+                    case 'progress':
+                        onProgress?.(/** @type {import('dictionary-importer').ProgressData} */ (data.progress));
+                        return;
+                    case 'complete':
+                        channel.port1.close();
+                        if (
+                            data.result &&
+                            typeof data.result === 'object' &&
+                            !Array.isArray(data.result)
+                        ) {
+                            const result = /** @type {{errors?: unknown[]}} */ (data.result);
+                            if (Array.isArray(result.errors)) {
+                                result.errors = result.errors.map((error) => {
+                                    if (error && typeof error === 'object' && !Array.isArray(error)) {
+                                        return ExtensionError.deserialize(/** @type {import('core').SerializedError} */ (error));
+                                    }
+                                    return error;
+                                });
+                            }
+                        }
+                        resolve(data.result ?? null);
+                        return;
+                    case 'error':
+                        channel.port1.close();
+                        reject(ExtensionError.deserialize(
+                            data.error ?? {name: 'Error', message: 'Dictionary runtime import failed', stack: ''},
+                        ));
+                        return;
+                    default:
+                        return;
+                }
+            };
+            channel.port1.onmessageerror = () => {
+                channel.port1.close();
+                reject(new Error('Dictionary runtime import response channel failed'));
+            };
+            this._pmInvoke('importDictionaryOffscreen', {archiveContent, details}, [channel.port2]);
+        });
     }
 
     /**

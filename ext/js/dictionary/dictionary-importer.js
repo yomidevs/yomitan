@@ -59,7 +59,7 @@ const JSON_QUOTED_STRING_CACHE_MAX_ENTRIES = 8192;
 const TERM_BANK_WASM_ROW_CHUNK_SIZE = 2048;
 const TERM_BANK_WASM_INITIAL_META_CAPACITY_DIVISOR = 24;
 const TERM_BANK_WASM_INITIAL_CONTENT_BYTES_PER_ROW = 96;
-const TERM_ARTIFACT_ROW_CHUNK_SIZE = 65536;
+const TERM_ARTIFACT_ROW_CHUNK_SIZE = 40960;
 const NO_MEDIA_FAST_PATH_TERM_BANK_WASM_ROW_CHUNK_SIZE = 8192;
 const ADAPTIVE_TERM_BANK_WASM_ROW_CHUNK_SIZE_THRESHOLD_BYTES = 8 * 1024 * 1024;
 const ADAPTIVE_TERM_BANK_WASM_ROW_CHUNK_SIZE_UPPER_BOUND_BYTES = 128 * 1024 * 1024;
@@ -99,7 +99,7 @@ function createSparseArray(length) {
  * }}
  */
 function createArtifactTermRecordPreinternedPlanBuilder() {
-    /** @type {Map<string, number[]>} */
+    /** @type {Map<number, Map<number, Map<number, number[]>>>} */
     const stringIndexesByHash = new Map();
     /** @type {number[]} */
     const stringLengths = [];
@@ -107,19 +107,50 @@ function createArtifactTermRecordPreinternedPlanBuilder() {
     const stringBytesList = [];
 
     /**
-     * @param {Uint8Array} bytes
-     * @returns {string}
+     * @param {number} h1
+     * @param {number} h2
+     * @param {number} byteLength
+     * @returns {number[]|undefined}
      */
-    const createBytesKey = (bytes) => {
-        let h1 = 0x811c9dc5;
-        let h2 = 0x9e3779b9;
-        for (let i = 0, ii = bytes.byteLength; i < ii; ++i) {
-            const code = bytes[i];
-            h1 = Math.imul((h1 ^ code) >>> 0, 0x01000193);
-            h2 = Math.imul((h2 ^ code) >>> 0, 0x85ebca6b);
-            h2 = (h2 ^ (h2 >>> 13)) >>> 0;
+    const getCachedIndexes = (h1, h2, byteLength) => {
+        const byH2 = stringIndexesByHash.get(h1 >>> 0);
+        if (!(byH2 instanceof Map)) {
+            return void 0;
         }
-        return `${h1 >>> 0}:${h2 >>> 0}:${bytes.byteLength}`;
+        const byLength = byH2.get(h2 >>> 0);
+        if (!(byLength instanceof Map)) {
+            return void 0;
+        }
+        return byLength.get(byteLength >>> 0);
+    };
+
+    /**
+     * @param {number} h1
+     * @param {number} h2
+     * @param {number} byteLength
+     * @param {number} index
+     * @returns {void}
+     */
+    const cacheIndex = (h1, h2, byteLength, index) => {
+        h1 >>>= 0;
+        h2 >>>= 0;
+        byteLength >>>= 0;
+        let byH2 = stringIndexesByHash.get(h1);
+        if (!(byH2 instanceof Map)) {
+            byH2 = new Map();
+            stringIndexesByHash.set(h1, byH2);
+        }
+        let byLength = byH2.get(h2);
+        if (!(byLength instanceof Map)) {
+            byLength = new Map();
+            byH2.set(h2, byLength);
+        }
+        const cachedIndexes = byLength.get(byteLength);
+        if (Array.isArray(cachedIndexes)) {
+            cachedIndexes.push(index);
+        } else {
+            byLength.set(byteLength, [index]);
+        }
     };
 
     /**
@@ -138,8 +169,15 @@ function createArtifactTermRecordPreinternedPlanBuilder() {
 
     return {
         internStringBytes(bytes) {
-            const key = createBytesKey(bytes);
-            const cachedIndexes = stringIndexesByHash.get(key);
+            let h1 = 0x811c9dc5;
+            let h2 = 0x9e3779b9;
+            for (let i = 0, ii = bytes.byteLength; i < ii; ++i) {
+                const code = bytes[i];
+                h1 = Math.imul((h1 ^ code) >>> 0, 0x01000193);
+                h2 = Math.imul((h2 ^ code) >>> 0, 0x85ebca6b);
+                h2 = (h2 ^ (h2 >>> 13)) >>> 0;
+            }
+            const cachedIndexes = getCachedIndexes(h1, h2, bytes.byteLength);
             if (Array.isArray(cachedIndexes)) {
                 for (const cachedIndex of cachedIndexes) {
                     const cachedBytes = stringBytesList[cachedIndex];
@@ -149,19 +187,15 @@ function createArtifactTermRecordPreinternedPlanBuilder() {
                 }
             }
             const index = stringBytesList.length;
-            if (Array.isArray(cachedIndexes)) {
-                cachedIndexes.push(index);
-            } else {
-                stringIndexesByHash.set(key, [index]);
-            }
+            cacheIndex(h1, h2, bytes.byteLength, index);
             stringLengths.push(bytes.byteLength);
             stringBytesList.push(bytes);
             return index;
         },
         buildPlan(expressionIndexes, readingIndexes, count = expressionIndexes.length) {
             let totalStringBytes = 0;
-            for (const length of stringLengths) {
-                totalStringBytes += length;
+            for (const stringLength of stringLengths) {
+                totalStringBytes += stringLength;
             }
             const stringsBuffer = new Uint8Array(totalStringBytes);
             let cursor = 0;
@@ -173,10 +207,10 @@ function createArtifactTermRecordPreinternedPlanBuilder() {
                 stringLengths: Uint16Array.from(stringLengths),
                 stringsBuffer,
                 expressionIndexes: expressionIndexes instanceof Uint32Array ?
-                    expressionIndexes.slice(0, count) :
+                    expressionIndexes.subarray(0, count) :
                     Uint32Array.from(expressionIndexes.slice(0, count)),
                 readingIndexes: readingIndexes instanceof Uint32Array ?
-                    readingIndexes.slice(0, count) :
+                    readingIndexes.subarray(0, count) :
                     Uint32Array.from(readingIndexes.slice(0, count)),
             };
         },
@@ -418,7 +452,7 @@ export class DictionaryImporter {
         const enableTermEntryContentDedup = details.enableTermEntryContentDedup !== false;
         const termContentStorageMode = (details.termContentStorageMode === 'raw-bytes') ?
             details.termContentStorageMode :
-            'baseline';
+            'raw-bytes';
         this._skipImageMetadata = details.skipImageMetadata === true;
         this._skipMediaImport = details.skipMediaImport === true;
         this._mediaResolutionConcurrency = Math.max(1, Math.min(32, Math.trunc(details.mediaResolutionConcurrency ?? 8)));
@@ -650,18 +684,28 @@ export class DictionaryImporter {
         );
         if (useParallelPackedArtifactPreload) {
             const tParallelPackedArtifactReadStart = Date.now();
-            const [parallelPackedTermArtifactBytes, parallelPackedMediaArtifactBytes] = await Promise.all([
+            const [parallelPackedTermArtifactBytes, parallelPackedMediaArtifact] = await Promise.all([
                 this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedTermArtifactEntry), new Uint8ArrayWriter()),
-                this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedMediaArtifactEntry), new Uint8ArrayWriter()),
+                this._skipImageMetadata ?
+                    this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedMediaArtifactEntry), new BlobWriter()) :
+                    this._getData(/** @type {import('@zip.js/zip.js').Entry} */ (packedMediaArtifactEntry), new Uint8ArrayWriter()),
             ]);
             packedTermArtifactBytes = parallelPackedTermArtifactBytes;
-            packedMediaArtifactBytes = parallelPackedMediaArtifactBytes;
+            if (parallelPackedMediaArtifact instanceof Blob) {
+                packedMediaArtifactBlob = parallelPackedMediaArtifact;
+            } else {
+                packedMediaArtifactBytes = parallelPackedMediaArtifact;
+            }
             const parallelPackedArtifactPreloadMs = Math.max(0, Date.now() - tParallelPackedArtifactReadStart);
             packedTermArtifactPreloadMs = parallelPackedArtifactPreloadMs;
             packedMediaArtifactPreloadMs = 0;
             this._logImport(
                 `parallel packed artifact preload ${parallelPackedArtifactPreloadMs}ms ` +
-                `termBytes=${packedTermArtifactBytes.byteLength} mediaBytes=${packedMediaArtifactBytes.byteLength}`,
+                `termBytes=${packedTermArtifactBytes.byteLength} mediaBytes=${
+                    packedMediaArtifactBytes instanceof Uint8Array ?
+                        packedMediaArtifactBytes.byteLength :
+                        (packedMediaArtifactBlob instanceof Blob ? packedMediaArtifactBlob.size : 0)
+                }`,
             );
         } else if (useTermArtifactFiles || typeof packedTermArtifactEntry !== 'undefined') {
             if (typeof packedTermArtifactEntry !== 'undefined') {
@@ -1086,7 +1130,7 @@ export class DictionaryImporter {
             };
             /**
              * @param {{filename: string}} termFile
-             * @param {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} termChunk
+             * @param {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: ((string|null)[]|null), uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} termChunk
              * @param {import('dictionary-importer').ImportRequirement[]|null} requirements
              * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}|null} streamedProgress
              * @param {number} streamedProgressStartIndex
@@ -1094,7 +1138,7 @@ export class DictionaryImporter {
              */
             const processTermChunk = async (termFile, termChunk, requirements, streamedProgress = null, streamedProgressStartIndex = 0) => {
                 const trackProgress = streamedProgress === null;
-                /** @type {{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}|null} */
+                /** @type {{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: ((string|null)[]|null), uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}|null} */
                 const directArtifactChunk = Array.isArray(termChunk) ? null : termChunk;
                 /** @type {import('dictionary-database').DatabaseTermEntry[]} */
                 const termList = Array.isArray(termChunk) ? termChunk : [];
@@ -1179,6 +1223,20 @@ export class DictionaryImporter {
                     bulkAdd('terms', termList, {trackProgress}));
                 const tTermsWriteEnd = Date.now();
                 bulkAddTermsMs += Math.max(0, tTermsWriteEnd - tTermsWriteStart);
+                if (directArtifactChunk !== null) {
+                    directArtifactChunk.expressionBytesList.length = 0;
+                    directArtifactChunk.readingBytesList.length = 0;
+                    directArtifactChunk.readingEqualsExpressionList.length = 0;
+                    directArtifactChunk.scoreList.length = 0;
+                    directArtifactChunk.sequenceList.length = 0;
+                    directArtifactChunk.contentBytesList.length = 0;
+                    directArtifactChunk.contentHash1List.length = 0;
+                    directArtifactChunk.contentHash2List.length = 0;
+                    if (Array.isArray(directArtifactChunk.contentDictNameList)) {
+                        directArtifactChunk.contentDictNameList.length = 0;
+                    }
+                    directArtifactChunk.termRecordPreinternedPlan = null;
+                }
                 const bulkAddTermsMetrics = dictionaryDatabase.getLastBulkAddTermsMetrics();
                 if (bulkAddTermsMetrics !== null) {
                     ({
@@ -1247,9 +1305,9 @@ export class DictionaryImporter {
                          * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}} streamProgress
                          * @returns {Promise<void>}
                          */
-                        const directArtifactChunkImport = !enableTermEntryContentDedup && !useTermMediaRequirements;
+                        const directArtifactChunkImport = !useTermMediaRequirements;
                         /**
-                         * @param {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} termListChunk
+                         * @param {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentHash1List: number[], contentHash2List: number[], contentDictNameList: (string|null)[], uniformContentDictName?: string|null, termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} termListChunk
                          * @param {import('dictionary-importer').ImportRequirement[]|null} requirementsChunk
                          * @param {{processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}} streamProgress
                          * @returns {Promise<void>}
@@ -1648,8 +1706,16 @@ export class DictionaryImporter {
             recordPhaseTiming('bulk-finalization', tBulkFinalizationStart, bulkFinalizationPhaseDetails);
             if (!importFailed) {
                 try {
-                    const directIntegrity = await dictionaryDatabase.debugSampleTermContentIntegrity(dictionaryTitle, 8);
-                    recordPhaseTiming('post-finalization-integrity-sample', Date.now(), directIntegrity);
+                    if (counts.terms.total >= 1_000_000) {
+                        recordPhaseTiming('post-finalization-integrity-sample', Date.now(), {
+                            skipped: true,
+                            reason: 'large-dictionary',
+                            termCount: counts.terms.total,
+                        });
+                    } else {
+                        const directIntegrity = await dictionaryDatabase.debugSampleTermContentIntegrity(dictionaryTitle, 8);
+                        recordPhaseTiming('post-finalization-integrity-sample', Date.now(), directIntegrity);
+                    }
                 } catch (e) {
                     recordPhaseTiming('post-finalization-integrity-sample', Date.now(), {
                         ok: false,
@@ -2998,7 +3064,9 @@ export class DictionaryImporter {
                             if (typeof row.glossaryJson === 'string' && row.glossaryJson.length > 0) {
                                 entry.glossaryJson = row.glossaryJson;
                             }
-                            usePrecomputedTermContent = !useRawBytesDirectContent;
+                            usePrecomputedTermContent = useRawBytesDirectContent ?
+                                hasPrecomputedTermContent(row) :
+                                true;
                         } else {
                             const skipGlossaryParse = (
                                 typeof row.glossaryMayContainMedia === 'boolean' ?
@@ -3192,14 +3260,20 @@ export class DictionaryImporter {
         let chunkSequences = [];
         /** @type {Uint8Array[]} */
         let chunkContentBytes = [];
-        /** @type {(string|null)[]} */
-        let chunkContentDictNames = [];
+        /** @type {number[]} */
+        let chunkContentHash1 = [];
+        /** @type {number[]} */
+        let chunkContentHash2 = [];
+        /** @type {(string|null)[]|null} */
+        let chunkContentDictNames = null;
         let termRecordPlanBuilder = directArtifactChunkImport ? null : createArtifactTermRecordPreinternedPlanBuilder();
         const chunkSize = this._termArtifactRowChunkSize;
         /** @type {number[]|Uint32Array} */
         let termRecordExpressionIndexes = [];
         /** @type {number[]|Uint32Array} */
         let termRecordReadingIndexes = [];
+        const usePreallocatedTermRecordIndexes = streamToChunkHandler;
+        let termRecordChunkIndex = 0;
         let chunkRowCount = 0;
         /** @type {string|null|undefined} */
         let chunkUniformContentDictName = void 0;
@@ -3210,7 +3284,12 @@ export class DictionaryImporter {
             chunkScores = createSparseArray(chunkSize);
             chunkSequences = createSparseArray(chunkSize);
             chunkContentBytes = createSparseArray(chunkSize);
-            chunkContentDictNames = createSparseArray(chunkSize);
+            chunkContentHash1 = createSparseArray(chunkSize);
+            chunkContentHash2 = createSparseArray(chunkSize);
+        }
+        if (usePreallocatedTermRecordIndexes) {
+            termRecordExpressionIndexes = new Uint32Array(chunkSize);
+            termRecordReadingIndexes = new Uint32Array(chunkSize);
         }
         const chunkCount = Math.max(1, Math.ceil(rowCount / Math.max(1, chunkSize)));
         let chunkIndex = 0;
@@ -3272,8 +3351,14 @@ export class DictionaryImporter {
                 const readingIndex = readingMatchesExpression ?
                     expressionIndex :
                     termRecordPlanBuilder.internStringBytes(readingBytes);
-                /** @type {number[]} */ (termRecordExpressionIndexes).push(expressionIndex);
-                /** @type {number[]} */ (termRecordReadingIndexes).push(readingIndex);
+                if (usePreallocatedTermRecordIndexes) {
+                    /** @type {Uint32Array} */ (termRecordExpressionIndexes)[termRecordChunkIndex] = expressionIndex >>> 0;
+                    /** @type {Uint32Array} */ (termRecordReadingIndexes)[termRecordChunkIndex] = readingIndex >>> 0;
+                    ++termRecordChunkIndex;
+                } else {
+                    /** @type {number[]} */ (termRecordExpressionIndexes).push(expressionIndex);
+                    /** @type {number[]} */ (termRecordReadingIndexes).push(readingIndex);
+                }
             }
             cursor += readingLength;
             if (artifactVersion >= 2) {
@@ -3332,11 +3417,19 @@ export class DictionaryImporter {
                     chunkScores[chunkRowCount] = score;
                     chunkSequences[chunkRowCount] = sequence;
                     chunkContentBytes[chunkRowCount] = contentBytes;
-                    chunkContentDictNames[chunkRowCount] = contentDictName;
+                    chunkContentHash1[chunkRowCount] = hash1 >>> 0;
+                    chunkContentHash2[chunkRowCount] = hash2 >>> 0;
                     if (chunkRowCount === 0) {
                         chunkUniformContentDictName = contentDictName;
                     } else if (chunkUniformContentDictName !== void 0 && contentDictName !== chunkUniformContentDictName) {
+                        if (chunkContentDictNames === null) {
+                            chunkContentDictNames = createSparseArray(chunkSize);
+                            chunkContentDictNames.fill(chunkUniformContentDictName, 0, chunkRowCount);
+                        }
                         chunkUniformContentDictName = void 0;
+                    }
+                    if (chunkContentDictNames !== null) {
+                        chunkContentDictNames[chunkRowCount] = contentDictName;
                     }
                     ++chunkRowCount;
                 } else {
@@ -3373,7 +3466,7 @@ export class DictionaryImporter {
                         null;
                     ++chunkIndex;
                     const tChunkSinkStart = Date.now();
-                    /** @type {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} */
+                    /** @type {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentHash1List: number[], contentHash2List: number[], contentDictNameList: ((string|null)[]|null), termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} */
                     const chunkPayload = directArtifactChunkImport ?
                         {
                             dictionary: dictionaryTitle,
@@ -3385,6 +3478,8 @@ export class DictionaryImporter {
                             scoreList: chunkScores,
                             sequenceList: chunkSequences,
                             contentBytesList: chunkContentBytes,
+                            contentHash1List: chunkContentHash1,
+                            contentHash2List: chunkContentHash2,
                             contentDictNameList: chunkContentDictNames,
                             uniformContentDictName: chunkUniformContentDictName,
                             termRecordPreinternedPlan,
@@ -3396,7 +3491,7 @@ export class DictionaryImporter {
                         }
                         setTermRecordPreinternedPlan(termList, termRecordPreinternedPlan);
                     }
-                    await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}, requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} */ (onChunk)(chunkPayload, null, {
+                    await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: ((string|null)[]|null), termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}, requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} */ (onChunk)(chunkPayload, null, {
                         processedRows: i + 1,
                         totalRows: rowCount,
                         chunkIndex,
@@ -3409,9 +3504,16 @@ export class DictionaryImporter {
                         termList.length = 0;
                     }
                     termRecordPlanBuilder = directArtifactChunkImport ? null : createArtifactTermRecordPreinternedPlanBuilder();
-                    termRecordExpressionIndexes = [];
-                    termRecordReadingIndexes = [];
+                    if (usePreallocatedTermRecordIndexes) {
+                        termRecordExpressionIndexes = new Uint32Array(chunkSize);
+                        termRecordReadingIndexes = new Uint32Array(chunkSize);
+                        termRecordChunkIndex = 0;
+                    } else {
+                        termRecordExpressionIndexes = [];
+                        termRecordReadingIndexes = [];
+                    }
                     chunkUniformContentDictName = void 0;
+                    chunkContentDictNames = null;
                 }
             } else {
                 /** @type {import('dictionary-database').DatabaseTermEntry} */
@@ -3447,19 +3549,21 @@ export class DictionaryImporter {
                 null;
             ++chunkIndex;
             const tChunkSinkStart = Date.now();
-            /** @type {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} */
+            /** @type {import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, dictionaryTotalRows?: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentHash1List: number[], contentHash2List: number[], contentDictNameList: ((string|null)[]|null), termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}} */
             const chunkPayload = directArtifactChunkImport ?
                 {
                     dictionary: dictionaryTitle,
                     rowCount: streamedRowCount,
                     dictionaryTotalRows,
-                    expressionBytesList: chunkExpressionBytes.slice(0, streamedRowCount),
-                    readingBytesList: chunkReadingBytes.slice(0, streamedRowCount),
-                    readingEqualsExpressionList: chunkReadingEqualsExpression.slice(0, streamedRowCount),
-                    scoreList: chunkScores.slice(0, streamedRowCount),
-                    sequenceList: chunkSequences.slice(0, streamedRowCount),
-                    contentBytesList: chunkContentBytes.slice(0, streamedRowCount),
-                    contentDictNameList: chunkContentDictNames.slice(0, streamedRowCount),
+                    expressionBytesList: chunkExpressionBytes,
+                    readingBytesList: chunkReadingBytes,
+                    readingEqualsExpressionList: chunkReadingEqualsExpression,
+                    scoreList: chunkScores,
+                    sequenceList: chunkSequences,
+                    contentBytesList: chunkContentBytes,
+                    contentHash1List: chunkContentHash1,
+                    contentHash2List: chunkContentHash2,
+                    contentDictNameList: chunkContentDictNames,
                     uniformContentDictName: chunkUniformContentDictName,
                     termRecordPreinternedPlan,
                 } :
@@ -3470,7 +3574,7 @@ export class DictionaryImporter {
                 }
                 setTermRecordPreinternedPlan(termList, termRecordPreinternedPlan);
             }
-            await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: (string|null)[], termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}, requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} */ (onChunk)(chunkPayload, null, {
+            await /** @type {(termList: import('dictionary-database').DatabaseTermEntry[]|{dictionary: string, rowCount: number, expressionBytesList: Uint8Array[], readingBytesList: Uint8Array[], readingEqualsExpressionList: boolean[], scoreList: number[], sequenceList: (number|undefined)[], contentBytesList: Uint8Array[], contentDictNameList: ((string|null)[]|null), termRecordPreinternedPlan?: import('./term-record-wasm-encoder.js').PreinternedTermRecordPlan|null}, requirements: import('dictionary-importer').ImportRequirement[]|null, progress: {processedRows: number, totalRows: number, chunkIndex: number, chunkCount: number}) => Promise<void>|void} */ (onChunk)(chunkPayload, null, {
                 processedRows: rowCount,
                 totalRows: rowCount,
                 chunkIndex,
@@ -3484,7 +3588,7 @@ export class DictionaryImporter {
                 chunkScores = [];
                 chunkSequences = [];
                 chunkContentBytes = [];
-                chunkContentDictNames = [];
+                chunkContentDictNames = null;
             } else {
                 termList.length = 0;
             }
@@ -3590,9 +3694,7 @@ export class DictionaryImporter {
         if (sharedGlossary) {
             return {
                 contentBytes,
-                contentDictName: sharedGlossaryBaseOffset > 0 ?
-                    RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME :
-                    RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME,
+                contentDictName: RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME,
             };
         }
         if (decodeRawTermContentBinary(contentBytes, this._textDecoder) !== null) {
@@ -3787,4 +3889,5 @@ export class DictionaryImporter {
         }
         return await entry.getData(writer);
     }
+
 }

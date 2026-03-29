@@ -39,6 +39,14 @@ type ApiSurface = {
         params: void;
         return: void;
     };
+    getDatabaseRuntimeStateOffscreen: {
+        params: void;
+        return: {
+            isPrepared: boolean;
+            usesFallbackStorage: boolean;
+            openStorageDiagnostics: unknown;
+        };
+    };
     databaseSetSuspendedOffscreen: {
         params: {
             suspended: boolean;
@@ -83,7 +91,18 @@ type ApiSurface = {
                 summaryTitle: string | null;
                 summaryImportSuccess: boolean | null;
             }>;
+            lastReplaceDictionaryTitleDebug?: unknown;
+            startupCleanupIncompleteImportsSummary?: unknown;
+            startupCleanupMissingTermRecordShardsSummary?: unknown;
+            termRecordShardFileNames?: string[];
         };
+    };
+    debugDictionaryLookupStateOffscreen: {
+        params: {
+            text: string;
+            dictionaryNames: string[];
+        };
+        return: unknown;
     };
     databasePurgeOffscreen: {
         params: void;

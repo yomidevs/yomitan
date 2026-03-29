@@ -60,7 +60,6 @@ export type ImportDetails = {
     replacementDictionaryTitle?: string;
     forceMemoryOnly?: boolean;
     skipImageMetadata?: boolean;
-    skipMediaImport?: boolean;
     mediaResolutionConcurrency?: number;
     debugImportLogging?: boolean;
     enableTermEntryContentDedup?: boolean;

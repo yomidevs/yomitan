@@ -50,6 +50,7 @@ export class Offscreen {
             ['clipboardSetBrowserOffscreen',   this._setClipboardBrowser.bind(this)],
             ['databasePrepareOffscreen',       this._prepareDatabaseHandler.bind(this)],
             ['databaseRefreshOffscreen',       this._refreshDatabaseHandler.bind(this)],
+            ['getDatabaseRuntimeStateOffscreen', this._getDatabaseRuntimeStateHandler.bind(this)],
             ['databaseSetSuspendedOffscreen',  this._setDatabaseSuspendedHandler.bind(this)],
             ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
             ['deleteDictionaryOffscreen',      this._deleteDictionaryHandler.bind(this)],
@@ -110,15 +111,11 @@ export class Offscreen {
         const locationValue = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'location') ?? {}));
         const navigatorValue = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'navigator') ?? {}));
         const storageValue = /** @type {Record<string, unknown>} */ (Reflect.get(navigatorValue, 'storage') ?? {});
-        const crossOriginIsolatedValue = Reflect.get(globalThis, 'crossOriginIsolated');
         /** @type {Record<string, unknown>} */
         const payload = {
             context: {
                 href: typeof locationValue.href === 'string' ? locationValue.href : null,
                 origin: typeof locationValue.origin === 'string' ? locationValue.origin : null,
-                crossOriginIsolated: typeof crossOriginIsolatedValue === 'boolean' ? crossOriginIsolatedValue : null,
-                hasSharedArrayBuffer: typeof Reflect.get(globalThis, 'SharedArrayBuffer') === 'function',
-                hasAtomics: typeof Reflect.get(globalThis, 'Atomics') === 'object' && Reflect.get(globalThis, 'Atomics') !== null,
                 hasNavigatorStorage: typeof storageValue === 'object' && storageValue !== null,
                 hasStorageGetDirectory: typeof storageValue.getDirectory === 'function',
                 hasFileSystemHandle: typeof Reflect.get(globalThis, 'FileSystemHandle') === 'function',
@@ -163,26 +160,11 @@ export class Offscreen {
                 return false;
             };
             const findVfs = sqlite3?.capi?.sqlite3_vfs_find;
-            const opfsVfsRaw = typeof findVfs === 'function' ? findVfs('opfs') : null;
             const opfsSahpoolVfsRaw = typeof findVfs === 'function' ? findVfs('opfs-sahpool') : null;
-            let wasmfsDir = null;
-            if (typeof sqlite3?.capi?.sqlite3_wasmfs_opfs_dir === 'function') {
-                try {
-                    wasmfsDir = String(sqlite3.capi.sqlite3_wasmfs_opfs_dir() ?? '');
-                } catch (_) {
-                    wasmfsDir = null;
-                }
-            }
             payload.sqlite = {
                 sqliteVersion: sqlite3?.version?.libVersion ?? null,
-                hasOpfsDbCtor: typeof sqlite3.oo1?.OpfsDb === 'function',
                 hasInstallOpfsSAHPoolVfs: typeof Reflect.get(sqlite3, 'installOpfsSAHPoolVfs') === 'function',
-                hasOpfsImportDb: typeof /** @type {{opfs?: {importDb?: unknown}}} */ (/** @type {unknown} */ (sqlite3)).opfs?.importDb === 'function',
-                hasWasmfsDir: typeof wasmfsDir === 'string' && wasmfsDir.length > 0,
-                wasmfsDir,
-                hasOpfsVfs: opfsVfsRaw !== null && isNonZeroPointer(opfsVfsRaw),
                 hasOpfsSahpoolVfs: opfsSahpoolVfsRaw !== null && isNonZeroPointer(opfsSahpoolVfsRaw),
-                opfsVfsPtr: serializePointer(opfsVfsRaw),
                 opfsSahpoolVfsPtr: serializePointer(opfsSahpoolVfsRaw),
             };
         } catch (e) {
@@ -237,6 +219,11 @@ export class Offscreen {
     /** @type {import('offscreen').ApiHandler<'databaseRefreshOffscreen'>} */
     async _refreshDatabaseHandler() {
         await this._invokeDictionaryWorker('databaseRefreshOffscreen', {});
+    }
+
+    /** @type {import('offscreen').ApiHandler<'getDatabaseRuntimeStateOffscreen'>} */
+    async _getDatabaseRuntimeStateHandler() {
+        return await this._invokeDictionaryWorker('getDatabaseRuntimeStateOffscreen', {});
     }
 
     /** @type {import('offscreen').ApiHandler<'databaseSetSuspendedOffscreen'>} */

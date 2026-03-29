@@ -20,49 +20,51 @@ import {reportDiagnostics} from '../core/diagnostics-reporter.js';
 
 export const DICTIONARY_DB_FILE = '/dict.sqlite3';
 
-const DICTIONARY_DB_FILE_ALT = 'dict.sqlite3';
 const OPFS_SAHPOOL_VFS_NAME = 'opfs-sahpool';
-
-let lastOpenUsedFallbackStorage = false;
-/** @type {{mode: string, caller: string, runtimeContext: ReturnType<typeof getRuntimeContextDiagnostics>|null, forceFallback: boolean, opfsReadyTimeoutMs: number, opfsReadyWait: {attempts: number, elapsedMs: number, ready: boolean}|null, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasInstallOpfsSAHPoolVfs: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null, opfsSahpoolInstallAttempted: boolean, opfsSahpoolInstallResult: string|null, opfsSahpoolInstallError: string|null, openFailureClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'|null, attempts?: Array<{strategy: string, target: string, flags: string, error: string, errorClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'}>, lastError?: string|null}} */
-let lastOpenStorageDiagnostics = {
-    mode: 'unknown',
-    caller: 'unknown',
-    runtimeContext: null,
-    forceFallback: false,
-    opfsReadyTimeoutMs: 0,
-    opfsReadyWait: null,
-    hasOpfsDbCtor: false,
-    hasOpfsImportDb: false,
-    hasWasmfsDir: false,
-    hasInstallOpfsSAHPoolVfs: false,
-    hasOpfsVfs: false,
-    hasOpfsSahpoolVfs: false,
-    opfsVfsPtr: null,
-    opfsSahpoolVfsPtr: null,
-    opfsSahpoolInstallAttempted: false,
-    opfsSahpoolInstallResult: null,
-    opfsSahpoolInstallError: null,
-    openFailureClass: null,
-    attempts: [],
-    lastError: null,
-};
-
-/**
- * @typedef {object} SqliteOpfsApi
- * @property {(path: string, recursive?: boolean, throwIfNotFound?: boolean) => Promise<void>|void} [unlink]
- * @property {(path: string, content: Uint8Array) => Promise<void>|void} [importDb]
- */
+const OPFS_SAHPOOL_DIRECTORY = '/manabitan/sqlite-sahpool-v1';
+const OPFS_SAHPOOL_MIN_CAPACITY = 8;
 
 /** @type {Promise<import('@sqlite.org/sqlite-wasm').Sqlite3Static>|null} */
 let sqlite3Promise = null;
-/** @type {Promise<boolean>|null} */
-let opfsSahpoolInstallPromise = null;
+/** @type {Promise<import('@sqlite.org/sqlite-wasm').SAHPoolUtil>|null} */
+let opfsSahpoolPromise = null;
 /** @type {boolean} */
 let sqliteInitDiagnosticsReported = false;
 
+/** @type {{mode: string, caller: string, runtimeContext: ReturnType<typeof getRuntimeContextDiagnostics>|null, forceFallback: boolean, opfsReadyTimeoutMs: number, opfsReadyWait: {attempts: number, elapsedMs: number, ready: boolean}|null, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasInstallOpfsSAHPoolVfs: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null, opfsSahpoolInstallAttempted: boolean, opfsSahpoolInstallResult: string|null, opfsSahpoolInstallError: string|null, opfsSahpoolDirectory: string|null, opfsSahpoolCapacity: number|null, opfsSahpoolFileCount: number|null, opfsSahpoolFileNames: string[]|null, openFailureClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'worker-required'|'unknown'|null, attempts?: Array<{strategy: string, target: string, flags: string, error: string, errorClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'worker-required'|'unknown'}>, lastError?: string|null}} */
+let lastOpenStorageDiagnostics = createInitialDiagnostics('unknown');
+
+function createInitialDiagnostics(caller) {
+    return {
+        mode: 'unknown',
+        caller,
+        runtimeContext: null,
+        forceFallback: false,
+        opfsReadyTimeoutMs: 0,
+        opfsReadyWait: null,
+        hasOpfsDbCtor: false,
+        hasOpfsImportDb: false,
+        hasWasmfsDir: false,
+        hasInstallOpfsSAHPoolVfs: false,
+        hasOpfsVfs: false,
+        hasOpfsSahpoolVfs: false,
+        opfsVfsPtr: null,
+        opfsSahpoolVfsPtr: null,
+        opfsSahpoolInstallAttempted: false,
+        opfsSahpoolInstallResult: null,
+        opfsSahpoolInstallError: null,
+        opfsSahpoolDirectory: null,
+        opfsSahpoolCapacity: null,
+        opfsSahpoolFileCount: null,
+        opfsSahpoolFileNames: null,
+        openFailureClass: null,
+        attempts: [],
+        lastError: null,
+    };
+}
+
 /**
- * @returns {{href: string|null, origin: string|null, globalConstructor: string|null, isWindow: boolean, isWorkerGlobalScope: boolean, isServiceWorkerGlobalScope: boolean, crossOriginIsolated: boolean|null, hasSharedArrayBuffer: boolean, hasAtomics: boolean, hasNavigatorStorage: boolean, hasStorageGetDirectory: boolean, hasFileSystemHandle: boolean, hasFileSystemDirectoryHandle: boolean, hasFileSystemFileHandle: boolean, hasCreateSyncAccessHandle: boolean, userAgent: string|null}}
+ * @returns {{href: string|null, origin: string|null, globalConstructor: string|null, isWindow: boolean, isWorkerGlobalScope: boolean, isServiceWorkerGlobalScope: boolean, isDedicatedWorkerGlobalScope: boolean, crossOriginIsolated: boolean|null, hasSharedArrayBuffer: boolean, hasAtomics: boolean, hasNavigatorStorage: boolean, hasStorageGetDirectory: boolean, hasFileSystemHandle: boolean, hasFileSystemDirectoryHandle: boolean, hasFileSystemFileHandle: boolean, hasCreateSyncAccessHandle: boolean, userAgent: string|null}}
  */
 function getRuntimeContextDiagnostics() {
     const locationValue = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'location') ?? {}));
@@ -83,6 +85,7 @@ function getRuntimeContextDiagnostics() {
         isWindow,
         isWorkerGlobalScope,
         isServiceWorkerGlobalScope,
+        isDedicatedWorkerGlobalScope: isWorkerGlobalScope && !isServiceWorkerGlobalScope && globalCtorName === 'DedicatedWorkerGlobalScope',
         crossOriginIsolated: typeof crossOriginIsolatedValue === 'boolean' ? crossOriginIsolatedValue : null,
         hasSharedArrayBuffer: typeof Reflect.get(globalThis, 'SharedArrayBuffer') === 'function',
         hasAtomics: typeof Reflect.get(globalThis, 'Atomics') === 'object' && Reflect.get(globalThis, 'Atomics') !== null,
@@ -100,34 +103,6 @@ function getRuntimeContextDiagnostics() {
         ),
         userAgent: typeof navigatorValue.userAgent === 'string' ? navigatorValue.userAgent : null,
     };
-}
-
-/**
- * @returns {string[]}
- */
-function getDatabasePaths() {
-    return [DICTIONARY_DB_FILE, DICTIONARY_DB_FILE_ALT];
-}
-
-/**
- * @param {import('@sqlite.org/sqlite-wasm').Sqlite3Static} sqlite3
- * @returns {string[]}
- */
-function getWasmfsDatabasePaths(sqlite3) {
-    const getOpfsDir = sqlite3?.capi?.sqlite3_wasmfs_opfs_dir;
-    if (typeof getOpfsDir !== 'function') {
-        return [];
-    }
-    let opfsDir = '';
-    try {
-        opfsDir = String(getOpfsDir() ?? '');
-    } catch (_) {
-        return [];
-    }
-    if (!/^\/[^/]+$/.test(opfsDir)) {
-        return [];
-    }
-    return [`${opfsDir}/dict.sqlite3`];
 }
 
 /**
@@ -159,49 +134,25 @@ function serializePointer(pointer) {
 }
 
 /**
- * @param {import('@sqlite.org/sqlite-wasm').Sqlite3Static} sqlite3
- * @returns {{OpfsDb: unknown, opfs: SqliteOpfsApi|undefined, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null}}
- */
-function getOpfsCapabilitySnapshot(sqlite3) {
-    const OpfsDb = /** @type {unknown} */ (sqlite3?.oo1?.OpfsDb);
-    const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
-    const findVfs = sqlite3?.capi?.sqlite3_vfs_find;
-    const opfsVfsRaw = typeof findVfs === 'function' ? findVfs('opfs') : null;
-    const opfsSahpoolVfsRaw = typeof findVfs === 'function' ? findVfs(OPFS_SAHPOOL_VFS_NAME) : null;
-    return {
-        OpfsDb,
-        opfs,
-        hasOpfsDbCtor: typeof OpfsDb === 'function',
-        hasOpfsImportDb: typeof opfs?.importDb === 'function',
-        hasWasmfsDir: getWasmfsDatabasePaths(sqlite3).length > 0,
-        hasOpfsVfs: isNonZeroPointer(opfsVfsRaw),
-        hasOpfsSahpoolVfs: isNonZeroPointer(opfsSahpoolVfsRaw),
-        opfsVfsPtr: serializePointer(opfsVfsRaw),
-        opfsSahpoolVfsPtr: serializePointer(opfsSahpoolVfsRaw),
-    };
-}
-
-/**
- * @param {number} ms
- * @returns {Promise<void>}
- */
-function sleep(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
-}
-
-/**
  * @param {string} message
- * @returns {'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'}
+ * @returns {'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'worker-required'|'unknown'}
  */
 function classifyOpenFailureMessage(message) {
     const text = message.toLowerCase();
     if (
+        text.includes('dedicated worker') ||
+        text.includes('workers only') ||
+        text.includes('syncaccesshandle') ||
+        text.includes('worker runtime')
+    ) {
+        return 'worker-required';
+    }
+    if (
         text.includes('no such vfs') ||
         text.includes('opfs is required') ||
-        text.includes('missing sharedarraybuffer') ||
-        text.includes('crossoriginisolated')
+        text.includes('createSyncAccessHandle'.toLowerCase()) ||
+        text.includes('getdirectory') ||
+        text.includes('file system access')
     ) {
         return 'unsupported-opfs';
     }
@@ -230,35 +181,68 @@ function classifyOpenFailureMessage(message) {
 }
 
 /**
- * @param {number} attempt
- * @returns {number}
+ * @param {import('@sqlite.org/sqlite-wasm').Sqlite3Static} sqlite3
+ * @returns {{hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null}}
  */
-function getOpenRetryDelayMs(attempt) {
-    const base = Math.min(1000, 50 * (2 ** attempt));
-    const jitter = Math.floor(Math.random() * 25);
-    return base + jitter;
+function getOpfsCapabilitySnapshot(sqlite3) {
+    const findVfs = sqlite3?.capi?.sqlite3_vfs_find;
+    const opfsVfsRaw = typeof findVfs === 'function' ? findVfs('opfs') : null;
+    const opfsSahpoolVfsRaw = typeof findVfs === 'function' ? findVfs(OPFS_SAHPOOL_VFS_NAME) : null;
+    return {
+        hasOpfsDbCtor: typeof sqlite3?.oo1?.OpfsDb === 'function',
+        hasOpfsImportDb: typeof /** @type {{opfs?: {importDb?: unknown}}} */ (/** @type {unknown} */ (sqlite3)).opfs?.importDb === 'function',
+        hasWasmfsDir: typeof sqlite3?.capi?.sqlite3_wasmfs_opfs_dir === 'function',
+        hasOpfsVfs: isNonZeroPointer(opfsVfsRaw),
+        hasOpfsSahpoolVfs: isNonZeroPointer(opfsSahpoolVfsRaw),
+        opfsVfsPtr: serializePointer(opfsVfsRaw),
+        opfsSahpoolVfsPtr: serializePointer(opfsSahpoolVfsRaw),
+    };
 }
 
 /**
- * @param {SqliteOpfsApi|undefined} opfs
- * @returns {Promise<void>}
+ * @param {string} caller
+ * @returns {void}
  */
-async function deleteOpfsDatabaseFilesInternal(opfs) {
-    if (typeof opfs?.unlink !== 'function') {
-        return;
+function resetOpenDiagnostics(caller) {
+    lastOpenStorageDiagnostics = createInitialDiagnostics(caller);
+    lastOpenStorageDiagnostics.runtimeContext = getRuntimeContextDiagnostics();
+}
+
+/**
+ * @param {string} strategy
+ * @param {string} target
+ * @param {string} flags
+ * @param {unknown} error
+ * @returns {void}
+ */
+function pushAttemptError(strategy, target, flags, error) {
+    const message = (error instanceof Error) ? error.message : String(error);
+    const errorClass = classifyOpenFailureMessage(message);
+    const attempts = /** @type {NonNullable<typeof lastOpenStorageDiagnostics.attempts>} */ (lastOpenStorageDiagnostics.attempts ?? []);
+    attempts.push({strategy, target, flags, error: message, errorClass});
+    if (attempts.length > 40) {
+        attempts.shift();
     }
-    /** @type {string[]} */
-    const targets = [];
-    for (const dbPath of getDatabasePaths()) {
-        targets.push(dbPath, `${dbPath}-wal`, `${dbPath}-shm`);
-    }
-    for (const target of targets) {
-        try {
-            await opfs.unlink(target, false, false);
-        } catch (_) {
-            // NOP - continue best-effort cleanup.
-        }
-    }
+    lastOpenStorageDiagnostics.attempts = attempts;
+    lastOpenStorageDiagnostics.lastError = message;
+    lastOpenStorageDiagnostics.openFailureClass = errorClass;
+}
+
+/**
+ * @param {import('@sqlite.org/sqlite-wasm').Sqlite3Static} sqlite3
+ * @returns {void}
+ */
+function syncCapabilityIntoDiagnostics(sqlite3) {
+    const snapshot = getOpfsCapabilitySnapshot(sqlite3);
+    lastOpenStorageDiagnostics.hasOpfsDbCtor = snapshot.hasOpfsDbCtor;
+    lastOpenStorageDiagnostics.hasOpfsImportDb = snapshot.hasOpfsImportDb;
+    lastOpenStorageDiagnostics.hasWasmfsDir = snapshot.hasWasmfsDir;
+    lastOpenStorageDiagnostics.hasOpfsVfs = snapshot.hasOpfsVfs;
+    lastOpenStorageDiagnostics.hasOpfsSahpoolVfs = snapshot.hasOpfsSahpoolVfs;
+    lastOpenStorageDiagnostics.opfsVfsPtr = snapshot.opfsVfsPtr;
+    lastOpenStorageDiagnostics.opfsSahpoolVfsPtr = snapshot.opfsSahpoolVfsPtr;
+    lastOpenStorageDiagnostics.hasInstallOpfsSAHPoolVfs = typeof Reflect.get(sqlite3, 'installOpfsSAHPoolVfs') === 'function';
+    lastOpenStorageDiagnostics.opfsSahpoolDirectory = OPFS_SAHPOOL_DIRECTORY;
 }
 
 /**
@@ -269,22 +253,16 @@ export async function getSqlite3() {
         return await sqlite3Promise;
     }
     const initWithOptions = /** @type {(options: {locateFile: (file: string) => string}) => Promise<import('@sqlite.org/sqlite-wasm').Sqlite3Static>} */ (sqlite3InitModule);
-    /**
-     * @param {string} file
-     * @returns {string}
-     */
     const locateFile = (file) => new URL(`../../lib/sqlite/${file}`, import.meta.url).href;
-    sqlite3Promise = initWithOptions({
-        locateFile,
-    });
+    sqlite3Promise = initWithOptions({locateFile});
     const sqlite3 = await sqlite3Promise;
     if (!sqliteInitDiagnosticsReported) {
         sqliteInitDiagnosticsReported = true;
         const snapshot = getOpfsCapabilitySnapshot(sqlite3);
         reportDiagnostics('opfs-sqlite-init', {
             context: getRuntimeContextDiagnostics(),
-            hasOpfsDbCtor: snapshot.hasOpfsDbCtor,
             hasInstallOpfsSAHPoolVfs: typeof Reflect.get(sqlite3, 'installOpfsSAHPoolVfs') === 'function',
+            hasOpfsDbCtor: snapshot.hasOpfsDbCtor,
             hasOpfsImportDb: snapshot.hasOpfsImportDb,
             hasWasmfsDir: snapshot.hasWasmfsDir,
             hasOpfsVfs: snapshot.hasOpfsVfs,
@@ -292,9 +270,56 @@ export async function getSqlite3() {
             opfsVfsPtr: snapshot.opfsVfsPtr,
             opfsSahpoolVfsPtr: snapshot.opfsSahpoolVfsPtr,
             sqliteVersion: sqlite3?.version?.libVersion ?? null,
+            opfsSahpoolDirectory: OPFS_SAHPOOL_DIRECTORY,
+            opfsSahpoolMinCapacity: OPFS_SAHPOOL_MIN_CAPACITY,
         });
     }
     return sqlite3;
+}
+
+/**
+ * @param {import('@sqlite.org/sqlite-wasm').Sqlite3Static} sqlite3
+ * @returns {Promise<import('@sqlite.org/sqlite-wasm').SAHPoolUtil>}
+ */
+async function ensureOpfsSahpool(sqlite3) {
+    if (opfsSahpoolPromise !== null) {
+        return await opfsSahpoolPromise;
+    }
+    const installOpfsSAHPoolVfs = /** @type {unknown} */ (Reflect.get(sqlite3, 'installOpfsSAHPoolVfs'));
+    if (typeof installOpfsSAHPoolVfs !== 'function') {
+        throw new Error('sqlite-wasm build does not expose installOpfsSAHPoolVfs()');
+    }
+    opfsSahpoolPromise = (async () => {
+        const context = getRuntimeContextDiagnostics();
+        if (!context.isDedicatedWorkerGlobalScope) {
+            throw new Error(`opfs-sahpool requires a DedicatedWorkerGlobalScope. runtimeContext=${JSON.stringify(context)}`);
+        }
+        if (!context.hasStorageGetDirectory || !context.hasCreateSyncAccessHandle) {
+            throw new Error(`opfs-sahpool runtime prerequisites are unavailable. runtimeContext=${JSON.stringify(context)}`);
+        }
+        lastOpenStorageDiagnostics.opfsSahpoolInstallAttempted = true;
+        try {
+            const poolUtil = await /** @type {(opts: {name?: string, directory?: string, initialCapacity?: number}) => Promise<import('@sqlite.org/sqlite-wasm').SAHPoolUtil>} */ (installOpfsSAHPoolVfs)({
+                name: OPFS_SAHPOOL_VFS_NAME,
+                directory: OPFS_SAHPOOL_DIRECTORY,
+                initialCapacity: OPFS_SAHPOOL_MIN_CAPACITY,
+            });
+            await poolUtil.reserveMinimumCapacity(OPFS_SAHPOOL_MIN_CAPACITY);
+            lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'installed';
+            lastOpenStorageDiagnostics.opfsSahpoolInstallError = null;
+            lastOpenStorageDiagnostics.opfsSahpoolCapacity = poolUtil.getCapacity();
+            lastOpenStorageDiagnostics.opfsSahpoolFileCount = poolUtil.getFileCount();
+            lastOpenStorageDiagnostics.opfsSahpoolFileNames = poolUtil.getFileNames();
+            return poolUtil;
+        } catch (error) {
+            const message = (error instanceof Error) ? error.message : String(error);
+            lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'failed';
+            lastOpenStorageDiagnostics.opfsSahpoolInstallError = message;
+            pushAttemptError('install-opfs-sahpool-vfs', OPFS_SAHPOOL_DIRECTORY, '-', error);
+            throw error;
+        }
+    })();
+    return await opfsSahpoolPromise;
 }
 
 /**
@@ -302,342 +327,45 @@ export async function getSqlite3() {
  * @returns {Promise<import('@sqlite.org/sqlite-wasm').Database>}
  */
 export async function openOpfsDatabase(caller = 'unknown') {
-    lastOpenUsedFallbackStorage = false;
+    resetOpenDiagnostics(caller);
     const sqlite3 = await getSqlite3();
-    const allowFallback = (
-        Reflect.get(globalThis, 'manabitanRequireOpfs') === false ||
-        Reflect.get(globalThis, 'manabitanAllowSqliteMemoryFallback') === true ||
-        typeof Reflect.get(globalThis, 'chrome') === 'undefined'
-    );
-    const forceFallback = Reflect.get(globalThis, 'manabitanForceSqliteFallback') === true;
-    const installOpfsSAHPoolVfs = /** @type {unknown} */ (Reflect.get(sqlite3, 'installOpfsSAHPoolVfs'));
-    const contextDiagnostics = getRuntimeContextDiagnostics();
-    const opfsReadyTimeoutMsRaw = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanOpfsReadyTimeoutMs'));
-    const opfsReadyTimeoutMs = (
-        typeof opfsReadyTimeoutMsRaw === 'number' &&
-        Number.isFinite(opfsReadyTimeoutMsRaw) &&
-        opfsReadyTimeoutMsRaw >= 0
-    ) ?
-        opfsReadyTimeoutMsRaw :
-        3000;
-    let capability = getOpfsCapabilitySnapshot(sqlite3);
-    lastOpenStorageDiagnostics = {
-        mode: 'opening',
-        caller,
-        runtimeContext: contextDiagnostics,
-        forceFallback,
-        opfsReadyTimeoutMs,
-        opfsReadyWait: null,
-        hasOpfsDbCtor: capability.hasOpfsDbCtor,
-        hasOpfsImportDb: capability.hasOpfsImportDb,
-        hasWasmfsDir: capability.hasWasmfsDir,
-        hasInstallOpfsSAHPoolVfs: typeof installOpfsSAHPoolVfs === 'function',
-        hasOpfsVfs: capability.hasOpfsVfs,
-        hasOpfsSahpoolVfs: capability.hasOpfsSahpoolVfs,
-        opfsVfsPtr: capability.opfsVfsPtr,
-        opfsSahpoolVfsPtr: capability.opfsSahpoolVfsPtr,
-        opfsSahpoolInstallAttempted: false,
-        opfsSahpoolInstallResult: null,
-        opfsSahpoolInstallError: null,
-        openFailureClass: null,
-        attempts: [],
-        lastError: null,
-    };
-    const attempts = /** @type {Array<{strategy: string, target: string, flags: string, error: string, errorClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'}>} */ (lastOpenStorageDiagnostics.attempts);
-    /**
-     * @param {string} strategy
-     * @param {string} target
-     * @param {string} flags
-     * @param {unknown} error
-     */
-    const pushAttemptError = (strategy, target, flags, error) => {
-        const message = (error instanceof Error) ? error.message : String(error);
-        const errorClass = classifyOpenFailureMessage(message);
-        attempts.push({strategy, target, flags, error: message, errorClass});
-        if (attempts.length > 40) {
-            attempts.shift();
-        }
-        lastOpenStorageDiagnostics.lastError = message;
-        lastOpenStorageDiagnostics.openFailureClass = errorClass;
-    };
-    /**
-     * @returns {ReturnType<typeof getOpfsCapabilitySnapshot>}
-     */
-    const syncCapabilityIntoDiagnostics = () => {
-        capability = getOpfsCapabilitySnapshot(sqlite3);
-        lastOpenStorageDiagnostics.hasOpfsDbCtor = capability.hasOpfsDbCtor;
-        lastOpenStorageDiagnostics.hasOpfsImportDb = capability.hasOpfsImportDb;
-        lastOpenStorageDiagnostics.hasWasmfsDir = capability.hasWasmfsDir;
-        lastOpenStorageDiagnostics.hasOpfsVfs = capability.hasOpfsVfs;
-        lastOpenStorageDiagnostics.hasOpfsSahpoolVfs = capability.hasOpfsSahpoolVfs;
-        lastOpenStorageDiagnostics.opfsVfsPtr = capability.opfsVfsPtr;
-        lastOpenStorageDiagnostics.opfsSahpoolVfsPtr = capability.opfsSahpoolVfsPtr;
-        return capability;
-    };
-    /**
-     * @returns {boolean}
-     */
-    const isOpfsReadyForOpen = () => (
-        capability.hasOpfsDbCtor ||
-        capability.hasOpfsVfs ||
-        capability.hasWasmfsDir ||
-        capability.hasOpfsImportDb ||
-        capability.hasOpfsSahpoolVfs
-    );
+    syncCapabilityIntoDiagnostics(sqlite3);
     reportDiagnostics('opfs-open-begin', {
         caller,
-        allowFallback,
-        forceFallback,
-        opfsReadyTimeoutMs,
-        context: contextDiagnostics,
+        allowFallback: false,
+        forceFallback: false,
+        opfsReadyTimeoutMs: 0,
+        context: lastOpenStorageDiagnostics.runtimeContext,
         diagnostics: lastOpenStorageDiagnostics,
     });
-    if (forceFallback) {
-        lastOpenStorageDiagnostics.mode = 'forced-fallback-disallowed';
-        reportDiagnostics('opfs-open-failed', {
-            stage: 'forced-fallback-disallowed',
-            caller,
-            context: contextDiagnostics,
-            diagnostics: lastOpenStorageDiagnostics,
-        });
-        throw new Error(`OPFS is required; forced fallback is disabled. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)}`);
-    }
-    if (!isOpfsReadyForOpen() && opfsReadyTimeoutMs > 0) {
-        const start = Date.now();
-        let waitAttempts = 0;
-        while ((Date.now() - start) < opfsReadyTimeoutMs) {
-            await sleep(100);
-            ++waitAttempts;
-            syncCapabilityIntoDiagnostics();
-            if (isOpfsReadyForOpen()) { break; }
-        }
-        lastOpenStorageDiagnostics.opfsReadyWait = {
-            attempts: waitAttempts,
-            elapsedMs: Date.now() - start,
-            ready: isOpfsReadyForOpen(),
-        };
-    }
-    syncCapabilityIntoDiagnostics();
-    /**
-     * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
-     */
-    const tryOpenWasmfsPersistent = () => {
-        const persistentPaths = getWasmfsDatabasePaths(sqlite3);
-        for (const dbPath of persistentPaths) {
-            for (const flags of ['cw']) {
-                try {
-                    return new sqlite3.oo1.DB(dbPath, flags);
-                } catch (error) {
-                    pushAttemptError('wasmfs-persistent', dbPath, flags, error);
-                    // Try the next wasmfs path/flag combination.
-                }
-            }
-        }
-        return null;
-    };
-    /**
-     * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
-     */
-    const tryOpenViaUri = () => {
-        for (const dbPath of getDatabasePaths()) {
-            const uri = `file:${dbPath}?vfs=opfs`;
-            for (const flags of ['cw']) {
-                try {
-                    return new sqlite3.oo1.DB(uri, flags);
-                } catch (error) {
-                    pushAttemptError('uri-opfs', uri, flags, error);
-                    // Try the next URI/flag combination.
-                }
-            }
-        }
-        return null;
-    };
-    /**
-     * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
-     */
-    const tryOpenViaSahpoolUri = () => {
-        for (const dbPath of getDatabasePaths()) {
-            const uri = `file:${dbPath}?vfs=${OPFS_SAHPOOL_VFS_NAME}`;
-            for (const flags of ['cw']) {
-                try {
-                    return new sqlite3.oo1.DB(uri, flags);
-                } catch (error) {
-                    pushAttemptError('uri-opfs-sahpool', uri, flags, error);
-                    // Try the next URI/flag combination.
-                }
-            }
-        }
-        return null;
-    };
-    /**
-     * @returns {Promise<boolean>}
-     */
-    const ensureOpfsSahpoolVfs = async () => {
-        const findVfs2 = sqlite3?.capi?.sqlite3_vfs_find;
-        if (typeof findVfs2 === 'function' && isNonZeroPointer(findVfs2(OPFS_SAHPOOL_VFS_NAME))) {
-            lastOpenStorageDiagnostics.opfsSahpoolInstallAttempted = false;
-            lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'already-registered';
-            lastOpenStorageDiagnostics.opfsSahpoolInstallError = null;
-            return true;
-        }
-        if (typeof installOpfsSAHPoolVfs !== 'function') {
-            lastOpenStorageDiagnostics.opfsSahpoolInstallAttempted = false;
-            lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'unavailable';
-            lastOpenStorageDiagnostics.opfsSahpoolInstallError = null;
-            return false;
-        }
-        if (opfsSahpoolInstallPromise === null) {
-            opfsSahpoolInstallPromise = (async () => {
-                lastOpenStorageDiagnostics.opfsSahpoolInstallAttempted = true;
-                try {
-                    await /** @type {(opts: {name?: string}) => Promise<unknown>} */ (installOpfsSAHPoolVfs)({
-                        name: OPFS_SAHPOOL_VFS_NAME,
-                    });
-                    lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'installed';
-                    lastOpenStorageDiagnostics.opfsSahpoolInstallError = null;
-                    return true;
-                } catch (error) {
-                    const message = (error instanceof Error) ? error.message : String(error);
-                    lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'failed';
-                    lastOpenStorageDiagnostics.opfsSahpoolInstallError = message;
-                    pushAttemptError('install-opfs-sahpool-vfs', OPFS_SAHPOOL_VFS_NAME, '-', error);
-                    return false;
-                }
-            })();
-        }
-        const installed = await opfsSahpoolInstallPromise;
-        syncCapabilityIntoDiagnostics();
-        if (typeof findVfs2 === 'function') {
-            const available = isNonZeroPointer(findVfs2(OPFS_SAHPOOL_VFS_NAME));
-            if (!available && installed && lastOpenStorageDiagnostics.opfsSahpoolInstallResult === 'installed') {
-                lastOpenStorageDiagnostics.opfsSahpoolInstallResult = 'installed-but-unregistered';
-            }
-            return available;
-        }
-        return installed;
-    };
-    if (typeof sqlite3.oo1.OpfsDb === 'function') {
-        const OpfsDb = sqlite3.oo1.OpfsDb;
-        /**
-         * @returns {import('@sqlite.org/sqlite-wasm').Database|null}
-         */
-        const tryOpen = () => {
-            for (const dbPath of getDatabasePaths()) {
-                for (const flags of ['cw']) {
-                    try {
-                        return new OpfsDb(dbPath, flags);
-                    } catch (error) {
-                        pushAttemptError('opfsdb', dbPath, flags, error);
-                        // Try the next path/flag combination.
-                    }
-                }
-            }
-            return null;
-        };
-
-        /**
-         * @returns {Promise<import('@sqlite.org/sqlite-wasm').Database|null>}
-         */
-        const tryOpenWithRetry = async () => {
-            const maxAttempts = 8;
-            for (let attempt = 0; attempt < maxAttempts; ++attempt) {
-                const opened = tryOpen();
-                if (opened !== null) { return opened; }
-                const retryableError = attempts.length > 0 ? attempts[attempts.length - 1].error : '';
-                const retryableErrorClass = classifyOpenFailureMessage(retryableError);
-                const shouldRetry = (
-                    retryableErrorClass === 'lock-contention' ||
-                    retryableErrorClass === 'transient-open-race'
-                );
-                if (!shouldRetry) { break; }
-                await sleep(getOpenRetryDelayMs(attempt));
-            }
-            return null;
-        };
-
-        const opened = await tryOpenWithRetry();
-        if (opened !== null) {
-            lastOpenStorageDiagnostics.mode = 'opfsdb';
-            reportDiagnostics('opfs-open-success', {
-                caller,
-                context: contextDiagnostics,
-                diagnostics: lastOpenStorageDiagnostics,
-            });
-            return opened;
-        }
-    }
-
-    const openedViaUri = tryOpenViaUri();
-    if (openedViaUri !== null) {
-        lastOpenStorageDiagnostics.mode = 'uri-opfs';
-        reportDiagnostics('opfs-open-success', {
-            caller,
-            context: contextDiagnostics,
-            diagnostics: lastOpenStorageDiagnostics,
-        });
-        return openedViaUri;
-    }
-
-    const openedViaWasmfsPersistentPath = tryOpenWasmfsPersistent();
-    if (openedViaWasmfsPersistentPath !== null) {
-        lastOpenStorageDiagnostics.mode = 'wasmfs-persistent';
-        reportDiagnostics('opfs-open-success', {
-            caller,
-            context: contextDiagnostics,
-            diagnostics: lastOpenStorageDiagnostics,
-        });
-        return openedViaWasmfsPersistentPath;
-    }
-
-    if (await ensureOpfsSahpoolVfs()) {
-        const openedViaSahpoolUri = tryOpenViaSahpoolUri();
-        if (openedViaSahpoolUri !== null) {
-            lastOpenStorageDiagnostics.mode = 'uri-opfs-sahpool';
-            syncCapabilityIntoDiagnostics();
-            reportDiagnostics('opfs-open-success', {
-                caller,
-                context: contextDiagnostics,
-                diagnostics: lastOpenStorageDiagnostics,
-            });
-            return openedViaSahpoolUri;
-        }
-        syncCapabilityIntoDiagnostics();
-    }
-
-    if (!allowFallback) {
-        syncCapabilityIntoDiagnostics();
-        lastOpenStorageDiagnostics.mode = 'opfs-unavailable';
-        reportDiagnostics('opfs-open-failed', {
-            stage: 'opfs-unavailable',
-            caller,
-            context: contextDiagnostics,
-            diagnostics: lastOpenStorageDiagnostics,
-            failureClass: lastOpenStorageDiagnostics.openFailureClass,
-        });
-        throw new Error(`OPFS is required but unavailable. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)}`);
-    }
-
-    lastOpenUsedFallbackStorage = true;
     try {
-        lastOpenStorageDiagnostics.mode = 'fallback-memory';
-        reportDiagnostics('opfs-open-fallback-memory', {
+        const poolUtil = await ensureOpfsSahpool(sqlite3);
+        lastOpenStorageDiagnostics.mode = 'opfs-sahpool';
+        lastOpenStorageDiagnostics.hasOpfsSahpoolVfs = true;
+        lastOpenStorageDiagnostics.opfsSahpoolCapacity = poolUtil.getCapacity();
+        lastOpenStorageDiagnostics.opfsSahpoolFileCount = poolUtil.getFileCount();
+        lastOpenStorageDiagnostics.opfsSahpoolFileNames = poolUtil.getFileNames();
+        const opened = new poolUtil.OpfsSAHPoolDb(DICTIONARY_DB_FILE);
+        reportDiagnostics('opfs-open-success', {
             caller,
-            context: contextDiagnostics,
+            context: lastOpenStorageDiagnostics.runtimeContext,
             diagnostics: lastOpenStorageDiagnostics,
         });
-        return new sqlite3.oo1.DB(':memory:', 'ct');
-    } catch (e) {
-        lastOpenStorageDiagnostics.mode = 'fallback-memory-open-failed';
-        lastOpenStorageDiagnostics.openFailureClass = classifyOpenFailureMessage(String(e));
+        return opened;
+    } catch (error) {
+        syncCapabilityIntoDiagnostics(sqlite3);
+        lastOpenStorageDiagnostics.mode = 'opfs-sahpool-unavailable';
+        if (lastOpenStorageDiagnostics.openFailureClass === null) {
+            lastOpenStorageDiagnostics.openFailureClass = classifyOpenFailureMessage((error instanceof Error) ? error.message : String(error));
+        }
         reportDiagnostics('opfs-open-failed', {
-            stage: 'fallback-memory-open-failed',
+            stage: 'opfs-sahpool-unavailable',
             caller,
-            context: contextDiagnostics,
+            context: lastOpenStorageDiagnostics.runtimeContext,
             diagnostics: lastOpenStorageDiagnostics,
             failureClass: lastOpenStorageDiagnostics.openFailureClass,
-            error: String(e),
         });
-        throw new Error(`Fallback in-memory database open failed. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)} error=${String(e)}`);
+        throw new Error(`OPFS sahpool database open failed: ${(error instanceof Error) ? error.message : String(error)}. diagnostics=${JSON.stringify(lastOpenStorageDiagnostics)}`);
     }
 }
 
@@ -645,11 +373,11 @@ export async function openOpfsDatabase(caller = 'unknown') {
  * @returns {boolean}
  */
 export function didLastOpenUseFallbackStorage() {
-    return lastOpenUsedFallbackStorage;
+    return false;
 }
 
 /**
- * @returns {{mode: string, caller: string, runtimeContext: ReturnType<typeof getRuntimeContextDiagnostics>|null, forceFallback: boolean, opfsReadyTimeoutMs: number, opfsReadyWait: {attempts: number, elapsedMs: number, ready: boolean}|null, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasInstallOpfsSAHPoolVfs: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null, openFailureClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'unknown'|null}}
+ * @returns {{mode: string, caller: string, runtimeContext: ReturnType<typeof getRuntimeContextDiagnostics>|null, forceFallback: boolean, opfsReadyTimeoutMs: number, opfsReadyWait: {attempts: number, elapsedMs: number, ready: boolean}|null, hasOpfsDbCtor: boolean, hasOpfsImportDb: boolean, hasWasmfsDir: boolean, hasInstallOpfsSAHPoolVfs: boolean, hasOpfsVfs: boolean, hasOpfsSahpoolVfs: boolean, opfsVfsPtr: string|number|null, opfsSahpoolVfsPtr: string|number|null, opfsSahpoolInstallAttempted: boolean, opfsSahpoolInstallResult: string|null, opfsSahpoolInstallError: string|null, opfsSahpoolDirectory: string|null, opfsSahpoolCapacity: number|null, opfsSahpoolFileCount: number|null, opfsSahpoolFileNames: string[]|null, openFailureClass: 'unsupported-opfs'|'lock-contention'|'corruption'|'transient-open-race'|'worker-required'|'unknown'|null}}
  */
 export function getLastOpenStorageDiagnostics() {
     return {...lastOpenStorageDiagnostics};
@@ -660,26 +388,22 @@ export function getLastOpenStorageDiagnostics() {
  */
 export async function deleteOpfsDatabaseFiles() {
     const sqlite3 = await getSqlite3();
-    const allowFallback = (
-        Reflect.get(globalThis, 'manabitanRequireOpfs') === false ||
-        Reflect.get(globalThis, 'manabitanAllowSqliteMemoryFallback') === true ||
-        typeof Reflect.get(globalThis, 'chrome') === 'undefined'
-    );
-    const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
-    if (typeof opfs?.unlink !== 'function') {
+    syncCapabilityIntoDiagnostics(sqlite3);
+    try {
+        const poolUtil = await ensureOpfsSahpool(sqlite3);
+        await poolUtil.wipeFiles();
+        lastOpenStorageDiagnostics.opfsSahpoolCapacity = poolUtil.getCapacity();
+        lastOpenStorageDiagnostics.opfsSahpoolFileCount = poolUtil.getFileCount();
+        lastOpenStorageDiagnostics.opfsSahpoolFileNames = poolUtil.getFileNames();
+        return true;
+    } catch (error) {
         reportDiagnostics('opfs-delete-files-unavailable', {
-            allowFallback,
             context: getRuntimeContextDiagnostics(),
             diagnostics: getLastOpenStorageDiagnostics(),
+            error: (error instanceof Error) ? error.message : String(error),
         });
-        if (allowFallback) {
-            return false;
-        }
-        throw new Error('OPFS unlink API is unavailable');
+        throw error;
     }
-    await deleteOpfsDatabaseFilesInternal(opfs);
-
-    return true;
 }
 
 /**
@@ -688,23 +412,20 @@ export async function deleteOpfsDatabaseFiles() {
  */
 export async function importOpfsDatabase(content) {
     const sqlite3 = await getSqlite3();
-    const opfs = /** @type {{opfs?: SqliteOpfsApi}} */ (/** @type {unknown} */ (sqlite3)).opfs;
-    if (typeof opfs?.importDb !== 'function') {
+    syncCapabilityIntoDiagnostics(sqlite3);
+    try {
+        const poolUtil = await ensureOpfsSahpool(sqlite3);
+        await poolUtil.importDb(DICTIONARY_DB_FILE, new Uint8Array(content));
+        lastOpenStorageDiagnostics.opfsSahpoolCapacity = poolUtil.getCapacity();
+        lastOpenStorageDiagnostics.opfsSahpoolFileCount = poolUtil.getFileCount();
+        lastOpenStorageDiagnostics.opfsSahpoolFileNames = poolUtil.getFileNames();
+    } catch (error) {
         reportDiagnostics('opfs-import-db-unavailable', {
             context: getRuntimeContextDiagnostics(),
             diagnostics: getLastOpenStorageDiagnostics(),
             contentBytes: content.byteLength,
+            error: (error instanceof Error) ? error.message : String(error),
         });
-        throw new Error('OPFS importDb API is unavailable');
+        throw error;
     }
-    const bytes = new Uint8Array(content);
-    for (const dbPath of getDatabasePaths()) {
-        try {
-            await opfs.importDb(dbPath, bytes);
-            return;
-        } catch (_) {
-            // Try alternate path variant.
-        }
-    }
-    throw new Error('Failed to import OPFS database using available path variants');
 }

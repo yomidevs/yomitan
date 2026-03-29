@@ -384,11 +384,23 @@ function isOpfsRuntimeAvailable(runtimeDiagnostics) {
     if (!(runtimeDiagnostics && typeof runtimeDiagnostics === 'object')) {
         return false;
     }
-    const hasCtor = runtimeDiagnostics.hasOpfsDbCtor === true;
-    const hasImportDb = runtimeDiagnostics.hasOpfsImportDb === true;
     const hasStorageDir = runtimeDiagnostics.hasStorageGetDirectory === true;
-    const hasVfs = typeof runtimeDiagnostics.opfsVfsPtr === 'number' ? runtimeDiagnostics.opfsVfsPtr > 0 : runtimeDiagnostics.opfsVfsPtr !== null;
-    return hasCtor && hasImportDb && hasStorageDir && hasVfs;
+    const workerRuntimeContext = (
+        runtimeDiagnostics.openStorageDiagnostics &&
+        typeof runtimeDiagnostics.openStorageDiagnostics === 'object' &&
+        !Array.isArray(runtimeDiagnostics.openStorageDiagnostics) &&
+        runtimeDiagnostics.openStorageDiagnostics.runtimeContext &&
+        typeof runtimeDiagnostics.openStorageDiagnostics.runtimeContext === 'object' &&
+        !Array.isArray(runtimeDiagnostics.openStorageDiagnostics.runtimeContext)
+    ) ? runtimeDiagnostics.openStorageDiagnostics.runtimeContext : null;
+    const hasSyncAccessHandle = (
+        runtimeDiagnostics.hasCreateSyncAccessHandle === true ||
+        workerRuntimeContext?.hasCreateSyncAccessHandle === true
+    );
+    const hasSahpoolVfs = runtimeDiagnostics.hasOpfsSahpoolVfs === true;
+    const installResult = typeof runtimeDiagnostics.opfsSahpoolInstallResult === 'string' ? runtimeDiagnostics.opfsSahpoolInstallResult : null;
+    const mode = typeof runtimeDiagnostics.openStorageMode === 'string' ? runtimeDiagnostics.openStorageMode : null;
+    return hasStorageDir && hasSyncAccessHandle && hasSahpoolVfs && installResult !== 'failed' && mode === 'opfs-sahpool';
 }
 
 function appendLog(report, level, message) {
@@ -2844,20 +2856,38 @@ async function main() {
                         resolve(snapshot ?? null);
                     });
                 });
-                let opfsVfsPtr = null;
+                let opfsSahpoolVfsPtr = null;
                 if (typeof (capi && capi.sqlite3_vfs_find) === 'function') {
-                    opfsVfsPtr = capi.sqlite3_vfs_find('opfs');
+                    opfsSahpoolVfsPtr = capi.sqlite3_vfs_find('opfs-sahpool');
                 }
+                const startupOpenStorageDiagnostics = (
+                    startupDiagnosticsSnapshot &&
+                    typeof startupDiagnosticsSnapshot === 'object' &&
+                    !Array.isArray(startupDiagnosticsSnapshot) &&
+                    typeof startupDiagnosticsSnapshot.dictionaryOpenStorageDiagnostics === 'object' &&
+                    startupDiagnosticsSnapshot.dictionaryOpenStorageDiagnostics !== null
+                ) ? startupDiagnosticsSnapshot.dictionaryOpenStorageDiagnostics : null;
                 return {
-                    crossOriginIsolated: globalThis.crossOriginIsolated === true,
-                    hasSharedArrayBuffer: typeof SharedArrayBuffer === 'function',
-                    hasAtomics: typeof Atomics === 'object' && Atomics !== null,
                     hasStorageGetDirectory: !!(navigator.storage && typeof navigator.storage.getDirectory === 'function'),
-                    hasOpfsDbCtor: typeof (sqlite3 && sqlite3.oo1 && sqlite3.oo1.OpfsDb) === 'function',
-                    hasOpfsImportDb: typeof (sqlite3 && sqlite3.opfs && sqlite3.opfs.importDb) === 'function',
-                    opfsVfsPtr,
-                    manifestCoop: manifest.cross_origin_opener_policy || null,
-                    manifestCoep: manifest.cross_origin_embedder_policy || null,
+                    hasCreateSyncAccessHandle: !!(
+                        globalThis.FileSystemFileHandle &&
+                        globalThis.FileSystemFileHandle.prototype &&
+                        typeof globalThis.FileSystemFileHandle.prototype.createSyncAccessHandle === 'function'
+                    ),
+                    hasOpfsSahpoolVfs: (
+                        startupOpenStorageDiagnostics &&
+                        typeof startupOpenStorageDiagnostics.hasOpfsSahpoolVfs === 'boolean'
+                    ) ? startupOpenStorageDiagnostics.hasOpfsSahpoolVfs : false,
+                    opfsSahpoolVfsPtr,
+                    opfsSahpoolInstallResult: (
+                        startupOpenStorageDiagnostics &&
+                        typeof startupOpenStorageDiagnostics.opfsSahpoolInstallResult === 'string'
+                    ) ? startupOpenStorageDiagnostics.opfsSahpoolInstallResult : null,
+                    openStorageMode: (
+                        startupOpenStorageDiagnostics &&
+                        typeof startupOpenStorageDiagnostics.mode === 'string'
+                    ) ? startupOpenStorageDiagnostics.mode : null,
+                    openStorageDiagnostics: startupOpenStorageDiagnostics,
                     startupDiagnosticsSnapshot,
                 };
             });

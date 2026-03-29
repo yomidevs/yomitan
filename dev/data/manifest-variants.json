@@ -33,12 +33,6 @@
             "service_worker": "sw.js",
             "type": "module"
         },
-        "cross_origin_opener_policy": {
-            "value": "same-origin"
-        },
-        "cross_origin_embedder_policy": {
-            "value": "require-corp"
-        },
         "omnibox": {
             "keyword": "yomi"
         },
@@ -277,6 +271,18 @@
                         "permissions"
                     ],
                     "item": "offscreen"
+                },
+                {
+                    "action": "delete",
+                    "path": [
+                        "cross_origin_opener_policy"
+                    ]
+                },
+                {
+                    "action": "delete",
+                    "path": [
+                        "cross_origin_embedder_policy"
+                    ]
                 }
             ],
             "excludeFiles": [

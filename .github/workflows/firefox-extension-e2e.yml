@@ -114,10 +114,13 @@ jobs:
           const report = JSON.parse(fs.readFileSync(path, 'utf8'));
           const phases = Array.isArray(report.phases) ? report.phases : [];
           const runtime = report.runtimeDiagnostics && typeof report.runtimeDiagnostics === 'object' ? report.runtimeDiagnostics : null;
+          const workerRuntimeContext = runtime && runtime.openStorageDiagnostics && typeof runtime.openStorageDiagnostics === 'object' ? runtime.openStorageDiagnostics.runtimeContext : null;
           const opfsReady = runtime ? (
-            runtime.crossOriginIsolated === true &&
-            runtime.hasSharedArrayBuffer === true &&
-            runtime.hasAtomics === true
+            runtime.hasStorageGetDirectory === true &&
+            (runtime.hasCreateSyncAccessHandle === true || (workerRuntimeContext && workerRuntimeContext.hasCreateSyncAccessHandle === true)) &&
+            runtime.hasOpfsSahpoolVfs === true &&
+            runtime.opfsSahpoolInstallResult !== 'failed' &&
+            runtime.openStorageMode === 'opfs-sahpool'
           ) : null;
           const top = [...phases].sort((a, b) => Number(b.durationMs || 0) - Number(a.durationMs || 0)).slice(0, 5);
           const lines = [

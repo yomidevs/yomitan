@@ -23,14 +23,10 @@ import {log} from '../../core/log.js';
 import {safePerformance} from '../../core/safe-performance.js';
 import {toError} from '../../core/to-error.js';
 import {getKebabCase} from '../../data/anki-template-util.js';
-import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryController} from './dictionary-controller.js';
 
 const OPFS_REQUIRED_USER_MESSAGE = 'Manabitan requires OPFS storage support.';
-const OFFSCREEN_IMPORT_SMALL_ARCHIVE_MIN_BYTES = 32 * 1024 * 1024;
-const OFFSCREEN_IMPORT_SMALL_ARCHIVE_MAX_BYTES = 96 * 1024 * 1024;
-const OFFSCREEN_IMPORT_LARGE_ARCHIVE_MIN_BYTES = 256 * 1024 * 1024;
 
 /**
  * @param {number} valueMs
@@ -157,7 +153,10 @@ function isOpfsUnavailableMessage(message) {
         message.includes('OPFS is required') ||
         message.includes('OPFS unlink API is unavailable') ||
         message.includes('OPFS importDb API is unavailable') ||
-        message.includes('no such vfs: opfs')
+        message.includes('no such vfs: opfs') ||
+        message.includes('opfs-sahpool') ||
+        message.includes('DedicatedWorkerGlobalScope') ||
+        message.includes('createSyncAccessHandle')
     );
 }
 
@@ -171,37 +170,36 @@ function getOpfsUnavailableUserMessage(message) {
     const isFirefoxRuntime = /Firefox\//i.test(userAgent);
     const storageValue = /** @type {Record<string, unknown>} */ (Reflect.get(navigator ?? {}, 'storage') ?? {});
     const hasStorageGetDirectoryFallback = typeof Reflect.get(storageValue, 'getDirectory') === 'function';
-    const hasSharedArrayBufferFallback = typeof Reflect.get(globalThis, 'SharedArrayBuffer') === 'function';
-    const hasAtomicsFallback = typeof Reflect.get(globalThis, 'Atomics') === 'object' && Reflect.get(globalThis, 'Atomics') !== null;
-    const crossOriginIsolatedValue = Reflect.get(globalThis, 'crossOriginIsolated');
-    const crossOriginIsolatedFallback = typeof crossOriginIsolatedValue === 'boolean' ? crossOriginIsolatedValue : null;
+    const hasCreateSyncAccessHandleFallback = (
+        typeof Reflect.get(globalThis, 'FileSystemFileHandle') === 'function' &&
+        typeof Reflect.get(
+            /** @type {{prototype?: Record<string, unknown>}} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'FileSystemFileHandle'))).prototype ?? {},
+            'createSyncAccessHandle',
+        ) === 'function'
+    );
     const formatFallbackDiagnostics = () => (
         `Runtime diagnostics: storage.getDirectory=${String(hasStorageGetDirectoryFallback)}, ` +
-        `SharedArrayBuffer=${String(hasSharedArrayBufferFallback)}, ` +
-        `Atomics=${String(hasAtomicsFallback)}, ` +
-        `crossOriginIsolated=${String(crossOriginIsolatedFallback)}.`
+        `createSyncAccessHandle=${String(hasCreateSyncAccessHandleFallback)}.`
     );
     const diagnosticsMatch = message.match(/diagnostics=(\{.*\})/);
     if (diagnosticsMatch === null) {
         if (isFirefoxRuntime) {
-            return `${base} This Firefox extension runtime is missing the storage or isolation features required for SQLite + OPFS. This is usually an extension security limitation, not a missing permission. ${formatFallbackDiagnostics()}`;
+            return `${base} This Firefox extension runtime is missing the worker OPFS APIs required for SQLite + opfs-sahpool. ${formatFallbackDiagnostics()}`;
         }
-        return `${base} Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension. ${formatFallbackDiagnostics()}`;
+        return `${base} Update to a browser/runtime which exposes worker OPFS SyncAccessHandle support and reload the extension. ${formatFallbackDiagnostics()}`;
     }
     try {
         const diagnostics = parseJson(diagnosticsMatch[1]);
         if (!(typeof diagnostics === 'object' && diagnostics !== null && !Array.isArray(diagnostics))) {
             if (isFirefoxRuntime) {
-                return `${base} This Firefox extension runtime is missing the storage or isolation features required for SQLite + OPFS. This is usually an extension security limitation, not a missing permission. ${formatFallbackDiagnostics()}`;
+                return `${base} This Firefox extension runtime is missing the worker OPFS APIs required for SQLite + opfs-sahpool. ${formatFallbackDiagnostics()}`;
             }
-            return `${base} Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension. ${formatFallbackDiagnostics()}`;
+            return `${base} Update to a browser/runtime which exposes worker OPFS SyncAccessHandle support and reload the extension. ${formatFallbackDiagnostics()}`;
         }
         const runtimeContext = Reflect.get(diagnostics, 'runtimeContext');
         const mode = typeof Reflect.get(diagnostics, 'mode') === 'string' ? Reflect.get(diagnostics, 'mode') : 'unknown';
         const hasStorageGetDirectory = typeof Reflect.get(runtimeContext ?? {}, 'hasStorageGetDirectory') === 'boolean' ? Reflect.get(runtimeContext ?? {}, 'hasStorageGetDirectory') : null;
-        const hasSharedArrayBuffer = typeof Reflect.get(runtimeContext ?? {}, 'hasSharedArrayBuffer') === 'boolean' ? Reflect.get(runtimeContext ?? {}, 'hasSharedArrayBuffer') : null;
-        const hasAtomics = typeof Reflect.get(runtimeContext ?? {}, 'hasAtomics') === 'boolean' ? Reflect.get(runtimeContext ?? {}, 'hasAtomics') : null;
-        const crossOriginIsolated = typeof Reflect.get(runtimeContext ?? {}, 'crossOriginIsolated') === 'boolean' ? Reflect.get(runtimeContext ?? {}, 'crossOriginIsolated') : null;
+        const hasCreateSyncAccessHandle = typeof Reflect.get(runtimeContext ?? {}, 'hasCreateSyncAccessHandle') === 'boolean' ? Reflect.get(runtimeContext ?? {}, 'hasCreateSyncAccessHandle') : null;
         const opfsSahpoolInstallResult = typeof Reflect.get(diagnostics, 'opfsSahpoolInstallResult') === 'string' ? Reflect.get(diagnostics, 'opfsSahpoolInstallResult') : null;
         const opfsSahpoolInstallError = typeof Reflect.get(diagnostics, 'opfsSahpoolInstallError') === 'string' ? Reflect.get(diagnostics, 'opfsSahpoolInstallError') : null;
         const opfsSahpoolVfs = typeof Reflect.get(diagnostics, 'hasOpfsSahpoolVfs') === 'boolean' ? Reflect.get(diagnostics, 'hasOpfsSahpoolVfs') : null;
@@ -213,30 +211,30 @@ function getOpfsUnavailableUserMessage(message) {
             .at(-1) ?? null;
         const runtimeUserAgent = typeof Reflect.get(runtimeContext ?? {}, 'userAgent') === 'string' ? Reflect.get(runtimeContext ?? {}, 'userAgent') : '';
         const isFirefoxRuntimeFromDiagnostics = /Firefox\//i.test(runtimeUserAgent) || isFirefoxRuntime;
-        let reason = 'Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension.';
+        let reason = 'Update to a browser/runtime which exposes worker OPFS SyncAccessHandle support and reload the extension.';
         if (isFirefoxRuntimeFromDiagnostics) {
             if (hasStorageGetDirectory !== true) {
-                reason = 'This Firefox runtime does not expose the required OPFS API to the extension. Make sure you loaded the current Firefox build and reload the extension.';
-            } else if (hasSharedArrayBuffer !== true || hasAtomics !== true || crossOriginIsolated !== true) {
-                reason = 'This Firefox extension runtime is missing the isolation features required for SQLite + OPFS. This is a browser extension security limitation, not a missing permission.';
+                reason = 'This Firefox runtime does not expose navigator.storage.getDirectory() to the extension worker runtime.';
+            } else if (hasCreateSyncAccessHandle !== true) {
+                reason = 'This Firefox runtime does not expose createSyncAccessHandle() to the extension worker runtime.';
             } else {
-                reason = 'This Firefox extension runtime still rejected the OPFS backend even though the basic APIs are present. Reload the extension, and if it persists, use the standard Firefox build or a Chromium-based build.';
+                reason = 'This Firefox extension runtime still rejected opfs-sahpool even though the basic worker OPFS APIs are present.';
             }
         } else if (hasStorageGetDirectory !== true) {
-            reason = 'This browser runtime does not expose the required OPFS API to the extension. Update the browser and reload the extension.';
-        } else if (hasSharedArrayBuffer !== true || hasAtomics !== true || crossOriginIsolated !== true) {
-            reason = 'This extension runtime is missing the isolation features required for SQLite + OPFS. Reload the extension or use a runtime with SharedArrayBuffer support.';
+            reason = 'This browser runtime does not expose navigator.storage.getDirectory() to the extension worker runtime.';
+        } else if (hasCreateSyncAccessHandle !== true) {
+            reason = 'This browser runtime does not expose createSyncAccessHandle() to the extension worker runtime.';
         }
         let sahpoolDetails = '';
         if (opfsSahpoolInstallResult !== null || opfsSahpoolVfs !== null || opfsSahpoolInstallError !== null || lastSahpoolOpenError !== null) {
             sahpoolDetails = ` opfs-sahpool: install=${String(opfsSahpoolInstallResult)}, vfs=${String(opfsSahpoolVfs)}, installError=${String(opfsSahpoolInstallError)}, openError=${String(lastSahpoolOpenError)}.`;
         }
-        return `${base} ${reason} Runtime diagnostics: mode=${mode}, storage.getDirectory=${String(hasStorageGetDirectory)}, SharedArrayBuffer=${String(hasSharedArrayBuffer)}, Atomics=${String(hasAtomics)}, crossOriginIsolated=${String(crossOriginIsolated)}.${sahpoolDetails}`;
+        return `${base} ${reason} Runtime diagnostics: mode=${mode}, storage.getDirectory=${String(hasStorageGetDirectory)}, createSyncAccessHandle=${String(hasCreateSyncAccessHandle)}.${sahpoolDetails}`;
     } catch (_) {
         if (isFirefoxRuntime) {
-            return `${base} This Firefox extension runtime is missing the storage or isolation features required for SQLite + OPFS. This is usually an extension security limitation, not a missing permission. ${formatFallbackDiagnostics()}`;
+            return `${base} This Firefox extension runtime is missing the worker OPFS APIs required for SQLite + opfs-sahpool. ${formatFallbackDiagnostics()}`;
         }
-        return `${base} Update to Chrome/Edge 120+ or Firefox 115+ and reload the extension. ${formatFallbackDiagnostics()}`;
+        return `${base} Update to a browser/runtime which exposes worker OPFS SyncAccessHandle support and reload the extension. ${formatFallbackDiagnostics()}`;
     }
 }
 
@@ -249,7 +247,9 @@ function classifyImportOpenFailure(message) {
     if (
         text.includes('no such vfs') ||
         text.includes('opfs is required') ||
-        text.includes('missing sharedarraybuffer')
+        text.includes('createSyncAccessHandle'.toLowerCase()) ||
+        text.includes('dedicatedworkerglobalscope') ||
+        text.includes('opfs-sahpool')
     ) {
         return 'unsupported-opfs';
     }
@@ -377,8 +377,6 @@ export class DictionaryImportController {
         this._recommendedDictionaryQueue = [];
         /** @type {boolean} */
         this._recommendedDictionaryActiveImport = false;
-        /** @type {DictionaryWorker|null} */
-        this._sessionDictionaryWorker = null;
         /** @type {boolean} */
         this._recommendedDictionariesRenderPending = false;
         /** @type {boolean} */
@@ -432,121 +430,17 @@ export class DictionaryImportController {
     // Private
 
     /**
-     * @param {boolean} useImportSession
-     * @returns {DictionaryWorker}
-     */
-    _getDictionaryWorker(useImportSession) {
-        if (!useImportSession) {
-            return new DictionaryWorker({reuseWorker: false});
-        }
-        if (this._sessionDictionaryWorker === null) {
-            this._sessionDictionaryWorker = new DictionaryWorker({reuseWorker: true});
-        }
-        return this._sessionDictionaryWorker;
-    }
-
-    /**
-     * @param {DictionaryWorker} dictionaryWorker
-     * @param {boolean} useImportSession
-     */
-    _releaseDictionaryWorker(dictionaryWorker, useImportSession) {
-        if (useImportSession) {
-            if (this._sessionDictionaryWorker === dictionaryWorker) {
-                this._sessionDictionaryWorker.destroy();
-                this._sessionDictionaryWorker = null;
-            }
-            return;
-        }
-        dictionaryWorker.destroy();
-    }
-
-    /**
      * @param {File} archiveContent
      * @param {import('dictionary-importer').ImportDetails} details
      * @param {?import('dictionary-worker').ImportProgressCallback} onProgress
-     * @returns {Promise<(import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}) | null>}
+     * @returns {Promise<import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}>}
      */
     async _tryImportDictionaryOffscreen(archiveContent, details, onProgress) {
-        if (!(archiveContent instanceof Blob) || !this._shouldUseOffscreenImport(archiveContent.size)) {
-            return null;
+        if (!(archiveContent instanceof Blob)) {
+            throw new Error('Dictionary import requires Blob-backed archive content');
         }
-        if (!('serviceWorker' in navigator)) { return null; }
-        const serviceWorkerReady = await navigator.serviceWorker.ready.catch(() => null);
-        const serviceWorker = serviceWorkerReady?.active ?? null;
-        if (serviceWorker === null) { return null; }
-        const channel = new MessageChannel();
-        const resultPromise = new Promise((resolve, reject) => {
-            channel.port1.onmessage = (event) => {
-                const eventData = /** @type {unknown} */ (event.data);
-                /** @type {{type?: string, progress?: unknown, result?: unknown, error?: import('core').SerializedError}|null} */
-                let data = null;
-                if (
-                    typeof eventData === 'object' &&
-                    eventData !== null &&
-                    !Array.isArray(eventData)
-                ) {
-                    data = /** @type {{type?: string, progress?: unknown, result?: unknown, error?: import('core').SerializedError}} */ (eventData);
-                }
-                switch (data?.type) {
-                    case 'progress':
-                        onProgress?.(/** @type {import('dictionary-importer').ProgressData} */ (data.progress));
-                        return;
-                    case 'complete':
-                        channel.port1.close();
-                        resolve(data.result ?? null);
-                        return;
-                    case 'error':
-                        channel.port1.close();
-                        reject(new Error('Offscreen import failed'));
-                        return;
-                    default:
-                        return;
-                }
-            };
-            channel.port1.onmessageerror = () => {
-                channel.port1.close();
-                reject(new Error('Offscreen import response channel failed'));
-            };
-        });
-        serviceWorker.postMessage({
-            action: 'importDictionaryOffscreen',
-            params: {archiveContent, details},
-        }, [channel.port2]);
-        try {
-            return /** @type {(import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}) | null} */ (await resultPromise);
-        } catch (error) {
-            log.log(`[ImportTiming] offscreen import unavailable, falling back to local worker: ${toError(error).message}`);
-            channel.port1.close();
-            return null;
-        }
-    }
-
-    /**
-     * @param {number} archiveSizeBytes
-     * @returns {boolean}
-     */
-    _shouldUseOffscreenImport(archiveSizeBytes) {
-        if (!Number.isFinite(archiveSizeBytes) || archiveSizeBytes <= 0) {
-            return false;
-        }
-        /** @type {number|null} */
-        let memoryGiB = null;
-        try {
-            const rawValue = /** @type {unknown} */ (Reflect.get(globalThis.navigator ?? {}, 'deviceMemory'));
-            if (typeof rawValue === 'number' && Number.isFinite(rawValue) && rawValue > 0) {
-                memoryGiB = rawValue;
-            }
-        } catch (_) {
-            // NOP
-        }
-        return (
-            (
-                archiveSizeBytes >= OFFSCREEN_IMPORT_SMALL_ARCHIVE_MIN_BYTES &&
-                archiveSizeBytes <= OFFSCREEN_IMPORT_SMALL_ARCHIVE_MAX_BYTES &&
-                memoryGiB !== null &&
-                memoryGiB <= 8
-            ) ||
-            archiveSizeBytes >= OFFSCREEN_IMPORT_LARGE_ARCHIVE_MIN_BYTES
+        return /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}} */ (
+            await this._settingsController.application.api.importDictionaryOffscreen(archiveContent, details, onProgress)
         );
     }
 
@@ -555,10 +449,6 @@ export class DictionaryImportController {
         document.removeEventListener('click', this._onDocumentClickCaptureBind, true);
         globalThis.removeEventListener('manabitan:modal-visibility-changed', this._onModalVisibilityChangedEventBind, false);
         this._recommendedDictionariesModal?.off('visibilityChanged', this._onRecommendedDictionariesModalVisibilityChangedBind);
-        if (this._sessionDictionaryWorker !== null) {
-            this._sessionDictionaryWorker.destroy();
-            this._sessionDictionaryWorker = null;
-        }
     }
 
     /**
@@ -1476,7 +1366,6 @@ export class DictionaryImportController {
             useImportSession,
             hasProfilesDictionarySettings: profilesDictionarySettings !== null,
         });
-        const dictionaryWorker = this._getDictionaryWorker(useImportSession);
         let importModeEnabled = false;
         const importStartTime = safePerformance.now();
         try {
@@ -1490,7 +1379,6 @@ export class DictionaryImportController {
             const optionsFull = await this._settingsController.getOptionsFull();
             const {
                 skipImageMetadata,
-                skipMediaImport,
                 mediaResolutionConcurrency,
                 debugImportLogging,
                 enableTermEntryContentDedup,
@@ -1500,7 +1388,6 @@ export class DictionaryImportController {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
                 yomitanVersion: chrome.runtime.getManifest().version,
                 skipImageMetadata,
-                skipMediaImport,
                 mediaResolutionConcurrency,
                 debugImportLogging,
                 enableTermEntryContentDedup,
@@ -1542,7 +1429,6 @@ export class DictionaryImportController {
                         file,
                         profilesDictionarySettings,
                         importDetails,
-                        dictionaryWorker,
                         useImportSession,
                         finalizeImportSession,
                         onProgress,
@@ -1580,7 +1466,6 @@ export class DictionaryImportController {
             for (const progress of [...progressContainers, ...recommendedProgressContainers]) { progress.hidden = true; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
             this._setModifying(false);
-            this._releaseDictionaryWorker(dictionaryWorker, useImportSession);
             if (importModeEnabled) {
                 try {
                     await this._settingsController.application.api.setDictionaryImportMode(false);
@@ -1616,18 +1501,17 @@ export class DictionaryImportController {
     }
 
     /**
-     * @returns {{skipImageMetadata: boolean, skipMediaImport: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes'}}
+     * @returns {{skipImageMetadata: boolean, mediaResolutionConcurrency: number, debugImportLogging: boolean, enableTermEntryContentDedup: boolean, termContentStorageMode: 'baseline'|'raw-bytes'}}
      */
     _getImportPerformanceFlags() {
         const flags = /** @type {unknown} */ (Reflect.get(globalThis, 'manabitanImportPerformanceFlags'));
         if (typeof flags !== 'object' || flags === null || Array.isArray(flags)) {
             return {
                 skipImageMetadata: false,
-                skipMediaImport: false,
                 mediaResolutionConcurrency: 8,
                 debugImportLogging: false,
                 enableTermEntryContentDedup: true,
-                termContentStorageMode: 'baseline',
+                termContentStorageMode: 'raw-bytes',
             };
         }
         const flagsRecord = /** @type {Record<string, unknown>} */ (flags);
@@ -1635,10 +1519,9 @@ export class DictionaryImportController {
         const termContentStorageModeRaw = flagsRecord.termContentStorageMode;
         const termContentStorageMode = (termContentStorageModeRaw === 'raw-bytes') ?
             termContentStorageModeRaw :
-            'baseline';
+            'raw-bytes';
         return {
             skipImageMetadata: flagsRecord.skipImageMetadata === true,
-            skipMediaImport: flagsRecord.skipMediaImport === true,
             mediaResolutionConcurrency: Math.max(1, Math.min(32, mediaResolutionConcurrency)),
             debugImportLogging: flagsRecord.debugImportLogging === true,
             enableTermEntryContentDedup: flagsRecord.enableTermEntryContentDedup !== false,
@@ -1691,13 +1574,12 @@ export class DictionaryImportController {
      * @param {File} file
      * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      * @param {import('dictionary-importer').ImportDetails} importDetails
-     * @param {DictionaryWorker} dictionaryWorker
      * @param {boolean} useImportSession
      * @param {boolean} finalizeImportSession
      * @param {import('dictionary-worker').ImportProgressCallback} onProgress
      * @returns {Promise<Error[] | undefined>}
      */
-    async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, dictionaryWorker, useImportSession, finalizeImportSession, onProgress) {
+    async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, useImportSession, finalizeImportSession, onProgress) {
         const dictionaryTitle = file.name || 'unknown-dictionary';
         const importStartTime = safePerformance.now();
         /** @type {Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>} */
@@ -1765,18 +1647,8 @@ export class DictionaryImportController {
                     ...(useImportSessionAttempt ? {useImportSession: true, finalizeImportSession: finalizeImportSessionAttempt} : {}),
                 };
                 const archiveContentAttempt = (attempt === 1 ? archiveContent : file);
-                const offscreenImportResult = (
-                    attempt === 1 ?
-                        await this._tryImportDictionaryOffscreen(archiveContentAttempt, detailsAttempt, onProgress) :
-                        null
-                );
                 importResult = /** @type {import('dictionary-importer').ImportResult & {debug?: {usesFallbackStorage?: boolean, openStorageDiagnostics?: unknown, useImportSession?: boolean, finalizeImportSession?: boolean, importerDebug?: {phaseTimings?: Array<{phase: string, elapsedMs: number, details?: Record<string, string|number|boolean|null>}>|null}|null}}} */ (
-                    offscreenImportResult ??
-                    await dictionaryWorker.importDictionary(
-                        archiveContentAttempt,
-                        detailsAttempt,
-                        onProgress,
-                    )
+                    await this._tryImportDictionaryOffscreen(archiveContentAttempt, detailsAttempt, onProgress)
                 );
             } catch (error) {
                 const message = (error instanceof Error) ? error.message : String(error);

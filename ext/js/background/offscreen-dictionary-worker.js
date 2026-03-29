@@ -41,6 +41,8 @@ class OffscreenDictionaryWorkerHandler {
         this._databaseSuspended = false;
         /** @type {DictionaryImporterMediaLoader} */
         this._mediaLoader = new DictionaryImporterMediaLoader();
+        /** @type {Promise<void>} */
+        this._requestQueue = Promise.resolve();
     }
 
     /** */
@@ -78,7 +80,13 @@ class OffscreenDictionaryWorkerHandler {
      * @param {MessageEvent<WorkerRequest>} event
      */
     _onMessage(event) {
-        void this._onMessageAsync(event);
+        this._requestQueue = this._requestQueue
+            .then(async () => {
+                await this._onMessageAsync(event);
+            })
+            .catch((error) => {
+                log.error(error);
+            });
     }
 
     /**
@@ -200,6 +208,16 @@ class OffscreenDictionaryWorkerHandler {
             case 'databasePrepareOffscreen':
                 await this._ensureDatabasePrepared();
                 return;
+            case 'getDatabaseRuntimeStateOffscreen':
+                return {
+                    isPrepared: this._dictionaryDatabase.isPrepared(),
+                    usesFallbackStorage: this._dictionaryDatabase.usesFallbackStorage(),
+                    openStorageDiagnostics: (
+                        typeof this._dictionaryDatabase.getOpenStorageDiagnostics === 'function' ?
+                            this._dictionaryDatabase.getOpenStorageDiagnostics() :
+                            null
+                    ),
+                };
             case 'databaseSetSuspendedOffscreen': {
                 const suspended = params.suspended === true;
                 if (suspended) {
@@ -381,8 +399,12 @@ class OffscreenDictionaryWorkerHandler {
         const ensureIndex = Reflect.get(this._dictionaryDatabase, '_ensureDirectTermIndex');
         const fetchTermRowsByIds = Reflect.get(this._dictionaryDatabase, '_fetchTermRowsByIds');
         const requireDb = Reflect.get(this._dictionaryDatabase, '_requireDb');
+        const ensureRecordDictionariesLoaded = Reflect.get(this._dictionaryDatabase, '_ensureDirectTermIndexesLoaded');
         if (typeof ensureIndex !== 'function' || typeof fetchTermRowsByIds !== 'function') {
             return {ok: false, reason: 'debug lookup unavailable', text, dictionaryNames};
+        }
+        if (typeof ensureRecordDictionariesLoaded === 'function') {
+            await ensureRecordDictionariesLoaded.call(this._dictionaryDatabase, dictionaryNames);
         }
         /** @type {Map<number, {dictionary: string, matchSource: string}>} */
         const ids = new Map();

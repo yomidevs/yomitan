@@ -129,19 +129,20 @@ export class StorageController {
         const userAgent = typeof navigator.userAgent === 'string' ? navigator.userAgent : '';
         const browserLabel = /Firefox\//i.test(userAgent) ? 'Firefox runtime' : 'Extension runtime';
         const storageValue = /** @type {Record<string, unknown>} */ (Reflect.get(navigator, 'storage') ?? {});
-        const crossOriginIsolatedValue = Reflect.get(globalThis, 'crossOriginIsolated');
-        const crossOriginIsolated = typeof crossOriginIsolatedValue === 'boolean' ? crossOriginIsolatedValue : null;
         const hasStorageGetDirectory = typeof Reflect.get(storageValue, 'getDirectory') === 'function';
-        const hasSharedArrayBuffer = typeof Reflect.get(globalThis, 'SharedArrayBuffer') === 'function';
-        const hasAtomics = typeof Reflect.get(globalThis, 'Atomics') === 'object' && Reflect.get(globalThis, 'Atomics') !== null;
-        const dictionaryBackendUsable = hasStorageGetDirectory && hasSharedArrayBuffer && hasAtomics && crossOriginIsolated === true;
+        const hasCreateSyncAccessHandle = (
+            typeof Reflect.get(globalThis, 'FileSystemFileHandle') === 'function' &&
+            typeof Reflect.get(
+                /** @type {{prototype?: Record<string, unknown>}} */ (/** @type {unknown} */ (Reflect.get(globalThis, 'FileSystemFileHandle'))).prototype ?? {},
+                'createSyncAccessHandle',
+            ) === 'function'
+        );
+        const dictionaryBackendUsable = hasStorageGetDirectory && hasCreateSyncAccessHandle;
         this._storageRuntimeCheckNode.textContent = (
             `${browserLabel} check:\n` +
             `dictionary backend usable=${String(dictionaryBackendUsable)}\n` +
             `storage.getDirectory=${String(hasStorageGetDirectory)}\n` +
-            `SharedArrayBuffer=${String(hasSharedArrayBuffer)}\n` +
-            `Atomics=${String(hasAtomics)}\n` +
-            `crossOriginIsolated=${String(crossOriginIsolated)}`
+            `createSyncAccessHandle=${String(hasCreateSyncAccessHandle)}`
         );
     }
 

@@ -44,7 +44,7 @@ import {getLanguageSummaries, isTextLookupWorthy} from '../language/languages.js
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
-import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
+import {ClipboardReaderProxy, DictionaryDatabaseProxy, DictionaryRuntimeWorkerProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
@@ -71,6 +71,8 @@ export class Backend {
 
         /** @type {?OffscreenProxy} */
         let offscreen = null;
+        /** @type {?DictionaryRuntimeWorkerProxy} */
+        let localDictionaryRuntime = null;
         /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
         let dictionaryDatabase;
         /** @type {Translator|TranslatorProxy} */
@@ -78,9 +80,9 @@ export class Backend {
         /** @type {ClipboardReader|ClipboardReaderProxy} */
         let clipboardReader;
         if (!chrome.offscreen) {
-            const database = new DictionaryDatabase();
-            dictionaryDatabase = database;
-            translator = new Translator(database);
+            localDictionaryRuntime = new DictionaryRuntimeWorkerProxy('/js/background/offscreen-dictionary-worker.js');
+            dictionaryDatabase = new DictionaryDatabaseProxy(localDictionaryRuntime);
+            translator = new TranslatorProxy(localDictionaryRuntime);
             clipboardReader = new ClipboardReader(
                 (typeof document === 'object' && document !== null ? document : null),
                 '#clipboard-paste-target',
@@ -94,6 +96,8 @@ export class Backend {
         }
         /** @type {?OffscreenProxy} */
         this._offscreen = offscreen;
+        /** @type {?DictionaryRuntimeWorkerProxy} */
+        this._localDictionaryRuntime = localDictionaryRuntime;
         /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
         this._dictionaryDatabase = dictionaryDatabase;
         /** @type {Translator|TranslatorProxy} */
@@ -316,14 +320,19 @@ export class Backend {
     async _onPmImportDictionaryOffscreen({archiveContent, details}, ports) {
         const responsePort = ports !== null && ports.length > 0 ? ports[0] : null;
         try {
-            if (this._offscreen === null) {
-                throw new Error('Offscreen import is unavailable');
-            }
             if (responsePort === null) {
                 throw new Error('Offscreen import response port missing');
             }
-            await this._offscreen.prepare();
-            this._offscreen.sendMessageViaPort({action: 'importDictionaryOffscreen', params: {archiveContent, details}}, [responsePort]);
+            if (this._offscreen !== null) {
+                await this._offscreen.prepare();
+                this._offscreen.sendMessageViaPort({action: 'importDictionaryOffscreen', params: {archiveContent, details}}, [responsePort]);
+                return;
+            }
+            if (this._localDictionaryRuntime !== null) {
+                this._localDictionaryRuntime.sendMessageViaPort({action: 'importDictionaryOffscreen', params: {archiveContent, details}}, [responsePort]);
+                return;
+            }
+            throw new Error('Dictionary runtime import is unavailable');
         } catch (error) {
             responsePort?.postMessage({type: 'error', error: ExtensionError.serialize(error)});
             responsePort?.close();
@@ -3214,6 +3223,10 @@ export class Backend {
         let dictionaryStartupCleanupSummary = null;
         /** @type {Record<string, unknown>|null} */
         let dictionaryTermRecordIntegritySummary = null;
+        /** @type {Record<string, unknown>|null} */
+        let dictionaryOpenStorageDiagnostics = null;
+        /** @type {boolean|null} */
+        let dictionaryUsesFallbackStorage = null;
 
         const getStartupCleanupIncompleteImportsSummary = /** @type {unknown} */ (
             Reflect.get(dictionaryDatabase, 'getStartupCleanupIncompleteImportsSummary')
@@ -3235,11 +3248,33 @@ export class Backend {
             }
         }
 
+        const getOpenStorageDiagnostics = /** @type {unknown} */ (
+            Reflect.get(dictionaryDatabase, 'getOpenStorageDiagnostics')
+        );
+        if (typeof getOpenStorageDiagnostics === 'function') {
+            const value = /** @type {unknown} */ (getOpenStorageDiagnostics.call(dictionaryDatabase));
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                dictionaryOpenStorageDiagnostics = /** @type {Record<string, unknown>} */ (value);
+            }
+        }
+
+        const usesFallbackStorage = /** @type {unknown} */ (
+            Reflect.get(dictionaryDatabase, 'usesFallbackStorage')
+        );
+        if (typeof usesFallbackStorage === 'function') {
+            const value = /** @type {unknown} */ (usesFallbackStorage.call(dictionaryDatabase));
+            if (typeof value === 'boolean') {
+                dictionaryUsesFallbackStorage = value;
+            }
+        }
+
         const snapshot = {
             createdAtIso: new Date().toISOString(),
             dictionaryOptionsPruneStartupSummary: dictionaryOptionsPruneSummary,
             dictionaryStartupCleanupSummary,
             dictionaryTermRecordIntegritySummary,
+            dictionaryOpenStorageDiagnostics,
+            dictionaryUsesFallbackStorage,
         };
         this._startupDiagnosticsSnapshot = snapshot;
         await this._storeStartupDiagnosticsSnapshot(snapshot);
@@ -3667,6 +3702,7 @@ export class Backend {
         const database = this._dictionaryDatabase;
         const ensureIndex = Reflect.get(database, '_ensureDirectTermIndex');
         const fetchTermRowsByIds = Reflect.get(database, '_fetchTermRowsByIds');
+        const ensureRecordDictionariesLoaded = Reflect.get(database, '_ensureDirectTermIndexesLoaded');
         if (typeof ensureIndex !== 'function' || typeof fetchTermRowsByIds !== 'function') {
             return {
                 ok: false,
@@ -3674,6 +3710,9 @@ export class Backend {
                 text,
                 dictionaryNames,
             };
+        }
+        if (typeof ensureRecordDictionariesLoaded === 'function') {
+            await ensureRecordDictionariesLoaded.call(database, dictionaryNames);
         }
         /** @type {Map<number, {dictionary: string, matchSource: string}>} */
         const ids = new Map();
