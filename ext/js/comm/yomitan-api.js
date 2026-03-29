@@ -166,15 +166,28 @@ export class YomitanApi {
                         /** @type {import('yomitan-api.js').termEntriesInput} */
                         // @ts-expect-error - Allow this to error
                         const {term} = parsedBody;
-                        const invokeParams = {
-                            text: term,
-                            details: {},
-                            optionsContext: {index: optionsFull.profileCurrent},
-                        };
-                        result = await this._invoke(
-                            'termsFind',
-                            invokeParams,
-                        );
+                        if (typeof term === 'string') {
+                            const invokeParams = {
+                                text: term,
+                                details: {},
+                                optionsContext: {index: optionsFull.profileCurrent},
+                            };
+                            result = {...await this._invoke('termsFind', invokeParams), index: 0};
+                        } else if (Array.isArray(term)) {
+                            result = await Promise.all(term.map(async (text, index) => {
+                                const invokeParams = {
+                                    text,
+                                    details: {},
+                                    optionsContext: {index: optionsFull.profileCurrent},
+                                };
+                                return {
+                                    ...(await this._invoke('termsFind', invokeParams)),
+                                    index,
+                                };
+                            }));
+                        } else {
+                            throw new Error('Invalid input for termEntries, expected "term" to be a string or a string array but got ' + typeof term);
+                        }
                         break;
                     }
                     case 'kanjiEntries': {
@@ -252,6 +265,7 @@ export class YomitanApi {
                             scanLength: scanLength,
                             useInternalParser: parser !== 'mecab',
                             useMecabParser: parser === 'mecab',
+                            useAllFrequencyDictionaries: true,
                         };
                         result = await this._invoke('parseText', invokeParams);
                         break;
