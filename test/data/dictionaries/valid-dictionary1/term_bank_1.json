@@ -348,5 +348,9 @@
     ["마시다", "", "v", "v", 1, ["masida definition"], 22, ""],
     ["自重", "じちょう", "n", "n", 1, ["jichou definition"], 23, ""],
     ["自重", "じじゅう", "n", "n", 2, ["jijuu definition"], 24, ""],
-    ["ありがとう", "ありがとう", "n", "n", 1, ["arigatou definition"], 25, ""]
+    ["ありがとう", "ありがとう", "n", "n", 1, ["arigatou definition"], 25, ""],
+    ["oppidum", "", "n", "n2s", 5, ["oppidum definition - town"], 26, ""],
+    ["oppido", "oppidō", "adv", "adv", 5, ["oppido definition - very"], 27, ""],
+    ["oppido", "", "", "", 1, [["oppidum", ["ablative"]]], 28, ""],
+    ["oppidorum", "", "", "", 1, [["oppidum", ["genitive plural"]]], 29, ""]
 ]

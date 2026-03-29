@@ -42241,5 +42241,232 @@
         "media": {}
       }
     ]
+  },
+  {
+    "name": "Longer match first (PR#1075)",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 34,
+          "source": "oppidorum",
+          "rawSource": "oppidorum",
+          "sourceTerm": "oppidum",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "dictionary",
+              "inflectionRules": [
+                {
+                  "name": "genitive plural"
+                }
+              ]
+            }
+          ],
+          "score": 5,
+          "isPrimary": true,
+          "sequence": 26,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryAlias": "termsDictAlias",
+          "dictionaryOrder": {
+            "index": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "oppidum",
+          "reading": "oppidum",
+          "expressions": [
+            {
+              "sourceTerm": "oppidum",
+              "expression": "oppidum",
+              "reading": "oppidum",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "oppidum",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n2s"
+              ]
+            }
+          ],
+          "glossary": [
+            "oppidum definition - town"
+          ],
+          "glossaryScopedStyles": ".yomitan-glossary {ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}\n}",
+          "dictScopedStyles": ".yomitan-glossary {[data-dictionary=\"Test Dictionary 2\"] {ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}\n}\n}",
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyNumbers": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "oppidum",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "oppidum"
+        ],
+        "uniqueReadings": [
+          "oppidum"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      },
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 35,
+          "source": "oppido",
+          "rawSource": "oppido",
+          "sourceTerm": "oppido",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 5,
+          "isPrimary": true,
+          "sequence": 27,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryAlias": "termsDictAlias",
+          "dictionaryOrder": {
+            "index": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "oppido",
+          "reading": "oppidō",
+          "expressions": [
+            {
+              "sourceTerm": "oppido",
+              "expression": "oppido",
+              "reading": "oppidō",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "oppido",
+                  "furigana": "oppidō"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "adv"
+              ]
+            }
+          ],
+          "glossary": [
+            "oppido definition - very"
+          ],
+          "glossaryScopedStyles": ".yomitan-glossary {ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}\n}",
+          "dictScopedStyles": ".yomitan-glossary {[data-dictionary=\"Test Dictionary 2\"] {ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}\n}\n}",
+          "definitionTags": [
+            {
+              "name": "adv",
+              "category": "default",
+              "notes": "",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyNumbers": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "oppido",
+              "furigana": "oppidō"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "oppido"
+        ],
+        "uniqueReadings": [
+          "oppidō"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
   }
 ]
