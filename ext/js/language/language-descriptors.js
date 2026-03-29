@@ -247,6 +247,13 @@ const languageDescriptors = [
         textPreprocessors: capitalizationPreprocessors,
         languageTransforms: irishTransforms,
     },
+	{
+		iso: 'gd',
+		iso639_3: 'gla',
+		name: 'Scottish Gaelic',
+		exampleText: 'leugh',
+		textPreprocessors: capitalizationPreprocessors,
+	},
     {
         iso: 'grc',
         iso639_3: 'grc',
