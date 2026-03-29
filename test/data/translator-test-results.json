@@ -23199,5 +23199,171 @@
         "frequencies": []
       }
     ]
+  },
+  {
+    "name": "Longer match first (PR#1075)",
+    "originalTextLength": 9,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "dictionary",
+            "inflectionRules": [
+              {
+                "name": "genitive plural"
+              }
+            ]
+          }
+        ],
+        "score": 5,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryAlias": "termsDictAlias",
+        "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
+        "maxOriginalTextLength": 9,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "oppidum",
+            "reading": "oppidum",
+            "sources": [
+              {
+                "originalText": "oppidorum",
+                "transformedText": "oppidorum",
+                "deinflectedText": "oppidum",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n2s"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 34,
+            "score": 5,
+            "frequencyOrder": 0,
+            "sequences": [
+              26
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "oppidum definition - town"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      },
+      {
+        "type": "term",
+        "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 5,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryAlias": "termsDictAlias",
+        "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
+        "maxOriginalTextLength": 6,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "oppido",
+            "reading": "oppidō",
+            "sources": [
+              {
+                "originalText": "oppido",
+                "transformedText": "oppido",
+                "deinflectedText": "oppido",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "adv"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "id": 35,
+            "score": 5,
+            "frequencyOrder": 0,
+            "sequences": [
+              27
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "adv",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "oppido definition - very"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
   }
 ]

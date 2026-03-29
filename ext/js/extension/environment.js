@@ -101,10 +101,14 @@ export class Environment {
             if (this._isSafari()) {
                 return 'safari';
             }
-            if (os === 'android') {
-                return 'firefox-mobile';
+            if (navigator.userAgent.includes('Firefox')) {
+                if (os === 'android') {
+                    return 'firefox-mobile';
+                }
+                return 'firefox';
             }
-            return 'firefox';
+            // Chrome 146+ now supports the browser namespace
+            return 'chrome';
         } else {
             return 'chrome';
         }

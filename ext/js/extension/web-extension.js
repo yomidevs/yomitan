@@ -114,7 +114,7 @@ export class WebExtension extends EventDispatcher {
         if (lastError) {
             if (lastError instanceof Error) { return lastError; }
             const {message} = lastError;
-            return new Error(typeof message === 'string' ? message : 'An unknown web extension error occured');
+            return new Error(typeof message === 'string' ? message : 'An unknown web extension error occurred');
         }
         return null;
     }
