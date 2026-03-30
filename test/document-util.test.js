@@ -188,6 +188,7 @@ describe('Document utility tests', () => {
                         deepContentScan: false,
                         normalizeCssZoom: true,
                         language: null,
+                        browser: null,
                     });
                     switch (resultType) {
                         case 'TextSourceRange':

@@ -2003,6 +2003,7 @@ export class Display extends EventDispatcher {
             childrenSupported: this._childrenSupported,
             hotkeyHandler: this._hotkeyHandler,
             canUseWindowPopup: true,
+            browser: this._browser,
         });
         this._frontend = frontend;
         await frontend.prepare();
@@ -2113,6 +2114,7 @@ export class Display extends EventDispatcher {
                 searchOnClick: true,
                 searchOnClickOnly: true,
                 textSourceGenerator: this._textSourceGenerator,
+                browser: this._browser,
             });
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
             this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';

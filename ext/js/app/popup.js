@@ -764,6 +764,10 @@ export class Popup extends EventDispatcher {
             if (contentWindow !== null) {
                 contentWindow.focus();
             }
+        } else if (getFullscreenElement() !== null) {
+            // In fullscreen, only blur the frame to let focus return implicitly.
+            // Calling window.focus() causes Chrome to exit fullscreen asynchronously.
+            this._frame.blur();
         } else {
             // Firefox doesn't like focusing window without first blurring the iframe.
             // this._frame.contentWindow.blur() doesn't work on Firefox for some reason.
