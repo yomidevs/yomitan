@@ -34,6 +34,20 @@
             }
         ]
     },
+    "ajp": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ajp-en",
+                "description": "South Levantine Arabic to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ajp/en/wty-ajp-en.zip"
+            }
+        ]
+    },
     "ang": {
         "frequency": [],
         "grammar": [],
@@ -45,6 +59,20 @@
                 "description": "Old English to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ang/en/wty-ang-en.zip"
+            }
+        ]
+    },
+    "apc": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-apc-en",
+                "description": "North Levantine Arabic to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/apc/en/wty-apc-en.zip"
             }
         ]
     },
@@ -90,6 +118,104 @@
             }
         ]
     },
+    "ast": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ast-en",
+                "description": "Asturian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ast/en/wty-ast-en.zip"
+            }
+        ]
+    },
+    "az": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-az-en",
+                "description": "Azerbaijani to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/az/en/wty-az-en.zip"
+            }
+        ]
+    },
+    "be": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-be-en",
+                "description": "Belarusian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/be/en/wty-be-en.zip"
+            }
+        ]
+    },
+    "bg": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-bg-en",
+                "description": "Bulgarian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/bg/en/wty-bg-en.zip"
+            }
+        ]
+    },
+    "bn": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-bn-en",
+                "description": "Bengali to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/bn/en/wty-bn-en.zip"
+            }
+        ]
+    },
+    "ca": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ca-en",
+                "description": "Catalan to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ca/en/wty-ca-en.zip"
+            }
+        ]
+    },
+    "ceb": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ceb-en",
+                "description": "Cebuano to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ceb/en/wty-ceb-en.zip"
+            }
+        ]
+    },
     "cs": {
         "frequency": [],
         "grammar": [],
@@ -101,6 +227,34 @@
                 "description": "Czech to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/cs/en/wty-cs-en.zip"
+            }
+        ]
+    },
+    "cy": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-cy-en",
+                "description": "Welsh to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/cy/en/wty-cy-en.zip"
+            }
+        ]
+    },
+    "da": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-da-en",
+                "description": "Danish to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/da/en/wty-da-en.zip"
             }
         ]
     },
@@ -188,6 +342,34 @@
             }
         ]
     },
+    "et": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-et-en",
+                "description": "Estonian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/et/en/wty-et-en.zip"
+            }
+        ]
+    },
+    "eu": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-eu-en",
+                "description": "Basque to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/eu/en/wty-eu-en.zip"
+            }
+        ]
+    },
     "fa": {
         "frequency": [],
         "grammar": [],
@@ -227,6 +409,62 @@
                 "description": "French to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/fr/en/wty-fr-en.zip"
+            }
+        ]
+    },
+    "ga": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ga-en",
+                "description": "Irish to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ga/en/wty-ga-en.zip"
+            }
+        ]
+    },
+    "gd": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-gd-en",
+                "description": "Scottish Gaelic to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/gd/en/wty-gd-en.zip"
+            }
+        ]
+    },
+    "gl": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-gl-en",
+                "description": "Galician to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/gl/en/wty-gl-en.zip"
+            }
+        ]
+    },
+    "got": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-got-en",
+                "description": "Gothic to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/got/en/wty-got-en.zip"
             }
         ]
     },
@@ -312,6 +550,20 @@
             }
         ]
     },
+    "hy": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-hy-en",
+                "description": "Armenian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/hy/en/wty-hy-en.zip"
+            }
+        ]
+    },
     "id": {
         "frequency": [],
         "grammar": [],
@@ -323,6 +575,34 @@
                 "description": "Indonesian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/id/en/wty-id-en.zip"
+            }
+        ]
+    },
+    "io": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-io-en",
+                "description": "Ido to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/io/en/wty-io-en.zip"
+            }
+        ]
+    },
+    "is": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-is-en",
+                "description": "Icelandic to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/is/en/wty-is-en.zip"
             }
         ]
     },
@@ -349,7 +629,7 @@
                 "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip"
             },
             {
-                "name": "JPDB",
+                "name": "JPDBv2㋕",
                 "description": "A frequency dictionary based on the corpus from the online Japanese dictionary and SRS system at https://jpdb.io.",
                 "homepage": "https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#jpdb-v22-frequency",
                 "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/JPDB_v2.2_Frequency_Kana.zip"
@@ -383,6 +663,34 @@
                 "description": "A dictionary of Japanese proper names maintained by the Electronic Dictionary Research and Development Group.",
                 "homepage": "https://github.com/yomidevs/jmdict-yomitan?tab=readme-ov-file#jmnedict-for-yomitan",
                 "downloadUrl": "https://github.com/yomidevs/jmdict-yomitan/releases/latest/download/JMnedict.zip"
+            }
+        ]
+    },
+    "ka": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ka-en",
+                "description": "Georgian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ka/en/wty-ka-en.zip"
+            }
+        ]
+    },
+    "kk": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-kk-en",
+                "description": "Kazakh to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/kk/en/wty-kk-en.zip"
             }
         ]
     },
@@ -428,6 +736,20 @@
             }
         ]
     },
+    "ku": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ku-en",
+                "description": "Kurdish to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ku/en/wty-ku-en.zip"
+            }
+        ]
+    },
     "la": {
         "frequency": [],
         "grammar": [],
@@ -439,6 +761,34 @@
                 "description": "Latin to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/la/en/wty-la-en.zip"
+            }
+        ]
+    },
+    "lo": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-lo-en",
+                "description": "Lao to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/lo/en/wty-lo-en.zip"
+            }
+        ]
+    },
+    "lt": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-lt-en",
+                "description": "Lithuanian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/lt/en/wty-lt-en.zip"
             }
         ]
     },
@@ -456,6 +806,34 @@
             }
         ]
     },
+    "mk": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-mk-en",
+                "description": "Macedonian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/mk/en/wty-mk-en.zip"
+            }
+        ]
+    },
+    "ml": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ml-en",
+                "description": "Malayalam to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ml/en/wty-ml-en.zip"
+            }
+        ]
+    },
     "mn": {
         "frequency": [],
         "grammar": [],
@@ -467,6 +845,34 @@
                 "description": "Mongolian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/mn/en/wty-mn-en.zip"
+            }
+        ]
+    },
+    "mr": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-mr-en",
+                "description": "Marathi to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/mr/en/wty-mr-en.zip"
+            }
+        ]
+    },
+    "ms": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ms-en",
+                "description": "Malay to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ms/en/wty-ms-en.zip"
             }
         ]
     },
@@ -491,6 +897,34 @@
             }
         ]
     },
+    "my": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-my-en",
+                "description": "Burmese to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/my/en/wty-my-en.zip"
+            }
+        ]
+    },
+    "nb": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-nb-en",
+                "description": "Norwegian Bokmål to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/nb/en/wty-nb-en.zip"
+            }
+        ]
+    },
     "nl": {
         "frequency": [],
         "grammar": [],
@@ -502,6 +936,20 @@
                 "description": "Dutch to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/nl/en/wty-nl-en.zip"
+            }
+        ]
+    },
+    "nn": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-nn-en",
+                "description": "Norwegian Nynorsk to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/nn/en/wty-nn-en.zip"
             }
         ]
     },
@@ -522,6 +970,76 @@
                 "description": "Norwegian Nynorsk to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/nn/en/wty-nn-en.zip"
+            }
+        ]
+    },
+    "non": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-non-en",
+                "description": "Old Norse to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/non/en/wty-non-en.zip"
+            }
+        ]
+    },
+    "nv": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-nv-en",
+                "description": "Navajo to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/nv/en/wty-nv-en.zip"
+            }
+        ]
+    },
+    "ota": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ota-en",
+                "description": "Ottoman Turkish to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ota/en/wty-ota-en.zip"
+            }
+        ]
+    },
+    "pa": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-pa-en",
+                "description": "Punjabi to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/pa/en/wty-pa-en.zip"
+            }
+        ]
+    },
+    "pi": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-pi-en",
+                "description": "Pali to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/pi/en/wty-pi-en.zip"
             }
         ]
     },
@@ -587,6 +1105,20 @@
             }
         ]
     },
+    "sa": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-sa-en",
+                "description": "Sanskrit to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/sa/en/wty-sa-en.zip"
+            }
+        ]
+    },
     "scn": {
         "frequency": [],
         "grammar": [],
@@ -629,6 +1161,34 @@
             }
         ]
     },
+    "sk": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-sk-en",
+                "description": "Slovak to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/sk/en/wty-sk-en.zip"
+            }
+        ]
+    },
+    "sl": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-sl-en",
+                "description": "Slovene to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/sl/en/wty-sl-en.zip"
+            }
+        ]
+    },
     "sq": {
         "frequency": [],
         "grammar": [],
@@ -654,6 +1214,48 @@
                 "description": "Swedish to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/sv/en/wty-sv-en.zip"
+            }
+        ]
+    },
+    "sw": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-sw-en",
+                "description": "Swahili to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/sw/en/wty-sw-en.zip"
+            }
+        ]
+    },
+    "ta": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ta-en",
+                "description": "Tamil to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ta/en/wty-ta-en.zip"
+            }
+        ]
+    },
+    "te": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-te-en",
+                "description": "Telugu to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/te/en/wty-te-en.zip"
             }
         ]
     },
@@ -811,6 +1413,20 @@
             }
         ]
     },
+    "ur": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ur-en",
+                "description": "Urdu to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ur/en/wty-ur-en.zip"
+            }
+        ]
+    },
     "vi": {
         "frequency": [],
         "grammar": [],
@@ -822,6 +1438,34 @@
                 "description": "Vietnamese to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/vi/en/wty-vi-en.zip"
+            }
+        ]
+    },
+    "xcl": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-xcl-en",
+                "description": "Old Armenian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/xcl/en/wty-xcl-en.zip"
+            }
+        ]
+    },
+    "yi": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-yi-en",
+                "description": "Yiddish to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/yi/en/wty-yi-en.zip"
             }
         ]
     },
