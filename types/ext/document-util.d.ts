@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type * as Environment from './environment';
+
 export type NormalizedWritingMode = 'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr';
 
 /**
@@ -34,6 +36,8 @@ export type GetRangeFromPointOptions = {
      * ISO-639 code of the language.
      */
     language: string | null;
+
+    browser: Environment.Browser | null;
 };
 
 export type ToNumberConstraints = {

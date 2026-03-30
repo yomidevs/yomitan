@@ -19,6 +19,7 @@ import type {TextSourceGenerator} from '../../ext/js/dom/text-source-generator';
 import type {API} from '../../ext/js/comm/api';
 import type * as Dictionary from './dictionary';
 import type * as Display from './display';
+import type * as Environment from './environment';
 import type * as Input from './input';
 import type * as Settings from './settings';
 import type * as TextSource from './text-source';
@@ -162,6 +163,7 @@ export type ConstructorDetails = {
     searchOnClick?: boolean;
     searchOnClickOnly?: boolean;
     textSourceGenerator: TextSourceGenerator;
+    browser: Environment.Browser | null;
 };
 
 export type SearchContext = {

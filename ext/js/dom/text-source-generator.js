@@ -187,7 +187,7 @@ export class TextSourceGenerator {
      * @returns {?import('text-source').TextSource} A range for the hovered text or element, or `null` if no applicable content was found.
      */
     _getRangeFromPointInternal(x, y, options) {
-        const {deepContentScan, normalizeCssZoom, language} = options;
+        const {deepContentScan, normalizeCssZoom, language, browser} = options;
 
         const elements = this._getElementsFromPoint(x, y, deepContentScan);
         /** @type {?HTMLDivElement} */
@@ -219,7 +219,7 @@ export class TextSourceGenerator {
             }
         }
 
-        const range = this._caretRangeFromPointExt(x, y, deepContentScan ? elements : [], normalizeCssZoom, language);
+        const range = this._caretRangeFromPointExt(x, y, deepContentScan ? elements : [], normalizeCssZoom, language, browser);
         if (range !== null) {
             if (imposter !== null) {
                 this._setImposterStyle(/** @type {HTMLDivElement} */ (imposterContainer).style, 'z-index', '-2147483646');
@@ -351,9 +351,10 @@ export class TextSourceGenerator {
      * @param {Range} range
      * @param {boolean} normalizeCssZoom
      * @param {?string} language
+     * @param {?import('environment').Browser} browser
      * @returns {boolean}
      */
-    _isPointInRange(x, y, range, normalizeCssZoom, language) {
+    _isPointInRange(x, y, range, normalizeCssZoom, language, browser) {
         // Require a text node to start
         const {startContainer} = range;
         if (startContainer.nodeType !== Node.TEXT_NODE) {
@@ -374,7 +375,7 @@ export class TextSourceGenerator {
             const {node, offset, content} = new DOMTextScanner(nodePre, offsetPre, true, false).seek(1);
             range.setEnd(node, offset);
 
-            if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects(), language)) {
+            if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects(), language, browser)) {
                 return true;
             }
         } finally {
@@ -385,7 +386,7 @@ export class TextSourceGenerator {
         const {node, offset, content} = new DOMTextScanner(startContainer, range.startOffset, true, false).seek(-1);
         range.setStart(node, offset);
 
-        if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects(), language)) {
+        if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects(), language, browser)) {
             // This purposefully leaves the starting offset as modified and sets the range length to 0.
             range.setEnd(node, offset);
             return true;
@@ -564,9 +565,10 @@ export class TextSourceGenerator {
      * @param {Element[]} elements
      * @param {boolean} normalizeCssZoom
      * @param {?string} language
+     * @param {?import('environment').Browser} browser
      * @returns {?Range}
      */
-    _caretRangeFromPointExt(x, y, elements, normalizeCssZoom, language) {
+    _caretRangeFromPointExt(x, y, elements, normalizeCssZoom, language, browser) {
         /** @type {?Map<Element, ?string>} */
         let previousStyles = null;
         try {
@@ -580,7 +582,7 @@ export class TextSourceGenerator {
 
                 const startContainer = range.startContainer;
                 if (startContainerPre !== startContainer) {
-                    if (this._isPointInRange(x, y, range, normalizeCssZoom, language)) {
+                    if (this._isPointInRange(x, y, range, normalizeCssZoom, language, browser)) {
                         return range;
                     }
                     startContainerPre = startContainer;

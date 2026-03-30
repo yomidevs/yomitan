@@ -111,15 +111,16 @@ export function isPointInRect(x, y, rect) {
  * @param {number} y The vertical coordinate.
  * @param {DOMRect[]|DOMRectList} rects The rect to check.
  * @param {?string} language
+ * @param {?import('environment').Browser} browser
  * @returns {boolean} `true` if the point is inside any of the rects, `false` otherwise.
  */
-export function isPointInAnyRect(x, y, rects, language) {
+export function isPointInAnyRect(x, y, rects, language, browser) {
     // Always return true for Firefox due to inconsistencies with Range.getClientRects() implementation from unclear W3C spec
     // https://drafts.csswg.org/cssom-view/#dom-range-getclientrects
     // https://bugzilla.mozilla.org/show_bug.cgi?id=816238
     // Firefox returns only the first level nodes, Chromium returns every text node
     // This only affects specific languages
-    if (typeof browser !== 'undefined' && FIREFOX_RECT_EXCLUDED_LANGUAGES.has(language)) {
+    if (browser && browser.includes('firefox') && FIREFOX_RECT_EXCLUDED_LANGUAGES.has(language)) {
         return true;
     }
     for (const rect of rects) {
@@ -136,12 +137,13 @@ export function isPointInAnyRect(x, y, rects, language) {
  * @param {number} y The vertical coordinate.
  * @param {Selection} selection The selection to check.
  * @param {string} language
+ * @param {?import('environment').Browser} browser
  * @returns {boolean} `true` if the point is inside the selection, `false` otherwise.
  */
-export function isPointInSelection(x, y, selection, language) {
+export function isPointInSelection(x, y, selection, language, browser) {
     for (let i = 0; i < selection.rangeCount; ++i) {
         const range = selection.getRangeAt(i);
-        if (isPointInAnyRect(x, y, range.getClientRects(), language)) {
+        if (isPointInAnyRect(x, y, range.getClientRects(), language, browser)) {
             return true;
         }
     }
