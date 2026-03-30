@@ -97,20 +97,6 @@
             }
         ]
     },
-    "ast": {
-        "frequency": [],
-        "grammar": [],
-        "kanji": [],
-        "pronunciation": [],
-        "terms": [
-            {
-                "name": "wty-ast-en",
-                "description": "Asturian to English dictionary created from Wiktionary data.",
-                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
-                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ast/en/wty-ast-en.zip"
-            }
-        ]
-    },
     "arz": {
         "frequency": [],
         "grammar": [],
@@ -129,6 +115,20 @@
                 "description": "Arabic to English dictionary created from Wiktionary data.",
                 "homepage": "https://github.com/yomidevs/wiktionary-to-yomitan/blob/master/downloads.md",
                 "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ar/en/wty-ar-en.zip"
+            }
+        ]
+    },
+    "ast": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "wty-ast-en",
+                "description": "Asturian to English dictionary created from Wiktionary data.",
+                "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/ast/en/wty-ast-en.zip"
             }
         ]
     },
@@ -578,17 +578,17 @@
             }
         ]
     },
-    "it": {
+    "io": {
         "frequency": [],
         "grammar": [],
         "kanji": [],
         "pronunciation": [],
         "terms": [
             {
-                "name": "wty-it-en",
-                "description": "Italian to English dictionary created from Wiktionary data.",
+                "name": "wty-io-en",
+                "description": "Ido to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
-                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/it/en/wty-it-en.zip"
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/io/en/wty-io-en.zip"
             }
         ]
     },
@@ -606,17 +606,17 @@
             }
         ]
     },
-    "io": {
+    "it": {
         "frequency": [],
         "grammar": [],
         "kanji": [],
         "pronunciation": [],
         "terms": [
             {
-                "name": "wty-io-en",
-                "description": "Ido to English dictionary created from Wiktionary data.",
+                "name": "wty-it-en",
+                "description": "Italian to English dictionary created from Wiktionary data.",
                 "homepage": "https://yomidevs.github.io/wiktionary-to-yomitan/",
-                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/io/en/wty-io-en.zip"
+                "downloadUrl": "https://huggingface.co/datasets/daxida/wty-release/resolve/main/latest/dict/it/en/wty-it-en.zip"
             }
         ]
     },
