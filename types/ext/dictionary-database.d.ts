@@ -32,6 +32,8 @@ export type MediaDataBase<TContentType = unknown> = {
     content: TContentType;
     contentOffset?: number;
     contentLength?: number;
+    contentCompressionMethod?: number;
+    contentUncompressedLength?: number;
 };
 
 export type MediaDataArrayBufferContent = MediaDataBase<ArrayBuffer>;

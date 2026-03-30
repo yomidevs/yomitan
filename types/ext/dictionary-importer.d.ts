@@ -65,6 +65,7 @@ export type ImportDetails = {
     enableTermEntryContentDedup?: boolean;
     termContentStorageMode?: 'baseline' | 'raw-bytes';
     expectedTermContentImportBytes?: number;
+    preserveCompressedMedia?: boolean;
 };
 
 export type Summary = {

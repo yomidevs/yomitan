@@ -959,14 +959,14 @@ export class TermRecordOpfsStore {
                 const record = {
                     id,
                     dictionary: chunk.dictionary,
-                    readingEqualsExpression: chunk.readingEqualsExpressionList[i] === true,
+                    readingEqualsExpression: chunk.readingEqualsExpressionList[i] === true || chunk.readingEqualsExpressionList[i] === 1,
                     expressionBytes: chunk.expressionBytesList[i],
-                    readingBytes: chunk.readingEqualsExpressionList[i] === true ? void 0 : chunk.readingBytesList[i],
+                    readingBytes: (chunk.readingEqualsExpressionList[i] === true || chunk.readingEqualsExpressionList[i] === 1) ? void 0 : chunk.readingBytesList[i],
                     entryContentOffset: contentOffsets[i],
                     entryContentLength: contentLengths[i],
                     entryContentDictName,
                     score: chunk.scoreList[i] ?? 0,
-                    sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
+                    sequence: typeof sequenceValue === 'number' && sequenceValue >= 0 ? sequenceValue : null,
                 };
                 this._recordsById.set(id, record);
                 this._loadedDictionaryNames.add(chunk.dictionary);
@@ -2148,16 +2148,16 @@ export class TermRecordOpfsStore {
                 dictionary: chunk.dictionary,
                 expression: '',
                 reading: '',
-                readingEqualsExpression: chunk.readingEqualsExpressionList[i] === true,
+                readingEqualsExpression: chunk.readingEqualsExpressionList[i] === true || chunk.readingEqualsExpressionList[i] === 1,
                 expressionBytes: chunk.expressionBytesList[i],
-                readingBytes: chunk.readingEqualsExpressionList[i] === true ? void 0 : chunk.readingBytesList[i],
+                readingBytes: (chunk.readingEqualsExpressionList[i] === true || chunk.readingEqualsExpressionList[i] === 1) ? void 0 : chunk.readingBytesList[i],
                 expressionReverse: null,
                 readingReverse: null,
                 entryContentOffset: contentOffsets[i],
                 entryContentLength: contentLengths[i],
                 entryContentDictName: 'raw',
                 score: chunk.scoreList[i] ?? 0,
-                sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
+                sequence: typeof sequenceValue === 'number' && sequenceValue >= 0 ? sequenceValue : null,
             };
         }
         return await this._encodeRecords(records, preinternedPlan);
@@ -3161,14 +3161,14 @@ export class TermRecordOpfsStore {
                 const record = {
                     id,
                     dictionary,
-                    readingEqualsExpression: plan.readingEqualsExpressionList[i] === true,
+                    readingEqualsExpression: plan.readingEqualsExpressionList[i] === true || plan.readingEqualsExpressionList[i] === 1,
                     expressionBytes: plan.expressionBytesList[i],
-                    readingBytes: plan.readingEqualsExpressionList[i] === true ? void 0 : plan.readingBytesList[i],
+                    readingBytes: (plan.readingEqualsExpressionList[i] === true || plan.readingEqualsExpressionList[i] === 1) ? void 0 : plan.readingBytesList[i],
                     entryContentOffset: plan.contentOffsets[i],
                     entryContentLength: plan.contentLengths[i],
                     entryContentDictName,
                     score: plan.scoreList[i] ?? 0,
-                    sequence: typeof sequenceValue === 'number' ? sequenceValue : null,
+                    sequence: typeof sequenceValue === 'number' && sequenceValue >= 0 ? sequenceValue : null,
                 };
                 this._recordsById.set(id, record);
             }

@@ -259,7 +259,6 @@ export async function encodeTermRecordArtifactChunkWithWasmPreinterned(chunk, co
         return new Uint8Array(0);
     }
     const wasm = await getWasm();
-
     const metasBuffer = new ArrayBuffer(count * META_BYTES);
     const metasU32 = new Uint32Array(metasBuffer);
     const metasI32 = new Int32Array(metasBuffer);
@@ -268,7 +267,7 @@ export async function encodeTermRecordArtifactChunkWithWasmPreinterned(chunk, co
     const planReadingIndexes = preinternedPlan?.readingIndexes ?? null;
     for (let i = 0; i < count; ++i) {
         const expressionBytes = chunk.expressionBytesList[i];
-        const readingEqualsExpression = chunk.readingEqualsExpressionList[i] === true;
+        const readingEqualsExpression = chunk.readingEqualsExpressionList[i] === true || chunk.readingEqualsExpressionList[i] === 1;
         const expressionIndex = planExpressionIndexes instanceof Uint32Array ? planExpressionIndexes[i] : internStringBytes('', expressionBytes);
         let readingIndex;
         if (planReadingIndexes instanceof Uint32Array) {

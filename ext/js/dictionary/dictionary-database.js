@@ -66,6 +66,34 @@ const TERM_CONTENT_STORAGE_MODE_RAW_BYTES = 'raw-bytes';
 const DEFAULT_RAW_TERM_CONTENT_PACK_TARGET_BYTES = 4 * 1024 * 1024;
 const LARGE_ARTIFACT_FIXED_PACK_MIN_TOTAL_ROWS = 2_000_000;
 const EXTERNAL_MEDIA_BULK_INSERT_BATCH_SIZE = 512;
+const ZIP_COMPRESSION_METHOD_STORE = 0;
+const ZIP_COMPRESSION_METHOD_DEFLATE = 8;
+
+/**
+ * @param {Uint8Array} bytes
+ * @param {number} compressionMethod
+ * @param {number} uncompressedLength
+ * @returns {Promise<Uint8Array>}
+ */
+async function inflateZipMediaContent(bytes, compressionMethod, uncompressedLength) {
+    switch (compressionMethod) {
+        case ZIP_COMPRESSION_METHOD_STORE:
+            return bytes;
+        case ZIP_COMPRESSION_METHOD_DEFLATE: {
+            if (typeof DecompressionStream === 'undefined') {
+                throw new Error('DecompressionStream is unavailable for compressed media content');
+            }
+            const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+            const inflated = new Uint8Array(await new Response(stream).arrayBuffer());
+            if (uncompressedLength > 0 && inflated.byteLength !== uncompressedLength) {
+                throw new Error(`Compressed media length mismatch: expected ${uncompressedLength}, got ${inflated.byteLength}`);
+            }
+            return inflated;
+        }
+        default:
+            throw new Error(`Unsupported zip media compression method: ${compressionMethod}`);
+    }
+}
 
 /**
  * @param {string} value
@@ -2086,7 +2114,7 @@ export class DictionaryDatabase {
                 bind[pathKey] = path;
                 conditions.push(`(dictionary = ${dictionaryKey} AND path = ${pathKey})`);
             }
-            const sql = `SELECT dictionary, path, mediaType, width, height, content, contentOffset, contentLength FROM media WHERE ${conditions.join(' OR ')}`;
+            const sql = `SELECT dictionary, path, mediaType, width, height, content, contentOffset, contentLength, contentCompressionMethod, contentUncompressedLength FROM media WHERE ${conditions.join(' OR ')}`;
             const stmt = this._getCachedStatement(sql);
             stmt.reset(true);
             stmt.bind(bind);
@@ -2567,7 +2595,10 @@ export class DictionaryDatabase {
         this._termPrefixNegativeCache.clear();
         this._directTermIndexByDictionary.clear();
         if (this._enableTermEntryContentDedup) {
-            const hasHashArrays = Array.isArray(chunk.contentHash1List) && Array.isArray(chunk.contentHash2List);
+            const hasHashArrays = (
+                (Array.isArray(chunk.contentHash1List) || chunk.contentHash1List instanceof Uint32Array) &&
+                (Array.isArray(chunk.contentHash2List) || chunk.contentHash2List instanceof Uint32Array)
+            );
             if (hasHashArrays) {
                 await this._bulkAddArtifactTermsChunkWithContentDedup(chunk);
                 return;
@@ -2597,10 +2628,11 @@ export class DictionaryDatabase {
         const rows = new Array(count);
         for (let i = 0; i < count; ++i) {
             const expressionBytes = chunk.expressionBytesList[i];
-            const readingEqualsExpression = chunk.readingEqualsExpressionList[i] === true;
+            const readingEqualsExpression = chunk.readingEqualsExpressionList[i] === true || chunk.readingEqualsExpressionList[i] === 1;
             const readingBytes = readingEqualsExpression ? expressionBytes : chunk.readingBytesList[i];
             const expression = this._textDecoder.decode(expressionBytes);
             const reading = readingEqualsExpression ? expression : this._textDecoder.decode(readingBytes);
+            const sequenceValue = chunk.sequenceList[i];
             rows[i] = {
                 dictionary: chunk.dictionary,
                 expression,
@@ -2615,7 +2647,7 @@ export class DictionaryDatabase {
                 termTags: '',
                 glossary: [],
                 score: chunk.scoreList[i] ?? 0,
-                sequence: typeof chunk.sequenceList[i] === 'number' ? chunk.sequenceList[i] : null,
+                sequence: typeof sequenceValue === 'number' && sequenceValue >= 0 ? sequenceValue : null,
                 termEntryContentBytes: chunk.contentBytesList[i],
                 termEntryContentDictName: Array.isArray(chunk.contentDictNameList) ? (chunk.contentDictNameList[i] ?? null) : null,
             };
@@ -2758,7 +2790,7 @@ export class DictionaryDatabase {
                 const bind = [];
                 for (let j = 0; j < chunkCount; ++j) {
                     const row = items[i + j];
-                    valueRows.push('(?, ?, ?, ?, ?, x\'\', ?, ?)');
+                    valueRows.push('(?, ?, ?, ?, ?, x\'\', ?, ?, ?, ?)');
                     bind.push(
                         row.dictionary,
                         row.path,
@@ -2767,9 +2799,69 @@ export class DictionaryDatabase {
                         row.height,
                         typeof row.contentOffset === 'number' ? row.contentOffset : 0,
                         typeof row.contentLength === 'number' ? row.contentLength : 0,
+                        typeof row.contentCompressionMethod === 'number' ? row.contentCompressionMethod : ZIP_COMPRESSION_METHOD_STORE,
+                        typeof row.contentUncompressedLength === 'number' ? row.contentUncompressedLength : (typeof row.contentLength === 'number' ? row.contentLength : 0),
                     );
                 }
-                const sql = 'INSERT INTO media(dictionary, path, mediaType, width, height, content, contentOffset, contentLength) VALUES ' + valueRows.join(',');
+                const sql = 'INSERT INTO media(dictionary, path, mediaType, width, height, content, contentOffset, contentLength, contentCompressionMethod, contentUncompressedLength) VALUES ' + valueRows.join(',');
+                const stmt = this._getCachedStatement(sql);
+                stmt.reset(true);
+                stmt.bind(bind);
+                stmt.step();
+            }
+            if (useLocalTransaction) {
+                db.exec('COMMIT');
+            }
+        } catch (e) {
+            if (useLocalTransaction) {
+                try { db.exec('ROLLBACK'); } catch (_) { /* NOP */ }
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * @param {string} dictionary
+     * @param {Array<{path: string, mediaType: string, packedOffset: number, packedLength: number, compressionMethod?: number, uncompressedLength?: number}>} items
+     * @param {number} baseOffset
+     * @param {boolean} preserveCompressedMedia
+     * @returns {Promise<void>}
+     */
+    async bulkAddExternalMediaManifestRows(dictionary, items, baseOffset, preserveCompressedMedia = false) {
+        const db = this._requireDb();
+        if (items.length === 0) { return; }
+        const useLocalTransaction = !this._bulkImportTransactionOpen;
+        if (useLocalTransaction) {
+            await this._beginImmediateTransaction(db);
+        }
+        try {
+            for (let i = 0, ii = items.length; i < ii; i += EXTERNAL_MEDIA_BULK_INSERT_BATCH_SIZE) {
+                const chunkCount = Math.min(EXTERNAL_MEDIA_BULK_INSERT_BATCH_SIZE, ii - i);
+                /** @type {string[]} */
+                const valueRows = [];
+                /** @type {import('@sqlite.org/sqlite-wasm').Bindable[]} */
+                const bind = [];
+                for (let j = 0; j < chunkCount; ++j) {
+                    const row = items[i + j];
+                    valueRows.push('(?, ?, ?, ?, ?, x\'\', ?, ?, ?, ?)');
+                    const packedLength = row.packedLength;
+                    bind.push(
+                        dictionary,
+                        row.path,
+                        row.mediaType,
+                        0,
+                        0,
+                        baseOffset + row.packedOffset,
+                        packedLength,
+                        preserveCompressedMedia ?
+                            (typeof row.compressionMethod === 'number' ? row.compressionMethod : ZIP_COMPRESSION_METHOD_STORE) :
+                            ZIP_COMPRESSION_METHOD_STORE,
+                        preserveCompressedMedia ?
+                            (typeof row.uncompressedLength === 'number' ? row.uncompressedLength : packedLength) :
+                            packedLength,
+                    );
+                }
+                const sql = 'INSERT INTO media(dictionary, path, mediaType, width, height, content, contentOffset, contentLength, contentCompressionMethod, contentUncompressedLength) VALUES ' + valueRows.join(',');
                 const stmt = this._getCachedStatement(sql);
                 stmt.reset(true);
                 stmt.bind(bind);
@@ -2889,8 +2981,8 @@ export class DictionaryDatabase {
             case 'media':
                 return {
                     table: 'media',
-                    columnsSql: 'dictionary, path, mediaType, width, height, content, contentOffset, contentLength',
-                    rowPlaceholderSql: '(?, ?, ?, ?, ?, ?, ?, ?)',
+                    columnsSql: 'dictionary, path, mediaType, width, height, content, contentOffset, contentLength, contentCompressionMethod, contentUncompressedLength',
+                    rowPlaceholderSql: '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                     batchSize: 8,
                     bindRow: (item) => {
                         const row = /** @type {import('dictionary-database').MediaDataArrayBufferContent} */ (item);
@@ -2903,6 +2995,8 @@ export class DictionaryDatabase {
                             row.content,
                             typeof row.contentOffset === 'number' ? row.contentOffset : 0,
                             typeof row.contentLength === 'number' ? row.contentLength : 0,
+                            typeof row.contentCompressionMethod === 'number' ? row.contentCompressionMethod : ZIP_COMPRESSION_METHOD_STORE,
+                            typeof row.contentUncompressedLength === 'number' ? row.contentUncompressedLength : (typeof row.contentLength === 'number' ? row.contentLength : 0),
                         ];
                     },
                 };
@@ -3789,10 +3883,10 @@ export class DictionaryDatabase {
             /** @type {number[]} */
             const contentLengths = new Array(count);
             /** @type {string | null} */
-            let uniformContentDictName = null;
-            /** @type {(string|null)[] | null} */
-            let contentDictNames = null;
-            const contentChunks = chunk.contentBytesList;
+                let uniformContentDictName = null;
+                /** @type {(string|null)[] | null} */
+                let contentDictNames = null;
+                const contentChunks = chunk.contentBytesList;
             const tContentAppendStart = safePerformance.now();
             if (this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) {
                 const firstContentLength = contentChunks[0]?.byteLength ?? 0;
@@ -3961,12 +4055,12 @@ export class DictionaryDatabase {
             await this._beginImmediateTransaction(this._requireDb());
         }
         try {
-            /** @type {number[]} */
-            const contentOffsets = new Array(count);
-            /** @type {number[]} */
-            const contentLengths = new Array(count);
-            /** @type {(string|null)[]} */
-            const resolvedContentDictNames = new Array(count);
+            const explicitContentDictNames = Array.isArray(chunk.contentDictNameList) ? chunk.contentDictNameList : null;
+            const uniformContentDictName = typeof chunk.uniformContentDictName !== 'undefined' ? (chunk.uniformContentDictName ?? null) : null;
+            const contentOffsets = new Int32Array(count);
+            const contentLengths = new Int32Array(count);
+            /** @type {string|((string|null)[])} */
+            let resolvedContentDictNames = explicitContentDictNames !== null ? new Array(count) : (uniformContentDictName ?? 'raw');
             /** @type {Map<number, Map<number, number>>} */
             const pendingContentIndexByHashPair = new Map();
             /** @type {Uint8Array[]} */
@@ -3977,10 +4071,20 @@ export class DictionaryDatabase {
             const pendingContentHash2s = [];
             /** @type {(string|null)[]} */
             const pendingContentDictNames = [];
-            /** @type {number[]} */
-            const pendingRowToUniqueIndex = new Array(count);
-            const explicitContentDictNames = Array.isArray(chunk.contentDictNameList) ? chunk.contentDictNameList : null;
-            const uniformContentDictName = typeof chunk.uniformContentDictName !== 'undefined' ? (chunk.uniformContentDictName ?? null) : null;
+            const pendingRowToUniqueIndex = new Int32Array(count);
+            pendingRowToUniqueIndex.fill(-1);
+            const ensureResolvedContentDictNamesArray = (fillUntil) => {
+                if (Array.isArray(resolvedContentDictNames)) {
+                    return resolvedContentDictNames;
+                }
+                const uniformDictName = resolvedContentDictNames;
+                const values = new Array(count);
+                if (fillUntil > 0) {
+                    values.fill(uniformDictName, 0, fillUntil);
+                }
+                resolvedContentDictNames = values;
+                return values;
+            };
             const tContentAppendStart = safePerformance.now();
             for (let i = 0; i < count; ++i) {
                 const hash1 = chunk.contentHash1List[i] >>> 0;
@@ -3989,8 +4093,11 @@ export class DictionaryDatabase {
                 if (typeof existingMeta !== 'undefined') {
                     contentOffsets[i] = existingMeta.offset;
                     contentLengths[i] = existingMeta.length;
-                    resolvedContentDictNames[i] = existingMeta.dictName;
-                    pendingRowToUniqueIndex[i] = -1;
+                    if (Array.isArray(resolvedContentDictNames)) {
+                        resolvedContentDictNames[i] = existingMeta.dictName;
+                    } else if (existingMeta.dictName !== resolvedContentDictNames) {
+                        ensureResolvedContentDictNamesArray(i)[i] = existingMeta.dictName;
+                    }
                     continue;
                 }
                 let byHash2 = pendingContentIndexByHashPair.get(hash1);
@@ -4020,23 +4127,36 @@ export class DictionaryDatabase {
                     compressionDictName,
                     pendingContentDictNames,
                 );
-                const spans = await this._termContentStore.appendBatch(storageChunks.storedChunks);
+                /** @type {number[]} */
+                const storedOffsets = [];
+                /** @type {number[]} */
+                const storedLengths = [];
+                await this._termContentStore.appendBatchToArrays(
+                    storageChunks.storedChunks,
+                    storedOffsets,
+                    storedLengths,
+                );
                 for (let i = 0; i < count; ++i) {
                     const pendingIndex = pendingRowToUniqueIndex[i];
                     if (pendingIndex < 0) { continue; }
                     const storedChunkIndex = storageChunks.entryToStoredChunkIndexes[pendingIndex];
-                    const span = spans[storedChunkIndex];
-                    contentOffsets[i] = span.offset;
-                    contentLengths[i] = span.length;
-                    resolvedContentDictNames[i] = storageChunks.contentDictNames[pendingIndex] ?? 'raw';
+                    const storedOffset = storedOffsets[storedChunkIndex];
+                    const storedLength = storedLengths[storedChunkIndex];
+                    contentOffsets[i] = storedOffset;
+                    contentLengths[i] = storedLength;
+                    const resolvedContentDictName = storageChunks.contentDictNames[pendingIndex] ?? 'raw';
+                    if (Array.isArray(resolvedContentDictNames)) {
+                        resolvedContentDictNames[i] = resolvedContentDictName;
+                    } else if (resolvedContentDictName !== resolvedContentDictNames) {
+                        ensureResolvedContentDictNamesArray(i)[i] = resolvedContentDictName;
+                    }
                 }
                 for (let i = 0; i < pendingContentBytes.length; ++i) {
                     const storedChunkIndex = storageChunks.entryToStoredChunkIndexes[i];
-                    const span = spans[storedChunkIndex];
                     this._cacheTermEntryContentMeta(
                         null,
-                        span.offset,
-                        span.length,
+                        storedOffsets[storedChunkIndex],
+                        storedLengths[storedChunkIndex],
                         storageChunks.contentDictNames[i],
                         0,
                         pendingContentHash1s[i],
@@ -4305,7 +4425,9 @@ export class DictionaryDatabase {
                 height INTEGER NOT NULL,
                 content BLOB NOT NULL,
                 contentOffset INTEGER NOT NULL DEFAULT 0,
-                contentLength INTEGER NOT NULL DEFAULT 0
+                contentLength INTEGER NOT NULL DEFAULT 0,
+                contentCompressionMethod INTEGER NOT NULL DEFAULT 0,
+                contentUncompressedLength INTEGER NOT NULL DEFAULT 0
             );
 
             CREATE TABLE IF NOT EXISTS sharedGlossaryArtifacts (
@@ -4823,11 +4945,19 @@ export class DictionaryDatabase {
         const mediaTableInfo = db.selectObjects('PRAGMA table_info(media)');
         const hasContentOffset = mediaTableInfo.some((row) => this._asString(row.name) === 'contentOffset');
         const hasContentLength = mediaTableInfo.some((row) => this._asString(row.name) === 'contentLength');
+        const hasContentCompressionMethod = mediaTableInfo.some((row) => this._asString(row.name) === 'contentCompressionMethod');
+        const hasContentUncompressedLength = mediaTableInfo.some((row) => this._asString(row.name) === 'contentUncompressedLength');
         if (!hasContentOffset) {
             db.exec('ALTER TABLE media ADD COLUMN contentOffset INTEGER NOT NULL DEFAULT 0');
         }
         if (!hasContentLength) {
             db.exec('ALTER TABLE media ADD COLUMN contentLength INTEGER NOT NULL DEFAULT 0');
+        }
+        if (!hasContentCompressionMethod) {
+            db.exec('ALTER TABLE media ADD COLUMN contentCompressionMethod INTEGER NOT NULL DEFAULT 0');
+        }
+        if (!hasContentUncompressedLength) {
+            db.exec('ALTER TABLE media ADD COLUMN contentUncompressedLength INTEGER NOT NULL DEFAULT 0');
         }
     }
 
@@ -4953,15 +5083,17 @@ export class DictionaryDatabase {
                 };
             case 'media':
                 return {
-                    sql: 'INSERT INTO media(dictionary, path, mediaType, width, height, content, contentOffset, contentLength) VALUES($dictionary, $path, $mediaType, $width, $height, $content, $contentOffset, $contentLength)',
+                    sql: 'INSERT INTO media(dictionary, path, mediaType, width, height, content, contentOffset, contentLength, contentCompressionMethod, contentUncompressedLength) VALUES($dictionary, $path, $mediaType, $width, $height, $content, $contentOffset, $contentLength, $contentCompressionMethod, $contentUncompressedLength)',
                     /**
                      * @param {import('dictionary-database').MediaDataArrayBufferContent} row
-                     * @returns {{$dictionary: string, $path: string, $mediaType: string, $width: number, $height: number, $content: ArrayBuffer, $contentOffset: number, $contentLength: number}}
+                     * @returns {{$dictionary: string, $path: string, $mediaType: string, $width: number, $height: number, $content: ArrayBuffer, $contentOffset: number, $contentLength: number, $contentCompressionMethod: number, $contentUncompressedLength: number}}
                      */
                     bind: (row) => {
-                        const source = /** @type {{dictionary: string, path: string, mediaType: string, width: number, height: number, content: ArrayBuffer, contentOffset?: unknown, contentLength?: unknown}} */ (row);
+                        const source = /** @type {{dictionary: string, path: string, mediaType: string, width: number, height: number, content: ArrayBuffer, contentOffset?: unknown, contentLength?: unknown, contentCompressionMethod?: unknown, contentUncompressedLength?: unknown}} */ (row);
                         const contentOffset = typeof source.contentOffset === 'number' ? source.contentOffset : 0;
                         const contentLength = typeof source.contentLength === 'number' ? source.contentLength : 0;
+                        const contentCompressionMethod = typeof source.contentCompressionMethod === 'number' ? source.contentCompressionMethod : ZIP_COMPRESSION_METHOD_STORE;
+                        const contentUncompressedLength = typeof source.contentUncompressedLength === 'number' ? source.contentUncompressedLength : contentLength;
                         return {
                             $dictionary: source.dictionary,
                             $path: source.path,
@@ -4971,6 +5103,8 @@ export class DictionaryDatabase {
                             $content: source.content,
                             $contentOffset: contentOffset,
                             $contentLength: contentLength,
+                            $contentCompressionMethod: contentCompressionMethod,
+                            $contentUncompressedLength: contentUncompressedLength,
                         };
                     },
                 };
@@ -5294,6 +5428,7 @@ export class DictionaryDatabase {
                     try {
                         const rawSharedGlossaryHeader = (
                             contentDictName === RAW_TERM_CONTENT_SHARED_GLOSSARY_DICT_NAME ||
+                            contentDictName === RAW_TERM_CONTENT_COMPRESSED_SHARED_GLOSSARY_DICT_NAME ||
                             isRawTermContentSharedGlossaryBinary(contentBytes)
                         ) ?
                             decodeRawTermContentSharedGlossaryHeader(contentBytes, this._textDecoder) :
@@ -5692,9 +5827,14 @@ export class DictionaryDatabase {
     async _deserializeMediaRow(row) {
         const contentOffset = this._asNumber(row.contentOffset, 0);
         const contentLength = this._asNumber(row.contentLength, 0);
+        const contentCompressionMethod = this._asNumber(row.contentCompressionMethod, ZIP_COMPRESSION_METHOD_STORE);
+        const contentUncompressedLength = this._asNumber(row.contentUncompressedLength, 0);
         let content = this._toArrayBuffer(row.content);
         if (contentLength > 0 && content.byteLength === 0) {
-            const contentBytes = await this._termContentStore.readSlice(contentOffset, contentLength);
+            let contentBytes = await this._termContentStore.readSlice(contentOffset, contentLength);
+            if (contentCompressionMethod !== ZIP_COMPRESSION_METHOD_STORE) {
+                contentBytes = await inflateZipMediaContent(contentBytes, contentCompressionMethod, contentUncompressedLength);
+            }
             content = (
                 contentBytes.byteOffset === 0 &&
                 contentBytes.byteLength === contentBytes.buffer.byteLength
@@ -5711,6 +5851,8 @@ export class DictionaryDatabase {
             content,
             contentOffset,
             contentLength,
+            contentCompressionMethod,
+            contentUncompressedLength,
         };
     }
 
@@ -5954,10 +6096,18 @@ export class DictionaryDatabase {
      * @param {Uint8Array[]} contentBytesList
      * @param {string|null} compressionDictName
      * @param {(string|null)[]} [contentDictNameOverrides]
+     * @param {string|null} [uniformRawContentDictName]
      * @returns {{storedChunks: Uint8Array[], contentDictNames: string[], entryToStoredChunkIndexes: number[]}}
      */
-    _createTermContentStorageChunks(contentBytesList, compressionDictName, contentDictNameOverrides = []) {
+    _createTermContentStorageChunks(contentBytesList, compressionDictName, contentDictNameOverrides = [], uniformRawContentDictName = null) {
         if (this._termContentStorageMode === TERM_CONTENT_STORAGE_MODE_RAW_BYTES) {
+            if (typeof uniformRawContentDictName === 'string' && uniformRawContentDictName.length > 0) {
+                return {
+                    storedChunks: contentBytesList,
+                    contentDictNames: Array(contentBytesList.length).fill(uniformRawContentDictName),
+                    entryToStoredChunkIndexes: contentBytesList.map((_, index) => index),
+                };
+            }
             return {
                 storedChunks: contentBytesList,
                 contentDictNames: contentBytesList.map((contentBytes, index) => {

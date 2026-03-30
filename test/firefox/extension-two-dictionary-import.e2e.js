@@ -1685,103 +1685,138 @@ async function hoverLookupOnPage(driver, pageUrl, targetSelector, expectedDictio
  * @returns {Promise<Record<string, unknown>>}
  */
 async function getBackendLookupDiagnostics(driver, term) {
+    const originalWindowHandle = await driver.getWindowHandle();
+    let activeExtensionWindowHandle = originalWindowHandle;
+    let shouldRestoreWindowHandle = false;
+    try {
+        const currentUrl = String(await driver.getCurrentUrl());
+        if (!/^(moz|chrome)-extension:\/\//.test(currentUrl)) {
+            const windowHandles = await driver.getAllWindowHandles();
+            for (const windowHandle of windowHandles) {
+                await driver.switchTo().window(windowHandle);
+                const url = String(await driver.getCurrentUrl());
+                if (/^(moz|chrome)-extension:\/\//.test(url)) {
+                    activeExtensionWindowHandle = windowHandle;
+                    shouldRestoreWindowHandle = windowHandle !== originalWindowHandle;
+                    break;
+                }
+            }
+        }
+    } catch (e) {
+        try {
+            await driver.switchTo().window(originalWindowHandle);
+        } catch (_) {
+            // Ignore restore failures here; the async script call below will report the real problem.
+        }
+        return {error: String(e && e.message ? e.message : e)};
+    }
     // Selenium executeAsyncScript return value is untyped (`any`).
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const diagnostics = await driver.executeAsyncScript(`
-        const done = arguments[arguments.length - 1];
-        const send = (action, params) => new Promise((resolve, reject) => {
-            try {
-                chrome.runtime.sendMessage({action, params}, (response) => {
-                    const runtimeError = chrome.runtime.lastError;
-                    if (runtimeError) {
-                        reject(new Error(runtimeError.message || String(runtimeError)));
-                        return;
-                    }
-                    if (response && typeof response === 'object' && 'error' in response) {
-                        reject(new Error(JSON.stringify(response.error)));
-                        return;
-                    }
-                    resolve(response && typeof response === 'object' ? response.result : response);
-                });
-            } catch (e) {
-                reject(e);
-            }
-        });
-        (async () => {
-            const term = arguments[0];
-            const dictionaryInfo = await send('getDictionaryInfo', undefined);
-            const installedTitles = (Array.isArray(dictionaryInfo) ? dictionaryInfo : [])
-                .map((row) => String(row?.title || '').trim())
-                .filter((value) => value.length > 0);
-            const termsFind = await send('termsFind', {
-                text: term,
-                details: {primaryReading: ''},
-                optionsContext: {},
+    try {
+        const diagnostics = await driver.executeAsyncScript(`
+            const done = arguments[arguments.length - 1];
+            const send = (action, params) => new Promise((resolve, reject) => {
+                try {
+                    chrome.runtime.sendMessage({action, params}, (response) => {
+                        const runtimeError = chrome.runtime.lastError;
+                        if (runtimeError) {
+                            reject(new Error(runtimeError.message || String(runtimeError)));
+                            return;
+                        }
+                        if (response && typeof response === 'object' && 'error' in response) {
+                            reject(new Error(JSON.stringify(response.error)));
+                            return;
+                        }
+                        resolve(response && typeof response === 'object' ? response.result : response);
+                    });
+                } catch (e) {
+                    reject(e);
+                }
             });
-            const termDictionaryNamesSet = new Set();
-            if (Array.isArray(termsFind?.dictionaryEntries)) {
-                for (const entry of termsFind.dictionaryEntries) {
-                    if (!(entry && typeof entry === 'object')) { continue; }
-                    const dictionary = typeof entry.dictionary === 'string' ? entry.dictionary : null;
-                    if (dictionary) {
-                        termDictionaryNamesSet.add(dictionary);
-                    }
-                    if (Array.isArray(entry.definitions)) {
-                        for (const definition of entry.definitions) {
-                            if (!(definition && typeof definition === 'object')) { continue; }
-                            const name = typeof definition.dictionary === 'string' ? definition.dictionary : null;
-                            if (name) {
-                                termDictionaryNamesSet.add(name);
+            (async () => {
+                const term = arguments[0];
+                const dictionaryInfo = await send('getDictionaryInfo', undefined);
+                const installedTitles = (Array.isArray(dictionaryInfo) ? dictionaryInfo : [])
+                    .map((row) => String(row?.title || '').trim())
+                    .filter((value) => value.length > 0);
+                const termsFind = await send('termsFind', {
+                    text: term,
+                    details: {primaryReading: ''},
+                    optionsContext: {},
+                });
+                const termDictionaryNamesSet = new Set();
+                if (Array.isArray(termsFind?.dictionaryEntries)) {
+                    for (const entry of termsFind.dictionaryEntries) {
+                        if (!(entry && typeof entry === 'object')) { continue; }
+                        const dictionary = typeof entry.dictionary === 'string' ? entry.dictionary : null;
+                        if (dictionary) {
+                            termDictionaryNamesSet.add(dictionary);
+                        }
+                        if (Array.isArray(entry.definitions)) {
+                            for (const definition of entry.definitions) {
+                                if (!(definition && typeof definition === 'object')) { continue; }
+                                const name = typeof definition.dictionary === 'string' ? definition.dictionary : null;
+                                if (name) {
+                                    termDictionaryNamesSet.add(name);
+                                }
                             }
                         }
                     }
                 }
-            }
-            const optionsFull = await send('optionsGetFull', undefined);
-            const profileDictionaries = Array.isArray(optionsFull?.profiles) ?
-                optionsFull.profiles.map((profile) => ({
-                    id: profile?.id ?? null,
-                    dictionaries: Array.isArray(profile?.options?.dictionaries) ?
-                        profile.options.dictionaries.map((dictionary) => String(dictionary?.name || '')) :
-                        [],
-                })) :
-                null;
-            const enabledInstalledExactMatches = Array.isArray(optionsFull?.profiles?.[0]?.options?.dictionaries) ?
-                optionsFull.profiles[0].options.dictionaries
-                    .filter((dictionary) => dictionary?.enabled === true)
-                    .map((dictionary) => String(dictionary?.name || '').trim())
-                    .filter((name) => name.length > 0 && installedTitles.includes(name)) :
-                [];
-            let debugLookupState = null;
-            try {
-                debugLookupState = await send('debugDictionaryLookupState', {
-                    text: term,
-                    dictionaryNames: [...new Set(enabledInstalledExactMatches)],
+                const optionsFull = await send('optionsGetFull', undefined);
+                const profileDictionaries = Array.isArray(optionsFull?.profiles) ?
+                    optionsFull.profiles.map((profile) => ({
+                        id: profile?.id ?? null,
+                        dictionaries: Array.isArray(profile?.options?.dictionaries) ?
+                            profile.options.dictionaries.map((dictionary) => String(dictionary?.name || '')) :
+                            [],
+                    })) :
+                    null;
+                const enabledInstalledExactMatches = Array.isArray(optionsFull?.profiles?.[0]?.options?.dictionaries) ?
+                    optionsFull.profiles[0].options.dictionaries
+                        .filter((dictionary) => dictionary?.enabled === true)
+                        .map((dictionary) => String(dictionary?.name || '').trim())
+                        .filter((name) => name.length > 0 && installedTitles.includes(name)) :
+                    [];
+                let debugLookupState = null;
+                try {
+                    debugLookupState = await send('debugDictionaryLookupState', {
+                        text: term,
+                        dictionaryNames: [...new Set(enabledInstalledExactMatches)],
+                    });
+                } catch (e) {
+                    debugLookupState = {
+                        ok: false,
+                        reason: 'debug lookup unavailable',
+                        text: term,
+                        error: String(e && e.message ? e.message : e),
+                    };
+                }
+                done({
+                    dictionaryInfo,
+                    installedTitles,
+                    debugLookupState,
+                    termResultCount: Array.isArray(termsFind?.dictionaryEntries) ? termsFind.dictionaryEntries.length : null,
+                    termDictionaryNames: [...termDictionaryNamesSet],
+                    profileDictionaries,
                 });
-            } catch (e) {
-                debugLookupState = {
-                    ok: false,
-                    reason: 'debug lookup unavailable',
-                    text: term,
-                    error: String(e && e.message ? e.message : e),
-                };
-            }
-            done({
-                dictionaryInfo,
-                installedTitles,
-                debugLookupState,
-                termResultCount: Array.isArray(termsFind?.dictionaryEntries) ? termsFind.dictionaryEntries.length : null,
-                termDictionaryNames: [...termDictionaryNamesSet],
-                profileDictionaries,
+            })().catch((e) => {
+                done({error: String(e && e.message ? e.message : e)});
             });
-        })().catch((e) => {
-            done({error: String(e && e.message ? e.message : e)});
-        });
-    `, term);
-    if (typeof diagnostics === 'object' && diagnostics !== null && !Array.isArray(diagnostics)) {
-        return /** @type {Record<string, unknown>} */ (diagnostics);
+        `, term);
+        if (typeof diagnostics === 'object' && diagnostics !== null && !Array.isArray(diagnostics)) {
+            return /** @type {Record<string, unknown>} */ (diagnostics);
+        }
+        return {error: `Unexpected diagnostics payload: ${String(diagnostics)}`};
+    } finally {
+        if (shouldRestoreWindowHandle && activeExtensionWindowHandle !== originalWindowHandle) {
+            try {
+                await driver.switchTo().window(originalWindowHandle);
+            } catch (_) {
+                // Ignore restoration failures; callers handle discarded contexts separately.
+            }
+        }
     }
-    return {error: `Unexpected diagnostics payload: ${String(diagnostics)}`};
 }
 
 /**
