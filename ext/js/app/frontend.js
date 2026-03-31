@@ -48,6 +48,7 @@ export class Frontend {
         allowRootFramePopupProxy,
         childrenSupported = true,
         hotkeyHandler,
+        browser,
     }) {
         /** @type {import('../application.js').Application} */
         this._application = application;
@@ -95,6 +96,7 @@ export class Frontend {
             searchTerms: true,
             searchKanji: true,
             textSourceGenerator: this._textSourceGenerator,
+            browser: browser,
         });
         /** @type {boolean} */
         this._textScannerHasBeenEnabled = false;

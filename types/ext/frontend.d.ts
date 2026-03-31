@@ -18,6 +18,7 @@
 import type {PopupFactory} from '../../ext/js/app/popup-factory';
 import type {HotkeyHandler} from '../../ext/js/input/hotkey-handler';
 import type {Application} from '../../ext/js/application';
+import type * as Environment from './environment';
 
 /** Details about how to set up the instance. */
 export type ConstructorDetails = {
@@ -43,6 +44,8 @@ export type ConstructorDetails = {
     childrenSupported: boolean;
     /** A HotkeyHandler instance. */
     hotkeyHandler: HotkeyHandler;
+    /** The detected browser */
+    browser: Environment.Browser | null;
 };
 
 export type PageType = 'web' | 'popup' | 'search';

@@ -70,6 +70,7 @@ type AlphabeticDiacriticsProcessor = {
  * Any new language should be added to this object.
  */
 type AllTextProcessors = {
+    xxx: Record<string, never>;
     aii: {
         pre: {
             removeSyriacScriptDiacritics: TextProcessor;
@@ -147,6 +148,9 @@ type AllTextProcessors = {
         };
     };
     ga: {
+        pre: CapitalizationPreprocessors;
+    };
+    gd: {
         pre: CapitalizationPreprocessors;
     };
     grc: {

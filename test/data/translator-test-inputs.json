@@ -544,6 +544,20 @@
                     "primaryReading": "じじゅう"
                 }
             ]
+        },
+        {
+            "name": "Longer match first (PR#1075)",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "oppidorum",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "language": "la",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
         }
     ]
 }

@@ -28,6 +28,8 @@ await Application.main(false, async (application) => {
     const popupFactory = new PopupFactory(application);
     popupFactory.prepare();
 
+    const {browser} = await application.api.getEnvironmentInfo();
+
     const frontend = new Frontend({
         application,
         popupFactory,
@@ -40,6 +42,7 @@ await Application.main(false, async (application) => {
         allowRootFramePopupProxy: true,
         childrenSupported: true,
         hotkeyHandler,
+        browser: browser,
     });
     await frontend.prepare();
 });
