@@ -52,6 +52,8 @@ export class QueryParser extends EventDispatcher {
         this._useInternalParser = true;
         /** @type {boolean} */
         this._useMecabParser = false;
+        /** @type {boolean} */
+        this._useAllFrequencyDictionaries = false;
         /** @type {import('api').ParseTextResultItem[]} */
         this._parseResults = [];
         /** @type {HTMLElement} */
@@ -94,7 +96,7 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('display').QueryParserOptions} display
      */
-    setOptions({selectedParser, termSpacing, readingMode, useInternalParser, useMecabParser, language, scanning}) {
+    setOptions({selectedParser, termSpacing, readingMode, useInternalParser, useMecabParser, useAllFrequencyDictionaries, language, scanning}) {
         let selectedParserChanged = false;
         if (selectedParser === null || typeof selectedParser === 'string') {
             selectedParserChanged = (this._selectedParser !== selectedParser);
@@ -111,6 +113,9 @@ export class QueryParser extends EventDispatcher {
         }
         if (typeof useMecabParser === 'boolean') {
             this._useMecabParser = useMecabParser;
+        }
+        if (typeof useAllFrequencyDictionaries === 'boolean') {
+            this._useAllFrequencyDictionaries = useAllFrequencyDictionaries;
         }
         if (scanning !== null && typeof scanning === 'object') {
             const {scanLength} = scanning;
@@ -142,7 +147,7 @@ export class QueryParser extends EventDispatcher {
         /** @type {?import('core').TokenObject} */
         const token = {};
         this._setTextToken = token;
-        this._parseResults = await this._api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
+        this._parseResults = await this._api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser, this._useAllFrequencyDictionaries);
         if (this._setTextToken !== token) { return; }
 
         this._refreshSelectedParser();
