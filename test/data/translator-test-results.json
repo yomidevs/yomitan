@@ -23924,6 +23924,7 @@
         "headwords": [
           {
             "index": 0,
+            "headwordIndex": 0,
             "term": "oppidum",
             "reading": "oppidum",
             "sources": [
@@ -24003,6 +24004,7 @@
         "headwords": [
           {
             "index": 0,
+            "headwordIndex": 0,
             "term": "oppido",
             "reading": "oppidō",
             "sources": [
