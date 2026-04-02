@@ -89,13 +89,13 @@ export const INVALID_NOTE_ID = -1;
 /**
  * @param {string} prefix
  * @param {string} extension
- * @param {number} timestamp
+ * @param {number|string} suffix
  * @returns {string}
  */
-export function generateAnkiNoteMediaFileName(prefix, extension, timestamp) {
+export function generateAnkiNoteMediaFileName(prefix, extension, suffix) {
     let fileName = prefix;
 
-    fileName += `_${ankNoteDateToString(new Date(timestamp))}`;
+    fileName += typeof suffix === 'string' ? suffix : `_${ankNoteDateToString(new Date(suffix))}`;
     fileName += extension;
 
     fileName = replaceInvalidFileNameCharacters(fileName);
