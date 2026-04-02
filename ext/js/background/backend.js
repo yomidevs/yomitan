@@ -27,8 +27,8 @@ import {fetchText} from '../core/fetch-utilities.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
-import {clone, deferPromise, promiseTimeout, unsafeArrayBufferDigest} from '../core/utilities.js';
-import {generateAnkiNoteMediaFileName, INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
+import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
+import {generateAnkiNoteMediaFileName, INVALID_NOTE_ID, isNoteDataValid, mediaFileNameHashOrTimestamp} from '../data/anki-util.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
@@ -2564,23 +2564,7 @@ export class Backend {
             if (media !== null) {
                 const {content, mediaType} = media;
                 const extension = getFileExtensionFromImageMediaType(mediaType);
-                try {
-                    // @ts-expect-error - typescript-eslint does not recognize `Uint8Array.fromBase64` yet despite it already being available on all major browsers for over 6 months
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                    const contentHash = await unsafeArrayBufferDigest('SHA-1', Uint8Array.fromBase64(content));
-                    fileName = generateAnkiNoteMediaFileName(
-                        'yomitan_dictionary_media_',
-                        extension !== null ? extension : '',
-                        contentHash,
-                    );
-                } catch {
-                    // fallback on using timestamp for older browser versions
-                    fileName = generateAnkiNoteMediaFileName(
-                        `yomitan_dictionary_media_${i + 1}`,
-                        extension !== null ? extension : '',
-                        timestamp,
-                    );
-                }
+                fileName = await mediaFileNameHashOrTimestamp(content, extension, i, timestamp);
                 try {
                     fileName = await ankiConnect.storeMediaFile(fileName, content);
                 } catch (e) {
