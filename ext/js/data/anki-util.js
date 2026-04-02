@@ -105,30 +105,24 @@ export function generateAnkiNoteMediaFileName(prefix, extension, suffix) {
 }
 
 /**
+ * @param {string} prefix
  * @param {string} content
  * @param {string?} extension
- * @param {number} mediaCount
+ * @param {number?} mediaCount
  * @param {number} timestamp
  * @returns {Promise<string>}
  */
-export async function mediaFileNameHashOrTimestamp(content, extension, mediaCount, timestamp) {
+export async function mediaFileNameHashOrTimestamp(prefix, content, extension, mediaCount, timestamp) {
     try {
         /** @type {string} */
         // @ts-expect-error - typescript-eslint does not recognize `Uint8Array.fromBase64` yet despite it already being available on all major browsers for over 6 months
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         const contentHash = await unsafeArrayBufferDigest('SHA-1', Uint8Array.fromBase64(content));
-        return generateAnkiNoteMediaFileName(
-            'yomitan_dictionary_media_',
-                            extension !== null ? extension : '',
-                            contentHash,
-        );
+        return generateAnkiNoteMediaFileName(`${prefix}_`, extension !== null ? extension : '', contentHash);
     } catch {
+        const mediaCountInfix = mediaCount ? mediaCount + 1 : '';
         // fallback on using timestamp for older browser versions
-        return generateAnkiNoteMediaFileName(
-            `yomitan_dictionary_media_${mediaCount + 1}`,
-                            extension !== null ? extension : '',
-                            timestamp,
-        );
+        return generateAnkiNoteMediaFileName(`${prefix}_${mediaCountInfix}`, extension !== null ? extension : '', timestamp);
     }
 }
 

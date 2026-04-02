@@ -2564,7 +2564,7 @@ export class Backend {
             if (media !== null) {
                 const {content, mediaType} = media;
                 const extension = getFileExtensionFromImageMediaType(mediaType);
-                fileName = await mediaFileNameHashOrTimestamp(content, extension, i, timestamp);
+                fileName = await mediaFileNameHashOrTimestamp('yomitan_dictionary_media', content, extension, i, timestamp);
                 try {
                     fileName = await ankiConnect.storeMediaFile(fileName, content);
                 } catch (e) {
