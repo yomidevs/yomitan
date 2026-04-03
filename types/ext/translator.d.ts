@@ -36,6 +36,8 @@ export type TermFrequencySimple = {
     displayValue: string | null;
     /** Whether or not the `frequency` field is derived from a parsed string. */
     displayValueParsed: boolean;
+    /** How the frequency should be interpreted. */
+    frequencyMode?: 'occurrence-based' | 'rank-based' | null;
 };
 
 export type TagGroup = {

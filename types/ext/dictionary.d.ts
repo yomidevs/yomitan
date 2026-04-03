@@ -198,6 +198,10 @@ export type KanjiFrequency = {
      * Whether or not the displayValue string was parsed to determine the frequency value.
      */
     displayValueParsed: boolean;
+    /**
+     * How the frequency should be interpreted.
+     */
+    frequencyMode?: 'occurrence-based' | 'rank-based' | null;
 };
 
 // Terms
@@ -498,6 +502,10 @@ export type TermFrequency = {
      * Whether or not the displayValue string was parsed to determine the frequency value.
      */
     displayValueParsed: boolean;
+    /**
+     * How the frequency should be interpreted.
+     */
+    frequencyMode?: 'occurrence-based' | 'rank-based' | null;
 };
 
 /**

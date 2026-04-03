@@ -1763,34 +1763,34 @@ describe('OptionsUtil', () => {
     {{~/if~}}
 {{/inline}}
 {{#*inline "frequency-harmonic-rank"}}
-    {{~#if (op "===" definition.frequencyHarmonic -1) ~}}
+    {{~#if (op "===" definition.frequencyHarmonicRank -1) ~}}
         9999999
     {{~else ~}}
-        {{definition.frequencyHarmonic}}
+        {{definition.frequencyHarmonicRank}}
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "frequency-harmonic-occurrence"}}
-    {{~#if (op "===" definition.frequencyHarmonic -1) ~}}
+    {{~#if (op "===" definition.frequencyHarmonicOccurrence -1) ~}}
         0
     {{~else ~}}
-        {{definition.frequencyHarmonic}}
+        {{definition.frequencyHarmonicOccurrence}}
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "frequency-average-rank"}}
-    {{~#if (op "===" definition.frequencyAverage -1) ~}}
+    {{~#if (op "===" definition.frequencyAverageRank -1) ~}}
         9999999
     {{~else ~}}
-        {{definition.frequencyAverage}}
+        {{definition.frequencyAverageRank}}
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "frequency-average-occurrence"}}
-    {{~#if (op "===" definition.frequencyAverage -1) ~}}
+    {{~#if (op "===" definition.frequencyAverageOccurrence -1) ~}}
         0
     {{~else ~}}
-        {{definition.frequencyAverage}}
+        {{definition.frequencyAverageOccurrence}}
     {{~/if~}}
 {{/inline}}
 
