@@ -17,6 +17,7 @@
  */
 
 import {isObjectNotArray} from '../core/object-utilities.js';
+import {unsafeArrayBufferDigest} from '../core/utilities.js';
 
 /** @type {RegExp} @readonly */
 const markerPattern = /\{([\p{Letter}\p{Number}_-]+)\}/gu;
@@ -89,18 +90,40 @@ export const INVALID_NOTE_ID = -1;
 /**
  * @param {string} prefix
  * @param {string} extension
- * @param {number} timestamp
+ * @param {number|string} suffix
  * @returns {string}
  */
-export function generateAnkiNoteMediaFileName(prefix, extension, timestamp) {
+export function generateAnkiNoteMediaFileName(prefix, extension, suffix) {
     let fileName = prefix;
 
-    fileName += `_${ankNoteDateToString(new Date(timestamp))}`;
+    fileName += typeof suffix === 'string' ? suffix : `_${ankNoteDateToString(new Date(suffix))}`;
     fileName += extension;
 
     fileName = replaceInvalidFileNameCharacters(fileName);
 
     return fileName;
+}
+
+/**
+ * @param {string} prefix
+ * @param {string} content
+ * @param {string?} extension
+ * @param {number?} mediaCount
+ * @param {number} timestamp
+ * @returns {Promise<string>}
+ */
+export async function mediaFileNameHashOrTimestamp(prefix, content, extension, mediaCount, timestamp) {
+    try {
+        /** @type {string} */
+        // @ts-expect-error - typescript-eslint does not recognize `Uint8Array.fromBase64` yet despite it already being available on all major browsers for over 6 months
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        const contentHash = await unsafeArrayBufferDigest('SHA-1', Uint8Array.fromBase64(content));
+        return generateAnkiNoteMediaFileName(`${prefix}_`, extension !== null ? extension : '', contentHash);
+    } catch {
+        const mediaCountInfix = mediaCount ? mediaCount + 1 : '';
+        // fallback on using timestamp for older browser versions
+        return generateAnkiNoteMediaFileName(`${prefix}_${mediaCountInfix}`, extension !== null ? extension : '', timestamp);
+    }
 }
 
 /**

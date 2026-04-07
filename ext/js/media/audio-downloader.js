@@ -19,6 +19,7 @@
 import {RequestBuilder} from '../background/request-builder.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {readResponseJson} from '../core/json.js';
+import {arrayBufferDigest} from '../core/utilities.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {JsonSchema} from '../data/json-schema.js';
 import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
@@ -559,7 +560,7 @@ export class AudioDownloader {
         switch (sourceType) {
             case 'jpod101':
             {
-                const digest = await this._arrayBufferDigest(arrayBuffer);
+                const digest = await arrayBufferDigest('SHA-256', arrayBuffer);
                 switch (digest) {
                     case 'ae6398b5a27bc8c0a771df6c907ade794be15518174773c58c7c7ddd17098906': // Invalid audio
                         return false;
@@ -570,19 +571,6 @@ export class AudioDownloader {
             default:
                 return true;
         }
-    }
-
-    /**
-     * @param {ArrayBuffer} arrayBuffer
-     * @returns {Promise<string>}
-     */
-    async _arrayBufferDigest(arrayBuffer) {
-        const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array(arrayBuffer)));
-        let digest = '';
-        for (const byte of hash) {
-            digest += byte.toString(16).padStart(2, '0');
-        }
-        return digest;
     }
 
     /**

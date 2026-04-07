@@ -26,7 +26,7 @@ import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {createFuriganaHtml, createFuriganaPlain} from '../data/anki-note-builder.js';
 import {getDynamicTemplates} from '../data/anki-template-util.js';
-import {generateAnkiNoteMediaFileName} from '../data/anki-util.js';
+import {mediaFileNameHashOrTimestamp} from '../data/anki-util.js';
 import {getLanguageSummaries} from '../language/languages.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -335,7 +335,7 @@ export class YomitanApi {
             for (const mediaFileData of mediaFilesData) {
                 if (media.some((x) => x.dictionary === mediaFileData.dictionary && x.path === mediaFileData.path)) { continue; }
                 const timestamp = Date.now();
-                const ankiFilename = generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${mediaCount}`, getFileExtensionFromImageMediaType(mediaFileData.mediaType) ?? '', timestamp);
+                const ankiFilename = await mediaFileNameHashOrTimestamp('yomitan_dictionary_media', mediaFileData.content, getFileExtensionFromImageMediaType(mediaFileData.mediaType) ?? '', mediaCount, timestamp);
                 media.push({
                     dictionary: mediaFileData.dictionary,
                     path: mediaFileData.path,
@@ -371,7 +371,7 @@ export class YomitanApi {
                 const mediaType = audioData.contentType ?? '';
                 let extension = mediaType !== null ? getFileExtensionFromAudioMediaType(mediaType) : null;
                 if (extension === null) { extension = '.mp3'; }
-                const ankiFilename = generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp);
+                const ankiFilename = await mediaFileNameHashOrTimestamp('yomitan_audio', audioData.data, extension, null, timestamp);
                 audioDatas.push({
                     term: headword.term,
                     reading: headword.reading,

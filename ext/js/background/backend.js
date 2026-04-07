@@ -28,7 +28,7 @@ import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
 import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
-import {generateAnkiNoteMediaFileName, INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
+import {generateAnkiNoteMediaFileName, INVALID_NOTE_ID, isNoteDataValid, mediaFileNameHashOrTimestamp} from '../data/anki-util.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
@@ -2470,7 +2470,7 @@ export class Backend {
 
         let extension = contentType !== null ? getFileExtensionFromAudioMediaType(contentType) : null;
         if (extension === null) { extension = '.mp3'; }
-        let fileName = generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp);
+        let fileName = await mediaFileNameHashOrTimestamp('yomitan_audio', data, extension, null, timestamp);
         fileName = fileName.replace(/\]/g, '');
         return await ankiConnect.storeMediaFile(fileName, data);
     }
@@ -2564,11 +2564,7 @@ export class Backend {
             if (media !== null) {
                 const {content, mediaType} = media;
                 const extension = getFileExtensionFromImageMediaType(mediaType);
-                fileName = generateAnkiNoteMediaFileName(
-                    `yomitan_dictionary_media_${i + 1}`,
-                    extension !== null ? extension : '',
-                    timestamp,
-                );
+                fileName = await mediaFileNameHashOrTimestamp('yomitan_dictionary_media', content, extension, i, timestamp);
                 try {
                     fileName = await ankiConnect.storeMediaFile(fileName, content);
                 } catch (e) {
