@@ -259,7 +259,7 @@ export class DisplayGenerator {
         const definitionElements = [];
         if (dictionaryEntry.definitions.length > 0) {
             const element = document.createElement('ol');
-            element.className = 'kanji-readings-japanese';
+            element.className = 'kanji-gloss-list';
             for (const x of dictionaryEntry.definitions) { element.appendChild(this._createKanjiDefinition(x)); }
             definitionElements.push(element);
         }
@@ -267,7 +267,7 @@ export class DisplayGenerator {
         const onyomiElements = [];
         if (dictionaryEntry.onyomi.length > 0) {
             const element = document.createElement('dl');
-            element.className = 'kanji-readings-japanese';
+            element.className = 'kanji-readings-chinese';
             for (const x of dictionaryEntry.onyomi) { element.appendChild(this._createKanjiReading(x)); }
             onyomiElements.push(element);
         }
