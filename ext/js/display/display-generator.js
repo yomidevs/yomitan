@@ -315,7 +315,7 @@ export class DisplayGenerator {
 
         for (const tableMapping of tableMappings) {
             if (tableMapping.elements.length === 0) {
-                tableMapping.header?.remove();
+                tableMapping.header.remove();
                 tableMapping.container.remove();
                 continue;
             }
