@@ -181,38 +181,20 @@ function isMatchingFrequencyHeadwordIndex(dictionaryEntryFrequency, requestedHea
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
  * @param {number?} requestedHeadwordIndex
- * @param {('occurrence-based'|'rank-based')} requestedFrequencyMode
- * @returns {boolean}
- */
-function hasFrequencyMode(dictionaryEntry, requestedHeadwordIndex, requestedFrequencyMode) {
-    for (const dictionaryEntryFrequency of dictionaryEntry.frequencies) {
-        if (!isMatchingFrequencyHeadwordIndex(dictionaryEntryFrequency, requestedHeadwordIndex)) { continue; }
-        if (dictionaryEntryFrequency.frequencyMode === requestedFrequencyMode) { return true; }
-    }
-    return false;
-}
-
-/**
- * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
- * @param {number?} requestedHeadwordIndex
  * @param {('occurrence-based'|'rank-based')|undefined} [requestedFrequencyMode]
  * @returns {import('anki-templates').FrequencyNumber[]}
  */
 function getFrequencyNumbers(dictionaryEntry, requestedHeadwordIndex, requestedFrequencyMode) {
-    const useLegacyFrequencyMode = (
-        typeof requestedFrequencyMode !== 'undefined' &&
-        !hasFrequencyMode(dictionaryEntry, requestedHeadwordIndex, requestedFrequencyMode)
-    );
     let previousDictionary;
     const frequencies = [];
     for (const dictionaryEntryFrequency of dictionaryEntry.frequencies) {
         const {dictionary, frequency, displayValue, frequencyMode} = dictionaryEntryFrequency;
         const wrongHeadwordIndex = !isMatchingFrequencyHeadwordIndex(dictionaryEntryFrequency, requestedHeadwordIndex);
-        const legacyFrequencyMode = (frequencyMode === null || typeof frequencyMode === 'undefined');
         const wrongFrequencyMode = (
             typeof requestedFrequencyMode !== 'undefined' &&
-            frequencyMode !== requestedFrequencyMode &&
-            !(useLegacyFrequencyMode && legacyFrequencyMode)
+            frequencyMode !== null &&
+            typeof frequencyMode !== 'undefined' &&
+            frequencyMode !== requestedFrequencyMode
         );
         if (dictionary === previousDictionary || wrongHeadwordIndex || wrongFrequencyMode) {
             continue;
