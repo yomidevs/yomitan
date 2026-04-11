@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025  Yomitan Authors
+ * Copyright (C) 2024-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ export class WebExtension extends EventDispatcher {
         if (lastError) {
             if (lastError instanceof Error) { return lastError; }
             const {message} = lastError;
-            return new Error(typeof message === 'string' ? message : 'An unknown web extension error occured');
+            return new Error(typeof message === 'string' ? message : 'An unknown web extension error occurred');
         }
         return null;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025  Yomitan Authors
+ * Copyright (C) 2025-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {createFuriganaHtml, createFuriganaPlain} from '../data/anki-note-builder.js';
 import {getDynamicTemplates} from '../data/anki-template-util.js';
-import {generateAnkiNoteMediaFileName} from '../data/anki-util.js';
+import {mediaFileNameHashOrTimestamp} from '../data/anki-util.js';
 import {getLanguageSummaries} from '../language/languages.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -166,15 +166,28 @@ export class YomitanApi {
                         /** @type {import('yomitan-api.js').termEntriesInput} */
                         // @ts-expect-error - Allow this to error
                         const {term} = parsedBody;
-                        const invokeParams = {
-                            text: term,
-                            details: {},
-                            optionsContext: {index: optionsFull.profileCurrent},
-                        };
-                        result = await this._invoke(
-                            'termsFind',
-                            invokeParams,
-                        );
+                        if (typeof term === 'string') {
+                            const invokeParams = {
+                                text: term,
+                                details: {},
+                                optionsContext: {index: optionsFull.profileCurrent},
+                            };
+                            result = {...await this._invoke('termsFind', invokeParams), index: 0};
+                        } else if (Array.isArray(term)) {
+                            result = await Promise.all(term.map(async (text, index) => {
+                                const invokeParams = {
+                                    text,
+                                    details: {},
+                                    optionsContext: {index: optionsFull.profileCurrent},
+                                };
+                                return {
+                                    ...(await this._invoke('termsFind', invokeParams)),
+                                    index,
+                                };
+                            }));
+                        } else {
+                            throw new Error('Invalid input for termEntries, expected "term" to be a string or a string array but got ' + typeof term);
+                        }
                         break;
                     }
                     case 'kanjiEntries': {
@@ -239,7 +252,7 @@ export class YomitanApi {
                     case 'tokenize': {
                         /** @type {import('yomitan-api.js').tokenizeInput} */
                         // @ts-expect-error - Allow this to error
-                        const {text, scanLength} = parsedBody;
+                        const {text, scanLength, parser} = parsedBody;
                         if (typeof text !== 'string' && !Array.isArray(text)) {
                             throw new Error('Invalid input for tokenize, expected "text" to be a string or a string array but got ' + typeof text);
                         }
@@ -250,8 +263,9 @@ export class YomitanApi {
                             text: text,
                             optionsContext: {index: optionsFull.profileCurrent},
                             scanLength: scanLength,
-                            useInternalParser: true,
-                            useMecabParser: false,
+                            useInternalParser: parser !== 'mecab',
+                            useMecabParser: parser === 'mecab',
+                            useAllFrequencyDictionaries: true,
                         };
                         result = await this._invoke('parseText', invokeParams);
                         break;
@@ -321,7 +335,7 @@ export class YomitanApi {
             for (const mediaFileData of mediaFilesData) {
                 if (media.some((x) => x.dictionary === mediaFileData.dictionary && x.path === mediaFileData.path)) { continue; }
                 const timestamp = Date.now();
-                const ankiFilename = generateAnkiNoteMediaFileName(`yomitan_dictionary_media_${mediaCount}`, getFileExtensionFromImageMediaType(mediaFileData.mediaType) ?? '', timestamp);
+                const ankiFilename = await mediaFileNameHashOrTimestamp('yomitan_dictionary_media', mediaFileData.content, getFileExtensionFromImageMediaType(mediaFileData.mediaType) ?? '', mediaCount, timestamp);
                 media.push({
                     dictionary: mediaFileData.dictionary,
                     path: mediaFileData.path,
@@ -357,7 +371,7 @@ export class YomitanApi {
                 const mediaType = audioData.contentType ?? '';
                 let extension = mediaType !== null ? getFileExtensionFromAudioMediaType(mediaType) : null;
                 if (extension === null) { extension = '.mp3'; }
-                const ankiFilename = generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp);
+                const ankiFilename = await mediaFileNameHashOrTimestamp('yomitan_audio', audioData.data, extension, null, timestamp);
                 audioDatas.push({
                     term: headword.term,
                     reading: headword.reading,

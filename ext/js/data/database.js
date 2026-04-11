@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -541,7 +541,7 @@ export class Database {
      *   - If the value is greater than or equal to `maxActiveRequests-1`, every time a single request completes, a new single request will be started.
      * @param {?(completedCount: number, totalCount: number) => void} onProgress An optional progress callback function.
      * @param {(error: ?Error) => void} onComplete A function which is called after all operations have finished.
-     *   If an error occured, the `error` parameter will be non-`null`. Otherwise, it will be `null`.
+     *   If an error occurred, the `error` parameter will be non-`null`. Otherwise, it will be `null`.
      * @throws {Error} An error is thrown if the input parameters are invalid.
      */
     _bulkDeleteInternal(objectStore, keys, maxActiveRequests, maxActiveRequestsForContinue, onProgress, onComplete) {

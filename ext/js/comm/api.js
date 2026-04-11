@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,10 +67,11 @@ export class API {
      * @param {import('api').ApiParam<'parseText', 'scanLength'>} scanLength
      * @param {import('api').ApiParam<'parseText', 'useInternalParser'>} useInternalParser
      * @param {import('api').ApiParam<'parseText', 'useMecabParser'>} useMecabParser
+     * @param {import('api').ApiParam<'parseText', 'useAllFrequencyDictionaries'>} useAllFrequencyDictionaries
      * @returns {Promise<import('api').ApiReturn<'parseText'>>}
      */
-    parseText(text, optionsContext, scanLength, useInternalParser, useMecabParser) {
-        return this._invoke('parseText', {text, optionsContext, scanLength, useInternalParser, useMecabParser});
+    parseText(text, optionsContext, scanLength, useInternalParser, useMecabParser, useAllFrequencyDictionaries) {
+        return this._invoke('parseText', {text, optionsContext, scanLength, useInternalParser, useMecabParser, useAllFrequencyDictionaries});
     }
 
     /**

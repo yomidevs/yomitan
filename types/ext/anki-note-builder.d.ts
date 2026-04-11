@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -142,5 +142,6 @@ export type MinimalApi = {
         scanLength: Api.ApiParam<'parseText', 'scanLength'>,
         useInternalParser: Api.ApiParam<'parseText', 'useInternalParser'>,
         useMecabParser: Api.ApiParam<'parseText', 'useMecabParser'>,
+        useAllFrequencyDictionaries: Api.ApiParam<'parseText', 'useAllFrequencyDictionaries'>,
     ): Promise<Api.ApiReturn<'parseText'>>;
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ import type {TextSourceGenerator} from '../../ext/js/dom/text-source-generator';
 import type {API} from '../../ext/js/comm/api';
 import type * as Dictionary from './dictionary';
 import type * as Display from './display';
+import type * as Environment from './environment';
 import type * as Input from './input';
 import type * as Settings from './settings';
 import type * as TextSource from './text-source';
@@ -162,6 +163,7 @@ export type ConstructorDetails = {
     searchOnClick?: boolean;
     searchOnClickOnly?: boolean;
     textSourceGenerator: TextSourceGenerator;
+    browser: Environment.Browser | null;
 };
 
 export type SearchContext = {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025  Yomitan Authors
+ * Copyright (C) 2024-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {suffixInflection} from '../language-transforms.js';
+import {suffixInflection, wholeWordInflection} from '../language-transforms.js';
 
 const shimauEnglishDescription = '1. Shows a sense of regret/surprise when you did have volition in doing something, but it turned out to be bad to do.\n' +
 '2. Shows perfective/punctual achievement. This shows that an action has been completed.\n' +
@@ -26,6 +26,7 @@ const passiveEnglishDescription = '1. Indicates an action received from an actio
 
 const ikuVerbs = ['いく', '行く', '逝く', '往く'];
 const godanUSpecialVerbs = ['こう', 'とう', '請う', '乞う', '恋う', '問う', '訪う', '宣う', '曰う', '給う', '賜う', '揺蕩う'];
+const specialHonorificMasuVerbs = ['いらっしゃる', 'ござる', 'なさる', 'くださる', '下さる', 'おっしゃる', '仰る', '仰有る'];
 const fuVerbTeConjugations = [
     ['のたまう', 'のたもう'],
     ['たまう', 'たもう'],
@@ -51,6 +52,15 @@ function irregularVerbSuffixInflections(suffix, conditionsIn, conditionsOut) {
         inflections.push(suffixInflection(`${teRoot}${suffix}`, verb, conditionsIn, conditionsOut));
     }
     return inflections;
+}
+
+/**
+ * @param {Condition[]} conditionsIn
+ * @param {Condition[]} conditionsOut
+ * @returns {import('language-transformer').Rule<Condition>[]}
+ */
+function specialHonorificMasuInflections(conditionsIn, conditionsOut) {
+    return specialHonorificMasuVerbs.map((verb) => wholeWordInflection(`${verb.slice(0, -1)}います`, verb, conditionsIn, conditionsOut));
 }
 
 const conditions = {
@@ -1195,6 +1205,7 @@ export const japaneseTransforms = {
             ],
             rules: [
                 suffixInflection('ます', 'る', ['-ます'], ['v1']),
+                ...specialHonorificMasuInflections(['-ます'], ['v5d']),
                 suffixInflection('います', 'う', ['-ます'], ['v5d']),
                 suffixInflection('きます', 'く', ['-ます'], ['v5d']),
                 suffixInflection('ぎます', 'ぐ', ['-ます'], ['v5d']),
@@ -1454,6 +1465,36 @@ export const japaneseTransforms = {
             ],
             rules: [
                 suffixInflection('がる', 'い', ['v5'], ['adj-i']),
+            ],
+        },
+        '-やがる': {
+            name: '-やがる',
+            description: 'Vulgar auxiliary showing contempt, irritation, or hostility toward the subject.\n' +
+            'Usage: Attach やがる to the continuative form (連用形) of verbs. It itself conjugates as a godan verb.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～やがる',
+                    description: '相手の言動をののしったり、腹立たしく思ったりする気持ちをこめて言う。',
+                },
+            ],
+            rules: [
+                suffixInflection('やがる', 'る', ['v5'], ['v1']),
+                suffixInflection('いやがる', 'う', ['v5'], ['v5']),
+                suffixInflection('きやがる', 'く', ['v5'], ['v5']),
+                suffixInflection('ぎやがる', 'ぐ', ['v5'], ['v5']),
+                suffixInflection('しやがる', 'す', ['v5'], ['v5']),
+                suffixInflection('ちやがる', 'つ', ['v5'], ['v5']),
+                suffixInflection('にやがる', 'ぬ', ['v5'], ['v5']),
+                suffixInflection('びやがる', 'ぶ', ['v5'], ['v5']),
+                suffixInflection('みやがる', 'む', ['v5'], ['v5']),
+                suffixInflection('りやがる', 'る', ['v5'], ['v5']),
+                suffixInflection('じやがる', 'ずる', ['v5'], ['vz']),
+                suffixInflection('しやがる', 'する', ['v5'], ['vs']),
+                suffixInflection('為やがる', '為る', ['v5'], ['vs']),
+                suffixInflection('きやがる', 'くる', ['v5'], ['vk']),
+                suffixInflection('来やがる', '来る', ['v5'], ['vk']),
+                suffixInflection('來やがる', '來る', ['v5'], ['vk']),
             ],
         },
         '-え': {

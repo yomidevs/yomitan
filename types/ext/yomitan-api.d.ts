@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025  Yomitan Authors
+ * Copyright (C) 2025-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type * as Dictionary from './dictionary';
+
 export type termEntriesInput = {
-    term: string;
+    term: string | string[];
+};
+
+export type termEntriesResponse = {
+    dictionaryEntries: Dictionary.TermDictionaryEntry[];
+    originalTextLength: number;
+    index: number;
 };
 
 export type kanjiEntriesInput = {

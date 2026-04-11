@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,6 +48,7 @@ export class Frontend {
         allowRootFramePopupProxy,
         childrenSupported = true,
         hotkeyHandler,
+        browser,
     }) {
         /** @type {import('../application.js').Application} */
         this._application = application;
@@ -95,6 +96,7 @@ export class Frontend {
             searchTerms: true,
             searchKanji: true,
             textSourceGenerator: this._textSourceGenerator,
+            browser: browser,
         });
         /** @type {boolean} */
         this._textScannerHasBeenEnabled = false;

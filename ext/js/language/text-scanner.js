@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,6 +45,7 @@ export class TextScanner extends EventDispatcher {
         searchOnClick = false,
         searchOnClickOnly = false,
         textSourceGenerator,
+        browser = null,
     }) {
         super();
         /** @type {import('../comm/api.js').API} */
@@ -78,6 +79,8 @@ export class TextScanner extends EventDispatcher {
         this._touchExcludeSelector = null;
         /** @type {?string} */
         this._language = null;
+        /** @type {?import('environment').Browser} */
+        this._browser = browser;
 
         /** @type {?import('text-scanner').InputInfo} */
         this._inputInfoCurrent = null;
@@ -782,7 +785,7 @@ export class TextScanner extends EventDispatcher {
 
         const languageNotNull = this._language !== null ? this._language : '';
         const selection = window.getSelection();
-        if (selection !== null && isPointInSelection(x, y, selection, languageNotNull)) {
+        if (selection !== null && isPointInSelection(x, y, selection, languageNotNull, this._browser)) {
             return;
         }
 
@@ -1339,6 +1342,7 @@ export class TextScanner extends EventDispatcher {
                 deepContentScan: this._deepContentScan,
                 normalizeCssZoom: this._normalizeCssZoom,
                 language: this._language,
+                browser: this._browser,
             });
             if (textSource !== null) {
                 try {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  * Copyright (C) 2017-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -473,6 +473,7 @@ export class Display extends EventDispatcher {
             readingMode: options.parsing.readingMode,
             useInternalParser: options.parsing.enableScanningParser,
             useMecabParser: options.parsing.enableMecabParser,
+            useAllFrequencyDictionaries: options.parsing.useAllFrequencyDictionaries,
             language: options.general.language,
             scanning: {
                 inputs: scanningOptions.inputs,
@@ -2003,6 +2004,7 @@ export class Display extends EventDispatcher {
             childrenSupported: this._childrenSupported,
             hotkeyHandler: this._hotkeyHandler,
             canUseWindowPopup: true,
+            browser: this._browser,
         });
         this._frontend = frontend;
         await frontend.prepare();
@@ -2113,6 +2115,7 @@ export class Display extends EventDispatcher {
                 searchOnClick: true,
                 searchOnClickOnly: true,
                 textSourceGenerator: this._textSourceGenerator,
+                browser: this._browser,
             });
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
             this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';

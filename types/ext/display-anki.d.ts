@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +49,16 @@ export type DictionaryEntryNoteDetails = {
      */
     noteIds: Anki.NoteId[] | null;
     noteInfos?: (Anki.NoteInfo | null)[];
+    ankiError: Error | null;
+};
+
+export type NoteDupeMappings = {
+    noteMap: Map<number, NoteDupeInfo>;
+};
+
+export type NoteDupeInfo = {
+    cardFormat: Settings.AnkiCardFormat;
+    noteIds: Anki.NoteId[] | null;
     ankiError: Error | null;
 };
 

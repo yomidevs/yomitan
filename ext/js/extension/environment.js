@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -101,10 +101,14 @@ export class Environment {
             if (this._isSafari()) {
                 return 'safari';
             }
-            if (os === 'android') {
-                return 'firefox-mobile';
+            if (navigator.userAgent.includes('Firefox')) {
+                if (os === 'android') {
+                    return 'firefox-mobile';
+                }
+                return 'firefox';
             }
-            return 'firefox';
+            // Chrome 146+ now supports the browser namespace
+            return 'chrome';
         } else {
             return 'chrome';
         }

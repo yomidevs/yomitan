@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,11 @@ export class LanguagesController {
     /** */
     async prepare() {
         const languages = await this._settingsController.application.api.getLanguageSummaries();
-        languages.sort((a, b) => a.name.localeCompare(b.name, 'en'));
+        languages.sort((a, b) => {
+            if (a.iso === 'xxx') { return -1; }
+            if (b.iso === 'xxx') { return 1; }
+            return a.name.localeCompare(b.name, 'en');
+        });
         this._fillSelect(languages);
     }
 

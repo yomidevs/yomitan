@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2023-2026  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,10 +62,13 @@ export type ParseTextResultItem = {
 export type ParseTextSegment = {
     text: string;
     reading: string;
+    lemma?: string;
+    lemmaReading?: string;
     headwords?: {
         term: string;
         reading: string;
         sources: Dictionary.TermSource[];
+        frequencies: Dictionary.TermFrequency[];
     }[][];
 };
 
@@ -152,6 +155,7 @@ type ApiSurface = {
             scanLength: number;
             useInternalParser: boolean;
             useMecabParser: boolean;
+            useAllFrequencyDictionaries?: boolean;
         };
         return: ParseTextResultItem[];
     };
