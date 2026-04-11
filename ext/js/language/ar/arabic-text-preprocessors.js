@@ -40,12 +40,17 @@ function generateReplacementCombinations(str, pattern, replacements) {
 
     const results = [];
 
-    for (let combo = 0; combo < total; combo++) {
-        let current = combo;
-
+    for (let combination = 0; combination < total; combination++) {
+        // Treat `combination` as a base-m number with n digits.
+        // Starting from the least significant digit, position 0, until the most significant digit,
+        // position n-1, we loop through each digit of `combination`. Each position i is a digit
+        // between 0 and m-1, representing which of the m replacement choices to substitute the ith
+        // occurrence of `pattern` with
+        let current = combination;
         const result = str.replaceAll(regex, (_) => {
-            // Pick option using base-m digit
+            // Pick replacement choice using the value of the current least significant digit
             const choiceIndex = current % m;
+            // Pop the least significant digit
             current = Math.floor(current / m);
 
             return replacements[choiceIndex];
