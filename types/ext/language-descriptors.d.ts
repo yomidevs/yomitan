@@ -80,9 +80,7 @@ type AllTextProcessors = {
             removeArabicScriptDiacritics: TextProcessor;
             removeTatweel: TextProcessor;
             normalizeUnicode: TextProcessor;
-            addHamzaTop: TextProcessor;
-            addHamzaBottom: TextProcessor;
-            addMadd: TextProcessor;
+            substituteAlif: TextProcessor;
             convertAlifMaqsuraToYaa: TextProcessor;
         };
     };
@@ -91,9 +89,7 @@ type AllTextProcessors = {
             removeArabicScriptDiacritics: TextProcessor;
             removeTatweel: TextProcessor;
             normalizeUnicode: TextProcessor;
-            addHamzaTop: TextProcessor;
-            addHamzaBottom: TextProcessor;
-            addMadd: TextProcessor;
+            substituteAlif: TextProcessor;
             convertAlifMaqsuraToYaa: TextProcessor;
             convertHaToTaMarbuta: TextProcessor;
         };

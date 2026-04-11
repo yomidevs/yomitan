@@ -16,36 +16,39 @@
  */
 
 /**
- * Generates all possible combinations of replacing or not replacing
- * each occurrence of a pattern within a string.
+ * Generates all possible combinations of replacing each occurrence of a
+ * pattern with each of the options provided in replacements.
  *
- * For a pattern that matches `n` times, this function returns `2^n`
- * strings representing every possible combination of replacements.
+ * For a pattern that matches `n` times, and a list of `m` replacements, this
+ * function returns `m^n` strings representing every possible combination of replacements.
  *
- * Note: this implementation only works for n < 31, as bitwise shifting is used, and
- * JavaScript operations operate on 32-bit signed integers. However, this function should
- * not be used if such large values of n are expected anyway, due to its inherent
+ * Note: This function should not be used for large values of n and m, due to its inherent
  * exponential growth.
  * @param {string} str
  * @param {string|RegExp} pattern
- * @param {string} replacement
+ * @param {string[]} replacements
  * @returns {string[]}
  */
-function generateReplacementCombinations(str, pattern, replacement) {
+function generateReplacementCombinations(str, pattern, replacements) {
     const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern, 'g');
+
     const matches = [...str.matchAll(regex)];
     const n = matches.length;
-    // Total of 2^n possible combinations
-    const total = 1 << n;
+
+    const m = replacements.length; // number of choices per match
+    const total = m ** n; // m^n combinations
 
     const results = [];
-    for (let mask = 0; mask < total; mask++) {
-        let i = 0;
 
-        const result = str.replaceAll(regex, (match) => {
-            // Only replace ith occurrence if ith bit in bitmask is set to 1
-            const shouldReplace = mask & (1 << i++);
-            return shouldReplace ? replacement : match;
+    for (let combo = 0; combo < total; combo++) {
+        let current = combo;
+
+        const result = str.replaceAll(regex, (_) => {
+            // Pick option using base-m digit
+            const choiceIndex = current % m;
+            current = Math.floor(current / m);
+
+            return replacements[choiceIndex];
         });
 
         results.push(result);
@@ -97,24 +100,10 @@ export const normalizeUnicode = {
 };
 
 /** @type {import('language').TextProcessor} */
-export const addHamzaTop = {
-    name: 'Add Hamza to top of Alif',
+export const substituteAlif = {
+    name: 'Substitutes plain alifs with its variations (alif with hamza, alif with madd)',
     description: 'اكبر → أكبر',
-    process: (text) => generateReplacementCombinations(text, 'ا', 'أ'),
-};
-
-/** @type {import('language').TextProcessor} */
-export const addHamzaBottom = {
-    name: 'Add Hamza to bottom of Alif',
-    description: 'اسلام → إسلام',
-    process: (text) => generateReplacementCombinations(text, 'ا', 'إ'),
-};
-
-/** @type {import('language').TextProcessor} */
-export const addMadd = {
-    name: 'Add Madd to Alif',
-    description: 'الان → الآن',
-    process: (text) => generateReplacementCombinations(text, 'ا', 'آ'),
+    process: (text) => generateReplacementCombinations(text, 'ا', ['ا', 'أ', 'إ', 'آ']),
 };
 
 /** @type {import('language').TextProcessor} */
