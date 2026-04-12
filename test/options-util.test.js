@@ -2090,7 +2090,7 @@ describe('OptionsUtil', () => {
     {{~/if~}}
 {{/inline}}
 `.trimStart(),
-            }
+            },
         ];
 
         const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;
