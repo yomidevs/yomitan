@@ -169,19 +169,11 @@ function getPublicContext(context) {
     };
 }
 
-/**
- * @param {import('dictionary').TermFrequency|import('dictionary').KanjiFrequency} dictionaryEntryFrequency
- * @param {number?} requestedHeadwordIndex
- * @returns {boolean}
- */
-function isMatchingFrequencyHeadwordIndex(dictionaryEntryFrequency, requestedHeadwordIndex) {
-    return !(Number.isInteger(requestedHeadwordIndex) && ('headwordIndex' in dictionaryEntryFrequency) && dictionaryEntryFrequency.headwordIndex !== requestedHeadwordIndex);
-}
 
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
  * @param {number?} requestedHeadwordIndex
- * @param {('occurrence-based'|'rank-based')|undefined} [requestedFrequencyMode]
+ * @param {import('dictionary-data').FrequencyMode|undefined} [requestedFrequencyMode]
  * @returns {import('anki-templates').FrequencyNumber[]}
  */
 function getFrequencyNumbers(dictionaryEntry, requestedHeadwordIndex, requestedFrequencyMode) {
@@ -189,7 +181,7 @@ function getFrequencyNumbers(dictionaryEntry, requestedHeadwordIndex, requestedF
     const frequencies = [];
     for (const dictionaryEntryFrequency of dictionaryEntry.frequencies) {
         const {dictionary, frequency, displayValue, frequencyMode} = dictionaryEntryFrequency;
-        const wrongHeadwordIndex = !isMatchingFrequencyHeadwordIndex(dictionaryEntryFrequency, requestedHeadwordIndex);
+        const wrongHeadwordIndex = Number.isInteger(requestedHeadwordIndex) && ('headwordIndex' in dictionaryEntryFrequency) && dictionaryEntryFrequency.headwordIndex !== requestedHeadwordIndex;
         const wrongFrequencyMode = (
             typeof requestedFrequencyMode !== 'undefined' &&
             frequencyMode !== null &&
@@ -221,7 +213,7 @@ function getFrequencyNumbers(dictionaryEntry, requestedHeadwordIndex, requestedF
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
  * @param {number?} headwordIndex
- * @param {('occurrence-based'|'rank-based')|undefined} [frequencyMode]
+ * @param {import('dictionary-data').FrequencyMode|undefined} [frequencyMode]
  * @returns {number}
  */
 export function getFrequencyHarmonic(dictionaryEntry, headwordIndex, frequencyMode) {
@@ -241,7 +233,7 @@ export function getFrequencyHarmonic(dictionaryEntry, headwordIndex, frequencyMo
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
  * @param {number?} headwordIndex
- * @param {('occurrence-based'|'rank-based')|undefined} [frequencyMode]
+ * @param {import('dictionary-data').FrequencyMode|undefined} [frequencyMode]
  * @returns {number}
  */
 function getFrequencyAverage(dictionaryEntry, headwordIndex, frequencyMode) {

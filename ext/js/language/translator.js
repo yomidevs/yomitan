@@ -1579,7 +1579,7 @@ export class Translator {
      * @param {number} frequency
      * @param {?string} displayValue
      * @param {boolean} displayValueParsed
-     * @param {('occurrence-based'|'rank-based')|undefined} frequencyMode
+     * @param {import('dictionary-data').FrequencyMode|undefined} frequencyMode
      * @returns {import('dictionary').KanjiFrequency}
      */
     _createKanjiFrequency(index, dictionary, dictionaryIndex, dictionaryAlias, character, frequency, displayValue, displayValueParsed, frequencyMode) {
