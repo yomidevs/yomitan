@@ -169,11 +169,10 @@ function getPublicContext(context) {
     };
 }
 
-
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
  * @param {number?} requestedHeadwordIndex
- * @param {import('dictionary-data').FrequencyMode|undefined} [requestedFrequencyMode]
+ * @param {import('dictionary-data').FrequencyMode|undefined?} requestedFrequencyMode
  * @returns {import('anki-templates').FrequencyNumber[]}
  */
 function getFrequencyNumbers(dictionaryEntry, requestedHeadwordIndex, requestedFrequencyMode) {
@@ -182,12 +181,7 @@ function getFrequencyNumbers(dictionaryEntry, requestedHeadwordIndex, requestedF
     for (const dictionaryEntryFrequency of dictionaryEntry.frequencies) {
         const {dictionary, frequency, displayValue, frequencyMode} = dictionaryEntryFrequency;
         const wrongHeadwordIndex = Number.isInteger(requestedHeadwordIndex) && ('headwordIndex' in dictionaryEntryFrequency) && dictionaryEntryFrequency.headwordIndex !== requestedHeadwordIndex;
-        const wrongFrequencyMode = (
-            typeof requestedFrequencyMode !== 'undefined' &&
-            frequencyMode !== null &&
-            typeof frequencyMode !== 'undefined' &&
-            frequencyMode !== requestedFrequencyMode
-        );
+        const wrongFrequencyMode = !!requestedFrequencyMode && !!frequencyMode && frequencyMode !== requestedFrequencyMode;
         if (dictionary === previousDictionary || wrongHeadwordIndex || wrongFrequencyMode) {
             continue;
         }
@@ -213,7 +207,7 @@ function getFrequencyNumbers(dictionaryEntry, requestedHeadwordIndex, requestedF
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
  * @param {number?} headwordIndex
- * @param {import('dictionary-data').FrequencyMode|undefined} [frequencyMode]
+ * @param {import('dictionary-data').FrequencyMode|undefined?} frequencyMode
  * @returns {number}
  */
 export function getFrequencyHarmonic(dictionaryEntry, headwordIndex, frequencyMode) {
@@ -233,7 +227,7 @@ export function getFrequencyHarmonic(dictionaryEntry, headwordIndex, frequencyMo
 /**
  * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
  * @param {number?} headwordIndex
- * @param {import('dictionary-data').FrequencyMode|undefined} [frequencyMode]
+ * @param {import('dictionary-data').FrequencyMode|undefined?} frequencyMode
  * @returns {number}
  */
 function getFrequencyAverage(dictionaryEntry, headwordIndex, frequencyMode) {
@@ -354,10 +348,10 @@ function getKanjiDefinition(dictionaryEntry, context) {
     const stats = createCachedValue(getKanjiStats.bind(null, dictionaryEntry));
     const tags = createCachedValue(convertTags.bind(null, dictionaryEntry.tags));
     const frequencies = createCachedValue(getKanjiFrequencies.bind(null, dictionaryEntry));
-    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry, null));
+    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry, null, null));
     const frequencyHarmonicRank = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry, null, 'rank-based'));
     const frequencyHarmonicOccurrence = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry, null, 'occurrence-based'));
-    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry, null));
+    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry, null, null));
     const frequencyAverageRank = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry, null, 'rank-based'));
     const frequencyAverageOccurrence = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry, null, 'occurrence-based'));
     const cloze = createCachedValue(getCloze.bind(null, dictionaryEntry, context));
@@ -465,11 +459,11 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
     const termTags = createCachedValue(getTermTags.bind(null, dictionaryEntry, type));
     const expressions = createCachedValue(getTermExpressions.bind(null, dictionaryEntry));
     const frequencies = createCachedValue(getTermFrequencies.bind(null, dictionaryEntry));
-    const frequencyNumbers = createCachedValue(getFrequencyNumbers.bind(null, dictionaryEntry, null));
-    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry, null));
+    const frequencyNumbers = createCachedValue(getFrequencyNumbers.bind(null, dictionaryEntry, null, null));
+    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry, null, null));
     const frequencyHarmonicRank = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry, null, 'rank-based'));
     const frequencyHarmonicOccurrence = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry, null, 'occurrence-based'));
-    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry, null));
+    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry, null, null));
     const frequencyAverageRank = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry, null, 'rank-based'));
     const frequencyAverageOccurrence = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry, null, 'occurrence-based'));
     const pitches = createCachedValue(getTermPitches.bind(null, dictionaryEntry));
