@@ -205,13 +205,24 @@ export class DisplayGenerator {
         const glyphContainer = this._querySelector(node, '.kanji-glyph');
         const frequencyGroupListContainer = this._querySelector(node, '.frequency-group-list');
         const tagContainer = this._querySelector(node, '.kanji-tag-list');
-        const definitionsContainer = this._querySelector(node, '.kanji-gloss-list');
-        const chineseReadingsContainer = this._querySelector(node, '.kanji-readings-chinese');
-        const japaneseReadingsContainer = this._querySelector(node, '.kanji-readings-japanese');
+
+        const definitionsContainer = this._querySelector(node, '.kanji-gloss-container');
+        const definitionsHeader = this._querySelector(node, '.kanji-meaning-header');
+
+        const readingsContainer = this._querySelector(node, '.kanji-readings');
+        const readingsHeader = this._querySelector(node, '.kanji-readings-header');
+
         const statisticsContainer = this._querySelector(node, '.kanji-statistics');
+        const statisticsHeader = this._querySelector(node, '.kanji-statistics-header');
+
         const classificationsContainer = this._querySelector(node, '.kanji-classifications');
+        const classificationsHeader = this._querySelector(node, '.kanji-classifications-header');
+
         const codepointsContainer = this._querySelector(node, '.kanji-codepoints');
+        const codepointsHeader = this._querySelector(node, '.kanji-codepoints-header');
+
         const dictionaryIndicesContainer = this._querySelector(node, '.kanji-dictionary-indices');
+        const dictionaryIndicesHeader = this._querySelector(node, '.kanji-dictionary-indices-header');
 
         this._setTextContent(glyphContainer, dictionaryEntry.character, this._language);
         if (this._language === 'ja') { glyphContainer.style.fontFamily = 'kanji-stroke-orders, sans-serif'; }
@@ -244,14 +255,75 @@ export class DisplayGenerator {
 
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, true);
         this._appendMultiple(tagContainer, this._createTag.bind(this), [...dictionaryEntry.tags, dictionaryTag]);
-        this._appendMultiple(definitionsContainer, this._createKanjiDefinition.bind(this), dictionaryEntry.definitions);
-        this._appendMultiple(chineseReadingsContainer, this._createKanjiReading.bind(this), dictionaryEntry.onyomi);
-        this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), dictionaryEntry.kunyomi);
 
-        statisticsContainer.appendChild(this._createKanjiInfoTable(dictionaryEntry.stats.misc));
-        classificationsContainer.appendChild(this._createKanjiInfoTable(dictionaryEntry.stats.class));
-        codepointsContainer.appendChild(this._createKanjiInfoTable(dictionaryEntry.stats.code));
-        dictionaryIndicesContainer.appendChild(this._createKanjiInfoTable(dictionaryEntry.stats.index));
+        const definitionElements = [];
+        if (dictionaryEntry.definitions.length > 0) {
+            const element = document.createElement('ol');
+            element.className = 'kanji-gloss-list';
+            for (const x of dictionaryEntry.definitions) { element.appendChild(this._createKanjiDefinition(x)); }
+            definitionElements.push(element);
+        }
+
+        const onyomiElements = [];
+        if (dictionaryEntry.onyomi.length > 0) {
+            const element = document.createElement('dl');
+            element.className = 'kanji-readings-chinese';
+            for (const x of dictionaryEntry.onyomi) { element.appendChild(this._createKanjiReading(x)); }
+            onyomiElements.push(element);
+        }
+
+        const kunyomiElements = [];
+        if (dictionaryEntry.kunyomi.length > 0) {
+            const element = document.createElement('dl');
+            element.className = 'kanji-readings-japanese';
+            for (const x of dictionaryEntry.kunyomi) { element.appendChild(this._createKanjiReading(x)); }
+            kunyomiElements.push(element);
+        }
+
+        const tableMappings = [
+            {
+                container: definitionsContainer,
+                elements: definitionElements,
+                header: definitionsHeader,
+            },
+            {
+                container: readingsContainer,
+                elements: [...onyomiElements, ...kunyomiElements],
+                header: readingsHeader,
+            },
+            {
+                container: statisticsContainer,
+                elements: this._createKanjiInfoTable(dictionaryEntry.stats.misc),
+                header: statisticsHeader,
+            },
+            {
+                container: classificationsContainer,
+                elements: this._createKanjiInfoTable(dictionaryEntry.stats.class),
+                header: classificationsHeader,
+            },
+            {
+                container: codepointsContainer,
+                elements: this._createKanjiInfoTable(dictionaryEntry.stats.code),
+                header: codepointsHeader,
+            },
+            {
+                container: dictionaryIndicesContainer,
+                elements: this._createKanjiInfoTable(dictionaryEntry.stats.index),
+                header: dictionaryIndicesHeader,
+            },
+        ];
+
+        for (const tableMapping of tableMappings) {
+            if (tableMapping.elements.length === 0) {
+                tableMapping.header.remove();
+                tableMapping.container.remove();
+                continue;
+            }
+
+            for (const tableElement of tableMapping.elements) {
+                tableMapping.container.appendChild(tableElement);
+            }
+        }
 
         return node;
     }
@@ -622,7 +694,7 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').KanjiStat[]} details
-     * @returns {HTMLElement}
+     * @returns {HTMLElement[]}
      */
     _createKanjiInfoTable(details) {
         const node = this._instantiate('kanji-info-table');
@@ -630,11 +702,10 @@ export class DisplayGenerator {
 
         const count = this._appendMultiple(container, this._createKanjiInfoTableItem.bind(this), details);
         if (count === 0) {
-            const n = this._createKanjiInfoTableItemEmpty();
-            container.appendChild(n);
+            return [];
         }
 
-        return node;
+        return [node];
     }
 
     /**
