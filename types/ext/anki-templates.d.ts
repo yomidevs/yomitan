@@ -135,7 +135,11 @@ export type KanjiDictionaryEntry = {
     readonly stats: KanjiStatGroups;
     readonly frequencies: KanjiFrequency[];
     readonly frequencyHarmonic: number;
+    readonly frequencyHarmonicRank: number;
+    readonly frequencyHarmonicOccurrence: number;
     readonly frequencyAverage: number;
+    readonly frequencyAverageRank: number;
+    readonly frequencyAverageOccurrence: number;
     url: string;
     readonly cloze: Cloze;
 };
@@ -196,7 +200,11 @@ export type TermDictionaryEntry = {
     readonly frequencies: TermFrequency[];
     readonly frequencyNumbers: FrequencyNumber[];
     readonly frequencyHarmonic: number;
+    readonly frequencyHarmonicRank: number;
+    readonly frequencyHarmonicOccurrence: number;
     readonly frequencyAverage: number;
+    readonly frequencyAverageRank: number;
+    readonly frequencyAverageOccurrence: number;
     readonly pitches: TermPitchAccent[];
     readonly phoneticTranscriptions: TermPhoneticTranscription[];
     sourceTermExactMatchCount: number;

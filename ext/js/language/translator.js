@@ -48,7 +48,6 @@ export class Translator {
         this._textProcessors = new Map();
         /** @type {import('translation-internal').ReadingNormalizerMap} */
         this._readingNormalizers = new Map();
-
         /** @type {?Map<string, (import('dictionary-importer').Summary['frequencyMode'])>} */
         this._dictionaryFrequencyModeMap = null;
         /** @type {?Promise<Map<string, (import('dictionary-importer').Summary['frequencyMode'])>>} */
@@ -203,6 +202,7 @@ export class Translator {
 
         const termList = termReadingList.map(({term}) => term);
         const metas = await this._database.findTermMetaBulk(termList, dictionarySet);
+        const dictionaryFrequencyModeMap = await this._getDictionaryFrequencyModeMap();
 
         /** @type {import('translator').TermFrequencySimple[]} */
         const results = [];
@@ -224,6 +224,7 @@ export class Translator {
                 frequency: frequencyValue,
                 displayValue,
                 displayValueParsed,
+                frequencyMode: dictionaryFrequencyModeMap.get(dictionary),
             });
         }
         return results;
@@ -1265,7 +1266,6 @@ export class Translator {
         for (const {mode, data, dictionary, index} of metas) {
             const {index: dictionaryIndex} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
             const dictionaryAlias = this._getDictionaryAlias(dictionary, enabledDictionaryMap);
-            const frequencyMode = dictionaryFrequencyModeMap.get(dictionary);
             const map2 = headwordReadingMaps[index];
             for (const [reading, targets] of map2.entries()) {
                 switch (mode) {
@@ -1274,6 +1274,7 @@ export class Translator {
                             const hasReading = (data !== null && typeof data === 'object' && typeof data.reading === 'string');
                             if (hasReading && data.reading !== reading) { continue; }
                             const frequency = hasReading ? data.frequency : /** @type {import('dictionary-data').GenericFrequencyData} */ (data);
+                            const frequencyMode = dictionaryFrequencyModeMap.get(dictionary);
                             for (const {frequencies, headwordIndex} of targets) {
                                 const {frequency: frequencyValue, displayValue, displayValueParsed} = this._getFrequencyInfo(frequency);
                                 frequencies.push(this._createTermFrequency(
@@ -1368,6 +1369,7 @@ export class Translator {
         }
 
         const metas = await this._database.findKanjiMetaBulk(kanjiList, enabledDictionaryMap);
+        const dictionaryFrequencyModeMap = await this._getDictionaryFrequencyModeMap();
         for (const {character, mode, data, dictionary, index} of metas) {
             const {index: dictionaryIndex} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
             const dictionaryAlias = this._getDictionaryAlias(dictionary, enabledDictionaryMap);
@@ -1375,6 +1377,7 @@ export class Translator {
                 case 'freq':
                     {
                         const {frequencies} = dictionaryEntries[index];
+                        const frequencyMode = dictionaryFrequencyModeMap.get(dictionary);
                         const {frequency, displayValue, displayValueParsed} = this._getFrequencyInfo(data);
                         frequencies.push(this._createKanjiFrequency(
                             frequencies.length,
@@ -1385,6 +1388,7 @@ export class Translator {
                             frequency,
                             displayValue,
                             displayValueParsed,
+                            frequencyMode,
                         ));
                     }
                     break;
@@ -1575,10 +1579,11 @@ export class Translator {
      * @param {number} frequency
      * @param {?string} displayValue
      * @param {boolean} displayValueParsed
+     * @param {import('dictionary-data').FrequencyMode|undefined} frequencyMode
      * @returns {import('dictionary').KanjiFrequency}
      */
-    _createKanjiFrequency(index, dictionary, dictionaryIndex, dictionaryAlias, character, frequency, displayValue, displayValueParsed) {
-        return {index, dictionary, dictionaryIndex, dictionaryAlias, character, frequency, displayValue, displayValueParsed};
+    _createKanjiFrequency(index, dictionary, dictionaryIndex, dictionaryAlias, character, frequency, displayValue, displayValueParsed, frequencyMode) {
+        return {index, dictionary, dictionaryIndex, dictionaryAlias, character, frequency, displayValue, displayValueParsed, frequencyMode: frequencyMode ?? null};
     }
 
     /**

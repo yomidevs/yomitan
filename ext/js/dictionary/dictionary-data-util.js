@@ -106,7 +106,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
 
     const averageFrequencies = [];
     for (let i = 0; i < dictionaryEntry.headwords.length; i++) {
-        const averageFrequency = getFrequencyHarmonic(dictionaryEntry, i);
+        const averageFrequency = getFrequencyHarmonic(dictionaryEntry, i, null);
         averageFrequencies.push({
             term: dictionaryEntry.headwords[i].term,
             reading: dictionaryEntry.headwords[i].reading,

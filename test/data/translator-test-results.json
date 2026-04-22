@@ -116,7 +116,8 @@
             "character": "打",
             "frequency": 1,
             "displayValue": null,
-            "displayValueParsed": false
+            "displayValueParsed": false,
+            "frequencyMode": null
           },
           {
             "index": 1,
@@ -126,7 +127,8 @@
             "character": "打",
             "frequency": 0,
             "displayValue": "three",
-            "displayValueParsed": true
+            "displayValueParsed": true,
+            "frequencyMode": null
           },
           {
             "index": 2,
@@ -136,7 +138,8 @@
             "character": "打",
             "frequency": 5,
             "displayValue": null,
-            "displayValueParsed": false
+            "displayValueParsed": false,
+            "frequencyMode": null
           }
         ]
       }
@@ -258,7 +261,8 @@
             "character": "込",
             "frequency": 2,
             "displayValue": null,
-            "displayValueParsed": false
+            "displayValueParsed": false,
+            "frequencyMode": null
           },
           {
             "index": 1,
@@ -268,7 +272,8 @@
             "character": "込",
             "frequency": 4,
             "displayValue": "four (4)",
-            "displayValueParsed": true
+            "displayValueParsed": true,
+            "frequencyMode": null
           },
           {
             "index": 2,
@@ -278,7 +283,8 @@
             "character": "込",
             "frequency": 6,
             "displayValue": "six",
-            "displayValueParsed": false
+            "displayValueParsed": false,
+            "frequencyMode": null
           }
         ]
       }

@@ -198,6 +198,10 @@ export type KanjiFrequency = {
      * Whether or not the displayValue string was parsed to determine the frequency value.
      */
     displayValueParsed: boolean;
+    /**
+     * How the frequency should be interpreted.
+     */
+    frequencyMode: DictionaryData.FrequencyMode | null;
 };
 
 // Terms
