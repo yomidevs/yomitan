@@ -96,7 +96,7 @@ await Application.main(true, async (application) => {
     preparePromises.push(dictionaryController.prepare());
 
     const dictionaryImportController = new DictionaryImportController(settingsController, modalController, statusFooter);
-    preparePromises.push(dictionaryImportController.prepare());
+    dictionaryImportController.prepare();
 
     const simpleScanningInputController = new ScanInputsSimpleController(settingsController);
     preparePromises.push(simpleScanningInputController.prepare());
