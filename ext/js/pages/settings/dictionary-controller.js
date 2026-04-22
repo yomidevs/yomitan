@@ -356,6 +356,8 @@ class DictionaryEntry {
             kanjiMeta: 'Kanji Meta Count',
             tagMeta: 'Tag Count',
             media: 'Media Count',
+            frequencyMode: 'Frequency Mode',
+            prefixWildcardsSupported: 'Prefix Wildcards Enabled',
             importSuccess: 'Import Success',
         };
 
