@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {log} from '../core/log.js';
 import {computeZoomScale, isPointInAnyRect} from './document-util.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
 import {TextSourceElement} from './text-source-element.js';
@@ -335,14 +336,19 @@ export class TextSourceGenerator {
      * @returns {Element[]}
      */
     _getElementsFromPoint(x, y, all) {
-        if (all) {
-            // document.elementsFromPoint can return duplicates which must be removed.
-            const elements = document.elementsFromPoint(x, y);
-            return elements.filter((e, i) => elements.indexOf(e) === i);
-        }
+        try {
+            if (all) {
+                // document.elementsFromPoint can return duplicates which must be removed.
+                const elements = document.elementsFromPoint(x, y);
+                return elements.filter((e, i) => elements.indexOf(e) === i);
+            }
 
-        const e = document.elementFromPoint(x, y);
-        return e !== null ? [e] : [];
+            const e = document.elementFromPoint(x, y);
+            return e !== null ? [e] : [];
+        } catch (e) {
+            log.logGenericError(e, 'log');
+            return [];
+        }
     }
 
     /**
