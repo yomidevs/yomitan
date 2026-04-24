@@ -9,7 +9,7 @@ Only collaborators with deployment permissions are allowed to deploy.
 1. Tag the commit with a version number. Like: `git tag 24.4.28.0 HEAD` (do this after pulling in the latest changes in master) or `git tag 24.4.28.0 abc123`
 
 > [!WARNING]
-> You can not use leading zeroes in the version tags (e.g. `24.04.28.0`). Firefox store does not allow them and the deploy will fail.
+> You cannot use leading zeroes in the version tags (e.g. `24.04.28.0`). Firefox store does not allow them and the deploy will fail.
 
 > [!NOTE]
 > Using the included `tag.sh` script is highly recommended to minimize mistakes.
