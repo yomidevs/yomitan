@@ -194,6 +194,7 @@ type AllTextProcessors = {
             convertHiraganaToKatakana: TextProcessor;
             collapseEmphaticSequences: TextProcessor;
             standardizeKanji: TextProcessor;
+            insertWildcard: TextProcessor;
         };
     };
     ka: Record<string, never>;
