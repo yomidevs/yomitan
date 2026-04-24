@@ -204,6 +204,7 @@ export class Backend {
             ['openInfoPage', this._onCommandOpenInfoPage.bind(this)],
             ['openSettingsPage', this._onCommandOpenSettingsPage.bind(this)],
             ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
+            ['openSearchPageCurrentTab', this._onCommandOpenSearchPageCurrentTab.bind(this)],
             ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)],
         ]));
 
@@ -1197,7 +1198,8 @@ export class Backend {
             const parsedUrl = new URL(url);
             const parsedBaseUrl = `${parsedUrl.origin}${parsedUrl.pathname}`;
             const parsedMode = parsedUrl.searchParams.get('mode');
-            return parsedBaseUrl === baseUrl && (parsedMode === mode || (!parsedMode && mode === 'existingOrNewTab'));
+            const modeIsNotSpecial = mode === 'existingOrNewTab' || mode === 'existingOrCurrentTab';
+            return parsedBaseUrl === baseUrl && (parsedMode === mode || (!parsedMode && modeIsNotSpecial));
         };
 
         const openInTab = async () => {
@@ -1218,12 +1220,15 @@ export class Backend {
 
         switch (mode) {
             case 'existingOrNewTab':
+            case 'existingOrCurrentTab':
                 try {
                     if (await openInTab()) { return; }
                 } catch (e) {
                     // NOP
                 }
-                await this._createTab(queryUrl);
+
+                await (mode === 'existingOrNewTab' ? this._createTab(queryUrl) : this._updateTab(queryUrl));
+
                 return;
             case 'newTab':
                 await this._createTab(queryUrl);
@@ -1231,6 +1236,18 @@ export class Backend {
             case 'popup':
                 return;
         }
+    }
+
+    /**
+     * @param {undefined|{mode: import('backend').Mode, query?: string}} params
+     */
+    async _onCommandOpenSearchPageCurrentTab(params) {
+        /** @type {{mode: import('backend').Mode, query?: string}} */
+        const newParams = {mode: 'existingOrCurrentTab'};
+        if (typeof params === 'object' && params !== null) {
+            newParams.query = params.query;
+        }
+        await this._onCommandOpenSearchPage(newParams);
     }
 
     /**
@@ -2869,6 +2886,23 @@ export class Backend {
     }
 
     /**
+     * @param {string} url
+     * @returns {Promise<chrome.tabs.Tab>}
+     */
+    _updateTab(url) {
+        return new Promise((resolve, reject) => {
+            chrome.tabs.update({url}, (tab) => {
+                const e = chrome.runtime.lastError;
+                if (e || !tab) {
+                    reject(new Error(e ? e.message : 'No active tab to update.'));
+                } else {
+                    resolve(tab);
+                }
+            });
+        });
+    }
+
+    /**
      * @param {number} tabId
      * @returns {Promise<chrome.tabs.Tab>}
      */
@@ -2958,6 +2992,7 @@ export class Backend {
     _normalizeOpenSettingsPageMode(mode, defaultValue) {
         switch (mode) {
             case 'existingOrNewTab':
+            case 'existingOrCurrentTab':
             case 'newTab':
             case 'popup':
                 return mode;

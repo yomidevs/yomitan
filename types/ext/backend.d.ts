@@ -35,4 +35,4 @@ export type FindTabsPredicate = (tabInfo: TabInfo) => boolean | Promise<boolean>
 
 export type CanAddResults = {note: import('anki').Note, isDuplicate: boolean}[];
 
-export type Mode = 'existingOrNewTab' | 'newTab' | 'popup';
+export type Mode = 'existingOrNewTab' | 'existingOrCurrentTab' | 'newTab' | 'popup';
