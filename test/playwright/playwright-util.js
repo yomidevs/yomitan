@@ -27,10 +27,11 @@ export const test = base.extend({
     // eslint-disable-next-line no-empty-pattern
     context: async ({}, /** @type {(r: import('playwright').BrowserContext) => Promise<void>} */ use) => {
         const pathToExtension = path.join(root, 'ext');
-        const context = await chromium.launchPersistentContext('', {
-            // Disabled: headless: false,
+        // Use a temp directory for user data
+        const userDataDir = path.join(root, '.playwright-user-data');
+        const context = await chromium.launchPersistentContext(userDataDir, {
+            headless: false,  // Extensions don't work properly in headless mode
             args: [
-                '--headless=new',
                 `--disable-extensions-except=${pathToExtension}`,
                 `--load-extension=${pathToExtension}`,
             ],
