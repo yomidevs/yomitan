@@ -41,7 +41,7 @@ jobs:
               return attempt < max ? attempt + 1 : '';
             }
 
-      - uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # pin@v1.12
+      - uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # pin@v1.13
         with:
           tag: ${{ github.ref_name }}
           fileName: "*"
@@ -107,7 +107,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # pin@v1.12
+      - uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # pin@v1.13
         with:
           tag: ${{ github.ref_name }}
           fileName: "*"
