@@ -712,16 +712,10 @@ export class Popup extends EventDispatcher {
         if (this._displayModeIsFullWidth) {
             left = viewport.left;
             width = viewport.right - viewport.left;
-            switch (this._fullWidthPosition) {
-                case 'top':
-                    top = viewport.top;
-                    break;
-                case 'above-cursor':
-                    break;
-                case 'bottom':
-                default:
-                    top = viewport.bottom - height;
-                    break;
+            if (this._fullWidthPosition === 'top') {
+                top = viewport.top;
+            } else if (this._fullWidthPosition !== 'above-cursor') {
+                top = viewport.bottom - height;
             }
         }
 
