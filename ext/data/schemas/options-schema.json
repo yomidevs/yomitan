@@ -88,6 +88,7 @@
                                     "showAdvanced",
                                     "showDebug",
                                     "popupDisplayMode",
+                                    "popupFullWidthPosition",
                                     "popupWidth",
                                     "popupHeight",
                                     "popupHorizontalOffset",
@@ -179,6 +180,11 @@
                                         "type": "string",
                                         "enum": ["default", "full-width"],
                                         "default": "default"
+                                    },
+                                    "popupFullWidthPosition": {
+                                        "type": "string",
+                                        "enum": ["top", "above-cursor", "bottom"],
+                                        "default": "bottom"
                                     },
                                     "popupWidth": {
                                         "type": "number",

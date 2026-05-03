@@ -93,6 +93,8 @@ export class Popup extends EventDispatcher {
         this._displayMode = 'default';
         /** @type {boolean} */
         this._displayModeIsFullWidth = false;
+        /** @type {import('settings').PopupFullWidthPosition} */
+        this._fullWidthPosition = 'bottom';
         /** @type {boolean} */
         this._scaleRelativeToVisualViewport = true;
         /** @type {boolean} */
@@ -709,8 +711,18 @@ export class Popup extends EventDispatcher {
 
         if (this._displayModeIsFullWidth) {
             left = viewport.left;
-            top = below ? viewport.bottom - height : viewport.top;
             width = viewport.right - viewport.left;
+            switch (this._fullWidthPosition) {
+                case 'top':
+                    top = viewport.top;
+                    break;
+                case 'above-cursor':
+                    break;
+                case 'bottom':
+                default:
+                    top = viewport.bottom - height;
+                    break;
+            }
         }
 
         const frame = this._frame;
@@ -1124,6 +1136,7 @@ export class Popup extends EventDispatcher {
         this._horizontalTextPositionBelow = (general.popupHorizontalTextPosition === 'below');
         this._displayMode = general.popupDisplayMode;
         this._displayModeIsFullWidth = (this._displayMode === 'full-width');
+        this._fullWidthPosition = general.popupFullWidthPosition;
         this._scaleRelativeToVisualViewport = general.popupScaleRelativeToVisualViewport;
         this._useSecureFrameUrl = general.useSecurePopupFrameUrl;
         this._useShadowDom = general.usePopupShadowDom;

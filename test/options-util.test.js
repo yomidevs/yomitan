@@ -43,6 +43,7 @@ function createProfileOptionsTestData1() {
             maxResults: 32,
             showAdvanced: false,
             popupDisplayMode: 'default',
+            popupFullWidthPosition: 'bottom',
             popupWidth: 400,
             popupHeight: 250,
             popupHorizontalOffset: 0,
@@ -275,6 +276,7 @@ function createProfileOptionsUpdatedTestData1() {
             showAdvanced: false,
             showDebug: false,
             popupDisplayMode: 'default',
+            popupFullWidthPosition: 'bottom',
             popupWidth: 400,
             popupHeight: 250,
             popupHorizontalOffset: 0,
@@ -705,7 +707,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 75,
+        version: 76,
         global: {
             database: {
                 prefixWildcardsSupported: false,
