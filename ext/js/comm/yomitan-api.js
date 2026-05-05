@@ -279,8 +279,10 @@ export class YomitanApi {
                             throw new Error('Invalid input for ankiConfigs, expected "profileIndex" to be a valid profile index but got ' + profileIndex);
                         }
                         const profileOptions = profile.options;
+                        const {apiKey: _redactedApiKey, ...ankiConfiguration} = profileOptions.anki;
+                        void _redactedApiKey;
                         result = {
-                            configuration: profileOptions.anki,
+                            configuration: ankiConfiguration,
                             fieldTemplates: await this._getAnkiTemplate(profileOptions),
                         };
                         break;
