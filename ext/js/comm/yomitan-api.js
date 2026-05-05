@@ -270,6 +270,21 @@ export class YomitanApi {
                         result = await this._invoke('parseText', invokeParams);
                         break;
                     }
+                    case 'ankiConfigs': {
+                        /** @type {import('yomitan-api.js').ankiConfigsInput} */
+                        const {profileIndex} = parsedBody;
+                        const resolvedProfileIndex = typeof profileIndex === 'number' ? profileIndex : optionsFull.profileCurrent;
+                        const profile = optionsFull.profiles[resolvedProfileIndex];
+                        if (typeof profile === 'undefined') {
+                            throw new Error('Invalid input for ankiConfigs, expected "profileIndex" to be a valid profile index but got ' + profileIndex);
+                        }
+                        const profileOptions = profile.options;
+                        result = {
+                            configuration: profileOptions.anki,
+                            fieldTemplates: await this._getAnkiTemplate(profileOptions),
+                        };
+                        break;
+                    }
                     default:
                         statusCode = 400;
                 }

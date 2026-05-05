@@ -44,6 +44,10 @@ export type tokenizeInput = {
     scanLength: number;
 };
 
+export type ankiConfigsInput = {
+    profileIndex?: number;
+};
+
 export type remoteVersionResponse = {
     version: number;
 };
