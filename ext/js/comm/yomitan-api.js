@@ -270,21 +270,16 @@ export class YomitanApi {
                         result = await this._invoke('parseText', invokeParams);
                         break;
                     }
-                    case 'ankiConfigs': {
-                        /** @type {import('yomitan-api.js').ankiConfigsInput} */
+                    case 'ankiCardFormats': {
+                        /** @type {import('yomitan-api.js').ankiCardFormatsInput} */
                         const {profileIndex} = parsedBody;
                         const resolvedProfileIndex = typeof profileIndex === 'number' ? profileIndex : optionsFull.profileCurrent;
                         const profile = optionsFull.profiles[resolvedProfileIndex];
                         if (typeof profile === 'undefined') {
-                            throw new Error('Invalid input for ankiConfigs, expected "profileIndex" to be a valid profile index but got ' + profileIndex);
+                            throw new Error('Invalid input for ankiCardFormats, expected "profileIndex" to be a valid profile index but got ' + profileIndex);
                         }
                         const profileOptions = profile.options;
-                        const {apiKey: _redactedApiKey, ...ankiConfiguration} = profileOptions.anki;
-                        void _redactedApiKey;
-                        result = {
-                            configuration: ankiConfiguration,
-                            fieldTemplates: await this._getAnkiTemplate(profileOptions),
-                        };
+                        result = profileOptions.anki.cardFormats;
                         break;
                     }
                     default:

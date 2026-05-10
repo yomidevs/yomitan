@@ -44,14 +44,13 @@ export type tokenizeInput = {
     scanLength: number;
 };
 
-export type ankiConfigsInput = {
+export type ankiCardFormatsInput = {
     profileIndex?: number;
 };
 
 export type remoteVersionResponse = {
     version: number;
 };
-
 export type apiDictionaryMediaDetails = {
     dictionary: string;
     path: string;
@@ -69,3 +68,4 @@ export type apiAudioMediaDetails = {
     content: AudioBinaryBase64;
     ankiFilename: string;
 };
+
