@@ -75,7 +75,8 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Run Benchmarks
-        uses: CodSpeedHQ/action@c381be0bfd20e844fb45594f6aa182ffcd94545c # v3.2
+        uses: CodSpeedHQ/action@c381be0bfd20e844fb45594f6aa182ffcd94545c # v4.15.0
         with:
+          mode: "simulation"
           token: ${{ secrets.CODSPEED_TOKEN }}
           run: npm run bench
