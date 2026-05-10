@@ -149,11 +149,22 @@ export class AnkiTemplateRenderer {
     }
 
     /**
+     * Marks a string as safe and not necessary to escape by handlebars.
+     *
+     * https://handlebarsjs.com/api-reference/utilities.html#handlebars-safestring-string
      * @param {string} text
      * @returns {string}
      */
     _safeString(text) {
         return new Handlebars.SafeString(text);
+    }
+
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
+    _escapeExpression(text) {
+        return text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
     }
 
     // Template helpers
@@ -721,12 +732,12 @@ export class AnkiTemplateRenderer {
     _formatGlossary(args, _context, options) {
         const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
         const data = this._getNoteDataFromOptions(options);
-        if (typeof content === 'string') { return this._safeString(this._stringToMultiLineHtml(content)); }
+        if (typeof content === 'string') { return this._safeString(this._stringToMultiLineHtml(this._escapeExpression(content))); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         switch (content.type) {
             case 'image': return this._formatGlossaryImage(content, dictionary, data);
             case 'structured-content': return this._formatStructuredContent(content, dictionary, data);
-            case 'text': return this._safeString(this._stringToMultiLineHtml(content.text));
+            case 'text': return this._safeString(this._stringToMultiLineHtml(this._escapeExpression(content.text)));
         }
         return '';
     }
@@ -761,7 +772,7 @@ export class AnkiTemplateRenderer {
     _formatGlossaryPlain(args, _context, options) {
         const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
         const data = this._getNoteDataFromOptions(options);
-        if (typeof content === 'string') { return this._safeString(content); }
+        if (typeof content === 'string') { return this._safeString(this._escapeExpression(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         const structuredContentGenerator = this._createStructuredContentGenerator(data);
         switch (content.type) {
@@ -775,7 +786,7 @@ export class AnkiTemplateRenderer {
                     return node !== null ? this._getStructuredContentText(node) : '';
                 }
             }
-            case 'text': return this._safeString(content.text);
+            case 'text': return this._safeString(this._escapeExpression(content.text));
         }
         return '';
     }
