@@ -712,12 +712,25 @@ export class Popup extends EventDispatcher {
         if (this._displayModeIsFullWidth) {
             left = viewport.left;
             width = viewport.right - viewport.left;
-            if (this._fullWidthPosition === 'top') {
-                top = viewport.top;
-                below = false;
-            } else if (this._fullWidthPosition !== 'above-cursor') {
-                top = viewport.bottom - height;
-                below = true;
+
+            const sourceRect = this._getBoundingSourceRect(this._convertSourceRectsCoordinateSpace(sourceRects));
+            const overflowAbove = (sourceRect.top - height) < viewport.top;
+            const overflowBelow = (sourceRect.bottom + height) > viewport.bottom;
+
+            switch (this._fullWidthPosition) {
+                case 'top':
+                    // Default to top, unless there is overflow, then set to bottom.
+                    top = overflowAbove ? viewport.bottom - height : viewport.top;
+                    below = overflowAbove;
+                    break;
+                case 'bottom':
+                    // Default to bottom, unless there is overflow below, then move to top.
+                    top = overflowBelow ? viewport.top : viewport.bottom - height;
+                    // If overflowBelow, remove top border, otherwise remove bottom.
+                    below = !overflowBelow;
+                    break;
+                case 'above-cursor':
+                    break;
             }
         }
 
