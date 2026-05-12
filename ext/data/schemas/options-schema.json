@@ -325,7 +325,7 @@
                                     },
                                     "frequencyDisplayMode": {
                                         "type": "string",
-                                        "enum": ["tags", "tags-grouped", "split-tags", "split-tags-grouped", "inline-list", "list"],
+                                        "enum": ["tags", "tags-grouped", "split-tags", "split-tags-grouped", "inline-list", "list", "list-bordered"],
                                         "default": "split-tags-grouped"
                                     },
                                     "termDisplayMode": {
