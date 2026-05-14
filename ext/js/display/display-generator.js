@@ -164,7 +164,9 @@ export class DisplayGenerator {
                 const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
                 if (currentDictionaryInfo) {
                     const dictionaryContentArray = [];
+                    // Title and revision are required keys as per the schema.
                     dictionaryContentArray.push(currentDictionaryInfo.title);
+                    dictionaryContentArray.push(`rev.${currentDictionaryInfo.revision}`);
                     if (currentDictionaryInfo.author) {
                         dictionaryContentArray.push('Author: ' + currentDictionaryInfo.author);
                     }
