@@ -1220,15 +1220,20 @@ export class Backend {
 
         switch (mode) {
             case 'existingOrNewTab':
+                try {
+                    if (await openInTab()) { return; }
+                } catch (e) {
+                    // NOP
+                }
+                await this._createTab(queryUrl);
+                return;
             case 'existingOrCurrentTab':
                 try {
                     if (await openInTab()) { return; }
                 } catch (e) {
                     // NOP
                 }
-
-                await (mode === 'existingOrNewTab' ? this._createTab(queryUrl) : this._updateTab(queryUrl));
-
+                await this._updateTab(queryUrl);
                 return;
             case 'newTab':
                 await this._createTab(queryUrl);
