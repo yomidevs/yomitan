@@ -143,7 +143,12 @@
                                     },
                                     "resultOutputMode": {
                                         "type": "string",
-                                        "enum": ["group", "merge", "split", "term"],
+                                        "enum": [
+                                            "group",
+                                            "merge",
+                                            "split",
+                                            "term"
+                                        ],
                                         "default": "group"
                                     },
                                     "fontFamily": {
@@ -177,7 +182,10 @@
                                     },
                                     "popupDisplayMode": {
                                         "type": "string",
-                                        "enum": ["default", "full-width"],
+                                        "enum": [
+                                            "default",
+                                            "full-width"
+                                        ],
                                         "default": "default"
                                     },
                                     "popupWidth": {
@@ -208,12 +216,21 @@
                                     },
                                     "popupHorizontalTextPosition": {
                                         "type": "string",
-                                        "enum": ["below", "above"],
+                                        "enum": [
+                                            "below",
+                                            "above"
+                                        ],
                                         "default": "below"
                                     },
                                     "popupVerticalTextPosition": {
                                         "type": "string",
-                                        "enum": ["default", "before", "after", "left", "right"],
+                                        "enum": [
+                                            "default",
+                                            "before",
+                                            "after",
+                                            "left",
+                                            "right"
+                                        ],
                                         "default": "before"
                                     },
                                     "popupScalingFactor": {
@@ -246,7 +263,11 @@
                                     },
                                     "glossaryLayoutMode": {
                                         "type": "string",
-                                        "enum": ["default", "compact", "compact-popup-anki"],
+                                        "enum": [
+                                            "default",
+                                            "compact",
+                                            "compact-popup-anki"
+                                        ],
                                         "default": "default"
                                     },
                                     "mainDictionary": {
@@ -254,12 +275,23 @@
                                     },
                                     "popupTheme": {
                                         "type": "string",
-                                        "enum": ["light", "dark", "browser", "site"],
+                                        "enum": [
+                                            "light",
+                                            "dark",
+                                            "browser",
+                                            "site"
+                                        ],
                                         "default": "site"
                                     },
                                     "popupOuterTheme": {
                                         "type": "string",
-                                        "enum": ["light", "dark", "browser", "site", "none"],
+                                        "enum": [
+                                            "light",
+                                            "dark",
+                                            "browser",
+                                            "site",
+                                            "none"
+                                        ],
                                         "default": "site"
                                     },
                                     "customPopupCss": {
@@ -304,36 +336,71 @@
                                     },
                                     "popupCurrentIndicatorMode": {
                                         "type": "string",
-                                        "enum": ["none", "asterisk", "triangle", "bar-left", "bar-right", "dot-left", "dot-right"],
+                                        "enum": [
+                                            "none",
+                                            "asterisk",
+                                            "triangle",
+                                            "bar-left",
+                                            "bar-right",
+                                            "dot-left",
+                                            "dot-right"
+                                        ],
                                         "default": "triangle"
                                     },
                                     "popupActionBarVisibility": {
                                         "type": "string",
-                                        "enum": ["auto", "always"],
+                                        "enum": [
+                                            "auto",
+                                            "always"
+                                        ],
                                         "default": "auto"
                                     },
                                     "popupActionBarLocation": {
                                         "type": "string",
-                                        "enum": ["left", "right", "top", "bottom"],
+                                        "enum": [
+                                            "left",
+                                            "right",
+                                            "top",
+                                            "bottom"
+                                        ],
                                         "default": "top"
                                     },
                                     "frequencyDisplayMode": {
                                         "type": "string",
-                                        "enum": ["tags", "tags-grouped", "split-tags", "split-tags-grouped", "inline-list", "list", "list-bordered"],
+                                        "enum": [
+                                            "tags",
+                                            "tags-grouped",
+                                            "split-tags",
+                                            "split-tags-grouped",
+                                            "inline-list",
+                                            "list",
+                                            "list-bordered"
+                                        ],
                                         "default": "split-tags-grouped"
                                     },
                                     "termDisplayMode": {
                                         "type": "string",
-                                        "enum": ["ruby", "ruby-and-reading", "term-and-reading", "term-only"],
+                                        "enum": [
+                                            "ruby",
+                                            "ruby-and-reading",
+                                            "term-and-reading",
+                                            "term-only"
+                                        ],
                                         "default": "ruby"
                                     },
                                     "sortFrequencyDictionary": {
-                                        "type": ["string", "null"],
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
                                         "default": null
                                     },
                                     "sortFrequencyDictionaryOrder": {
                                         "type": "string",
-                                        "enum": ["ascending", "descending"],
+                                        "enum": [
+                                            "ascending",
+                                            "descending"
+                                        ],
                                         "default": "descending"
                                     },
                                     "stickySearchHeader": {
@@ -351,6 +418,10 @@
                                     "yomitanApiAllowCssSanitizationBypass": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "enableSmoothScroll": {
+                                        "type": "boolean",
+                                        "default": true
                                     }
                                 }
                             },
@@ -395,12 +466,19 @@
                                     },
                                     "windowType": {
                                         "type": "string",
-                                        "enum": ["normal", "popup"],
+                                        "enum": [
+                                            "normal",
+                                            "popup"
+                                        ],
                                         "default": "popup"
                                     },
                                     "windowState": {
                                         "type": "string",
-                                        "enum": ["normal", "maximized", "fullscreen"],
+                                        "enum": [
+                                            "normal",
+                                            "maximized",
+                                            "fullscreen"
+                                        ],
                                         "default": "normal"
                                     }
                                 }
@@ -432,7 +510,11 @@
                                     },
                                     "fallbackSoundType": {
                                         "type": "string",
-                                        "enum": ["none", "click", "bloop"],
+                                        "enum": [
+                                            "none",
+                                            "click",
+                                            "bloop"
+                                        ],
                                         "default": "click"
                                     },
                                     "sources": {
@@ -935,7 +1017,13 @@
                                         },
                                         "definitionsCollapsible": {
                                             "type": "string",
-                                            "enum": ["not-collapsible", "expanded", "collapsed", "force-collapsed", "force-expanded"],
+                                            "enum": [
+                                                "not-collapsible",
+                                                "expanded",
+                                                "collapsed",
+                                                "force-collapsed",
+                                                "force-expanded"
+                                            ],
                                             "default": "not-collapsible"
                                         },
                                         "partsOfSpeechFilter": {
@@ -968,7 +1056,10 @@
                                         "default": false
                                     },
                                     "selectedParser": {
-                                        "type": ["string", "null"],
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
                                         "default": null
                                     },
                                     "termSpacing": {
@@ -977,7 +1068,13 @@
                                     },
                                     "readingMode": {
                                         "type": "string",
-                                        "enum": ["hiragana", "katakana", "romaji", "dictionary-reading", "none"],
+                                        "enum": [
+                                            "hiragana",
+                                            "katakana",
+                                            "romaji",
+                                            "dictionary-reading",
+                                            "none"
+                                        ],
                                         "default": "hiragana"
                                     }
                                 }
@@ -1031,7 +1128,10 @@
                                         "properties": {
                                             "format": {
                                                 "type": "string",
-                                                "enum": ["png", "jpeg"],
+                                                "enum": [
+                                                    "png",
+                                                    "jpeg"
+                                                ],
                                                 "default": "png"
                                             },
                                             "quality": {
@@ -1061,7 +1161,12 @@
                                                 },
                                                 "icon": {
                                                     "type": "string",
-                                                    "enum": ["big-circle", "small-circle", "big-square", "big-diamond"],
+                                                    "enum": [
+                                                        "big-circle",
+                                                        "small-circle",
+                                                        "big-square",
+                                                        "big-diamond"
+                                                    ],
                                                     "default": "big-circle"
                                                 },
                                                 "deck": {
@@ -1074,7 +1179,10 @@
                                                 },
                                                 "type": {
                                                     "type": "string",
-                                                    "enum": ["term", "kanji"],
+                                                    "enum": [
+                                                        "term",
+                                                        "kanji"
+                                                    ],
                                                     "default": "term"
                                                 },
                                                 "fields": {
@@ -1088,7 +1196,14 @@
                                                             },
                                                             "overwriteMode": {
                                                                 "type": "string",
-                                                                "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
+                                                                "enum": [
+                                                                    "coalesce",
+                                                                    "coalesce-new",
+                                                                    "skip",
+                                                                    "append",
+                                                                    "prepend",
+                                                                    "overwrite"
+                                                                ],
                                                                 "default": "coalesce"
                                                             }
                                                         }
@@ -1126,7 +1241,11 @@
                                     "duplicateScope": {
                                         "type": "string",
                                         "default": "collection",
-                                        "enum": ["collection", "deck", "deck-root"]
+                                        "enum": [
+                                            "collection",
+                                            "deck",
+                                            "deck-root"
+                                        ]
                                     },
                                     "duplicateScopeCheckAllModels": {
                                         "type": "boolean",
@@ -1138,11 +1257,18 @@
                                     },
                                     "duplicateBehavior": {
                                         "type": "string",
-                                        "enum": ["prevent", "overwrite", "new"],
+                                        "enum": [
+                                            "prevent",
+                                            "overwrite",
+                                            "new"
+                                        ],
                                         "default": "new"
                                     },
                                     "fieldTemplates": {
-                                        "type": ["string", "null"],
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
                                         "default": null
                                     },
                                     "suspendNewCards": {
@@ -1151,7 +1277,12 @@
                                     },
                                     "displayTagsAndFlags": {
                                         "type": "string",
-                                        "enum": ["never", "always", "non-standard", "custom"],
+                                        "enum": [
+                                            "never",
+                                            "always",
+                                            "non-standard",
+                                            "custom"
+                                        ],
                                         "default": "never"
                                     },
                                     "targetTags": {
@@ -1163,7 +1294,10 @@
                                     },
                                     "noteGuiMode": {
                                         "type": "string",
-                                        "enum": ["browse", "edit"],
+                                        "enum": [
+                                            "browse",
+                                            "edit"
+                                        ],
                                         "default": "browse"
                                     },
                                     "apiKey": {
@@ -1200,7 +1334,12 @@
                                     },
                                     "terminationCharacterMode": {
                                         "type": "string",
-                                        "enum": ["custom", "custom-no-newlines", "newlines", "none"],
+                                        "enum": [
+                                            "custom",
+                                            "custom-no-newlines",
+                                            "newlines",
+                                            "none"
+                                        ],
                                         "default": "custom"
                                     },
                                     "terminationCharacters": {
@@ -1226,7 +1365,10 @@
                                                     "maxLength": 1
                                                 },
                                                 "character2": {
-                                                    "type": ["string", "null"],
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
                                                     "default": "\"",
                                                     "minLength": 1,
                                                     "maxLength": 1
@@ -1242,22 +1384,118 @@
                                             }
                                         },
                                         "default": [
-                                            {"enabled": true, "character1": "「", "character2": "」", "includeCharacterAtStart": false, "includeCharacterAtEnd": false},
-                                            {"enabled": true, "character1": "『", "character2": "』", "includeCharacterAtStart": false, "includeCharacterAtEnd": false},
-                                            {"enabled": true, "character1": "\"", "character2": "\"", "includeCharacterAtStart": false, "includeCharacterAtEnd": false},
-                                            {"enabled": true, "character1": "'", "character2": "'", "includeCharacterAtStart": false, "includeCharacterAtEnd": false},
-                                            {"enabled": true, "character1": ".", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "!", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "?", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "．", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "。", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "！", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "？", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "…", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "︒", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "︕", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "︖", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
-                                            {"enabled": true, "character1": "︙", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true}
+                                            {
+                                                "enabled": true,
+                                                "character1": "\u300c",
+                                                "character2": "\u300d",
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": false
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\u300e",
+                                                "character2": "\u300f",
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": false
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\"",
+                                                "character2": "\"",
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": false
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "'",
+                                                "character2": "'",
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": false
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": ".",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "!",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "?",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\uff0e",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\u3002",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\uff01",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\uff1f",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\u2026",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\ufe12",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\ufe15",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\ufe16",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            },
+                                            {
+                                                "enabled": true,
+                                                "character1": "\ufe19",
+                                                "character2": null,
+                                                "includeCharacterAtStart": false,
+                                                "includeCharacterAtEnd": true
+                                            }
                                         ]
                                     }
                                 }
@@ -1290,14 +1528,22 @@
                                                     "default": ""
                                                 },
                                                 "key": {
-                                                    "type": ["string", "null"],
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
                                                     "default": null
                                                 },
                                                 "modifiers": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "enum": ["alt", "ctrl", "shift", "meta"],
+                                                        "enum": [
+                                                            "alt",
+                                                            "ctrl",
+                                                            "shift",
+                                                            "meta"
+                                                        ],
                                                         "default": "alt"
                                                     }
                                                 },
@@ -1305,10 +1551,17 @@
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "enum": ["popup", "search", "web"],
+                                                        "enum": [
+                                                            "popup",
+                                                            "search",
+                                                            "web"
+                                                        ],
                                                         "default": "popup"
                                                     },
-                                                    "default": ["popup", "search"]
+                                                    "default": [
+                                                        "popup",
+                                                        "search"
+                                                    ]
                                                 },
                                                 "enabled": {
                                                     "type": "boolean",
@@ -1317,24 +1570,235 @@
                                             }
                                         },
                                         "default": [
-                                            {"action": "close",             "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["popup"],           "enabled": true},
-                                            {"action": "focusSearchBox",    "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["search"],          "enabled": true},
-                                            {"action": "previousEntry",     "argument": "3", "key": "PageUp",    "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "nextEntry",         "argument": "3", "key": "PageDown",  "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "lastEntry",         "argument": "",  "key": "End",       "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "firstEntry",        "argument": "",  "key": "Home",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "previousEntry",     "argument": "1", "key": "ArrowUp",   "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "nextEntry",         "argument": "1", "key": "ArrowDown", "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "historyBackward",   "argument": "",  "key": "KeyB",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "historyForward",    "argument": "",  "key": "KeyF",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "profilePrevious",   "argument": "",  "key": "Minus",     "modifiers": ["alt"],  "scopes": ["popup", "search", "web"], "enabled": true},
-                                            {"action": "profileNext",       "argument": "",  "key": "Equal",     "modifiers": ["alt"],  "scopes": ["popup", "search", "web"], "enabled": true},
-                                            {"action": "addNote",           "argument": "0", "key": "KeyE",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "addNote",           "argument": "1", "key": "KeyR",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "addNote",           "argument": "2", "key": "KeyK",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "playAudio",         "argument": "",  "key": "KeyP",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "viewNotes",         "argument": "0", "key": "KeyV",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "copyHostSelection", "argument": "",  "key": "KeyC",      "modifiers": ["ctrl"], "scopes": ["popup"],           "enabled": true}
+                                            {
+                                                "action": "close",
+                                                "argument": "",
+                                                "key": "Escape",
+                                                "modifiers": [],
+                                                "scopes": [
+                                                    "popup"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "focusSearchBox",
+                                                "argument": "",
+                                                "key": "Escape",
+                                                "modifiers": [],
+                                                "scopes": [
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "previousEntry",
+                                                "argument": "3",
+                                                "key": "PageUp",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "nextEntry",
+                                                "argument": "3",
+                                                "key": "PageDown",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "lastEntry",
+                                                "argument": "",
+                                                "key": "End",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "firstEntry",
+                                                "argument": "",
+                                                "key": "Home",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "previousEntry",
+                                                "argument": "1",
+                                                "key": "ArrowUp",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "nextEntry",
+                                                "argument": "1",
+                                                "key": "ArrowDown",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "historyBackward",
+                                                "argument": "",
+                                                "key": "KeyB",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "historyForward",
+                                                "argument": "",
+                                                "key": "KeyF",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "profilePrevious",
+                                                "argument": "",
+                                                "key": "Minus",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search",
+                                                    "web"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "profileNext",
+                                                "argument": "",
+                                                "key": "Equal",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search",
+                                                    "web"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "addNote",
+                                                "argument": "0",
+                                                "key": "KeyE",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "addNote",
+                                                "argument": "1",
+                                                "key": "KeyR",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "addNote",
+                                                "argument": "2",
+                                                "key": "KeyK",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "playAudio",
+                                                "argument": "",
+                                                "key": "KeyP",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "viewNotes",
+                                                "argument": "0",
+                                                "key": "KeyV",
+                                                "modifiers": [
+                                                    "alt"
+                                                ],
+                                                "scopes": [
+                                                    "popup",
+                                                    "search"
+                                                ],
+                                                "enabled": true
+                                            },
+                                            {
+                                                "action": "copyHostSelection",
+                                                "argument": "",
+                                                "key": "KeyC",
+                                                "modifiers": [
+                                                    "ctrl"
+                                                ],
+                                                "scopes": [
+                                                    "popup"
+                                                ],
+                                                "enabled": true
+                                            }
                                         ]
                                     }
                                 }

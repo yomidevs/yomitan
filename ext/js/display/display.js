@@ -1709,7 +1709,8 @@ export class Display extends EventDispatcher {
         }
 
         this._windowScroll.stop();
-        if (smooth) {
+        const enableSmoothScroll = smooth && (this._options?.general.enableSmoothScroll !== false);
+        if (enableSmoothScroll) {
             this._windowScroll.animate(this._windowScroll.x, target, 200);
         } else {
             this._windowScroll.toY(target);
