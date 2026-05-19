@@ -115,6 +115,7 @@ export type GeneralOptions = {
     fontSize: number;
     lineHeight: string;
     popupDisplayMode: PopupDisplayMode;
+    popupFullWidthPosition: PopupFullWidthPosition;
     popupWidth: number;
     popupHeight: number;
     popupHorizontalOffset: number;
@@ -396,6 +397,8 @@ export type PreventSecondaryMouseOptions = {
 export type ResultOutputMode = 'group' | 'merge' | 'split' | 'term';
 
 export type PopupDisplayMode = 'default' | 'full-width';
+
+export type PopupFullWidthPosition = 'top' | 'above-cursor' | 'bottom';
 
 export type PopupHorizontalTextPosition = 'below' | 'above';
 

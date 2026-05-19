@@ -1238,7 +1238,13 @@
                     </div>
                 </div>
                 <div class="settings-item-right">
-                    <select data-setting="general.popupDisplayMode">
+                    <select data-setting="general.popupDisplayMode"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#full-width-position-options",
+                            "condition": {"op": "===", "value": "full-width"}
+                        }'
+                    >
                         <option value="default">Default</option>
                         <option value="full-width">Full width</option>
                     </select>
@@ -1253,6 +1259,20 @@
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
                 </p>
+            </div>
+            <div class="settings-item-children settings-item-children-group" id="full-width-position-options" hidden>
+                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Popup position</div>
+                    </div>
+                    <div class="settings-item-right">
+                        <select data-setting="general.popupFullWidthPosition">
+                            <option value="top">Top</option>
+                            <option value="above-cursor">Follow Cursor</option>
+                            <option value="bottom">Bottom</option>
+                        </select>
+                    </div>
+                </div></div>
             </div>
         </div>
         <div class="settings-item">

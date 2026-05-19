@@ -93,6 +93,8 @@ export class Popup extends EventDispatcher {
         this._displayMode = 'default';
         /** @type {boolean} */
         this._displayModeIsFullWidth = false;
+        /** @type {import('settings').PopupFullWidthPosition} */
+        this._fullWidthPosition = 'bottom';
         /** @type {boolean} */
         this._scaleRelativeToVisualViewport = true;
         /** @type {boolean} */
@@ -709,8 +711,27 @@ export class Popup extends EventDispatcher {
 
         if (this._displayModeIsFullWidth) {
             left = viewport.left;
-            top = below ? viewport.bottom - height : viewport.top;
             width = viewport.right - viewport.left;
+
+            const sourceRect = this._getBoundingSourceRect(this._convertSourceRectsCoordinateSpace(sourceRects));
+            const overflowAbove = (sourceRect.top - height) < viewport.top;
+            const overflowBelow = (sourceRect.bottom + height) > viewport.bottom;
+
+            switch (this._fullWidthPosition) {
+                case 'top':
+                    // Default to top, unless there is overflow, then set to bottom.
+                    top = overflowAbove ? viewport.bottom - height : viewport.top;
+                    below = overflowAbove;
+                    break;
+                case 'bottom':
+                    // Default to bottom, unless there is overflow below, then move to top.
+                    top = overflowBelow ? viewport.top : viewport.bottom - height;
+                    // If overflowBelow, remove top border, otherwise remove bottom.
+                    below = !overflowBelow;
+                    break;
+                case 'above-cursor':
+                    break;
+            }
         }
 
         const frame = this._frame;
@@ -1124,6 +1145,7 @@ export class Popup extends EventDispatcher {
         this._horizontalTextPositionBelow = (general.popupHorizontalTextPosition === 'below');
         this._displayMode = general.popupDisplayMode;
         this._displayModeIsFullWidth = (this._displayMode === 'full-width');
+        this._fullWidthPosition = general.popupFullWidthPosition;
         this._scaleRelativeToVisualViewport = general.popupScaleRelativeToVisualViewport;
         this._useSecureFrameUrl = general.useSecurePopupFrameUrl;
         this._useShadowDom = general.usePopupShadowDom;
