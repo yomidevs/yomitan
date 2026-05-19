@@ -94,7 +94,10 @@
                 "suggested_key": {
                     "default": "Alt+Insert"
                 },
-                "description": "Open the search page"
+                "description": "Open the search page in a new tab"
+            },
+            "openSearchPageCurrentTab": {
+                "description": "Open the search page in the current tab"
             },
             "openPopupWindow": {
                 "description": "Open the popup window"
