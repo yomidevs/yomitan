@@ -270,6 +270,18 @@ export class YomitanApi {
                         result = await this._invoke('parseText', invokeParams);
                         break;
                     }
+                    case 'ankiCardFormats': {
+                        /** @type {import('yomitan-api.js').ankiCardFormatsInput} */
+                        const {profileIndex} = parsedBody;
+                        const resolvedProfileIndex = typeof profileIndex === 'number' ? profileIndex : optionsFull.profileCurrent;
+                        const profile = optionsFull.profiles[resolvedProfileIndex];
+                        if (typeof profile === 'undefined') {
+                            throw new Error('Invalid input for ankiCardFormats, expected "profileIndex" to be a valid profile index but got ' + profileIndex);
+                        }
+                        const profileOptions = profile.options;
+                        result = profileOptions.anki.cardFormats;
+                        break;
+                    }
                     default:
                         statusCode = 400;
                 }
