@@ -517,7 +517,8 @@ export class AnkiConnect {
      * @returns {Promise<unknown[]>}
      */
     async _invokeMulti(actions) {
-        const result = await this._invoke('multi', {actions});
+        const modifiedActions = actions.map(action => ({ ...action, key:this._apiKey}));
+        const result = await this._invoke('multi', {actions: modifiedActions});
         if (!Array.isArray(result)) {
             throw this._createUnexpectedResultError('array', result);
         }
