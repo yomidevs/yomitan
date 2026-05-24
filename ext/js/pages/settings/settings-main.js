@@ -117,6 +117,18 @@ await Application.main(true, async (application) => {
     const genericSettingController = new GenericSettingController(settingsController);
     preparePromises.push(setupGenericSettingController(genericSettingController));
 
+    // Generate theme mode dropdown options from registry BEFORE controller init
+    const themeModeSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('theme-mode-select'));
+    if (themeModeSelect) {
+        themeModeSelect.innerHTML = '';
+        for (const theme of themes) {
+            const option = document.createElement('option');
+            option.value = theme.id;
+            option.textContent = theme.label;
+            themeModeSelect.appendChild(option);
+        }
+    }
+
     const audioController = new AudioController(settingsController, modalController);
     preparePromises.push(audioController.prepare());
 
@@ -188,21 +200,9 @@ await Application.main(true, async (application) => {
     document.documentElement.dataset.loaded = 'true';
 
     // Theme mode UI state management
-    const themeModeSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('theme-mode-select'));
     const shadowSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('shadow-theme-select'));
     const einkWarning = document.getElementById('eink-warning');
     const customCssInput = /** @type {HTMLTextAreaElement|null} */ (document.querySelector('[data-setting="general.customPopupCss"]'));
-
-    // Generate theme mode dropdown options from registry
-    if (themeModeSelect) {
-        themeModeSelect.innerHTML = '';
-        for (const theme of themes) {
-            const option = document.createElement('option');
-            option.value = theme.id;
-            option.textContent = theme.label;
-            themeModeSelect.appendChild(option);
-        }
-    }
 
     /**
      * Updates the UI state based on the selected theme mode.

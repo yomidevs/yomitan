@@ -676,42 +676,41 @@ export class Popup extends EventDispatcher {
      * Injects the active theme's CSS into the outer chrome (parent page/shadow DOM).
      * Theme CSS files contain both inner and outer selectors; outer selectors
      * (iframe.yomitan-popup) match here, inner selectors are harmless no-ops.
+     * Uses manual DOM manipulation to avoid loadStyle's WebExtension API tracking
+     * which throws on repeated injection with the same ID.
      * @param {string} themeMode
      */
-    async _injectThemeStylesheet(themeMode) {
+    _injectThemeStylesheet(themeMode) {
         const theme = getThemeById(themeMode);
-        if (!theme || !theme.css) {
-            // Remove any previously injected theme stylesheet
-            if (this._shadow !== null) {
-                const existing = this._shadow.querySelector('#yomitan-popup-theme-outer-stylesheet');
-                if (existing) { existing.remove(); }
-            }
-            return;
-        }
 
-        /** @type {'code'|'file'|'file-content'} */
-        let fileType = 'file';
-        let useWebExtensionApi = true;
-        let parentNode = null;
+        // Remove any previously injected theme stylesheet
+        const existingId = 'yomitan-popup-theme-outer-stylesheet';
         if (this._shadow !== null) {
-            fileType = 'file-content';
-            useWebExtensionApi = false;
-            parentNode = this._shadow;
-        }
-
-        if (parentNode !== null) {
-            const existing = parentNode.querySelector('#yomitan-popup-theme-outer-stylesheet');
+            const existing = this._shadow.querySelector(`#${existingId}`);
+            if (existing) { existing.remove(); }
+        } else {
+            const existing = document.querySelector(`#${existingId}`);
             if (existing) { existing.remove(); }
         }
 
-        await loadStyle(
-            this._application,
-            'yomitan-popup-theme-outer-stylesheet',
-            fileType,
-            theme.css,
-            useWebExtensionApi,
-            parentNode,
-        );
+        if (!theme || !theme.css) {
+            return;
+        }
+
+        const link = document.createElement('link');
+        link.id = existingId;
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = theme.css;
+
+        if (this._shadow !== null) {
+            this._shadow.appendChild(link);
+        } else {
+            const head = document.head;
+            if (head !== null) {
+                head.appendChild(link);
+            }
+        }
     }
 
     /**
@@ -1179,7 +1178,7 @@ export class Popup extends EventDispatcher {
             this._themeController.outerTheme = this._themeController.theme;
         }
         this._themeController.themeMode = general.popupThemeMode;
-        await this._injectThemeStylesheet(general.popupThemeMode);
+        this._injectThemeStylesheet(general.popupThemeMode);
         this._initialWidth = general.popupWidth;
         this._initialHeight = general.popupHeight;
         this._horizontalOffset = general.popupHorizontalOffset;

@@ -36,8 +36,8 @@
     --shadow-color-light: rgba(0, 0, 0, 0);
 
     --tag-text-color: #000000;
-    --tag-default-background-color: rgba(128, 128, 128, 0.2);
-    --tag-name-background-color: rgba(128, 128, 128, 0.2);
+    --tag-muted-background-color: rgba(128, 128, 128, 0.2);
+    --tag-accent-background-color: rgba(128, 128, 128, 0.2);
     --tag-expression-background-color: rgba(120, 140, 160, 0.22);
     --tag-popular-background-color: rgba(120, 140, 160, 0.22);
     --tag-frequent-background-color: rgba(128, 128, 128, 0.2);
@@ -45,7 +45,6 @@
     --tag-dictionary-background-color: rgba(128, 128, 128, 0.2);
     --tag-frequency-background-color: rgba(119, 170, 235, 0.25);
     --tag-part-of-speech-background-color: rgba(128, 128, 128, 0.2);
-    --tag-search-background-color: rgba(128, 128, 128, 0.2);
     --tag-pronunciation-dictionary-background-color: rgba(148, 166, 235, 0.25);
 
     --sidebar-background-color: var(--background-color);
@@ -75,8 +74,8 @@
     --shadow-color-light: rgba(0, 0, 0, 0);
 
     --tag-text-color: #ffffff;
-    --tag-default-background-color: rgba(128, 128, 128, 0.25);
-    --tag-name-background-color: rgba(128, 128, 128, 0.25);
+    --tag-muted-background-color: rgba(128, 128, 128, 0.25);
+    --tag-accent-background-color: rgba(128, 128, 128, 0.25);
     --tag-expression-background-color: rgba(120, 140, 160, 0.3);
     --tag-popular-background-color: rgba(120, 140, 160, 0.3);
     --tag-frequent-background-color: rgba(128, 128, 128, 0.25);
@@ -84,7 +83,6 @@
     --tag-dictionary-background-color: rgba(128, 128, 128, 0.25);
     --tag-frequency-background-color: rgba(119, 170, 235, 0.3);
     --tag-part-of-speech-background-color: rgba(128, 128, 128, 0.25);
-    --tag-search-background-color: rgba(128, 128, 128, 0.25);
     --tag-pronunciation-dictionary-background-color: rgba(148, 166, 235, 0.3);
 
     --sidebar-background-color: var(--background-color);
@@ -154,7 +152,7 @@
     padding: 0.1em 0.25em;
     margin-right: 0.25em;
     border-radius: 4px;
-    background-color: var(--tag-default-background-color);
+    background-color: var(--tag-muted-background-color);
     color: var(--tag-text-color);
 }
 

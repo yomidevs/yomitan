@@ -459,7 +459,7 @@ export class Display extends EventDispatcher {
 
         this._updateHotkeys(options);
         this._updateDocumentOptions(options);
-        await this._setTheme(options);
+        this._setTheme(options);
         this._setStickyHeader(options);
         this._hotkeyHelpController.setOptions(options);
         this._displayGenerator.updateHotkeys();
@@ -1277,7 +1277,7 @@ export class Display extends EventDispatcher {
     /**
      * @param {import('settings').ProfileOptions} options
      */
-    async _setTheme(options) {
+    _setTheme(options) {
         const {general} = options;
         const {popupTheme, popupOuterTheme, popupThemeMode, fontFamily, fontSize, lineHeight} = general;
         /** @type {string} */

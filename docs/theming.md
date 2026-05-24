@@ -109,7 +109,7 @@ Add your theme ID to the `popupThemeMode` enum in [`ext/data/schemas/options-sch
 "popupThemeMode": {
     "type": "string",
     "enum": ["classic", "minimal", "eink", "your-theme-id"],
-    "default": "classic"
+    "default": "minimal"
 }
 ```
 

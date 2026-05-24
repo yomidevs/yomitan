@@ -93,6 +93,18 @@ await Application.main(true, async (application) => {
     const genericSettingController = new GenericSettingController(settingsController);
     preparePromises.push(setupGenericSettingsController(genericSettingController));
 
+    // Generate theme mode dropdown options from registry BEFORE controller init
+    const themeModeSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('theme-mode-select'));
+    if (themeModeSelect) {
+        themeModeSelect.innerHTML = '';
+        for (const theme of themes) {
+            const option = document.createElement('option');
+            option.value = theme.id;
+            option.textContent = theme.label;
+            themeModeSelect.appendChild(option);
+        }
+    }
+
     const dictionaryController = new DictionaryController(settingsController, modalController, statusFooter);
     preparePromises.push(dictionaryController.prepare());
 
@@ -117,16 +129,4 @@ await Application.main(true, async (application) => {
     await Promise.all(preparePromises);
 
     document.documentElement.dataset.loaded = 'true';
-
-    // Generate theme mode dropdown options from registry
-    const themeModeSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('theme-mode-select'));
-    if (themeModeSelect) {
-        themeModeSelect.innerHTML = '';
-        for (const theme of themes) {
-            const option = document.createElement('option');
-            option.value = theme.id;
-            option.textContent = theme.label;
-            themeModeSelect.appendChild(option);
-        }
-    }
 });
