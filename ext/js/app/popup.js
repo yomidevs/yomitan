@@ -24,7 +24,6 @@ import {ExtensionError} from '../core/extension-error.js';
 import {safePerformance} from '../core/safe-performance.js';
 import {deepEqual} from '../core/utilities.js';
 import {addFullscreenChangeEventListener, computeZoomScale, convertRectZoomCoordinates, getFullscreenElement} from '../dom/document-util.js';
-import {getThemeById} from '../data/theme-registry.js';
 import {loadStyle} from '../dom/style-util.js';
 import {checkPopupPreviewURL} from '../pages/settings/popup-preview-controller.js';
 import {ThemeController} from './theme-controller.js';
@@ -673,39 +672,6 @@ export class Popup extends EventDispatcher {
     }
 
     /**
-     * Injects the active theme's CSS into the outer chrome.
-     * @param {string} themeMode
-     */
-    async _injectThemeStylesheet(themeMode) {
-        const theme = getThemeById(themeMode);
-        /** @type {'code'|'file'|'file-content'} */
-        let fileType = 'file';
-        let useWebExtensionApi = true;
-        let parentNode = null;
-        if (this._shadow !== null) {
-            fileType = 'file-content';
-            useWebExtensionApi = false;
-            parentNode = this._shadow;
-        }
-        if (parentNode !== null) {
-            const existing = parentNode.querySelector('#yomitan-popup-theme-outer-stylesheet');
-            if (existing) {
-                existing.remove();
-            }
-        }
-        if (theme && theme.css) {
-            await loadStyle(
-                this._application,
-                'yomitan-popup-theme-outer-stylesheet',
-                fileType,
-                theme.css,
-                useWebExtensionApi,
-                parentNode,
-            );
-        }
-    }
-
-    /**
      * @param {boolean} observe
      */
     _observeFullscreen(observe) {
@@ -1169,7 +1135,6 @@ export class Popup extends EventDispatcher {
         if (this._themeController.outerTheme === 'site' && this._themeController.siteOverride && ['dark', 'light'].includes(this._themeController.theme)) {
             this._themeController.outerTheme = this._themeController.theme;
         }
-        await this._injectThemeStylesheet(general.popupThemeMode);
         this._themeController.themeMode = general.popupThemeMode;
         this._initialWidth = general.popupWidth;
         this._initialHeight = general.popupHeight;

@@ -17,7 +17,6 @@
  */
 
 import {ThemeController} from '../app/theme-controller.js';
-import {getThemeById} from '../data/theme-registry.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
 import {extendApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {DynamicProperty} from '../core/dynamic-property.js';
@@ -1296,7 +1295,6 @@ export class Display extends EventDispatcher {
         } catch (e) {
             log.error(e);
         }
-        await this._loadThemeStylesheet(popupThemeMode);
         this._themeController.theme = popupTheme;
         this._themeController.outerTheme = popupOuterTheme;
         this._themeController.themeMode = popupThemeMode;
@@ -1305,31 +1303,6 @@ export class Display extends EventDispatcher {
         const customCss = this._getCustomCss(options);
         this.setCustomCss(customCss);
         this.setFontOptions(fontFamily, fontSize, lineHeight);
-    }
-
-    /**
-     * Dynamically loads the active theme's CSS file.
-     * @param {string} themeMode
-     */
-    async _loadThemeStylesheet(themeMode) {
-        const theme = getThemeById(themeMode);
-        const existing = document.getElementById('yomitan-theme-stylesheet');
-        if (existing) {
-            existing.remove();
-        }
-        if (theme && theme.css) {
-            const link = document.createElement('link');
-            link.id = 'yomitan-theme-stylesheet';
-            link.rel = 'stylesheet';
-            link.type = 'text/css';
-            link.href = theme.css;
-            document.head.appendChild(link);
-            await new Promise((resolve) => {
-                link.onload = resolve;
-                link.onerror = resolve;
-                setTimeout(resolve, 500);
-            });
-        }
     }
 
     /**
