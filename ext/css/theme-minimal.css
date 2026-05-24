@@ -123,3 +123,21 @@ iframe.yomitan-popup[data-theme-mode='minimal'][data-theme='dark'] {
     --popup-border-color: #3a3a3c;
     background-color: #000000;
 }
+
+/* ===== MINIMAL THEME: DICTIONARY NAME LABELS ===== */
+
+/* Hide dictionary tag pills - they're too visually noisy */
+:root[data-theme-mode='minimal'] .tag[data-category='dictionary'] {
+    display: none;
+}
+
+/* Show dictionary name as subtle text label above each definition */
+:root[data-theme-mode='minimal'] .definition-item::before {
+    content: attr(data-dictionary);
+    display: block;
+    font-size: calc(1em * 10 / 14);
+    font-weight: 500;
+    color: var(--text-color-light2);
+    margin-bottom: 0.35em;
+    letter-spacing: 0.02em;
+}
