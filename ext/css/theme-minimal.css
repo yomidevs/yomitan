@@ -138,6 +138,7 @@ iframe.yomitan-popup[data-theme-mode='minimal'][data-theme='dark'] {
     font-size: calc(1em * 10 / 14);
     font-weight: 500;
     color: var(--text-color-light2);
-    margin-bottom: 0.35em;
+    margin-top: 0.35em;
+    margin-bottom: 0.6em;
     letter-spacing: 0.02em;
 }
