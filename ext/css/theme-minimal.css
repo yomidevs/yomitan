@@ -19,7 +19,7 @@
 /* ===== MINIMAL THEME: FULL HOSHI READER REPRODUCTION ===== */
 
 /* Light mode — pure white bg, black text, muted grays */
-:root[data-theme-mode="minimal"][data-theme="light"] {
+:root[data-theme-mode='minimal'][data-theme='light'] {
     --text-color: #000000;
     --text-color-light1: #555555;
     --text-color-light2: #666666;
@@ -58,7 +58,7 @@
 }
 
 /* Dark mode — pure black bg, white text */
-:root[data-theme-mode="minimal"][data-theme="dark"] {
+:root[data-theme-mode='minimal'][data-theme='dark'] {
     --text-color: #ffffff;
     --text-color-light1: #aaaaaa;
     --text-color-light2: #999999;
@@ -97,29 +97,29 @@
 }
 
 /* Structural overrides (same for light and dark) */
-:root[data-theme-mode="minimal"] .entry + .entry {
+:root[data-theme-mode='minimal'] .entry+.entry {
     border-top: none;
 }
 
-:root[data-theme-mode="minimal"] button.action-button {
+:root[data-theme-mode='minimal'] button.action-button {
     background: transparent;
     border: none;
     opacity: 0.6;
     transition: opacity 0.1s ease;
 }
-:root[data-theme-mode="minimal"] button.action-button:hover {
+:root[data-theme-mode='minimal'] button.action-button:hover {
     opacity: 1;
 }
 
 /* ===== MINIMAL THEME: OUTER CHROME ===== */
-iframe.yomitan-popup[data-theme-mode="minimal"] {
+iframe.yomitan-popup[data-theme-mode='minimal'] {
     --popup-border-radius: 8em;
     --popup-border-color: #d1d1d6;
     --popup-box-shadow: none;
     background-color: #ffffff;
 }
 
-iframe.yomitan-popup[data-theme-mode="minimal"][data-theme="dark"] {
+iframe.yomitan-popup[data-theme-mode='minimal'][data-theme='dark'] {
     --popup-border-color: #3a3a3c;
     background-color: #000000;
 }

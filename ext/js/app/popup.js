@@ -687,10 +687,11 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        if (parentNode === null) { return; }
-        const existing = parentNode.querySelector('#yomitan-popup-theme-outer-stylesheet');
-        if (existing) {
-            existing.remove();
+        if (parentNode !== null) {
+            const existing = parentNode.querySelector('#yomitan-popup-theme-outer-stylesheet');
+            if (existing) {
+                existing.remove();
+            }
         }
         if (theme && theme.css) {
             await loadStyle(
