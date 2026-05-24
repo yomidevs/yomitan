@@ -76,11 +76,13 @@ export const themes = [
   {
     id: "classic",
     label: "Classic",
+    css: null /* base CSS is classic; no override file needed */,
   },
   // ... existing themes ...
   {
     id: "your-theme-id",
     label: "Your Theme Name",
+    css: "/css/theme-your-theme-id.css",
   },
 ];
 ```
@@ -158,7 +160,14 @@ Target specific components with attribute-qualified selectors:
 
 ### Outer chrome styling
 
-For popup iframe styling (borders, shadows, radius), target the iframe:
+Theme CSS files are loaded in **both** contexts:
+
+1. **Inner** — via static `<link>` in `popup.html` / `search.html` / `popup-preview.html`
+2. **Outer** — via dynamic injection by `popup.js` into the parent page's shadow DOM
+
+This means a single theme file contains both inner selectors (`:root[data-theme-mode='...']`) and outer selectors (`iframe.yomitan-popup[data-theme-mode='...']`). Selectors that don't match their current context are harmless no-ops.
+
+For popup iframe styling (borders, shadows, radius), add outer selectors at the **end** of your theme file:
 
 ```css
 iframe.yomitan-popup[data-theme-mode="your-theme-id"] {
@@ -218,3 +227,4 @@ The Minimal theme ([`ext/css/theme-minimal.css`](../ext/css/theme-minimal.css)) 
 | [`ext/search.html`](../ext/search.html)                                           | Search page HTML           |
 | [`ext/popup-preview.html`](../ext/popup-preview.html)                             | Settings preview HTML      |
 | [`ext/js/app/theme-controller.js`](../ext/js/app/theme-controller.js)             | Theme attribute controller |
+| [`ext/js/app/popup.js`](../ext/js/app/popup.js)                                   | Outer theme injection      |

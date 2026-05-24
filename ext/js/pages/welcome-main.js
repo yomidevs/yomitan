@@ -20,6 +20,7 @@ import {Application} from '../application.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
+import {themes} from '../data/theme-registry.js';
 import {DataTransmissionConsentController} from './settings/data-transmission-consent-controller.js';
 import {DictionaryController} from './settings/dictionary-controller.js';
 import {DictionaryImportController} from './settings/dictionary-import-controller.js';
@@ -116,4 +117,16 @@ await Application.main(true, async (application) => {
     await Promise.all(preparePromises);
 
     document.documentElement.dataset.loaded = 'true';
+
+    // Generate theme mode dropdown options from registry
+    const themeModeSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('theme-mode-select'));
+    if (themeModeSelect) {
+        themeModeSelect.innerHTML = '';
+        for (const theme of themes) {
+            const option = document.createElement('option');
+            option.value = theme.id;
+            option.textContent = theme.label;
+            themeModeSelect.appendChild(option);
+        }
+    }
 });

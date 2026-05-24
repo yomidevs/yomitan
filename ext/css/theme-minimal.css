@@ -111,19 +111,6 @@
     opacity: 1;
 }
 
-/* ===== MINIMAL THEME: OUTER CHROME ===== */
-iframe.yomitan-popup[data-theme-mode='minimal'] {
-    --popup-border-radius: 8em;
-    --popup-border-color: #d1d1d6;
-    --popup-box-shadow: none;
-    background-color: #ffffff;
-}
-
-iframe.yomitan-popup[data-theme-mode='minimal'][data-theme='dark'] {
-    --popup-border-color: #3a3a3c;
-    background-color: #000000;
-}
-
 /* ===== MINIMAL THEME: DICTIONARY NAME LABELS ===== */
 
 /* Hide dictionary tag pills - they're too visually noisy */
@@ -174,4 +161,17 @@ iframe.yomitan-popup[data-theme-mode='minimal'][data-theme='dark'] {
 /* Compact the inflection rule chain container */
 :root[data-theme-mode='minimal'] .inflection-rule-chain {
     margin: 0.15em 0;
+}
+
+/* ===== MINIMAL THEME: OUTER CHROME ===== */
+iframe.yomitan-popup[data-theme-mode='minimal'] {
+    --popup-border-radius: 8em;
+    --popup-border-color: #d1d1d6;
+    --popup-box-shadow: none;
+    background-color: #ffffff;
+}
+
+iframe.yomitan-popup[data-theme-mode='minimal'][data-theme='dark'] {
+    --popup-border-color: #3a3a3c;
+    background-color: #000000;
 }

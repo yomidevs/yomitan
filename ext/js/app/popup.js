@@ -27,6 +27,7 @@ import {addFullscreenChangeEventListener, computeZoomScale, convertRectZoomCoord
 import {loadStyle} from '../dom/style-util.js';
 import {checkPopupPreviewURL} from '../pages/settings/popup-preview-controller.js';
 import {ThemeController} from './theme-controller.js';
+import {getThemeById} from '../data/theme-registry.js';
 
 /**
  * This class is the container which hosts the display of search results.
@@ -672,6 +673,48 @@ export class Popup extends EventDispatcher {
     }
 
     /**
+     * Injects the active theme's CSS into the outer chrome (parent page/shadow DOM).
+     * Theme CSS files contain both inner and outer selectors; outer selectors
+     * (iframe.yomitan-popup) match here, inner selectors are harmless no-ops.
+     * @param {string} themeMode
+     */
+    async _injectThemeStylesheet(themeMode) {
+        const theme = getThemeById(themeMode);
+        if (!theme || !theme.css) {
+            // Remove any previously injected theme stylesheet
+            if (this._shadow !== null) {
+                const existing = this._shadow.querySelector('#yomitan-popup-theme-outer-stylesheet');
+                if (existing) { existing.remove(); }
+            }
+            return;
+        }
+
+        /** @type {'code'|'file'|'file-content'} */
+        let fileType = 'file';
+        let useWebExtensionApi = true;
+        let parentNode = null;
+        if (this._shadow !== null) {
+            fileType = 'file-content';
+            useWebExtensionApi = false;
+            parentNode = this._shadow;
+        }
+
+        if (parentNode !== null) {
+            const existing = parentNode.querySelector('#yomitan-popup-theme-outer-stylesheet');
+            if (existing) { existing.remove(); }
+        }
+
+        await loadStyle(
+            this._application,
+            'yomitan-popup-theme-outer-stylesheet',
+            fileType,
+            theme.css,
+            useWebExtensionApi,
+            parentNode,
+        );
+    }
+
+    /**
      * @param {boolean} observe
      */
     _observeFullscreen(observe) {
@@ -1136,6 +1179,7 @@ export class Popup extends EventDispatcher {
             this._themeController.outerTheme = this._themeController.theme;
         }
         this._themeController.themeMode = general.popupThemeMode;
+        await this._injectThemeStylesheet(general.popupThemeMode);
         this._initialWidth = general.popupWidth;
         this._initialHeight = general.popupHeight;
         this._horizontalOffset = general.popupHorizontalOffset;
