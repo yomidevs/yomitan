@@ -296,6 +296,7 @@ function createProfileOptionsUpdatedTestData1() {
             mainDictionary: '',
             popupTheme: 'light',
             popupOuterTheme: 'light',
+            popupThemeMode: 'classic',
             customPopupCss: '',
             customPopupOuterCss: '',
             enableWanakana: true,
@@ -707,7 +708,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 76,
+        version: 77,
         global: {
             database: {
                 prefixWildcardsSupported: false,
