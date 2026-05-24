@@ -99,6 +99,12 @@
     display: none;
 }
 
+/* Remove borders from tag inner elements to prevent double-bordering */
+:root[data-theme-mode='eink'] .tag-label,
+:root[data-theme-mode='eink'] .tag-body {
+    border: none;
+}
+
 /* ===== E-INK THEME: REMOVE ALL ROUNDING ===== */
 :root[data-theme-mode='eink'] .entry,
 :root[data-theme-mode='eink'] .tag,
