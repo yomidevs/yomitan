@@ -22,7 +22,7 @@
         "test:static-analysis": "npm run test:js && npm run test:ts && npm run test:css && npm run test:html && npm run test:md",
         "test:ts": "npm run test:ts:main && npm run test:ts:dev && npm run test:ts:test && npm run test:ts:bench",
         "//END-WARNING": "",
-        "test:js": "npx eslint . --ignore-pattern '**/*.json'",
+        "test:js": "npx eslint . --ignore-pattern '**/*.json' --ignore-pattern '**/*.jsonc'",
         "test:json": "npm run test:json:format && npm run test:json:types",
         "test:json:format": "npx eslint '**/*.json'",
         "test:json:types": "vitest run --config test/data/vitest.json.config.json",
