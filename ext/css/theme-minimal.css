@@ -142,3 +142,32 @@ iframe.yomitan-popup[data-theme-mode='minimal'][data-theme='dark'] {
     margin-bottom: 0.6em;
     letter-spacing: 0.02em;
 }
+
+/* ===== MINIMAL THEME: COMPACT INFLECTION DISPLAY ===== */
+
+/* Hide source icons (📖, 🧩) — too noisy in minimal mode */
+:root[data-theme-mode='minimal'] .inflection-source-icon {
+    display: none;
+}
+
+/* Hide « separators between inflections */
+:root[data-theme-mode='minimal'] .inflection-rule-chain>.inflection+.inflection-separator+.inflection::before,
+:root[data-theme-mode='minimal'] .inflection-separator {
+    display: none;
+}
+
+/* Style inflections as small inline pills */
+:root[data-theme-mode='minimal'] .inflection {
+    display: inline-block;
+    font-size: calc(1em * 11 / 14);
+    padding: 0.15em 0.4em;
+    margin-right: 0.3em;
+    border-radius: 4px;
+    background-color: var(--tag-default-background-color);
+    color: var(--tag-text-color);
+}
+
+/* Compact the inflection rule chain container */
+:root[data-theme-mode='minimal'] .inflection-rule-chain {
+    margin: 0.25em 0;
+}
