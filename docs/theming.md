@@ -189,12 +189,12 @@ iframe.yomitan-popup[data-theme-mode="your-theme-id"] {
 - Test both light and dark modes
 - Run `npm run test:css` to validate syntax
 
-### Don't
+### Caution
 
-- Use `!important` (stylelint will reject it)
-- Use universal `*` selectors (performance issue)
-- Modify HTML structure — themes are CSS-only
-- Load fonts or external resources (extension CSP restrictions)
+- **`!important`** — Hard to override and fights the cascade. Use higher-specificity selectors instead. If you must (e.g. killing animations), disable the lint rule with `/* stylelint-disable-next-line declaration-no-important */`.
+- **Universal `*`** — Slows rendering on large popups. Target specific classes.
+- **HTML structure** — Themes are CSS-only; markup changes require core changes.
+- **External fonts/resources** — Blocked by extension CSP. Use system fonts only.
 
 ## Testing
 

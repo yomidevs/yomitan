@@ -45,7 +45,6 @@
 }
 
 /* ===== E-INK THEME: INNER CONTENT (Light) ===== */
-/* NOTE: E-ink is the ONLY theme that overrides palette colors */
 :root[data-theme-mode='eink'][data-theme='light'] {
     --text-color: #000000;
     --text-color-light1: #000000;
