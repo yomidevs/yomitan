@@ -1,0 +1,125 @@
+/*
+ * Copyright (C) 2023-2026  Yomitan Authors
+ * Copyright (C) 2016-2022  Yomichan Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/* ===== MINIMAL THEME: FULL HOSHI READER REPRODUCTION ===== */
+
+/* Light mode — pure white bg, black text, muted grays */
+:root[data-theme-mode="minimal"][data-theme="light"] {
+    --text-color: #000000;
+    --text-color-light1: #555555;
+    --text-color-light2: #666666;
+    --text-color-light3: #777777;
+    --text-color-light4: #888888;
+    --background-color: #ffffff;
+    --background-color-light: #ffffff;
+    --background-color-dark1: #eeeeee;
+
+    --accent-color: #426cf5;
+    --link-color: #426cf5;
+
+    --shadow-color: rgba(0, 0, 0, 0);
+    --shadow-color-light: rgba(0, 0, 0, 0);
+
+    --tag-text-color: #000000;
+    --tag-default-background-color: rgba(128, 128, 128, 0.2);
+    --tag-name-background-color: rgba(128, 128, 128, 0.2);
+    --tag-expression-background-color: rgba(120, 140, 160, 0.22);
+    --tag-popular-background-color: rgba(120, 140, 160, 0.22);
+    --tag-frequent-background-color: rgba(128, 128, 128, 0.2);
+    --tag-archaism-background-color: rgba(128, 128, 128, 0.2);
+    --tag-dictionary-background-color: rgba(128, 128, 128, 0.2);
+    --tag-frequency-background-color: rgba(128, 128, 128, 0.2);
+    --tag-part-of-speech-background-color: rgba(128, 128, 128, 0.2);
+    --tag-search-background-color: rgba(128, 128, 128, 0.2);
+    --tag-pronunciation-dictionary-background-color: rgba(128, 128, 128, 0.2);
+
+    --sidebar-background-color: var(--background-color);
+    --sidebar-button-background-color-hover: var(--background-color-dark1);
+    --sidebar-button-background-color-active: var(--background-color-dark1);
+
+    --entry-current-indicator-color: transparent;
+    --action-button-hover-color: transparent;
+    --action-button-active-color: transparent;
+}
+
+/* Dark mode — pure black bg, white text */
+:root[data-theme-mode="minimal"][data-theme="dark"] {
+    --text-color: #ffffff;
+    --text-color-light1: #aaaaaa;
+    --text-color-light2: #999999;
+    --text-color-light3: #888888;
+    --text-color-light4: #777777;
+    --background-color: #000000;
+    --background-color-light: #000000;
+    --background-color-dark1: #333333;
+
+    --accent-color: #426cf5;
+    --link-color: #426cf5;
+
+    --shadow-color: rgba(0, 0, 0, 0);
+    --shadow-color-light: rgba(0, 0, 0, 0);
+
+    --tag-text-color: #ffffff;
+    --tag-default-background-color: rgba(128, 128, 128, 0.25);
+    --tag-name-background-color: rgba(128, 128, 128, 0.25);
+    --tag-expression-background-color: rgba(120, 140, 160, 0.3);
+    --tag-popular-background-color: rgba(120, 140, 160, 0.3);
+    --tag-frequent-background-color: rgba(128, 128, 128, 0.25);
+    --tag-archaism-background-color: rgba(128, 128, 128, 0.25);
+    --tag-dictionary-background-color: rgba(128, 128, 128, 0.25);
+    --tag-frequency-background-color: rgba(128, 128, 128, 0.25);
+    --tag-part-of-speech-background-color: rgba(128, 128, 128, 0.25);
+    --tag-search-background-color: rgba(128, 128, 128, 0.25);
+    --tag-pronunciation-dictionary-background-color: rgba(128, 128, 128, 0.25);
+
+    --sidebar-background-color: var(--background-color);
+    --sidebar-button-background-color-hover: var(--background-color-dark1);
+    --sidebar-button-background-color-active: var(--background-color-dark1);
+
+    --entry-current-indicator-color: transparent;
+    --action-button-hover-color: transparent;
+    --action-button-active-color: transparent;
+}
+
+/* Structural overrides (same for light and dark) */
+:root[data-theme-mode="minimal"] .entry + .entry {
+    border-top: none;
+}
+
+:root[data-theme-mode="minimal"] button.action-button {
+    background: transparent;
+    border: none;
+    opacity: 0.6;
+    transition: opacity 0.1s ease;
+}
+:root[data-theme-mode="minimal"] button.action-button:hover {
+    opacity: 1;
+}
+
+/* ===== MINIMAL THEME: OUTER CHROME ===== */
+iframe.yomitan-popup[data-theme-mode="minimal"] {
+    --popup-border-radius: 8em;
+    --popup-border-color: #d1d1d6;
+    --popup-box-shadow: none;
+    background-color: #ffffff;
+}
+
+iframe.yomitan-popup[data-theme-mode="minimal"][data-theme="dark"] {
+    --popup-border-color: #3a3a3c;
+    background-color: #000000;
+}
