@@ -676,11 +676,10 @@ export class Popup extends EventDispatcher {
      * Injects the active theme's CSS into the outer chrome (parent page/shadow DOM).
      * Theme CSS files contain both inner and outer selectors; outer selectors
      * (iframe.yomitan-popup) match here, inner selectors are harmless no-ops.
-     * Uses manual DOM manipulation to avoid loadStyle's WebExtension API tracking
-     * which throws on repeated injection with the same ID.
      * @param {string} themeMode
+     * @returns {Promise<void>}
      */
-    _injectThemeStylesheet(themeMode) {
+    async _injectThemeStylesheet(themeMode) {
         const theme = getThemeById(themeMode);
 
         // Remove any previously injected theme stylesheet
@@ -697,19 +696,10 @@ export class Popup extends EventDispatcher {
             return;
         }
 
-        const link = document.createElement('link');
-        link.id = existingId;
-        link.rel = 'stylesheet';
-        link.type = 'text/css';
-        link.href = theme.css;
-
-        if (this._shadow !== null) {
-            this._shadow.appendChild(link);
-        } else {
-            const head = document.head;
-            if (head !== null) {
-                head.appendChild(link);
-            }
+        const parentNode = this._shadow !== null ? this._shadow : null;
+        const styleNode = await loadStyle(this._application, existingId, 'file-content', theme.css, false, parentNode);
+        if (styleNode) {
+            styleNode.id = existingId;
         }
     }
 
@@ -1178,7 +1168,7 @@ export class Popup extends EventDispatcher {
             this._themeController.outerTheme = this._themeController.theme;
         }
         this._themeController.themeMode = general.popupThemeMode;
-        this._injectThemeStylesheet(general.popupThemeMode);
+        await this._injectThemeStylesheet(general.popupThemeMode);
         this._initialWidth = general.popupWidth;
         this._initialHeight = general.popupHeight;
         this._horizontalOffset = general.popupHorizontalOffset;

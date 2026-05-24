@@ -34,13 +34,31 @@ export const themes = [
         id: 'eink',
         label: 'E-Ink',
         css: '/css/theme-eink.css',
+        constraints: {
+            disableShadow: true,
+        },
     },
 ];
 
 /**
  * @param {string} themeId
- * @returns {{id: string, label: string, css: string | null} | undefined}
+ * @returns {{id: string, label: string, css: string | null, constraints?: {disableShadow?: boolean}} | undefined}
  */
 export function getThemeById(themeId) {
     return themes.find((t) => t.id === themeId);
+}
+
+/**
+ * Populates a <select> element with theme options from the registry.
+ * @param {HTMLSelectElement|null} select
+ */
+export function populateThemeModeSelect(select) {
+    if (!select) { return; }
+    select.innerHTML = '';
+    for (const theme of themes) {
+        const option = document.createElement('option');
+        option.value = theme.id;
+        option.textContent = theme.label;
+        select.appendChild(option);
+    }
 }

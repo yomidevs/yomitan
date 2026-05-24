@@ -20,7 +20,7 @@ import {Application} from '../../application.js';
 import {DocumentFocusController} from '../../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ExtensionContentController} from '../common/extension-content-controller.js';
-import {themes} from '../../data/theme-registry.js';
+import {getThemeById, populateThemeModeSelect} from '../../data/theme-registry.js';
 import {AnkiController} from './anki-controller.js';
 import {AnkiDeckGeneratorController} from './anki-deck-generator-controller.js';
 import {AnkiTemplatesController} from './anki-templates-controller.js';
@@ -119,15 +119,7 @@ await Application.main(true, async (application) => {
 
     // Generate theme mode dropdown options from registry BEFORE controller init
     const themeModeSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('theme-mode-select'));
-    if (themeModeSelect) {
-        themeModeSelect.innerHTML = '';
-        for (const theme of themes) {
-            const option = document.createElement('option');
-            option.value = theme.id;
-            option.textContent = theme.label;
-            themeModeSelect.appendChild(option);
-        }
-    }
+    populateThemeModeSelect(themeModeSelect);
 
     const audioController = new AudioController(settingsController, modalController);
     preparePromises.push(audioController.prepare());
@@ -201,28 +193,34 @@ await Application.main(true, async (application) => {
 
     // Theme mode UI state management
     const shadowSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('shadow-theme-select'));
-    const einkWarning = document.getElementById('eink-warning');
-    const customCssInput = /** @type {HTMLTextAreaElement|null} */ (document.querySelector('[data-setting="general.customPopupCss"]'));
+    /** @type {string|null} */
+    let previousShadowValue = null;
 
     /**
      * Updates the UI state based on the selected theme mode.
      */
     function updateThemeModeUI() {
-        const isEink = themeModeSelect?.value === 'eink';
+        const theme = getThemeById(themeModeSelect?.value ?? '');
+        const disableShadow = theme?.constraints?.disableShadow ?? false;
         if (shadowSelect) {
-            shadowSelect.disabled = isEink;
-            if (isEink) {
+            if (disableShadow) {
+                if (shadowSelect.value !== 'none') {
+                    previousShadowValue = shadowSelect.value;
+                }
                 shadowSelect.value = 'none';
+                shadowSelect.disabled = true;
                 shadowSelect.dispatchEvent(new Event('change', {bubbles: true}));
+            } else {
+                shadowSelect.disabled = false;
+                if (previousShadowValue && previousShadowValue !== 'none') {
+                    shadowSelect.value = previousShadowValue;
+                    previousShadowValue = null;
+                    shadowSelect.dispatchEvent(new Event('change', {bubbles: true}));
+                }
             }
-        }
-        if (einkWarning) {
-            const hasCustomCss = (customCssInput?.value?.trim().length ?? 0) > 0;
-            einkWarning.style.display = (isEink && hasCustomCss) ? 'block' : 'none';
         }
     }
 
     themeModeSelect?.addEventListener('change', updateThemeModeUI);
-    customCssInput?.addEventListener('input', updateThemeModeUI);
     updateThemeModeUI();
 });

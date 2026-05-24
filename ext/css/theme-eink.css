@@ -28,16 +28,6 @@
     transition: none;
     box-shadow: none;
     text-shadow: none;
-}
-
-/* Only animation properties keep !important if absolutely needed */
-:root[data-theme-mode='eink'] .entry,
-:root[data-theme-mode='eink'] .tag,
-:root[data-theme-mode='eink'] button,
-:root[data-theme-mode='eink'] .popup-menu,
-:root[data-theme-mode='eink'] .sidebar-button,
-:root[data-theme-mode='eink'] .action-button,
-:root[data-theme-mode='eink'] .progress-bar-indeterminant {
     /* stylelint-disable-next-line declaration-no-important */
     animation-duration: 0s !important;
     /* stylelint-disable-next-line declaration-no-important */

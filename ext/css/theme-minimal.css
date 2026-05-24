@@ -51,9 +51,9 @@
     --sidebar-button-background-color-hover: var(--background-color-dark1);
     --sidebar-button-background-color-active: var(--background-color-dark1);
 
-    --entry-current-indicator-color: transparent;
-    --action-button-hover-color: transparent;
-    --action-button-active-color: transparent;
+    --entry-current-indicator-color: rgba(128, 128, 128, 0.15);
+    --action-button-hover-color: rgba(128, 128, 128, 0.12);
+    --action-button-active-color: rgba(128, 128, 128, 0.12);
 }
 
 /* Dark mode — pure black bg, white text */
@@ -89,9 +89,9 @@
     --sidebar-button-background-color-hover: var(--background-color-dark1);
     --sidebar-button-background-color-active: var(--background-color-dark1);
 
-    --entry-current-indicator-color: transparent;
-    --action-button-hover-color: transparent;
-    --action-button-active-color: transparent;
+    --entry-current-indicator-color: rgba(255, 255, 255, 0.15);
+    --action-button-hover-color: rgba(255, 255, 255, 0.12);
+    --action-button-active-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Structural overrides (same for light and dark) */
