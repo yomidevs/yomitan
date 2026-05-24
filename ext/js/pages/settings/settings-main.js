@@ -185,4 +185,32 @@ await Application.main(true, async (application) => {
     await Promise.all(preparePromises);
 
     document.documentElement.dataset.loaded = 'true';
+
+    // Theme mode UI state management
+    const themeModeSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('theme-mode-select'));
+    const shadowSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('shadow-theme-select'));
+    const einkWarning = document.getElementById('eink-warning');
+    const customCssInput = /** @type {HTMLTextAreaElement|null} */ (document.querySelector('[data-setting="general.customPopupCss"]'));
+
+    /**
+     * Updates the UI state based on the selected theme mode.
+     */
+    function updateThemeModeUI() {
+        const isEink = themeModeSelect?.value === 'eink';
+        if (shadowSelect) {
+            shadowSelect.disabled = isEink;
+            if (isEink) {
+                shadowSelect.value = 'none';
+                shadowSelect.dispatchEvent(new Event('change', {bubbles: true}));
+            }
+        }
+        if (einkWarning) {
+            const hasCustomCss = (customCssInput?.value?.trim().length ?? 0) > 0;
+            einkWarning.style.display = (isEink && hasCustomCss) ? 'block' : 'none';
+        }
+    }
+
+    themeModeSelect?.addEventListener('change', updateThemeModeUI);
+    customCssInput?.addEventListener('input', updateThemeModeUI);
+    updateThemeModeUI();
 });

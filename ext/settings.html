@@ -837,6 +837,14 @@
             <div class="settings-item-right">
                 <div class="settings-item-group">
                     <div class="settings-item-group-item">
+                        <div class="settings-item-group-item-label">Mode</div>
+                        <select data-setting="general.popupThemeMode" class="short-width short-height" id="theme-mode-select">
+                            <option value="minimal">Minimal</option>
+                            <option value="classic">Classic</option>
+                            <option value="eink">E-Ink</option>
+                        </select>
+                    </div>
+                    <div class="settings-item-group-item">
                         <div class="settings-item-group-item-label">Body</div>
                         <select data-setting="general.popupTheme" class="short-width short-height">
                             <option value="site">Auto</option>
@@ -847,7 +855,7 @@
                     </div>
                     <div class="settings-item-group-item">
                         <div class="settings-item-group-item-label">Shadow</div>
-                        <select data-setting="general.popupOuterTheme" class="short-width short-height">
+                        <select data-setting="general.popupOuterTheme" class="short-width short-height" id="shadow-theme-select">
                             <option value="site">Auto</option>
                             <option value="light">Light</option>
                             <option value="dark">Dark</option>
@@ -855,6 +863,9 @@
                             <option value="none">None</option>
                         </select>
                     </div>
+                </div>
+                <div id="eink-warning" class="settings-item-warning" style="display: none; color: #c62828; font-size: 0.85em; margin-top: 0.5em;">
+                    E-Ink mode forces pure black/white and disables shadows. Custom CSS may not apply as expected.
                 </div>
             </div>
         </div></div>
