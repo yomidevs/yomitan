@@ -135,6 +135,7 @@ export type GeneralOptions = {
     mainDictionary: string;
     popupTheme: PopupTheme;
     popupOuterTheme: PopupOuterTheme;
+    popupThemeMode: PopupThemeMode;
     customPopupCss: string;
     customPopupOuterCss: string;
     enableWanakana: boolean;
@@ -409,6 +410,8 @@ export type GlossaryLayoutMode = 'default' | 'compact' | 'compact-popup-anki';
 export type PopupTheme = 'light' | 'dark' | 'browser' | 'site';
 
 export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site' | 'none';
+
+export type PopupThemeMode = 'minimal' | 'classic' | 'eink';
 
 export type PopupCurrentIndicatorMode = 'none' | 'asterisk' | 'triangle' | 'bar-left' | 'bar-right' | 'dot-left' | 'dot-right';
 

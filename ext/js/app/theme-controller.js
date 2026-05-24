@@ -31,6 +31,8 @@ export class ThemeController {
         this._theme = 'site';
         /** @type {import("settings.js").PopupOuterTheme} */
         this._outerTheme = 'site';
+        /** @type {import("settings.js").PopupThemeMode} */
+        this._themeMode = 'minimal';
         /** @type {?('dark'|'light')} */
         this._siteTheme = null;
         /** @type {'dark'|'light'} */
@@ -88,6 +90,22 @@ export class ThemeController {
     }
 
     /**
+     * Gets the theme mode.
+     * @type {import("settings.js").PopupThemeMode}
+     */
+    get themeMode() {
+        return this._themeMode;
+    }
+
+    /**
+     * Sets the theme mode.
+     * @param {import("settings.js").PopupThemeMode} value The theme mode to assign.
+     */
+    set themeMode(value) {
+        this._themeMode = value;
+    }
+
+    /**
      * Gets the override value for the site theme.
      * If this value is `null`, the computed value will be used.
      * @type {?('dark'|'light')}
@@ -137,6 +155,7 @@ export class ThemeController {
         data.browserTheme = this._browserTheme;
         data.themeRaw = this._theme;
         data.outerThemeRaw = this._outerTheme;
+        data.themeMode = this._themeMode;
     }
 
     /**

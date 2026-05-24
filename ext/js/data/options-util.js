@@ -588,6 +588,7 @@ export class OptionsUtil {
             this._updateVersion74,
             this._updateVersion75,
             this._updateVersion76,
+            this._updateVersion77,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1848,6 +1849,19 @@ export class OptionsUtil {
     async _updateVersion76(options) {
         for (const profile of options.profiles) {
             profile.options.general.popupFullWidthPosition = 'bottom';
+        }
+    }
+
+    /**
+     * - Added general.popupThemeMode.
+     * - Existing users default to 'classic' to preserve current appearance.
+     * @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion77(options) {
+        for (const profile of options.profiles) {
+            if (profile.options?.general && !('popupThemeMode' in profile.options.general)) {
+                profile.options.general.popupThemeMode = 'classic';
+            }
         }
     }
 

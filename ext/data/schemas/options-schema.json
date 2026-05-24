@@ -108,6 +108,7 @@
                                     "mainDictionary",
                                     "popupTheme",
                                     "popupOuterTheme",
+                                    "popupThemeMode",
                                     "customPopupCss",
                                     "customPopupOuterCss",
                                     "enableWanakana",
@@ -267,6 +268,11 @@
                                         "type": "string",
                                         "enum": ["light", "dark", "browser", "site", "none"],
                                         "default": "site"
+                                    },
+                                    "popupThemeMode": {
+                                        "type": "string",
+                                        "enum": ["minimal", "classic", "eink"],
+                                        "default": "minimal"
                                     },
                                     "customPopupCss": {
                                         "type": "string",
