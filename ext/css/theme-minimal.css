@@ -150,8 +150,12 @@ iframe.yomitan-popup[data-theme-mode='minimal'][data-theme='dark'] {
     display: none;
 }
 
-/* Hide « separators between inflections */
-:root[data-theme-mode='minimal'] .inflection-rule-chain>.inflection+.inflection-separator+.inflection::before,
+/* No arrow separator — use spacing instead for consistency across platforms */
+:root[data-theme-mode='minimal'] .inflection-rule-chain>.inflection+.inflection-separator+.inflection::before {
+    display: none;
+}
+
+/* Keep the .inflection-separator itself hidden (the ::before handles it) */
 :root[data-theme-mode='minimal'] .inflection-separator {
     display: none;
 }
@@ -161,7 +165,7 @@ iframe.yomitan-popup[data-theme-mode='minimal'][data-theme='dark'] {
     display: inline-block;
     font-size: calc(1em * 11 / 14);
     padding: 0.15em 0.4em;
-    margin-right: 0.3em;
+    margin-right: 0.5em;
     border-radius: 4px;
     background-color: var(--tag-default-background-color);
     color: var(--tag-text-color);
