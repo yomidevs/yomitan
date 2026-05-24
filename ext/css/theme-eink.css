@@ -105,6 +105,11 @@
     border: none;
 }
 
+/* Remove border from nested frequency tags to prevent double-bordering in grouped modes */
+:root[data-theme-mode='eink'] .frequency-group-tag .frequency-tag {
+    border: none;
+}
+
 /* ===== E-INK THEME: REMOVE ALL ROUNDING ===== */
 :root[data-theme-mode='eink'] .entry,
 :root[data-theme-mode='eink'] .tag,
