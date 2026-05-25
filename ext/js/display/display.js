@@ -534,7 +534,7 @@ export class Display extends EventDispatcher {
         }
 
         if (this._options) {
-            void this._setTheme(this._options);
+            this._setTheme(this._options);
         }
     }
 

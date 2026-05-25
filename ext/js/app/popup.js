@@ -687,22 +687,15 @@ export class Popup extends EventDispatcher {
      */
     async _injectThemeStylesheet(themeMode) {
         const theme = getThemeById(themeMode);
-
-        // Remove any previously injected theme stylesheet
         const existingId = 'yomitan-popup-theme-outer-stylesheet';
-        if (this._shadow !== null) {
-            const existing = this._shadow.querySelector(`#${existingId}`);
-            if (existing) { existing.remove(); }
-        } else {
-            const existing = document.querySelector(`#${existingId}`);
-            if (existing) { existing.remove(); }
-        }
+        const parentNode = this._shadow !== null ? this._shadow : null;
 
         if (!theme || !theme.css) {
+            const existing = (this._shadow !== null ? this._shadow : document).querySelector(`#${existingId}`);
+            if (existing) { existing.remove(); }
             return;
         }
 
-        const parentNode = this._shadow !== null ? this._shadow : null;
         const styleNode = await loadStyle(this._application, existingId, 'file-content', theme.css, false, parentNode);
         if (styleNode) {
             styleNode.id = existingId;
@@ -1174,7 +1167,12 @@ export class Popup extends EventDispatcher {
             this._themeController.outerTheme = this._themeController.theme;
         }
         this._themeController.themeMode = general.popupThemeMode;
-        await this._injectThemeStylesheet(general.popupThemeMode);
+        if (general.popupThemeMode === 'eink') {
+            this._themeController.outerTheme = 'none';
+        }
+        if (this._injectPromiseComplete) {
+            await this._injectThemeStylesheet(general.popupThemeMode);
+        }
         this._initialWidth = general.popupWidth;
         this._initialHeight = general.popupHeight;
         this._horizontalOffset = general.popupHorizontalOffset;

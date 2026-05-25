@@ -198,8 +198,9 @@ await Application.main(true, async (application) => {
 
     /**
      * Updates the UI state based on the selected theme mode.
+     * @param {boolean} [dispatchChange] Whether to dispatch a change event on the shadow select.
      */
-    function updateThemeModeUI() {
+    function updateThemeModeUI(dispatchChange = true) {
         const theme = getThemeById(themeModeSelect?.value ?? '');
         const disableShadow = theme?.constraints?.disableShadow ?? false;
         if (shadowSelect) {
@@ -209,18 +210,22 @@ await Application.main(true, async (application) => {
                 }
                 shadowSelect.value = 'none';
                 shadowSelect.disabled = true;
-                shadowSelect.dispatchEvent(new Event('change', {bubbles: true}));
+                if (dispatchChange) {
+                    shadowSelect.dispatchEvent(new Event('change', {bubbles: true}));
+                }
             } else {
                 shadowSelect.disabled = false;
                 if (previousShadowValue && previousShadowValue !== 'none') {
                     shadowSelect.value = previousShadowValue;
                     previousShadowValue = null;
-                    shadowSelect.dispatchEvent(new Event('change', {bubbles: true}));
+                    if (dispatchChange) {
+                        shadowSelect.dispatchEvent(new Event('change', {bubbles: true}));
+                    }
                 }
             }
         }
     }
 
-    themeModeSelect?.addEventListener('change', updateThemeModeUI);
-    updateThemeModeUI();
+    themeModeSelect?.addEventListener('change', () => updateThemeModeUI(true));
+    updateThemeModeUI(false);
 });
