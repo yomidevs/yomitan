@@ -34,7 +34,7 @@ iframe.yomitan-popup[data-theme=dark] {
     border-color: var(--popup-border-color, #666666);
 }
 iframe.yomitan-popup[data-outer-theme=dark] {
-    box-shadow: 0 0 10em rgba(255, 255, 255, 0.5);
+    box-shadow: var(--popup-box-shadow, 0 0 10em rgba(255, 255, 255, 0.5));
 }
 iframe.yomitan-popup[data-outer-theme=none] {
     box-shadow: none;

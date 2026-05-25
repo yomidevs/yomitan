@@ -650,6 +650,12 @@ export class Popup extends EventDispatcher {
         }
 
         try {
+            await this._injectThemeStylesheet(this._themeController.themeMode);
+        } catch (e) {
+            // NOP
+        }
+
+        try {
             await this.setCustomOuterCss(this._customOuterCss, true);
         } catch (e) {
             // NOP
