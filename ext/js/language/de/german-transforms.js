@@ -89,13 +89,13 @@ const conditions = {
     v: {
         name: 'Verb',
         isDictionaryForm: true,
-        subConditions: ['vw', 'vs'],
+        subConditions: ['vw', 'vst'],
     },
     vw: {
         name: 'Weak verb',
         isDictionaryForm: true,
     },
-    vs: {
+    vst: {
         name: 'Strong verb',
         isDictionaryForm: true,
     },

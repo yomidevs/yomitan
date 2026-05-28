@@ -19,7 +19,7 @@ import {suffixInflection} from '../language-transforms.js';
 
 const conditions = {
     v: {
-        name: 'Verb or Auxiliary Verb',
+        name: 'Verb',
         isDictionaryForm: true,
         i18n: [
             {
@@ -29,7 +29,7 @@ const conditions = {
         ],
     },
     adj: {
-        name: 'Adjective or Auxiliary Adjective',
+        name: 'Adjective',
         isDictionaryForm: true,
         i18n: [
             {

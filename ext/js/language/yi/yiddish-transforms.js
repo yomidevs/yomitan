@@ -72,11 +72,11 @@ const conditions = {
         subConditions: ['np', 'ns'],
     },
     np: {
-        name: 'Noun, plural',
+        name: 'Noun plural',
         isDictionaryForm: false,
     },
     ns: {
-        name: 'Noun, singular',
+        name: 'Noun singular',
         isDictionaryForm: true,
     },
     adj: {
