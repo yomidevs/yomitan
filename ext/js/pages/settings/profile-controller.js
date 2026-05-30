@@ -431,7 +431,10 @@ export class ProfileController {
 
         // Update UI
         this._updateProfileSelectOptions();
-        void this.setDefaultProfile(profileCurrent);
+
+        if (this._settingsController.profileIndex !== profileCurrent) {
+            void this.setDefaultProfile(profileCurrent);
+        }
 
         /** @type {HTMLSelectElement} */ (this._profileActiveSelect).value = `${profileCurrent}`;
 
