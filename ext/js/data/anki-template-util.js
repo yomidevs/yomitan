@@ -63,6 +63,7 @@ export function getStandardFieldMarkers(type, language = 'ja') {
                 'sentence-furigana-plain',
                 'tags',
                 'url',
+                'url-plain',
             ];
             if (language === 'ja') {
                 markers.push(
@@ -105,6 +106,7 @@ export function getStandardFieldMarkers(type, language = 'ja') {
                 'stroke-count',
                 'tags',
                 'url',
+                'url-plain',
             ];
         default:
             throw new Error(`Unsupported type: ${type}`);
