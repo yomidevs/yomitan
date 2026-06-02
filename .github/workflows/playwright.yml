@@ -228,9 +228,7 @@ jobs:
           if compgen -G "playwright-outputs/*" > /dev/null; then
             cat playwright-outputs/* > playwright-output
           else
-            cat > playwright-output <<'EOF'
-            Playwright tests did not run because no master screenshots were available for comparison.
-            EOF
+            printf '%s\n' "Playwright tests did not run because no master screenshots were available for comparison." > playwright-output
           fi
 
       - uses: actions/upload-artifact@v6
