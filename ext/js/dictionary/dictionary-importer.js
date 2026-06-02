@@ -100,12 +100,12 @@ export class DictionaryImporter {
 
         this._progressReset();
 
-        configure({
-            workerScripts: {
-                deflate: ['../../lib/z-worker.js'],
-                inflate: ['../../lib/z-worker.js'],
-            },
-        });
+        const globalObject = /** @type {typeof globalThis & {browser?: {runtime?: unknown}}} */ (globalThis);
+        const hasExtensionRuntime = (
+            (typeof chrome === 'object' && chrome !== null && typeof chrome.runtime !== 'undefined') ||
+            (typeof globalObject.browser === 'object' && globalObject.browser !== null && typeof globalObject.browser.runtime !== 'undefined')
+        );
+        configure({workerURI: '../../lib/z-worker.js', useWebWorkers: typeof Worker !== 'undefined' && hasExtensionRuntime});
 
         // Read archive
         const fileMap = await this._getFilesFromArchive(archiveContent);
@@ -1007,7 +1007,7 @@ export class DictionaryImporter {
      * @returns {Promise<T>}
      */
     async _getData(entry, writer) {
-        if (typeof entry.getData === 'undefined') {
+        if (entry.directory) {
             throw new Error(`Cannot read ${entry.filename}`);
         }
         return await entry.getData(writer);
