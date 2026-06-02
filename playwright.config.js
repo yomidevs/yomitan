@@ -74,7 +74,7 @@ export default defineConfig({
             name: 'chromium',
             use: {
                 ...devices['Desktop Chrome'],
-                channel: 'chromium',
+                channel: process.env.CI ? 'chrome' : 'chromium',
             },
             dependencies: ['playwright setup'],
         },

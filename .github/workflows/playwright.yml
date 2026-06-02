@@ -31,19 +31,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Cache playwright browsers
-        id: cache-playwright
-        uses: actions/cache@v5
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: cache-playwright-${{ hashFiles('node_modules/playwright-core/browsers.json') }}
-          restore-keys: |
-            cache-playwright-
-
-      - if: ${{ steps.cache-playwright.outputs.cache-hit != 'true' }}
-        name: Install Playwright Browsers
-        run: npx playwright install chromium
+      - name: Verify Playwright browser
+        run: google-chrome --version
 
       - name: Grab latest dictionaries from dictionaries branch
         uses: actions/checkout@v6
