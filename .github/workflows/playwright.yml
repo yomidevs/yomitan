@@ -139,30 +139,44 @@ jobs:
         with:
           path: all-blob-reports
           pattern: blob-report-*
-          merge-multiple: true
 
       - name: Check for blob reports
         id: blob-reports
         run: |
-          if compgen -G "all-blob-reports/*" > /dev/null; then
-            echo "found=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "found=false" >> "$GITHUB_OUTPUT"
-          fi
+          found=false
+          complete=true
+
+          for shard in 1 2 3 4 5; do
+            if compgen -G "all-blob-reports/blob-report-${shard}/*" > /dev/null; then
+              found=true
+            else
+              complete=false
+              printf '%s\n' "Missing blob report for shard ${shard}."
+            fi
+          done
+
+          echo "found=${found}" >> "$GITHUB_OUTPUT"
+          echo "complete=${complete}" >> "$GITHUB_OUTPUT"
 
       - name: Fail when blob reports are unexpectedly missing
-        if: steps.blob-reports.outputs.found != 'true' && steps.master-screenshots-outcome.outputs.outcome != 'failure'
+        if: steps.blob-reports.outputs.complete != 'true' && (steps.master-screenshots-outcome.outputs.outcome != 'failure' || steps.blob-reports.outputs.found == 'true')
         run: |
-          echo "No Playwright blob reports were found, and this was not caused by an unavailable master screenshots baseline."
+          echo "One or more Playwright blob reports were missing, and this was not caused by an unavailable master screenshots baseline."
           exit 1
 
+      - name: Prepare blob reports for merge
+        if: steps.blob-reports.outputs.complete == 'true'
+        run: |
+          mkdir merged-blob-reports
+          cp all-blob-reports/blob-report-*/* merged-blob-reports/
+
       - name: Merge into HTML Report
-        if: steps.blob-reports.outputs.found == 'true'
-        run: npx playwright merge-reports --reporter html ./all-blob-reports
+        if: steps.blob-reports.outputs.complete == 'true'
+        run: npx playwright merge-reports --reporter html ./merged-blob-reports
 
       - name: Merge into JSON Report
-        if: steps.blob-reports.outputs.found == 'true'
-        run: npx playwright merge-reports --reporter json ./all-blob-reports > playwright-results.json
+        if: steps.blob-reports.outputs.complete == 'true'
+        run: npx playwright merge-reports --reporter json ./merged-blob-reports > playwright-results.json
 
       - name: Create fallback report when no blob reports exist
         if: steps.blob-reports.outputs.found != 'true' && steps.master-screenshots-outcome.outputs.outcome == 'failure'
