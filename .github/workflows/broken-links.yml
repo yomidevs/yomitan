@@ -25,4 +25,4 @@ jobs:
         with:
           fail: true
           jobSummary: false
-          args: --exclude-path 'node_modules' --root-dir './ext' --verbose --no-progress './**/*.md' './**/*.html' './**/*.rst'
+          args: --exclude-path 'node_modules' --verbose --no-progress './**/*.md' './**/*.html' './**/*.rst'
