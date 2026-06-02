@@ -101,4 +101,4 @@ You can view the tag colors [here](https://github.com/yomidevs/yomitan/blob/48f1
 
 # Community Contributions
 
-If you have any questions, need help, or want to share a new dictionary, feel free to pop in the [Yomitan Discord server](/README.md#yomitan). We're happy to help you get started!
+If you have any questions, need help, or want to share a new dictionary, feel free to pop in the [Yomitan Discord server](../README.md#yomitan). We're happy to help you get started!
