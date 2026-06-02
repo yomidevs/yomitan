@@ -37,7 +37,9 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
-          key: cache-playwright-${{ hashFiles('package-lock.json') }} # playwright version is included in package-lock, so this serves as a reasonable cache key
+          key: cache-playwright-${{ hashFiles('node_modules/playwright-core/browsers.json') }}
+          restore-keys: |
+            cache-playwright-
 
       - if: ${{ steps.cache-playwright.outputs.cache-hit != 'true' }}
         name: Install Playwright Browsers
