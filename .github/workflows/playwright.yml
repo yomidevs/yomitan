@@ -111,19 +111,77 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
 
+      ### [PR] master-screenshots-outcome
+      - name: '[PR] Download master-screenshots-outcome files'
+        uses: actions/download-artifact@v7
+        with:
+          path: master-screenshots-outcomes
+          pattern: master-screenshots-outcome-*
+          merge-multiple: true
+        if: github.event_name == 'pull_request'
+
+      - name: '[PR] Calculate if any shard failed to download master screenshots'
+        id: master-screenshots-outcome
+        run: |
+          if grep -q "failure" master-screenshots-outcomes/*; then
+            echo "failure" > master-screenshots-outcome
+            echo "outcome=failure" >> "$GITHUB_OUTPUT"
+          else
+            echo "success" > master-screenshots-outcome
+            echo "outcome=success" >> "$GITHUB_OUTPUT"
+          fi
+        if: github.event_name == 'pull_request'
+
       ### playwright-report
       - name: Download blob reports from GitHub Actions Artifacts
+        continue-on-error: true
         uses: actions/download-artifact@v7
         with:
           path: all-blob-reports
           pattern: blob-report-*
           merge-multiple: true
 
+      - name: Check for blob reports
+        id: blob-reports
+        run: |
+          if compgen -G "all-blob-reports/*" > /dev/null; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fail when blob reports are unexpectedly missing
+        if: steps.blob-reports.outputs.found != 'true' && steps.master-screenshots-outcome.outputs.outcome != 'failure'
+        run: |
+          echo "No Playwright blob reports were found, and this was not caused by an unavailable master screenshots baseline."
+          exit 1
+
       - name: Merge into HTML Report
+        if: steps.blob-reports.outputs.found == 'true'
         run: npx playwright merge-reports --reporter html ./all-blob-reports
 
       - name: Merge into JSON Report
+        if: steps.blob-reports.outputs.found == 'true'
         run: npx playwright merge-reports --reporter json ./all-blob-reports > playwright-results.json
+
+      - name: Create fallback report when no blob reports exist
+        if: steps.blob-reports.outputs.found != 'true' && steps.master-screenshots-outcome.outputs.outcome == 'failure'
+        run: |
+          mkdir -p playwright-report
+          cat > playwright-report/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+            <head><meta charset="utf-8"><title>Playwright report unavailable</title></head>
+            <body>
+              <h1>Playwright report unavailable</h1>
+              <p>No Playwright blob reports were uploaded by the shard jobs.</p>
+              <p>On pull requests, this can happen when master screenshots could not be downloaded and visual comparison tests were skipped.</p>
+            </body>
+          </html>
+          EOF
+          cat > playwright-results.json <<'EOF'
+          {"stats":{"unexpected":0,"flaky":0}}
+          EOF
 
       - uses: actions/upload-artifact@v6
         with:
@@ -137,6 +195,7 @@ jobs:
 
       ### playwright-screenshots
       - name: Download & merge screenshots from GitHub Actions Artifacts
+        continue-on-error: true
         uses: actions/download-artifact@v7
         with:
           path: test/playwright/__screenshots__
@@ -148,24 +207,6 @@ jobs:
           name: playwright-screenshots
           path: test/playwright/__screenshots__/
 
-      ### [PR] master-screenshots-outcome
-      - name: '[PR] Download master-screenshots-outcome files'
-        uses: actions/download-artifact@v7
-        with:
-          path: master-screenshots-outcomes
-          pattern: master-screenshots-outcome-*
-          merge-multiple: true
-        if: github.event_name == 'pull_request'
-
-      - name: '[PR] Calculate if any shard failed to download master screenshots'
-        run: |
-          if grep -q "failure" master-screenshots-outcomes/*; then
-            echo "failure" > master-screenshots-outcome
-          else
-            echo "success" > master-screenshots-outcome
-          fi
-        if: github.event_name == 'pull_request'
-
       - name: '[PR] Upload master-screenshots-outcome'
         uses: actions/upload-artifact@v6
         with:
@@ -175,6 +216,7 @@ jobs:
 
       ### playwright-output
       - name: Download playwright-output files
+        continue-on-error: true
         uses: actions/download-artifact@v7
         with:
           path: playwright-outputs
@@ -182,7 +224,14 @@ jobs:
           merge-multiple: true
 
       - name: Merge playwright output files
-        run: cat playwright-outputs/* > playwright-output
+        run: |
+          if compgen -G "playwright-outputs/*" > /dev/null; then
+            cat playwright-outputs/* > playwright-output
+          else
+            cat > playwright-output <<'EOF'
+            Playwright tests did not run because no master screenshots were available for comparison.
+            EOF
+          fi
 
       - uses: actions/upload-artifact@v6
         with:
