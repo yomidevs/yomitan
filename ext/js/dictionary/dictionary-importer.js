@@ -105,7 +105,8 @@ export class DictionaryImporter {
             (typeof chrome === 'object' && chrome !== null && typeof chrome.runtime !== 'undefined') ||
             (typeof globalObject.browser === 'object' && globalObject.browser !== null && typeof globalObject.browser.runtime !== 'undefined')
         );
-        configure({workerURI: '../../lib/z-worker.js', useWebWorkers: typeof Worker !== 'undefined' && hasExtensionRuntime});
+        const hasWorkerPostMessage = typeof Worker !== 'undefined' && typeof Worker.prototype.postMessage === 'function';
+        configure({workerURI: '../../lib/z-worker.js', useWebWorkers: hasWorkerPostMessage && hasExtensionRuntime});
 
         // Read archive
         const fileMap = await this._getFilesFromArchive(archiveContent);
