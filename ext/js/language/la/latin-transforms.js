@@ -30,12 +30,12 @@ const conditions = {
         subConditions: ['ns', 'np'],
     },
     ns: {
-        name: 'Noun, singular',
+        name: 'Noun singular',
         isDictionaryForm: true,
         subConditions: ['n1s', 'n2s', 'n3s', 'n4s', 'n5s'],
     },
     np: {
-        name: 'Noun, plural',
+        name: 'Noun plural',
         isDictionaryForm: true,
         subConditions: ['n1p', 'n2p', 'n3p', 'n4p', 'n5p'],
     },
