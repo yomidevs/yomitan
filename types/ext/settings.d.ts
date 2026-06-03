@@ -261,6 +261,8 @@ export type TranslationOptions = {
     collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
     textReplacements: TranslationTextReplacementOptions;
     searchResolution: SearchResolution;
+    enableFusejiLookup: boolean;
+    fusejiTriggers: string;
 };
 
 export type SearchResolution = 'letter' | 'word';
