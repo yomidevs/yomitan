@@ -26,6 +26,10 @@ import {MultiLanguageTransformer} from './multi-language-transformer.js';
 import {MAX_PROCESS_VARIANTS} from './text-processors.js';
 import {isCodePointChinese} from './zh/chinese.js';
 
+// For suffix lookup case (e.g. ○○ルド), each candidate suffix length is one database lookup,
+// This caps those lookups to a plausible length.
+const FUSEJI_MAX_SUFFIX_LOOKUP_LENGTH = 8;
+
 /**
  * Class which finds term and kanji dictionary entries for text.
  */
@@ -86,8 +90,21 @@ export class Translator {
     async findTerms(mode, text, options) {
         safePerformance.mark('translator:findTerms:start');
         const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language, primaryReading, useAllFrequencyDictionaries} = options;
+        const fusejiTriggerSet = options.enableFusejiLookup ? new Set(options.fusejiTriggers ?? '') : null;
         const tagAggregator = new TranslatorTagAggregator();
-        let {dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, options, tagAggregator, primaryReading);
+        /** @type {import('translation-internal').TermDictionaryEntry[]} */
+        let dictionaryEntries = [];
+        let originalTextLength = 0;
+        if (fusejiTriggerSet !== null && fusejiTriggerSet.size > 0) {
+            const fusejiDetails = this._getFusejiTriggerDetails(text, fusejiTriggerSet);
+            if (fusejiDetails.firstTriggerIndex >= 0) {
+                ({dictionaryEntries, originalTextLength} = await this._findFusejiTerms(text, options, fusejiDetails, fusejiTriggerSet, tagAggregator, primaryReading));
+            }
+        }
+
+        if (dictionaryEntries.length === 0) {
+            ({dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, options, tagAggregator, primaryReading));
+        }
 
         switch (mode) {
             case 'group':
@@ -251,6 +268,158 @@ export class Translator {
         const deinflections = await this._getDeinflections(text, options);
 
         return this._getDictionaryEntries(deinflections, enabledDictionaryMap, tagAggregator, primaryReading);
+    }
+
+    /**
+     * Splits the text into characters and locates the positions of the first and last
+     * fuseji (mask) characters, which bound the region that needs wildcard matching.
+     * @param {string} text
+     * @param {Set<string>} triggerSet
+     * @returns {{characters: string[], firstTriggerIndex: number, lastTriggerIndex: number}} -1 for indexes if not present.
+     */
+    _getFusejiTriggerDetails(text, triggerSet) {
+        const characters = [...text];
+        let firstTriggerIndex = -1;
+        let lastTriggerIndex = -1;
+        for (let i = 0; i < characters.length; ++i) {
+            if (!triggerSet.has(characters[i])) { continue; }
+            if (firstTriggerIndex < 0) {
+                firstTriggerIndex = i;
+            }
+            lastTriggerIndex = i;
+        }
+        return {characters, firstTriggerIndex, lastTriggerIndex};
+    }
+
+    /**
+     * Finds dictionary entries for masked text (伏せ字), where some characters are replaced by trigger
+     * symbols such as `◯`. The unmasked text around the triggers is used to query the database via a
+     * prefix lookup (when text precedes the first trigger) or a series of suffix lookups (when the text
+     * begins with a trigger), and the candidates are then filtered against the full masked pattern.
+     * @param {string} text
+     * @param {import('translation').FindTermsOptions} options
+     * @param {{characters: string[], firstTriggerIndex: number, lastTriggerIndex: number}} fusejiDetails The trigger information for `text`, as produced by {@link Translator._getFusejiTriggerDetails}.
+     * @param {Set<string>} triggerSet The set of characters treated as single-character wildcards.
+     * @param {TranslatorTagAggregator} tagAggregator
+     * @param {string} primaryReading
+     * @returns {Promise<{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}>}
+     */
+    async _findFusejiTerms(text, options, fusejiDetails, triggerSet, tagAggregator, primaryReading) {
+        const {prefixLookupText, suffixLookupText} = this._getFusejiLookupTexts(fusejiDetails);
+        if (prefixLookupText.length === 0 && suffixLookupText.length === 0) {
+            return {dictionaryEntries: [], originalTextLength: 0};
+        }
+
+        /** @type {import('translation-internal').TermDictionaryEntry[]} */
+        let dictionaryEntries = [];
+        if (prefixLookupText.length > 0) {
+            const lookupOptions = /** @type {import('translation').FindTermsOptions} */ ({...options, matchType: 'prefix', deinflect: false});
+            ({dictionaryEntries} = await this._findTermsInternal(prefixLookupText, lookupOptions, tagAggregator, primaryReading));
+        } else {
+            // fallback to normal lookup
+            const lookupOptions = /** @type {import('translation').FindTermsOptions} */ ({...options, matchType: 'suffix', deinflect: false});
+            for (const lookupText of this._getFusejiSuffixLookupTexts(suffixLookupText)) {
+                ({dictionaryEntries} = await this._findTermsInternal(lookupText, lookupOptions, tagAggregator, primaryReading));
+                if (dictionaryEntries.length > 0) { break; }
+            }
+        }
+        return this._filterFusejiDictionaryEntries(dictionaryEntries, text, triggerSet);
+    }
+
+    /**
+     * Extracts the everything before the first trigger character
+     * and everything after the last one. These anchors drive the database lookup.
+     * @param {{characters: string[], firstTriggerIndex: number, lastTriggerIndex: number}} fusejiDetails The trigger information, as produced by {@link Translator._getFusejiTriggerDetails}.
+     * @returns {{prefixLookupText: string, suffixLookupText: string}}
+     */
+    _getFusejiLookupTexts(fusejiDetails) {
+        const {characters, firstTriggerIndex, lastTriggerIndex} = fusejiDetails;
+        if (firstTriggerIndex < 0) {
+            return {prefixLookupText: '', suffixLookupText: ''};
+        }
+
+        const prefixLookupText = characters.slice(0, firstTriggerIndex).join('');
+        const suffixLookupText = characters.slice(lastTriggerIndex + 1).join('');
+        return {prefixLookupText, suffixLookupText};
+    }
+
+    /**
+     * Generates the candidate query strings for suffix lookup where only the
+     * trailing unmasked text is known (e.g. `◯◯ルド`). This returns progressively
+     * shorter prefixes of the unmasked suffix (longest first, capped at {@link FUSEJI_MAX_SUFFIX_LOOKUP_LENGTH})
+     * to be tried in turn as database suffix lookups.
+     * @param {string} suffixLookupText The unmasked text following the last trigger character.
+     * @returns {string[]}
+     */
+    _getFusejiSuffixLookupTexts(suffixLookupText) {
+        const suffixChars = [...suffixLookupText];
+        const maxLength = Math.min(suffixChars.length, FUSEJI_MAX_SUFFIX_LOOKUP_LENGTH);
+        /** @type {string[]} */
+        const results = [];
+        for (let i = maxLength; i > 0; --i) {
+            results.push(suffixChars.slice(0, i).join(''));
+        }
+        return results;
+    }
+
+    /**
+     * Narrows a set of candidate entries down to those
+     * whose term or reading actually fits the masked pattern, treating trigger characters as wildcards.
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
+     * @param {string} patternText The original masked text, e.g. `マ◯ド◯ルド`.
+     * @param {Set<string>} triggerSet
+     * @returns {{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}}
+     */
+    _filterFusejiDictionaryEntries(dictionaryEntries, patternText, triggerSet) {
+        const matcher = this._createFusejiPatternMatcher(patternText, triggerSet);
+        let originalTextLength = 0;
+        /** @type {import('translation-internal').TermDictionaryEntry[]} */
+        const filteredDictionaryEntries = [];
+        for (const dictionaryEntry of dictionaryEntries) {
+            for (const headword of dictionaryEntry.headwords) {
+                const candidates = headword.reading.length === 0 ? [headword.term] : [headword.term, headword.reading];
+                const matchLength = Math.max(...candidates.map(matcher));
+                if (matchLength > 0) {
+                    originalTextLength = Math.max(originalTextLength, matchLength);
+                    filteredDictionaryEntries.push({...dictionaryEntry, maxOriginalTextLength: Math.max(dictionaryEntry.maxOriginalTextLength, matchLength)});
+                    break;
+                }
+            }
+        }
+        return {dictionaryEntries: filteredDictionaryEntries, originalTextLength};
+    }
+
+    /**
+     * Builds a matcher function that tests a candidate string against the masked pattern.
+     * Candidates shorter than the pattern are allowed to match a leading portion of it (partial match).
+     * @param {string} patternText The masked text to match against, e.g. `マ◯ド◯ルド`.
+     * @param {Set<string>} triggerSet
+     * @returns {(text: string) => number} A function returning the matched length in code units, or `0` if the candidate does not fit the pattern.
+     */
+    _createFusejiPatternMatcher(patternText, triggerSet) {
+        const patternChars = [...patternText];
+        const patternTextLengths = [0];
+        for (const character of patternChars) {
+            patternTextLengths.push(patternTextLengths[patternTextLengths.length - 1] + character.length);
+        }
+        return (text) => {
+            const textChars = [...text];
+            if (textChars.length > patternChars.length) {
+                return 0;
+            }
+            for (let i = 0; i < patternChars.length; ++i) {
+                if (i >= textChars.length) {
+                    return patternTextLengths[textChars.length];
+                }
+                if (triggerSet.has(patternChars[i])) {
+                    continue;
+                }
+                if (patternChars[i] !== textChars[i]) {
+                    return 0;
+                }
+            }
+            return patternTextLengths[textChars.length];
+        };
     }
 
     /**
