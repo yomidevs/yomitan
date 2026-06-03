@@ -1754,7 +1754,15 @@ export class Backend {
                                     if (src.matchType !== 'exact') { continue; }
                                     validSources.push(src);
                                 }
-                                if (validSources.length > 0) { validHeadwords.push({term: headword.term, reading: headword.reading, sources: validSources, frequencies: dictionaryEntry.frequencies.filter((f) => f.headwordIndex === headword.headwordIndex)}); }
+                                if (validSources.length > 0) {
+                                    validHeadwords.push({
+                                        term: headword.term,
+                                        reading: headword.reading,
+                                        sources: validSources,
+                                        frequencies: dictionaryEntry.frequencies.filter((f) => f.headwordIndex === headword.headwordIndex),
+                                        pronunciations: dictionaryEntry.pronunciations.filter((p) => p.headwordIndex === headword.headwordIndex),
+                                    });
+                                }
                             }
                             if (validHeadwords.length > 0) { trimmedHeadwords.push(validHeadwords); }
                         }
