@@ -310,20 +310,51 @@ export class Translator {
             return {dictionaryEntries: [], originalTextLength: 0};
         }
 
+        // The full masked pattern is pushed down to the database.
+        const matcher = this._createFusejiPatternMatcher(text, triggerSet);
+        const termKeyFilter = (/** @type {string} */ term) => matcher(term) > 0;
+
+        // NOTE: inflected masked spans are unsupported. If the mask covers the stem (eg. ◯んでる), visible
+        // tail never matches a dictionary-form headword and deinflection doesnt help — the lookup text
+        // here is the stripped anchor, not the whole word. Supporting it means deinflecting the visible
+        // tail and reconstructing the pattern (◯んでる → ◯む) before lookup.
+        // Arguably not desirable since it pollutes the results?
         /** @type {import('translation-internal').TermDictionaryEntry[]} */
         let dictionaryEntries = [];
         if (prefixLookupText.length > 0) {
-            const lookupOptions = /** @type {import('translation').FindTermsOptions} */ ({...options, matchType: 'prefix', deinflect: false});
-            ({dictionaryEntries} = await this._findTermsInternal(prefixLookupText, lookupOptions, tagAggregator, primaryReading));
+            ({dictionaryEntries} = await this._findFusejiTermsForAnchor(prefixLookupText, 'prefix', options, tagAggregator, primaryReading, termKeyFilter));
         } else {
-            // fallback to normal lookup
-            const lookupOptions = /** @type {import('translation').FindTermsOptions} */ ({...options, matchType: 'suffix', deinflect: false});
             for (const lookupText of this._getFusejiSuffixLookupTexts(suffixLookupText)) {
-                ({dictionaryEntries} = await this._findTermsInternal(lookupText, lookupOptions, tagAggregator, primaryReading));
+                ({dictionaryEntries} = await this._findFusejiTermsForAnchor(lookupText, 'suffix', options, tagAggregator, primaryReading, termKeyFilter));
                 if (dictionaryEntries.length > 0) { break; }
             }
         }
-        return this._filterFusejiDictionaryEntries(dictionaryEntries, text, triggerSet);
+        return this._filterFusejiDictionaryEntries(dictionaryEntries, matcher);
+    }
+
+    /**
+     * Looks up dictionary entries for a single fuseji anchor (the unmasked text before the first trigger,
+     * or after the last). Unlike {@link Translator._findTermsInternal} this skips the deinflection pipeline
+     * (algorithm deinflection and {@link Translator._getDictionaryDeinflections}).
+     * @param {string} anchorText The unmasked prefix/suffix to scan for.
+     * @param {import('dictionary').TermSourceMatchType} matchType `'prefix'` or `'suffix'`.
+     * @param {import('translation').FindTermsOptions} options
+     * @param {TranslatorTagAggregator} tagAggregator
+     * @param {string} primaryReading
+     * @param {(term: string) => boolean} termKeyFilter Keeps only records whose term/reading fits the masked pattern.
+     * @returns {Promise<{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}>}
+     */
+    async _findFusejiTermsForAnchor(anchorText, matchType, options, tagAggregator, primaryReading, termKeyFilter) {
+        const {enabledDictionaryMap} = options;
+        const databaseEntries = await this._database.findTermsBulk([anchorText], enabledDictionaryMap, matchType, termKeyFilter);
+        for (const entry of databaseEntries) { entry.definitions = entry.definitions.filter((d) => !Array.isArray(d)); }
+        const matchedEntries = databaseEntries.filter((entry) => entry.definitions.length > 0);
+
+        if (matchedEntries.length === 0) { return {dictionaryEntries: [], originalTextLength: 0}; }
+
+        const deinflection = this._createDeinflection(anchorText, anchorText, anchorText, 0, [], []);
+        deinflection.databaseEntries = matchedEntries;
+        return this._getDictionaryEntries([deinflection], enabledDictionaryMap, tagAggregator, primaryReading);
     }
 
     /**
@@ -363,15 +394,13 @@ export class Translator {
     }
 
     /**
-     * Narrows a set of candidate entries down to those
-     * whose term or reading actually fits the masked pattern, treating trigger characters as wildcards.
+     * Narrows a set of candidate entries down to those whose term or reading fits the masked
+     * pattern, and records the matched source length on each survivor.
      * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
-     * @param {string} patternText The original masked text, e.g. `マ◯ド◯ルド`.
-     * @param {Set<string>} triggerSet
+     * @param {(text: string) => number} matcher The pattern matcher from {@link Translator._createFusejiPatternMatcher}.
      * @returns {{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}}
      */
-    _filterFusejiDictionaryEntries(dictionaryEntries, patternText, triggerSet) {
-        const matcher = this._createFusejiPatternMatcher(patternText, triggerSet);
+    _filterFusejiDictionaryEntries(dictionaryEntries, matcher) {
         let originalTextLength = 0;
         /** @type {import('translation-internal').TermDictionaryEntry[]} */
         const filteredDictionaryEntries = [];

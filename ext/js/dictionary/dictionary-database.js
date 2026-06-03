@@ -283,13 +283,17 @@ export class DictionaryDatabase {
      * @param {string[]} termList
      * @param {import('dictionary-database').DictionarySet} dictionaries
      * @param {import('dictionary-database').MatchType} matchType
+     * @param {?((term: string) => boolean)} [keyFilter] When provided, a record is kept only if its expression or reading
+     *   satisfies this predicate.
      * @returns {Promise<import('dictionary-database').TermEntry[]>}
      */
-    findTermsBulk(termList, dictionaries, matchType) {
+    findTermsBulk(termList, dictionaries, matchType, keyFilter = null) {
         const visited = new Set();
         /** @type {import('dictionary-database').FindPredicate<string, import('dictionary-database').DatabaseTermEntryWithId>} */
         const predicate = (row) => {
             if (!dictionaries.has(row.dictionary)) { return false; }
+            // The full record is already in hand, so match the forward expression/reading directly — no index-key reversal.
+            if (keyFilter !== null && !keyFilter(row.expression) && !(row.reading.length > 0 && keyFilter(row.reading))) { return false; }
             const {id} = row;
             if (visited.has(id)) { return false; }
             visited.add(id);
