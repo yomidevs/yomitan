@@ -178,7 +178,7 @@ jobs:
         if: steps.blob-reports.outputs.complete == 'true'
         run: npx playwright merge-reports --reporter json ./merged-blob-reports > playwright-results.json
 
-      - name: Create fallback report when no blob reports exist
+      - name: Create failure report when master screenshots are unavailable
         if: steps.blob-reports.outputs.found != 'true' && steps.master-screenshots-outcome.outputs.outcome == 'failure'
         run: |
           mkdir -p playwright-report
@@ -189,12 +189,10 @@ jobs:
             <body>
               <h1>Playwright report unavailable</h1>
               <p>No Playwright blob reports were uploaded by the shard jobs.</p>
-              <p>On pull requests, this can happen when master screenshots could not be downloaded and visual comparison tests were skipped.</p>
+              <p>Master screenshots could not be downloaded, so visual comparison tests were skipped.</p>
+              <p>This workflow fails intentionally because no visual comparison was performed.</p>
             </body>
           </html>
-          EOF
-          cat > playwright-results.json <<'EOF'
-          {"stats":{"unexpected":0,"flaky":0}}
           EOF
 
       - uses: actions/upload-artifact@v6
@@ -203,6 +201,7 @@ jobs:
           path: playwright-report/
 
       - uses: actions/upload-artifact@v6
+        if: steps.blob-reports.outputs.complete == 'true'
         with:
           name: playwright-results-json
           path: playwright-results.json
@@ -249,3 +248,10 @@ jobs:
         with:
           name: playwright-output
           path: playwright-output
+
+      - name: Fail when master screenshots are unavailable
+        if: steps.blob-reports.outputs.found != 'true' && steps.master-screenshots-outcome.outputs.outcome == 'failure'
+        run: |
+          echo "Master screenshots could not be downloaded, so Playwright visual comparison tests did not run."
+          echo "Failing intentionally to avoid a misleading green Playwright check."
+          exit 1
