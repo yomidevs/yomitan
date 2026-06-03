@@ -27,6 +27,7 @@ import {addFullscreenChangeEventListener, computeZoomScale, convertRectZoomCoord
 import {loadStyle} from '../dom/style-util.js';
 import {checkPopupPreviewURL} from '../pages/settings/popup-preview-controller.js';
 import {ThemeController} from './theme-controller.js';
+import {getThemeById} from '../data/theme-registry.js';
 
 /**
  * This class is the container which hosts the display of search results.
@@ -649,6 +650,12 @@ export class Popup extends EventDispatcher {
         }
 
         try {
+            await this._injectThemeStylesheet(this._themeController.themeMode);
+        } catch (e) {
+            // NOP
+        }
+
+        try {
             await this.setCustomOuterCss(this._customOuterCss, true);
         } catch (e) {
             // NOP
@@ -669,6 +676,30 @@ export class Popup extends EventDispatcher {
             parentNode = this._shadow;
         }
         await loadStyle(this._application, 'yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
+    }
+
+    /**
+     * Injects the active theme's CSS into the outer chrome (parent page/shadow DOM).
+     * Theme CSS files contain both inner and outer selectors; outer selectors
+     * (iframe.yomitan-popup) match here, inner selectors are harmless no-ops.
+     * @param {string} themeMode
+     * @returns {Promise<void>}
+     */
+    async _injectThemeStylesheet(themeMode) {
+        const theme = getThemeById(themeMode);
+        const existingId = 'yomitan-popup-theme-outer-stylesheet';
+        const parentNode = this._shadow !== null ? this._shadow : null;
+
+        if (!theme || !theme.css) {
+            const existing = (this._shadow !== null ? this._shadow : document).querySelector(`#${existingId}`);
+            if (existing) { existing.remove(); }
+            return;
+        }
+
+        const styleNode = await loadStyle(this._application, existingId, 'file-content', theme.css, false, parentNode);
+        if (styleNode) {
+            styleNode.id = existingId;
+        }
     }
 
     /**
@@ -1134,6 +1165,13 @@ export class Popup extends EventDispatcher {
         this._themeController.siteOverride = checkPopupPreviewURL(optionsContext.url);
         if (this._themeController.outerTheme === 'site' && this._themeController.siteOverride && ['dark', 'light'].includes(this._themeController.theme)) {
             this._themeController.outerTheme = this._themeController.theme;
+        }
+        this._themeController.themeMode = general.popupThemeMode;
+        if (general.popupThemeMode === 'eink') {
+            this._themeController.outerTheme = 'none';
+        }
+        if (this._injectPromiseComplete) {
+            await this._injectThemeStylesheet(general.popupThemeMode);
         }
         this._initialWidth = general.popupWidth;
         this._initialHeight = general.popupHeight;

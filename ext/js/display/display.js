@@ -1279,7 +1279,7 @@ export class Display extends EventDispatcher {
      */
     _setTheme(options) {
         const {general} = options;
-        const {popupTheme, popupOuterTheme, fontFamily, fontSize, lineHeight} = general;
+        const {popupTheme, popupOuterTheme, popupThemeMode, fontFamily, fontSize, lineHeight} = general;
         /** @type {string} */
         let pageType = this._pageType;
         try {
@@ -1297,6 +1297,7 @@ export class Display extends EventDispatcher {
         }
         this._themeController.theme = popupTheme;
         this._themeController.outerTheme = popupOuterTheme;
+        this._themeController.themeMode = popupThemeMode;
         this._themeController.siteOverride = pageType === 'search' || pageType === 'popupPreview';
         this._themeController.updateTheme();
         const customCss = this._getCustomCss(options);

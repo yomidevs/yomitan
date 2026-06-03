@@ -20,6 +20,7 @@ import {Application} from '../../application.js';
 import {DocumentFocusController} from '../../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ExtensionContentController} from '../common/extension-content-controller.js';
+import {getThemeById, populateThemeModeSelect} from '../../data/theme-registry.js';
 import {AnkiController} from './anki-controller.js';
 import {AnkiDeckGeneratorController} from './anki-deck-generator-controller.js';
 import {AnkiTemplatesController} from './anki-templates-controller.js';
@@ -116,6 +117,10 @@ await Application.main(true, async (application) => {
     const genericSettingController = new GenericSettingController(settingsController);
     preparePromises.push(setupGenericSettingController(genericSettingController));
 
+    // Generate theme mode dropdown options from registry BEFORE controller init
+    const themeModeSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('theme-mode-select'));
+    populateThemeModeSelect(themeModeSelect);
+
     const audioController = new AudioController(settingsController, modalController);
     preparePromises.push(audioController.prepare());
 
@@ -185,4 +190,42 @@ await Application.main(true, async (application) => {
     await Promise.all(preparePromises);
 
     document.documentElement.dataset.loaded = 'true';
+
+    // Theme mode UI state management
+    const shadowSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('shadow-theme-select'));
+    /** @type {string|null} */
+    let previousShadowValue = null;
+
+    /**
+     * Updates the UI state based on the selected theme mode.
+     * @param {boolean} [dispatchChange] Whether to dispatch a change event on the shadow select.
+     */
+    function updateThemeModeUI(dispatchChange = true) {
+        const theme = getThemeById(themeModeSelect?.value ?? '');
+        const disableShadow = theme?.constraints?.disableShadow ?? false;
+        if (shadowSelect) {
+            if (disableShadow) {
+                if (shadowSelect.value !== 'none') {
+                    previousShadowValue = shadowSelect.value;
+                }
+                shadowSelect.value = 'none';
+                shadowSelect.disabled = true;
+                if (dispatchChange) {
+                    shadowSelect.dispatchEvent(new Event('change', {bubbles: true}));
+                }
+            } else {
+                shadowSelect.disabled = false;
+                if (previousShadowValue && previousShadowValue !== 'none') {
+                    shadowSelect.value = previousShadowValue;
+                    previousShadowValue = null;
+                    if (dispatchChange) {
+                        shadowSelect.dispatchEvent(new Event('change', {bubbles: true}));
+                    }
+                }
+            }
+        }
+    }
+
+    themeModeSelect?.addEventListener('change', () => updateThemeModeUI(true));
+    updateThemeModeUI(false);
 });

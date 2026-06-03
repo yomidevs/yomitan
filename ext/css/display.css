@@ -151,6 +151,9 @@
     --tag-search-background-color: #8a8a91;
     --tag-pronunciation-dictionary-background-color: #6640be;
 
+    --tag-muted-background-color: #8a8a91;
+    --tag-accent-background-color: #b6327a;
+
     --sidebar-background-color: #f8f9fa;
 
     --sidebar-button-background-color: transparent;
@@ -218,6 +221,9 @@
     --tag-part-of-speech-background-color: #565656;
     --tag-search-background-color: #69696e;
     --tag-pronunciation-dictionary-background-color: #6640be;
+
+    --tag-muted-background-color: #69696e;
+    --tag-accent-background-color: #992a67;
 
     --sidebar-background-color: #282828;
 
@@ -792,7 +798,7 @@ button.action-button:active:not(:disabled) {
 
 /* Tags */
 .tag {
-    --tag-color: var(--tag-default-background-color);
+    --tag-color: var(--tag-muted-background-color);
 
     display: inline-flex;
     flex-flow: row nowrap;
@@ -855,7 +861,7 @@ button.action-button:active:not(:disabled) {
     border-bottom-right-radius: 0;
 }
 .tag[data-category=name] {
-    --tag-color: var(--tag-name-background-color);
+    --tag-color: var(--tag-accent-background-color);
 }
 .tag[data-category=expression] {
     --tag-color: var(--tag-expression-background-color);
@@ -879,7 +885,7 @@ button.action-button:active:not(:disabled) {
     --tag-color: var(--tag-part-of-speech-background-color);
 }
 .tag[data-category=search] {
-    --tag-color: var(--tag-search-background-color);
+    --tag-color: var(--tag-muted-background-color);
 }
 .tag[data-category=pronunciation-dictionary] {
     --tag-color: var(--tag-pronunciation-dictionary-background-color);

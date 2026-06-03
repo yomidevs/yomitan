@@ -45,6 +45,7 @@ Yomitan provides powerful features not available in other browser-based dictiona
 - Anki Integration
   - 🔧 [Anki handlebar templates](./docs/templates.md)
 - Advanced Features
+  - 🎨 [Creating themes](./docs/theming.md)
 - Troubleshooting
   - 🕷️ [Known browser bugs](./docs/browser-bugs.md)
 

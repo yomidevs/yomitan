@@ -1,0 +1,143 @@
+/*
+ * Copyright (C) 2023-2026  Yomitan Authors
+ * Copyright (C) 2016-2022  Yomichan Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/* ===== E-INK THEME: STRIP ALL MOTION AND DEPTH ===== */
+/* Targeted selectors — NOT universal * */
+:root[data-theme-mode='eink'] .entry,
+:root[data-theme-mode='eink'] .tag,
+:root[data-theme-mode='eink'] button,
+:root[data-theme-mode='eink'] .popup-menu,
+:root[data-theme-mode='eink'] .sidebar-button,
+:root[data-theme-mode='eink'] .action-button,
+:root[data-theme-mode='eink'] .progress-bar-indeterminant {
+    transition: none;
+    box-shadow: none;
+    text-shadow: none;
+    /* stylelint-disable-next-line declaration-no-important */
+    animation-duration: 0s !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    animation-delay: 0s !important;
+}
+
+/* ===== E-INK THEME: INNER CONTENT (Light) ===== */
+:root[data-theme-mode='eink'][data-theme='light'] {
+    --text-color: #000000;
+    --text-color-light1: #000000;
+    --text-color-light2: #000000;
+    --text-color-light3: #000000;
+    --text-color-light4: #000000;
+    --background-color: #ffffff;
+    --background-color-light: #ffffff;
+    --background-color-dark1: #ffffff;
+    --accent-color: #000000;
+    --link-color: #000000;
+    --sidebar-background-color: #ffffff;
+    --light-border-color: #000000;
+    --medium-border-color: #000000;
+    --dark-border-color: #000000;
+    --tag-text-color: #000000;
+    --tag-border-color: #000000;
+}
+
+/* ===== E-INK THEME: INNER CONTENT (Dark) ===== */
+:root[data-theme-mode='eink'][data-theme='dark'] {
+    --text-color: #ffffff;
+    --text-color-light1: #ffffff;
+    --text-color-light2: #ffffff;
+    --text-color-light3: #ffffff;
+    --text-color-light4: #ffffff;
+    --background-color: #000000;
+    --background-color-light: #000000;
+    --background-color-dark1: #000000;
+    --accent-color: #ffffff;
+    --link-color: #ffffff;
+    --sidebar-background-color: #000000;
+    --light-border-color: #ffffff;
+    --medium-border-color: #ffffff;
+    --dark-border-color: #ffffff;
+    --tag-text-color: #ffffff;
+    --tag-border-color: #ffffff;
+}
+
+/* ===== E-INK THEME: TAGS AS OUTLINED BOXES ===== */
+/* High specificity, no !important needed */
+:root[data-theme-mode='eink'] .tag {
+    --tag-color: transparent;
+    background-color: transparent;
+    border: 1px solid currentColor;
+    border-radius: 0;
+}
+:root[data-theme-mode='eink'] .tag-label {
+    background-color: transparent;
+    color: inherit;
+}
+:root[data-theme-mode='eink'] .tag-body::before {
+    display: none;
+}
+
+/* Remove borders from tag inner elements to prevent double-bordering */
+:root[data-theme-mode='eink'] .tag-label,
+:root[data-theme-mode='eink'] .tag-body {
+    border: none;
+}
+
+/* Remove border from nested frequency tags to prevent double-bordering in grouped modes */
+:root[data-theme-mode='eink'] .frequency-group-tag .frequency-tag {
+    border: none;
+}
+
+/* ===== E-INK THEME: REMOVE ALL ROUNDING ===== */
+:root[data-theme-mode='eink'] .entry,
+:root[data-theme-mode='eink'] .tag,
+:root[data-theme-mode='eink'] button,
+:root[data-theme-mode='eink'] input,
+:root[data-theme-mode='eink'] .popup-menu {
+    border-radius: 0;
+}
+
+/* ===== E-INK THEME: ENTRY SEPARATION ===== */
+:root[data-theme-mode='eink'] .entry+.entry {
+    border-top: 1px solid currentColor;
+}
+
+/* ===== E-INK THEME: IMAGE FILTERS ===== */
+:root[data-theme-mode='eink'] .gloss-image {
+    filter: none;
+}
+
+/* ===== E-INK THEME: SCROLLBAR ===== */
+:root[data-theme-mode='eink'] ::-webkit-scrollbar-thumb {
+    background-color: currentColor;
+}
+:root[data-theme-mode='eink'] ::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* ===== E-INK THEME: OUTER CHROME ===== */
+iframe.yomitan-popup[data-theme-mode='eink'] {
+    --popup-border-radius: 0;
+    --popup-border-width: 1px;
+    --popup-border-color: #000000;
+    --popup-box-shadow: none;
+    --popup-background-color: #ffffff;
+}
+
+iframe.yomitan-popup[data-theme-mode='eink'][data-theme='dark'] {
+    --popup-border-color: #ffffff;
+    --popup-background-color: #000000;
+}
