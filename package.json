@@ -112,15 +112,17 @@
         "vitest": "^3.0.9"
     },
     "dependencies": {
+        "@bokuweb/zstd-wasm": "^0.0.27",
         "@resvg/resvg-wasm": "^2.6.2",
+        "@sqlite.org/sqlite-wasm": "^3.51.2-build6",
         "@zip.js/zip.js": "^2.7.54",
         "dexie": "^4.0.10",
         "dexie-export-import": "^4.1.4",
         "hangul-js": "^0.2.6",
         "kanji-processor": "^1.0.2",
+        "linkedom": "^0.18.10",
         "parse5": "^7.2.1",
-        "yomitan-handlebars": "git+https://github.com/yomidevs/yomitan-handlebars.git#12aff5e3550954d7d3a98a5917ff7d579f3cce25",
-        "linkedom": "^0.18.10"
+        "yomitan-handlebars": "git+https://github.com/yomidevs/yomitan-handlebars.git#12aff5e3550954d7d3a98a5917ff7d579f3cce25"
     },
     "lint-staged": {
         "*.md": "prettier --write"
