@@ -432,22 +432,18 @@ export class Translator {
             patternTextLengths.push(patternTextLengths[patternTextLengths.length - 1] + character.length);
         }
         return (text) => {
-            const textChars = [...text];
-            if (textChars.length > patternChars.length) {
-                return 0;
+            let matchedCount = 0;
+            for (const character of text) {
+                if (matchedCount >= patternChars.length) {
+                    return 0; // candidate has more characters than the pattern
+                }
+                const patternCharacter = patternChars[matchedCount];
+                if (patternCharacter !== character && !triggerSet.has(patternCharacter)) {
+                    return 0; // literal mismatch
+                }
+                ++matchedCount;
             }
-            for (let i = 0; i < patternChars.length; ++i) {
-                if (i >= textChars.length) {
-                    return patternTextLengths[textChars.length];
-                }
-                if (triggerSet.has(patternChars[i])) {
-                    continue;
-                }
-                if (patternChars[i] !== textChars[i]) {
-                    return 0;
-                }
-            }
-            return patternTextLengths[textChars.length];
+            return patternTextLengths[matchedCount];
         };
     }
 
