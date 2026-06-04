@@ -133,6 +133,15 @@ describe('Fuseji lookup', () => {
         expect(dictionaryEntries.some(({headwords}) => headwords.some(({term}) => term === '打ち込む'))).toBe(true);
     });
 
+    translatorTest('matches masked latin terms', async ({translator}) => {
+        const options = createFindTermsOptions(dictionaryName, optionsPresets, 'default');
+        options.enableFusejiLookup = true;
+
+        const {dictionaryEntries, originalTextLength} = await translator.findTerms('split', 'Eng○ish', options);
+        expect(originalTextLength).toBe(7);
+        expect(dictionaryEntries.some(({headwords}) => headwords.some(({term}) => term === 'English'))).toBe(true);
+    });
+
     translatorTest('bounds the masked word to the first group when a later masked word is in range', async ({translator}) => {
         const options = createFindTermsOptions(dictionaryName, optionsPresets, 'default');
         options.enableFusejiLookup = true;
