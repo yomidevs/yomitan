@@ -310,12 +310,11 @@ export class Translator {
             return {dictionaryEntries: [], originalTextLength: 0};
         }
 
-        const matcher = this._createFusejiPatternMatcher(text, triggerSet);
-        const termKeyFilter = (/** @type {string} */ term) => matcher(term) > 0;
-        // Same pattern in structured form, used to drive the database skip-scan.
+        // Single decomposition of the masked pattern, shared by the in-memory matcher and the database skip-scan.
         /** @type {import('dictionary-database').MaskedPattern} */
         const pattern = {chars: fusejiDetails.characters, isMask: fusejiDetails.characters.map((c) => triggerSet.has(c))};
-
+        const matcher = this._createFusejiPatternMatcher(pattern);
+        const termKeyFilter = (/** @type {string} */ term) => matcher(term) > 0;
 
         // NOTE: inflected masked spans are unsupported. If the mask covers the stem (eg. ◯んでる), visible
         // tail never matches a dictionary-form headword and deinflection doesnt help — the lookup text
@@ -425,14 +424,13 @@ export class Translator {
     }
 
     /**
-     * Builds a matcher function that tests a candidate string against the masked pattern.
+     * Builds a matcher function that tests a candidate string against a masked pattern.
      * Candidates shorter than the pattern are allowed to match a leading portion of it (partial match).
-     * @param {string} patternText The masked text to match against, e.g. `マ◯ド◯ルド`.
-     * @param {Set<string>} triggerSet
+     * @param {import('dictionary-database').MaskedPattern} pattern The decomposed masked pattern, e.g. `マ◯ド◯ルド`.
      * @returns {(text: string) => number} A function returning the matched length in code units, or `0` if the candidate does not fit the pattern.
      */
-    _createFusejiPatternMatcher(patternText, triggerSet) {
-        const patternChars = [...patternText];
+    _createFusejiPatternMatcher(pattern) {
+        const {chars: patternChars, isMask} = pattern;
         const patternTextLengths = [0];
         for (const character of patternChars) {
             patternTextLengths.push(patternTextLengths[patternTextLengths.length - 1] + character.length);
@@ -443,8 +441,7 @@ export class Translator {
                 if (matchedCount >= patternChars.length) {
                     return 0; // candidate has more characters than the pattern
                 }
-                const patternCharacter = patternChars[matchedCount];
-                if (patternCharacter !== character && !triggerSet.has(patternCharacter)) {
+                if (!isMask[matchedCount] && patternChars[matchedCount] !== character) {
                     return 0; // literal mismatch
                 }
                 ++matchedCount;
