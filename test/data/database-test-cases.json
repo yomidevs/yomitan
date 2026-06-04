@@ -222,7 +222,8 @@
       },
       {
         "inputs": [
-          {"maskedText": "○○○ナルド", "triggers": "○", "anchor": "ナルド", "matchType": "suffix", "usePattern": false}
+          {"maskedText": "○○○ナルド", "triggers": "○", "anchor": "ナルド", "matchType": "suffix", "usePattern": false},
+          {"maskedText": "○○○ナルド", "triggers": "○", "anchor": "ナルド", "matchType": "suffix", "usePattern": true}
         ],
         "expectedResults": {
           "total": 1,
