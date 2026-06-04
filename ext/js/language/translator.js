@@ -98,7 +98,7 @@ export class Translator {
         if (fusejiTriggerSet !== null && fusejiTriggerSet.size > 0) {
             const fusejiDetails = this._getFusejiTriggerDetails(text, fusejiTriggerSet);
             if (fusejiDetails.firstTriggerIndex >= 0) {
-                ({dictionaryEntries, originalTextLength} = await this._findFusejiTerms(text, options, fusejiDetails, fusejiTriggerSet, tagAggregator, primaryReading));
+                ({dictionaryEntries, originalTextLength} = await this._findFusejiTerms(text, options, fusejiTriggerSet, tagAggregator, primaryReading));
             }
         }
 
@@ -303,19 +303,61 @@ export class Translator {
      * begins with a trigger), and the candidates are then filtered against the full masked pattern.
      * @param {string} text
      * @param {import('translation').FindTermsOptions} options
-     * @param {{characters: string[], firstTriggerIndex: number, lastTriggerIndex: number}} fusejiDetails The trigger information for `text`, as produced by {@link Translator._getFusejiTriggerDetails}.
      * @param {Set<string>} triggerSet The set of characters treated as single-character wildcards.
      * @param {TranslatorTagAggregator} tagAggregator
      * @param {string} primaryReading
      * @returns {Promise<{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}>}
      */
-    async _findFusejiTerms(text, options, fusejiDetails, triggerSet, tagAggregator, primaryReading) {
+    async _findFusejiTerms(text, options, triggerSet, tagAggregator, primaryReading) {
+        const textVariants = this._getFusejiTextVariants(text, options);
+        /** @type {import('translation-internal').TermDictionaryEntry[]} */
+        const dictionaryEntries = [];
+        let originalTextLength = 0;
+        for (const [variant, textProcessorRuleChainCandidates] of textVariants) {
+            // Preprocessors can move trigger positions, so recompute the span for each variant.
+            const fusejiDetails = this._getFusejiTriggerDetails(variant, triggerSet);
+            if (fusejiDetails.firstTriggerIndex < 0) { continue; }
+            const result = await this._findFusejiTermsForPattern(options, fusejiDetails, triggerSet, textProcessorRuleChainCandidates, tagAggregator, primaryReading);
+            dictionaryEntries.push(...result.dictionaryEntries);
+            originalTextLength = Math.max(originalTextLength, result.originalTextLength);
+        }
+        return {dictionaryEntries, originalTextLength};
+    }
+
+    /**
+     * Returns the raw masked text and all text-preprocessor variants that match the current language.
+     * @param {string} text
+     * @param {import('translation').FindTermsOptions} options
+     * @returns {[string, import('translation-internal').TextProcessorRuleChainCandidate[]][]}
+     * @throws {Error}
+     */
+    _getFusejiTextVariants(text, options) {
+        const {language} = options;
+        const processorsForLanguage = this._textProcessors.get(language);
+        if (typeof processorsForLanguage === 'undefined') { throw new Error(`Unsupported language: ${language}`); }
+        const {textPreprocessors} = processorsForLanguage;
+        /** @type {import('translation-internal').TextCache} */
+        const sourceCache = new Map();
+        return [...this._getTextVariants(text, textPreprocessors, this._getTextReplacementsVariants(options), sourceCache).entries()];
+    }
+
+    /**
+     * Finds dictionary entries for one masked pattern variant.
+     * @param {import('translation').FindTermsOptions} options
+     * @param {{characters: string[], firstTriggerIndex: number, lastTriggerIndex: number}} fusejiDetails The trigger information for the variant, as produced by {@link Translator._getFusejiTriggerDetails}.
+     * @param {Set<string>} triggerSet The set of characters treated as single-character wildcards.
+     * @param {import('translation-internal').TextProcessorRuleChainCandidate[]} textProcessorRuleChainCandidates Used by sorting to prefer direct text over variant text.
+     * @param {TranslatorTagAggregator} tagAggregator
+     * @param {string} primaryReading
+     * @returns {Promise<{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}>}
+     */
+    async _findFusejiTermsForPattern(options, fusejiDetails, triggerSet, textProcessorRuleChainCandidates, tagAggregator, primaryReading) {
         const {prefixLookupText, suffixLookupText} = this._getFusejiLookupTexts(fusejiDetails);
         if (prefixLookupText.length === 0 && suffixLookupText.length === 0) {
             return {dictionaryEntries: [], originalTextLength: 0};
         }
 
-        // Single decomposition of the masked pattern, shared by the in-memory matcher and the database skip-scan.
+        // Reuse the same masked pattern for the database filter and the in-memory matcher.
         /** @type {import('dictionary-database').MaskedPattern} */
         const pattern = {chars: fusejiDetails.characters, isMask: fusejiDetails.characters.map((c) => triggerSet.has(c))};
         const matcher = this._createFusejiPatternMatcher(pattern);
@@ -329,10 +371,10 @@ export class Translator {
         /** @type {import('translation-internal').TermDictionaryEntry[]} */
         let dictionaryEntries = [];
         if (prefixLookupText.length > 0) {
-            ({dictionaryEntries} = await this._findFusejiTermsForAnchor(prefixLookupText, 'prefix', options, tagAggregator, primaryReading, termKeyFilter, pattern));
+            ({dictionaryEntries} = await this._findFusejiTermsForAnchor(prefixLookupText, 'prefix', options, textProcessorRuleChainCandidates, tagAggregator, primaryReading, termKeyFilter, pattern));
         } else {
             for (const lookupText of this._getFusejiSuffixLookupTexts(suffixLookupText)) {
-                ({dictionaryEntries} = await this._findFusejiTermsForAnchor(lookupText, 'suffix', options, tagAggregator, primaryReading, termKeyFilter, pattern));
+                ({dictionaryEntries} = await this._findFusejiTermsForAnchor(lookupText, 'suffix', options, textProcessorRuleChainCandidates, tagAggregator, primaryReading, termKeyFilter, pattern));
                 if (dictionaryEntries.length > 0) { break; }
             }
         }
@@ -346,13 +388,14 @@ export class Translator {
      * @param {string} anchorText The unmasked prefix/suffix to scan for.
      * @param {import('dictionary').TermSourceMatchType} matchType `'prefix'` or `'suffix'`.
      * @param {import('translation').FindTermsOptions} options
+     * @param {import('translation-internal').TextProcessorRuleChainCandidate[]} textProcessorRuleChainCandidates
      * @param {TranslatorTagAggregator} tagAggregator
      * @param {string} primaryReading
      * @param {(term: string) => boolean} termKeyFilter Keeps only records whose term/reading fits the masked pattern.
      * @param {?import('dictionary-database').MaskedPattern} pattern The forward masked pattern, enabling skip-scan for prefix anchors.
      * @returns {Promise<{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}>}
      */
-    async _findFusejiTermsForAnchor(anchorText, matchType, options, tagAggregator, primaryReading, termKeyFilter, pattern) {
+    async _findFusejiTermsForAnchor(anchorText, matchType, options, textProcessorRuleChainCandidates, tagAggregator, primaryReading, termKeyFilter, pattern) {
         const {enabledDictionaryMap} = options;
         const databaseEntries = await this._database.findTermsByMaskedQueryBulk(anchorText, matchType, enabledDictionaryMap, termKeyFilter, pattern);
         for (const entry of databaseEntries) { entry.definitions = entry.definitions.filter((d) => !Array.isArray(d)); }
@@ -360,7 +403,7 @@ export class Translator {
 
         if (matchedEntries.length === 0) { return {dictionaryEntries: [], originalTextLength: 0}; }
 
-        const deinflection = this._createDeinflection(anchorText, anchorText, anchorText, 0, [], []);
+        const deinflection = this._createDeinflection(anchorText, anchorText, anchorText, 0, textProcessorRuleChainCandidates, []);
         deinflection.databaseEntries = matchedEntries;
         return this._getDictionaryEntries([deinflection], enabledDictionaryMap, tagAggregator, primaryReading);
     }
@@ -417,10 +460,16 @@ export class Translator {
         for (const dictionaryEntry of dictionaryEntries) {
             for (const headword of dictionaryEntry.headwords) {
                 const candidates = headword.reading.length === 0 ? [headword.term] : [headword.term, headword.reading];
-                const matchLength = Math.max(...candidates.map(matcher));
-                if (matchLength > 0) {
-                    originalTextLength = Math.max(originalTextLength, matchLength);
-                    matchedDictionaryEntries.push({...dictionaryEntry, maxOriginalTextLength: Math.max(dictionaryEntry.maxOriginalTextLength, matchLength)});
+                let best = 0;
+                for (const candidate of candidates) {
+                    best = Math.max(best, matcher(candidate));
+                }
+                if (best > 0) {
+                    originalTextLength = Math.max(originalTextLength, best);
+                    matchedDictionaryEntries.push({
+                        ...dictionaryEntry,
+                        maxOriginalTextLength: Math.max(dictionaryEntry.maxOriginalTextLength, best),
+                    });
                     break;
                 }
             }

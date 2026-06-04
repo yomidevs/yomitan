@@ -102,8 +102,31 @@ describe('Fuseji lookup', () => {
         const {dictionaryEntries, originalTextLength} = await translator.findTerms('split', 'マ○ドナ○ドに行きたい', options);
         expect(originalTextLength).toBe(6);
         expect(dictionaryEntries.length).toBeGreaterThan(1);
-        expect(dictionaryEntries[0].headwords.some(({term}) => term === 'マクドナルド')).toBe(true);
-        expect(dictionaryEntries.some(({headwords}) => headwords.some(({term}) => term === 'マギ'))).toBe(true);
+        expect(dictionaryEntries[0].maxOriginalTextLength).toBe(6);
+        const macdonaldIndex = dictionaryEntries.findIndex(({headwords}) => headwords.some(({term}) => term === 'マクドナルド'));
+        const magiIndex = dictionaryEntries.findIndex(({headwords}) => headwords.some(({term}) => term === 'マギ'));
+        expect(macdonaldIndex).toBeGreaterThanOrEqual(0);
+        expect(magiIndex).toBeGreaterThan(macdonaldIndex);
+    });
+
+    translatorTest('aggregates matches across preprocessor variants and ranks shorter partials last', async ({translator}) => {
+        const options = createFindTermsOptions(dictionaryName, optionsPresets, 'default');
+        options.enableFusejiLookup = true;
+
+        const {dictionaryEntries, originalTextLength} = await translator.findTerms('split', 'ま○どなるど', options);
+        expect(originalTextLength).toBe(6);
+        expect(dictionaryEntries[0].maxOriginalTextLength).toBe(6);
+
+        const hiraganaIndex = dictionaryEntries.findIndex(({headwords}) => headwords.some(({term}) => term === 'まくどなるど'));
+        const katakanaIndex = dictionaryEntries.findIndex(({headwords}) => headwords.some(({term}) => term === 'マクドナルド'));
+        const magiIndex = dictionaryEntries.findIndex(({headwords}) => headwords.some(({term}) => term === 'マギ'));
+
+        expect(hiraganaIndex).toBeGreaterThanOrEqual(0);
+        expect(katakanaIndex).toBeGreaterThanOrEqual(0);
+        expect(magiIndex).toBeGreaterThanOrEqual(0);
+        expect(magiIndex).toBeGreaterThan(hiraganaIndex);
+        expect(magiIndex).toBeGreaterThan(katakanaIndex);
+        expect(hiraganaIndex).toBeLessThan(katakanaIndex);
     });
 
     translatorTest('finds terms with leading fuseji triggers', async ({translator}) => {

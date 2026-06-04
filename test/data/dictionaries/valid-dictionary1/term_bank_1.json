@@ -356,5 +356,6 @@
     ["マ", "マ", "n", "n", 1, ["ma definition"], 200, ""],
     ["マギ", "マギ", "n", "n", 1, ["magi definition"], 202, ""],
     ["マキマ", "マキマ", "n", "n", 1, ["makima definition"], 203, ""],
-    ["マクドナルド", "マクドナルド", "n", "n", 1, ["makudonarudo definition"], 201, ""]
+    ["マクドナルド", "マクドナルド", "n", "n", 1, ["makudonarudo definition"], 201, ""],
+    ["まくどなるど", "まくどなるど", "n", "n", 1, ["makudonarudo hiragana definition"], 204, ""]
 ]
