@@ -18,7 +18,7 @@
 
 import {safePerformance} from '../core/safe-performance.js';
 import {applyTextReplacement} from '../general/regex-util.js';
-import {isCodePointJapanese} from './ja/japanese.js';
+import {isCodePointJapanese, isCodePointKana, isCodePointKanji} from './ja/japanese.js';
 import {isCodePointKorean} from './ko/korean.js';
 import {LanguageTransformer} from './language-transformer.js';
 import {getAllLanguageReadingNormalizers, getAllLanguageTextProcessors} from './languages.js';
@@ -278,16 +278,22 @@ export class Translator {
      * @returns {{characters: string[], firstTriggerIndex: number, lastTriggerIndex: number}} -1 for indexes if not present.
      */
     _getFusejiTriggerDetails(text, triggerSet) {
-        const characters = [...text];
+        const allCharacters = [...text];
         let firstTriggerIndex = -1;
         let lastTriggerIndex = -1;
-        for (let i = 0; i < characters.length; ++i) {
-            if (!triggerSet.has(characters[i])) { continue; }
-            if (firstTriggerIndex < 0) {
-                firstTriggerIndex = i;
+        let end = 0;
+        for (; end < allCharacters.length; ++end) {
+            const character = allCharacters[end];
+            if (triggerSet.has(character)) {
+                if (firstTriggerIndex < 0) { firstTriggerIndex = end; }
+                lastTriggerIndex = end;
+                continue;
             }
-            lastTriggerIndex = i;
+            const codePoint = character.codePointAt(0) ?? 0;
+            // stops at functuations etc
+            if (!isCodePointKana(codePoint) && !isCodePointKanji(codePoint)) { break; }
         }
+        const characters = allCharacters.slice(0, end);
         return {characters, firstTriggerIndex, lastTriggerIndex};
     }
 
@@ -327,7 +333,7 @@ export class Translator {
             ({dictionaryEntries} = await this._findFusejiTermsForAnchor(prefixLookupText, 'prefix', options, tagAggregator, primaryReading, termKeyFilter, pattern));
         } else {
             for (const lookupText of this._getFusejiSuffixLookupTexts(suffixLookupText)) {
-                ({dictionaryEntries} = await this._findFusejiTermsForAnchor(lookupText, 'suffix', options, tagAggregator, primaryReading, termKeyFilter, null));
+                ({dictionaryEntries} = await this._findFusejiTermsForAnchor(lookupText, 'suffix', options, tagAggregator, primaryReading, termKeyFilter, pattern));
                 if (dictionaryEntries.length > 0) { break; }
             }
         }
