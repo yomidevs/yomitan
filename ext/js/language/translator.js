@@ -18,7 +18,7 @@
 
 import {safePerformance} from '../core/safe-performance.js';
 import {applyTextReplacement} from '../general/regex-util.js';
-import {isCodePointJapanese, isCodePointKana, isCodePointKanji} from './ja/japanese.js';
+import {isCodePointJapanese} from './ja/japanese.js';
 import {isCodePointKorean} from './ko/korean.js';
 import {LanguageTransformer} from './language-transformer.js';
 import {getAllLanguageReadingNormalizers, getAllLanguageTextProcessors} from './languages.js';
@@ -289,9 +289,8 @@ export class Translator {
                 lastTriggerIndex = end;
                 continue;
             }
-            const codePoint = character.codePointAt(0) ?? 0;
-            // stops at functuations etc
-            if (!isCodePointKana(codePoint) && !isCodePointKanji(codePoint)) { break; }
+            // stops at word delimitors (punctuation/space/symbol).
+            if (!/[\p{L}\p{N}\p{M}]/u.test(character)) { break; }
         }
         const characters = allCharacters.slice(0, end);
         return {characters, firstTriggerIndex, lastTriggerIndex};
