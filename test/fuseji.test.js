@@ -33,6 +33,22 @@ const translatorTest = await createTranslatorTest(void 0, path.join(dirname, 'da
 const {optionsPresets} = parseJson(readFileSync(path.join(dirname, 'data/translator-test-inputs.json'), {encoding: 'utf8'}));
 
 describe('Fuseji lookup', () => {
+    /**
+     * @param {import('dictionary').TermDictionaryEntry[]} dictionaryEntries
+     * @returns {{total: number, unique: number}}
+     */
+    function countDefinitionIds(dictionaryEntries) {
+        const ids = new Set();
+        let total = 0;
+        for (const {definitions} of dictionaryEntries) {
+            for (const {id} of definitions) {
+                ++total;
+                ids.add(id);
+            }
+        }
+        return {total, unique: ids.size};
+    }
+
     translatorTest('does not find fuseji terms when disabled', async ({translator}) => {
         const options = createFindTermsOptions(dictionaryName, optionsPresets, 'default');
 
@@ -116,6 +132,8 @@ describe('Fuseji lookup', () => {
         const {dictionaryEntries, originalTextLength} = await translator.findTerms('split', 'ま○どなるど', options);
         expect(originalTextLength).toBe(6);
         expect(dictionaryEntries[0].maxOriginalTextLength).toBe(6);
+        const definitionIds = countDefinitionIds(dictionaryEntries);
+        expect(definitionIds.unique).toBe(definitionIds.total);
 
         const hiraganaIndex = dictionaryEntries.findIndex(({headwords}) => headwords.some(({term}) => term === 'まくどなるど'));
         const katakanaIndex = dictionaryEntries.findIndex(({headwords}) => headwords.some(({term}) => term === 'マクドナルド'));
@@ -127,6 +145,23 @@ describe('Fuseji lookup', () => {
         expect(magiIndex).toBeGreaterThan(hiraganaIndex);
         expect(magiIndex).toBeGreaterThan(katakanaIndex);
         expect(hiraganaIndex).toBeLessThan(katakanaIndex);
+    });
+
+    translatorTest('deduplicates repeated rows across text variants', async ({translator}) => {
+        const options = createFindTermsOptions(dictionaryName, optionsPresets, 'default');
+        options.enableFusejiLookup = true;
+        options.textReplacements = [
+            null,
+            [
+                {pattern: /打/g, replacement: 'う'},
+                {pattern: /込/g, replacement: 'こ'},
+            ],
+        ];
+
+        const {dictionaryEntries} = await translator.findTerms('split', '打〇込む', options);
+        const definitionIds = countDefinitionIds(dictionaryEntries);
+        expect(definitionIds.total).toBeGreaterThan(0);
+        expect(definitionIds.unique).toBe(definitionIds.total);
     });
 
     translatorTest('finds terms with leading fuseji triggers', async ({translator}) => {

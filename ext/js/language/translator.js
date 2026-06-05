@@ -312,15 +312,43 @@ export class Translator {
         const textVariants = this._getFusejiTextVariants(text, options);
         /** @type {import('translation-internal').TermDictionaryEntry[]} */
         const dictionaryEntries = [];
+        /** @type {Map<number, import('translation-internal').TermDictionaryEntry>} */
+        const dictionaryEntryMap = new Map();
         let originalTextLength = 0;
         for (const [variant, textProcessorRuleChainCandidates] of textVariants) {
             // Preprocessors can move trigger positions, so recompute the span for each variant.
             const fusejiDetails = this._getFusejiTriggerDetails(variant, triggerSet);
             if (fusejiDetails.firstTriggerIndex < 0) { continue; }
             const result = await this._findFusejiTermsForPattern(options, fusejiDetails, triggerSet, textProcessorRuleChainCandidates, tagAggregator, primaryReading);
-            dictionaryEntries.push(...result.dictionaryEntries);
+            for (const dictionaryEntry of result.dictionaryEntries) {
+                const definitionId = dictionaryEntry.definitions[0]?.id;
+                if (typeof definitionId !== 'number') {
+                    dictionaryEntries.push(dictionaryEntry);
+                    continue;
+                }
+
+                const existingEntry = dictionaryEntryMap.get(definitionId);
+                if (typeof existingEntry === 'undefined') {
+                    dictionaryEntryMap.set(definitionId, dictionaryEntry);
+                    continue;
+                }
+
+                const existingTextProcessorChainLength = this._getShortestTextProcessingChainLength(existingEntry.textProcessorRuleChainCandidates);
+                const newTextProcessorChainLength = this._getShortestTextProcessingChainLength(dictionaryEntry.textProcessorRuleChainCandidates);
+                const shouldReplace =
+                    dictionaryEntry.maxOriginalTextLength > existingEntry.maxOriginalTextLength ||
+                    (dictionaryEntry.maxOriginalTextLength === existingEntry.maxOriginalTextLength && newTextProcessorChainLength < existingTextProcessorChainLength);
+
+                if (shouldReplace) {
+                    this._mergeFusejiDictionaryEntries(dictionaryEntry, existingEntry);
+                    dictionaryEntryMap.set(definitionId, dictionaryEntry);
+                } else {
+                    this._mergeFusejiDictionaryEntries(existingEntry, dictionaryEntry);
+                }
+            }
             originalTextLength = Math.max(originalTextLength, result.originalTextLength);
         }
+        dictionaryEntries.push(...dictionaryEntryMap.values());
         return {dictionaryEntries, originalTextLength};
     }
 
@@ -475,6 +503,18 @@ export class Translator {
             }
         }
         return {dictionaryEntries: matchedDictionaryEntries, originalTextLength};
+    }
+
+    /**
+     * @param {import('translation-internal').TermDictionaryEntry} target
+     * @param {import('translation-internal').TermDictionaryEntry} source
+     */
+    _mergeFusejiDictionaryEntries(target, source) {
+        target.isPrimary ||= source.isPrimary;
+        target.maxOriginalTextLength = Math.max(target.maxOriginalTextLength, source.maxOriginalTextLength);
+        target.sourceTermExactMatchCount = Math.max(target.sourceTermExactMatchCount, source.sourceTermExactMatchCount);
+        this._mergeTextProcessorRuleChains(target, source.textProcessorRuleChainCandidates);
+        this._mergeInflectionRuleChains(target, source.inflectionRuleChainCandidates);
     }
 
     /**
