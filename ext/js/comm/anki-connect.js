@@ -517,20 +517,12 @@ export class AnkiConnect {
      * @returns {Promise<unknown[]>}
      */
     async _invokeMulti(actions) {
-        if (this._apiKey !== null) {
-            const modifiedActions = actions.map((action) => ({...action, key: this._apiKey}));
-            const result = await this._invoke('multi', {actions: modifiedActions});
-            if (!Array.isArray(result)) {
-                throw this._createUnexpectedResultError('array', result);
-            }
-            return result;
-        } else {
-            const result = await this._invoke('multi', {actions: actions});
-            if (!Array.isArray(result)) {
-                throw this._createUnexpectedResultError('array', result);
-            }
-            return result;
+        const modifiedActions = this._apiKey !== null ? actions.map((action) => ({...action, key: this._apiKey})) : actions;
+        const result = await this._invoke('multi', {actions: modifiedActions});
+        if (!Array.isArray(result)) {
+            throw this._createUnexpectedResultError('array', result);
         }
+        return result;
     }
 
     /**
