@@ -29,7 +29,7 @@
         "ipa": 1
       },
       "terms": {
-        "total": 38
+        "total": 43
       }
     }
   },
@@ -38,7 +38,7 @@
       {
         "kanji": 2,
         "kanjiMeta": 6,
-        "terms": 38,
+        "terms": 43,
         "termMeta": 40,
         "tagMeta": 15,
         "media": 6
@@ -47,7 +47,7 @@
     "total": {
       "kanji": 2,
       "kanjiMeta": 6,
-      "terms": 38,
+      "terms": 43,
       "termMeta": 40,
       "tagMeta": 15,
       "media": 6
@@ -177,6 +177,64 @@
             "matchType": "exact",
             "termList": []
           }
+        ],
+        "expectedResults": {
+          "total": 0,
+          "terms": [],
+          "readings": []
+        }
+      }
+    ],
+    "findTermsByMaskedQueryBulk": [
+      {
+        "inputs": [
+          {"maskedText": "マ○ド○ルド", "triggers": "○", "anchor": "マ", "matchType": "prefix", "usePattern": true},
+          {"maskedText": "マ○ド○ルド", "triggers": "○", "anchor": "マ", "matchType": "prefix", "usePattern": false}
+        ],
+        "expectedResults": {
+          "total": 3,
+          "terms": [["マ", 1], ["マギ", 1], ["マクドナルド", 1], ["マキマ", 0]],
+          "readings": [],
+          "matchTypes": [["exact", 1], ["prefix", 2]],
+          "matchSources": [["term", 3]]
+        }
+      },
+      {
+        "inputs": [
+          {"maskedText": "マ○", "triggers": "○", "anchor": "マ", "matchType": "prefix", "usePattern": true}
+        ],
+        "expectedResults": {
+          "total": 2,
+          "terms": [["マ", 1], ["マギ", 1], ["マキマ", 0], ["マクドナルド", 0]],
+          "readings": []
+        }
+      },
+      {
+        "inputs": [
+          {"maskedText": "う○こむ", "triggers": "○", "anchor": "う", "matchType": "prefix", "usePattern": true}
+        ],
+        "expectedResults": {
+          "total": 4,
+          "terms": [["打ち込む", 2], ["打つ", 2]],
+          "readings": [["うちこむ", 2], ["うつ", 2]],
+          "matchSources": [["reading", 4], ["term", 0]]
+        }
+      },
+      {
+        "inputs": [
+          {"maskedText": "○○○ナルド", "triggers": "○", "anchor": "ナルド", "matchType": "suffix", "usePattern": false},
+          {"maskedText": "○○○ナルド", "triggers": "○", "anchor": "ナルド", "matchType": "suffix", "usePattern": true}
+        ],
+        "expectedResults": {
+          "total": 1,
+          "terms": [["マクドナルド", 1]],
+          "readings": [],
+          "matchTypes": [["suffix", 1]]
+        }
+      },
+      {
+        "inputs": [
+          {"maskedText": "ゑ○", "triggers": "○", "anchor": "ゑ", "matchType": "prefix", "usePattern": true}
         ],
         "expectedResults": {
           "total": 0,

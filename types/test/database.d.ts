@@ -16,7 +16,7 @@
  */
 
 import type {Summary} from '../ext/dictionary-importer';
-import type {Tag, MatchType, TermMetaType, KanjiMetaType, TermExactRequest, DictionaryCounts} from '../ext/dictionary-database';
+import type {Tag, MatchType, MatchSource, TermMetaType, KanjiMetaType, TermExactRequest, DictionaryCounts} from '../ext/dictionary-database';
 
 export type DatabaseTestData = {
     expectedSummary: Summary;
@@ -26,6 +26,7 @@ export type DatabaseTestData = {
         findTermsExactBulk: FindTermsExactBulkTestCase[];
         findTermsBySequenceBulk: FindTermsBySequenceBulkTestCase[];
         findTermMetaBulk: FindTermMetaBulkTestCase[];
+        findTermsByMaskedQueryBulk: FindTermsByMaskedQueryBulkTestCase[];
         findKanjiBulk: FindKanjiBulkTestCase[];
         findKanjiMetaBulk: FindKanjiMetaBulkTestCase[];
         findTagForTitle: FindTagForTitleTestCase[];
@@ -75,6 +76,23 @@ export type FindTermMetaBulkTestCase = {
     expectedResults: {
         total: number;
         modes: ItemCount<TermMetaType>[];
+    };
+};
+
+export type FindTermsByMaskedQueryBulkTestCase = {
+    inputs: {
+        maskedText: string;
+        triggers: string;
+        anchor: string;
+        matchType: MatchType;
+        usePattern: boolean;
+    }[];
+    expectedResults: {
+        total: number;
+        terms: ItemCount<string>[];
+        readings: ItemCount<string>[];
+        matchTypes?: ItemCount<MatchType>[];
+        matchSources?: ItemCount<MatchSource>[];
     };
 };
 
