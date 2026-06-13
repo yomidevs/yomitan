@@ -69,6 +69,7 @@ export type ParseTextSegment = {
         reading: string;
         sources: Dictionary.TermSource[];
         frequencies: Dictionary.TermFrequency[];
+        pronunciations: Dictionary.TermPronunciation[];
     }[][];
 };
 
