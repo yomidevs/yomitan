@@ -588,6 +588,7 @@ export class OptionsUtil {
             this._updateVersion74,
             this._updateVersion75,
             this._updateVersion76,
+            this._updateVersion77,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1849,6 +1850,14 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.general.popupFullWidthPosition = 'bottom';
         }
+    }
+
+    /**
+     *  - Add {url-plain} handlebar
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion77(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v77.handlebars');
     }
 
     /**

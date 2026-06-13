@@ -237,6 +237,10 @@
     <a href="{{definition.url}}">{{definition.url}}</a>
 {{~/inline~}}
 
+{{~#*inline "url-plain"~}}
+    {{definition.url}}
+{{~/inline~}}
+
 {{#*inline "screenshot"}}
     {{~#if (hasMedia "screenshot")~}}
         <img src="{{getMedia "screenshot"}}" />
