@@ -81,8 +81,7 @@ export class AudioSystem extends EventDispatcher {
      * @returns {Promise<HTMLAudioElement|WebAudioLocalAudio>}
      */
     async createAudio(url, sourceType) {
-        if (isLocalhostUrl(url)) {
-            if (!this._api) { throw new Error('Backend API not available'); }
+        if (isLocalhostUrl(url) && this._api) {
             /** @type {{data: string, contentType: string}|null} */
             const response = await this._api.fetchLocalAudioData(url);
 
