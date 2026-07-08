@@ -51,10 +51,6 @@ export class WebAudioLocalAudio {
         this._gainNode = null;
         /** @type {?AudioBuffer} */
         this._decodedBuffer = null;
-        /** @type {?Error} */
-        this._error = null;
-        /** @type {?(() => void)} */
-        this._errorCallback = null;
     }
 
     /** @type {number} */
@@ -72,9 +68,6 @@ export class WebAudioLocalAudio {
 
     /** @type {number} */
     get duration() { return this._decodedBuffer ? this._decodedBuffer.duration : 0; }
-
-    /** @type {?Error} */
-    get error() { return this._error; }
 
     /** */
     async prepare() {
