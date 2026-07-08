@@ -17,6 +17,7 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
+import {isLocalhostUrl} from '../core/utilities.js';
 import {TextToSpeechAudio} from './text-to-speech-audio.js';
 import {WebAudioLocalAudio} from './web-audio-local-audio.js';
 
@@ -74,7 +75,7 @@ export class AudioSystem extends EventDispatcher {
      * @returns {Promise<HTMLAudioElement|WebAudioLocalAudio>}
      */
     async createAudio(url, sourceType) {
-        if (this._isLocalUrl(url)) {
+        if (isLocalhostUrl(url)) {
             /** @type {{success: boolean, data?: string, contentType?: string, error?: string}|undefined} */
             const response = await chrome.runtime.sendMessage({
                 type: 'FETCH_LOCAL_AUDIO_DATA',
@@ -149,19 +150,6 @@ export class AudioSystem extends EventDispatcher {
             }
             default:
                 return true;
-        }
-    }
-
-    /**
-     * @param {string} url
-     * @returns {boolean}
-     */
-    _isLocalUrl(url) {
-        try {
-            const {hostname} = new URL(url);
-            return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
-        } catch (e) {
-            return false;
         }
     }
 
