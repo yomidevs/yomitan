@@ -89,9 +89,9 @@ export class AudioSystem extends EventDispatcher {
                 throw new Error('Failed to fetch local audio from background context');
             }
 
-            const audio = new WebAudioLocalAudio(response.data, response.contentType || 'audio/mpeg');
-            await this._waitForData(audio);
-            return audio;
+            const localAudio = new WebAudioLocalAudio(response.data, response.contentType || 'audio/mpeg');
+            await localAudio.prepare();
+            return localAudio;
         }
 
         const audio = new Audio(url);
@@ -126,7 +126,7 @@ export class AudioSystem extends EventDispatcher {
     }
 
     /**
-     * @param {HTMLAudioElement|WebAudioLocalAudio} audio
+     * @param {HTMLAudioElement} audio
      * @returns {Promise<void>}
      */
     _waitForData(audio) {

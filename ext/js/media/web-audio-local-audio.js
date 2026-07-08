@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {toError} from '../core/to-error.js';
 
 /** @type {?AudioContext} */
 let sharedAudioContext = null;
@@ -44,8 +43,8 @@ export class WebAudioLocalAudio {
         this._volume = 1;
         /** @type {number} */
         this._currentTime = 0;
-        /** @type {?AudioContext} */
-        this._audioContext = null;
+        /** @type {AudioContext} */
+        this._audioContext = getSharedAudioContext();
         /** @type {?AudioBufferSourceNode} */
         this._bufferSource = null;
         /** @type {?GainNode} */
@@ -77,41 +76,16 @@ export class WebAudioLocalAudio {
     /** @type {?Error} */
     get error() { return this._error; }
 
-    /**
-     * @param {string} event
-     * @param {() => void} callback
-     */
-    addEventListener(event, callback) {
-        if (event === 'loadeddata') {
-            try {
-                this._audioContext = getSharedAudioContext();
-
-                const byteCharacters = atob(this._base64Data);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-
-                void this._audioContext.decodeAudioData(
-                    /** @type {ArrayBuffer} */ (byteArray.buffer),
-                    (buffer) => {
-                        this._decodedBuffer = buffer;
-                        callback();
-                    },
-                    (err) => {
-                        this._error = toError(err);
-                        if (this._errorCallback) { this._errorCallback(); }
-                    },
-                );
-            } catch (e) {
-                this._error = toError(e);
-                if (this._errorCallback) { this._errorCallback(); }
-            }
-        } else if (event === 'error') {
-            this._errorCallback = callback;
-            if (this._error) { callback(); }
+    /** */
+    async prepare() {
+        const byteCharacters = atob(this._base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
+        const byteArray = new Uint8Array(byteNumbers);
+
+        this._decodedBuffer = await this._audioContext.decodeAudioData(byteArray.buffer);
     }
 
     /**
