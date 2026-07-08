@@ -27,7 +27,7 @@ import {WebAudioLocalAudio} from './web-audio-local-audio.js';
  */
 export class AudioSystem extends EventDispatcher {
     /**
-     * @param {API} api
+     * @param {API?} api
      */
     constructor(api) {
         super();
@@ -35,7 +35,7 @@ export class AudioSystem extends EventDispatcher {
         this._fallbackAudio = null;
         /** @type {?import('settings').FallbackSoundType} */
         this._fallbackSoundType = null;
-        /** @type {API} */
+        /** @type {API?} */
         this._api = api;
     }
 
@@ -82,6 +82,7 @@ export class AudioSystem extends EventDispatcher {
      */
     async createAudio(url, sourceType) {
         if (isLocalhostUrl(url)) {
+            if (!this._api) { throw new Error('Backend API not available'); }
             /** @type {{data: string, contentType: string}|null} */
             const response = await this._api.fetchLocalAudioData(url);
 
