@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {API} from '../comm/api.js';
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {isLocalhostUrl} from '../core/utilities.js';
 import {TextToSpeechAudio} from './text-to-speech-audio.js';
@@ -25,12 +26,17 @@ import {WebAudioLocalAudio} from './web-audio-local-audio.js';
  * @augments EventDispatcher<import('audio-system').Events>
  */
 export class AudioSystem extends EventDispatcher {
-    constructor() {
+    /**
+     * @param {API} api
+     */
+    constructor(api) {
         super();
         /** @type {?HTMLAudioElement} */
         this._fallbackAudio = null;
         /** @type {?import('settings').FallbackSoundType} */
         this._fallbackSoundType = null;
+        /** @type {API} */
+        this._api = api;
     }
 
     /**
@@ -76,14 +82,11 @@ export class AudioSystem extends EventDispatcher {
      */
     async createAudio(url, sourceType) {
         if (isLocalhostUrl(url)) {
-            /** @type {{success: boolean, data?: string, contentType?: string, error?: string}|undefined} */
-            const response = await chrome.runtime.sendMessage({
-                type: 'FETCH_LOCAL_AUDIO_DATA',
-                url: url,
-            });
+            /** @type {{data: string, contentType: string}|null} */
+            const response = await this._api.fetchLocalAudioData(url);
 
-            if (!response || !response.success || !response.data) {
-                throw new Error(response?.error || 'Failed to fetch local audio from background context');
+            if (!response) {
+                throw new Error('Failed to fetch local audio from background context');
             }
 
             const audio = new WebAudioLocalAudio(response.data, response.contentType || 'audio/mpeg');

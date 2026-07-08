@@ -414,6 +414,12 @@ type ApiSurface = {
         params: void;
         return: void;
     };
+    fetchLocalAudioData: {
+        params: {
+            url: string;
+        };
+        return: {data: string, contentType: string} | null;
+    };
 };
 
 type ApiExtraArgs = [sender: chrome.runtime.MessageSender];
