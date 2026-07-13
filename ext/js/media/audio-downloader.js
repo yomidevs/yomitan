@@ -542,11 +542,11 @@ export class AudioDownloader {
             clearTimeout(idleTimer);
         }
 
-        if (!await this._isAudioBinaryValid(arrayBuffer, sourceType)) {
+        if (!await this._isAudioBinaryValid(new Uint8Array(arrayBuffer).buffer, sourceType)) {
             throw new Error('Could not retrieve audio');
         }
 
-        const data = arrayBufferToBase64(arrayBuffer);
+        const data = arrayBufferToBase64(new Uint8Array(arrayBuffer).buffer);
         const contentType = response.headers.get('Content-Type');
         return {data, contentType};
     }

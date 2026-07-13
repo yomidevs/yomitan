@@ -153,7 +153,7 @@ export class RequestBuilder {
         }
 
         if (target === null) {
-            target = this._joinUint8Arrays(targets, totalLength);
+            target = new Uint8Array(this._joinUint8Arrays(targets, totalLength));
         } else if (totalLength < target.length) {
             target = target.slice(0, totalLength);
         }
@@ -162,7 +162,7 @@ export class RequestBuilder {
             onProgress(true);
         }
 
-        return /** @type {Uint8Array} */ (target);
+        return target;
     }
 
     // Private
