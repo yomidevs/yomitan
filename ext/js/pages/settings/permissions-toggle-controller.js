@@ -153,10 +153,11 @@ export class PermissionsToggleController {
 
     /**
      * @param {HTMLInputElement} toggle
-     * @returns {string[]}
+     * @returns {chrome.runtime.ManifestPermission[]}
      */
     _getRequiredPermissions(toggle) {
         const requiredPermissions = toggle.dataset.requiredPermissions;
+        // @ts-expect-error - chrome.runtime.ManifestPermission is just a string enum
         return (typeof requiredPermissions === 'string' && requiredPermissions.length > 0 ? requiredPermissions.split(' ') : []);
     }
 }

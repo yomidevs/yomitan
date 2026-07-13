@@ -193,7 +193,7 @@ export class AnkiController {
 
     /**
      * @param {string} fieldValue
-     * @returns {string[]}
+     * @returns {chrome.runtime.ManifestPermission[]}
      */
     getRequiredPermissions(fieldValue) {
         return getRequiredPermissionsForAnkiFieldValue(fieldValue);
@@ -1206,7 +1206,7 @@ class AnkiCardController {
     }
 
     /**
-     * @param {string[]} permissions
+     * @param {chrome.runtime.ManifestPermission[]} permissions
      */
     async _requestPermissions(permissions) {
         try {
@@ -1253,6 +1253,7 @@ class AnkiCardController {
 
             let hasPermissions2 = true;
             for (const permission of requiredPermissionArray) {
+                // @ts-expect-error - Typing this does not matter at all, chrome.runtime.ManifestPermission is just a string enum so using has to check strings on it is okay
                 if (!permissionsSet.has(permission)) {
                     hasPermissions2 = false;
                     break;
