@@ -1007,7 +1007,7 @@ export class DictionaryImporter {
      * @returns {Promise<T>}
      */
     async _getData(entry, writer) {
-        if (typeof entry.getData === 'undefined') {
+        if (entry.directory || typeof entry.getData === 'undefined') {
             throw new Error(`Cannot read ${entry.filename}`);
         }
         return await entry.getData(writer);

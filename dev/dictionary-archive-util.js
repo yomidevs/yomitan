@@ -57,7 +57,7 @@ export async function createDictionaryArchiveData(dictionaryDirectory, dictionar
  * @returns {Promise<string>}
  */
 export async function readArchiveEntryDataString(entry) {
-    if (typeof entry.getData === 'undefined') { throw new Error('Cannot get index data'); }
+    if (entry.directory || typeof entry.getData === 'undefined') { throw new Error('Cannot get index data'); }
     return await entry.getData(new TextWriter());
 }
 
