@@ -289,6 +289,8 @@ export class AnkiTemplateRenderer {
                 const regex = new RegExp(pattern, typeof flags === 'string' ? flags : '');
                 /** @type {string[]} */
                 const parts = [];
+                // Allow using replace for side effects
+                // eslint-disable-next-line sonarjs/no-ignored-return
                 value.replace(regex, (g0) => {
                     parts.push(g0);
                     return g0;
