@@ -22,4 +22,5 @@ export type Info = {
 
 export type Browser = 'chrome' | 'firefox' | 'firefox-mobile' | 'edge' | 'edge-legacy' | 'safari';
 
-export type OperatingSystem = chrome.runtime.PlatformOs | 'unknown';
+/** Expansion of @type {chrome.runtime.PlatformOs} */
+export type OperatingSystem = 'mac' | 'win' | 'android' | 'cros' | 'linux' | 'openbsd' | 'fuchsia' | 'unknown';
