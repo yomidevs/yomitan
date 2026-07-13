@@ -267,6 +267,7 @@ export class GenericSettingController {
      */
     _getTransformDataArray(transformRaw) {
         if (typeof transformRaw === 'string') {
+            /** @type {import('generic-setting-controller').TransformData} */
             const transforms = parseJson(transformRaw);
             return Array.isArray(transforms) ? transforms : [transforms];
         }
