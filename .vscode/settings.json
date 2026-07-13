@@ -42,5 +42,6 @@
         }
     ],
     "typescript.tsdk": "node_modules/typescript/lib",
-    "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
+    "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix",
+    "js/ts.tsdk.path": "node_modules/typescript/lib"
 }
