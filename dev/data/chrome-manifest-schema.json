@@ -258,6 +258,7 @@
                             "tts",
                             "ttsEngine",
                             "unlimitedStorage",
+                            "userScripts",
                             "vpnProvider",
                             "wallpaper",
                             "webAuthenticationProxy",
@@ -567,7 +568,12 @@
                     },
                     "match_about_blank": {
                         "type": "boolean",
-                        "description": "Whether to insert the content script on about:blank and about:srcdoc.",
+                        "description": "Whether to insert the content script into about:blank and about:srcdoc.",
+                        "default": false
+                    },
+                    "match_origin_as_fallback": {
+                        "type": "boolean",
+                        "description": "Whether to insert the content script into frames with about:, data:, blob:, and filesystem: schemes whose initiator origin matches a pattern in matches. Requires the path of every matches pattern to be '*'.",
                         "default": false
                     }
                 }
@@ -896,10 +902,66 @@
             "type": "string",
             "description": "In addition to the version field, which is used for update purposes, version_name can be set to a descriptive version string and will be used for display purposes if present."
         },
+        "author": {
+            "description": "The extension's author, shown in the Chrome Web Store.",
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "email": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
+        },
+        "export": {
+            "type": "object",
+            "description": "Shared Modules: exposes this extension's resources to other extensions.",
+            "additionalProperties": false,
+            "properties": {
+                "allowlist": {
+                    "type": "array",
+                    "description": "Extension IDs allowed to import resources from this Shared Module. If omitted, any extension may import.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "whitelist": {
+                    "type": "array",
+                    "description": "Deprecated alias for allowlist.",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "chrome_settings_overrides": {},
         "content_pack": {},
         "current_locale": {},
-        "import": {},
+        "import": {
+            "type": "array",
+            "description": "Shared Modules: declares the extension IDs this extension imports resources from.",
+            "items": {
+                "type": "object",
+                "required": ["id"],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "The extension ID of the Shared Module to import."
+                    },
+                    "minimum_version": {
+                        "$ref": "#/definitions/version_string",
+                        "description": "The minimum version of the Shared Module required."
+                    }
+                }
+            }
+        },
         "platforms": {},
         "signature": {},
         "spellcheck": {},
@@ -963,6 +1025,74 @@
                 "uniqueItems": true,
                 "items": {
                     "$ref": "#/definitions/web_resource"
+                }
+            },
+            "optional_host_permissions": {
+                "$ref": "#/definitions/permissions",
+                "description": "Hosts the extension may request access to at runtime through the chrome.permissions API, rather than at install time."
+            },
+            "declarative_net_request": {
+                "type": "object",
+                "description": "Declares static rulesets for the declarativeNetRequest API, which blocks or modifies network requests without intercepting them or reading their content.",
+                "required": ["rule_resources"],
+                "additionalProperties": false,
+                "properties": {
+                    "rule_resources": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "object",
+                            "required": ["id", "enabled", "path"],
+                            "additionalProperties": false,
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "description": "A non-empty string that uniquely identifies the ruleset. IDs starting with '_' are reserved for internal use."
+                                },
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Whether the ruleset is enabled by default."
+                                },
+                                "path": {
+                                    "$ref": "#/definitions/uri",
+                                    "description": "The path of the JSON ruleset, relative to the extension directory."
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "side_panel": {
+                "type": "object",
+                "description": "Configures the side panel, a UI surface displayed alongside the main page (Chrome 114+).",
+                "additionalProperties": false,
+                "properties": {
+                    "default_path": {
+                        "$ref": "#/definitions/uri",
+                        "description": "The path to the HTML file shown in the side panel by default."
+                    }
+                }
+            },
+            "cross_origin_embedder_policy": {
+                "type": "object",
+                "description": "Sets the Cross-Origin-Embedder-Policy response header for the extension's pages, enabling cross-origin isolation features such as SharedArrayBuffer.",
+                "additionalProperties": false,
+                "properties": {
+                    "value": {
+                        "type": "string",
+                        "description": "The Cross-Origin-Embedder-Policy header value, for example 'require-corp'."
+                    }
+                }
+            },
+            "cross_origin_opener_policy": {
+                "type": "object",
+                "description": "Sets the Cross-Origin-Opener-Policy response header for the extension's pages.",
+                "additionalProperties": false,
+                "properties": {
+                    "value": {
+                        "type": "string",
+                        "description": "The Cross-Origin-Opener-Policy header value, for example 'same-origin'."
+                    }
                 }
             }
         },

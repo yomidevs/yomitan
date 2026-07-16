@@ -125,6 +125,7 @@ function createContentScriptRegistrationOptions(details, id) {
     const options = {
         id: id,
         persistAcrossSessions: true,
+        js: [],
     };
     if (Array.isArray(css)) {
         options.css = [...css];

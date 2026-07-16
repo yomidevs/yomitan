@@ -45,6 +45,7 @@
                     "file://*/*"
                 ],
                 "match_about_blank": true,
+                "match_origin_as_fallback": true,
                 "all_frames": true,
                 "js": [
                     "js/app/content-script-wrapper.js"
