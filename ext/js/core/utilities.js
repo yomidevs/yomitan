@@ -344,3 +344,27 @@ export async function unsafeArrayBufferDigest(algorithm, arrayBuffer) {
     // @ts-expect-error - Allow SHA-1 here
     return arrayBufferDigest(algorithm, arrayBuffer);
 }
+
+/**
+ * @param {string} urlString
+ * @returns {boolean}
+ */
+export function isLocalhostUrl(urlString) {
+    try {
+        const url = new URL(urlString);
+        switch (url.hostname.toLowerCase()) {
+            case 'localhost':
+            case '127.0.0.1':
+            case '[::1]':
+                switch (url.protocol.toLowerCase()) {
+                    case 'http:':
+                    case 'https:':
+                        return true;
+                }
+                break;
+        }
+    } catch (e) {
+        // NOP
+    }
+    return false;
+}

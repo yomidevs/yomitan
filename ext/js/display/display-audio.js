@@ -32,7 +32,7 @@ export class DisplayAudio {
         /** @type {?import('display-audio').GenericAudio} */
         this._audioPlaying = null;
         /** @type {AudioSystem} */
-        this._audioSystem = new AudioSystem();
+        this._audioSystem = new AudioSystem(this._display.application.api);
         /** @type {number} */
         this._playbackVolume = 1;
         /** @type {boolean} */

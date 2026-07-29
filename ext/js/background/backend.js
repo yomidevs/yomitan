@@ -189,6 +189,7 @@ export class Backend {
             ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)],
             ['heartbeat',                    this._onApiHeartbeat.bind(this)],
             ['forceSync',                    this._onApiForceSync.bind(this)],
+            ['fetchLocalAudioData',          this._onApiFetchLocalAudioData.bind(this)],
         ]);
 
         /** @type {import('api').PmApiMap} */
@@ -1165,6 +1166,29 @@ export class Backend {
             throw e;
         }
         return void 0;
+    }
+
+    /** @type {import('api').ApiHandler<'fetchLocalAudioData'>} */
+    async _onApiFetchLocalAudioData({url}) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            log.error(`Local server responded with HTTP status code ${response.status}`);
+            return null;
+        }
+
+        const contentType = response.headers.get('content-type') || 'audio/mpeg';
+        const arrayBuffer = await response.arrayBuffer();
+
+        let binary = '';
+        const bytes = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+
+        return {
+            data: btoa(binary),
+            contentType: contentType,
+        };
     }
 
     // Command handlers
