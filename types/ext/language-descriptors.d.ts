@@ -103,6 +103,9 @@ type AllTextProcessors = {
     bg: {
         pre: CapitalizationPreprocessors;
     };
+    br: {
+        pre: CapitalizationPreprocessors;
+    };
     cs: {
         pre: CapitalizationPreprocessors;
     };
@@ -158,6 +161,9 @@ type AllTextProcessors = {
             convertLatinToGreek: TextProcessor;
         };
     };
+    gv: {
+        pre: CapitalizationPreprocessors;
+    };
     haw: {
         pre: CapitalizationPreprocessors;
     };
@@ -207,6 +213,9 @@ type AllTextProcessors = {
     };
     km: Record<string, never>;
     kn: Record<string, never>;
+    kw: {
+        pre: CapitalizationPreprocessors;
+    };
     mn: {
         pre: CapitalizationPreprocessors;
     };
