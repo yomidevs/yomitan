@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {SORT_FREQUENCY_DICTIONARY_AVERAGE} from '../../data/sort-frequency-dictionary.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class SortFrequencyDictionaryController {
@@ -93,7 +94,7 @@ export class SortFrequencyDictionaryController {
     /** */
     _onSortFrequencyDictionaryOrderAutoButtonClick() {
         const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
-        if (value === '') { return; }
+        if (value === '' || value === SORT_FREQUENCY_DICTIONARY_AVERAGE) { return; }
         void this._autoUpdateOrder(value);
     }
 
@@ -101,18 +102,23 @@ export class SortFrequencyDictionaryController {
      * @param {import('dictionary-importer').Summary[]} dictionaries
      */
     _updateDictionaryOptions(dictionaries) {
+        const frequencyDictionaries = dictionaries.filter(({counts}) => !!counts && !!counts.termMeta && counts.termMeta.freq > 0);
         const fragment = document.createDocumentFragment();
         let option = document.createElement('option');
         option.value = '';
         option.textContent = 'None';
         fragment.appendChild(option);
-        for (const {title, counts} of dictionaries) {
-            if (counts && counts.termMeta && counts.termMeta.freq > 0) {
-                option = document.createElement('option');
-                option.value = title;
-                option.textContent = title;
-                fragment.appendChild(option);
-            }
+        if (frequencyDictionaries.length > 0) {
+            option = document.createElement('option');
+            option.value = SORT_FREQUENCY_DICTIONARY_AVERAGE;
+            option.textContent = 'Average (all dictionaries)';
+            fragment.appendChild(option);
+        }
+        for (const {title} of frequencyDictionaries) {
+            option = document.createElement('option');
+            option.value = title;
+            option.textContent = title;
+            fragment.appendChild(option);
         }
         const select = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
         select.textContent = '';
@@ -125,7 +131,7 @@ export class SortFrequencyDictionaryController {
     async _setSortFrequencyDictionaryValue(value) {
         /** @type {HTMLElement} */ (this._sortFrequencyDictionaryOrderContainerNode).hidden = (value === null);
         await this._settingsController.setProfileSetting('general.sortFrequencyDictionary', value);
-        if (value !== null) {
+        if (value !== null && value !== SORT_FREQUENCY_DICTIONARY_AVERAGE) {
             await this._autoUpdateOrder(value);
         }
     }
