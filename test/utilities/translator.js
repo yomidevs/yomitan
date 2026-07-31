@@ -127,6 +127,8 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         primaryReading,
         excludeDictionaryDefinitions,
         searchResolution,
+        enableFusejiLookup,
+        fusejiTriggers,
         language,
     } = preset;
 
@@ -142,6 +144,8 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         enabledDictionaryMap,
         excludeDictionaryDefinitions: Array.isArray(excludeDictionaryDefinitions) ? new Set(excludeDictionaryDefinitions) : null,
         searchResolution: typeof searchResolution !== 'undefined' ? searchResolution : 'letter',
+        enableFusejiLookup: typeof enableFusejiLookup !== 'undefined' ? enableFusejiLookup : false,
+        fusejiTriggers: typeof fusejiTriggers !== 'undefined' ? fusejiTriggers : '◯○〇●',
         language: typeof language !== 'undefined' ? language : 'ja',
         useAllFrequencyDictionaries: false,
     };

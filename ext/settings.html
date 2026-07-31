@@ -1796,6 +1796,24 @@
                 </select>
             </div>
         </div></div>
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Enable fuseji lookup</div>
+                <div class="settings-item-description">Look up masked words (伏せ字) containing trigger characters, such as マ◯ド◯ルド.</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" data-setting="translation.enableFusejiLookup"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Fuseji trigger characters</div>
+                <div class="settings-item-description">Characters that act as one-character wildcards during fuseji lookup.</div>
+            </div>
+            <div class="settings-item-right">
+                <input type="text" data-setting="translation.fusejiTriggers">
+            </div>
+        </div></div>
         <div class="settings-item settings-item-button" data-modal-action="show,translation-text-replacement-patterns"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure custom text replacement patterns&hellip;</div>
