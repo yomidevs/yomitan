@@ -16,19 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {API} from '../comm/api.js';
 import {EventDispatcher} from '../core/event-dispatcher.js';
+import {isLocalhostUrl} from '../core/utilities.js';
 import {TextToSpeechAudio} from './text-to-speech-audio.js';
+import {WebAudioLocalAudio} from './web-audio-local-audio.js';
 
 /**
  * @augments EventDispatcher<import('audio-system').Events>
  */
 export class AudioSystem extends EventDispatcher {
-    constructor() {
+    /**
+     * @param {API?} api
+     */
+    constructor(api) {
         super();
         /** @type {?HTMLAudioElement} */
         this._fallbackAudio = null;
         /** @type {?import('settings').FallbackSoundType} */
         this._fallbackSoundType = null;
+        /** @type {API?} */
+        this._api = api;
     }
 
     /**
@@ -70,9 +78,22 @@ export class AudioSystem extends EventDispatcher {
     /**
      * @param {string} url
      * @param {import('settings').AudioSourceType} sourceType
-     * @returns {Promise<HTMLAudioElement>}
+     * @returns {Promise<HTMLAudioElement|WebAudioLocalAudio>}
      */
     async createAudio(url, sourceType) {
+        if (isLocalhostUrl(url) && this._api) {
+            /** @type {{data: string, contentType: string}|null} */
+            const response = await this._api.fetchLocalAudioData(url);
+
+            if (!response) {
+                throw new Error('Failed to fetch local audio from background context');
+            }
+
+            const localAudio = new WebAudioLocalAudio(response.data, response.contentType || 'audio/mpeg');
+            await localAudio.prepare();
+            return localAudio;
+        }
+
         const audio = new Audio(url);
         await this._waitForData(audio);
         if (!this._isAudioValid(audio, sourceType)) {

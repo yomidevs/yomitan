@@ -16,6 +16,7 @@
  */
 
 import type {TextToSpeechAudio} from '../../ext/js/media/text-to-speech-audio';
+import type {WebAudioLocalAudio} from '../../ext/js/media/web-audio-local-audio';
 import type * as Audio from './audio';
 import type * as AudioDownloader from './audio-downloader';
 import type * as Settings from './settings';
@@ -92,7 +93,7 @@ export type CreateAudioResult = {
     cacheUpdated: boolean;
 };
 
-export type GenericAudio = HTMLAudioElement | TextToSpeechAudio;
+export type GenericAudio = HTMLAudioElement | TextToSpeechAudio | WebAudioLocalAudio;
 
 export type MenuItemEntry = {
     valid: boolean | null;

@@ -138,6 +138,13 @@ const languageDescriptors = [
         textPreprocessors: capitalizationPreprocessors,
     },
     {
+        iso: 'br',
+        iso639_3: 'bre',
+        name: 'Breton',
+        exampleText: 'lenn',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'cs',
         iso639_3: 'ces',
         name: 'Czech',
@@ -269,6 +276,13 @@ const languageDescriptors = [
         languageTransforms: ancientGreekTransforms,
     },
     {
+        iso: 'gv',
+        iso639_3: 'glv',
+        name: 'Manx',
+        exampleText: 'lhaih',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         // no 2 letter iso for hawaiian
         iso: 'haw',
         iso639_3: 'haw',
@@ -391,6 +405,13 @@ const languageDescriptors = [
             reassembleHangul,
         },
         languageTransforms: koreanTransforms,
+    },
+    {
+        iso: 'kw',
+        iso639_3: 'cor',
+        name: 'Cornish',
+        exampleText: 'lenna',
+        textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'mn',

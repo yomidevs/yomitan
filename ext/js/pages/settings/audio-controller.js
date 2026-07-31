@@ -36,7 +36,7 @@ export class AudioController extends EventDispatcher {
         /** @type {import('./modal-controller.js').ModalController} */
         this._modalController = modalController;
         /** @type {AudioSystem} */
-        this._audioSystem = new AudioSystem();
+        this._audioSystem = new AudioSystem(null);
         /** @type {HTMLElement} */
         this._audioSourceContainer = querySelectorNotNull(document, '#audio-source-list');
         /** @type {HTMLButtonElement} */
