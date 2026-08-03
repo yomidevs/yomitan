@@ -31,6 +31,8 @@ export const test = base.extend({
             // Disabled: headless: false,
             args: [
                 '--headless=new',
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
                 `--disable-extensions-except=${pathToExtension}`,
                 `--load-extension=${pathToExtension}`,
             ],
