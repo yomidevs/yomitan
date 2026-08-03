@@ -1571,9 +1571,16 @@ export class Backend {
             if (!chrome.contextMenus) { return; }
 
             if (options.general.enableContextMenuScanSelected) {
+                let contextMenuTitle = 'Lookup in Yomitan';
+                try {
+                    const localized = chrome.i18n.getMessage('contextMenuLookup');
+                    if (localized) { contextMenuTitle = localized; }
+                } catch (e) {
+                    // NOP
+                }
                 chrome.contextMenus.create({
                     id: 'yomitan_lookup',
-                    title: 'Lookup in Yomitan',
+                    title: contextMenuTitle,
                     contexts: ['selection'],
                 }, () => this._checkLastError(chrome.runtime.lastError));
                 chrome.contextMenus.onClicked.addListener((info) => {

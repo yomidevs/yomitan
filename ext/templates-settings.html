@@ -1,4 +1,5 @@
-<!DOCTYPE html><html><head><title>Templates</title></head><body>
+<!DOCTYPE html>
+<html><head><title>Templates</title></head><body>
 
 <!-- Profile -->
 <template id="profile-entry-template"><div class="profile-entry generic-list-entry">
@@ -11,9 +12,9 @@
 <template id="profile-condition-group-template"><div class="profile-condition-group">
     <div class="profile-condition-list"></div>
     <div class="profile-condition-list-info">
-        <div class="profile-condition-group-separator-label">or</div>
+        <div class="profile-condition-group-separator-label" data-i18n="ui_or">or</div>
         <div class="profile-condition-list-info-space"></div>
-        <button type="button" class="profile-condition-add-button low-emphasis">Add</button>
+        <button type="button" class="profile-condition-add-button low-emphasis" data-i18n="ui_add">Add</button>
     </div>
 </div></template>
 <template id="profile-condition-template"><div class="profile-condition">
@@ -33,18 +34,18 @@
     </div>
 </div></template>
 <template id="profile-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="moveUp">Move up</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveDown">Move down</button>
-    <button type="button" class="popup-menu-item" data-menu-action="copyFrom">Copy from&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="editConditions">Edit conditions&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="duplicate">Duplicate</button>
-    <button type="button" class="popup-menu-item" data-menu-action="reset">Reset to Default</button>
-    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
+    <button type="button" class="popup-menu-item" data-menu-action="moveUp" data-i18n="ui_move_up">Move up</button>
+    <button type="button" class="popup-menu-item" data-menu-action="moveDown" data-i18n="ui_move_down">Move down</button>
+    <button type="button" class="popup-menu-item" data-menu-action="copyFrom">Copy from…</button>
+    <button type="button" class="popup-menu-item" data-menu-action="editConditions">Edit conditions…</button>
+    <button type="button" class="popup-menu-item" data-menu-action="duplicate" data-i18n="ui_duplicate">Duplicate</button>
+    <button type="button" class="popup-menu-item" data-menu-action="reset" data-i18n="ui_reset_to_default">Reset to Default</button>
+    <button type="button" class="popup-menu-item" data-menu-action="delete" data-i18n="ui_delete">Delete</button>
 </div></div></div></template>
 <template id="profile-condition-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="resetValue">Reset value</button>
-    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
-    <button type="button" class="popup-menu-item" data-menu-action="deleteGroup">Delete group</button>
+    <button type="button" class="popup-menu-item" data-menu-action="resetValue" data-i18n="ui_reset_value">Reset value</button>
+    <button type="button" class="popup-menu-item" data-menu-action="delete" data-i18n="ui_delete">Delete</button>
+    <button type="button" class="popup-menu-item" data-menu-action="deleteGroup" data-i18n="ui_delete_group">Delete group</button>
 </div></div></div></template>
 
 <!-- Dictionary -->
@@ -92,7 +93,7 @@
     <div class="dictionary-item-bottom"></div>
     <div class="dictionary-item-bottom dictionary-item-title-container">
         <span>
-            <strong class="dictionary-title">Unassociated Data</strong> <span class="light dictionary-total-count"></span>
+            <strong class="dictionary-title" data-i18n="ui_unassociated_data">Unassociated Data</strong> <span class="light dictionary-total-count"></span>
         </span>
         <button type="button" class="dictionary-integrity-button-warning">
             <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
@@ -102,10 +103,10 @@
     <div class="dictionary-item-bottom dictionary-item-button-height"></div>
 </template>
 <template id="dictionary-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="showDetails">Details&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="rename">Rename&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
+    <button type="button" class="popup-menu-item" data-menu-action="showDetails">Details…</button>
+    <button type="button" class="popup-menu-item" data-menu-action="rename">Rename…</button>
+    <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to…</button>
+    <button type="button" class="popup-menu-item" data-menu-action="delete" data-i18n="ui_delete">Delete</button>
 </div></div></div></template>
 <template id="secondary-search-dictionary-template"><div class="secondary-search-dictionary-item horizontal-flex">
     <label class="toggle"><input type="checkbox" class="dictionary-allow-secondary-searches"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -117,11 +118,11 @@
     </div>
     <div class="collapsible-dictionary-cell">
         <select class="definitions-collapsible medium-width">
-            <option value="not-collapsible">Not collapsible</option>
-            <option value="collapsed">Collapsed</option>
-            <option value="expanded">Expanded</option>
-            <option value="force-collapsed">Force collapsed</option>
-            <option value="force-expanded">Force expanded</option>
+            <option value="not-collapsible" data-i18n="ui_not_collapsible">Not collapsible</option>
+            <option value="collapsed" data-i18n="ui_collapsed">Collapsed</option>
+            <option value="expanded" data-i18n="ui_expanded">Expanded</option>
+            <option value="force-collapsed" data-i18n="ui_force_collapsed">Force collapsed</option>
+            <option value="force-expanded" data-i18n="ui_force_expanded">Force expanded</option>
         </select>
     </div>
 </div></template>
@@ -132,11 +133,11 @@
                 <strong><div class="settings-item-label"></div></strong>
                 <div class="settings-item-description description"></div>
                 <div class="settings-item-description">
-                    <a class="homepage">Homepage</a>
+                    <a class="homepage" data-i18n="ui_homepage">Homepage</a>
                 </div>
             </div>
             <div class="settings-item-right">
-                <button type="button" class="action-button" data-action="import-recommended-dictionary" data-import-url="">Download</button>
+                <button type="button" class="action-button" data-action="import-recommended-dictionary" data-import-url="" data-i18n="ui_download">Download</button>
             </div>
         </div>
     </div>
@@ -147,22 +148,22 @@
     <div class="audio-source-index generic-list-index-prefix"></div>
     <div class="audio-source-inner">
         <select class="audio-source-type-select">
-            <option value="jpod101">JapanesePod101</option>
-            <option value="language-pod-101">LanguagePod101</option>
-            <option value="jisho">Jisho.org</option>
-            <option value="lingua-libre">(Commons) Lingua Libre</option>
-            <option value="wiktionary">(Commons) Wiktionary</option>
-            <option value="text-to-speech" title="Not supported in Anki">Text-to-speech ⚠️</option>
-            <option value="text-to-speech-reading" title="Not supported in Anki">Text-to-speech (Kana reading) ⚠️</option>
-            <option value="custom">Custom URL</option>
-            <option value="custom-json">Custom URL (JSON)</option>
+            <option value="jpod101" data-i18n="ui_japanesepod101">JapanesePod101</option>
+            <option value="language-pod-101" data-i18n="ui_languagepod101">LanguagePod101</option>
+            <option value="jisho" data-i18n="ui_jisho_org">Jisho.org</option>
+            <option value="lingua-libre" data-i18n="ui_commons_lingua_libre">(Commons) Lingua Libre</option>
+            <option value="wiktionary" data-i18n="ui_commons_wiktionary">(Commons) Wiktionary</option>
+            <option value="text-to-speech" title="Not supported in Anki" data-i18n="ui_text_to_speech">Text-to-speech ⚠️</option>
+            <option value="text-to-speech-reading" title="Not supported in Anki" data-i18n="ui_text_to_speech_kana_reading">Text-to-speech (Kana reading) ⚠️</option>
+            <option value="custom" data-i18n="ui_custom_url">Custom URL</option>
+            <option value="custom-json" data-i18n="ui_custom_url_json">Custom URL (JSON)</option>
         </select>
         <div class="audio-source-parameter-container" data-field="url" hidden>
-            <span class="audio-source-parameter-label">URL:</span>
+            <span class="audio-source-parameter-label" data-i18n="ui_url">URL:</span>
             <input type="text" class="audio-source-parameter">
         </div>
         <div class="audio-source-parameter-container" data-field="voice" hidden>
-            <span class="audio-source-parameter-label">Voice:</span>
+            <span class="audio-source-parameter-label" data-i18n="ui_voice">Voice:</span>
             <select class="audio-source-parameter"></select>
         </div>
     </div>
@@ -171,9 +172,9 @@
     <button type="button" class="icon-button audio-source-menu-button" data-menu="audio-source-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
 </div></template>
 <template id="audio-source-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="help">Help</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
+    <button type="button" class="popup-menu-item" data-menu-action="help" data-i18n="ui_help">Help</button>
+    <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to…</button>
+    <button type="button" class="popup-menu-item" data-menu-action="remove" data-i18n="ui_remove">Remove</button>
 </div></div></div></template>
 
 <!-- Scanning inputs -->
@@ -186,108 +187,108 @@
             </div>
         </div>
 
-        <div class="scan-input-prefix-cell" data-property="include"><span>Required inputs:</span></div>
+        <div class="scan-input-prefix-cell" data-property="include"><span data-i18n="ui_required_inputs">Required inputs:</span></div>
         <div class="scan-input-content-cell input-group" data-property="include">
             <input type="text" class="scan-input-field" autocomplete="off" spellcheck="false" placeholder="No inputs" data-property="include">
             <button type="button" class="input-suffix input-suffix-icon-button light-icon mouse-button" data-property="include"><span class="icon" data-icon="mouse"></span></button>
         </div>
 
-        <div class="scan-input-prefix-cell" data-property="exclude"><span>Excluded inputs:</span></div>
+        <div class="scan-input-prefix-cell" data-property="exclude"><span data-i18n="ui_excluded_inputs">Excluded inputs:</span></div>
         <div class="scan-input-content-cell input-group" data-property="exclude">
             <input type="text" class="scan-input-field" autocomplete="off" spellcheck="false" placeholder="No inputs" data-property="exclude">
             <button type="button" class="input-suffix input-suffix-icon-button light-icon mouse-button" data-property="exclude"><span class="icon" data-icon="mouse"></span></button>
         </div>
 
-        <div class="scan-input-prefix-cell scan-input-options-cell" data-property="types"><span>Input types:</span></div>
+        <div class="scan-input-prefix-cell scan-input-options-cell" data-property="types"><span data-i18n="ui_input_types">Input types:</span></div>
         <div class="scan-input-content-cell scan-input-options-cell" data-property="types">
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.mouse"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Mouse</span>
+                <span data-i18n="ui_mouse">Mouse</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.touch"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Touch</span>
+                <span data-i18n="ui_touch">Touch</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.pen"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Pen</span>
+                <span data-i18n="ui_pen">Pen</span>
             </label>
         </div>
 
-        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="search-options"><span>Search types:</span></div>
+        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="search-options"><span data-i18n="ui_search_types">Search types:</span></div>
         <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="search-options">
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.searchTerms"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Search for terms</span>
+                <span data-i18n="ui_search_for_terms">Search for terms</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.searchKanji"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Search for kanji</span>
+                <span data-i18n="ui_search_for_kanji">Search for kanji</span>
             </label>
         </div>
 
-        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options"><span>Touch options:</span></div>
+        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options"><span data-i18n="ui_touch_options">Touch options:</span></div>
         <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options">
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchTap"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on touch tap</span>
+                <span data-i18n="ui_scan_on_touch_tap">Scan on touch tap</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchPress"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on touch press</span>
+                <span data-i18n="ui_scan_on_touch_press">Scan on touch press</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchRelease"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on touch release</span>
+                <span data-i18n="ui_scan_on_touch_release">Scan on touch release</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchMove"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on touch move</span>
+                <span data-i18n="ui_scan_on_touch_move">Scan on touch move</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.preventTouchScrolling"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Prevent touch scrolling</span>
+                <span data-i18n="ui_prevent_touch_scrolling">Prevent touch scrolling</span>
             </label>
             <label class="scan-input-input-item">
-                <span>Minimum Touch Time <span class="light">(in milliseconds)</span>:</span>
+                <span data-i18n-html="html_minimum_touch_time_in_milliseconds">Minimum Touch Time <span class="light" data-i18n="ui_in_milliseconds">(in milliseconds)</span>:</span>
                 <label class="input"><input type="number" class="scan-input-settings-input" data-property="options.minimumTouchTime"></label>
             </label>
         </div>
 
-        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="pen-options"><span>Pen options:</span></div>
+        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="pen-options"><span data-i18n="ui_pen_options">Pen options:</span></div>
         <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="pen-options">
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenPress"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen press</span>
+                <span data-i18n="ui_scan_on_pen_press">Scan on pen press</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenRelease"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen release</span>
+                <span data-i18n="ui_scan_on_pen_release">Scan on pen release</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenMove"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen move (while touched)</span>
+                <span data-i18n="ui_scan_on_pen_move_while_touched">Scan on pen move (while touched)</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen hover (before touched)</span>
+                <span data-i18n="ui_scan_on_pen_hover_before_touched">Scan on pen hover (before touched)</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenReleaseHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen hover (after touched)</span>
+                <span data-i18n="ui_scan_on_pen_hover_after_touched">Scan on pen hover (after touched)</span>
             </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.preventPenScrolling"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Prevent pen scrolling</span>
+                <span data-i18n="ui_prevent_pen_scrolling">Prevent pen scrolling</span>
             </label>
         </div>
     </div>
 </div></template>
 <template id="scanning-inputs-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="showAdvanced">Show advanced options</button>
-    <button type="button" class="popup-menu-item" data-menu-action="hideAdvanced">Hide advanced options</button>
-    <button type="button" class="popup-menu-item" data-menu-action="clearInputs">Clear inputs</button>
-    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
+    <button type="button" class="popup-menu-item" data-menu-action="showAdvanced" data-i18n="ui_show_advanced_options">Show advanced options</button>
+    <button type="button" class="popup-menu-item" data-menu-action="hideAdvanced" data-i18n="ui_hide_advanced_options">Hide advanced options</button>
+    <button type="button" class="popup-menu-item" data-menu-action="clearInputs" data-i18n="ui_clear_inputs">Clear inputs</button>
+    <button type="button" class="popup-menu-item" data-menu-action="remove" data-i18n="ui_remove">Remove</button>
 </div></div></div></template>
 
 <!-- Anki card -->
@@ -304,22 +305,18 @@
     </div>
     <div class="anki-card-field-value-container input-group">
         <input type="text" class="anki-card-field-value" autocomplete="off">
-        <button
-            type="button"
-            class="anki-card-field-value-menu-button input-suffix input-suffix-icon-button light-icon"
-            data-menu-position="v-center left"
-        >
+        <button type="button" class="anki-card-field-value-menu-button input-suffix input-suffix-icon-button light-icon" data-menu-position="v-center left">
             <span class="icon" data-icon="material-down-arrow"></span>
         </button>
     </div>
     <div class="anki-card-field-overwrite-container">
         <select class="anki-card-field-overwrite">
-            <option value="skip" title="Keep existing value">Skip</option>
-            <option value="prepend" title="Insert new value before existing">Prepend</option>
-            <option value="append" title="Insert new value after existing">Append</option>
-            <option value="coalesce" title="Overwrite if existing value is empty">Fill if empty</option>
-            <option class="warning-text" value="coalesce-new" title="Overwrite if new value is not empty">Overwrite if available</option>
-            <option class="danger-text" value="overwrite" title="Overwrite even if new value is empty">Overwrite</option>
+            <option value="skip" title="Keep existing value" data-i18n="ui_skip">Skip</option>
+            <option value="prepend" title="Insert new value before existing" data-i18n="ui_prepend">Prepend</option>
+            <option value="append" title="Insert new value after existing" data-i18n="ui_append">Append</option>
+            <option value="coalesce" title="Overwrite if existing value is empty" data-i18n="ui_fill_if_empty">Fill if empty</option>
+            <option class="warning-text" value="coalesce-new" title="Overwrite if new value is not empty" data-i18n="ui_overwrite_if_available">Overwrite if available</option>
+            <option class="danger-text" value="overwrite" title="Overwrite even if new value is empty" data-i18n="ui_overwrite">Overwrite</option>
         </select>
     </div>
 </template>
@@ -330,13 +327,13 @@
 <!-- Translation -->
 <template id="translation-text-replacement-entry-template"><div class="translation-text-replacement-entry">
     <div class="translation-text-replacement-index generic-list-index-prefix"></div>
-    <div class="translation-text-replacement-pattern-label">Pattern:</div>
-    <div class="translation-text-replacement-replacement-label">Replacement:</div>
+    <div class="translation-text-replacement-pattern-label" data-i18n="ui_pattern">Pattern:</div>
+    <div class="translation-text-replacement-replacement-label" data-i18n="ui_replacement">Replacement:</div>
     <div class="translation-text-replacement-pattern-container">
         <input type="text" class="translation-text-replacement-pattern code">
         <label class="translation-text-replacement-checkbox-container">
             <label class="checkbox"><input type="checkbox" class="translation-text-replacement-checkbox translation-text-replacement-pattern-ignore-case"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-            <span class="translation-text-replacement-checkbox-label">Ignore case</span>
+            <span class="translation-text-replacement-checkbox-label" data-i18n="ui_ignore_case">Ignore case</span>
         </label>
     </div>
     <div class="translation-text-replacement-replacement-container">
@@ -344,17 +341,17 @@
     </div>
     <button type="button" class="icon-button translation-text-replacement-button" data-menu="translation-text-replacement-entry-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
 
-    <div class="translation-text-replacement-test-label translation-text-replacement-test-node">Test Input:</div>
+    <div class="translation-text-replacement-test-label translation-text-replacement-test-node" data-i18n="ui_test_input">Test Input:</div>
     <div class="translation-text-replacement-test-container translation-text-replacement-test-node">
         <input type="text" class="translation-text-replacement-test-input" lang="ja">
-        <div class="translation-text-replacement-test-label-inner">Output:</div>
+        <div class="translation-text-replacement-test-label-inner" data-i18n="ui_output">Output:</div>
         <input type="text" class="translation-text-replacement-test-output" lang="ja" readonly>
     </div>
 </div></template>
 <template id="translation-text-replacement-entry-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="showTest">Test</button>
-    <button type="button" class="popup-menu-item" data-menu-action="hideTest">Hide test</button>
-    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
+    <button type="button" class="popup-menu-item" data-menu-action="showTest" data-i18n="ui_test">Test</button>
+    <button type="button" class="popup-menu-item" data-menu-action="hideTest" data-i18n="ui_hide_test">Hide test</button>
+    <button type="button" class="popup-menu-item" data-menu-action="remove" data-i18n="ui_remove">Remove</button>
 </div></div></div></template>
 
 <!-- Sentence parsing -->
@@ -365,8 +362,8 @@
     </td>
     <td>
         <select class="sentence-termination-character-type">
-            <option value="terminator">Terminator</option>
-            <option value="quote">Quote</option>
+            <option value="terminator" data-i18n="ui_terminator">Terminator</option>
+            <option value="quote" data-i18n="ui_quote">Quote</option>
         </select>
     </td>
     <td>
@@ -374,17 +371,17 @@
     </td>
     <td>
         <input type="text" class="sentence-termination-character-input2" maxlength="1" lang="ja">
-        <div class="sentence-termination-character-input2-alt">&mdash;</div>
+        <div class="sentence-termination-character-input2-alt">—</div>
     </td>
     <td>
         <div class="sentence-termination-character-include-list">
             <label class="sentence-termination-character-include">
                 <label class="checkbox"><input type="checkbox" class="sentence-termination-character-include-at-start"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>At start</span>
+                <span data-i18n="ui_at_start">At start</span>
             </label>
             <label class="sentence-termination-character-include">
                 <label class="checkbox"><input type="checkbox" class="sentence-termination-character-include-at-end"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>At end</span>
+                <span data-i18n="ui_at_end">At end</span>
             </label>
         </div>
     </td>
@@ -393,7 +390,7 @@
     </td>
 </tr></template>
 <template id="sentence-termination-character-entry-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
+    <button type="button" class="popup-menu-item" data-menu-action="delete" data-i18n="ui_delete">Delete</button>
 </div></div></div></template>
 
 <!-- Keyboard shortcuts -->
@@ -405,45 +402,45 @@
         </div>
     </div>
 
-    <div class="hotkey-list-item-input-label-cell">Input:</div>
+    <div class="hotkey-list-item-input-label-cell" data-i18n="ui_input">Input:</div>
     <div class="hotkey-list-item-input-cell">
         <input type="text" class="hotkey-list-item-input" autocomplete="off" spellcheck="false" placeholder="No input" data-property="include">
         <div class="hotkey-list-item-enabled-button-container input-group">
             <button type="button" class="hotkey-list-item-enabled-button input-button">
                 <label class="hotkey-list-item-enabled-button-label button-inner-label">
                     <span class="checkbox"><input type="checkbox" class="hotkey-list-item-enabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></span>
-                    <span>Enabled</span>
+                    <span data-i18n="ui_enabled">Enabled</span>
                 </label>
             </button>
             <button type="button" class="hotkey-list-item-scopes-button input-suffix input-suffix-icon-button light-icon" data-menu="hotkey-list-item-scopes-menu" data-menu-position="below left"><span class="icon" data-icon="material-down-arrow"></span></button>
         </div>
     </div>
 
-    <div class="hotkey-list-item-action-label-cell">Action:</div>
+    <div class="hotkey-list-item-action-label-cell" data-i18n="ui_action">Action:</div>
     <div class="hotkey-list-item-action-cell">
         <select class="hotkey-list-item-action">
-            <option value="">None</option>
-            <option value="close">Close</option>
-            <option value="focusSearchBox">Focus search box</option>
-            <option value="nextEntry">Go to next entry</option>
-            <option value="previousEntry">Go to previous entry</option>
-            <option value="lastEntry">Go to last entry</option>
-            <option value="firstEntry">Go to first entry</option>
-            <option value="nextEntryDifferentDictionary">Go to next dictionary</option>
-            <option value="previousEntryDifferentDictionary">Go to previous dictionary</option>
-            <option value="historyBackward">Navigate backward in history</option>
-            <option value="historyForward">Navigate forward in history</option>
-            <option value="profilePrevious">Switch to previous profile</option>
-            <option value="profileNext">Switch to next profile</option>
-            <option value="addNote">Add note</option>
-            <option value="viewNotes">View notes</option>
-            <option value="playAudio">Play audio</option>
-            <option value="playAudioFromSource">Play audio from source</option>
-            <option value="copyHostSelection">Copy host window selection</option>
-            <option value="scanSelectedText">Scan selected text</option>
-            <option value="scanTextAtSelection">Scan text at selection</option>
-            <option value="scanTextAtCaret">Scan text at caret</option>
-            <option value="toggleOption">Toggle option</option>
+            <option value="" data-i18n="ui_none">None</option>
+            <option value="close" data-i18n="ui_close">Close</option>
+            <option value="focusSearchBox" data-i18n="ui_focus_search_box">Focus search box</option>
+            <option value="nextEntry" data-i18n="ui_go_to_next_entry">Go to next entry</option>
+            <option value="previousEntry" data-i18n="ui_go_to_previous_entry">Go to previous entry</option>
+            <option value="lastEntry" data-i18n="ui_go_to_last_entry">Go to last entry</option>
+            <option value="firstEntry" data-i18n="ui_go_to_first_entry">Go to first entry</option>
+            <option value="nextEntryDifferentDictionary" data-i18n="ui_go_to_next_dictionary">Go to next dictionary</option>
+            <option value="previousEntryDifferentDictionary" data-i18n="ui_go_to_previous_dictionary">Go to previous dictionary</option>
+            <option value="historyBackward" data-i18n="ui_navigate_backward_in_history">Navigate backward in history</option>
+            <option value="historyForward" data-i18n="ui_navigate_forward_in_history">Navigate forward in history</option>
+            <option value="profilePrevious" data-i18n="ui_switch_to_previous_profile">Switch to previous profile</option>
+            <option value="profileNext" data-i18n="ui_switch_to_next_profile">Switch to next profile</option>
+            <option value="addNote" data-i18n="ui_add_note">Add note</option>
+            <option value="viewNotes" data-i18n="ui_view_notes">View notes</option>
+            <option value="playAudio" data-i18n="ui_play_audio">Play audio</option>
+            <option value="playAudioFromSource" data-i18n="ui_play_audio_from_source">Play audio from source</option>
+            <option value="copyHostSelection" data-i18n="ui_copy_host_window_selection">Copy host window selection</option>
+            <option value="scanSelectedText" data-i18n="ui_scan_selected_text">Scan selected text</option>
+            <option value="scanTextAtSelection" data-i18n="ui_scan_text_at_selection">Scan text at selection</option>
+            <option value="scanTextAtCaret" data-i18n="ui_scan_text_at_caret">Scan text at caret</option>
+            <option value="toggleOption" data-i18n="ui_toggle_option">Toggle option</option>
         </select>
         <div class="hotkey-list-item-action-argument-container"></div>
     </div>
@@ -460,52 +457,52 @@
     </div>
 </div></div></template>
 <template id="hotkey-list-item-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="clearInputs">Clear input</button>
-    <button type="button" class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
-    <button type="button" class="popup-menu-item" data-menu-action="resetArgument">Reset argument</button>
-    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
+    <button type="button" class="popup-menu-item" data-menu-action="clearInputs" data-i18n="ui_clear_input">Clear input</button>
+    <button type="button" class="popup-menu-item" data-menu-action="resetInput" data-i18n="ui_reset_input">Reset input</button>
+    <button type="button" class="popup-menu-item" data-menu-action="resetArgument" data-i18n="ui_reset_argument">Reset argument</button>
+    <button type="button" class="popup-menu-item" data-menu-action="delete" data-i18n="ui_delete">Delete</button>
 </div></div></div></template>
 <template id="hotkey-list-item-scopes-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
     <button type="button" class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="web"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
         <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="web"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-        <span>Web</span>
+        <span data-i18n="ui_web">Web</span>
     </label></button>
     <button type="button" class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="popup"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
         <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="popup"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-        <span>Popup</span>
+        <span data-i18n="ui_popup">Popup</span>
     </label></button>
     <button type="button" class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="search"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
         <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="search"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-        <span>Search</span>
+        <span data-i18n="ui_search">Search</span>
     </label></button>
 </div></div></div></template>
 <template id="extension-hotkey-list-item-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="clearInput">Clear input</button>
-    <button type="button" class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
+    <button type="button" class="popup-menu-item" data-menu-action="clearInput" data-i18n="ui_clear_input">Clear input</button>
+    <button type="button" class="popup-menu-item" data-menu-action="resetInput" data-i18n="ui_reset_input">Reset input</button>
 </div></div></div></template>
 <template id="hotkey-argument-move-offset-template"><div class="flex-row-nowrap">
-    <span class="hotkey-argument-label">Count:</span>
+    <span class="hotkey-argument-label" data-i18n="ui_count">Count:</span>
     <input type="number" step="1" min="1" class="hotkey-argument-input">
 </div></template>
 <template id="hotkey-argument-setting-path-template"><div class="flex-row-nowrap">
-    <span class="hotkey-argument-label">Path:</span>
+    <span class="hotkey-argument-label" data-i18n="ui_path">Path:</span>
     <input type="text" class="hotkey-argument-input horizontal-flex-fill" spellcheck="false" autocomplete="off">
 </div></template>
 <template id="hotkey-argument-audio-source-template"><div class="flex-row-nowrap">
-    <span class="hotkey-argument-label">Source:</span>
+    <span class="hotkey-argument-label" data-i18n="ui_source">Source:</span>
     <select class="audio-source-select hotkey-argument-input horizontal-flex-fill">
-        <option value="jpod101">JapanesePod101</option>
-        <option value="language-pod-101">LanguagePod101</option>
-        <option value="jisho">Jisho.org</option>
-        <option value="lingua-libre">Lingua Libre</option>
-        <option value="wiktionary">Wiktionary</option>
-        <option value="text-to-speech" title="Not supported in Anki">Text-to-speech ⚠️</option>
-        <option value="text-to-speech-reading" title="Not supported in Anki">Text-to-speech (Kana reading) ⚠️</option>
-        <option value="custom">Custom</option>
+        <option value="jpod101" data-i18n="ui_japanesepod101">JapanesePod101</option>
+        <option value="language-pod-101" data-i18n="ui_languagepod101">LanguagePod101</option>
+        <option value="jisho" data-i18n="ui_jisho_org">Jisho.org</option>
+        <option value="lingua-libre" data-i18n="ui_lingua_libre">Lingua Libre</option>
+        <option value="wiktionary" data-i18n="ui_wiktionary">Wiktionary</option>
+        <option value="text-to-speech" title="Not supported in Anki" data-i18n="ui_text_to_speech">Text-to-speech ⚠️</option>
+        <option value="text-to-speech-reading" title="Not supported in Anki" data-i18n="ui_text_to_speech_kana_reading">Text-to-speech (Kana reading) ⚠️</option>
+        <option value="custom" data-i18n="ui_custom">Custom</option>
     </select>
 </div></template>
 <template id="hotkey-argument-anki-card-format-template"><div class="flex-row-nowrap">
-    <span class="hotkey-argument-label">Format:</span>
+    <span class="hotkey-argument-label" data-i18n="ui_format_2">Format:</span>
     <select class="anki-card-format-select hotkey-argument-input horizontal-flex-fill">
     </select>
 </div></template>
@@ -517,7 +514,7 @@
     <button type="button" class="icon-button permissions-origin-menu-button permissions-origin-button" data-menu="permissions-origin-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
 </template>
 <template id="permissions-origin-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
+    <button type="button" class="popup-menu-item" data-menu-action="remove" data-i18n="ui_remove">Remove</button>
 </div></div></div></template>
 
 <!-- Recommended Settings -->

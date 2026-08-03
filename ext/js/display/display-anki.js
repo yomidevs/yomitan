@@ -27,6 +27,7 @@ import {INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
+import {getMessage, localizeCardFormatName} from '../language/i18n-util.js';
 
 export class DisplayAnki {
     /**
@@ -324,16 +325,18 @@ export class DisplayAnki {
         const iconSpan = querySelectorNotNull(saveButton, '.action-icon');
         // Set button properties
         const cardFormat = this._cardFormats[cardFormatIndex];
+        const cardFormatLabel = localizeCardFormatName(cardFormat.name);
+        const addNoteTitle = getMessage('ui_add_card_format_note', [cardFormatLabel]) || `Add ${cardFormatLabel} note`;
         singleNoteActionButtons.dataset.cardFormatIndex = cardFormatIndex.toString();
-        saveButton.title = `Add ${cardFormat.name} note`;
+        saveButton.title = addNoteTitle;
         saveButton.dataset.cardFormatIndex = cardFormatIndex.toString();
         iconSpan.dataset.icon = cardFormat.icon;
 
         const saveButtonIndex = container.querySelectorAll('.action-button-container').length;
         if ([0, 1].includes(saveButtonIndex)) {
-            saveButton.dataset.hotkey = `["addNote${saveButtonIndex + 1}","title","Add ${cardFormat.name} note"]`;
+            saveButton.dataset.hotkey = `["addNote${saveButtonIndex + 1}","title",${JSON.stringify(addNoteTitle)}]`;
             // eslint-disable-next-line no-underscore-dangle
-            this._display._hotkeyHelpController.setHotkeyLabel(saveButton, `Add ${cardFormat.name} note ({0})`);
+            this._display._hotkeyHelpController.setHotkeyLabel(saveButton, `${addNoteTitle} ({0})`);
         } else {
             delete saveButton.dataset.hotkey;
         }
@@ -574,7 +577,7 @@ export class DisplayAnki {
 
         const verb = behavior === 'overwrite' ? 'Overwrite' : 'Add duplicate';
         const iconPrefix = behavior === 'overwrite' ? 'overwrite' : 'add-duplicate';
-        const target = `${cardFormat.name} note`;
+        const target = getMessage('ui_card_format_note', [localizeCardFormatName(cardFormat.name)]) || `${localizeCardFormatName(cardFormat.name)} note`;
 
         if (behavior === 'overwrite') {
             button.dataset.overwrite = 'true';

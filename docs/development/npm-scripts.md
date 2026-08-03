@@ -36,6 +36,9 @@ Scripts can be executed by running `npm run <name>`.
 
   Builds for Chromium and then uses `adb` to `push` the built zip file over to `/sdcard/yomitan`. You can then open up Kiwi Browser on the target phone and install the extension through that zip file.
 
+- `test:i18n`
+  Checks that every non-default locale under `ext/_locales/` contains all keys from `en/messages.json`. See [i18n.md](./i18n.md).
+
 - `test`
   Runs all of the tests.
 

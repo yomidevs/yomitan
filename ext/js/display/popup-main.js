@@ -19,6 +19,7 @@
 import {Application} from '../application.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {applyI18nToDocument} from '../language/i18n-util.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
 import {DisplayProfileSelection} from './display-profile-selection.js';
@@ -26,6 +27,8 @@ import {DisplayResizer} from './display-resizer.js';
 import {Display} from './display.js';
 
 await Application.main(true, async (application) => {
+    applyI18nToDocument();
+
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
