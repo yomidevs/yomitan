@@ -15,6 +15,53 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Generates all possible combinations of replacing each occurrence of a
+ * pattern with each of the options provided in replacements.
+ *
+ * For a pattern that matches `n` times, and a list of `m` replacements, this
+ * function returns `m^n` strings representing every possible combination of replacements.
+ *
+ * Note: This function should not be used for large values of n and m, due to its inherent
+ * exponential growth.
+ * @param {string} str
+ * @param {string|RegExp} pattern
+ * @param {string[]} replacements
+ * @returns {string[]}
+ */
+function generateReplacementCombinations(str, pattern, replacements) {
+    const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern, 'g');
+
+    const matches = [...str.matchAll(regex)];
+    const n = matches.length;
+
+    const m = replacements.length; // number of choices per match
+    const total = m ** n; // m^n combinations
+
+    const results = [];
+
+    for (let combination = 0; combination < total; combination++) {
+        // Treat `combination` as a base-m number with n digits.
+        // Starting from the least significant digit, position 0, until the most significant digit,
+        // position n-1, we loop through each digit of `combination`. Each position i is a digit
+        // between 0 and m-1, representing which of the m replacement choices to substitute the ith
+        // occurrence of `pattern` with
+        let current = combination;
+        const result = str.replaceAll(regex, (_) => {
+            // Pick replacement choice using the value of the current least significant digit
+            const choiceIndex = current % m;
+            // Pop the least significant digit
+            current = Math.floor(current / m);
+
+            return replacements[choiceIndex];
+        });
+
+        results.push(result);
+    }
+
+    return results;
+}
+
 const optionalDiacritics = [
     '\u0618', // Small Fatha
     '\u0619', // Small Damma
@@ -58,17 +105,10 @@ export const normalizeUnicode = {
 };
 
 /** @type {import('language').TextProcessor} */
-export const addHamzaTop = {
-    name: 'Add Hamza to top of Alif',
+export const substituteAlif = {
+    name: 'Substitutes plain alifs with its variations (alif with hamza, alif with madd)',
     description: 'اكبر → أكبر',
-    process: (text) => [text, text.replace('ا', 'أ')],
-};
-
-/** @type {import('language').TextProcessor} */
-export const addHamzaBottom = {
-    name: 'Add Hamza to bottom of Alif',
-    description: 'اسلام → إسلام',
-    process: (text) => [text, text.replace('ا', 'إ')],
+    process: (text) => generateReplacementCombinations(text, 'ا', ['ا', 'أ', 'إ', 'آ']),
 };
 
 /** @type {import('language').TextProcessor} */

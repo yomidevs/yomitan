@@ -17,8 +17,7 @@
 
 import {removeSyriacScriptDiacritics} from './aii/assyrian-neo-aramaic-text-preprocessors.js';
 import {
-    addHamzaBottom,
-    addHamzaTop,
+    substituteAlif,
     convertAlifMaqsuraToYaa,
     convertHaToTaMarbuta,
     normalizeUnicode,
@@ -101,8 +100,7 @@ const languageDescriptors = [
             removeArabicScriptDiacritics,
             removeTatweel,
             normalizeUnicode,
-            addHamzaTop,
-            addHamzaBottom,
+            substituteAlif,
             convertAlifMaqsuraToYaa,
         },
         languageTransforms: arabicTransforms,
@@ -116,8 +114,7 @@ const languageDescriptors = [
             removeArabicScriptDiacritics,
             removeTatweel,
             normalizeUnicode,
-            addHamzaTop,
-            addHamzaBottom,
+            substituteAlif,
             convertAlifMaqsuraToYaa,
             convertHaToTaMarbuta,
         },
