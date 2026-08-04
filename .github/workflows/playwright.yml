@@ -53,7 +53,7 @@ jobs:
       ### [PR] master-screenshots
 
       - name: "[PR] Grab latest screenshots from master branch"
-        uses: dawidd6/action-download-artifact@07ab29fd4a977ae4d2b275087cf67563dfdf0295 # pin@v2
+        uses: dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151 # pin@v2
         continue-on-error: true
         id: master-screenshots
         with:
