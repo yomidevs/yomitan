@@ -33,6 +33,7 @@ export async function createDictionaryArchiveData(dictionaryDirectory, dictionar
     // See dev/lib/zip.js for more details.
     const zipWriter = new ZipWriter(zipFileWriter, {
         level: 0,
+        useWebWorkers: false,
     });
     for (const fileName of fileNames) {
         if (/\.json$/.test(fileName)) {
@@ -57,8 +58,8 @@ export async function createDictionaryArchiveData(dictionaryDirectory, dictionar
  * @returns {Promise<string>}
  */
 export async function readArchiveEntryDataString(entry) {
-    if (typeof entry.getData === 'undefined') { throw new Error('Cannot get index data'); }
-    return await entry.getData(new TextWriter());
+    if (entry.directory) { throw new Error('Cannot get index data'); }
+    return await entry.getData(new TextWriter(), {useWebWorkers: false});
 }
 
 /**

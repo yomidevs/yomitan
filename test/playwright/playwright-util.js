@@ -28,6 +28,7 @@ export const test = base.extend({
     context: async ({}, /** @type {(r: import('playwright').BrowserContext) => Promise<void>} */ use) => {
         const pathToExtension = path.join(root, 'ext');
         const context = await chromium.launchPersistentContext('', {
+            ...(process.env.CI ? {channel: 'chrome'} : {}),
             // Disabled: headless: false,
             args: [
                 '--headless=new',
