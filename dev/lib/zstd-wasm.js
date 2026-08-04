@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2026  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +14,5 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import {vi} from 'vitest';
 
-/**
- *
- */
-export function setupStubs() {
-    vi.stubGlobal('yomitanRequireOpfs', false);
-    vi.stubGlobal('self', {
-        constructor: {
-            name: 'Window',
-        },
-    });
-
-
-    /** @returns {{addEventListener: () => void, terminate: () => void}} */
-    function Worker() {
-        return {
-            addEventListener: () => {},
-            terminate: () => {},
-        };
-    }
-    vi.stubGlobal('Worker', Worker);
-}
+export * from '@bokuweb/zstd-wasm';
