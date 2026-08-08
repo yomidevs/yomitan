@@ -1403,7 +1403,8 @@ export const japaneseTransforms = {
             '3. Indicates a state or condition that can be taken to be the result of undergoing some change.\n' +
             'Usage: Attach いる to the て-form of verbs. い can be dropped in speech.\n' +
             'Attach でいる after ない negative form of verbs.\n' +
-            '(Slang) Attach おる to the て-form of verbs. Contracts to とる・でる in speech.',
+            '(Slang) Attach おる to the て-form of verbs. Contracts to とる・でる in speech.\n' +
+            '(古文) Attach ゐる to the て-form of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -1412,13 +1413,16 @@ export const japaneseTransforms = {
             ],
             rules: [
                 suffixInflection('ている', 'て', ['v1'], ['-て']),
+                suffixInflection('てゐる', 'て', ['v1'], ['-て']),
                 suffixInflection('ておる', 'て', ['v5'], ['-て']),
                 suffixInflection('てる', 'て', ['v1p'], ['-て']),
                 suffixInflection('でいる', 'で', ['v1'], ['-て']),
+                suffixInflection('でゐる', 'で', ['v1'], ['-て']),
                 suffixInflection('でおる', 'で', ['v5'], ['-て']),
                 suffixInflection('でる', 'で', ['v1p'], ['-て']),
                 suffixInflection('とる', 'て', ['v5'], ['-て']),
                 suffixInflection('ないでいる', 'ない', ['v1'], ['adj-i']),
+                suffixInflection('ないでゐる', 'ない', ['v1'], ['adj-i']),
             ],
         },
         '-き': {
