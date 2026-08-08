@@ -1496,7 +1496,7 @@ const tests = [
         tests: [
             {term: '食べる', source: '食べないでいる', rule: 'v1', reasons: ['negative', '-いる']},
             {term: '食べる', source: '食べないでゐる', rule: 'v1', reasons: ['negative', '-いる']},
-        ]
+        ],
     },
     {
         category: 'kawaii',
@@ -1505,6 +1505,41 @@ const tests = [
             {term: 'かわいい', source: 'かわいげ',   rule: 'adj-i', reasons: ['-げ']},
             {term: '可愛い',   source: '可愛げ',   rule: 'adj-i', reasons: ['-げ']},
             {term: '可愛い',   source: '可愛気',   rule: 'adj-i', reasons: ['-げ']},
+        ],
+    },
+    {
+        category: 'historical kana (歴史的仮名遣い)',
+        valid: true,
+        tests: [
+            {term: '思う', source: '思ふ', rule: 'v5', reasons: ['-ふ']},
+            {term: '思う', source: '思へば', rule: 'v5', reasons: ['-ば']},
+            {term: '思う', source: '思はず', rule: 'v5', reasons: ['-ず']},
+            {term: '思う', source: '思はぬ', rule: 'v5', reasons: ['-ぬ']},
+            {term: '思う', source: '思はん', rule: 'v5', reasons: ['-ん']},
+            {term: '思う', source: '思はんばかり', rule: 'v5', reasons: ['-んばかり']},
+            {term: '思う', source: '思はんとする', rule: 'v5', reasons: ['-んとする']},
+            {term: '思う', source: '思はむ', rule: 'v5', reasons: ['-む']},
+            {term: '思う', source: '思はざる', rule: 'v5', reasons: ['-ざる']},
+            {term: '思う', source: '思はねば', rule: 'v5', reasons: ['-ねば']},
+            {term: '思う', source: '思はせる', rule: 'v5', reasons: ['causative']},
+            {term: '思う', source: '思はす', rule: 'v5', reasons: ['short causative']},
+            {term: '思う', source: '思へ', rule: 'v5', reasons: ['imperative']},
+            {term: '思う', source: '思ひ', rule: 'v5', reasons: ['continuative']},
+            {term: '思う', source: '思はない', rule: 'v5', reasons: ['negative']},
+            {term: '思う', source: '思はれる', rule: 'v5', reasons: ['passive']},
+            {term: '思う', source: '思ひます', rule: 'v5', reasons: ['-ます']},
+            {term: '思う', source: '思はう', rule: 'v5', reasons: ['volitional']},
+        ],
+    },
+    {
+        category: 'historical kana (歴史的仮名遣い) - combinations',
+        valid: true,
+        tests: [
+            {term: '思う', source: '思はせられたくない', rule: 'v5', reasons: ['causative', 'potential or passive', '-たい', 'negative']},
+            {term: '思う', source: '思ってしまふ', rule: 'v5', reasons: ['-て', '-しまう', '-ふ']},
+            {term: '思う', source: '思ってしまひました', rule: 'v5', reasons: ['-て', '-しまう', '-ます', '-た']},
+            {term: '思う', source: '思ってしまはう', rule: 'v5', reasons: ['-て', '-しまう', 'volitional']},
+            {term: '思う', source: '思ってゐぬ', rule: 'v5', reasons: ['-て', '-いる', '-ぬ']},
         ],
     },
     {

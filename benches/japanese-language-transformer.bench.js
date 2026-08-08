@@ -257,6 +257,27 @@ describe('japanese language transformer', () => {
             '買うたり',
         ];
 
+        const historicalKanaInflections = [
+            '思ふ',
+            '思へば',
+            '思はず',
+            '思はぬ',
+            '思はん',
+            '思はんばかり',
+            '思はんとする',
+            '思はむ',
+            '思はざる',
+            '思はねば',
+            '思はせる',
+            '思はす',
+            '思へ',
+            '思ひ',
+            '思はない',
+            '思はれる',
+            '思ひます',
+            '思はう',
+        ];
+
         const basicTransformations = [...adjectiveInflections, ...verbInflections, ...inflectionCombinations];
         bench(`japanese transformations (n=${basicTransformations.length})`, () => {
             for (const transform of basicTransformations) {
@@ -264,7 +285,7 @@ describe('japanese language transformer', () => {
             }
         });
 
-        const transformationsFull = [...basicTransformations, ...kuruInflections, ...suruInflections, ...kansaibenInflections];
+        const transformationsFull = [...basicTransformations, ...kuruInflections, ...suruInflections, ...kansaibenInflections, ...historicalKanaInflections];
         bench(`japanese transformations-full (n=${transformationsFull.length})`, () => {
             for (const transform of transformationsFull) {
                 languageTransformer.transform(transform);
