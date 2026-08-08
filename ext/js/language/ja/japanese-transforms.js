@@ -1421,8 +1421,7 @@ export const japaneseTransforms = {
             '3. Indicates a state or condition that can be taken to be the result of undergoing some change.\n' +
             'Usage: Attach いる to the て-form of verbs. い can be dropped in speech.\n' +
             'Attach でいる after ない negative form of verbs.\n' +
-            '(Slang) Attach おる to the て-form of verbs. Contracts to とる・でる in speech.\n' +
-            '(古文) Attach ゐる to the て-form of verbs.',
+            '(Slang) Attach おる to the て-form of verbs. Contracts to とる・でる in speech.',
             i18n: [
                 {
                     language: 'ja',
