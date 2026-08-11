@@ -122,6 +122,9 @@ export const ukrainianTransforms = {
                 suffixInflection('зі', 'г', [], ['n']), // 'друзі' -> 'друг'
                 alternatingSuffixInflection('и', '', [], ['n']), // 'столи' -> 'стіл'
                 alternatingSuffixInflection('і', 'ь', [], ['n']), // 'коні' -> 'кінь'
+                suffixInflection('ки', 'ок', [], ['n']), // 'підвечірки' -> 'підвечірок'
+                suffixInflection('ці', 'ець', [], ['n']), // 'українці' -> 'українець'
+                suffixInflection('йці', 'єць', [], ['n']), // 'латвійці' -> 'латвієць'
                 // Second declension, neuter
                 suffixInflection('а', 'о', [], ['n']), // 'вікна' -> 'вікно'
                 suffixInflection('я', 'е', [], ['n']), // 'поля' -> 'поле'
@@ -158,6 +161,16 @@ export const ukrainianTransforms = {
                 alternatingSuffixInflection('у', '', [], ['n']), // 'столу' -> 'стіл'
                 alternatingSuffixInflection('я', 'ь', [], ['n']), // 'коня' -> 'кінь'
                 alternatingSuffixInflection('ів', '', [], ['n']), // 'столів' -> 'стіл'
+                suffixInflection('ка', 'ок', [], ['n']), // 'підвечірка' -> 'підвечірок'
+                suffixInflection('ку', 'ок', [], ['n']), // 'підвечірку' -> 'підвечірок'
+                suffixInflection('ків', 'ок', [], ['n']), // 'підвечірків' -> 'підвечірок'
+                suffixInflection('ця', 'ець', [], ['n']), // 'українця' -> 'українець'
+                suffixInflection('цю', 'ець', [], ['n']), // 'українцю' -> 'українець'
+                suffixInflection('ців', 'ець', [], ['n']), // 'українців' -> 'українець'
+                suffixInflection('йця', 'єць', [], ['n']), // 'латвійця' -> 'латвієць'
+                suffixInflection('йців', 'єць', [], ['n']), // 'латвійців' -> 'латвієць'
+                suffixInflection('ій', 'ія', [], ['n']), // 'сесій' -> 'сесія'
+                alternatingSuffixInflection('и', 'ь', [], ['n']), // 'щільности' -> 'щільність'
                 // Second declension, neuter
                 suffixInflection('а', 'о', [], ['n']), // 'вікна' -> 'вікно'
                 suffixInflection('я', 'е', [], ['n']), // 'поля' -> 'поле'
@@ -204,6 +217,11 @@ export const ukrainianTransforms = {
                 alternatingSuffixInflection('ові', '', [], ['n']), // 'столові' -> 'стіл'
                 alternatingSuffixInflection('еві', 'ь', [], ['n']), // 'коневі' -> 'кінь'
                 alternatingSuffixInflection('ям', 'ь', [], ['n']), // 'коням' -> 'кінь'
+                suffixInflection('кові', 'ок', [], ['n']), // 'підвечіркові' -> 'підвечірок'
+                suffixInflection('ку', 'ок', [], ['n']), // 'підвечірку' -> 'підвечірок'
+                suffixInflection('кам', 'ок', [], ['n']), // 'підвечіркам' -> 'підвечірок'
+                suffixInflection('цеві', 'ець', [], ['n']), // 'українцеві' -> 'українець'
+                suffixInflection('цям', 'ець', [], ['n']), // 'українцям' -> 'українець'
                 // Second declension, neuter
                 suffixInflection('у', 'о', [], ['n']), // 'вікну' -> 'вікно'
                 suffixInflection('ю', 'е', [], ['n']), // 'полю' -> 'поле'
@@ -257,6 +275,12 @@ export const ukrainianTransforms = {
                 alternatingSuffixInflection('ом', '', [], ['n']), // 'столом' -> 'стіл'
                 alternatingSuffixInflection('ем', 'ь', [], ['n']), // 'конем' -> 'кінь'
                 alternatingSuffixInflection('ями', 'ь', [], ['n']), // 'конями' -> 'кінь'
+                suffixInflection('ком', 'ок', [], ['n']), // 'підвечірком' -> 'підвечірок'
+                suffixInflection('ками', 'ок', [], ['n']), // 'підвечірками' -> 'підвечірок'
+                suffixInflection('цем', 'ець', [], ['n']), // 'українцем' -> 'українець'
+                suffixInflection('цями', 'ець', [], ['n']), // 'українцями' -> 'українець'
+                suffixInflection('йцем', 'єць', [], ['n']), // 'латвійцем' -> 'латвієць'
+                suffixInflection('йцями', 'єць', [], ['n']), // 'латвійцями' -> 'латвієць'
                 // Second declension, neuter
                 suffixInflection('ом', 'о', [], ['n']), // 'вікном' -> 'вікно'
                 suffixInflection('ем', 'е', [], ['n']), // 'полем' -> 'поле'
@@ -303,6 +327,12 @@ export const ukrainianTransforms = {
                 suffixInflection('зі', 'г', [], ['n']), // 'друзі' -> 'друг'
                 alternatingSuffixInflection('і', '', [], ['n']), // 'столі' -> 'стіл'
                 alternatingSuffixInflection('ях', 'ь', [], ['n']), // 'конях' -> 'кінь'
+                suffixInflection('і', '', [], ['n']), // "харків’янині" -> "харків’янин"
+                suffixInflection('ку', 'ок', [], ['n']), // 'підвечірку' -> 'підвечірок'
+                suffixInflection('ках', 'ок', [], ['n']), // 'підвечірках' -> 'підвечірок'
+                suffixInflection('ці', 'ець', [], ['n']), // 'українці' -> 'українець'
+                suffixInflection('цях', 'ець', [], ['n']), // 'українцях' -> 'українець'
+                suffixInflection('йці', 'єць', [], ['n']), // 'латвійці' -> 'латвієць'
                 // Second declension, neuter
                 suffixInflection('і', 'о', [], ['n']), // 'вікні' -> 'вікно'
                 suffixInflection('і', 'е', [], ['n']), // 'полі' -> 'поле'
@@ -319,6 +349,8 @@ export const ukrainianTransforms = {
                 suffixInflection('их', 'ий', [], ['adj']), // 'гарних' -> 'гарний'
                 suffixInflection('ьому', 'ій', [], ['adj']), // 'синьому' -> 'синій'
                 suffixInflection('іх', 'ій', [], ['adj']), // 'синіх' -> 'синій'
+                suffixInflection('ім', 'ий', [], ['adj']), // 'гарнім' -> 'гарний'
+                suffixInflection('ім', 'ій', [], ['adj']), // 'синім' -> 'синій'
             ],
         },
         'vocative': {
@@ -335,6 +367,7 @@ export const ukrainianTransforms = {
                 suffixInflection('ю', 'й', [], ['n']), // 'краю' -> 'край'
                 suffixInflection('ю', 'ь', [], ['n']), // 'учителю' -> 'учитель'
                 alternatingSuffixInflection('е', '', [], ['n']), // 'столе' -> 'стіл'
+                alternatingSuffixInflection('е', 'ь', [], ['n']), // 'радосте' -> 'радість'
             ],
         },
         'feminine': {
@@ -492,6 +525,12 @@ export const ukrainianTransforms = {
                 ['млю', 'мити'], // 'ломлю' -> 'ломити'
                 ['плю', 'пити'], // 'куплю' -> 'купити'
                 ['флю', 'фити'], // 'графлю' -> 'графити'
+                // Colloquial short first-person plural in -м beside the standard -мо
+                ['аєм', 'ати'],
+                ['яєм', 'яти'],
+                ['уєм', 'увати'],
+                ['юєм', 'ювати'],
+                ['ієм', 'іти'],
             ]),
         },
         'future': {
@@ -505,6 +544,7 @@ export const ukrainianTransforms = {
                 ['тимемо', 'ти'],
                 ['тимете', 'ти'],
                 ['тимуть', 'ти'],
+                ['тимем', 'ти'], // colloquial short first-person plural
             ]),
         },
         'past': {
@@ -546,6 +586,13 @@ export const ukrainianTransforms = {
             name: 'imperative',
             description: 'Imperative mood of a verb',
             rules: verbInflections([
+                // -увати and -ювати stems: 'маринуймо' -> 'маринувати'
+                ['уй', 'увати'],
+                ['уймо', 'увати'],
+                ['уйте', 'увати'],
+                ['юй', 'ювати'],
+                ['юймо', 'ювати'],
+                ['юйте', 'ювати'],
                 // Stems with a j before the ending: 'читай' -> 'читати'
                 ['й', 'ти'],
                 ['ймо', 'ти'],

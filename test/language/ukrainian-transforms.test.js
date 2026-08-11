@@ -308,6 +308,57 @@ const tests = [
         ],
     },
     {
+        category: 'stems which drop a vowel before the ending',
+        valid: true,
+        tests: [
+            {term: 'підвечірок', source: 'підвечірка', rule: 'n', reasons: ['genitive']},
+            {term: 'підвечірок', source: 'підвечірку', rule: 'n', reasons: ['dative']},
+            {term: 'підвечірок', source: 'підвечірком', rule: 'n', reasons: ['instrumental']},
+            {term: 'підвечірок', source: 'підвечірками', rule: 'n', reasons: ['instrumental']},
+            {term: 'підвечірок', source: 'підвечірках', rule: 'n', reasons: ['locative']},
+            {term: 'підвечірок', source: 'підвечірки', rule: 'n', reasons: ['nominative plural']},
+            {term: 'українець', source: 'українця', rule: 'n', reasons: ['genitive']},
+            {term: 'українець', source: 'українцем', rule: 'n', reasons: ['instrumental']},
+            {term: 'українець', source: 'українців', rule: 'n', reasons: ['genitive']},
+            {term: 'українець', source: 'українці', rule: 'n', reasons: ['nominative plural']},
+            {term: 'латвієць', source: 'латвійцем', rule: 'n', reasons: ['instrumental']},
+            {term: 'латвієць', source: 'латвійця', rule: 'n', reasons: ['genitive']},
+        ],
+    },
+    {
+        category: 'additional case endings',
+        valid: true,
+        tests: [
+            {term: 'гарний', source: 'гарнім', rule: 'adj', reasons: ['locative']},
+            {term: 'синій', source: 'синім', rule: 'adj', reasons: ['locative']},
+            {term: 'сесія', source: 'сесій', rule: 'n', reasons: ['genitive']},
+            {term: 'радість', source: 'радосте', rule: 'n', reasons: ['vocative']},
+            {term: 'щільність', source: 'щільности', rule: 'n', reasons: ['genitive']},
+        ],
+    },
+    {
+        category: 'imperatives of -увати and -ювати verbs',
+        valid: true,
+        tests: [
+            {term: 'маринувати', source: 'маринуй', rule: 'v', reasons: ['imperative']},
+            {term: 'маринувати', source: 'маринуймо', rule: 'v', reasons: ['imperative']},
+            {term: 'замаринувати', source: 'замаринуйте', rule: 'v', reasons: ['imperative']},
+            {term: 'ухвалювати', source: 'ухвалюй', rule: 'v', reasons: ['imperative']},
+            {term: 'ухвалювати', source: 'ухвалюйте', rule: 'v', reasons: ['imperative']},
+        ],
+    },
+    {
+        category: 'colloquial short first-person plural',
+        valid: true,
+        tests: [
+            {term: 'читати', source: 'читаєм', rule: 'v', reasons: ['present']},
+            {term: 'ухвалювати', source: 'ухвалюєм', rule: 'v', reasons: ['present']},
+            {term: 'замаринувати', source: 'замаринуєм', rule: 'v', reasons: ['present']},
+            {term: 'розуміти', source: 'розумієм', rule: 'v', reasons: ['present']},
+            {term: 'ухвалювати', source: 'ухвалюватимем', rule: 'v', reasons: ['future']},
+        ],
+    },
+    {
         category: 'invalid deinflections',
         valid: false,
         tests: [
