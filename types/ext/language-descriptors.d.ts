@@ -269,7 +269,10 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     uk: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & {
+            removeUkrainianDiacritics: TextProcessor;
+            ukrainianApostropheVariants: TextProcessor;
+        };
     };
     vi: {
         pre: CapitalizationPreprocessors & {
