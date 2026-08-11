@@ -22,6 +22,13 @@
  */
 const apostropheVariantsRegExp = /['‘’ʼ`´]/g;
 
+/**
+ * Dictionary terms are indexed exactly as the dictionary spells them, so a variant has to be
+ * produced for every character an entry might realistically be stored with, not just for the one
+ * the scanned text happens to use. These three all occur as headword spellings in practice.
+ */
+const apostropheNormalizations = ['\'', '’', 'ʼ'];
+
 /** @type {import('language').TextProcessor} */
 export const removeUkrainianDiacritics = {
     name: 'Remove diacritics',
@@ -32,10 +39,9 @@ export const removeUkrainianDiacritics = {
 /** @type {import('language').TextProcessor} */
 export const ukrainianApostropheVariants = {
     name: 'Search for apostrophe variants',
-    description: '’ → \' and vice versa',
+    description: '’ → \', ʼ → \' and vice versa',
     process: (str) => [
         str,
-        str.replace(apostropheVariantsRegExp, '\''),
-        str.replace(apostropheVariantsRegExp, '’'),
+        ...apostropheNormalizations.map((apostrophe) => str.replace(apostropheVariantsRegExp, apostrophe)),
     ],
 };
