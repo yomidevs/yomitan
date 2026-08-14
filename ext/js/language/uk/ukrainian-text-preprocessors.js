@@ -19,6 +19,9 @@
  * Ukrainian uses several visually similar characters for the apostrophe which separates a labial
  * consonant from a following iotated vowel, as in "п'ять". Dictionaries and the text they are
  * scanned against rarely agree on which one to use, so all of them are treated as equivalent.
+ * The input set is deliberately wider than the output set below: the grave and acute accents show up
+ * in careless typing but never as a dictionary headword spelling, so they are recognised on the way
+ * in and never generated on the way out.
  */
 const apostropheVariantsRegExp = /['‘’ʼ`´]/g;
 
