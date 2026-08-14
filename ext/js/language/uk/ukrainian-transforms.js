@@ -68,11 +68,17 @@ function zeroEndingInflection(deinflectedSuffix) {
  * @returns {import('language-transformer').Rule<Condition>[]}
  */
 function verbInflection(inflectedSuffix, deinflectedSuffix) {
-    return [
+    const rules = [
         suffixInflection(inflectedSuffix, deinflectedSuffix, [], ['v']),
         suffixInflection(`${inflectedSuffix}ся`, `${deinflectedSuffix}ся`, [], ['v']),
-        suffixInflection(`${inflectedSuffix}сь`, `${deinflectedSuffix}ся`, [], ['v']),
+        suffixInflection(`${inflectedSuffix}сь`, `${deinflectedSuffix}сь`.replace(/сь$/, 'ся'), [], ['v']),
     ];
+    // A third-person singular ending in a vowel keeps its underlying -ть before the postfix:
+    // "сміється", not "смієся".
+    if (/[еє]$/.test(inflectedSuffix)) {
+        rules.push(suffixInflection(`${inflectedSuffix}ться`, `${deinflectedSuffix}ся`, [], ['v']));
+    }
+    return rules;
 }
 
 /**
@@ -185,6 +191,15 @@ export const ukrainianTransforms = {
                 suffixInflection('ель', 'ля', [], ['n']), // 'земель' -> 'земля'
                 suffixInflection('ень', 'ня', [], ['n']), // 'пісень' -> 'пісня'
                 zeroEndingInflection('а'), // 'книг' -> 'книга'
+                suffixInflection('ань', 'ання', [], ['n']), // 'завдань' -> 'завдання'
+                suffixInflection('ень', 'ення', [], ['n']), // 'рішень' -> 'рішення'
+                suffixInflection('інь', 'іння', [], ['n']), // 'знарядінь' -> 'знаряддя'
+                suffixInflection('ищ', 'ище', [], ['n']), // 'училищ' -> 'училище'
+                suffixInflection('ць', 'це', [], ['n']), // 'місць' -> 'місце'
+                suffixInflection('дець', 'це', [], ['n']), // 'сердець' -> 'серце'
+                suffixInflection('ів', 'и', [], ['n']), // 'перегонів' -> 'перегони'
+                suffixInflection('ей', 'і', [], ['n']), // 'дверей' -> 'двері'
+                suffixInflection('иць', 'иця', [], ['n']), // 'автолюбительниць' -> 'автолюбительниця'
                 // Second declension, masculine
                 suffixInflection('а', '', [], ['n']), // 'студента' -> 'студент'
                 suffixInflection('у', '', [], ['n']), // 'телефону' -> 'телефон'
@@ -402,6 +417,18 @@ export const ukrainianTransforms = {
                 suffixInflection('ю', 'ь', [], ['n']), // 'учителю' -> 'учитель'
                 alternatingSuffixInflection('е', '', [], ['n']), // 'столе' -> 'стіл'
                 alternatingSuffixInflection('е', 'ь', [], ['n']), // 'радосте' -> 'радість'
+            ],
+        },
+        'archaic full form': {
+            name: 'archaic full form',
+            description: 'Longer adjective form found in verse and folk song, beside the standard one',
+            rules: [
+                suffixInflection('ая', 'ий', [], ['adj']), // 'багатая' -> 'багатий'
+                suffixInflection('еє', 'ий', [], ['adj']), // 'бажанеє' -> 'бажаний'
+                suffixInflection('ії', 'ий', [], ['adj']), // 'білії' -> 'білий'
+                suffixInflection('яя', 'ій', [], ['adj']), // 'синяя' -> 'синій'
+                suffixInflection('єє', 'ій', [], ['adj']), // 'синєє' -> 'синій'
+                suffixInflection('ії', 'ій', [], ['adj']), // 'синії' -> 'синій'
             ],
         },
         'feminine': {
@@ -672,6 +699,13 @@ export const ukrainianTransforms = {
                 ['удуть', 'ути'],
             ]),
         },
+        'reflexive infinitive': {
+            name: 'reflexive infinitive',
+            description: 'The -тись variant of a reflexive infinitive, beside the standard -тися',
+            rules: [
+                suffixInflection('тись', 'тися', [], ['v']), // 'вчитись' -> 'вчитися'
+            ],
+        },
         'past': {
             name: 'past',
             description: 'Past tense of a verb',
@@ -766,6 +800,13 @@ export const ukrainianTransforms = {
                 ['жіть', 'зати'],
                 ['жи', 'гти'], // 'біжи' -> 'бігти'
                 ['жіть', 'гти'],
+                ['ни', 'нути'], // 'крикни' -> 'крикнути'
+                ['нім', 'нути'], // truncated: 'бабахнім' beside 'бабахнімо'
+                ['ім', 'ити'], // truncated: 'ввалім' beside 'ввалімо'
+                ['ім', 'ати'],
+                ['ім', 'ти'],
+                ['німо', 'нути'],
+                ['ніть', 'нути'],
                 ['ви', 'ти'], // 'живи' -> 'жити'
                 ['віть', 'ти'],
             ]),
@@ -831,6 +872,7 @@ export const ukrainianTransforms = {
                 ['уєм', 'увати'],
                 ['юєм', 'ювати'],
                 ['ієм', 'іти'],
+                ['нем', 'нути'], // 'крикнем' -> 'крикнути'
             ]),
         },
         'colloquial future': {
@@ -1055,6 +1097,36 @@ export const ukrainianTransforms = {
                 suffixInflection('дцятьом', 'дцять', [], ['num']),
                 suffixInflection('дцятьма', 'дцять', [], ['num']),
                 suffixInflection('дцятьома', 'дцять', [], ['num']),
+            ],
+        },
+        'impersonal passive': {
+            name: 'impersonal passive',
+            description: 'Impersonal passive form of a verb, as in "було зроблено"',
+            rules: [
+                suffixInflection('ано', 'ати', [], ['v']), // 'написано' -> 'написати'
+                suffixInflection('яно', 'яти', [], ['v']),
+                suffixInflection('овано', 'увати', [], ['v']), // 'абортовано' -> 'абортувати'
+                suffixInflection('ьовано', 'ювати', [], ['v']), // 'мальовано' -> 'малювати'
+                suffixInflection('ено', 'ити', [], ['v']), // 'визначено' -> 'визначити'
+                suffixInflection('ено', 'ти', [], ['v']), // 'несено' -> 'нести'
+                suffixInflection('лено', 'ити', [], ['v']), // 'зроблено' -> 'зробити'
+                suffixInflection('дено', 'ти', [], ['v']), // 'знайдено' -> 'знайти'
+                suffixInflection('джено', 'дити', [], ['v']), // 'народжено' -> 'народити'
+                suffixInflection('шено', 'сити', [], ['v']), // 'запрошено' -> 'запросити'
+                suffixInflection('чено', 'тити', [], ['v']), // 'сплачено' -> 'сплатити'
+                suffixInflection('щено', 'стити', [], ['v']), // 'прощено' -> 'простити'
+                suffixInflection('нено', 'нути', [], ['v']), // 'зігнено' -> 'зігнути'
+                suffixInflection('то', 'ти', [], ['v']), // 'вжито' -> 'вжити'
+            ],
+        },
+        'possessive adjective': {
+            name: 'possessive adjective',
+            description: 'Declined form of a possessive adjective',
+            rules: [
+                ...['ового', 'овому', 'овим', 'ова', 'ової', 'овій', 'ову', 'овою', 'ове', 'ові', 'ових', 'овими']
+                    .map((ending) => suffixInflection(ending, 'ів', [], ['adj'])), // 'батькового' -> 'батьків'
+                ...['иного', 'иному', 'иним', 'ина', 'иної', 'иній', 'ину', 'иною', 'ине', 'ині', 'иних', 'иними']
+                    .map((ending) => suffixInflection(ending, 'ин', [], ['adj'])), // 'сестриного' -> 'сестрин'
             ],
         },
         'verbal noun': {

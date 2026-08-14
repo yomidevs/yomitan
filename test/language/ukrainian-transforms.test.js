@@ -495,6 +495,78 @@ const tests = [
         ],
     },
     {
+        category: 'impersonal passive',
+        valid: true,
+        tests: [
+            {term: 'зробити', source: 'зроблено', rule: 'v', reasons: ['impersonal passive']},
+            {term: 'написати', source: 'написано', rule: 'v', reasons: ['impersonal passive']},
+            {term: 'показати', source: 'показано', rule: 'v', reasons: ['impersonal passive']},
+            {term: 'знайти', source: 'знайдено', rule: 'v', reasons: ['impersonal passive']},
+            {term: 'визначити', source: 'визначено', rule: 'v', reasons: ['impersonal passive']},
+            {term: 'створити', source: 'створено', rule: 'v', reasons: ['impersonal passive']},
+            {term: 'абортувати', source: 'абортовано', rule: 'v', reasons: ['impersonal passive']},
+            {term: 'народити', source: 'народжено', rule: 'v', reasons: ['impersonal passive']},
+            {term: 'вжити', source: 'вжито', rule: 'v', reasons: ['impersonal passive']},
+            {term: 'прийняти', source: 'прийнято', rule: 'v', reasons: ['impersonal passive']},
+        ],
+    },
+    {
+        category: 'reflexive third person and -тись infinitive',
+        valid: true,
+        tests: [
+            {term: 'вчитися', source: 'вчитись', rule: 'v', reasons: ['reflexive infinitive']},
+            {term: 'сміятися', source: 'сміятись', rule: 'v', reasons: ['reflexive infinitive']},
+            {term: 'сміятися', source: 'сміється', rule: 'v', reasons: ['present']},
+            {term: 'акліматизуватися', source: 'акліматизується', rule: 'v', reasons: ['present']},
+            {term: 'опрацьовуватися', source: 'опрацьовується', rule: 'v', reasons: ['present']},
+        ],
+    },
+    {
+        category: 'genitive plural, further stem types',
+        valid: true,
+        tests: [
+            {term: 'завдання', source: 'завдань', rule: 'n', reasons: ['genitive']},
+            {term: 'знання', source: 'знань', rule: 'n', reasons: ['genitive']},
+            {term: 'рішення', source: 'рішень', rule: 'n', reasons: ['genitive']},
+            {term: 'училище', source: 'училищ', rule: 'n', reasons: ['genitive']},
+            {term: 'місце', source: 'місць', rule: 'n', reasons: ['genitive']},
+            {term: 'серце', source: 'сердець', rule: 'n', reasons: ['genitive']},
+            {term: 'двері', source: 'дверей', rule: 'n', reasons: ['genitive']},
+            {term: 'перегони', source: 'перегонів', rule: 'n', reasons: ['genitive']},
+        ],
+    },
+    {
+        category: 'the -нути verb class',
+        valid: true,
+        tests: [
+            {term: 'крикнути', source: 'крикни', rule: 'v', reasons: ['imperative']},
+            {term: 'крикнути', source: 'крикніть', rule: 'v', reasons: ['imperative']},
+            {term: 'крикнути', source: 'крикнімо', rule: 'v', reasons: ['imperative']},
+            {term: 'бабахнути', source: 'бабахнім', rule: 'v', reasons: ['imperative']},
+            {term: 'крикнути', source: 'крикнем', rule: 'v', reasons: ['colloquial present']},
+        ],
+    },
+    {
+        category: 'possessive adjectives',
+        valid: true,
+        tests: [
+            {term: 'батьків', source: 'батькового', rule: 'adj', reasons: ['possessive adjective']},
+            {term: 'батьків', source: 'батьковому', rule: 'adj', reasons: ['possessive adjective']},
+            {term: 'сестрин', source: 'сестриного', rule: 'adj', reasons: ['possessive adjective']},
+            {term: 'материн', source: 'материна', rule: 'adj', reasons: ['possessive adjective']},
+        ],
+    },
+    {
+        category: 'archaic full adjective forms',
+        valid: true,
+        tests: [
+            {term: 'багатий', source: 'багатая', rule: 'adj', reasons: ['archaic full form']},
+            {term: 'бажаний', source: 'бажанеє', rule: 'adj', reasons: ['archaic full form']},
+            {term: 'білий', source: 'білії', rule: 'adj', reasons: ['archaic full form']},
+            {term: 'синій', source: 'синяя', rule: 'adj', reasons: ['archaic full form']},
+        ],
+    },
+    {
         category: 'invalid deinflections',
         valid: false,
         tests: [
