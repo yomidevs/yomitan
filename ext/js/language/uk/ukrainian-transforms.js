@@ -419,18 +419,6 @@ export const ukrainianTransforms = {
                 alternatingSuffixInflection('е', 'ь', [], ['n']), // 'радосте' -> 'радість'
             ],
         },
-        'archaic full form': {
-            name: 'archaic full form',
-            description: 'Longer adjective form found in verse and folk song, beside the standard one',
-            rules: [
-                suffixInflection('ая', 'ий', [], ['adj']), // 'багатая' -> 'багатий'
-                suffixInflection('еє', 'ий', [], ['adj']), // 'бажанеє' -> 'бажаний'
-                suffixInflection('ії', 'ий', [], ['adj']), // 'білії' -> 'білий'
-                suffixInflection('яя', 'ій', [], ['adj']), // 'синяя' -> 'синій'
-                suffixInflection('єє', 'ій', [], ['adj']), // 'синєє' -> 'синій'
-                suffixInflection('ії', 'ій', [], ['adj']), // 'синії' -> 'синій'
-            ],
-        },
         'feminine': {
             name: 'feminine',
             description: 'Feminine form of an adjective',

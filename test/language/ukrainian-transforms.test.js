@@ -557,16 +557,6 @@ const tests = [
         ],
     },
     {
-        category: 'archaic full adjective forms',
-        valid: true,
-        tests: [
-            {term: 'багатий', source: 'багатая', rule: 'adj', reasons: ['archaic full form']},
-            {term: 'бажаний', source: 'бажанеє', rule: 'adj', reasons: ['archaic full form']},
-            {term: 'білий', source: 'білії', rule: 'adj', reasons: ['archaic full form']},
-            {term: 'синій', source: 'синяя', rule: 'adj', reasons: ['archaic full form']},
-        ],
-    },
-    {
         category: 'invalid deinflections',
         valid: false,
         tests: [
