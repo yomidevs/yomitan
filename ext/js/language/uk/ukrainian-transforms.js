@@ -428,8 +428,34 @@ export const ukrainianTransforms = {
                 suffixInflection('ший', 'кий', ['adj'], ['adj']), // 'солодший' -> 'солодкий'
                 suffixInflection('жчий', 'зький', ['adj'], ['adj']), // 'ближчий' -> 'близький'
                 suffixInflection('щий', 'сокий', ['adj'], ['adj']), // 'вищий' -> 'високий'
+                suffixInflection('рший', 'рий', ['adj'], ['adj']), // 'старший' -> 'старий'
+                suffixInflection('дший', 'дий', ['adj'], ['adj']), // 'молодший' -> 'молодий'
+                suffixInflection('ший', 'гий', ['adj'], ['adj']), // 'довший' -> 'довгий'
+                suffixInflection('вший', 'вий', ['adj'], ['adj']), // 'дешевший' -> 'дешевий'
+                suffixInflection('жчий', 'жкий', ['adj'], ['adj']), // 'тяжчий' -> 'тяжкий'
+                suffixInflection('жчий', 'гий', ['adj'], ['adj']), // 'дорожчий' -> 'дорогий'
+                suffixInflection('бший', 'бокий', ['adj'], ['adj']), // 'глибший' -> 'глибокий'
+                suffixInflection('вщий', 'встий', ['adj'], ['adj']), // 'товщий' -> 'товстий'
+                suffixInflection('ирший', 'ирокий', ['adj'], ['adj']), // 'ширший' -> 'широкий'
+                // Suppletive degrees share no stem with their base word, so they are listed
+                wholeWordInflection('більший', 'великий', ['adj'], ['adj']),
+                wholeWordInflection('менший', 'малий', ['adj'], ['adj']),
+                wholeWordInflection('кращий', 'добрий', ['adj'], ['adj']),
+                wholeWordInflection('кращий', 'хороший', ['adj'], ['adj']),
+                wholeWordInflection('ліпший', 'добрий', ['adj'], ['adj']),
+                wholeWordInflection('гірший', 'поганий', ['adj'], ['adj']),
                 suffixInflection('іше', 'о', ['adv'], ['adv']), // 'гарніше' -> 'гарно'
                 suffixInflection('ше', 'ко', ['adv'], ['adv']), // 'швидше' -> 'швидко'
+                suffixInflection('ше', 'го', ['adv'], ['adv']), // 'довше' -> 'довго'
+                suffixInflection('ще', 'соко', ['adv'], ['adv']), // 'вище' -> 'високо'
+                suffixInflection('жче', 'зько', ['adv'], ['adv']), // 'ближче' -> 'близько'
+                suffixInflection('жче', 'жко', ['adv'], ['adv']), // 'тяжче' -> 'тяжко'
+                suffixInflection('жче', 'го', ['adv'], ['adv']), // 'дорожче' -> 'дорого'
+                wholeWordInflection('більше', 'багато', ['adv'], ['adv']),
+                wholeWordInflection('менше', 'мало', ['adv'], ['adv']),
+                wholeWordInflection('краще', 'добре', ['adv'], ['adv']),
+                wholeWordInflection('ліпше', 'добре', ['adv'], ['adv']),
+                wholeWordInflection('гірше', 'погано', ['adv'], ['adv']),
             ],
         },
         'superlative': {
@@ -782,6 +808,18 @@ export const ukrainianTransforms = {
                 ['вши', 'ти'], // 'прочитавши' -> 'прочитати'
                 ['уючи', 'увати'], // 'фінансуючи' -> 'фінансувати'
                 ['юючи', 'ювати'],
+                // Gerunds of the irregular verbs
+                ['ївши', 'їсти'], // "з'ївши" -> "з'їсти"
+                ['їдячи', 'їсти'],
+                ['ідучи', 'іти'], // 'ідучи' -> 'іти'
+                ['йдучи', 'йти'],
+                ['удучи', 'ути'], // 'будучи' -> 'бути'
+                ['еручи', 'рати'], // 'беручи' -> 'брати'
+                ['жучи', 'зати'], // 'кажучи' -> 'казати'
+                ['вучи', 'ти'], // 'живучи' -> 'жити'
+                ['жачи', 'гти'], // 'біжачи' -> 'бігти'
+                ['тячи', 'тіти'], // 'хотячи' -> 'хотіти'
+                ["'ючи", 'ити'], // "п'ючи" -> 'пити'
             ]),
         },
         'colloquial present': {
