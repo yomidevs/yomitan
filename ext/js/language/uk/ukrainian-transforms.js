@@ -84,6 +84,32 @@ function verbInflections(endings) {
     return endings.flatMap(([inflectedSuffix, deinflectedSuffix]) => verbInflection(inflectedSuffix, deinflectedSuffix));
 }
 
+
+/**
+ * Pronouns, determiners and numerals are closed classes: the full paradigm of each one can simply be
+ * listed. Enumerating them cannot over-generate the way a suffix rule can, and their stems alternate
+ * too freely ("я" → "мене", "цей" → "цього", "два" → "двома") for suffix rules to reach anyway.
+ * @param {string} lemma
+ * @param {string} stem
+ * @param {string[]} endings
+ * @param {Condition} condition
+ * @returns {import('language-transformer').Rule<Condition>[]}
+ */
+function closedClassParadigm(lemma, stem, endings, condition) {
+    return endings.flatMap((ending) => (stem + ending === lemma ? [] : [wholeWordInflection(stem + ending, lemma, [], [condition])]));
+}
+
+/** Hard-stem determiners: той, який, такий, котрий, сам, наш, ваш. */
+const hardDeterminerEndings = ['ого', 'ому', 'им', 'а', 'ої', 'ій', 'у', 'ою', 'е', 'і', 'их', 'ими', 'ім'];
+/** Soft-stem determiners: цей. */
+const softDeterminerEndings = ['ього', 'ьому', 'им', 'я', 'ієї', 'ій', 'ю', 'ією', 'е', 'і', 'их', 'ими', 'ім'];
+/** Possessives on a vowel stem: мій, твій, свій. */
+const possessiveEndings = ['го', 'єму', 'їм', 'я', 'єї', 'їй', 'ю', 'єю', 'є', 'ї', 'їх', 'їми'];
+/** весь / увесь, whose plural and instrumental take і. */
+const vesEndings = ['ього', 'ьому', 'ім', 'я', 'ієї', 'ій', 'ю', 'ією', 'е', 'і', 'іх', 'іма'];
+/** їхній-type soft stems. */
+const softNijEndings = ['ього', 'ьому', 'ім', 'я', 'ьої', 'ій', 'ю', 'ьою', 'є', 'і', 'іх', 'іми'];
+
 const conditions = {
     n: {
         name: 'Noun',
@@ -95,6 +121,14 @@ const conditions = {
     },
     adv: {
         name: 'Adverb',
+        isDictionaryForm: true,
+    },
+    pron: {
+        name: 'Pronoun',
+        isDictionaryForm: true,
+    },
+    num: {
+        name: 'Numeral',
         isDictionaryForm: true,
     },
     v: {
@@ -723,6 +757,8 @@ export const ukrainianTransforms = {
                 suffixInflection('шений', 'сити', ['adj'], ['v']), // 'запрошений' -> 'запросити'
                 suffixInflection('чений', 'тити', ['adj'], ['v']), // 'сплачений' -> 'сплатити'
                 suffixInflection('щений', 'стити', ['adj'], ['v']), // 'прощений' -> 'простити'
+                suffixInflection('ований', 'увати', ['adj'], ['v']), // 'маринований' -> 'маринувати'
+                suffixInflection('ьований', 'ювати', ['adj'], ['v']), // 'мальований' -> 'малювати'
             ],
         },
         'active participle': {
@@ -744,6 +780,8 @@ export const ukrainianTransforms = {
                 ['ачи', 'ати'], // 'кричачи' -> 'кричати'
                 ['ячи', 'ити'], // 'говорячи' -> 'говорити'
                 ['вши', 'ти'], // 'прочитавши' -> 'прочитати'
+                ['уючи', 'увати'], // 'фінансуючи' -> 'фінансувати'
+                ['юючи', 'ювати'],
             ]),
         },
         'colloquial present': {
@@ -763,6 +801,223 @@ export const ukrainianTransforms = {
             rules: verbInflections([
                 ['тимем', 'ти'], // 'читатимем' -> 'читати'
             ]),
+        },
+        'pronoun declension': {
+            name: 'pronoun declension',
+            description: 'Declined form of a pronoun or determiner',
+            rules: [
+                // Personal, interrogative and negative pronouns are suppletive
+                wholeWordInflection('мене', 'я', [], ['pron']),
+                wholeWordInflection('мені', 'я', [], ['pron']),
+                wholeWordInflection('мною', 'я', [], ['pron']),
+                wholeWordInflection('тебе', 'ти', [], ['pron']),
+                wholeWordInflection('тобі', 'ти', [], ['pron']),
+                wholeWordInflection('тобою', 'ти', [], ['pron']),
+                wholeWordInflection('його', 'він', [], ['pron']),
+                wholeWordInflection('нього', 'він', [], ['pron']),
+                wholeWordInflection('йому', 'він', [], ['pron']),
+                wholeWordInflection('ньому', 'він', [], ['pron']),
+                wholeWordInflection('ним', 'він', [], ['pron']),
+                wholeWordInflection('нім', 'він', [], ['pron']),
+                wholeWordInflection('його', 'воно', [], ['pron']),
+                wholeWordInflection('нього', 'воно', [], ['pron']),
+                wholeWordInflection('йому', 'воно', [], ['pron']),
+                wholeWordInflection('ньому', 'воно', [], ['pron']),
+                wholeWordInflection('ним', 'воно', [], ['pron']),
+                wholeWordInflection('нім', 'воно', [], ['pron']),
+                wholeWordInflection('її', 'вона', [], ['pron']),
+                wholeWordInflection('неї', 'вона', [], ['pron']),
+                wholeWordInflection('їй', 'вона', [], ['pron']),
+                wholeWordInflection('ній', 'вона', [], ['pron']),
+                wholeWordInflection('нею', 'вона', [], ['pron']),
+                wholeWordInflection('нас', 'ми', [], ['pron']),
+                wholeWordInflection('нам', 'ми', [], ['pron']),
+                wholeWordInflection('нами', 'ми', [], ['pron']),
+                wholeWordInflection('вас', 'ви', [], ['pron']),
+                wholeWordInflection('вам', 'ви', [], ['pron']),
+                wholeWordInflection('вами', 'ви', [], ['pron']),
+                wholeWordInflection('їх', 'вони', [], ['pron']),
+                wholeWordInflection('них', 'вони', [], ['pron']),
+                wholeWordInflection('їм', 'вони', [], ['pron']),
+                wholeWordInflection('ним', 'вони', [], ['pron']),
+                wholeWordInflection('ними', 'вони', [], ['pron']),
+                wholeWordInflection('німи', 'вони', [], ['pron']),
+                wholeWordInflection('собі', 'себе', [], ['pron']),
+                wholeWordInflection('собою', 'себе', [], ['pron']),
+                wholeWordInflection('кого', 'хто', [], ['pron']),
+                wholeWordInflection('кому', 'хто', [], ['pron']),
+                wholeWordInflection('ким', 'хто', [], ['pron']),
+                wholeWordInflection('кім', 'хто', [], ['pron']),
+                wholeWordInflection('чого', 'що', [], ['pron']),
+                wholeWordInflection('чому', 'що', [], ['pron']),
+                wholeWordInflection('чим', 'що', [], ['pron']),
+                wholeWordInflection('чім', 'що', [], ['pron']),
+                wholeWordInflection('нікого', 'ніхто', [], ['pron']),
+                wholeWordInflection('нікому', 'ніхто', [], ['pron']),
+                wholeWordInflection('ніким', 'ніхто', [], ['pron']),
+                wholeWordInflection('нічого', 'ніщо', [], ['pron']),
+                wholeWordInflection('нічому', 'ніщо', [], ['pron']),
+                wholeWordInflection('нічим', 'ніщо', [], ['pron']),
+                // Indefinite series built on хто / що
+                wholeWordInflection('когось', 'хтось', [], ['pron']),
+                wholeWordInflection('комусь', 'хтось', [], ['pron']),
+                wholeWordInflection('кимось', 'хтось', [], ['pron']),
+                wholeWordInflection('чогось', 'щось', [], ['pron']),
+                wholeWordInflection('чомусь', 'щось', [], ['pron']),
+                wholeWordInflection('чимось', 'щось', [], ['pron']),
+                wholeWordInflection('декого', 'дехто', [], ['pron']),
+                wholeWordInflection('декому', 'дехто', [], ['pron']),
+                wholeWordInflection('деким', 'дехто', [], ['pron']),
+                wholeWordInflection('дечого', 'дещо', [], ['pron']),
+                wholeWordInflection('дечому', 'дещо', [], ['pron']),
+                wholeWordInflection('дечим', 'дещо', [], ['pron']),
+                wholeWordInflection('абикого', 'абихто', [], ['pron']),
+                wholeWordInflection('абикому', 'абихто', [], ['pron']),
+                wholeWordInflection('абиким', 'абихто', [], ['pron']),
+                wholeWordInflection('абичого', 'абищо', [], ['pron']),
+                wholeWordInflection('абичому', 'абищо', [], ['pron']),
+                wholeWordInflection('абичим', 'абищо', [], ['pron']),
+                ...closedClassParadigm('чийсь', 'чи', ['йогось', 'ємусь', 'їмсь', 'ясь', 'єїсь', 'їйсь', 'юсь', 'єюсь', 'єсь', 'їсь', 'їхсь', 'їмись'], 'pron'),
+                ...closedClassParadigm('нічий', 'нічи', ['його', 'єму', 'їм', 'я', 'єї', 'їй', 'ю', 'єю', 'є', 'ї', 'їх', 'їми'], 'pron'),
+                ...closedClassParadigm('ніякий', 'нияк', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('ніякий', 'ніяк', hardDeterminerEndings, 'pron'),
+                // Determiners and possessives decline adjective-like but to an irregular lemma shape
+                ...closedClassParadigm('той', 'т', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('який', 'як', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('такий', 'так', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('котрий', 'котр', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('сам', 'сам', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('наш', 'наш', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('ваш', 'ваш', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('інший', 'інш', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('кожний', 'кожн', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('жодний', 'жодн', hardDeterminerEndings, 'pron'),
+                ...closedClassParadigm('цей', 'ц', softDeterminerEndings, 'pron'),
+                ...closedClassParadigm('мій', 'мо', possessiveEndings, 'pron'),
+                ...closedClassParadigm('твій', 'тво', possessiveEndings, 'pron'),
+                ...closedClassParadigm('свій', 'сво', possessiveEndings, 'pron'),
+                ...closedClassParadigm('чий', 'чи', ['його', 'єму', 'їм', 'я', 'єї', 'їй', 'ю', 'єю', 'є', 'ї', 'їх', 'їми'], 'pron'),
+                ...closedClassParadigm('весь', 'вс', vesEndings, 'pron'),
+                ...closedClassParadigm('весь', 'ус', vesEndings, 'pron'),
+                ...closedClassParadigm('їхній', 'їхн', softNijEndings, 'pron'),
+            ],
+        },
+        'numeral declension': {
+            name: 'numeral declension',
+            description: 'Declined form of a numeral',
+            rules: [
+                ...closedClassParadigm('один', 'одн', [...hardDeterminerEndings, 'ієї', 'ією'], 'num'),
+                wholeWordInflection('двох', 'два', [], ['num']),
+                wholeWordInflection('двом', 'два', [], ['num']),
+                wholeWordInflection('двома', 'два', [], ['num']),
+                wholeWordInflection('трьох', 'три', [], ['num']),
+                wholeWordInflection('трьом', 'три', [], ['num']),
+                wholeWordInflection('трьома', 'три', [], ['num']),
+                wholeWordInflection('чотирьох', 'чотири', [], ['num']),
+                wholeWordInflection('чотирьом', 'чотири', [], ['num']),
+                wholeWordInflection('чотирма', 'чотири', [], ['num']),
+                wholeWordInflection("п'яти", "п'ять", [], ['num']),
+                wholeWordInflection("п'ятьох", "п'ять", [], ['num']),
+                wholeWordInflection("п'ятьом", "п'ять", [], ['num']),
+                wholeWordInflection("п'ятьма", "п'ять", [], ['num']),
+                wholeWordInflection("п'ятьома", "п'ять", [], ['num']),
+                wholeWordInflection('шести', 'шість', [], ['num']),
+                wholeWordInflection('шістьох', 'шість', [], ['num']),
+                wholeWordInflection('шістьом', 'шість', [], ['num']),
+                wholeWordInflection('шістьма', 'шість', [], ['num']),
+                wholeWordInflection('шістьома', 'шість', [], ['num']),
+                wholeWordInflection('семи', 'сім', [], ['num']),
+                wholeWordInflection('сімох', 'сім', [], ['num']),
+                wholeWordInflection('сімом', 'сім', [], ['num']),
+                wholeWordInflection('сьома', 'сім', [], ['num']),
+                wholeWordInflection('сімома', 'сім', [], ['num']),
+                wholeWordInflection('восьми', 'вісім', [], ['num']),
+                wholeWordInflection('вісьмох', 'вісім', [], ['num']),
+                wholeWordInflection('вісьмом', 'вісім', [], ['num']),
+                wholeWordInflection('вісьма', 'вісім', [], ['num']),
+                wholeWordInflection('вісьмома', 'вісім', [], ['num']),
+                wholeWordInflection("дев'яти", "дев'ять", [], ['num']),
+                wholeWordInflection("дев'ятьох", "дев'ять", [], ['num']),
+                wholeWordInflection("дев'ятьом", "дев'ять", [], ['num']),
+                wholeWordInflection("дев'ятьма", "дев'ять", [], ['num']),
+                wholeWordInflection('десяти', 'десять', [], ['num']),
+                wholeWordInflection('десятьох', 'десять', [], ['num']),
+                wholeWordInflection('десятьом', 'десять', [], ['num']),
+                wholeWordInflection('десятьма', 'десять', [], ['num']),
+                wholeWordInflection('сорока', 'сорок', [], ['num']),
+                wholeWordInflection('ста', 'сто', [], ['num']),
+                wholeWordInflection('обох', 'обидва', [], ['num']),
+                wholeWordInflection('обом', 'обидва', [], ['num']),
+                wholeWordInflection('обома', 'обидва', [], ['num']),
+                wholeWordInflection('багатьох', 'багато', [], ['num']),
+                wholeWordInflection('багатьом', 'багато', [], ['num']),
+                wholeWordInflection('багатьма', 'багато', [], ['num']),
+                wholeWordInflection('кількох', 'кілька', [], ['num']),
+                wholeWordInflection('кільком', 'кілька', [], ['num']),
+                wholeWordInflection('кількома', 'кілька', [], ['num']),
+                wholeWordInflection('скількох', 'скільки', [], ['num']),
+                wholeWordInflection('скільком', 'скільки', [], ['num']),
+                wholeWordInflection('скількома', 'скільки', [], ['num']),
+                wholeWordInflection('декількох', 'декілька', [], ['num']),
+                wholeWordInflection('декільком', 'декілька', [], ['num']),
+                wholeWordInflection('декількома', 'декілька', [], ['num']),
+                // Tens and hundreds decline on both parts
+                wholeWordInflection('двохсот', 'двісті', [], ['num']),
+                wholeWordInflection('двомстам', 'двісті', [], ['num']),
+                wholeWordInflection('двомастами', 'двісті', [], ['num']),
+                wholeWordInflection('двохстах', 'двісті', [], ['num']),
+                wholeWordInflection('трьохсот', 'триста', [], ['num']),
+                wholeWordInflection('трьомстам', 'триста', [], ['num']),
+                wholeWordInflection('трьомастами', 'триста', [], ['num']),
+                wholeWordInflection('трьохстах', 'триста', [], ['num']),
+                wholeWordInflection('чотирьохсот', 'чотириста', [], ['num']),
+                wholeWordInflection('чотирьомстам', 'чотириста', [], ['num']),
+                wholeWordInflection('чотирмастами', 'чотириста', [], ['num']),
+                wholeWordInflection('чотирьохстах', 'чотириста', [], ['num']),
+                wholeWordInflection("п'ятисот", "п'ятсот", [], ['num']),
+                wholeWordInflection("п'ятистам", "п'ятсот", [], ['num']),
+                wholeWordInflection("п'ятьмастами", "п'ятсот", [], ['num']),
+                wholeWordInflection("п'ятистах", "п'ятсот", [], ['num']),
+                wholeWordInflection('шестисот', 'шістсот', [], ['num']),
+                wholeWordInflection('шестистам', 'шістсот', [], ['num']),
+                wholeWordInflection('шістьмастами', 'шістсот', [], ['num']),
+                wholeWordInflection('шестистах', 'шістсот', [], ['num']),
+                wholeWordInflection('семисот', 'сімсот', [], ['num']),
+                wholeWordInflection('семистам', 'сімсот', [], ['num']),
+                wholeWordInflection('сьомастами', 'сімсот', [], ['num']),
+                wholeWordInflection('семистах', 'сімсот', [], ['num']),
+                wholeWordInflection('восьмисот', 'вісімсот', [], ['num']),
+                wholeWordInflection('восьмистам', 'вісімсот', [], ['num']),
+                wholeWordInflection('вісьмастами', 'вісімсот', [], ['num']),
+                wholeWordInflection('восьмистах', 'вісімсот', [], ['num']),
+                wholeWordInflection("дев'ятисот", "дев'ятсот", [], ['num']),
+                wholeWordInflection("дев'ятистам", "дев'ятсот", [], ['num']),
+                wholeWordInflection("дев'ятьмастами", "дев'ятсот", [], ['num']),
+                wholeWordInflection("дев'ятистах", "дев'ятсот", [], ['num']),
+                wholeWordInflection("п'ятдесяти", "п'ятдесят", [], ['num']),
+                wholeWordInflection("п'ятдесятьох", "п'ятдесят", [], ['num']),
+                wholeWordInflection("п'ятдесятьом", "п'ятдесят", [], ['num']),
+                wholeWordInflection("п'ятдесятьма", "п'ятдесят", [], ['num']),
+                wholeWordInflection('шістдесяти', 'шістдесят', [], ['num']),
+                wholeWordInflection('шістдесятьох', 'шістдесят', [], ['num']),
+                wholeWordInflection('шістдесятьом', 'шістдесят', [], ['num']),
+                wholeWordInflection('шістдесятьма', 'шістдесят', [], ['num']),
+                wholeWordInflection('сімдесяти', 'сімдесят', [], ['num']),
+                wholeWordInflection('сімдесятьох', 'сімдесят', [], ['num']),
+                wholeWordInflection('сімдесятьом', 'сімдесят', [], ['num']),
+                wholeWordInflection('сімдесятьма', 'сімдесят', [], ['num']),
+                wholeWordInflection('вісімдесяти', 'вісімдесят', [], ['num']),
+                wholeWordInflection('вісімдесятьох', 'вісімдесят', [], ['num']),
+                wholeWordInflection('вісімдесятьом', 'вісімдесят', [], ['num']),
+                wholeWordInflection('вісімдесятьма', 'вісімдесят', [], ['num']),
+                wholeWordInflection("дев'яноста", "дев'яносто", [], ['num']),
+                // одинадцять … тридцять share one pattern
+                suffixInflection('дцяти', 'дцять', [], ['num']),
+                suffixInflection('дцятьох', 'дцять', [], ['num']),
+                suffixInflection('дцятьом', 'дцять', [], ['num']),
+                suffixInflection('дцятьма', 'дцять', [], ['num']),
+                suffixInflection('дцятьома', 'дцять', [], ['num']),
+            ],
         },
         'verbal noun': {
             name: 'verbal noun',
