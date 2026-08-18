@@ -23,6 +23,7 @@ import {isObjectNotArray} from '../../core/object-utilities.js';
 import {toError} from '../../core/to-error.js';
 import {arrayBufferUtf8Decode} from '../../data/array-buffer-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
+import {getSettingsExportDateString} from './backup-controller.js';
 
 export class TranslationTextReplacementsController {
     /**
@@ -230,35 +231,10 @@ export class TranslationTextReplacementsController {
             patterns: patterns.map(({pattern, ignoreCase, replacement}) => ({pattern, ignoreCase, replacement})),
         };
 
-        const fileName = `yomitan-text-replacements-${this._getExportDateString(date, '-', '-', '-', 6)}.json`;
+        const fileName = `yomitan-text-replacements-${getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
         const blob = new Blob([JSON.stringify(data, null, 4)], {type: 'application/json'});
         this._saveBlob(blob, fileName);
         this._setStatus(`Exported ${patterns.length} ${patterns.length === 1 ? 'pattern' : 'patterns'}.`, false);
-    }
-
-    /**
-     * @param {Date} date
-     * @param {string} dateSeparator
-     * @param {string} dateTimeSeparator
-     * @param {string} timeSeparator
-     * @param {number} resolution
-     * @returns {string}
-     */
-    _getExportDateString(date, dateSeparator, dateTimeSeparator, timeSeparator, resolution) {
-        const values = [
-            date.getUTCFullYear().toString(),
-            dateSeparator,
-            (date.getUTCMonth() + 1).toString().padStart(2, '0'),
-            dateSeparator,
-            date.getUTCDate().toString().padStart(2, '0'),
-            dateTimeSeparator,
-            date.getUTCHours().toString().padStart(2, '0'),
-            timeSeparator,
-            date.getUTCMinutes().toString().padStart(2, '0'),
-            timeSeparator,
-            date.getUTCSeconds().toString().padStart(2, '0'),
-        ];
-        return values.slice(0, resolution * 2 - 1).join('');
     }
 
     /**
