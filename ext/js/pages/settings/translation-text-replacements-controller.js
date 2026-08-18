@@ -23,7 +23,7 @@ import {isObjectNotArray} from '../../core/object-utilities.js';
 import {toError} from '../../core/to-error.js';
 import {arrayBufferUtf8Decode} from '../../data/array-buffer-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {getSettingsExportDateString} from './backup-controller.js';
+import {getSettingsExportDateString, readFileArrayBuffer} from './backup-controller.js';
 
 export class TranslationTextReplacementsController {
     /**
@@ -298,7 +298,7 @@ export class TranslationTextReplacementsController {
      * @returns {Promise<import('translation-text-replacements-controller').ImportResult>}
      */
     async _importPatternsFile(file) {
-        const dataString = arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
+        const dataString = arrayBufferUtf8Decode(await readFileArrayBuffer(file));
         /** @type {unknown} */
         const data = parseJson(dataString);
         const patterns = this._parseImportedPatterns(data);
@@ -388,19 +388,6 @@ export class TranslationTextReplacementsController {
      */
     _getEntryKey({pattern, ignoreCase, replacement}) {
         return JSON.stringify([pattern, ignoreCase, replacement]);
-    }
-
-    /**
-     * @param {File} file
-     * @returns {Promise<ArrayBuffer>}
-     */
-    _readFileArrayBuffer(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(/** @type {ArrayBuffer} */ (reader.result));
-            reader.onerror = () => reject(reader.error);
-            reader.readAsArrayBuffer(file);
-        });
     }
 
     /**

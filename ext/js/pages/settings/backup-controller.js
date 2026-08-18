@@ -194,19 +194,6 @@ export class BackupController {
         this._saveBlob(blob, fileName);
     }
 
-    /**
-     * @param {File} file
-     * @returns {Promise<ArrayBuffer>}
-     */
-    _readFileArrayBuffer(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(/** @type {ArrayBuffer} */ (reader.result));
-            reader.onerror = () => reject(reader.error);
-            reader.readAsArrayBuffer(file);
-        });
-    }
-
     // Importing
 
     /**
@@ -379,7 +366,7 @@ export class BackupController {
     async _importSettingsFile(file) {
         if (this._optionsUtil === null) { throw new Error('OptionsUtil invalid'); }
 
-        const dataString = arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
+        const dataString = arrayBufferUtf8Decode(await readFileArrayBuffer(file));
         /** @type {import('backup-controller').BackupData} */
         const data = parseJson(dataString);
 
@@ -691,4 +678,17 @@ export function getSettingsExportDateString(date, dateSeparator, dateTimeSeparat
         date.getUTCSeconds().toString().padStart(2, '0'),
     ];
     return values.slice(0, resolution * 2 - 1).join('');
+}
+
+/**
+ * @param {File} file
+ * @returns {Promise<ArrayBuffer>}
+ */
+export function readFileArrayBuffer(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(/** @type {ArrayBuffer} */ (reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsArrayBuffer(file);
+    });
 }
