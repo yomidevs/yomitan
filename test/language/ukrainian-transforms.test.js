@@ -773,6 +773,12 @@ const tests = [
         valid: true,
         tests: [
             {term: 'боєць', source: 'бійця', rule: 'n', reasons: ['genitive']},
+            {term: 'боєць', source: 'бійці', rule: 'n', reasons: ['nominative plural']},
+            // the -ійці rule sits beside upstream's -йці one; neither may shadow the other
+            {term: 'латвієць', source: 'латвійці', rule: 'n', reasons: ['nominative plural']},
+            {term: 'вівця', source: 'овець', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'лід', source: 'льоду', rule: 'n', reasons: ['genitive']},
+            {term: 'покоління', source: 'поколінь', rule: 'n', reasons: ['genitive']},
             {term: 'боєць', source: 'бійцем', rule: 'n', reasons: ['genitive']},
             {term: 'політ', source: 'польоту', rule: 'n', reasons: ['genitive']},
             {term: 'колір', source: 'кольори', rule: 'n', reasons: ['genitive']},
@@ -815,6 +821,11 @@ const tests = [
             {term: 'усіх', source: 'увесь', rule: null, reasons: null},
             // part-of-speech conditions still bind
             {term: 'смерть', source: 'смерті', rule: 'v', reasons: null},
+            // the second palatalisation is dative/locative singular only; the
+            // locative plural keeps the velar, so "рузах" must reach nothing
+            {term: 'рука', source: 'рузах', rule: null, reasons: null},
+            {term: 'книга', source: 'книзах', rule: null, reasons: null},
+            {term: 'муха', source: 'мусах', rule: null, reasons: null},
             // The truncated-stem rules deliberately over-generate non-words ("книга" also
             // yields "книгати"), which costs nothing because no such headword exists. What
             // must hold is that they stay inside the verb condition.

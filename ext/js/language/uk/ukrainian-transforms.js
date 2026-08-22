@@ -261,7 +261,8 @@ export const ukrainianTransforms = {
                 alternatingSuffixInflection('і', 'ь', [], ['n']), // 'коні' -> 'кінь'
                 suffixInflection('ки', 'ок', [], ['n']), // 'підвечірки' -> 'підвечірок'
                 suffixInflection('ці', 'ець', [], ['n']), // 'українці' -> 'українець'
-                suffixInflection('ійці', 'оєць', [], ['n']), // 'латвійці' -> 'латвієць'
+                suffixInflection('йці', 'єць', [], ['n']), // 'латвійці' -> 'латвієць'
+                suffixInflection('ійці', 'оєць', [], ['n']), // 'бійці' -> 'боєць'
                 // Second declension, neuter
                 suffixInflection('а', 'о', [], ['n']), // 'вікна' -> 'вікно'
                 suffixInflection('я', 'е', [], ['n']), // 'поля' -> 'поле'
@@ -287,7 +288,6 @@ export const ukrainianTransforms = {
                 suffixInflection('ійцям', 'оєць', [], ['n']),
                 suffixInflection('ійцями', 'оєць', [], ['n']),
                 suffixInflection('ійцях', 'оєць', [], ['n']),
-                suffixInflection('йці', 'єць', [], ['n']),
                 suffixInflection('ьоту', 'іт', [], ['n']), // 'польоту' -> 'політ'
                 suffixInflection('ьоти', 'іт', [], ['n']),
                 suffixInflection('ьотів', 'іт', [], ['n']),
@@ -303,10 +303,9 @@ export const ukrainianTransforms = {
                 suffixInflection('ьорові', 'ір', [], ['n']),
                 ...['грудей', 'грудьми', 'грудим', 'грудям', 'грудях', 'грудима'].map((f) => wholeWordInflection(f, 'груди', [], ['n'])),
                 ...['четверга', 'четвергу', 'четвергом', 'четверги', 'четвергів', 'четвергам', 'четвергами', 'четвергах', 'четвергові'].map((f) => wholeWordInflection(f, 'четвер', [], ['n'])),
-                alternatingSuffixInflection('ьоду', 'д', [], ['n']), // 'льоду' -> 'лід'
+                suffixInflection('ьоду', 'ід', [], ['n']), // 'льоду' -> 'лід'
                 suffixInflection('онь', 'ня', [], ['n']), // 'поверхонь' -> 'поверхня'
                 suffixInflection('ов', 'ва', [], ['n']), // 'церков' -> 'церква'
-                suffixInflection('ець', 'івця', [], ['n']), // 'овець' -> 'вівця'
                 suffixInflection('я', 'й', [], ['n']), // 'андрія' -> 'андрій', 'злодія' -> 'злодій'
                 suffixInflection('обами', 'іб', [], ['n']), // 'засобами' -> 'засіб'
                 suffixInflection('обів', 'іб', [], ['n']),
@@ -365,7 +364,7 @@ export const ukrainianTransforms = {
                 zeroEndingInflection('а'), // 'книг' -> 'книга'
                 suffixInflection('ань', 'ання', [], ['n']), // 'завдань' -> 'завдання'
                 suffixInflection('ень', 'ення', [], ['n']), // 'рішень' -> 'рішення'
-                suffixInflection('інь', 'іння', [], ['n']), // 'знарядінь' -> 'знаряддя'
+                suffixInflection('інь', 'іння', [], ['n']), // 'поколінь' -> 'покоління'
                 suffixInflection('ищ', 'ище', [], ['n']), // 'училищ' -> 'училище'
                 suffixInflection('ць', 'це', [], ['n']), // 'місць' -> 'місце'
                 suffixInflection('дець', 'це', [], ['n']), // 'сердець' -> 'серце'
@@ -501,7 +500,6 @@ export const ukrainianTransforms = {
                 alternatingSuffixInflection('ем', '', [], ['n']), // 'ножем' -> 'ніж'
                 ...fleetingVowelInflection('ями', 'ь'), // 'днями' -> 'день'
                 suffixInflection('тю', 'ть', [], ['n']), // 'смертю' -> 'смерть'
-                ...fleetingVowelInflection('ем', ''), // 'вітром' handled; 'днем' -> 'день'
                 ...fleetingVowelInflection('ом', ''), // 'сном' -> 'сон'
                 // First declension
                 suffixInflection('ою', 'а', [], ['n']), // 'книгою' -> 'книга'
@@ -557,7 +555,6 @@ export const ukrainianTransforms = {
                 suffixInflection('остях', 'ість', [], ['n']),
                 suffixInflection('ні', 'нь', [], ['n']), // 'відстані' -> 'відстань'
                 suffixInflection('лі', 'ль', [], ['n']), // 'моделі' -> 'модель'
-                ...palatalizingSuffixInflection('ах', 'а', false), // 'руках' -> 'рука'
                 alternatingSuffixInflection('ах', '', [], ['n']), // 'роках' -> 'рік'
                 ...fleetingVowelInflection('ях', 'ь'), // 'днях' -> 'день'
                 suffixInflection('ях', 'ь', [], ['n']), // 'грудях' -> 'грудь'
@@ -1067,7 +1064,7 @@ export const ukrainianTransforms = {
                 suffixInflection('ло', 'нути', [], ['v']), // 'зникло' -> 'зникнути'
                 suffixInflection('ли', 'нути', [], ['v']), // 'виникли' -> 'виникнути'
                 suffixInflection('ла', 'нути', [], ['v']),
-                suffixInflection('вся', 'стися', [], ['v']), // 'підвівся' -> 'підвестися'
+                suffixInflection('івся', 'естися', [], ['v']), // 'підвівся' -> 'підвестися'
                 suffixInflection('ів', 'ести', [], ['v']), // 'вів' -> 'вести'
                 suffixInflection('те', 'ити', [], ['v']), // 'пробачте' -> 'пробачити', 'бачте' -> 'бачити'
                 suffixInflection('ж', 'зати', [], ['v']), // 'ріж' -> 'різати'
@@ -1159,6 +1156,8 @@ export const ukrainianTransforms = {
             name: 'suppletive noun',
             description: 'Declined form of a noun whose plural stem differs from its singular',
             rules: [
+                ...['овець', 'вівці', 'вівцю', 'вівцею', 'вівцям', 'вівцями', 'вівцях']
+                    .map((form) => wholeWordInflection(form, 'вівця', [], ['n'])),
                 ...['сліз', 'слізьми', 'сльози', 'сльозам', 'сльозами', 'сльозах']
                     .map((form) => wholeWordInflection(form, 'сльоза', [], ['n'])),
                 // "людина"/"люди", "око"/"очі", "дитина"/"діти" and friends replace the stem
