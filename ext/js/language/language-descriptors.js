@@ -66,6 +66,7 @@ import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from '.
 import {tagalogTransforms} from './tl/tagalog-transforms.js';
 import {removeUkrainianDiacritics, ukrainianApostropheVariants} from './uk/ukrainian-text-preprocessors.js';
 import {ukrainianTransforms} from './uk/ukrainian-transforms.js';
+import {isStringPartiallyUkrainian} from './uk/ukrainian.js';
 import {normalizeDiacritics} from './vi/viet-text-preprocessors.js';
 import {convertFinalLetters, convertYiddishLigatures} from './yi/yiddish-text-postprocessors.js';
 import {combineYiddishLigatures, removeYiddishDiacritics} from './yi/yiddish-text-preprocessors.js';
@@ -553,6 +554,7 @@ const languageDescriptors = [
         iso639_3: 'ukr',
         name: 'Ukrainian',
         exampleText: 'читати',
+        isTextLookupWorthy: isStringPartiallyUkrainian,
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeUkrainianDiacritics,
