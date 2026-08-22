@@ -619,6 +619,9 @@ const tests = [
             {term: 'матір', source: 'матері', rule: 'n', reasons: ['suppletive noun']},
             {term: 'матір', source: 'матерів', rule: 'n', reasons: ['suppletive noun']},
             {term: 'небо', source: 'небеса', rule: 'n', reasons: ['suppletive noun']},
+            // "вусі" is the locative of both "вухо" and "вус"; neither may hide the other
+            {term: 'вухо', source: 'вусі', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'вус', source: 'вусі', rule: 'n', reasons: ['suppletive noun']},
         ],
     },
     {
@@ -679,6 +682,10 @@ const tests = [
         valid: true,
         tests: [
             {term: 'гора', source: 'гір', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'голова', source: 'голів', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'доба', source: 'діб', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'брова', source: 'брів', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'щока', source: 'щік', rule: 'n', reasons: ['alternating genitive plural']},
             {term: 'нога', source: 'ніг', rule: 'n', reasons: ['alternating genitive plural']},
             {term: 'особа', source: 'осіб', rule: 'n', reasons: ['alternating genitive plural']},
             {term: 'робота', source: 'робіт', rule: 'n', reasons: ['alternating genitive plural']},
@@ -719,6 +726,14 @@ const tests = [
             {term: 'давати', source: 'даю', rule: 'v', reasons: ['present']},
             {term: 'ставати', source: 'стає', rule: 'v', reasons: ['present']},
             {term: 'здаватися', source: 'здається', rule: 'v', reasons: ['present']},
+        ],
+    },
+    {
+        category: 'suppletive verbs',
+        valid: true,
+        tests: [
+            {term: 'бути', source: 'єси', rule: 'v', reasons: ['suppletive verb']},
+            {term: 'бути', source: 'суть', rule: 'v', reasons: ['suppletive verb']},
         ],
     },
     {

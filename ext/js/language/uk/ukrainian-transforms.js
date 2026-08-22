@@ -352,7 +352,7 @@ export const ukrainianTransforms = {
                 zeroEndingInflection('е'), // 'сердець' handled above; 'слів' needs the alternation below
                 ...fleetingVowelInflection('я', 'ь'), // 'дня' -> 'день'
                 ...fleetingVowelInflection('у', ''), // 'вітру' -> 'вітер'
-                ...fleetingVowelInflection('а', ''), // 'сна' -> 'сон'
+                ...fleetingVowelInflection('а', ''), // 'котла' -> 'котел', 'білка' -> 'білок'
                 // First declension
                 suffixInflection('и', 'а', [], ['n']), // 'книги' -> 'книга'
                 suffixInflection('і', 'я', [], ['n']), // 'землі' -> 'земля'
@@ -370,7 +370,7 @@ export const ukrainianTransforms = {
                 suffixInflection('дець', 'це', [], ['n']), // 'сердець' -> 'серце'
                 suffixInflection('ів', 'и', [], ['n']), // 'перегонів' -> 'перегони'
                 suffixInflection('ей', 'і', [], ['n']), // 'дверей' -> 'двері'
-                suffixInflection('иць', 'иця', [], ['n']), // 'автолюбительниць' -> 'автолюбительниця'
+                suffixInflection('иць', 'иця', [], ['n']), // 'вулиць' -> 'вулиця'
                 // Second declension, masculine
                 suffixInflection('а', '', [], ['n']), // 'студента' -> 'студент'
                 suffixInflection('у', '', [], ['n']), // 'телефону' -> 'телефон'
@@ -381,7 +381,7 @@ export const ukrainianTransforms = {
                 alternatingSuffixInflection('у', '', [], ['n']), // 'столу' -> 'стіл'
                 alternatingSuffixInflection('я', 'ь', [], ['n']), // 'коня' -> 'кінь'
                 alternatingSuffixInflection('ів', '', [], ['n']), // 'столів' -> 'стіл'
-                suffixInflection('ка', 'ок', [], ['n']), // 'підвечірка' -> 'підвечірок'
+                suffixInflection('ка', 'ок', [], ['n']), // 'будиночка' -> 'будиночок'
                 suffixInflection('ку', 'ок', [], ['n']), // 'підвечірку' -> 'підвечірок'
                 suffixInflection('ків', 'ок', [], ['n']), // 'підвечірків' -> 'підвечірок'
                 suffixInflection('ця', 'ець', [], ['n']), // 'українця' -> 'українець'
@@ -1103,8 +1103,8 @@ export const ukrainianTransforms = {
             description: 'Active participle of a verb',
             rules: [
                 suffixInflection('ючий', 'ти', ['adj'], ['v']), // 'читаючий' -> 'читати'
-                suffixInflection('ачий', 'ати', ['adj'], ['v']), // 'кричачий' -> 'кричати'
-                suffixInflection('ячий', 'ити', ['adj'], ['v']), // 'говорячий' -> 'говорити'
+                suffixInflection('ачий', 'ати', ['adj'], ['v']), // 'лежачий' -> 'лежати'
+                suffixInflection('ячий', 'ити', ['adj'], ['v']), // 'ходячий' -> 'ходити'
                 suffixInflection('лий', 'ти', ['adj'], ['v']), // 'побілілий' -> 'побіліти'
             ],
         },
@@ -1168,6 +1168,8 @@ export const ukrainianTransforms = {
                     .map((form) => wholeWordInflection(form, 'око', [], ['n'])),
                 ...['вуха', 'вух', 'вухам', 'вухами', 'вухах', 'вусі']
                     .map((form) => wholeWordInflection(form, 'вухо', [], ['n'])),
+                // "вусі" is the locative of "вус" as well as of "вухо"; both must be offered
+                wholeWordInflection('вусі', 'вус', [], ['n']),
                 ...['діти', 'дітей', 'дітям', 'дітьми', 'дітях', 'дитини', 'дитині', 'дитину', 'дитиною']
                     .map((form) => wholeWordInflection(form, 'дитина', [], ['n'])),
                 ...['матері', 'матір', "матір'ю", 'матерів', 'матерям', 'матерями', 'матерях']
@@ -1212,11 +1214,20 @@ export const ukrainianTransforms = {
                 ...indefiniteParadigm('скільки', ['скількох', 'скільком', 'скількома']),
             ],
         },
+        'suppletive verb': {
+            name: 'suppletive verb',
+            description: 'Form of a verb whose stem is suppletive (бути)',
+            rules:
+                // Archaic and dialectal forms of "бути" still common in the literary
+                // register goroh quotes from.
+                ['єси', 'єсть', 'суть', 'єсьм', 'єсмо'].map(
+                    (form) => wholeWordInflection(form, 'бути', [], ['v']),
+                ),
+        },
         'motion verb': {
             name: 'motion verb',
             description: 'Present or past of іти/йти and its prefixed forms, whose stems are suppletive',
             rules: [
-                ...['єси', 'єсть', 'суть'].map((f) => wholeWordInflection(f, 'бути', [], ['v'])),
 
                 // imperatives share the suppletive stem: 'піди' -> 'піти'
                 ...['іди', 'ідіть', 'ідім', 'ідімо'].flatMap((form) => [
@@ -1255,6 +1266,20 @@ export const ukrainianTransforms = {
             name: 'alternating genitive plural',
             description: 'Genitive plural with no ending whose stem raises о/е to і (гора → гір)',
             rules: [
+                ...['бджіл'].map((form) => wholeWordInflection(form, 'бджола', [], ['n'])),
+                ...['боліт'].map((form) => wholeWordInflection(form, 'болото', [], ['n'])),
+                ...['борід'].map((form) => wholeWordInflection(form, 'борода', [], ['n'])),
+                ...['брів'].map((form) => wholeWordInflection(form, 'брова', [], ['n'])),
+                ...['вдів'].map((form) => wholeWordInflection(form, 'вдова', [], ['n'])),
+                ...['голів'].map((form) => wholeWordInflection(form, 'голова', [], ['n'])),
+                ...['діб'].map((form) => wholeWordInflection(form, 'доба', [], ['n'])),
+                ...['дрів'].map((form) => wholeWordInflection(form, 'дрова', [], ['n'])),
+                ...['кіл'].map((form) => wholeWordInflection(form, 'коло', [], ['n'])),
+                ...['нір'].map((form) => wholeWordInflection(form, 'нора', [], ['n'])),
+                ...['сковорід'].map((form) => wholeWordInflection(form, 'сковорода', [], ['n'])),
+                ...['слобід'].map((form) => wholeWordInflection(form, 'слобода', [], ['n'])),
+                ...['чіл'].map((form) => wholeWordInflection(form, 'чоло', [], ['n'])),
+                ...['щік'].map((form) => wholeWordInflection(form, 'щока', [], ['n'])),
                 // A blanket rule here would also turn the dictionary form "стіл" into "стола",
                 // which the guardrail tests forbid: nothing in the surface distinguishes a
                 // nominative singular from a genitive plural. The set is small, so it is listed.
@@ -1587,7 +1612,7 @@ export const ukrainianTransforms = {
                 suffixInflection('шено', 'сити', [], ['v']), // 'запрошено' -> 'запросити'
                 suffixInflection('чено', 'тити', [], ['v']), // 'сплачено' -> 'сплатити'
                 suffixInflection('щено', 'стити', [], ['v']), // 'прощено' -> 'простити'
-                suffixInflection('нено', 'нути', [], ['v']), // 'зігнено' -> 'зігнути'
+                suffixInflection('нено', 'нути', [], ['v']), // 'звернено' -> 'звернути'
                 suffixInflection('то', 'ти', [], ['v']), // 'вжито' -> 'вжити'
             ],
         },
