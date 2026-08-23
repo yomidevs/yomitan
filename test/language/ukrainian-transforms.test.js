@@ -625,7 +625,16 @@ const tests = [
             {term: 'гість', source: 'гостя', rule: 'n', reasons: ['suppletive noun']},
             {term: 'тиждень', source: 'тижнів', rule: 'n', reasons: ['suppletive noun']},
             {term: 'більше', source: 'більш', rule: 'adv', reasons: ['comparative']},
-            {term: 'підвестися', source: 'підвівся', rule: 'v', reasons: ['passive participle']},
+            {term: 'підвестися', source: 'підвівся', rule: 'v', reasons: ['past']},
+            // these are past-tense and imperative forms, not passive participles; the transform
+            // name is the explanation the reader is shown, so it has to be the right one
+            {term: 'вирости', source: 'виріс', rule: 'v', reasons: ['past']},
+            {term: 'зникнути', source: 'зникло', rule: 'v', reasons: ['past']},
+            {term: 'вести', source: 'вів', rule: 'v', reasons: ['past']},
+            {term: 'лізти', source: 'лізь', rule: 'v', reasons: ['imperative']},
+            {term: 'різати', source: 'ріж', rule: 'v', reasons: ['imperative']},
+            {term: 'глянути', source: 'глянь', rule: 'v', reasons: ['imperative']},
+            {term: 'читати', source: 'читаний', rule: 'v', reasons: ['passive participle']},
             // verb rules are exempt: a suppletive form is written as a suffix so that one rule
             // reaches both the bare form and its prefixed variants
             {term: 'йти', source: 'йде', rule: 'v', reasons: ['present']},
