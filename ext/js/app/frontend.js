@@ -131,6 +131,7 @@ export class Frontend {
             ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)],
             ['scanNextWord', this._onActionScanNextWord.bind(this)],
             ['scanPreviousWord', this._onActionScanPreviousWord.bind(this)],
+            ['scanFirstWord', this._onActionScanFirstWord.bind(this)],
             ['profilePrevious',   async () => { await setProfile(-1, this._application); }],
             ['profileNext',       async () => { await setProfile(1, this._application); }],
         ]);
@@ -305,6 +306,13 @@ export class Frontend {
      */
     _onActionScanPreviousWord() {
         void this._scanKeyboardWord(-1);
+    }
+
+    /**
+     * @returns {void}
+     */
+    _onActionScanFirstWord() {
+        void this._scanKeyboardWordFirst();
     }
 
     // API message handlers
@@ -1045,11 +1053,7 @@ export class Frontend {
      * @returns {Promise<void>}
      */
     async _scanKeyboardWord(direction) {
-        if (this._options === null) { return; }
-        const selector = this._options.scanning.keyboardScanSelector;
-        if (selector === '') { return; }
-
-        const containerElement = this._selectKeyboardScanContainer(selector);
+        const containerElement = this._getKeyboardScanContainer();
         if (containerElement === null) { return; }
 
         if (direction < 0) {
@@ -1059,6 +1063,38 @@ export class Frontend {
             return;
         }
 
+        await this._scanKeyboardWordForward(containerElement);
+    }
+
+    /**
+     * Jumps back to the first scannable word of the `scanning.keyboardScanSelector`
+     * container, discarding any in-progress next/previous navigation.
+     * @returns {Promise<void>}
+     */
+    async _scanKeyboardWordFirst() {
+        const containerElement = this._getKeyboardScanContainer();
+        if (containerElement === null) { return; }
+        this._keyboardTextNavigator.forceReset();
+        await this._scanKeyboardWordForward(containerElement);
+    }
+
+    /**
+     * @returns {?Element}
+     */
+    _getKeyboardScanContainer() {
+        if (this._options === null) { return null; }
+        const selector = this._options.scanning.keyboardScanSelector;
+        if (selector === '') { return null; }
+        return this._selectKeyboardScanContainer(selector);
+    }
+
+    /**
+     * Probes forward from the navigator's current position within `containerElement`
+     * until a scannable word is found (showing it) or the container is exhausted.
+     * @param {Element} containerElement
+     * @returns {Promise<void>}
+     */
+    async _scanKeyboardWordForward(containerElement) {
         for (;;) {
             const candidate = this._keyboardTextNavigator.getNextCandidate(containerElement);
             if (candidate === null) { return; }
@@ -1125,7 +1161,7 @@ export class Frontend {
             timer = setTimeout(() => { finish({textSource: null}); }, 500);
             this._textScanner.on('searchSuccess', onSuccess);
             this._textScanner.on('searchEmpty', onEmpty);
-            void this._textScanner.search(source, null, false);
+            void this._textScanner.search(source, {focus: true, restoreSelection: false}, false);
         });
     }
 

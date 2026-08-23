@@ -158,4 +158,21 @@ describe('KeyboardTextNavigator', () => {
         const navigator = new KeyboardTextNavigator();
         expect(navigator.getNextCandidate(container)).toBeNull();
     });
+
+    test('forceReset jumps back to the first word even without a text change', () => {
+        const container = createContainer('alpha beta');
+        const navigator = new KeyboardTextNavigator();
+
+        const first = navigator.getNextCandidate(container);
+        navigator.reportSuccess(/** @type {number} */ (first?.offset), 5); // "alpha"
+        const second = navigator.getNextCandidate(container);
+        navigator.reportSuccess(/** @type {number} */ (second?.offset), 4); // "beta"
+
+        navigator.forceReset();
+
+        const afterReset = navigator.getNextCandidate(container);
+        expect(afterReset?.offset).toBe(0);
+        expect(afterReset?.range.toString()).toBe('alpha beta');
+        expect(navigator.getPrevious(container)).toBeNull(); // history was discarded
+    });
 });

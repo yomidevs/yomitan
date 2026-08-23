@@ -52,6 +52,20 @@ export class KeyboardTextNavigator {
     }
 
     /**
+     * Unconditionally discards all navigation state, regardless of whether the
+     * container's text has changed. The next getNextCandidate() call will
+     * probe from the very start of whatever container it's given.
+     * @returns {void}
+     */
+    forceReset() {
+        this._offsets = [];
+        this._historyIndex = -1;
+        this._probeOffset = 0;
+        this._pendingIsReplay = false;
+        this._containerText = '';
+    }
+
+    /**
      * Returns the `Range` that a "scan next word" press should try, or `null` if
      * there is nothing left to try (the container's text has been fully consumed).
      * Does not mutate any state; call reportSuccess() or reportFailure()
