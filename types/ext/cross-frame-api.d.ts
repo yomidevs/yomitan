@@ -97,6 +97,18 @@ export type ApiSurface = {
         params: void;
         return: void;
     };
+    frontendScanNextWord: {
+        params: void;
+        return: void;
+    };
+    frontendScanPreviousWord: {
+        params: void;
+        return: void;
+    };
+    frontendScanFirstWord: {
+        params: void;
+        return: void;
+    };
     frontendGetPopupSelectionText: {
         params: void;
         return: string;

@@ -69,9 +69,9 @@ export class KeyboardShortcutController {
             ['scanSelectedText',                 {scopes: new Set(['web'])}],
             ['scanTextAtSelection',              {scopes: new Set(['web'])}],
             ['scanTextAtCaret',                  {scopes: new Set(['web'])}],
-            ['scanNextWord',                     {scopes: new Set(['web'])}],
-            ['scanPreviousWord',                 {scopes: new Set(['web'])}],
-            ['scanFirstWord',                    {scopes: new Set(['web'])}],
+            ['scanNextWord',                     {scopes: new Set(['web', 'popup'])}],
+            ['scanPreviousWord',                 {scopes: new Set(['web', 'popup'])}],
+            ['scanFirstWord',                    {scopes: new Set(['web', 'popup'])}],
             ['toggleOption',                     {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-setting-path', default: ''}}],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */

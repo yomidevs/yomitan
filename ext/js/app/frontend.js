@@ -202,6 +202,9 @@ export class Frontend {
             ['frontendGetPopupSelectionText', this._onApiGetPopupSelectionText.bind(this)],
             ['frontendGetPopupInfo',     this._onApiGetPopupInfo.bind(this)],
             ['frontendGetPageInfo',      this._onApiGetPageInfo.bind(this)],
+            ['frontendScanNextWord',     this._onApiScanNextWord.bind(this)],
+            ['frontendScanPreviousWord', this._onApiScanPreviousWord.bind(this)],
+            ['frontendScanFirstWord',    this._onApiScanFirstWord.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -326,6 +329,21 @@ export class Frontend {
     _onApiCopySelection() {
         // This will not work on Firefox if a popup has focus, which is usually the case when this function is called.
         document.execCommand('copy');
+    }
+
+    /** @type {import('cross-frame-api').ApiHandler<'frontendScanNextWord'>} */
+    _onApiScanNextWord() {
+        void this._scanKeyboardWord(1);
+    }
+
+    /** @type {import('cross-frame-api').ApiHandler<'frontendScanPreviousWord'>} */
+    _onApiScanPreviousWord() {
+        void this._scanKeyboardWord(-1);
+    }
+
+    /** @type {import('cross-frame-api').ApiHandler<'frontendScanFirstWord'>} */
+    _onApiScanFirstWord() {
+        void this._scanKeyboardWordFirst();
     }
 
     /** @type {import('cross-frame-api').ApiHandler<'frontendGetPopupSelectionText'>} */

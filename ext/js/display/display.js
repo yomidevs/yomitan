@@ -216,6 +216,9 @@ export class Display extends EventDispatcher {
             ['copyHostSelection', () => this._copyHostSelection()],
             ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }],
+            ['scanNextWord',      () => this._forwardKeyboardScanToContentOrigin('frontendScanNextWord')],
+            ['scanPreviousWord',  () => this._forwardKeyboardScanToContentOrigin('frontendScanPreviousWord')],
+            ['scanFirstWord',     () => this._forwardKeyboardScanToContentOrigin('frontendScanFirstWord')],
         ]);
         this.registerDirectMessageHandlers([
             ['displaySetOptionsContext', this._onMessageSetOptionsContext.bind(this)],
@@ -2025,6 +2028,34 @@ export class Display extends EventDispatcher {
     async _copyHostSelectionSafe() {
         try {
             await this._copyHostSelectionInner();
+        } catch (e) {
+            // NOP
+        }
+    }
+
+    /**
+     * Forwards a keyboard-scan-navigation hotkey pressed while this popup has
+     * focus back to the content page's Frontend, which is where
+     * `scanning.keyboardScanSelector` and the page DOM it targets actually live.
+     * Without this, pressing e.g. scanNextWord again while the popup is focused
+     * would silently do nothing, since the popup's own document has no idea
+     * what that action means.
+     * @param {'frontendScanNextWord'|'frontendScanPreviousWord'|'frontendScanFirstWord'} action
+     * @returns {boolean}
+     */
+    _forwardKeyboardScanToContentOrigin(action) {
+        if (typeof this._contentOriginFrameId !== 'number') { return false; }
+        void this._forwardKeyboardScanToContentOriginSafe(action);
+        return true;
+    }
+
+    /**
+     * @param {'frontendScanNextWord'|'frontendScanPreviousWord'|'frontendScanFirstWord'} action
+     * @returns {Promise<void>}
+     */
+    async _forwardKeyboardScanToContentOriginSafe(action) {
+        try {
+            await this.invokeContentOrigin(action, void 0);
         } catch (e) {
             // NOP
         }
