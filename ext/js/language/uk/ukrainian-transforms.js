@@ -238,6 +238,9 @@ const conditions = {
  */
 const oneCharacterEndingRegExp = /^(?:\[[^\]]+\]|[^\\^$.*+?()[\]{}|])\$$/;
 
+/** The same shape but of any length: an ending and nothing else, as in /ями$/ or /ого$/. */
+const endingOnlyRegExp = /^(?:\[[^\]]+\]|[^\\^$.*+?()[\]{}|])+\$$/;
+
 /**
  * A rule that strips a one-character ending has nothing to work on when the word is barely longer
  * than the ending. This matters because Yomitan looks up every prefix of the scanned text, not just
@@ -248,6 +251,13 @@ const oneCharacterEndingRegExp = /^(?:\[[^\]]+\]|[^\\^$.*+?()[\]{}|])\$$/;
  * 1.03M-token corpus it gives up two forms, "ям" and "ер", eleven tokens in all, and cuts the
  * entries contributed by the one- and two-letter prefixes of a scanned word by 94%. Three characters
  * would be too many: that costs 1.7 points of coverage and removes no further noise.
+ *
+ * A longer ending needs only to leave something behind, because a Ukrainian noun or adjective is
+ * never nothing but its ending: without that, the instrumental plural rule read the word "ями" as
+ * the ending of "землями" and offered the reader the pronoun "я". Verb rules are exempt, and have
+ * to be: the suppletive forms are written as suffixes precisely so that one rule catches both "йде"
+ * and "підійде", so demanding a stem would lose the bare form. The distinction is worth 1,683
+ * tokens -- "йде", "йшов", "дасть", "беруть", "їсть" and the like.
  *
  * The common short forms are unaffected because they are whole-word rules: "їй", "їм", "ті", "ці",
  * "ту", "ця", "цю" and the suppletive "їв", "їж". Only the test is tightened; each rule keeps the
@@ -261,6 +271,8 @@ function requireStem(descriptor) {
             const {source} = rule.isInflected;
             if (oneCharacterEndingRegExp.test(source)) {
                 rule.isInflected = new RegExp(`..${source}`);
+            } else if (endingOnlyRegExp.test(source) && !rule.conditionsOut.includes('v')) {
+                rule.isInflected = new RegExp(`.${source}`);
             }
         }
     }

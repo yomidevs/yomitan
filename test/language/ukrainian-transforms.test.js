@@ -583,6 +583,10 @@ const tests = [
             {term: 'но', source: 'н', rule: null, reasons: null},
             {term: 'не', source: 'н', rule: null, reasons: null},
             {term: 'та', source: 'т', rule: null, reasons: null},
+            // a longer ending must leave a stem behind too: the word "ями" is not the tail of
+            // "землями", and reading it that way offered the reader the pronoun "я"
+            {term: 'я', source: 'ями', rule: null, reasons: null},
+            {term: 'ть', source: 'ті', rule: null, reasons: null},
         ],
     },
     {
@@ -595,6 +599,15 @@ const tests = [
             {term: 'вона', source: 'їй', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'той', source: 'ті', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'цей', source: 'цю', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'яма', source: 'ями', rule: 'n', reasons: ['nominative plural']},
+            {term: 'земля', source: 'землями', rule: 'n', reasons: ['instrumental']},
+            // verb rules are exempt: a suppletive form is written as a suffix so that one rule
+            // reaches both the bare form and its prefixed variants
+            {term: 'йти', source: 'йде', rule: 'v', reasons: ['present']},
+            {term: 'йти', source: 'йшов', rule: 'v', reasons: ['past']},
+            {term: 'дати', source: 'дасть', rule: 'v', reasons: ['present']},
+            {term: 'брати', source: 'беруть', rule: 'v', reasons: ['present']},
+            {term: 'їсти', source: 'їсть', rule: 'v', reasons: ['present']},
             {term: 'день', source: 'дня', rule: 'n', reasons: ['genitive']},
             {term: 'сон', source: 'сну', rule: 'n', reasons: ['genitive']},
             {term: 'їсти', source: 'їм', rule: 'v', reasons: ['present']},
