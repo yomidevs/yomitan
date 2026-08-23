@@ -22,7 +22,10 @@ import {prefixInflection, suffixInflection, wholeWordInflection} from '../langua
 /** Consonants which can close the final syllable of a stem undergoing the о/е → і alternation. */
 const consonants = 'бвгґджзклмнпрстфхцчшщ';
 
-const closedSyllableRegExp = new RegExp(`[${consonants}]$`);
+/** Every Ukrainian word carries a syllable nucleus, so a string with none of these is not one. */
+const vowels = 'аеєиіїоуюя';
+
+const closedSyllableRegExp = new RegExp(`[${vowels}].*[${consonants}]$`);
 
 /**
  * Ukrainian stems raise о and е to і when the final syllable becomes closed, so the alternation has
@@ -47,6 +50,11 @@ function alternatingSuffixInflection(inflectedSuffix, deinflectedSuffix, conditi
 /**
  * The genitive plural of the first and second declensions has no ending, so the nominative singular
  * cannot be recovered by trimming a suffix: "книг" → "книга", "мов" → "мова".
+ *
+ * There is no ending to strip here, so the pattern is a condition on the whole word rather than on
+ * its tail, and the general stem guard below would read it wrongly and demand a third character --
+ * losing "ям" → "яма" and "ер" → "ера". What the word does have to be is a word, which in Ukrainian
+ * means it has a vowel in it. That is what separates "ям" from the "ґр" inside "ґрунтовний".
  * @param {string} deinflectedSuffix
  * @returns {import('language-transformer').Rule<Condition>}
  */

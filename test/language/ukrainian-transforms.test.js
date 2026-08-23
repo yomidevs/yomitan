@@ -587,6 +587,10 @@ const tests = [
             // "землями", and reading it that way offered the reader the pronoun "я"
             {term: 'я', source: 'ями', rule: null, reasons: null},
             {term: 'ть', source: 'ті', rule: null, reasons: null},
+            // a consonant cluster is not a word, so it is not a genitive plural either
+            {term: 'ґра', source: 'ґр', rule: null, reasons: null},
+            {term: 'бла', source: 'бл', rule: null, reasons: null},
+            {term: 'сма', source: 'см', rule: null, reasons: null},
         ],
     },
     {
@@ -601,6 +605,11 @@ const tests = [
             {term: 'цей', source: 'цю', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'яма', source: 'ями', rule: 'n', reasons: ['nominative plural']},
             {term: 'земля', source: 'землями', rule: 'n', reasons: ['instrumental']},
+            // the zero-ending genitive plural has no ending to strip, so it asks only that the
+            // word be a word -- that is, that it have a vowel
+            {term: 'яма', source: 'ям', rule: 'n', reasons: ['genitive']},
+            {term: 'ера', source: 'ер', rule: 'n', reasons: ['genitive']},
+            {term: 'оса', source: 'ос', rule: 'n', reasons: ['genitive']},
             // verb rules are exempt: a suppletive form is written as a suffix so that one rule
             // reaches both the bare form and its prefixed variants
             {term: 'йти', source: 'йде', rule: 'v', reasons: ['present']},
