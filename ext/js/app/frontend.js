@@ -1049,13 +1049,7 @@ export class Frontend {
         const selector = this._options.scanning.keyboardScanSelector;
         if (selector === '') { return; }
 
-        /** @type {?Element} */
-        let containerElement;
-        try {
-            containerElement = document.querySelector(selector);
-        } catch (e) {
-            return;
-        }
+        const containerElement = this._selectKeyboardScanContainer(selector);
         if (containerElement === null) { return; }
 
         if (direction < 0) {
@@ -1076,6 +1070,32 @@ export class Frontend {
             }
             this._keyboardTextNavigator.reportFailure(offset);
         }
+    }
+
+    /**
+     * Resolves the `scanning.keyboardScanSelector` to a single container element.
+     * Some pages (e.g. asbplayer's subtitle overlay) accumulate multiple elements
+     * matching the same selector over time instead of reusing/removing one, so
+     * `querySelector`'s "first match" isn't reliable. Prefer the last matching
+     * element that currently has text, falling back to the last match overall.
+     * @param {string} selector
+     * @returns {?Element}
+     */
+    _selectKeyboardScanContainer(selector) {
+        /** @type {NodeListOf<Element>} */
+        let elements;
+        try {
+            elements = document.querySelectorAll(selector);
+        } catch (e) {
+            return null;
+        }
+        let fallback = null;
+        for (let i = elements.length - 1; i >= 0; --i) {
+            const element = elements[i];
+            if (fallback === null) { fallback = element; }
+            if ((element.textContent ?? '').trim().length > 0) { return element; }
+        }
+        return fallback;
     }
 
     /**

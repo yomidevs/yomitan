@@ -536,9 +536,14 @@
                 <p>
                     When set, the <em>Scan next word</em> and <em>Scan previous word</em> hotkeys (configurable under
                     <em data-modal-action="show,keyboard-shortcuts">Keyboard shortcuts</em>) will step through scannable
-                    text found inside the first element on the page matching this CSS selector, without requiring the
+                    text found inside an element on the page matching this CSS selector, without requiring the
                     mouse to hover over it. This is useful for hands-free lookups of subtitles or other text
                     rendered by another page/extension (e.g. asbplayer).
+                </p>
+                <p>
+                    If multiple elements on the page match the selector (for example, if the page keeps old subtitle
+                    lines around instead of removing them), the element containing the current text is used, not
+                    necessarily the first match.
                 </p>
                 <p>
                     To use a different selector on different websites, create a separate profile with a URL condition
