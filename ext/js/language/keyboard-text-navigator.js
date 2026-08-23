@@ -49,6 +49,15 @@ export class KeyboardTextNavigator {
         this._probeOffset = 0;
         /** @type {boolean} */
         this._pendingIsReplay = false;
+        /**
+         * How many character positions have been examined (skipped as
+         * whitespace, or tried and failed) since the current forward search
+         * began. Bounds wrap-around probing to at most one full pass over the
+         * container's text, so a container with nothing scannable at all
+         * can't cause an infinite loop. `null` while no search is in progress.
+         * @type {?number}
+         */
+        this._cycleStepsExamined = null;
     }
 
     /**
@@ -63,6 +72,7 @@ export class KeyboardTextNavigator {
         this._probeOffset = 0;
         this._pendingIsReplay = false;
         this._containerText = '';
+        this._cycleStepsExamined = null;
     }
 
     /**
@@ -129,6 +139,7 @@ export class KeyboardTextNavigator {
             this._historyIndex = this._offsets.length - 1;
         }
         this._probeOffset = offset + Math.max(1, matchLength);
+        this._cycleStepsExamined = null;
     }
 
     /**
@@ -144,6 +155,9 @@ export class KeyboardTextNavigator {
             this._offsets.length = this._historyIndex + 1;
         }
         this._probeOffset = offset + 1;
+        if (this._cycleStepsExamined !== null) {
+            this._cycleStepsExamined += 1;
+        }
     }
 
     // Private
@@ -160,23 +174,42 @@ export class KeyboardTextNavigator {
             this._historyIndex = -1;
             this._probeOffset = 0;
             this._pendingIsReplay = false;
+            this._cycleStepsExamined = null;
         }
     }
 
     /**
+     * Probes forward from `_probeOffset`, wrapping around to the start of the
+     * container's text at most once if the end is reached, so "next word"
+     * cycles back to the first word instead of stopping. Bounded by
+     * `_cycleStepsExamined` reaching the text length, so a container with no
+     * scannable text anywhere terminates instead of looping forever.
      * @param {Element} containerElement
      * @returns {?{offset: number, range: Range}}
      */
     _nextProbeCandidate(containerElement) {
         const text = containerElement.textContent ?? '';
-        let offset = this._probeOffset;
-        while (offset < text.length && isIgnorableCharacter(text.charAt(offset))) {
-            ++offset;
+        const {length} = text;
+        if (length === 0) { return null; }
+        if (this._cycleStepsExamined === null) { this._cycleStepsExamined = 0; }
+
+        let offset = this._probeOffset % length;
+        while (this._cycleStepsExamined < length && isIgnorableCharacter(text.charAt(offset))) {
+            offset = (offset + 1) % length;
+            ++this._cycleStepsExamined;
         }
+        if (this._cycleStepsExamined >= length) {
+            this._cycleStepsExamined = null;
+            return null;
+        }
+
         this._probeOffset = offset;
-        if (offset >= text.length) { return null; }
         const range = this._createRangeAtOffset(containerElement, offset);
-        return range === null ? null : {offset, range};
+        if (range === null) {
+            this._cycleStepsExamined = null;
+            return null;
+        }
+        return {offset, range};
     }
 
     /**

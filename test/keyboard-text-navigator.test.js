@@ -58,7 +58,33 @@ describe('KeyboardTextNavigator', () => {
         expect(third?.offset).toBe(8);
         navigator.reportSuccess(/** @type {number} */ (third?.offset), 5); // "three"
 
+        // After the last word, next word wraps back around to the first.
+        const wrapped = navigator.getNextCandidate(container);
+        expect(wrapped).not.toBeNull();
+        expect(wrapped?.offset).toBe(0);
+        expect(wrapped?.range.toString()).toBe('one two three');
+    });
+
+    test('wrapping around gives up after one full pass over text with nothing scannable', () => {
+        const container = createContainer('   ');
+        const navigator = new KeyboardTextNavigator();
         expect(navigator.getNextCandidate(container)).toBeNull();
+    });
+
+    test('wrapping does not loop forever when every candidate fails', () => {
+        const container = createContainer('xxx');
+        const navigator = new KeyboardTextNavigator();
+
+        let candidate = navigator.getNextCandidate(container);
+        let attempts = 0;
+        while (candidate !== null && attempts < 10) {
+            navigator.reportFailure(candidate.offset);
+            candidate = navigator.getNextCandidate(container);
+            ++attempts;
+        }
+
+        expect(candidate).toBeNull();
+        expect(attempts).toBeLessThan(10); // must terminate within one pass over the text
     });
 
     test('skips over failed candidates when probing forward', () => {
