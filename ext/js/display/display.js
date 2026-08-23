@@ -2040,11 +2040,16 @@ export class Display extends EventDispatcher {
      * Without this, pressing e.g. scanNextWord again while the popup is focused
      * would silently do nothing, since the popup's own document has no idea
      * what that action means.
+     *
+     * Uses `invokeParentFrame` (the frame that created this popup), not
+     * `invokeContentOrigin` (which is for proxy-popup scenarios and throws
+     * when the popup and its content live in the same frame — the normal case
+     * for a typical embedded popup).
      * @param {'frontendScanNextWord'|'frontendScanPreviousWord'|'frontendScanFirstWord'} action
      * @returns {boolean}
      */
     _forwardKeyboardScanToContentOrigin(action) {
-        if (typeof this._contentOriginFrameId !== 'number') { return false; }
+        if (typeof this._parentFrameId !== 'number') { return false; }
         void this._forwardKeyboardScanToContentOriginSafe(action);
         return true;
     }
@@ -2055,7 +2060,7 @@ export class Display extends EventDispatcher {
      */
     async _forwardKeyboardScanToContentOriginSafe(action) {
         try {
-            await this.invokeContentOrigin(action, void 0);
+            await this.invokeParentFrame(action, void 0);
         } catch (e) {
             // NOP
         }
