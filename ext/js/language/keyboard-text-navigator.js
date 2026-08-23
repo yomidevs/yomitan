@@ -30,11 +30,17 @@ function isIgnorableCharacter(character) {
  * from the live DOM by the caller, so this class only needs to know how to
  * turn a linear character offset into a `Range`, and how to remember which
  * offsets have already been confirmed to contain a dictionary match.
+ *
+ * Navigation state resets when the container's *text content* changes, not
+ * when the element reference changes: some pages (e.g. React-based subtitle
+ * overlays) recreate the container element on re-render even when its text
+ * is unchanged, and treating that as "a new subtitle" would make it
+ * impossible to ever move past the first word.
  */
 export class KeyboardTextNavigator {
     constructor() {
-        /** @type {?Element} */
-        this._containerElement = null;
+        /** @type {string} */
+        this._containerText = '';
         /** @type {number[]} */
         this._offsets = [];
         /** @type {number} */
@@ -43,11 +49,6 @@ export class KeyboardTextNavigator {
         this._probeOffset = 0;
         /** @type {boolean} */
         this._pendingIsReplay = false;
-    }
-
-    /** @type {?Element} */
-    get containerElement() {
-        return this._containerElement;
     }
 
     /**
@@ -138,8 +139,9 @@ export class KeyboardTextNavigator {
      * @returns {void}
      */
     _setContainer(containerElement) {
-        if (this._containerElement !== containerElement) {
-            this._containerElement = containerElement;
+        const text = containerElement.textContent ?? '';
+        if (text !== this._containerText) {
+            this._containerText = text;
             this._offsets = [];
             this._historyIndex = -1;
             this._probeOffset = 0;

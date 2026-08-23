@@ -98,7 +98,7 @@ describe('KeyboardTextNavigator', () => {
         expect(replay?.range.toString()).toBe('beta');
     });
 
-    test('resets navigation state when the container element changes', () => {
+    test('resets navigation state when the container text changes', () => {
         const containerA = createContainer('foo');
         const containerB = createContainer('bar');
         const navigator = new KeyboardTextNavigator();
@@ -110,6 +110,22 @@ describe('KeyboardTextNavigator', () => {
         const other = navigator.getNextCandidate(containerB);
         expect(other?.offset).toBe(0);
         expect(other?.range.toString()).toBe('bar');
+    });
+
+    test('preserves navigation state across a different element instance with the same text', () => {
+        // Some pages (e.g. React-based subtitle overlays) recreate the container
+        // element on re-render even when the displayed text hasn't changed; this
+        // must not be treated as a new subtitle line.
+        const containerInstance1 = createContainer('alpha beta');
+        const navigator = new KeyboardTextNavigator();
+
+        const first = navigator.getNextCandidate(containerInstance1);
+        navigator.reportSuccess(/** @type {number} */ (first?.offset), 5); // "alpha"
+
+        const containerInstance2 = createContainer('alpha beta');
+        const second = navigator.getNextCandidate(containerInstance2);
+        expect(second?.offset).toBe(6); // continues to "beta", does not restart at "alpha"
+        expect(second?.range.toString()).toBe('beta');
     });
 
     test('drops a stale replayed offset instead of retrying it forever', () => {
