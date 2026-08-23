@@ -418,7 +418,7 @@ const tests = [
             {term: 'хто', source: 'кого', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'що', source: 'чого', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'ніщо', source: 'нічого', rule: 'pron', reasons: ['pronoun declension']},
-            {term: 'хтось', source: 'комусь', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'хтось', source: 'комусь', rule: 'pron', reasons: ['indefinite pronoun']},
             {term: 'цей', source: 'цього', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'цей', source: 'ці', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'той', source: 'тим', rule: 'pron', reasons: ['pronoun declension']},
@@ -578,6 +578,11 @@ const tests = [
         valid: false,
         tests: [
             {term: 'ґо', source: 'ґ', rule: null, reasons: null},
+            // the removed fleetingVowelInflection('ем','') used to produce this
+            {term: 'ден', source: 'днем', rule: null, reasons: null},
+            // the never-correct alternating rule that produced these has been removed
+            {term: 'кін', source: 'коня', rule: null, reasons: null},
+            {term: 'мір', source: 'моря', rule: null, reasons: null},
             {term: 'ґра', source: 'ґр', rule: null, reasons: null},
             {term: 'на', source: 'но', rule: null, reasons: null},
             {term: 'но', source: 'н', rule: null, reasons: null},
@@ -587,6 +592,10 @@ const tests = [
             // "землями", and reading it that way offered the reader the pronoun "я"
             {term: 'я', source: 'ями', rule: null, reasons: null},
             {term: 'ть', source: 'ті', rule: null, reasons: null},
+            // "ів" is the genitive plural ending; on its own it is a word, not an ending
+            {term: 'ь', source: 'ів', rule: null, reasons: null},
+            {term: 'я', source: 'ів', rule: null, reasons: null},
+            {term: 'е', source: 'ів', rule: null, reasons: null},
             // a consonant cluster is not a word, so it is not a genitive plural either
             {term: 'ґра', source: 'ґр', rule: null, reasons: null},
             {term: 'бла', source: 'бл', rule: null, reasons: null},
@@ -610,6 +619,13 @@ const tests = [
             {term: 'яма', source: 'ям', rule: 'n', reasons: ['genitive']},
             {term: 'ера', source: 'ер', rule: 'n', reasons: ['genitive']},
             {term: 'оса', source: 'ос', rule: 'n', reasons: ['genitive']},
+            {term: 'боятися', source: 'бійся', rule: 'v', reasons: ['imperative']},
+            {term: 'боятися', source: 'боїться', rule: 'v', reasons: ['present']},
+            {term: 'стояти', source: 'стій', rule: 'v', reasons: ['imperative']},
+            {term: 'гість', source: 'гостя', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'тиждень', source: 'тижнів', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'більше', source: 'більш', rule: 'adv', reasons: ['comparative']},
+            {term: 'підвестися', source: 'підвівся', rule: 'v', reasons: ['passive participle']},
             // verb rules are exempt: a suppletive form is written as a suffix so that one rule
             // reaches both the bare form and its prefixed variants
             {term: 'йти', source: 'йде', rule: 'v', reasons: ['present']},
@@ -814,10 +830,10 @@ const tests = [
             {term: 'увесь', source: 'усіх', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'кожний', source: 'кожен', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'жодний', source: 'жоден', rule: 'pron', reasons: ['pronoun declension']},
-            {term: 'один', source: 'одно', rule: 'num', reasons: ['pronoun declension']},
+            {term: 'один', source: 'одно', rule: 'num', reasons: ['numeral declension']},
             {term: 'той', source: 'тієї', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'сей', source: 'сього', rule: 'pron', reasons: ['pronoun declension']},
-            {term: 'повинний', source: 'повинен', rule: 'adj', reasons: ['pronoun declension']},
+            {term: 'повинний', source: 'повинен', rule: 'adj', reasons: ['short adjective']},
         ],
     },
     {

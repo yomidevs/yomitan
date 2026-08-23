@@ -79,7 +79,7 @@ function verbInflection(inflectedSuffix, deinflectedSuffix) {
     const rules = [
         suffixInflection(inflectedSuffix, deinflectedSuffix, [], ['v']),
         suffixInflection(`${inflectedSuffix}ся`, `${deinflectedSuffix}ся`, [], ['v']),
-        suffixInflection(`${inflectedSuffix}сь`, `${deinflectedSuffix}сь`.replace(/сь$/, 'ся'), [], ['v']),
+        suffixInflection(`${inflectedSuffix}сь`, `${deinflectedSuffix}ся`, [], ['v']),
     ];
     // A third-person singular ending in a vowel keeps its underlying -ть before the postfix:
     // "сміється", not "смієся".
@@ -262,10 +262,11 @@ const endingOnlyRegExp = /^(?:\[[^\]]+\]|[^\\^$.*+?()[\]{}|])+\$$/;
  *
  * A longer ending needs only to leave something behind, because a Ukrainian noun or adjective is
  * never nothing but its ending: without that, the instrumental plural rule read the word "ями" as
- * the ending of "землями" and offered the reader the pronoun "я". Verb rules are exempt, and have
- * to be: the suppletive forms are written as suffixes precisely so that one rule catches both "йде"
- * and "підійде", so demanding a stem would lose the bare form. The distinction is worth 1,683
- * tokens -- "йде", "йшов", "дасть", "беруть", "їсть" and the like.
+ * the ending of "землями" and offered the reader the pronoun "я". Verb rules are exempt from that
+ * second test, and have to be: a suppletive form is written as a suffix precisely so that one rule
+ * catches both "йде" and "підійде", so demanding a stem would lose the bare form -- 1,683 tokens,
+ * "йде", "йшов", "дасть", "беруть", "їсть" and the like. They are not exempt from the first, since
+ * no Ukrainian verb form is two characters long and exempting them only adds candidates.
  *
  * The common short forms are unaffected because they are whole-word rules: "їй", "їм", "ті", "ці",
  * "ту", "ця", "цю" and the suppletive "їв", "їж". Only the test is tightened; each rule keeps the
@@ -365,7 +366,6 @@ export const ukrainianTransforms = requireStem({
                 suffixInflection('я', 'й', [], ['n']), // 'андрія' -> 'андрій', 'злодія' -> 'злодій'
                 suffixInflection('обами', 'іб', [], ['n']), // 'засобами' -> 'засіб'
                 suffixInflection('обів', 'іб', [], ['n']),
-                suffixInflection('ольцях', 'олець', [], ['n']), // 'бувальцях' -> 'бувалець'
                 suffixInflection('оєн', 'ійна', [], ['n']), // 'воєн' -> 'війна'
                 suffixInflection('ів', 'ь', [], ['n']), // 'правителів' -> 'правитель' (soft masculine)
                 suffixInflection('ів', 'і', [], ['n']), // 'труднощів' -> 'труднощі'
@@ -373,7 +373,7 @@ export const ukrainianTransforms = requireStem({
                 suffixInflection('ок', 'ки', [], ['n']), // 'діток' -> 'дітки'
                 suffixInflection('ел', 'ло', [], ['n']), // 'чисел' -> 'число'
                 suffixInflection('ен', "'я", [], ['n']), // 'племен' -> "плем'я"
-                suffixInflection('ю', 'ій', [], ['n']), // 'настрою' -> 'настрій'
+                suffixInflection('ю', 'ій', [], ['n']), // 'останню' -> 'останній'
                 suffixInflection('ьору', 'ір', [], ['n']), // 'кольору' -> 'колір'
                 suffixInflection('остей', 'ість', [], ['n']), // 'властивостей' -> 'властивість'
                 suffixInflection('остям', 'ість', [], ['n']),
@@ -389,23 +389,21 @@ export const ukrainianTransforms = requireStem({
                 suffixInflection('ин', 'ини', [], ['n']), // 'відносин' -> 'відносини'
                 suffixInflection('ьця', 'ець', [], ['n']), // 'пальця' -> 'палець'
                 suffixInflection('ща', 'ще', [], ['n']), // 'становища' -> 'становище'
-                suffixInflection('ца', 'це', [], ['n']), // 'серця' -> 'серце'
                 suffixInflection('ль', 'лля', [], ['n']), // 'зусиль' -> 'зусилля'
                 suffixInflection('ть', 'ття', [], ['n']), // 'століть' -> 'століття'
                 suffixInflection('нь', 'ння', [], ['n']), // 'бажань' -> 'бажання'
                 ...fleetingVowelInflection('ів', 'ь'), // 'днів' -> 'день'
                 alternatingSuffixInflection('ю', 'ь', [], ['n']), // 'болю' -> 'біль'
                 suffixInflection('ою', 'ій', [], ['n']), // 'спокою' -> 'спокій'
-                alternatingSuffixInflection('я', '', [], ['n']), // 'ножа' -> 'ніж'
                 ...['коней', 'коням', 'кіньми', 'конях', 'коня', 'коні'].map((f) => wholeWordInflection(f, 'кінь', [], ['n'])),
                 suffixInflection('ті', 'ть', [], ['n']), // 'смерті' -> 'смерть' (third declension)
                 suffixInflection('ді', 'дь', [], ['n']), // 'міді' -> 'мідь'
-                suffixInflection('сті', 'сть', [], ['n']), // 'радості' -> 'радість'
+                suffixInflection('сті', 'сть', [], ['n']), // 'участі' -> 'участь'
                 suffixInflection('я', '', [], ['n']), // 'царя' -> 'цар' (soft masculine)
                 suffixInflection('я', 'ь', [], ['n']), // 'короля' -> 'король'
-                suffixInflection('ю', '', [], ['n']), // 'краю' -> 'край'
+                suffixInflection('ю', '', [], ['n']), // 'царю' -> 'цар' (soft masculine)
                 zeroEndingInflection('о'), // 'див' -> 'диво'
-                zeroEndingInflection('е'), // 'сердець' handled above; 'слів' needs the alternation below
+                zeroEndingInflection('е'), // 'озер' -> 'озеро'
                 ...fleetingVowelInflection('я', 'ь'), // 'дня' -> 'день'
                 ...fleetingVowelInflection('у', ''), // 'вітру' -> 'вітер'
                 ...fleetingVowelInflection('а', ''), // 'котла' -> 'котел', 'білка' -> 'білок'
@@ -433,7 +431,7 @@ export const ukrainianTransforms = requireStem({
                 suffixInflection('ю', 'й', [], ['n']), // 'краю' -> 'край'
                 suffixInflection('ів', '', [], ['n']), // 'студентів' -> 'студент'
                 suffixInflection('їв', 'й', [], ['n']), // 'країв' -> 'край'
-                alternatingSuffixInflection('а', '', [], ['n']), // 'стола' -> 'стіл'
+                alternatingSuffixInflection('а', '', [], ['n']), // 'стола' -> 'стіл', 'ножа' -> 'ніж'
                 alternatingSuffixInflection('у', '', [], ['n']), // 'столу' -> 'стіл'
                 alternatingSuffixInflection('я', 'ь', [], ['n']), // 'коня' -> 'кінь'
                 alternatingSuffixInflection('ів', '', [], ['n']), // 'столів' -> 'стіл'
@@ -477,7 +475,7 @@ export const ukrainianTransforms = requireStem({
             rules: [
                 ...fleetingVowelInflection('ям', 'ь'), // 'дням' -> 'день'
                 suffixInflection('ті', 'ть', [], ['n']), // 'смерті' -> 'смерть'
-                suffixInflection('сті', 'сть', [], ['n']), // 'радості' -> 'радість'
+                suffixInflection('сті', 'сть', [], ['n']), // 'участі' -> 'участь'
                 ...palatalizingSuffixInflection('і', '', true), // 'році' -> 'рік'
                 ...fleetingVowelInflection('ю', 'ь'), // 'дню' -> 'день'
                 // First declension
@@ -615,7 +613,7 @@ export const ukrainianTransforms = requireStem({
                 ...fleetingVowelInflection('ях', 'ь'), // 'днях' -> 'день'
                 suffixInflection('ях', 'ь', [], ['n']), // 'грудях' -> 'грудь'
                 suffixInflection('ті', 'ть', [], ['n']), // 'смерті' -> 'смерть'
-                suffixInflection('сті', 'сть', [], ['n']), // 'радості' -> 'радість'
+                suffixInflection('сті', 'сть', [], ['n']), // 'участі' -> 'участь'
                 ...palatalizingSuffixInflection('і', '', true), // 'році' -> 'рік'
                 ...fleetingVowelInflection('і', 'ь'), // 'дні' -> 'день'
                 // First declension
@@ -701,14 +699,9 @@ export const ukrainianTransforms = requireStem({
             name: 'comparative',
             description: 'Comparative degree of an adjective or adverb',
             rules: [
+                wholeWordInflection('більш', 'більше', [], ['adv']),
+                wholeWordInflection('менш', 'менше', [], ['adv']),
                 suffixInflection('ш', 'ше', [], ['adv']), // 'швидш' -> 'швидше'
-                ...[['здоров', 'здоровий'],
-                    ['певен', 'певний'],
-                    ['винен', 'винний'],
-                    ['годен', 'годний'],
-                    ['повинен', 'повинний'],
-                    ['потрібен', 'потрібний'],
-                    ['ладен', 'ладний']].map(([short, long]) => wholeWordInflection(short, long, [], ['adj'])), // short adjectives
                 suffixInflection('іш', 'іше', [], ['adv']), // 'раніш' -> 'раніше'
                 suffixInflection('іший', 'ий', ['adj'], ['adj']), // 'гарніший' -> 'гарний'
                 suffixInflection('ший', 'кий', ['adj'], ['adj']), // 'солодший' -> 'солодкий'
@@ -756,6 +749,7 @@ export const ukrainianTransforms = requireStem({
             name: 'present',
             description: 'Present tense of an imperfective verb, or future tense of a perfective one',
             rules: [
+                ...['боюся', 'боїться', 'бояться'].map((f) => wholeWordInflection(f, 'боятися', [], ['v'])),
                 // Upstream covers the 1sg of the epenthetic-л class; the 3pl was missing.
                 ...verbInflections([['блять', 'бити'], ['влять', 'вити'], ['млять', 'мити'], ['плять', 'пити']]),
                 ...verbInflections([['джу', 'діти']]), // 'сиджу' -> 'сидіти'
@@ -1057,59 +1051,63 @@ export const ukrainianTransforms = requireStem({
         'imperative': {
             name: 'imperative',
             description: 'Imperative mood of a verb',
-            rules: verbInflections([
+            rules: [
+                ...['бійся', 'бійтеся'].map((f) => wholeWordInflection(f, 'боятися', [], ['v'])),
+                ...['стій', 'стійте', 'стіймо'].map((f) => wholeWordInflection(f, 'стояти', [], ['v'])),
+                ...verbInflections([
                 // -увати and -ювати stems: 'маринуймо' -> 'маринувати'
-                ['уй', 'увати'],
-                ['уймо', 'увати'],
-                ['уйте', 'увати'],
-                ['юй', 'ювати'],
-                ['юймо', 'ювати'],
-                ['юйте', 'ювати'],
-                // Stems with a j before the ending: 'читай' -> 'читати'
-                ['й', 'ти'],
-                ['ймо', 'ти'],
-                ['йте', 'ти'],
-                // -ити stems: 'говори' -> 'говорити'
-                ['и', 'ити'],
-                ['імо', 'ити'],
-                ['іть', 'ити'],
-                // Consonant stems: 'неси' -> 'нести'
-                ['и', 'ти'],
-                ['імо', 'ти'],
-                ['іть', 'ти'],
-                // -ати stems after a hushing consonant: 'кричи' -> 'кричати'
-                ['и', 'ати'],
-                ['імо', 'ати'],
-                ['іть', 'ати'],
-                // Irregular imperatives
-                ['йди', 'йти'], // 'йди' -> 'йти'
-                ['йдіть', 'йти'],
-                ['йдімо', 'йти'],
-                ['їж', 'їсти'], // 'їж' -> 'їсти'
-                ['їжте', 'їсти'],
-                ['їжмо', 'їсти'],
-                ['бери', 'брати'], // 'бери' -> 'брати'
-                ['беріть', 'брати'],
-                ['берімо', 'брати'],
-                ['ізьми', 'зяти'], // 'візьми' -> 'взяти'
-                ['ізьміть', 'зяти'],
-                ['удь', 'ути'], // 'будь' -> 'бути'
-                ['удьте', 'ути'],
-                ['удьмо', 'ути'],
-                ['жи', 'зати'], // 'кажи' -> 'казати'
-                ['жіть', 'зати'],
-                ['жи', 'гти'], // 'біжи' -> 'бігти'
-                ['жіть', 'гти'],
-                ['ни', 'нути'], // 'крикни' -> 'крикнути'
-                ['нім', 'нути'], // truncated: 'бабахнім' beside 'бабахнімо'
-                ['ім', 'ити'], // truncated: 'ввалім' beside 'ввалімо'
-                ['ім', 'ати'],
-                ['ім', 'ти'],
-                ['німо', 'нути'],
-                ['ніть', 'нути'],
-                ['ви', 'ти'], // 'живи' -> 'жити'
-                ['віть', 'ти'],
-            ]),
+                    ['уй', 'увати'],
+                    ['уймо', 'увати'],
+                    ['уйте', 'увати'],
+                    ['юй', 'ювати'],
+                    ['юймо', 'ювати'],
+                    ['юйте', 'ювати'],
+                    // Stems with a j before the ending: 'читай' -> 'читати'
+                    ['й', 'ти'],
+                    ['ймо', 'ти'],
+                    ['йте', 'ти'],
+                    // -ити stems: 'говори' -> 'говорити'
+                    ['и', 'ити'],
+                    ['імо', 'ити'],
+                    ['іть', 'ити'],
+                    // Consonant stems: 'неси' -> 'нести'
+                    ['и', 'ти'],
+                    ['імо', 'ти'],
+                    ['іть', 'ти'],
+                    // -ати stems after a hushing consonant: 'кричи' -> 'кричати'
+                    ['и', 'ати'],
+                    ['імо', 'ати'],
+                    ['іть', 'ати'],
+                    // Irregular imperatives
+                    ['йди', 'йти'], // 'йди' -> 'йти'
+                    ['йдіть', 'йти'],
+                    ['йдімо', 'йти'],
+                    ['їж', 'їсти'], // 'їж' -> 'їсти'
+                    ['їжте', 'їсти'],
+                    ['їжмо', 'їсти'],
+                    ['бери', 'брати'], // 'бери' -> 'брати'
+                    ['беріть', 'брати'],
+                    ['берімо', 'брати'],
+                    ['ізьми', 'зяти'], // 'візьми' -> 'взяти'
+                    ['ізьміть', 'зяти'],
+                    ['удь', 'ути'], // 'будь' -> 'бути'
+                    ['удьте', 'ути'],
+                    ['удьмо', 'ути'],
+                    ['жи', 'зати'], // 'кажи' -> 'казати'
+                    ['жіть', 'зати'],
+                    ['жи', 'гти'], // 'біжи' -> 'бігти'
+                    ['жіть', 'гти'],
+                    ['ни', 'нути'], // 'крикни' -> 'крикнути'
+                    ['нім', 'нути'], // truncated: 'бабахнім' beside 'бабахнімо'
+                    ['ім', 'ити'], // truncated: 'ввалім' beside 'ввалімо'
+                    ['ім', 'ати'],
+                    ['ім', 'ти'],
+                    ['німо', 'нути'],
+                    ['ніть', 'нути'],
+                    ['ви', 'ти'], // 'живи' -> 'жити'
+                    ['віть', 'ти'],
+                ]),
+            ],
         },
         'passive participle': {
             name: 'passive participle',
@@ -1212,6 +1210,8 @@ export const ukrainianTransforms = requireStem({
             name: 'suppletive noun',
             description: 'Declined form of a noun whose plural stem differs from its singular',
             rules: [
+                ...['гостя', 'гості', 'гостей', 'гостям', 'гостями', 'гостях'].map((f) => wholeWordInflection(f, 'гість', [], ['n'])),
+                ...['тижня', 'тижні', 'тижнів', 'тижням', 'тижнями', 'тижнях'].map((f) => wholeWordInflection(f, 'тиждень', [], ['n'])),
                 ...['овець', 'вівці', 'вівцю', 'вівцею', 'вівцям', 'вівцями', 'вівцях']
                     .map((form) => wholeWordInflection(form, 'вівця', [], ['n'])),
                 ...['сліз', 'слізьми', 'сльози', 'сльозам', 'сльозами', 'сльозах']
@@ -1268,6 +1268,14 @@ export const ukrainianTransforms = requireStem({
                 ...indefiniteParadigm('чий', ['чийого', 'чийому', 'чиїм', 'чия', 'чию', 'чиєї', 'чиїй', 'чиєю', 'чиє', 'чиї', 'чиїх', 'чиїми']),
                 ...indefiniteParadigm('котрий', ['котрого', 'котрому', 'котрим', 'котра', 'котру', 'котрої', 'котрій', 'котрою', 'котре', 'котрі', 'котрих', 'котрими']),
                 ...indefiniteParadigm('скільки', ['скількох', 'скільком', 'скількома']),
+                // indefiniteParadigm does not build the де- series, whose forms are listed instead
+                wholeWordInflection('декого', 'дехто', [], ['pron']),
+                wholeWordInflection('декому', 'дехто', [], ['pron']),
+                wholeWordInflection('деким', 'дехто', [], ['pron']),
+                wholeWordInflection('дечого', 'дещо', [], ['pron']),
+                wholeWordInflection('дечому', 'дещо', [], ['pron']),
+                wholeWordInflection('дечим', 'дещо', [], ['pron']),
+                wholeWordInflection('чиємусь', 'чийсь', [], ['pron']),
             ],
         },
         'suppletive verb': {
@@ -1403,8 +1411,18 @@ export const ukrainianTransforms = requireStem({
                 ...closedClassParadigm('четверо', 'чотирь', ['ох', 'ом', 'ома'], 'num'),
                 ...closedClassParadigm("п'ятеро", "п'ять", ['ох', 'ом', 'ома'], 'num'),
                 ...closedClassParadigm('стільки', 'стільк', ['ох', 'ом', 'ома'], 'num'),
-                ...closedClassParadigm('скільки', 'скільк', ['ох', 'ом', 'ома'], 'num'),
             ],
+        },
+        'short adjective': {
+            name: 'short adjective',
+            description: 'Short predicative form of an adjective',
+            rules: [['певен', 'певний'],
+                ['повинен', 'повинний'],
+                ['потрібен', 'потрібний'],
+                ['годен', 'годний'],
+                ['винен', 'винний'],
+                ['здоров', 'здоровий'],
+                ['ладен', 'ладний']].map(([short, long]) => wholeWordInflection(short, long, [], ['adj'])),
         },
         'pronoun declension': {
             name: 'pronoun declension',
@@ -1412,7 +1430,6 @@ export const ukrainianTransforms = requireStem({
             rules: [
                 ...closedClassParadigm('отой', 'от', ['ого', 'ому', 'им', 'а', 'ої', 'ій', 'у', 'ою', 'е', 'і', 'их', 'ими', 'ім', 'ієї', 'ією'], 'pron'),
                 ...['тії', 'тая', 'теє', 'тую'].map((f) => wholeWordInflection(f, 'той', [], ['pron'])),
-                ...['бійся', 'бійтеся', 'боюся', 'боїться', 'бояться'].map((f) => wholeWordInflection(f, 'боятися', [], ['v'])),
 
                 ...closedClassParadigm('сей', 'с', softDeterminerEndings, 'pron'),
                 ...closedClassParadigm('оцей', 'оц', softDeterminerEndings, 'pron'),
@@ -1422,20 +1439,8 @@ export const ukrainianTransforms = requireStem({
                 ...closedClassParadigm('увесь', 'ус', vesEndings, 'pron'),
                 ...closedClassParadigm('увесь', 'увс', vesEndings, 'pron'),
                 wholeWordInflection('кожен', 'кожний', [], ['pron']),
-                wholeWordInflection('більш', 'більше', [], ['adv']),
-                wholeWordInflection('менш', 'менше', [], ['adv']),
                 wholeWordInflection('віщо', 'що', [], ['pron']),
-                ...['гостя', 'гості', 'гостей', 'гостям', 'гостями', 'гостях'].map((f) => wholeWordInflection(f, 'гість', [], ['n'])),
-                ...['тижня', 'тижні', 'тижнів', 'тижням', 'тижнями', 'тижнях'].map((f) => wholeWordInflection(f, 'тиждень', [], ['n'])),
-                ...['стій', 'стійте', 'стіймо'].map((f) => wholeWordInflection(f, 'стояти', [], ['v'])),
                 wholeWordInflection('жоден', 'жодний', [], ['pron']),
-                wholeWordInflection('певен', 'певний', [], ['adj']),
-                wholeWordInflection('повинен', 'повинний', [], ['adj']),
-                wholeWordInflection('потрібен', 'потрібний', [], ['adj']),
-                wholeWordInflection('годен', 'годний', [], ['adj']),
-                wholeWordInflection('винен', 'винний', [], ['adj']),
-                wholeWordInflection('одно', 'один', [], ['num']),
-                wholeWordInflection('однеє', 'один', [], ['num']),
                 ...['усього', 'усьому', 'усім', 'усе'].map((f) => wholeWordInflection(f, 'усе', [], ['pron'])),
 
                 // Personal, interrogative and negative pronouns are suppletive
@@ -1490,26 +1495,6 @@ export const ukrainianTransforms = requireStem({
                 wholeWordInflection('нічого', 'ніщо', [], ['pron']),
                 wholeWordInflection('нічому', 'ніщо', [], ['pron']),
                 wholeWordInflection('нічим', 'ніщо', [], ['pron']),
-                // Indefinite series built on хто / що
-                wholeWordInflection('когось', 'хтось', [], ['pron']),
-                wholeWordInflection('комусь', 'хтось', [], ['pron']),
-                wholeWordInflection('кимось', 'хтось', [], ['pron']),
-                wholeWordInflection('чогось', 'щось', [], ['pron']),
-                wholeWordInflection('чомусь', 'щось', [], ['pron']),
-                wholeWordInflection('чимось', 'щось', [], ['pron']),
-                wholeWordInflection('декого', 'дехто', [], ['pron']),
-                wholeWordInflection('декому', 'дехто', [], ['pron']),
-                wholeWordInflection('деким', 'дехто', [], ['pron']),
-                wholeWordInflection('дечого', 'дещо', [], ['pron']),
-                wholeWordInflection('дечому', 'дещо', [], ['pron']),
-                wholeWordInflection('дечим', 'дещо', [], ['pron']),
-                wholeWordInflection('абикого', 'абихто', [], ['pron']),
-                wholeWordInflection('абикому', 'абихто', [], ['pron']),
-                wholeWordInflection('абиким', 'абихто', [], ['pron']),
-                wholeWordInflection('абичого', 'абищо', [], ['pron']),
-                wholeWordInflection('абичому', 'абищо', [], ['pron']),
-                wholeWordInflection('абичим', 'абищо', [], ['pron']),
-                ...closedClassParadigm('чийсь', 'чи', ['йогось', 'ємусь', 'їмсь', 'ясь', 'єїсь', 'їйсь', 'юсь', 'єюсь', 'єсь', 'їсь', 'їхсь', 'їмись'], 'pron'),
                 ...closedClassParadigm('нічий', 'нічи', ['його', 'єму', 'їм', 'я', 'єї', 'їй', 'ю', 'єю', 'є', 'ї', 'їх', 'їми'], 'pron'),
                 ...closedClassParadigm('ніякий', 'нияк', hardDeterminerEndings, 'pron'),
                 ...closedClassParadigm('ніякий', 'ніяк', hardDeterminerEndings, 'pron'),
@@ -1539,6 +1524,8 @@ export const ukrainianTransforms = requireStem({
             name: 'numeral declension',
             description: 'Declined form of a numeral',
             rules: [
+                wholeWordInflection('одно', 'один', [], ['num']),
+                wholeWordInflection('однеє', 'один', [], ['num']),
                 ...closedClassParadigm('один', 'одн', [...hardDeterminerEndings, 'ієї', 'ією'], 'num'),
                 wholeWordInflection('двох', 'два', [], ['num']),
                 wholeWordInflection('двом', 'два', [], ['num']),
