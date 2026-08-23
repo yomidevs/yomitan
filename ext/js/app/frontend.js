@@ -1067,10 +1067,23 @@ export class Frontend {
      * Scans forward (`direction === 1`) or backward (`direction === -1`) to the
      * next/previous scannable word inside the `scanning.keyboardScanSelector`
      * container, without requiring the mouse to be positioned over it.
+     *
+     * A nested `Frontend` instance (one created inside a popup, for recursive
+     * scanning of the popup's own content — see `Display._setupNestedFrontend`)
+     * shares its `HotkeyHandler` with the popup's `Display`, so its registration
+     * for this action silently shadows `Display`'s own forwarding registration.
+     * If this instance is nested (`_depth > 0`), forward to the parent frame
+     * instead of scanning this instance's own document, which would never find
+     * the page's `scanning.keyboardScanSelector` container.
      * @param {1|-1} direction
      * @returns {Promise<void>}
      */
     async _scanKeyboardWord(direction) {
+        if (this._depth > 0) {
+            await this._forwardKeyboardScanToParent(direction < 0 ? 'frontendScanPreviousWord' : 'frontendScanNextWord');
+            return;
+        }
+
         const containerElement = this._getKeyboardScanContainer();
         if (containerElement === null) { return; }
 
@@ -1087,13 +1100,32 @@ export class Frontend {
     /**
      * Jumps back to the first scannable word of the `scanning.keyboardScanSelector`
      * container, discarding any in-progress next/previous navigation.
+     * See _scanKeyboardWord() for why nested instances forward instead.
      * @returns {Promise<void>}
      */
     async _scanKeyboardWordFirst() {
+        if (this._depth > 0) {
+            await this._forwardKeyboardScanToParent('frontendScanFirstWord');
+            return;
+        }
+
         const containerElement = this._getKeyboardScanContainer();
         if (containerElement === null) { return; }
         this._keyboardTextNavigator.forceReset();
         await this._scanKeyboardWordForward(containerElement);
+    }
+
+    /**
+     * @param {'frontendScanNextWord'|'frontendScanPreviousWord'|'frontendScanFirstWord'} action
+     * @returns {Promise<void>}
+     */
+    async _forwardKeyboardScanToParent(action) {
+        if (this._parentFrameId === null) { return; }
+        try {
+            await this._application.crossFrame.invoke(this._parentFrameId, action, void 0);
+        } catch (e) {
+            // NOP
+        }
     }
 
     /**

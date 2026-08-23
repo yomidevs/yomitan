@@ -2041,6 +2041,14 @@ export class Display extends EventDispatcher {
      * would silently do nothing, since the popup's own document has no idea
      * what that action means.
      *
+     * Note: when popup nesting is enabled (the default), `Display` shares its
+     * `HotkeyHandler` with a nested `Frontend` instance it creates for scanning
+     * the popup's own content (see `_setupNestedFrontend`), and that nested
+     * `Frontend` registers the same action names — silently shadowing this
+     * registration. The nested `Frontend` handles forwarding itself in that
+     * case (see `Frontend._scanKeyboardWord`'s `_depth > 0` check); this
+     * registration only ends up being used when nesting is disabled.
+     *
      * Uses `invokeParentFrame` (the frame that created this popup), not
      * `invokeContentOrigin` (which is for proxy-popup scenarios and throws
      * when the popup and its content live in the same frame — the normal case
