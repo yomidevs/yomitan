@@ -589,6 +589,7 @@ export class OptionsUtil {
             this._updateVersion75,
             this._updateVersion76,
             this._updateVersion77,
+            this._updateVersion78,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1858,6 +1859,16 @@ export class OptionsUtil {
      */
     async _updateVersion77(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v77.handlebars');
+    }
+
+    /**
+     * - Added scanning.keyboardScanSelector
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion78(options) {
+        for (const profile of options.profiles) {
+            profile.options.scanning.keyboardScanSelector = '';
+        }
     }
 
     /**

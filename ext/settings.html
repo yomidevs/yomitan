@@ -519,6 +519,36 @@
                 <label class="toggle"><input type="checkbox" data-setting="scanning.scanWithoutMousemove"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
+        <div class="settings-item">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Keyboard scan container selector</div>
+                    <div class="settings-item-description">
+                        CSS selector for an element to scan through using the keyboard-only scan hotkeys, without needing the mouse.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <input type="text" placeholder="e.g. .subtitle-text" spellcheck="false" autocomplete="off" data-setting="scanning.keyboardScanSelector">
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    When set, the <em>Scan next word</em> and <em>Scan previous word</em> hotkeys (configurable under
+                    <em data-modal-action="show,keyboard-shortcuts">Keyboard shortcuts</em>) will step through scannable
+                    text found inside the first element on the page matching this CSS selector, without requiring the
+                    mouse to hover over it. This is useful for hands-free lookups of subtitles or other text
+                    rendered by another page/extension (e.g. asbplayer).
+                </p>
+                <p>
+                    To use a different selector on different websites, create a separate profile with a URL condition
+                    for that site and set this option within it.
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Select matched text</div>

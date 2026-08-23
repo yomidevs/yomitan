@@ -384,6 +384,7 @@ function createProfileOptionsUpdatedTestData1() {
             },
             scanWithoutMousemove: true,
             scanResolution: 'character',
+            keyboardScanSelector: '',
             inputs: [
                 {
                     include: 'shift',
@@ -707,7 +708,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 77,
+        version: 78,
         global: {
             database: {
                 prefixWildcardsSupported: false,

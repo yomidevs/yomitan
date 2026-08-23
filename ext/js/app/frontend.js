@@ -26,6 +26,7 @@ import {addFullscreenChangeEventListener, getFullscreenElement} from '../dom/doc
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
+import {KeyboardTextNavigator} from '../language/keyboard-text-navigator.js';
 import {TextScanner} from '../language/text-scanner.js';
 
 /**
@@ -112,6 +113,8 @@ export class Frontend {
         this._isPointerOverPopup = false;
         /** @type {?import('settings').OptionsContext} */
         this._optionsContextOverride = null;
+        /** @type {KeyboardTextNavigator} */
+        this._keyboardTextNavigator = new KeyboardTextNavigator();
 
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('application').ApiMap} */
@@ -126,6 +129,8 @@ export class Frontend {
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
             ['scanTextAtSelection', this._onActionScanTextAtSelection.bind(this)],
             ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)],
+            ['scanNextWord', this._onActionScanNextWord.bind(this)],
+            ['scanPreviousWord', this._onActionScanPreviousWord.bind(this)],
             ['profilePrevious',   async () => { await setProfile(-1, this._application); }],
             ['profileNext',       async () => { await setProfile(1, this._application); }],
         ]);
@@ -286,6 +291,20 @@ export class Frontend {
      */
     _onActionScanTextAtCaret() {
         void this._scanSelectedText(true, false);
+    }
+
+    /**
+     * @returns {void}
+     */
+    _onActionScanNextWord() {
+        void this._scanKeyboardWord(1);
+    }
+
+    /**
+     * @returns {void}
+     */
+    _onActionScanPreviousWord() {
+        void this._scanKeyboardWord(-1);
     }
 
     // API message handlers
@@ -1016,6 +1035,78 @@ export class Frontend {
         safePerformance.mark('frontend:scanSelectedText:end');
         safePerformance.measure('frontend:scanSelectedText', 'frontend:scanSelectedText:start', 'frontend:scanSelectedText:end');
         return true;
+    }
+
+    /**
+     * Scans forward (`direction === 1`) or backward (`direction === -1`) to the
+     * next/previous scannable word inside the `scanning.keyboardScanSelector`
+     * container, without requiring the mouse to be positioned over it.
+     * @param {1|-1} direction
+     * @returns {Promise<void>}
+     */
+    async _scanKeyboardWord(direction) {
+        if (this._options === null) { return; }
+        const selector = this._options.scanning.keyboardScanSelector;
+        if (selector === '') { return; }
+
+        /** @type {?Element} */
+        let containerElement;
+        try {
+            containerElement = document.querySelector(selector);
+        } catch (e) {
+            return;
+        }
+        if (containerElement === null) { return; }
+
+        if (direction < 0) {
+            const range = this._keyboardTextNavigator.getPrevious(containerElement);
+            if (range === null) { return; }
+            await this._textScanner.search(TextSourceRange.create(range), {focus: true, restoreSelection: false}, false);
+            return;
+        }
+
+        for (;;) {
+            const candidate = this._keyboardTextNavigator.getNextCandidate(containerElement);
+            if (candidate === null) { return; }
+            const {offset, range} = candidate;
+            const result = await this._probeKeyboardScan(TextSourceRange.create(range));
+            if (result.textSource !== null) {
+                this._keyboardTextNavigator.reportSuccess(offset, result.textSource.text().length);
+                return;
+            }
+            this._keyboardTextNavigator.reportFailure(offset);
+        }
+    }
+
+    /**
+     * Performs a scan and resolves once the scanner reports whether it found a
+     * dictionary match, since {@link TextScanner#search} itself doesn't return this.
+     * @param {import('text-source').TextSource} source
+     * @returns {Promise<{textSource: ?import('text-source').TextSource}>}
+     */
+    _probeKeyboardScan(source) {
+        return new Promise((resolve) => {
+            let settled = false;
+            /** @type {?import('core').Timeout} */
+            let timer = null;
+            const finish = (/** @type {{textSource: ?import('text-source').TextSource}} */ result) => {
+                if (settled) { return; }
+                settled = true;
+                this._textScanner.off('searchSuccess', onSuccess);
+                this._textScanner.off('searchEmpty', onEmpty);
+                if (timer !== null) { clearTimeout(timer); }
+                resolve(result);
+            };
+            /**
+             * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
+             */
+            const onSuccess = ({textSource}) => { finish({textSource}); };
+            const onEmpty = () => { finish({textSource: null}); };
+            timer = setTimeout(() => { finish({textSource: null}); }, 500);
+            this._textScanner.on('searchSuccess', onSuccess);
+            this._textScanner.on('searchEmpty', onEmpty);
+            void this._textScanner.search(source, null, false);
+        });
     }
 
     /**

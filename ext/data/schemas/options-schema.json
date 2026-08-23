@@ -512,7 +512,8 @@
                                     "reducedMotionScrollingSwipeThreshold",
                                     "normalizeCssZoom",
                                     "scanWithoutMousemove",
-                                    "scanResolution"
+                                    "scanResolution",
+                                    "keyboardScanSelector"
                                 ],
                                 "properties": {
                                     "inputs": {
@@ -848,6 +849,10 @@
                                             "word"
                                         ],
                                         "default": "character"
+                                    },
+                                    "keyboardScanSelector": {
+                                        "type": "string",
+                                        "default": ""
                                     }
                                 }
                             },

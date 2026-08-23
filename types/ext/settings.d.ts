@@ -211,6 +211,7 @@ export type ScanningOptions = {
     normalizeCssZoom: boolean;
     scanWithoutMousemove: boolean;
     scanResolution: string;
+    keyboardScanSelector: string;
 };
 
 export type ScanningInput = {
