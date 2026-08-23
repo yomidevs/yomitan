@@ -570,10 +570,48 @@ const tests = [
         ],
     },
     {
+        // Yomitan looks up every prefix of the scanned text, so the shortest prefixes are fed to
+        // every rule. A one-character ending must not consume the whole word: "ґрунтовний" starts
+        // "ґрунтовний" starts with "ґ" and "ґр", and unguarded rules offered the reader "ґо" and
+        // "ґра", while the feminine vocative turned the "но" in any word into "на".
+        category: 'a one-character ending needs a stem in front of it',
+        valid: false,
+        tests: [
+            {term: 'ґо', source: 'ґ', rule: null, reasons: null},
+            {term: 'ґра', source: 'ґр', rule: null, reasons: null},
+            {term: 'на', source: 'но', rule: null, reasons: null},
+            {term: 'но', source: 'н', rule: null, reasons: null},
+            {term: 'не', source: 'н', rule: null, reasons: null},
+            {term: 'та', source: 'т', rule: null, reasons: null},
+        ],
+    },
+    {
+        // The guard is on the ending alone; rules that spell out part of the stem, and whole-word
+        // rules, are untouched, so genuinely short forms still resolve.
+        category: 'short words still deinflect',
+        valid: true,
+        tests: [
+            {term: 'бути', source: 'є', rule: 'v', reasons: ['present']},
+            {term: 'вона', source: 'їй', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'той', source: 'ті', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'цей', source: 'цю', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'день', source: 'дня', rule: 'n', reasons: ['genitive']},
+            {term: 'сон', source: 'сну', rule: 'n', reasons: ['genitive']},
+            {term: 'їсти', source: 'їм', rule: 'v', reasons: ['present']},
+            {term: 'йти', source: 'йду', rule: 'v', reasons: ['present']},
+            {term: 'книга', source: 'книг', rule: 'n', reasons: ['genitive']},
+            {term: 'нога', source: 'ніг', rule: 'n', reasons: ['alternating genitive plural']},
+        ],
+    },
+    {
         // Guardrails: these assert that permissive rules stay inside their intended domain.
         category: 'rules do not overreach',
         valid: false,
         tests: [
+            // a possessive adjective is spelled like a relational adjective in -овий, so the
+            // endings that collide far more often than they hit are deliberately not covered
+            {term: 'побутів', source: 'побутових', rule: null, reasons: null},
+            {term: 'льодовиків', source: 'льодовиковими', rule: null, reasons: null},
             // the zero-ending genitive plural applies to consonant stems, not to -ь or -й
             {term: 'деня', source: 'день', rule: null, reasons: null},
             {term: 'оленя', source: 'олень', rule: null, reasons: null},
