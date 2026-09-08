@@ -309,7 +309,7 @@ export class AnkiConnect {
         if (!this._enabled) { return []; }
         await this._checkVersion();
 
-        const actions = [];
+        const queries = [];
         const actionsTargetsList = [];
         /** @type {Map<string, import('anki').NoteId[][]>} */
         const actionsTargetsMap = new Map();
@@ -323,12 +323,32 @@ export class AnkiConnect {
                 actionsTargets = [];
                 actionsTargetsList.push(actionsTargets);
                 actionsTargetsMap.set(query, actionsTargets);
-                actions.push({action: 'findNotes', params: {query}});
+                queries.push(query);
             }
             /** @type {import('anki').NoteId[]} */
             const noteIds = [];
             allNoteIds.push(noteIds);
             actionsTargets.push(noteIds);
+        }
+
+        if (queries.length === 0) { return allNoteIds; }
+
+        let actions;
+        const hasEmptyQuery = queries.some((query) => query.length === 0);
+        if (queries.length === 1 || hasEmptyQuery) {
+            actions = queries.map((query) => ({action: 'findNotes', params: {query}}));
+        } else {
+            // Find the union once, then constrain each original query to the candidate notes.
+            const unionQuery = queries.map((query) => `(${query})`).join(' or ');
+            const unionResult = await this._invoke('findNotes', {query: unionQuery});
+            const candidateNoteIds = /** @type {number[]} */ (this._normalizeArray(unionResult, -1, 'number'));
+            if (candidateNoteIds.length === 0) { return allNoteIds; }
+
+            const candidateFilter = `nid:${candidateNoteIds.join(',')}`;
+            actions = queries.map((query) => ({
+                action: 'findNotes',
+                params: {query: `${candidateFilter} (${query})`},
+            }));
         }
 
         const result = await this._invokeMulti(actions);
