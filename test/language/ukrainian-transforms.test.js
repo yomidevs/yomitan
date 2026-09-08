@@ -418,7 +418,7 @@ const tests = [
             {term: 'хто', source: 'кого', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'що', source: 'чого', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'ніщо', source: 'нічого', rule: 'pron', reasons: ['pronoun declension']},
-            {term: 'хтось', source: 'комусь', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'хтось', source: 'комусь', rule: 'pron', reasons: ['indefinite pronoun']},
             {term: 'цей', source: 'цього', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'цей', source: 'ці', rule: 'pron', reasons: ['pronoun declension']},
             {term: 'той', source: 'тим', rule: 'pron', reasons: ['pronoun declension']},
@@ -570,10 +570,95 @@ const tests = [
         ],
     },
     {
+        // Yomitan looks up every prefix of the scanned text, so the shortest prefixes are fed to
+        // every rule. A one-character ending must not consume the whole word: "ґрунтовний" starts
+        // "ґрунтовний" starts with "ґ" and "ґр", and unguarded rules offered the reader "ґо" and
+        // "ґра", while the feminine vocative turned the "но" in any word into "на".
+        category: 'a one-character ending needs a stem in front of it',
+        valid: false,
+        tests: [
+            {term: 'ґо', source: 'ґ', rule: null, reasons: null},
+            // the removed fleetingVowelInflection('ем','') used to produce this
+            {term: 'ден', source: 'днем', rule: null, reasons: null},
+            // the never-correct alternating rule that produced these has been removed
+            {term: 'кін', source: 'коня', rule: null, reasons: null},
+            {term: 'мір', source: 'моря', rule: null, reasons: null},
+            {term: 'ґра', source: 'ґр', rule: null, reasons: null},
+            {term: 'на', source: 'но', rule: null, reasons: null},
+            {term: 'но', source: 'н', rule: null, reasons: null},
+            {term: 'не', source: 'н', rule: null, reasons: null},
+            {term: 'та', source: 'т', rule: null, reasons: null},
+            // a longer ending must leave a stem behind too: the word "ями" is not the tail of
+            // "землями", and reading it that way offered the reader the pronoun "я"
+            {term: 'я', source: 'ями', rule: null, reasons: null},
+            {term: 'ть', source: 'ті', rule: null, reasons: null},
+            // "ів" is the genitive plural ending; on its own it is a word, not an ending
+            {term: 'ь', source: 'ів', rule: null, reasons: null},
+            {term: 'я', source: 'ів', rule: null, reasons: null},
+            {term: 'е', source: 'ів', rule: null, reasons: null},
+            // a consonant cluster is not a word, so it is not a genitive plural either
+            {term: 'ґра', source: 'ґр', rule: null, reasons: null},
+            {term: 'бла', source: 'бл', rule: null, reasons: null},
+            {term: 'сма', source: 'см', rule: null, reasons: null},
+        ],
+    },
+    {
+        // The guard is on the ending alone; rules that spell out part of the stem, and whole-word
+        // rules, are untouched, so genuinely short forms still resolve.
+        category: 'short words still deinflect',
+        valid: true,
+        tests: [
+            {term: 'бути', source: 'є', rule: 'v', reasons: ['present']},
+            {term: 'вона', source: 'їй', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'той', source: 'ті', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'цей', source: 'цю', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'яма', source: 'ями', rule: 'n', reasons: ['nominative plural']},
+            {term: 'земля', source: 'землями', rule: 'n', reasons: ['instrumental']},
+            // the zero-ending genitive plural has no ending to strip, so it asks only that the
+            // word be a word -- that is, that it have a vowel
+            {term: 'яма', source: 'ям', rule: 'n', reasons: ['genitive']},
+            {term: 'ера', source: 'ер', rule: 'n', reasons: ['genitive']},
+            {term: 'оса', source: 'ос', rule: 'n', reasons: ['genitive']},
+            {term: 'боятися', source: 'бійся', rule: 'v', reasons: ['imperative']},
+            {term: 'боятися', source: 'боїться', rule: 'v', reasons: ['present']},
+            {term: 'стояти', source: 'стій', rule: 'v', reasons: ['imperative']},
+            {term: 'гість', source: 'гостя', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'тиждень', source: 'тижнів', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'більше', source: 'більш', rule: 'adv', reasons: ['comparative']},
+            {term: 'підвестися', source: 'підвівся', rule: 'v', reasons: ['past']},
+            // these are past-tense and imperative forms, not passive participles; the transform
+            // name is the explanation the reader is shown, so it has to be the right one
+            {term: 'вирости', source: 'виріс', rule: 'v', reasons: ['past']},
+            {term: 'зникнути', source: 'зникло', rule: 'v', reasons: ['past']},
+            {term: 'вести', source: 'вів', rule: 'v', reasons: ['past']},
+            {term: 'лізти', source: 'лізь', rule: 'v', reasons: ['imperative']},
+            {term: 'різати', source: 'ріж', rule: 'v', reasons: ['imperative']},
+            {term: 'глянути', source: 'глянь', rule: 'v', reasons: ['imperative']},
+            {term: 'читати', source: 'читаний', rule: 'v', reasons: ['passive participle']},
+            // verb rules are exempt: a suppletive form is written as a suffix so that one rule
+            // reaches both the bare form and its prefixed variants
+            {term: 'йти', source: 'йде', rule: 'v', reasons: ['present']},
+            {term: 'йти', source: 'йшов', rule: 'v', reasons: ['past']},
+            {term: 'дати', source: 'дасть', rule: 'v', reasons: ['present']},
+            {term: 'брати', source: 'беруть', rule: 'v', reasons: ['present']},
+            {term: 'їсти', source: 'їсть', rule: 'v', reasons: ['present']},
+            {term: 'день', source: 'дня', rule: 'n', reasons: ['genitive']},
+            {term: 'сон', source: 'сну', rule: 'n', reasons: ['genitive']},
+            {term: 'їсти', source: 'їм', rule: 'v', reasons: ['present']},
+            {term: 'йти', source: 'йду', rule: 'v', reasons: ['present']},
+            {term: 'книга', source: 'книг', rule: 'n', reasons: ['genitive']},
+            {term: 'нога', source: 'ніг', rule: 'n', reasons: ['alternating genitive plural']},
+        ],
+    },
+    {
         // Guardrails: these assert that permissive rules stay inside their intended domain.
         category: 'rules do not overreach',
         valid: false,
         tests: [
+            // a possessive adjective is spelled like a relational adjective in -овий, so the
+            // endings that collide far more often than they hit are deliberately not covered
+            {term: 'побутів', source: 'побутових', rule: null, reasons: null},
+            {term: 'льодовиків', source: 'льодовиковими', rule: null, reasons: null},
             // the zero-ending genitive plural applies to consonant stems, not to -ь or -й
             {term: 'деня', source: 'день', rule: null, reasons: null},
             {term: 'оленя', source: 'олень', rule: null, reasons: null},
@@ -601,6 +686,253 @@ const tests = [
             {term: 'гарніший', source: 'гарний', rule: 'adj', reasons: null},
             {term: 'вікнати', source: 'вікно', rule: null, reasons: null},
             {term: 'деревти', source: 'дерево', rule: null, reasons: null},
+        ],
+    },
+    {
+        category: 'suppletive nouns',
+        valid: true,
+        tests: [
+            {term: 'людина', source: 'людей', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'людина', source: 'людьми', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'око', source: 'очі', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'око', source: 'очима', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'дитина', source: 'дітей', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'мати', source: 'матері', rule: 'n', reasons: ['suppletive noun']},
+            {term: "ім'я", source: 'імені', rule: 'n', reasons: ['suppletive noun']},
+            // мати and матір are both headwords, so the shared oblique forms reach either
+            {term: 'мати', source: "матір'ю", rule: 'n', reasons: ['suppletive noun']},
+            {term: 'матір', source: 'матері', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'матір', source: 'матерів', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'небо', source: 'небеса', rule: 'n', reasons: ['suppletive noun']},
+            // "вусі" is the locative of both "вухо" and "вус"; neither may hide the other
+            {term: 'вухо', source: 'вусі', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'вус', source: 'вусі', rule: 'n', reasons: ['suppletive noun']},
+        ],
+    },
+    {
+        category: 'indefinite pronouns',
+        valid: true,
+        tests: [
+            {term: 'хто-небудь', source: 'кого-небудь', rule: 'pron', reasons: ['indefinite pronoun']},
+            {term: 'хто-небудь', source: 'кому-небудь', rule: 'pron', reasons: ['indefinite pronoun']},
+            {term: 'що-небудь', source: 'чого-небудь', rule: 'pron', reasons: ['indefinite pronoun']},
+            {term: 'що-небудь', source: 'чим-небудь', rule: 'pron', reasons: ['indefinite pronoun']},
+            {term: 'щось', source: 'чогось', rule: 'pron', reasons: ['indefinite pronoun']},
+            {term: 'хтось', source: 'кимсь', rule: 'pron', reasons: ['indefinite pronoun']},
+            {term: 'якийсь', source: 'якихось', rule: 'pron', reasons: ['indefinite pronoun']},
+            {term: 'будь-хто', source: 'будь-кого', rule: 'pron', reasons: ['indefinite pronoun']},
+        ],
+    },
+    {
+        category: 'third declension and soft stems',
+        valid: true,
+        tests: [
+            {term: 'смерть', source: 'смерті', rule: 'n', reasons: ['genitive']},
+            {term: 'смерть', source: 'смертю', rule: 'n', reasons: ['instrumental']},
+            {term: 'радість', source: 'радості', rule: 'n', reasons: ['genitive']},
+            {term: 'відповідь', source: 'відповіддю', rule: 'n', reasons: ['instrumental']},
+            {term: 'відстань', source: 'відстані', rule: 'n', reasons: ['genitive']},
+            {term: 'модель', source: 'моделі', rule: 'n', reasons: ['genitive']},
+            {term: 'цар', source: 'царя', rule: 'n', reasons: ['genitive']},
+            {term: 'король', source: 'королем', rule: 'n', reasons: ['instrumental']},
+            {term: 'правитель', source: 'правителів', rule: 'n', reasons: ['genitive']},
+        ],
+    },
+    {
+        category: 'velar palatalisation',
+        valid: true,
+        tests: [
+            {term: 'рік', source: 'році', rule: 'n', reasons: ['locative']},
+            {term: 'рік', source: 'роках', rule: 'n', reasons: ['locative']},
+            {term: 'нога', source: 'нозі', rule: 'n', reasons: ['dative']},
+            {term: 'рука', source: 'руках', rule: 'n', reasons: ['locative']},
+            {term: 'друг', source: 'друже', rule: 'n', reasons: ['vocative']},
+        ],
+    },
+    {
+        category: 'fleeting vowel',
+        valid: true,
+        tests: [
+            {term: 'день', source: 'дня', rule: 'n', reasons: ['genitive']},
+            {term: 'день', source: 'днів', rule: 'n', reasons: ['genitive']},
+            {term: 'день', source: 'днем', rule: 'n', reasons: ['instrumental']},
+            {term: 'вітер', source: 'вітру', rule: 'n', reasons: ['genitive']},
+            {term: 'палець', source: 'пальця', rule: 'n', reasons: ['genitive']},
+            {term: 'палець', source: 'пальцем', rule: 'n', reasons: ['instrumental']},
+            {term: 'вогонь', source: 'вогнем', rule: 'n', reasons: ['instrumental']},
+        ],
+    },
+    {
+        category: 'alternating genitive plural',
+        valid: true,
+        tests: [
+            {term: 'гора', source: 'гір', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'голова', source: 'голів', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'доба', source: 'діб', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'брова', source: 'брів', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'щока', source: 'щік', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'нога', source: 'ніг', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'особа', source: 'осіб', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'робота', source: 'робіт', rule: 'n', reasons: ['alternating genitive plural']},
+            {term: 'дорога', source: 'доріг', rule: 'n', reasons: ['alternating genitive plural']},
+        ],
+    },
+    {
+        category: 'soft masculine with о/е to і',
+        valid: true,
+        tests: [
+            {term: 'ніж', source: 'ножем', rule: 'n', reasons: ['instrumental']},
+            {term: 'ніж', source: 'ножів', rule: 'n', reasons: ['genitive']},
+            {term: 'біль', source: 'болю', rule: 'n', reasons: ['genitive']},
+            {term: 'спокій', source: 'спокою', rule: 'n', reasons: ['genitive']},
+            {term: 'сон', source: 'сну', rule: 'n', reasons: ['genitive']},
+        ],
+    },
+    {
+        category: 'verb stem alternation',
+        valid: true,
+        tests: [
+            {term: 'робити', source: 'роблять', rule: 'v', reasons: ['present']},
+            {term: 'любити', source: 'люблять', rule: 'v', reasons: ['present']},
+            {term: 'плакати', source: 'плаче', rule: 'v', reasons: ['present']},
+            {term: 'брехати', source: 'брешуть', rule: 'v', reasons: ['present']},
+            {term: 'сидіти', source: 'сиджу', rule: 'v', reasons: ['present']},
+            {term: 'вести', source: 'веде', rule: 'v', reasons: ['present']},
+            {term: 'чути', source: 'чує', rule: 'v', reasons: ['present']},
+            {term: 'померти', source: 'помре', rule: 'v', reasons: ['present']},
+            {term: 'померти', source: 'помер', rule: 'v', reasons: ['past']},
+        ],
+    },
+    {
+        category: '-авати verbs',
+        valid: true,
+        tests: [
+            {term: 'давати', source: 'дає', rule: 'v', reasons: ['present']},
+            {term: 'давати', source: 'даю', rule: 'v', reasons: ['present']},
+            {term: 'ставати', source: 'стає', rule: 'v', reasons: ['present']},
+            {term: 'здаватися', source: 'здається', rule: 'v', reasons: ['present']},
+        ],
+    },
+    {
+        category: 'suppletive verbs',
+        valid: true,
+        tests: [
+            {term: 'бути', source: 'єси', rule: 'v', reasons: ['suppletive verb']},
+            {term: 'бути', source: 'суть', rule: 'v', reasons: ['suppletive verb']},
+        ],
+    },
+    {
+        category: 'motion verbs',
+        valid: true,
+        tests: [
+            {term: 'іти', source: 'іде', rule: 'v', reasons: ['motion verb']},
+            {term: 'піти', source: 'піде', rule: 'v', reasons: ['motion verb']},
+            {term: 'піти', source: 'пішов', rule: 'v', reasons: ['motion verb']},
+            {term: 'піти', source: 'піди', rule: 'v', reasons: ['motion verb']},
+            {term: 'прийти', source: 'прийшов', rule: 'v', reasons: ['motion verb']},
+        ],
+    },
+    {
+        category: 'determiner and short-form variants',
+        valid: true,
+        tests: [
+            {term: 'увесь', source: 'усіх', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'кожний', source: 'кожен', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'жодний', source: 'жоден', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'один', source: 'одно', rule: 'num', reasons: ['numeral declension']},
+            {term: 'той', source: 'тієї', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'сей', source: 'сього', rule: 'pron', reasons: ['pronoun declension']},
+            {term: 'повинний', source: 'повинен', rule: 'adj', reasons: ['short adjective']},
+        ],
+    },
+    {
+        category: 'substantivised neuter adjectives',
+        valid: true,
+        tests: [
+            {term: 'це', source: 'цього', rule: 'pron', reasons: ['substantivised neuter']},
+            {term: 'добре', source: 'доброго', rule: 'adj', reasons: ['substantivised neuter']},
+            {term: 'майбутнє', source: 'майбутнього', rule: 'adj', reasons: ['substantivised neuter']},
+            {term: 'минуле', source: 'минулим', rule: 'adj', reasons: ['substantivised neuter']},
+            {term: 'дані', source: 'даних', rule: 'adj', reasons: ['substantivised neuter']},
+            {term: 'все', source: 'всього', rule: 'pron', reasons: ['substantivised neuter']},
+            {term: 'всі', source: 'всіх', rule: 'adj', reasons: ['substantivised neuter']},
+        ],
+    },
+    {
+        category: 'collective numerals',
+        valid: true,
+        tests: [
+            {term: 'двоє', source: 'двох', rule: 'num', reasons: ['collective numeral']},
+            {term: 'троє', source: 'трьома', rule: 'num', reasons: ['collective numeral']},
+            {term: 'обоє', source: 'обом', rule: 'num', reasons: ['collective numeral']},
+            {term: 'стільки', source: 'стількох', rule: 'num', reasons: ['collective numeral']},
+        ],
+    },
+    {
+        category: 'stems that alternate inside the word',
+        valid: true,
+        tests: [
+            {term: 'боєць', source: 'бійця', rule: 'n', reasons: ['genitive']},
+            {term: 'боєць', source: 'бійці', rule: 'n', reasons: ['nominative plural']},
+            // the -ійці rule sits beside upstream's -йці one; neither may shadow the other
+            {term: 'латвієць', source: 'латвійці', rule: 'n', reasons: ['nominative plural']},
+            {term: 'вівця', source: 'овець', rule: 'n', reasons: ['suppletive noun']},
+            {term: 'лід', source: 'льоду', rule: 'n', reasons: ['genitive']},
+            {term: 'покоління', source: 'поколінь', rule: 'n', reasons: ['genitive']},
+            {term: 'боєць', source: 'бійцем', rule: 'n', reasons: ['genitive']},
+            {term: 'політ', source: 'польоту', rule: 'n', reasons: ['genitive']},
+            {term: 'колір', source: 'кольори', rule: 'n', reasons: ['genitive']},
+            {term: 'четвер', source: 'четверга', rule: 'n', reasons: ['genitive']},
+            {term: 'білорусь', source: 'білорусі', rule: 'n', reasons: ['genitive']},
+        ],
+    },
+    {
+        category: 'truncated stems',
+        valid: true,
+        tests: [
+            {term: 'значити', source: 'знач', rule: 'v', reasons: ['truncated stem']},
+            {term: 'бачити', source: 'бач', rule: 'v', reasons: ['truncated stem']},
+            {term: 'правити', source: 'прав', rule: 'v', reasons: ['truncated stem']},
+            {term: 'дозволити', source: 'дозволь', rule: 'v', reasons: ['truncated stem']},
+            {term: 'знати', source: 'зна', rule: 'v', reasons: ['truncated stem']},
+            {term: 'бувати', source: 'бува', rule: 'v', reasons: ['truncated stem']},
+        ],
+    },
+    {
+        // Guardrails for the rules added above, which are the permissive ones.
+        category: 'added rules do not overreach',
+        valid: false,
+        tests: [
+            // the suppletive tables are whole-word, so a lookalike must not match
+            {term: 'людина', source: 'люд', rule: null, reasons: null},
+            {term: 'око', source: 'окови', rule: null, reasons: null},
+            // a suppletive list must not swallow a lookalike from another lexeme
+            {term: 'вухо', source: 'вуса', rule: null, reasons: null},
+            {term: 'мати', source: 'мами', rule: null, reasons: null},
+            // the indefinite affixes must not fire on an ordinary word ending in -сь
+            {term: 'хто', source: 'колись', rule: null, reasons: null},
+            {term: 'що', source: 'вісь', rule: null, reasons: null},
+            // the alternating genitive plural is a list, not a blanket rule
+            {term: 'стола', source: 'стіл', rule: null, reasons: null},
+            {term: 'кіня', source: 'кінь', rule: null, reasons: null},
+            // deinflection stays one-way for the new rules too
+            {term: 'роблять', source: 'робити', rule: null, reasons: null},
+            {term: 'дає', source: 'давати', rule: null, reasons: null},
+            {term: 'усіх', source: 'увесь', rule: null, reasons: null},
+            // part-of-speech conditions still bind
+            {term: 'смерть', source: 'смерті', rule: 'v', reasons: null},
+            // the second palatalisation is dative/locative singular only; the
+            // locative plural keeps the velar, so "рузах" must reach nothing
+            {term: 'рука', source: 'рузах', rule: null, reasons: null},
+            {term: 'книга', source: 'книзах', rule: null, reasons: null},
+            {term: 'муха', source: 'мусах', rule: null, reasons: null},
+            // The truncated-stem rules deliberately over-generate non-words ("книга" also
+            // yields "книгати"), which costs nothing because no such headword exists. What
+            // must hold is that they stay inside the verb condition.
+            {term: 'значити', source: 'знач', rule: 'n', reasons: null},
+            {term: 'бачити', source: 'бач', rule: 'adj', reasons: null},
+            {term: 'знати', source: 'зна', rule: 'n', reasons: null},
+            {term: 'рік', source: 'році', rule: 'v', reasons: null},
         ],
     },
 ];
