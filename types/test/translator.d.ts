@@ -49,6 +49,8 @@ export type FindTermsOptionsPreset = {
     enabledDictionaryMap?: [key: string, value: FindTermDictionary][];
     excludeDictionaryDefinitions?: string[] | null;
     searchResolution?: SearchResolution;
+    enableFusejiLookup?: boolean;
+    fusejiTriggers?: string;
     language?: string;
 };
 
