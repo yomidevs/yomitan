@@ -170,7 +170,7 @@ function getPublicContext(context) {
 }
 
 /**
- * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry|import('translation-internal').TermDictionaryEntry} dictionaryEntry
  * @param {number?} requestedHeadwordIndex
  * @param {import('dictionary-data').FrequencyMode|undefined?} requestedFrequencyMode
  * @returns {import('anki-templates').FrequencyNumber[]}
@@ -205,7 +205,7 @@ function getFrequencyNumbers(dictionaryEntry, requestedHeadwordIndex, requestedF
 }
 
 /**
- * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry|import('translation-internal').TermDictionaryEntry} dictionaryEntry
  * @param {number?} headwordIndex
  * @param {import('dictionary-data').FrequencyMode|undefined?} frequencyMode
  * @returns {number}
