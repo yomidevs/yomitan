@@ -15,4 +15,4 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import '../../node_modules/@zip.js/zip.js/lib/z-worker.js';
+import '../../node_modules/@zip.js/zip.js/dist/zip-web-worker-native.js';
