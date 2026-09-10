@@ -1,0 +1,7 @@
+{
+    "title": "Invalid Dictionary 12",
+    "format": 3,
+    "revision": "test",
+    "sequenced": true,
+    "description": "Mixed valid array entry followed by invalid string entry in term bank"
+}
