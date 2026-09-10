@@ -95,3 +95,29 @@ export const standardizeKanji = {
     description: '萬 → 万',
     process: (str) => [str, convertVariants(str)],
 };
+
+const WILDCARD_MAX_VARIANTS = 51;
+const WILDCARD_CHAR = '～'; // U+FF5E fullwidth tilde
+
+/** @type {import('language').TextProcessor} */
+export const insertWildcard = {
+    name: 'Insert wildcard for grammar patterns',
+    description: 'いくら騒いでも → いくら～でも',
+    process: (str) => {
+        const chars = [...str];
+        const n = chars.length;
+        if (n < 3) { return [str]; }
+
+        /** @type {string[]} */
+        const results = [str];
+        for (let prefixLen = 1; prefixLen < n; prefixLen++) {
+            for (let suffixLen = 1; suffixLen < n - prefixLen; suffixLen++) {
+                const prefix = chars.slice(0, prefixLen).join('');
+                const suffix = chars.slice(n - suffixLen).join('');
+                results.push(prefix + WILDCARD_CHAR + suffix);
+                if (results.length >= WILDCARD_MAX_VARIANTS) { return results; }
+            }
+        }
+        return results;
+    },
+};
