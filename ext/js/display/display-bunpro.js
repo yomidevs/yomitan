@@ -200,40 +200,32 @@ export class DisplayBunpro {
             return control;
         }
         const status = /** @type {HTMLButtonElement} */ (control.querySelector('.bunpro-status'));
+        const added = control.querySelector('.bunpro-added');
         const open = /** @type {HTMLButtonElement} */ (control.querySelector('.bunpro-open'));
         const level = control.querySelector('.bunpro-button-level');
-        const plus = control.querySelector('.bunpro-plus');
-        const check = control.querySelector('.bunpro-check');
-        if (plus !== null) { setGlyphVisible(plus, view.mark === 'plus'); }
-        if (check !== null) { setGlyphVisible(check, view.mark === 'check'); }
         if (level !== null) {
             level.hidden = view.level === null;
             level.textContent = view.level ?? '';
         }
-        status.title = view.statusTitle;
-        status.setAttribute('aria-label', view.statusTitle);
-        status.disabled = view.busy;
+        status.hidden = view.mark === 'check';
+        if (added !== null) {
+            added.hidden = view.mark !== 'check';
+            added.title = view.mark === 'check' ? view.statusTitle : '';
+        }
+        if (view.mark === 'plus') {
+            status.title = view.statusTitle;
+            status.setAttribute('aria-label', view.statusTitle);
+            status.disabled = view.busy;
+            if (!view.busy) {
+                this._eventListeners.addEventListener(status, 'click', this._onAddButtonClickBind);
+            }
+        }
         open.dataset.href = view.href;
         open.title = 'Open in Bunpro';
         open.setAttribute('aria-label', 'Open in Bunpro');
-        if (view.mark === 'plus' && !view.busy) {
-            this._eventListeners.addEventListener(status, 'click', this._onAddButtonClickBind);
-        }
         this._eventListeners.addEventListener(open, 'click', this._onOpenClickBind);
         return control;
     }
-}
-
-/**
- * @param {Element} glyph
- * @param {boolean} visible
- */
-function setGlyphVisible(glyph, visible) {
-    if (visible) {
-        glyph.removeAttribute('hidden');
-        return;
-    }
-    glyph.setAttribute('hidden', '');
 }
 
 /**

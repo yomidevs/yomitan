@@ -689,12 +689,12 @@ button.sidebar-button.sidebar-button-highlight {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
+    margin-right: 8px;
 }
 .bunpro-control {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-right: 2px;
     color: var(--text-color);
     line-height: 1;
 }
@@ -731,7 +731,19 @@ button.bunpro-status:disabled {
     color: var(--text-color);
     background: transparent;
 }
+.bunpro-added {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    color: var(--text-color);
+}
+button.bunpro-status[hidden],
+.bunpro-added[hidden] {
+    display: none;
+}
 .bunpro-status svg,
+.bunpro-added svg,
 .bunpro-mark {
     display: block;
     width: 12px;
@@ -741,9 +753,6 @@ button.bunpro-status:disabled {
 .bunpro-mark {
     width: 13px;
     height: 12px;
-}
-.bunpro-status svg[hidden] {
-    display: none;
 }
 .bunpro-button-level {
     color: var(--text-color);
