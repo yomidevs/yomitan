@@ -47,22 +47,31 @@ function getMatchView({entryItems, items, attempts, pending}, entryIndex) {
     const key = entryItems[entryIndex] ?? null;
     const match = key === null ? void 0 : items.get(key);
     if (key === null || typeof match === 'undefined') { return NONE; }
-    if (match.inReviews) { return createButtonView('✓', match, 'In your Bunpro reviews', true); }
+    if (match.inReviews) { return createButtonView('check', false, match, 'In your Bunpro reviews'); }
     const attempt = attempts.get(key);
-    if (typeof attempt === 'undefined') { return createButtonView('+', match, 'Add to Bunpro reviews', false); }
+    if (typeof attempt === 'undefined') { return createButtonView('plus', false, match, 'Add to Bunpro reviews'); }
     switch (attempt.state) {
-        case 'adding': return createButtonView('…', match, 'Adding to Bunpro reviews', true);
-        case 'failed': return createButtonView('!', match, attempt.error, false);
+        case 'adding': return createButtonView('plus', true, match, 'Adding to Bunpro reviews');
+        case 'failed': return createButtonView('plus', false, match, attempt.error);
     }
 }
 
 /**
- * @param {string} icon
+ * @param {'plus'|'check'} mark
+ * @param {boolean} busy
  * @param {import('bunpro').BunproMatch} match
- * @param {string} title
- * @param {boolean} disabled
+ * @param {string} statusTitle
  * @returns {import('display-bunpro').ControlView}
  */
-function createButtonView(icon, {level}, title, disabled) {
-    return {kind: 'button', text: level === null ? icon : `${icon} ${level}`, title, disabled};
+function createButtonView(mark, busy, match, statusTitle) {
+    return {kind: 'button', mark, busy, level: match.level, statusTitle, href: vocabPageUrl(match)};
+}
+
+/**
+ * @param {import('bunpro').BunproMatch} match
+ * @returns {string}
+ */
+function vocabPageUrl(match) {
+    if (match.kind !== 'vocab') { return ''; }
+    return `https://bunpro.jp/vocabs/${encodeURIComponent(match.written)}`;
 }

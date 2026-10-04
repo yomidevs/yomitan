@@ -39,4 +39,15 @@ export type State =
 export type ControlView =
     | {kind: 'none'}
     | {kind: 'reserved'}
-    | {kind: 'button', text: string, title: string, disabled: boolean};
+    | {
+        kind: 'button';
+        /** Plus offers an add. Check means the item is already in reviews. */
+        mark: 'plus' | 'check';
+        /** True while an add is in flight. The plus stays, and it does not accept another click. */
+        busy: boolean;
+        level: string | null;
+        /** Title for the plus or check. A failed add puts the error here. */
+        statusTitle: string;
+        /** Vocab page for this item. Empty when the match is not a vocab slug. */
+        href: string;
+    };

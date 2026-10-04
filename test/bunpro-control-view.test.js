@@ -62,28 +62,61 @@ describe('getControlView', () => {
         expect(getControlView(createReadyState(null), 0)).toStrictEqual({kind: 'none'});
     });
 
-    test('a match not in reviews offers the add', () => {
-        expect(getControlView(createReadyState(createMatch()), 0)).toStrictEqual({kind: 'button', text: '+ N3', title: 'Add to Bunpro reviews', disabled: false});
+    test('a match not in reviews offers a plus and links to its vocab page', () => {
+        expect(getControlView(createReadyState(createMatch()), 0)).toStrictEqual({
+            kind: 'button',
+            mark: 'plus',
+            busy: false,
+            level: 'N3',
+            statusTitle: 'Add to Bunpro reviews',
+            href: 'https://bunpro.jp/vocabs/%E9%A3%9F%E3%81%B9%E3%82%8B',
+        });
     });
 
-    test('an add in progress is disabled', () => {
-        expect(getControlView(createReadyState(createMatch(), {state: 'adding'}), 0)).toStrictEqual({kind: 'button', text: '… N3', title: 'Adding to Bunpro reviews', disabled: true});
+    test('an add in progress keeps the plus and the page link', () => {
+        expect(getControlView(createReadyState(createMatch(), {state: 'adding'}), 0)).toStrictEqual({
+            kind: 'button',
+            mark: 'plus',
+            busy: true,
+            level: 'N3',
+            statusTitle: 'Adding to Bunpro reviews',
+            href: 'https://bunpro.jp/vocabs/%E9%A3%9F%E3%81%B9%E3%82%8B',
+        });
     });
 
-    test('a failed add shows the error and stays clickable for a retry', () => {
-        expect(getControlView(createReadyState(createMatch(), {state: 'failed', error: 'Bunpro responded with HTTP status 502'}), 0)).toStrictEqual(
-            {kind: 'button', text: '! N3', title: 'Bunpro responded with HTTP status 502', disabled: false},
-        );
+    test('a failed add shows the error on the plus', () => {
+        expect(getControlView(createReadyState(createMatch(), {state: 'failed', error: 'Bunpro responded with HTTP status 502'}), 0)).toStrictEqual({
+            kind: 'button',
+            mark: 'plus',
+            busy: false,
+            level: 'N3',
+            statusTitle: 'Bunpro responded with HTTP status 502',
+            href: 'https://bunpro.jp/vocabs/%E9%A3%9F%E3%81%B9%E3%82%8B',
+        });
     });
 
-    test('a match in reviews is done whatever the attempt says', () => {
-        const done = {kind: 'button', text: '✓ N3', title: 'In your Bunpro reviews', disabled: true};
+    test('a match in reviews shows a check and still links to its page', () => {
+        const done = {
+            kind: 'button',
+            mark: 'check',
+            busy: false,
+            level: 'N3',
+            statusTitle: 'In your Bunpro reviews',
+            href: 'https://bunpro.jp/vocabs/%E9%A3%9F%E3%81%B9%E3%82%8B',
+        };
         expect(getControlView(createReadyState(createMatch({inReviews: true})), 0)).toStrictEqual(done);
         expect(getControlView(createReadyState(createMatch({inReviews: true}), {state: 'failed', error: 'stale'}), 0)).toStrictEqual(done);
     });
 
-    test('a match without a level shows the icon only', () => {
-        expect(getControlView(createReadyState(createMatch({level: null})), 0)).toStrictEqual({kind: 'button', text: '+', title: 'Add to Bunpro reviews', disabled: false});
+    test('a match without a level still links to the vocab page', () => {
+        expect(getControlView(createReadyState(createMatch({level: null})), 0)).toStrictEqual({
+            kind: 'button',
+            mark: 'plus',
+            busy: false,
+            level: null,
+            statusTitle: 'Add to Bunpro reviews',
+            href: 'https://bunpro.jp/vocabs/%E9%A3%9F%E3%81%B9%E3%82%8B',
+        });
     });
 
     test('signed out, other unavailable states, and off render no per-entry control', () => {

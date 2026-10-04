@@ -35,6 +35,8 @@ export class DisplayBunpro {
         this._eventListeners = new EventListenerCollection();
         /** @type {(event: MouseEvent) => void} */
         this._onAddButtonClickBind = this._onAddButtonClick.bind(this);
+        /** @type {(event: MouseEvent) => void} */
+        this._onOpenClickBind = this._onOpenClick.bind(this);
         /** @type {?symbol} */
         this._generation = null;
     }
@@ -126,8 +128,18 @@ export class DisplayBunpro {
      */
     _onAddButtonClick(e) {
         e.preventDefault();
-        const index = this._display.getElementDictionaryEntryIndex(/** @type {HTMLElement} */ (e.currentTarget));
+        const button = /** @type {HTMLButtonElement} */ (e.currentTarget);
+        const index = this._display.getElementDictionaryEntryIndex(button);
         void this._addEntry(index);
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onOpenClick(e) {
+        e.preventDefault();
+        const button = /** @type {HTMLButtonElement} */ (e.currentTarget);
+        openBunproPage(button.dataset.href ?? '');
     }
 
     /**
@@ -171,30 +183,69 @@ export class DisplayBunpro {
             const container = entries[i].querySelector('.bunpro-actions-container');
             if (container === null) { continue; }
             container.textContent = '';
-            const button = this._createButton(getControlView(this._state, i));
-            if (button !== null) { container.appendChild(button); }
+            const control = this._createControl(getControlView(this._state, i));
+            if (control !== null) { container.appendChild(control); }
         }
     }
 
     /**
      * @param {import('display-bunpro').ControlView} view
-     * @returns {?HTMLButtonElement}
+     * @returns {?HTMLElement}
      */
-    _createButton(view) {
+    _createControl(view) {
         if (view.kind === 'none') { return null; }
-        const button = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('bunpro-button'));
+        const control = this._display.displayGenerator.instantiateTemplate('bunpro-button');
         if (view.kind === 'reserved') {
-            button.dataset.reserved = 'true';
-            button.disabled = true;
-            button.textContent = '+';
-            return button;
+            control.dataset.reserved = 'true';
+            return control;
         }
-        button.textContent = view.text;
-        button.title = view.title;
-        button.disabled = view.disabled;
-        this._eventListeners.addEventListener(button, 'click', this._onAddButtonClickBind);
-        return button;
+        const status = /** @type {HTMLButtonElement} */ (control.querySelector('.bunpro-status'));
+        const open = /** @type {HTMLButtonElement} */ (control.querySelector('.bunpro-open'));
+        const level = control.querySelector('.bunpro-button-level');
+        const plus = control.querySelector('.bunpro-plus');
+        const check = control.querySelector('.bunpro-check');
+        if (plus !== null) { setGlyphVisible(plus, view.mark === 'plus'); }
+        if (check !== null) { setGlyphVisible(check, view.mark === 'check'); }
+        if (level !== null) {
+            level.hidden = view.level === null;
+            level.textContent = view.level ?? '';
+        }
+        status.title = view.statusTitle;
+        status.setAttribute('aria-label', view.statusTitle);
+        status.disabled = view.busy;
+        open.dataset.href = view.href;
+        open.title = 'Open in Bunpro';
+        open.setAttribute('aria-label', 'Open in Bunpro');
+        if (view.mark === 'plus' && !view.busy) {
+            this._eventListeners.addEventListener(status, 'click', this._onAddButtonClickBind);
+        }
+        this._eventListeners.addEventListener(open, 'click', this._onOpenClickBind);
+        return control;
     }
+}
+
+/**
+ * @param {Element} glyph
+ * @param {boolean} visible
+ */
+function setGlyphVisible(glyph, visible) {
+    if (visible) {
+        glyph.removeAttribute('hidden');
+        return;
+    }
+    glyph.setAttribute('hidden', '');
+}
+
+/**
+ * @param {string} url
+ */
+function openBunproPage(url) {
+    if (url === '') { return; }
+    if (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.create === 'function') {
+        void chrome.tabs.create({url});
+        return;
+    }
+    window.open(url, '_blank');
 }
 
 /**
