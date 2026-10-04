@@ -685,6 +685,29 @@ button.sidebar-button.sidebar-button-highlight {
     display: none;
 }
 
+.bunpro-actions-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+button.bunpro-button {
+    cursor: pointer;
+    border: 0;
+    margin: 0;
+    padding: var(--action-button-padding);
+    background: transparent;
+    box-shadow: none;
+    color: var(--accent-color);
+    font-size: 0.875em;
+    white-space: nowrap;
+}
+button.bunpro-button:disabled {
+    cursor: default;
+}
+button.bunpro-button[data-reserved=true] {
+    visibility: hidden;
+}
+
 button.action-button {
     cursor: pointer;
     display: block;
@@ -2052,6 +2075,9 @@ button.footer-notification-close-button {
 }
 :root[data-anki-enabled=false] .action-button[data-action=view-note],
 :root[data-anki-enabled=false] .action-button[data-action=save-note] {
+    display: none;
+}
+:root[data-bunpro-enabled=false] .bunpro-actions-container {
     display: none;
 }
 

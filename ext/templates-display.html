@@ -5,6 +5,7 @@
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
+            <div class="bunpro-actions-container"></div>
             <div class="note-actions-container"></div>
             <div class="action-button-container">
                 <button type="button" class="action-button" data-action="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover">
@@ -205,6 +206,8 @@
     <span class="action-icon icon color-icon" data-icon="view-note"></span>
     <span class="action-button-badge icon"></span>
 </button></template>
+
+<template id="bunpro-button-template"><button type="button" class="bunpro-button" data-action="add-to-bunpro"></button></template>
 
 <template id="action-button-container-template">
     <div class="action-button-container">

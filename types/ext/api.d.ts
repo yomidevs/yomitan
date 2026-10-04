@@ -20,8 +20,10 @@ import type * as AnkiNoteBuilder from './anki-note-builder';
 import type * as Audio from './audio';
 import type * as AudioDownloader from './audio-downloader';
 import type * as Backend from './backend';
+import type * as Bunpro from './bunpro';
 import type * as Core from './core';
 import type * as Dictionary from './dictionary';
+import type * as DictionaryDataUtil from './dictionary-data-util';
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
@@ -75,18 +77,7 @@ export type ParseTextSegment = {
 
 export type ParseTextLine = ParseTextSegment[];
 
-export type InjectAnkiNoteMediaTermDefinitionDetails = {
-    type: 'term';
-    term: string;
-    reading: string;
-};
-
-export type InjectAnkiNoteMediaKanjiDefinitionDetails = {
-    type: 'kanji';
-    character: string;
-};
-
-export type InjectAnkiNoteMediaDefinitionDetails = InjectAnkiNoteMediaTermDefinitionDetails | InjectAnkiNoteMediaKanjiDefinitionDetails;
+export type InjectAnkiNoteMediaDefinitionDetails = DictionaryDataUtil.PrimaryHeadword;
 
 export type InjectAnkiNoteMediaAudioDetails = AnkiNoteBuilder.AudioMediaOptions;
 
@@ -420,6 +411,22 @@ type ApiSurface = {
             url: string;
         };
         return: {data: string, contentType: string} | null;
+    };
+    getBunproStatus: {
+        params: void;
+        return: Bunpro.BunproStatus;
+    };
+    findBunproMatches: {
+        params: {
+            queries: Bunpro.BunproQuery[];
+        };
+        return: Bunpro.BunproLookup;
+    };
+    addToBunpro: {
+        params: {
+            match: Bunpro.BunproMatch;
+        };
+        return: Bunpro.BunproMatch;
     };
 };
 

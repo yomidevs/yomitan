@@ -443,6 +443,29 @@ export class API {
         return this._invoke('fetchLocalAudioData', {url});
     }
 
+    /**
+     * @returns {Promise<import('api').ApiReturn<'getBunproStatus'>>}
+     */
+    getBunproStatus() {
+        return this._invoke('getBunproStatus', void 0);
+    }
+
+    /**
+     * @param {import('api').ApiParam<'findBunproMatches', 'queries'>} queries
+     * @returns {Promise<import('api').ApiReturn<'findBunproMatches'>>}
+     */
+    findBunproMatches(queries) {
+        return this._invoke('findBunproMatches', {queries});
+    }
+
+    /**
+     * @param {import('api').ApiParam<'addToBunpro', 'match'>} match
+     * @returns {Promise<import('api').ApiReturn<'addToBunpro'>>}
+     */
+    addToBunpro(match) {
+        return this._invoke('addToBunpro', {match});
+    }
+
     // Utilities
 
     /**

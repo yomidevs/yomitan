@@ -37,6 +37,7 @@
             <a href="#text-parsing"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="text-parsing"></span></span><span class="outline-item-label">Text Parsing</span></a>
             <a href="#translation"      class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">Translation</span></a>
             <a href="#anki"             class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="note-card"></span></span><span class="outline-item-label">Anki</span></a>
+            <a href="#bunpro"           class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="note-card"></span></span><span class="outline-item-label">Bunpro</span></a>
             <a href="#clipboard"        class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="clipboard"></span></span><span class="outline-item-label">Clipboard</span></a>
             <a href="#shortcuts"        class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="keyboard"></span></span><span class="outline-item-label">Shortcuts</span></a>
             <a href="#backup"           class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="backup"></span></span><span class="outline-item-label">Backup</span></a>
@@ -2211,6 +2212,39 @@
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
+    </div>
+
+    <!-- Bunpro -->
+    <div>
+        <div class="heading-container">
+            <div class="heading-container-icon"><span class="icon" data-icon="note-card"></span></div>
+            <div class="heading-container-left"><h2 id="bunpro"><a href="#bunpro">Bunpro</a></h2></div>
+            <div class="heading-container-right"><a tabindex="0" class="more-toggle more-only heading-link-light" data-parent-distance="3">Info&hellip;</a></div>
+        </div>
+        <div class="heading-description more" hidden>
+            <p>
+                Yomitan can add looked-up words and grammar points to your <a href="https://bunpro.jp/" target="_blank" rel="noopener noreferrer">Bunpro</a> reviews.
+                It uses the account you are signed in to at bunpro.jp, which requires the cookies permission.
+            </p>
+            <p>
+                <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+            </p>
+        </div>
+    </div>
+    <div class="settings-group">
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-invalid-indicator"></div>
+                <div class="settings-item-label">Enable Bunpro integration</div>
+                <div class="settings-item-description">
+                    <span id="bunpro-status"></span>
+                    <a id="bunpro-sign-in-link" href="https://bunpro.jp/login" target="_blank" rel="noopener noreferrer" hidden>Sign in to Bunpro</a>
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" class="permissions-toggle" data-permissions-setting="bunpro.enable" data-required-permissions="cookies"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
     </div>

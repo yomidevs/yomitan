@@ -98,6 +98,7 @@ export type ProfileOptions = {
     dictionaries: DictionariesOptions;
     parsing: ParsingOptions;
     anki: AnkiOptions;
+    bunpro: BunproOptions;
     sentenceParsing: SentenceParsingOptions;
     inputs: InputsOptions;
     clipboard: ClipboardOptions;
@@ -380,6 +381,10 @@ export type ClipboardOptions = {
     enableSearchPageMonitor: boolean;
     autoSearchContent: boolean;
     maximumSearchLength: number;
+};
+
+export type BunproOptions = {
+    enable: boolean;
 };
 
 export type AccessibilityOptions = {

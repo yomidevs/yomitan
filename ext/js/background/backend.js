@@ -41,6 +41,7 @@ import {getLanguageSummaries, isTextLookupWorthy} from '../language/languages.js
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
+import {createBunproClient} from './bunpro/bunpro-client.js';
 import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
@@ -61,6 +62,8 @@ export class Backend {
         this._environment = new Environment();
         /** @type {AnkiConnect} */
         this._anki = new AnkiConnect();
+        /** @type {ReturnType<typeof createBunproClient>} */
+        this._bunpro = createBunproClient();
         /** @type {Mecab} */
         this._mecab = new Mecab();
 
@@ -190,6 +193,9 @@ export class Backend {
             ['heartbeat',                    this._onApiHeartbeat.bind(this)],
             ['forceSync',                    this._onApiForceSync.bind(this)],
             ['fetchLocalAudioData',          this._onApiFetchLocalAudioData.bind(this)],
+            ['getBunproStatus',              this._onApiGetBunproStatus.bind(this)],
+            ['findBunproMatches',            this._onApiFindBunproMatches.bind(this)],
+            ['addToBunpro',                  this._onApiAddToBunpro.bind(this)],
         ]);
 
         /** @type {import('api').PmApiMap} */
@@ -1191,6 +1197,21 @@ export class Backend {
         };
     }
 
+    /** @type {import('api').ApiHandler<'getBunproStatus'>} */
+    async _onApiGetBunproStatus() {
+        return await this._bunpro.getStatus();
+    }
+
+    /** @type {import('api').ApiHandler<'findBunproMatches'>} */
+    async _onApiFindBunproMatches({queries}) {
+        return await this._bunpro.findMatches(queries);
+    }
+
+    /** @type {import('api').ApiHandler<'addToBunpro'>} */
+    async _onApiAddToBunpro({match}) {
+        return await this._bunpro.add(match);
+    }
+
     // Command handlers
 
     /**
@@ -1543,6 +1564,8 @@ export class Backend {
         this._anki.server = options.anki.server;
         this._anki.enabled = options.anki.enable;
         this._anki.apiKey = apiKey;
+
+        this._bunpro.enabled = options.bunpro.enable;
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
 
