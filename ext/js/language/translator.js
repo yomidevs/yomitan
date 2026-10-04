@@ -265,18 +265,16 @@ export class Translator {
         let originalTextLength = 0;
         /** @type {import('translation-internal').TermDictionaryEntry[]} */
         const dictionaryEntries = [];
-        const ids = new Set();
+        /** @type {Map<number, number>} */
+        const entryIndices = new Map();
         for (const {databaseEntries, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates} of deinflections) {
             if (databaseEntries.length === 0) { continue; }
             originalTextLength = Math.max(originalTextLength, originalText.length);
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
-                if (ids.has(id)) {
-                    const existingEntryInfo = this._findExistingEntry(dictionaryEntries, id);
-                    if (!existingEntryInfo) {
-                        continue;
-                    }
-                    const {existingEntry, existingIndex} = existingEntryInfo;
+                const existingIndex = entryIndices.get(id);
+                if (typeof existingIndex !== 'undefined') {
+                    const existingEntry = dictionaryEntries[existingIndex];
 
                     const existingTransformedText = existingEntry.headwords[0].sources[0].transformedText;
                     const existingTransformedLength = existingTransformedText.length;
@@ -285,7 +283,7 @@ export class Translator {
                     }
                     if (transformedText.length > existingTransformedLength) {
                         if (originalText !== existingTransformedText) {
-                            dictionaryEntries.splice(existingIndex, 1, this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading));
+                            dictionaryEntries[existingIndex] = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading);
                         }
                     } else {
                         this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
@@ -293,30 +291,12 @@ export class Translator {
                     }
                 } else {
                     const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading);
+                    entryIndices.set(id, dictionaryEntries.length);
                     dictionaryEntries.push(dictionaryEntry);
-                    ids.add(id);
                 }
             }
         }
         return {dictionaryEntries, originalTextLength};
-    }
-
-    /**
-     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
-     * @param {number} id
-     * @returns {{existingEntry: import('translation-internal').TermDictionaryEntry, existingIndex: number} | null}
-     */
-    _findExistingEntry(dictionaryEntries, id) {
-        let existingIndex = null;
-        let existingEntry = null;
-        for (const [index, entry] of dictionaryEntries.entries()) {
-            if (entry.definitions.some((definition) => definition.id === id)) {
-                existingIndex = index;
-                existingEntry = entry;
-                return {existingEntry, existingIndex};
-            }
-        }
-        return null;
     }
 
     /**
@@ -403,11 +383,13 @@ export class Translator {
         await this._addEntriesToDeinflections(language, deinflections, enabledDictionaryMap, matchType);
 
         if (options.enableGrammarWildcards && language === 'ja' && matchType === 'exact') {
-            deinflections.push(...await this._getGrammarWildcardDeinflections(deinflections, options));
+            // Repeated endings across many rows can exceed the function argument limit.
+            const grammarDeinflections = await this._getGrammarWildcardDeinflections(deinflections, options);
+            for (const deinflection of grammarDeinflections) { deinflections.push(deinflection); }
         }
 
         const dictionaryDeinflections = await this._getDictionaryDeinflections(language, deinflections, enabledDictionaryMap, matchType);
-        deinflections.push(...dictionaryDeinflections);
+        for (const deinflection of dictionaryDeinflections) { deinflections.push(deinflection); }
 
         for (const deinflection of deinflections) {
             for (const entry of deinflection.databaseEntries) {

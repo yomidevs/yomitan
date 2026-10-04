@@ -240,4 +240,47 @@ describe('grammar wildcard dictionary lookup', () => {
         expect(terms(await translator.findTerms('simple', 'いくら騒いでも余分', options({deinflect: false})))).not.toContain('いくら～でも');
         expect(terms(await translator.findTerms('simple', 'いくら騒いでも', options({deinflect: false})))).toContain('いくら～でも');
     });
+
+    test.each([false, true])('handles many rows and repeated endings with dictionary inflections: %s', async (useDictionaryInflections) => {
+        const name = 'Large Grammar Dictionary';
+        const rowCount = 2500;
+        const text = `前${'あ後'.repeat(60)}`;
+        /** @type {import('dictionary-database').DatabaseTermEntry[]} */
+        const rows = Array.from({length: rowCount}, (_, sequence) => ({
+            expression: '前～後',
+            reading: '',
+            definitionTags: '',
+            rules: '',
+            score: 0,
+            glossary: [useDictionaryInflections ? ['費用', ['Dictionary form']] : `Definition ${sequence}`],
+            sequence,
+            termTags: '',
+            dictionary: name,
+        }));
+        if (useDictionaryInflections) {
+            rows.push({expression: '費用', reading: 'ひよう', definitionTags: '', rules: '', score: 0, glossary: ['Cost'], dictionary: name});
+        }
+        const database = new DictionaryDatabase();
+        await database.prepare();
+        try {
+            await database.bulkAdd('terms', rows, 0, rows.length);
+            const opts = options();
+            opts.enabledDictionaryMap = new Map([[name, {
+                index: 0, alias: name, allowSecondarySearches: false, partsOfSpeechFilter: true, useDeinflections: true,
+            }]]);
+            const result = await translator.findTerms('simple', text, opts);
+            expect(result.originalTextLength).toBe(text.length);
+            expect(result.dictionaryEntries).toHaveLength(useDictionaryInflections ? 1 : rowCount);
+            expect(result.dictionaryEntries.every((entry) => entry.headwords[0].sources[0].originalText === text)).toBe(true);
+            if (useDictionaryInflections) {
+                expect(terms(result)).toEqual(['費用']);
+                expect(result.dictionaryEntries[0].inflectionRuleChainCandidates).toContainEqual({
+                    source: 'dictionary', inflectionRules: [{name: 'Dictionary form'}],
+                });
+            }
+        } finally {
+            await database.deleteDictionary(name, 100, () => {});
+            await database.close();
+        }
+    }, 30000);
 });
