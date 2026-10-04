@@ -61,7 +61,7 @@ export class DisplayBunpro {
      */
     async _onContentUpdateComplete() {
         const options = this._display.getOptions();
-        if (options === null || !options.bunpro.enable) {
+        if (options === null || !options.bunpro.enable || options.general.language !== 'ja') {
             this._generation = null;
             this._setState({phase: 'off'});
             return;
