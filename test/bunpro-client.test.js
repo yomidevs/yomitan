@@ -31,6 +31,19 @@ function jsonResponse(status, body) {
 }
 
 /**
+ * @param {unknown} body
+ * @returns {?number}
+ */
+function reviewableIdFrom(body) {
+    if (typeof body !== 'object' || body === null) { return null; }
+    const record = /** @type {Record<string, unknown>} */ (body);
+    const pairs = record.reviewables;
+    if (!Array.isArray(pairs) || !Array.isArray(pairs[0])) { return null; }
+    const id = /** @type {unknown} */ (pairs[0][1]);
+    return typeof id === 'number' ? id : null;
+}
+
+/**
  * A stand-in for Bunpro's frontend API that knows one vocab, 食べる (id 101).
  * @param {{validToken?: string, validTokens?: string[], failNextPatch?: boolean}} [setup]
  * @returns {{requests: {method: string, url: string, authorization: string, body: unknown}[], setCookie: (value: ?string) => void, setStored: (value: ?string) => void, stored: () => ?string, setCookiesPermission: (value: boolean) => void, methods: () => string[], client: ReturnType<typeof createBunproClient>}}
@@ -54,7 +67,14 @@ function createFakeBunpro({validToken = 'token-a', validTokens = null, failNextP
             const body = typeof init.body === 'string' ? parseJson(init.body) : null;
             requests.push({method, url, authorization, body});
             if (!accepted.has(authorization.slice('Token token='.length))) { return jsonResponse(401, {errors: [{code: 'unauthorized'}]}); }
-            if (method === 'GET') { return jsonResponse(200, {}); }
+            if (method === 'GET' && url.endsWith('/user')) { return jsonResponse(200, {}); }
+            if (method === 'GET') {
+                const slug = decodeURIComponent(url.split('/reviewables/vocab/')[1] ?? '');
+                if (slug !== '食べる') { return jsonResponse(500, {}); }
+                return jsonResponse(200, {
+                    data: {id: '101', type: 'vocab', attributes: {id: 101, furigana: '食（た）べる', level: 'N5'}},
+                });
+            }
             if (method === 'PATCH') {
                 reviewed.add(101);
                 if (failPatch) {
@@ -63,12 +83,10 @@ function createFakeBunpro({validToken = 'token-a', validTokens = null, failNextP
                 }
                 return jsonResponse(200, {});
             }
+            const reviewableId = reviewableIdFrom(body);
+            const inReviews = typeof reviewableId === 'number' && reviewed.has(reviewableId);
             return jsonResponse(200, {
-                vocabs: {
-                    data: [{id: '101', type: 'vocab', attributes: {id: 101, furigana: '食（た）べる', level: 'N5'}}],
-                    included: reviewed.has(101) ? [{id: '1', type: 'review', attributes: {reviewable_id: 101, reviewable_type: 'Vocab'}}] : [],
-                },
-                grammar_points: {data: [], included: []},
+                data: inReviews ? [{id: '1', type: 'review', attributes: {reviewable_id: reviewableId, reviewable_type: 'Vocab'}}] : [],
             });
         },
         readCookie: async () => cookie,
@@ -103,14 +121,10 @@ describe('BunproClient.findMatches', () => {
         const lookup = await bunpro.client.findMatches([TABERU_QUERY, {term: '食べ', reading: 'たべ'}, TABERU_QUERY]);
         const taberu = {id: 101, kind: 'vocab', written: '食べる', reading: 'たべる', level: 'N5', inReviews: false};
         expect(lookup).toStrictEqual({status: 'ready', matches: [taberu, null, taberu]});
-        expect(bunpro.requests.map(({url, body}) => [url, body])).toStrictEqual([
-            ['https://api.bunpro.jp/api/frontend/search/reviewables_v1_1', {
-                query: '食べる',
-                options: {include_reviews: true, include_bookmarks: false, include_notes: false, only_bookmarks: false},
-                is_searching_grammar: true,
-                is_searching_vocab: true,
-            }],
-            ['https://api.bunpro.jp/api/frontend/search/reviewables_v1_1', expect.objectContaining({query: '食べ'})],
+        expect(bunpro.requests.map(({method, url, body}) => [method, url, body])).toStrictEqual([
+            ['GET', 'https://api.bunpro.jp/api/frontend/reviewables/vocab/%E9%A3%9F%E3%81%B9%E3%82%8B', null],
+            ['GET', 'https://api.bunpro.jp/api/frontend/reviewables/vocab/%E9%A3%9F%E3%81%B9', null],
+            ['POST', 'https://api.bunpro.jp/api/frontend/reviews/hydrate_reviewables', {reviewables: [['Vocab', 101]]}],
         ]);
     });
 
@@ -131,12 +145,12 @@ describe('BunproClient.add', () => {
 
         const added = await bunpro.client.add(match);
         expect(added).toStrictEqual({...match, inReviews: true});
-        expect(bunpro.requests.slice(1).map(({method, body}) => [method, body])).toStrictEqual([
+        expect(bunpro.requests.slice(2).map(({method, body}) => [method, body])).toStrictEqual([
             ['PATCH', {action_type: 'add', deck_id: null, reviewables: [['Vocab', 101]]}],
         ]);
 
         expect(await bunpro.client.add(match)).toStrictEqual({...match, inReviews: true});
-        expect(bunpro.methods()).toStrictEqual(['POST', 'PATCH']);
+        expect(bunpro.methods()).toStrictEqual(['GET', 'POST', 'PATCH']);
         expect(await bunpro.client.findMatches([TABERU_QUERY])).toStrictEqual({status: 'ready', matches: [{...match, inReviews: true}]});
     });
 
@@ -148,10 +162,10 @@ describe('BunproClient.add', () => {
 
         const results = await Promise.all([bunpro.client.add(match), bunpro.client.add(match)]);
         expect(results.map(({inReviews}) => inReviews)).toStrictEqual([true, true]);
-        expect(bunpro.methods()).toStrictEqual(['POST', 'PATCH']);
+        expect(bunpro.methods()).toStrictEqual(['GET', 'POST', 'PATCH']);
     });
 
-    test('an unknown match is searched first', async () => {
+    test('an unknown match is checked for an existing review first', async () => {
         const bunpro = createFakeBunpro();
         const match = /** @type {import('bunpro').BunproMatch} */ ({id: 101, kind: 'vocab', written: '食べる', reading: 'たべる', level: 'N5', inReviews: false});
         expect(await bunpro.client.add(match)).toStrictEqual({...match, inReviews: true});
@@ -164,7 +178,7 @@ describe('BunproClient.add', () => {
         if (lookup.status !== 'ready' || lookup.matches[0] === null) { throw new Error('expected a match'); }
 
         expect((await bunpro.client.add(lookup.matches[0])).inReviews).toStrictEqual(true);
-        expect(bunpro.methods()).toStrictEqual(['POST', 'PATCH', 'POST']);
+        expect(bunpro.methods()).toStrictEqual(['GET', 'POST', 'PATCH', 'POST']);
     });
 });
 

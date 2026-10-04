@@ -21,7 +21,18 @@ export const SEARCH_PATH = '/search/reviewables_v1_1';
 
 export const ADD_PATH = '/reviews/update_via_action_type';
 
+export const HYDRATE_PATH = '/reviews/hydrate_reviewables';
+
 export const USER_PATH = '/user';
+
+/**
+ * The vocab page slug is the written form, as in `/vocabs/国`.
+ * @param {string} term
+ * @returns {string}
+ */
+export function vocabPath(term) {
+    return `/reviewables/vocab/${encodeURIComponent(term)}`;
+}
 
 /** @type {Readonly<Record<import('bunpro').ReviewableKind, import('bunpro').KindWire>>} */
 export const KIND = Object.freeze({
@@ -58,8 +69,46 @@ export function addBody(match) {
     return {
         action_type: 'add',
         deck_id: null,
-        reviewables: [[KIND[match.kind].reviewable, match.id]],
+        reviewables: reviewablePair(match),
     };
+}
+
+/**
+ * @param {import('bunpro').BunproMatch} match
+ * @returns {import('core').SerializableObject}
+ */
+export function hydrateBody(match) {
+    return {reviewables: reviewablePair(match)};
+}
+
+/**
+ * @param {import('bunpro').BunproMatch} match
+ * @returns {[string, import('bunpro').ReviewableId][]}
+ */
+function reviewablePair(match) {
+    return [[KIND[match.kind].reviewable, match.id]];
+}
+
+/**
+ * @param {unknown} payload
+ * @returns {?import('bunpro').BunproMatch}
+ */
+export function parseVocabItem(payload) {
+    const response = asObject(payload);
+    const data = response === null ? null : asObject(response.data);
+    if (data === null) { return null; }
+    return parseRecord('vocab', data, []);
+}
+
+/**
+ * An empty list means the item is not in the user's reviews.
+ * @param {unknown} payload
+ * @returns {boolean}
+ */
+export function isInReviews(payload) {
+    const response = asObject(payload);
+    if (response === null) { return false; }
+    return recordsOf(response.data).length > 0;
 }
 
 /**

@@ -19,7 +19,7 @@ import {ExtensionError} from '../../core/extension-error.js';
 import {readResponseJson} from '../../core/json.js';
 import {hasPermissions} from '../../data/permissions-util.js';
 import {SIGNED_OUT_ERROR_CODE, isSignedOutError, itemKey, queryKey} from './bunpro-match.js';
-import {ADD_PATH, API_BASE, SEARCH_PATH, USER_PATH, addBody, parseSearchResponse, pickExactMatch, searchBody} from './bunpro-protocol.js';
+import {ADD_PATH, API_BASE, HYDRATE_PATH, USER_PATH, addBody, hydrateBody, isInReviews, parseVocabItem, pickExactMatch, vocabPath} from './bunpro-protocol.js';
 
 const TOKEN_COOKIE = {url: 'https://bunpro.jp/', name: 'frontend_api_token'};
 const TOKEN_STORAGE_KEY = 'bunproFrontendToken';
@@ -177,8 +177,8 @@ class BunproClient {
         const {cookie} = session;
 
         if (!this._items.has(itemKey(match))) {
-            const current = await this._searchItem(cookie, match);
-            if (current !== null && current.inReviews) { return current; }
+            const current = await this._withReviewState(cookie, match);
+            if (current.inReviews) { return current; }
         }
 
         try {
@@ -186,7 +186,7 @@ class BunproClient {
         } catch (e) {
             if (isSignedOutError(e)) { throw e; }
             // The add may have landed even though the response failed.
-            const current = await this._searchItem(cookie, match).catch(() => null);
+            const current = await this._withReviewState(cookie, match).catch(() => null);
             if (current !== null && current.inReviews) { return current; }
             throw e;
         }
@@ -211,14 +211,21 @@ class BunproClient {
     }
 
     /**
-     * A failed search is not remembered, so the next lookup can try again.
+     * A failed lookup is not remembered, so the next lookup can try again.
+     * An unknown slug is remembered: Bunpro answers that with HTTP 500.
      * @param {string} cookie
      * @param {import('bunpro').BunproQuery} query
      */
     async _searchOnce(cookie, query) {
         try {
-            const match = pickExactMatch(await this._search(cookie, query.term), query);
-            this._resolutions.set(queryKey(query), match === null ? null : itemKey(this._remember(match)));
+            const item = parseVocabItem(await this._get(cookie, vocabPath(query.term)));
+            const match = item === null ? null : pickExactMatch([item], query);
+            if (match === null) {
+                this._resolutions.set(queryKey(query), null);
+                return;
+            }
+            const reviewed = await this._withReviewState(cookie, match);
+            this._resolutions.set(queryKey(query), itemKey(reviewed));
         } catch (e) {
             if (isSignedOutError(e)) { throw e; }
         }
@@ -236,21 +243,26 @@ class BunproClient {
     /**
      * @param {string} cookie
      * @param {import('bunpro').BunproMatch} match
-     * @returns {Promise<?import('bunpro').BunproMatch>}
+     * @returns {Promise<import('bunpro').BunproMatch>}
      */
-    async _searchItem(cookie, match) {
-        const key = itemKey(match);
-        const current = (await this._search(cookie, match.written)).find((candidate) => itemKey(candidate) === key);
-        return typeof current === 'undefined' ? null : this._remember(current);
+    async _withReviewState(cookie, match) {
+        const payload = await this._request(cookie, HYDRATE_PATH, 'POST', hydrateBody(match));
+        return this._remember({...match, inReviews: isInReviews(payload)});
     }
 
     /**
      * @param {string} cookie
-     * @param {string} term
-     * @returns {Promise<import('bunpro').BunproMatch[]>}
+     * @param {string} path
+     * @returns {Promise<unknown>}
+     * @throws {Error}
      */
-    async _search(cookie, term) {
-        return parseSearchResponse(await this._request(cookie, SEARCH_PATH, 'POST', searchBody(term)));
+    async _get(cookie, path) {
+        const response = await this._send(cookie, path, 'GET');
+        if (response.status === 404 || response.status === 500) { return null; }
+        if (!response.ok) {
+            throw new Error(`Bunpro responded with HTTP status ${response.status}`);
+        }
+        return await readResponseJson(response);
     }
 
     /**
@@ -262,25 +274,40 @@ class BunproClient {
      * @throws {Error}
      */
     async _request(cookie, path, method, body) {
+        const response = await this._send(cookie, path, method, body);
+        if (!response.ok) {
+            throw new Error(`Bunpro responded with HTTP status ${response.status}`);
+        }
+        return await readResponseJson(response);
+    }
+
+    /**
+     * @param {string} cookie
+     * @param {string} path
+     * @param {'GET'|'POST'|'PATCH'} method
+     * @param {import('core').SerializableObject} [body]
+     * @returns {Promise<Response>}
+     * @throws {Error}
+     */
+    async _send(cookie, path, method, body) {
+        /** @type {Record<string, string>} */
+        const headers = {
+            Accept: 'application/json',
+            Authorization: `Token token=${cookie}`,
+        };
+        if (typeof body !== 'undefined') { headers['Content-Type'] = 'application/json'; }
         const response = await this._ports.fetch(`${API_BASE}${path}`, {
             method,
             credentials: 'omit',
             signal: searchSignal(this._ports),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': `Token token=${cookie}`,
-            },
-            body: JSON.stringify(body),
+            headers,
+            body: typeof body === 'undefined' ? void 0 : JSON.stringify(body),
         });
         if (response.status === 401) {
             await this._rejectToken(cookie);
             throw createNotReadyError('signedOut');
         }
-        if (!response.ok) {
-            throw new Error(`Bunpro responded with HTTP status ${response.status}`);
-        }
-        return await readResponseJson(response);
+        return response;
     }
 
     /**

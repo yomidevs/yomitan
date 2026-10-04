@@ -16,7 +16,7 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {addBody, parseSearchResponse, pickExactMatch} from '../ext/js/background/bunpro/bunpro-protocol.js';
+import {addBody, hydrateBody, isInReviews, parseSearchResponse, parseVocabItem, pickExactMatch} from '../ext/js/background/bunpro/bunpro-protocol.js';
 
 const SEARCH_RESPONSE = {
     vocabs: {
@@ -85,6 +85,29 @@ describe('pickExactMatch', () => {
         const kanji = createMatch({id: 5, written: '凄い', reading: 'すごい'});
         expect(pickExactMatch([kanji], {term: 'すごい', reading: 'すごい'})).toStrictEqual(kanji);
         expect(pickExactMatch([kanji], {term: 'すごい', reading: 'スゴイ'})).toStrictEqual(null);
+    });
+});
+
+describe('parseVocabItem', () => {
+    test('reads the single vocab item from the slug response', () => {
+        expect(parseVocabItem({
+            data: {id: '444', type: 'vocab', attributes: {id: 444, furigana: '国（くに）', jlpt_level: 'N5', slug: '国'}},
+            included: [{type: 'study_question'}],
+        })).toStrictEqual({id: 444, kind: 'vocab', written: '国', reading: 'くに', level: 'N5', inReviews: false});
+        expect(parseVocabItem(null)).toBeNull();
+    });
+});
+
+describe('isInReviews', () => {
+    test('an empty hydrate list means the item is not in reviews', () => {
+        expect(isInReviews({data: []})).toStrictEqual(false);
+        expect(isInReviews({data: [{type: 'review'}]})).toStrictEqual(true);
+    });
+});
+
+describe('hydrateBody', () => {
+    test('names the same reviewable pair the add request uses', () => {
+        expect(hydrateBody(createMatch({id: 444}))).toStrictEqual({reviewables: [['Vocab', 444]]});
     });
 });
 
