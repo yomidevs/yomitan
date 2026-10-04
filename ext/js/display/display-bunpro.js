@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isSignedOutError, itemKey} from '../background/bunpro/bunpro-match.js';
+import {isSignedOutError, itemKey, queryKey} from '../background/bunpro/bunpro-match.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
@@ -35,6 +35,8 @@ export class DisplayBunpro {
         this._eventListeners = new EventListenerCollection();
         /** @type {(event: MouseEvent) => void} */
         this._onAddButtonClickBind = this._onAddButtonClick.bind(this);
+        /** @type {?symbol} */
+        this._generation = null;
     }
 
     /** */
@@ -47,46 +49,76 @@ export class DisplayBunpro {
 
     /** */
     _onContentClear() {
+        this._generation = null;
         this._eventListeners.removeAllEventListeners();
         this._state = {phase: 'off'};
     }
 
-    /** */
+    /**
+     * Levels appear from the top definition downward. A later search does not hold the ones above it.
+     */
     async _onContentUpdateComplete() {
         const options = this._display.getOptions();
         if (options === null || !options.bunpro.enable) {
+            this._generation = null;
             this._setState({phase: 'off'});
             return;
         }
         const entryQueries = this._display.dictionaryEntries.map(getBunproQuery);
-        /** @type {import('display-bunpro').State} */
-        const loading = {phase: 'loading', entryQueries};
-        this._setState(loading);
-        const nextState = await this._lookUp(entryQueries);
-        if (this._state === loading) { this._setState(nextState); }
+        const generation = Symbol();
+        this._generation = generation;
+        const state = createPendingState(entryQueries);
+        this._setState(state);
+        await this._settleFromTheTop(generation, state, entryQueries);
     }
 
     /**
+     * @param {symbol} generation
+     * @param {Extract<import('display-bunpro').State, {phase: 'ready'}>} state
      * @param {(import('bunpro').BunproQuery | null)[]} entryQueries
-     * @returns {Promise<import('display-bunpro').State>}
      */
-    async _lookUp(entryQueries) {
-        /** @type {import('bunpro').BunproQuery[]} */
-        const queries = [];
-        for (const query of entryQueries) {
-            if (query !== null) { queries.push(query); }
-        }
+    async _settleFromTheTop(generation, state, entryQueries) {
+        const queries = uniqueQueries(entryQueries);
+        /** @type {Map<number, import('bunpro').BunproMatch | null>} */
+        const arrived = new Map();
+        let next = 0;
 
-        /** @type {import('bunpro').BunproLookup} */
-        let lookup;
-        try {
-            lookup = await this._display.application.api.findBunproMatches(queries);
-        } catch (e) {
-            log.error(e);
-            return {phase: 'unavailable', reason: 'error'};
-        }
-        if (lookup.status !== 'ready') { return {phase: 'unavailable', reason: lookup.status}; }
-        return createReadyState(entryQueries, lookup.matches);
+        /**
+         * @param {number} index
+         * @param {import('bunpro').BunproMatch | null} match
+         */
+        const publish = (index, match) => {
+            if (this._generation !== generation) { return; }
+            arrived.set(index, match);
+            while (arrived.has(next)) {
+                const settled = /** @type {import('bunpro').BunproMatch | null} */ (arrived.get(next));
+                arrived.delete(next);
+                applyQuery(state, entryQueries, queries[next], settled);
+                next += 1;
+                this._render();
+            }
+        };
+
+        await runFromTheTop(queries, async (query, index) => {
+            if (this._generation !== generation) { return; }
+            /** @type {import('bunpro').BunproLookup} */
+            let lookup;
+            try {
+                lookup = await this._display.application.api.findBunproMatches([query]);
+            } catch (e) {
+                log.error(e);
+                publish(index, null);
+                return;
+            }
+            if (lookup.status !== 'ready') {
+                if (this._generation === generation) {
+                    this._generation = null;
+                    this._setState({phase: 'unavailable', reason: lookup.status});
+                }
+                return;
+            }
+            publish(index, lookup.matches[0] ?? null);
+        });
     }
 
     /**
@@ -176,24 +208,74 @@ function getBunproQuery(dictionaryEntry) {
 
 /**
  * @param {(import('bunpro').BunproQuery | null)[]} entryQueries
- * @param {(import('bunpro').BunproMatch | null)[]} matches One per non-null query, in order.
- * @returns {import('display-bunpro').State}
+ * @returns {Extract<import('display-bunpro').State, {phase: 'ready'}>}
  */
-function createReadyState(entryQueries, matches) {
-    /** @type {Map<import('bunpro').ItemKey, import('bunpro').BunproMatch>} */
-    const items = new Map();
-    /** @type {(import('bunpro').ItemKey | null)[]} */
-    const entryItems = [];
-    let matchIndex = 0;
+function createPendingState(entryQueries) {
+    return {
+        phase: 'ready',
+        entryItems: entryQueries.map(() => null),
+        items: new Map(),
+        attempts: new Map(),
+        pending: entryQueries.map((query) => query !== null),
+    };
+}
+
+/**
+ * @param {(import('bunpro').BunproQuery | null)[]} entryQueries
+ * @returns {import('bunpro').BunproQuery[]}
+ */
+function uniqueQueries(entryQueries) {
+    /** @type {import('bunpro').BunproQuery[]} */
+    const queries = [];
+    const seen = new Set();
     for (const query of entryQueries) {
-        const match = query === null ? null : (matches[matchIndex++] ?? null);
+        if (query === null) { continue; }
+        const key = queryKey(query);
+        if (seen.has(key)) { continue; }
+        seen.add(key);
+        queries.push(query);
+    }
+    return queries;
+}
+
+/**
+ * @param {Extract<import('display-bunpro').State, {phase: 'ready'}>} state
+ * @param {(import('bunpro').BunproQuery | null)[]} entryQueries
+ * @param {import('bunpro').BunproQuery} query
+ * @param {?import('bunpro').BunproMatch} match
+ */
+function applyQuery(state, entryQueries, query, match) {
+    const key = queryKey(query);
+    const pending = state.pending ?? [];
+    for (let i = 0; i < entryQueries.length; i++) {
+        const entryQuery = entryQueries[i];
+        if (entryQuery === null || queryKey(entryQuery) !== key) { continue; }
+        pending[i] = false;
         if (match === null) {
-            entryItems.push(null);
+            state.entryItems[i] = null;
             continue;
         }
-        const key = itemKey(match);
-        items.set(key, match);
-        entryItems.push(key);
+        const item = itemKey(match);
+        state.items.set(item, match);
+        state.entryItems[i] = item;
     }
-    return {phase: 'ready', entryItems, items, attempts: new Map()};
+}
+
+/**
+ * Starts at the top query and keeps a few searches running. Results are published by the caller in order.
+ * @template T
+ * @param {T[]} items
+ * @param {(item: T, index: number) => Promise<void>} run
+ */
+async function runFromTheTop(items, run) {
+    const limit = 4;
+    let cursor = 0;
+    const worker = async () => {
+        while (cursor < items.length) {
+            const index = cursor;
+            cursor += 1;
+            await run(items[index], index);
+        }
+    };
+    await Promise.all(Array.from({length: Math.min(limit, items.length)}, worker));
 }

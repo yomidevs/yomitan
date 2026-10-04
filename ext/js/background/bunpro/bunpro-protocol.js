@@ -21,6 +21,8 @@ export const SEARCH_PATH = '/search/reviewables_v1_1';
 
 export const ADD_PATH = '/reviews/update_via_action_type';
 
+export const USER_PATH = '/user';
+
 /** @type {Readonly<Record<import('bunpro').ReviewableKind, import('bunpro').KindWire>>} */
 export const KIND = Object.freeze({
     vocab: {searchKey: 'vocabs', recordType: 'vocab', reviewable: 'Vocab'},

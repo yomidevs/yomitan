@@ -1848,6 +1848,11 @@ code.anki-field-marker {
     resize: none;
     min-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
 }
+#bunpro-token-input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
 #generate-anki-notes-test-text-input {
     width: 100%;
 }

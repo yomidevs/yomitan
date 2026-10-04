@@ -18,11 +18,13 @@
 import {ExtensionError} from '../../core/extension-error.js';
 import {readResponseJson} from '../../core/json.js';
 import {hasPermissions} from '../../data/permissions-util.js';
-import {SIGNED_OUT_ERROR_CODE, isSignedOutError, itemKey} from './bunpro-match.js';
-import {ADD_PATH, API_BASE, SEARCH_PATH, addBody, parseSearchResponse, pickExactMatch, searchBody} from './bunpro-protocol.js';
+import {SIGNED_OUT_ERROR_CODE, isSignedOutError, itemKey, queryKey} from './bunpro-match.js';
+import {ADD_PATH, API_BASE, SEARCH_PATH, USER_PATH, addBody, parseSearchResponse, pickExactMatch, searchBody} from './bunpro-protocol.js';
 
 const TOKEN_COOKIE = {url: 'https://bunpro.jp/', name: 'frontend_api_token'};
+const TOKEN_STORAGE_KEY = 'bunproFrontendToken';
 const MAX_SEARCHES_IN_FLIGHT = 4;
+const SEARCH_TIMEOUT_MS = 8000;
 
 /**
  * The cookie is the user's Bunpro credential, so only the background page may hold it.
@@ -55,6 +57,8 @@ class BunproClient {
         this._items = new Map();
         /** @type {Map<import('bunpro').ItemKey, Promise<import('bunpro').BunproMatch>>} */
         this._adds = new Map();
+        /** @type {Map<string, Promise<void>>} */
+        this._searches = new Map();
     }
 
     /** @type {boolean} */
@@ -72,6 +76,57 @@ class BunproClient {
      */
     async getStatus() {
         return (await this._getSession()).status;
+    }
+
+    /**
+     * Validates the saved key, then the browser login, before the settings page offers either.
+     * @returns {Promise<import('bunpro').BunproAuthorization>}
+     */
+    async getAuthorization() {
+        const stored = blankToNull(await this._ports.readStoredToken());
+        const savedToken = stored !== null && stored !== this._rejectedCookie ? stored : null;
+        if (!this._enabled) {
+            return {status: 'disabled', saved: savedToken !== null, offerBrowserLogin: false};
+        }
+        if (savedToken !== null) {
+            if (await this._probe(savedToken)) {
+                return {status: 'ready', saved: true, offerBrowserLogin: await this._browserLoginIsUsable(savedToken)};
+            }
+            await this._rejectToken(savedToken);
+        }
+        return await this._authorizationFromBrowser();
+    }
+
+    /**
+     * @returns {Promise<import('bunpro').BunproAuthorization>}
+     */
+    async saveBrowserLogin() {
+        if (!(await this._ports.hasCookiesPermission())) { throw createNotReadyError('needsPermission'); }
+        const cookie = blankToNull(await this._ports.readCookie());
+        if (cookie === null || !(await this._probe(cookie))) { throw rejectedKeyError(); }
+        await this._storeToken(cookie);
+        return await this.getAuthorization();
+    }
+
+    /**
+     * @param {string} token
+     * @returns {Promise<import('bunpro').BunproAuthorization>}
+     */
+    async saveToken(token) {
+        const value = token.trim();
+        if (value === '') { throw new ExtensionError('Enter a Bunpro key.'); }
+        if (!(await this._probe(value))) { throw rejectedKeyError(); }
+        await this._storeToken(value);
+        return await this.getAuthorization();
+    }
+
+    /**
+     * @returns {Promise<import('bunpro').BunproAuthorization>}
+     */
+    async clearToken() {
+        await this._ports.writeStoredToken(null);
+        this._forget();
+        return await this.getAuthorization();
     }
 
     /**
@@ -143,8 +198,30 @@ class BunproClient {
      * @param {import('bunpro').BunproQuery} query
      */
     async _resolve(cookie, query) {
-        const match = pickExactMatch(await this._search(cookie, query.term), query);
-        this._resolutions.set(queryKey(query), match === null ? null : itemKey(this._remember(match)));
+        const key = queryKey(query);
+        if (this._resolutions.has(key)) { return; }
+        let pending = this._searches.get(key);
+        if (typeof pending === 'undefined') {
+            pending = this._searchOnce(cookie, query).finally(() => {
+                if (this._searches.get(key) === pending) { this._searches.delete(key); }
+            });
+            this._searches.set(key, pending);
+        }
+        await pending;
+    }
+
+    /**
+     * A failed search is not remembered, so the next lookup can try again.
+     * @param {string} cookie
+     * @param {import('bunpro').BunproQuery} query
+     */
+    async _searchOnce(cookie, query) {
+        try {
+            const match = pickExactMatch(await this._search(cookie, query.term), query);
+            this._resolutions.set(queryKey(query), match === null ? null : itemKey(this._remember(match)));
+        } catch (e) {
+            if (isSignedOutError(e)) { throw e; }
+        }
     }
 
     /**
@@ -188,6 +265,7 @@ class BunproClient {
         const response = await this._ports.fetch(`${API_BASE}${path}`, {
             method,
             credentials: 'omit',
+            signal: searchSignal(this._ports),
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -196,8 +274,7 @@ class BunproClient {
             body: JSON.stringify(body),
         });
         if (response.status === 401) {
-            this._rejectedCookie = cookie;
-            this._forget();
+            await this._rejectToken(cookie);
             throw createNotReadyError('signedOut');
         }
         if (!response.ok) {
@@ -211,10 +288,88 @@ class BunproClient {
      */
     async _getSession() {
         if (!this._enabled) { return {status: 'disabled'}; }
+        const saved = blankToNull(await this._ports.readStoredToken());
+        if (saved !== null && saved !== this._rejectedCookie) { return {status: 'ready', cookie: saved}; }
         if (!(await this._ports.hasCookiesPermission())) { return {status: 'needsPermission'}; }
-        const cookie = await this._ports.readCookie();
+        const cookie = blankToNull(await this._ports.readCookie());
         if (cookie === null || cookie === this._rejectedCookie) { return {status: 'signedOut'}; }
         return {status: 'ready', cookie};
+    }
+
+    /**
+     * @returns {Promise<import('bunpro').BunproAuthorization>}
+     */
+    async _authorizationFromBrowser() {
+        if (!(await this._ports.hasCookiesPermission())) {
+            return {status: 'needsPermission', saved: false, offerBrowserLogin: false};
+        }
+        const cookie = blankToNull(await this._ports.readCookie());
+        if (cookie === null || cookie === this._rejectedCookie) {
+            return {status: 'signedOut', saved: false, offerBrowserLogin: false};
+        }
+        if (!(await this._probe(cookie))) {
+            await this._rejectToken(cookie);
+            return {status: 'signedOut', saved: false, offerBrowserLogin: false};
+        }
+        return {status: 'ready', saved: false, offerBrowserLogin: true};
+    }
+
+    /**
+     * A browser login is offerable when it is present, different from the saved key, and accepted by Bunpro.
+     * A failed check does not reject the saved key.
+     * @param {string} savedToken
+     * @returns {Promise<boolean>}
+     */
+    async _browserLoginIsUsable(savedToken) {
+        try {
+            if (!(await this._ports.hasCookiesPermission())) { return false; }
+            const cookie = blankToNull(await this._ports.readCookie());
+            if (cookie === null || cookie === savedToken || cookie === this._rejectedCookie) { return false; }
+            return await this._probe(cookie);
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * @param {string} token
+     * @returns {Promise<boolean>}
+     */
+    async _probe(token) {
+        const response = await this._ports.fetch(`${API_BASE}${USER_PATH}`, {
+            method: 'GET',
+            credentials: 'omit',
+            signal: searchSignal(this._ports),
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Token token=${token}`,
+            },
+        });
+        if (response.status === 401) { return false; }
+        if (!response.ok) {
+            throw new Error(`Bunpro responded with HTTP status ${response.status}`);
+        }
+        return true;
+    }
+
+    /**
+     * @param {string} token
+     */
+    async _storeToken(token) {
+        const previous = blankToNull(await this._ports.readStoredToken());
+        await this._ports.writeStoredToken(token);
+        if (previous !== token) { this._forget(); }
+        if (this._rejectedCookie === token) { this._rejectedCookie = null; }
+    }
+
+    /**
+     * @param {string} token
+     */
+    async _rejectToken(token) {
+        this._rejectedCookie = token;
+        const stored = blankToNull(await this._ports.readStoredToken());
+        if (stored === token) { await this._ports.writeStoredToken(null); }
+        this._forget();
     }
 
     /**
@@ -234,11 +389,12 @@ class BunproClient {
 }
 
 /**
- * @param {import('bunpro').BunproQuery} query
- * @returns {string}
+ * @param {import('bunpro').ClientPorts} ports
+ * @returns {AbortSignal}
  */
-function queryKey({term, reading}) {
-    return `${term}\n${reading}`;
+function searchSignal(ports) {
+    const timeoutMs = typeof ports.searchTimeoutMs === 'number' ? ports.searchTimeoutMs : SEARCH_TIMEOUT_MS;
+    return AbortSignal.timeout(timeoutMs);
 }
 
 /**
@@ -249,6 +405,23 @@ function createNotReadyError(status) {
     const error = new ExtensionError(status === 'signedOut' ? 'Signed out of Bunpro' : `Bunpro is unavailable: ${status}`);
     error.data = {code: status === 'signedOut' ? SIGNED_OUT_ERROR_CODE : `bunpro-${status}`};
     return error;
+}
+
+/**
+ * @returns {ExtensionError}
+ */
+function rejectedKeyError() {
+    const error = new ExtensionError('Bunpro rejected this key.');
+    error.data = {code: SIGNED_OUT_ERROR_CODE};
+    return error;
+}
+
+/**
+ * @param {?string} value
+ * @returns {?string}
+ */
+function blankToNull(value) {
+    return typeof value === 'string' && value !== '' ? value : null;
 }
 
 /**
@@ -282,6 +455,8 @@ function browserPorts() {
         fetch: (url, init) => fetch(url, init),
         readCookie: readTokenCookie,
         hasCookiesPermission: () => hasPermissions({permissions: ['cookies']}),
+        readStoredToken: readStoredToken,
+        writeStoredToken: writeStoredToken,
     };
 }
 
@@ -297,6 +472,48 @@ function decodeCookieValue(value) {
     } catch {
         return value;
     }
+}
+
+/**
+ * @returns {Promise<?string>}
+ */
+function readStoredToken() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get([TOKEN_STORAGE_KEY], (store) => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                const value = store[TOKEN_STORAGE_KEY];
+                resolve(typeof value === 'string' && value !== '' ? value : null);
+            }
+        });
+    });
+}
+
+/**
+ * @param {?string} token
+ * @returns {Promise<void>}
+ */
+function writeStoredToken(token) {
+    return new Promise((resolve, reject) => {
+        /**
+         * @returns {void}
+         */
+        const finish = () => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                resolve();
+            }
+        };
+        if (token === null) {
+            chrome.storage.local.remove(TOKEN_STORAGE_KEY, finish);
+        } else {
+            chrome.storage.local.set({[TOKEN_STORAGE_KEY]: token}, finish);
+        }
+    });
 }
 
 /**

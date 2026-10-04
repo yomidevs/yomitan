@@ -32,25 +32,29 @@ function jsonResponse(status, body) {
 
 /**
  * A stand-in for Bunpro's frontend API that knows one vocab, 食べる (id 101).
- * @param {{validToken?: string, failNextPatch?: boolean}} [setup]
- * @returns {{requests: {method: string, url: string, authorization: string, body: unknown}[], setCookie: (value: ?string) => void, methods: () => string[], client: ReturnType<typeof createBunproClient>}}
+ * @param {{validToken?: string, validTokens?: string[], failNextPatch?: boolean}} [setup]
+ * @returns {{requests: {method: string, url: string, authorization: string, body: unknown}[], setCookie: (value: ?string) => void, setStored: (value: ?string) => void, stored: () => ?string, setCookiesPermission: (value: boolean) => void, methods: () => string[], client: ReturnType<typeof createBunproClient>}}
  */
-function createFakeBunpro({validToken = 'token-a', failNextPatch = false} = {}) {
+function createFakeBunpro({validToken = 'token-a', validTokens = null, failNextPatch = false} = {}) {
     /** @type {{method: string, url: string, authorization: string, body: unknown}[]} */
     const requests = [];
     /** @type {Set<number>} */
     const reviewed = new Set();
     let failPatch = failNextPatch;
     let cookie = /** @type {?string} */ (validToken);
+    let stored = /** @type {?string} */ (null);
+    let cookiesPermission = true;
+    const accepted = new Set(validTokens ?? [validToken]);
 
     /** @type {import('bunpro').ClientPorts} */
     const ports = {
         fetch: async (url, init) => {
             const authorization = /** @type {Record<string, string>} */ (init.headers).Authorization;
             const method = /** @type {string} */ (init.method);
-            const body = parseJson(/** @type {string} */ (init.body));
+            const body = typeof init.body === 'string' ? parseJson(init.body) : null;
             requests.push({method, url, authorization, body});
-            if (authorization !== `Token token=${validToken}`) { return jsonResponse(401, {errors: [{code: 'unauthorized'}]}); }
+            if (!accepted.has(authorization.slice('Token token='.length))) { return jsonResponse(401, {errors: [{code: 'unauthorized'}]}); }
+            if (method === 'GET') { return jsonResponse(200, {}); }
             if (method === 'PATCH') {
                 reviewed.add(101);
                 if (failPatch) {
@@ -68,13 +72,21 @@ function createFakeBunpro({validToken = 'token-a', failNextPatch = false} = {}) 
             });
         },
         readCookie: async () => cookie,
-        hasCookiesPermission: async () => true,
+        hasCookiesPermission: async () => cookiesPermission,
+        readStoredToken: async () => stored,
+        writeStoredToken: async (token) => { stored = token; },
     };
 
     return {
         requests,
         /** @param {?string} value */
         setCookie: (value) => { cookie = value; },
+        /** @param {?string} value */
+        setStored: (value) => { stored = value; },
+        /** @returns {?string} */
+        stored: () => stored,
+        /** @param {boolean} value */
+        setCookiesPermission: (value) => { cookiesPermission = value; },
         /** @returns {string[]} */
         methods: () => requests.map(({method}) => method),
         client: (() => {
@@ -182,6 +194,112 @@ describe('BunproClient sign-in', () => {
         const bunpro = createFakeBunpro();
         bunpro.setCookie(null);
         expect(await bunpro.client.getStatus()).toStrictEqual('signedOut');
+    });
+});
+
+describe('BunproClient saved key', () => {
+    test('a saved key is used when the browser has no login', async () => {
+        const bunpro = createFakeBunpro();
+        bunpro.setStored('token-a');
+        bunpro.setCookie(null);
+        const lookup = await bunpro.client.findMatches([TABERU_QUERY]);
+        expect(lookup.status).toStrictEqual('ready');
+        expect(bunpro.requests[0].authorization).toStrictEqual('Token token=token-a');
+    });
+
+    test('a saved key does not need the cookies permission', async () => {
+        const bunpro = createFakeBunpro();
+        bunpro.setStored('token-a');
+        bunpro.setCookiesPermission(false);
+        expect(await bunpro.client.getStatus()).toStrictEqual('ready');
+    });
+
+    test('a rejected saved key is removed', async () => {
+        const bunpro = createFakeBunpro({validToken: 'token-b'});
+        bunpro.setStored('token-a');
+        bunpro.setCookie(null);
+        expect(await bunpro.client.findMatches([TABERU_QUERY])).toStrictEqual({status: 'signedOut'});
+        expect(bunpro.stored()).toBeNull();
+    });
+
+    test('a valid browser login is offered until it is saved', async () => {
+        const bunpro = createFakeBunpro();
+        bunpro.setCookie('token-a');
+        expect(await bunpro.client.getAuthorization()).toStrictEqual({status: 'ready', saved: false, offerBrowserLogin: true});
+
+        expect(await bunpro.client.saveBrowserLogin()).toStrictEqual({status: 'ready', saved: true, offerBrowserLogin: false});
+        expect(bunpro.stored()).toStrictEqual('token-a');
+        bunpro.setCookie(null);
+        expect(await bunpro.client.getStatus()).toStrictEqual('ready');
+    });
+
+    test('the current browser login is not offered again', async () => {
+        const bunpro = createFakeBunpro();
+        bunpro.setStored('token-a');
+        expect(await bunpro.client.getAuthorization()).toStrictEqual({status: 'ready', saved: true, offerBrowserLogin: false});
+        expect(bunpro.methods()).toStrictEqual(['GET']);
+    });
+
+    test('an invalid saved key is dropped and a valid browser login is offered', async () => {
+        const bunpro = createFakeBunpro({validToken: 'token-b'});
+        bunpro.setStored('token-a');
+        bunpro.setCookie('token-b');
+        expect(await bunpro.client.getAuthorization()).toStrictEqual({status: 'ready', saved: false, offerBrowserLogin: true});
+        expect(bunpro.stored()).toBeNull();
+    });
+
+    test('a different valid browser login is offered beside a saved key', async () => {
+        const bunpro = createFakeBunpro({validTokens: ['token-a', 'token-b']});
+        bunpro.setStored('token-a');
+        bunpro.setCookie('token-b');
+        expect(await bunpro.client.getAuthorization()).toStrictEqual({status: 'ready', saved: true, offerBrowserLogin: true});
+        expect(bunpro.stored()).toStrictEqual('token-a');
+    });
+
+    test('a rejected manual key is not saved', async () => {
+        const bunpro = createFakeBunpro();
+        await expect(bunpro.client.saveToken('token-b')).rejects.toMatchObject({data: {code: 'bunpro-signed-out'}});
+        expect(bunpro.stored()).toBeNull();
+    });
+
+    test('an empty manual key is refused before any request', async () => {
+        const bunpro = createFakeBunpro();
+        await expect(bunpro.client.saveToken('  ')).rejects.toThrow('Enter a Bunpro key.');
+        expect(bunpro.requests).toStrictEqual([]);
+    });
+
+    test('a search that never answers is skipped and can be tried again', async () => {
+        let calls = 0;
+        /** @type {import('bunpro').ClientPorts} */
+        const ports = {
+            fetch: (_url, init) => {
+                calls += 1;
+                if (calls === 1) {
+                    return new Promise((_resolve, reject) => {
+                        init.signal?.addEventListener('abort', () => reject(init.signal?.reason));
+                    });
+                }
+                return Promise.resolve(jsonResponse(200, {}));
+            },
+            readCookie: async () => 'token-a',
+            hasCookiesPermission: async () => true,
+            readStoredToken: async () => 'token-a',
+            writeStoredToken: async () => {},
+            searchTimeoutMs: 30,
+        };
+        const client = createBunproClient(ports);
+        client.enabled = true;
+
+        expect(await client.findMatches([TABERU_QUERY])).toStrictEqual({status: 'ready', matches: [null]});
+        expect(await client.findMatches([TABERU_QUERY])).toStrictEqual({status: 'ready', matches: [null]});
+        expect(calls).toStrictEqual(2);
+    });
+
+    test('removing the saved key falls back to the browser login', async () => {
+        const bunpro = createFakeBunpro();
+        bunpro.setStored('token-a');
+        expect(await bunpro.client.clearToken()).toStrictEqual({status: 'ready', saved: false, offerBrowserLogin: true});
+        expect(bunpro.stored()).toBeNull();
     });
 });
 

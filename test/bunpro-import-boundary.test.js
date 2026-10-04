@@ -55,10 +55,15 @@ describe('Bunpro import boundary', () => {
         expect(findImporters('bunpro-protocol.js')).toStrictEqual([`${BUNPRO_DIRECTORY}bunpro-client.js`, 'test/bunpro-protocol.test.js']);
     });
 
-    test('the credential is named only inside the Bunpro directory', () => {
+    test('the request header is built only in the client', () => {
         const productFiles = sourceFiles.filter((file) => !file.startsWith('test/'));
-        const credentialPattern = /Token token=|frontend_api_token/;
-        const namingFiles = productFiles.filter((file) => credentialPattern.test(fs.readFileSync(path.join(root, file), {encoding: 'utf8'})));
+        const namingFiles = productFiles.filter((file) => /Token token=/.test(fs.readFileSync(path.join(root, file), {encoding: 'utf8'})));
         expect(namingFiles).toStrictEqual([`${BUNPRO_DIRECTORY}bunpro-client.js`]);
+    });
+
+    test('the cookie name is read in the client and shown in the settings instructions', () => {
+        const productFiles = sourceFiles.filter((file) => !file.startsWith('test/'));
+        const namingFiles = productFiles.filter((file) => /frontend_api_token/.test(fs.readFileSync(path.join(root, file), {encoding: 'utf8'})));
+        expect(namingFiles).toStrictEqual([`${BUNPRO_DIRECTORY}bunpro-client.js`, 'ext/settings.html']);
     });
 });

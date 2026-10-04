@@ -32,6 +32,8 @@ export type State =
         entryItems: (Bunpro.ItemKey | null)[];
         items: Map<Bunpro.ItemKey, Bunpro.BunproMatch>;
         attempts: Map<Bunpro.ItemKey, AddAttempt>;
+        /** True while that entry's Bunpro lookup has not finished. Entries settle from the top down. */
+        pending?: boolean[];
     };
 
 export type ControlView =

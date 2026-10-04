@@ -42,7 +42,8 @@ export function getControlView(state, entryIndex) {
  * @param {number} entryIndex
  * @returns {import('display-bunpro').ControlView}
  */
-function getMatchView({entryItems, items, attempts}, entryIndex) {
+function getMatchView({entryItems, items, attempts, pending}, entryIndex) {
+    if (pending?.[entryIndex] === true) { return RESERVED; }
     const key = entryItems[entryIndex] ?? null;
     const match = key === null ? void 0 : items.get(key);
     if (key === null || typeof match === 'undefined') { return NONE; }

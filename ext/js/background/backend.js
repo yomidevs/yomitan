@@ -194,6 +194,9 @@ export class Backend {
             ['forceSync',                    this._onApiForceSync.bind(this)],
             ['fetchLocalAudioData',          this._onApiFetchLocalAudioData.bind(this)],
             ['getBunproStatus',              this._onApiGetBunproStatus.bind(this)],
+            ['saveBunproBrowserLogin',       this._onApiSaveBunproBrowserLogin.bind(this)],
+            ['saveBunproToken',              this._onApiSaveBunproToken.bind(this)],
+            ['clearBunproToken',             this._onApiClearBunproToken.bind(this)],
             ['findBunproMatches',            this._onApiFindBunproMatches.bind(this)],
             ['addToBunpro',                  this._onApiAddToBunpro.bind(this)],
         ]);
@@ -1199,7 +1202,22 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getBunproStatus'>} */
     async _onApiGetBunproStatus() {
-        return await this._bunpro.getStatus();
+        return await this._bunpro.getAuthorization();
+    }
+
+    /** @type {import('api').ApiHandler<'saveBunproBrowserLogin'>} */
+    async _onApiSaveBunproBrowserLogin() {
+        return await this._bunpro.saveBrowserLogin();
+    }
+
+    /** @type {import('api').ApiHandler<'saveBunproToken'>} */
+    async _onApiSaveBunproToken({token}) {
+        return await this._bunpro.saveToken(token);
+    }
+
+    /** @type {import('api').ApiHandler<'clearBunproToken'>} */
+    async _onApiClearBunproToken() {
+        return await this._bunpro.clearToken();
     }
 
     /** @type {import('api').ApiHandler<'findBunproMatches'>} */

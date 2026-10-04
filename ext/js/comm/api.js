@@ -451,6 +451,28 @@ export class API {
     }
 
     /**
+     * @returns {Promise<import('api').ApiReturn<'saveBunproBrowserLogin'>>}
+     */
+    saveBunproBrowserLogin() {
+        return this._invoke('saveBunproBrowserLogin', void 0);
+    }
+
+    /**
+     * @param {import('api').ApiParam<'saveBunproToken', 'token'>} token
+     * @returns {Promise<import('api').ApiReturn<'saveBunproToken'>>}
+     */
+    saveBunproToken(token) {
+        return this._invoke('saveBunproToken', {token});
+    }
+
+    /**
+     * @returns {Promise<import('api').ApiReturn<'clearBunproToken'>>}
+     */
+    clearBunproToken() {
+        return this._invoke('clearBunproToken', void 0);
+    }
+
+    /**
      * @param {import('api').ApiParam<'findBunproMatches', 'queries'>} queries
      * @returns {Promise<import('api').ApiReturn<'findBunproMatches'>>}
      */

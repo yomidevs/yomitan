@@ -414,7 +414,21 @@ type ApiSurface = {
     };
     getBunproStatus: {
         params: void;
-        return: Bunpro.BunproStatus;
+        return: Bunpro.BunproAuthorization;
+    };
+    saveBunproBrowserLogin: {
+        params: void;
+        return: Bunpro.BunproAuthorization;
+    };
+    saveBunproToken: {
+        params: {
+            token: string;
+        };
+        return: Bunpro.BunproAuthorization;
+    };
+    clearBunproToken: {
+        params: void;
+        return: Bunpro.BunproAuthorization;
     };
     findBunproMatches: {
         params: {

@@ -28,6 +28,14 @@ export function itemKey({kind, id}) {
 }
 
 /**
+ * @param {import('bunpro').BunproQuery} query
+ * @returns {string}
+ */
+export function queryKey({term, reading}) {
+    return `${term}\n${reading}`;
+}
+
+/**
  * @param {unknown} error
  * @returns {boolean}
  */

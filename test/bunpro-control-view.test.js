@@ -52,6 +52,12 @@ describe('getControlView', () => {
         expect(getControlView(state, 1)).toStrictEqual({kind: 'none'});
     });
 
+    test('a ready entry still waiting on its lookup reserves space', () => {
+        const state = createReadyState(null);
+        state.pending = [true];
+        expect(getControlView(state, 0)).toStrictEqual({kind: 'reserved'});
+    });
+
     test('an absent match renders nothing', () => {
         expect(getControlView(createReadyState(null), 0)).toStrictEqual({kind: 'none'});
     });

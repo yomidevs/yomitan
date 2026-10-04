@@ -35,6 +35,15 @@ export type BunproMatch = {
 
 export type BunproStatus = 'disabled' | 'needsPermission' | 'signedOut' | 'ready';
 
+/** What the settings page may know. The token itself stays in the background. */
+export type BunproAuthorization = {
+    status: BunproStatus;
+    /** A key is saved on this device. */
+    saved: boolean;
+    /** A different valid browser login can be saved. */
+    offerBrowserLogin: boolean;
+};
+
 export type BunproLookup =
     | {status: 'ready', matches: (BunproMatch | null)[]}
     | {status: Exclude<BunproStatus, 'ready'>};
@@ -55,6 +64,10 @@ export type ClientPorts = {
     fetch: (url: string, init: RequestInit) => Promise<Response>;
     readCookie: () => Promise<string | null>;
     hasCookiesPermission: () => Promise<boolean>;
+    readStoredToken: () => Promise<string | null>;
+    writeStoredToken: (token: string | null) => Promise<void>;
+    /** How long one Bunpro request may run before it is abandoned. Defaults to 8 seconds. */
+    searchTimeoutMs?: number;
 };
 
 export type Session =
