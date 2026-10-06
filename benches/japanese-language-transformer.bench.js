@@ -102,6 +102,10 @@ describe('japanese language transformer', () => {
             '食べましたら',
             '食べますれば',
             '食べませんかった',
+            '食べやしない',
+            '食べやしません',
+            '食べやしなかった',
+            '食べやしませんでした',
         ];
 
         const inflectionCombinations = [
@@ -176,6 +180,8 @@ describe('japanese language transformer', () => {
             'きましたら',
             'きますれば',
             'きませんかった',
+            'きやしない',
+            'きやしません',
         ];
 
         const suruInflections = [
@@ -246,6 +252,8 @@ describe('japanese language transformer', () => {
             'しましたら',
             'しますれば',
             'しませんかった',
+            'しやしない',
+            'しやしません',
         ];
 
         const kansaibenInflections = [
@@ -280,6 +288,8 @@ describe('japanese language transformer', () => {
             '思ひます',
             '思はう',
             '思ひさう',
+            '思ひやしない',
+            '思ひやしません',
         ];
 
         const basicTransformations = [...adjectiveInflections, ...verbInflections, ...inflectionCombinations];
