@@ -124,6 +124,8 @@ const tests = [
             {term: '食べる', source: '食べやがって',     rule: 'v1', reasons: ['-やがる', '-て']},
             {term: '食べる', source: '食べやがった',     rule: 'v1', reasons: ['-やがる', '-た']},
             {term: '食べる', source: '食べやがれ',       rule: 'v1', reasons: ['-やがる', 'imperative']},
+            {term: '食べる', source: '食べやしない',     rule: 'v1', reasons: ['-やしない']},
+            {term: '食べる', source: '食べやしません',     rule: 'v1', reasons: ['-やしません']},
         ],
     },
     {
@@ -201,6 +203,8 @@ const tests = [
             {term: '買う', source: '買いやがって',     rule: 'v5', reasons: ['-やがる', '-て']},
             {term: '買う', source: '買いやがった',     rule: 'v5', reasons: ['-やがる', '-た']},
             {term: '買う', source: '買いやがれ',       rule: 'v5', reasons: ['-やがる', 'imperative']},
+            {term: '買う', source: '買いやしない',     rule: 'v5', reasons: ['-やしない']},
+            {term: '買う', source: '買いやしません',     rule: 'v5', reasons: ['-やしません']},
 
             {term: '買う', source: '買いますまい',     rule: 'v5', reasons: ['-ます', '-まい']},
             {term: '買う', source: '買いましたら',     rule: 'v5', reasons: ['-ます', '-たら']},
@@ -283,6 +287,8 @@ const tests = [
             {term: '行く', source: '行きやがって',     rule: 'v5', reasons: ['-やがる', '-て']},
             {term: '行く', source: '行きやがった',     rule: 'v5', reasons: ['-やがる', '-た']},
             {term: '行く', source: '行きやがれ',       rule: 'v5', reasons: ['-やがる', 'imperative']},
+            {term: '行く', source: '行きやしない',     rule: 'v5', reasons: ['-やしない']},
+            {term: '行く', source: '行きやしません',     rule: 'v5', reasons: ['-やしません']},
 
             {term: '行く', source: '行きますまい',     rule: 'v5', reasons: ['-ます', '-まい']},
             {term: '行く', source: '行きましたら',     rule: 'v5', reasons: ['-ます', '-たら']},
@@ -365,6 +371,8 @@ const tests = [
             {term: '泳ぐ', source: '泳ぎやがって',     rule: 'v5', reasons: ['-やがる', '-て']},
             {term: '泳ぐ', source: '泳ぎやがった',     rule: 'v5', reasons: ['-やがる', '-た']},
             {term: '泳ぐ', source: '泳ぎやがれ',       rule: 'v5', reasons: ['-やがる', 'imperative']},
+            {term: '泳ぐ', source: '泳ぎやしない',     rule: 'v5', reasons: ['-やしない']},
+            {term: '泳ぐ', source: '泳ぎやしません',     rule: 'v5', reasons: ['-やしません']},
 
             {term: '泳ぐ', source: '泳ぎますまい',     rule: 'v5', reasons: ['-ます', '-まい']},
             {term: '泳ぐ', source: '泳ぎましたら',     rule: 'v5', reasons: ['-ます', '-たら']},
@@ -446,6 +454,8 @@ const tests = [
             {term: '話す', source: '話しやがって',     rule: 'v5', reasons: ['-やがる', '-て']},
             {term: '話す', source: '話しやがった',     rule: 'v5', reasons: ['-やがる', '-た']},
             {term: '話す', source: '話しやがれ',       rule: 'v5', reasons: ['-やがる', 'imperative']},
+            {term: '話す', source: '話しやしない',     rule: 'v5', reasons: ['-やしない']},
+            {term: '話す', source: '話しやしません',     rule: 'v5', reasons: ['-やしません']},
 
             {term: '増す', source: '増せん',             rule: 'v5', reasons: ['potential', '-ん']},
             {term: '増す', source: '増せんかった',             rule: 'v5', reasons: ['potential', '-ん', '-た']},
@@ -534,6 +544,8 @@ const tests = [
             {term: '待つ', source: '待ちやがって',     rule: 'v5', reasons: ['-やがる', '-て']},
             {term: '待つ', source: '待ちやがった',     rule: 'v5', reasons: ['-やがる', '-た']},
             {term: '待つ', source: '待ちやがれ',       rule: 'v5', reasons: ['-やがる', 'imperative']},
+            {term: '待つ', source: '待ちやしない',     rule: 'v5', reasons: ['-やしない']},
+            {term: '待つ', source: '待ちやしません',     rule: 'v5', reasons: ['-やしません']},
 
             {term: '待つ', source: '待ちますまい',     rule: 'v5', reasons: ['-ます', '-まい']},
             {term: '待つ', source: '待ちましたら',     rule: 'v5', reasons: ['-ます', '-たら']},
@@ -615,6 +627,8 @@ const tests = [
             {term: '死ぬ', source: '死にやがって',     rule: 'v5', reasons: ['-やがる', '-て']},
             {term: '死ぬ', source: '死にやがった',     rule: 'v5', reasons: ['-やがる', '-た']},
             {term: '死ぬ', source: '死にやがれ',       rule: 'v5', reasons: ['-やがる', 'imperative']},
+            {term: '死ぬ', source: '死にやしない',     rule: 'v5', reasons: ['-やしない']},
+            {term: '死ぬ', source: '死にやしません',     rule: 'v5', reasons: ['-やしません']},
 
             {term: '死ぬ', source: '死にますまい',     rule: 'v5', reasons: ['-ます', '-まい']},
             {term: '死ぬ', source: '死にましたら',     rule: 'v5', reasons: ['-ます', '-たら']},
@@ -696,6 +710,8 @@ const tests = [
             {term: '遊ぶ', source: '遊びやがって',     rule: 'v5', reasons: ['-やがる', '-て']},
             {term: '遊ぶ', source: '遊びやがった',     rule: 'v5', reasons: ['-やがる', '-た']},
             {term: '遊ぶ', source: '遊びやがれ',       rule: 'v5', reasons: ['-やがる', 'imperative']},
+            {term: '遊ぶ', source: '遊びやしない',     rule: 'v5', reasons: ['-やしない']},
+            {term: '遊ぶ', source: '遊びやしません',     rule: 'v5', reasons: ['-やしません']},
 
             {term: '遊ぶ', source: '遊びますまい',     rule: 'v5', reasons: ['-ます', '-まい']},
             {term: '遊ぶ', source: '遊びましたら',     rule: 'v5', reasons: ['-ます', '-たら']},
@@ -778,6 +794,8 @@ const tests = [
             {term: '飲む', source: '飲みやがって',     rule: 'v5', reasons: ['-やがる', '-て']},
             {term: '飲む', source: '飲みやがった',     rule: 'v5', reasons: ['-やがる', '-た']},
             {term: '飲む', source: '飲みやがれ',       rule: 'v5', reasons: ['-やがる', 'imperative']},
+            {term: '飲む', source: '飲みやしない',     rule: 'v5', reasons: ['-やしない']},
+            {term: '飲む', source: '飲みやしません',     rule: 'v5', reasons: ['-やしません']},
 
             {term: '飲む', source: '飲みますまい',     rule: 'v5', reasons: ['-ます', '-まい']},
             {term: '飲む', source: '飲みましたら',     rule: 'v5', reasons: ['-ます', '-たら']},
@@ -858,6 +876,8 @@ const tests = [
             {term: '作る', source: '作りやがって',     rule: 'v5', reasons: ['-やがる', '-て']},
             {term: '作る', source: '作りやがった',     rule: 'v5', reasons: ['-やがる', '-た']},
             {term: '作る', source: '作りやがれ',       rule: 'v5', reasons: ['-やがる', 'imperative']},
+            {term: '作る', source: '作りやしない',     rule: 'v5', reasons: ['-やしない']},
+            {term: '作る', source: '作りやしません',     rule: 'v5', reasons: ['-やしません']},
 
             {term: '作る', source: '作りますまい',     rule: 'v5', reasons: ['-ます', '-まい']},
             {term: '作る', source: '作りましたら',     rule: 'v5', reasons: ['-ます', '-たら']},
@@ -1039,6 +1059,10 @@ const tests = [
             {term: 'する', source: 'しやがって',     rule: 'vs', reasons: ['-やがる', '-て']},
             {term: 'する', source: 'しやがった',     rule: 'vs', reasons: ['-やがる', '-た']},
             {term: 'する', source: 'しやがれ',       rule: 'vs', reasons: ['-やがる', 'imperative']},
+            {term: 'する', source: 'しやしない',     rule: 'vs', reasons: ['-やしない']},
+            {term: 'する', source: 'しやしません',     rule: 'vs', reasons: ['-やしません']},
+            {term: '為る', source: '為やしない',     rule: 'vs', reasons: ['-やしない']},
+            {term: '為る', source: '為やしません',     rule: 'vs', reasons: ['-やしません']},
 
             {term: 'する', source: 'しますまい',     rule: 'vs', reasons: ['-ます', '-まい']},
             {term: 'する', source: 'しましたら',     rule: 'vs', reasons: ['-ます', '-たら']},
@@ -1263,6 +1287,10 @@ const tests = [
             {term: 'くる', source: 'きやがって',     rule: 'vk', reasons: ['-やがる', '-て']},
             {term: 'くる', source: 'きやがった',     rule: 'vk', reasons: ['-やがる', '-た']},
             {term: 'くる', source: 'きやがれ',       rule: 'vk', reasons: ['-やがる', 'imperative']},
+            {term: 'くる', source: 'きやしない',     rule: 'vk', reasons: ['-やしない']},
+            {term: 'くる', source: 'きやしません',     rule: 'vk', reasons: ['-やしません']},
+            {term: '来る', source: '来やしない',     rule: 'vk', reasons: ['-やしない']},
+            {term: '来る', source: '来やしません',     rule: 'vk', reasons: ['-やしません']},
 
             {term: 'くる', source: 'きますまい',     rule: 'vk', reasons: ['-ます', '-まい']},
             {term: 'くる', source: 'きましたら',     rule: 'vk', reasons: ['-ます', '-たら']},
@@ -1350,6 +1378,8 @@ const tests = [
             {term: '論ずる', source: '論じやがって',     rule: 'vz', reasons: ['-やがる', '-て']},
             {term: '論ずる', source: '論じやがった',     rule: 'vz', reasons: ['-やがる', '-た']},
             {term: '論ずる', source: '論じやがれ',       rule: 'vz', reasons: ['-やがる', 'imperative']},
+            {term: '論ずる', source: '論じやしない',     rule: 'vz', reasons: ['-やしない']},
+            {term: '論ずる', source: '論じやしません',     rule: 'vz', reasons: ['-やしません']},
         ],
     },
     {
@@ -1559,6 +1589,15 @@ const tests = [
         ],
     },
     {
+        category: '-やしない combinations',
+        valid: true,
+        tests: [
+            {term: '食べる', source: '食べやしませんでした', rule: 'v1', reasons: ['-やしません', '-た']},
+            {term: '食べる', source: '食べやしなかった',     rule: 'v1', reasons: ['-やしない', '-た']},
+            {term: '食べる', source: '食べやしねえ',         rule: 'v1', reasons: ['-やしない', '-え']},
+        ],
+    },
+    {
         category: 'historical kana (歴史的仮名遣い)',
         valid: true,
         tests: [
@@ -1579,6 +1618,8 @@ const tests = [
             {term: '思う', source: '思はない', rule: 'v5', reasons: ['negative']},
             {term: '思う', source: '思はれる', rule: 'v5', reasons: ['passive']},
             {term: '思う', source: '思ひます', rule: 'v5', reasons: ['-ます']},
+            {term: '思う', source: '思ひやしない', rule: 'v5', reasons: ['-やしない']},
+            {term: '思う', source: '思ひやしません',     rule: 'v5', reasons: ['-やしません']},
             {term: '思う', source: '思はう', rule: 'v5', reasons: ['volitional']},
         ],
     },

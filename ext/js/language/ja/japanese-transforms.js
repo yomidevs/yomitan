@@ -1565,6 +1565,75 @@ export const japaneseTransforms = {
                 suffixInflection('來やがる', '來る', ['v5'], ['vk']),
             ],
         },
+        '-やしない': {
+            name: '-やしない',
+            description: '1. Expresses dissatisfaction or blame.\n' +
+            '2. Strongly denies an obvious fact.\n' +
+            'Usage: Attach やしない to the continuative form (連用形) of verbs. It itself conjugates as an i-adjective.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～やしない',
+                    description: '強い否定に加え、主観的な不満が現れる表現です。その事態に対する話者の非難の気持ちを含みます。\n' +
+                    '1. 不満や非難の気持ちを表す\n' +
+                    '2. 当たり前の事実を強く否定する',
+                },
+            ],
+            rules: [
+                suffixInflection('やしない', 'る', ['adj-i'], ['v1']),
+                suffixInflection('いやしない', 'う', ['adj-i'], ['v5']),
+                suffixInflection('ひやしない', 'う', ['adj-i'], ['v5']),
+                suffixInflection('きやしない', 'く', ['adj-i'], ['v5']),
+                suffixInflection('ぎやしない', 'ぐ', ['adj-i'], ['v5']),
+                suffixInflection('しやしない', 'す', ['adj-i'], ['v5']),
+                suffixInflection('ちやしない', 'つ', ['adj-i'], ['v5']),
+                suffixInflection('にやしない', 'ぬ', ['adj-i'], ['v5']),
+                suffixInflection('びやしない', 'ぶ', ['adj-i'], ['v5']),
+                suffixInflection('みやしない', 'む', ['adj-i'], ['v5']),
+                suffixInflection('りやしない', 'る', ['adj-i'], ['v5']),
+                suffixInflection('じやしない', 'ずる', ['adj-i'], ['vz']),
+                suffixInflection('しやしない', 'する', ['adj-i'], ['vs']),
+                suffixInflection('為やしない', '為る', ['adj-i'], ['vs']),
+                suffixInflection('きやしない', 'くる', ['adj-i'], ['vk']),
+                suffixInflection('来やしない', '来る', ['adj-i'], ['vk']),
+                suffixInflection('來やしない', '來る', ['adj-i'], ['vk']),
+            ],
+        },
+        '-やしません': {
+            name: '-やしません',
+            description: 'Polite form of -やしない.\n' +
+            '1. Expresses dissatisfaction or blame.\n' +
+            '2. Strongly denies an obvious fact.\n' +
+            'Usage: Attach やしません to the continuative form (連用形) of verbs.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～やしません',
+                    description: '「～やしない」の丁寧形。\n' +
+                    '1. 不満や非難の気持ちを表す\n' +
+                    '2. 当たり前の事実を強く否定する',
+                },
+            ],
+            rules: [
+                suffixInflection('やしません', 'る', ['-ません'], ['v1']),
+                suffixInflection('いやしません', 'う', ['-ません'], ['v5']),
+                suffixInflection('ひやしません', 'う', ['-ません'], ['v5']),
+                suffixInflection('きやしません', 'く', ['-ません'], ['v5']),
+                suffixInflection('ぎやしません', 'ぐ', ['-ません'], ['v5']),
+                suffixInflection('しやしません', 'す', ['-ません'], ['v5']),
+                suffixInflection('ちやしません', 'つ', ['-ません'], ['v5']),
+                suffixInflection('にやしません', 'ぬ', ['-ません'], ['v5']),
+                suffixInflection('びやしません', 'ぶ', ['-ません'], ['v5']),
+                suffixInflection('みやしません', 'む', ['-ません'], ['v5']),
+                suffixInflection('りやしません', 'る', ['-ません'], ['v5']),
+                suffixInflection('じやしません', 'ずる', ['-ません'], ['vz']),
+                suffixInflection('しやしません', 'する', ['-ません'], ['vs']),
+                suffixInflection('為やしません', '為る', ['-ません'], ['vs']),
+                suffixInflection('きやしません', 'くる', ['-ません'], ['vk']),
+                suffixInflection('来やしません', '来る', ['-ません'], ['vk']),
+                suffixInflection('來やしません', '來る', ['-ません'], ['vk']),
+            ],
+        },
         '-え': {
             name: '-え',
             description: 'Slang. A sound change of i-adjectives.\n' +
