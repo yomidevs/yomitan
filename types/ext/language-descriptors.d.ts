@@ -222,6 +222,9 @@ type AllTextProcessors = {
     mt: {
         pre: CapitalizationPreprocessors;
     };
+    hy: {
+        pre: CapitalizationPreprocessors;
+    };
     nl: {
         pre: CapitalizationPreprocessors;
     };

@@ -431,6 +431,13 @@ const languageDescriptors = [
         textPreprocessors: capitalizationPreprocessors,
     },
     {
+        iso: 'hy',
+        iso639_3: 'hye',
+        name: 'Armenian',
+        exampleText: 'կարդալ',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'nl',
         iso639_3: 'nld',
         name: 'Dutch',
