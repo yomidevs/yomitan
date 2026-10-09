@@ -20,6 +20,7 @@ import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {afterAll, describe, expect, test} from 'vitest';
 import {TextSourceRange} from '../ext/js/dom/text-source-range.js';
+import {TextScanner} from '../ext/js/language/text-scanner.js';
 import {setupDomTest} from './fixtures/dom-test.js';
 
 
@@ -76,5 +77,38 @@ describe('TextSourceRange', () => {
         expect(endLength).toBeLessThan(textLength);
         const count = (text.match(/山/g) || []).length;
         expect(count).toEqual(1);
+    });
+
+    test('term lookup selects the matched number of supplementary characters', async () => {
+        const {document} = window;
+        const textNode = document.createTextNode('𤾓𢆥𥪞𡎝');
+        document.body.appendChild(textNode);
+        const range = document.createRange();
+        range.setStart(textNode, 0);
+        range.collapse(true);
+        const source = TextSourceRange.create(range);
+        const matchedTerm = '𤾓𢆥';
+        const scanner = new TextScanner({
+            api: /** @type {import('../ext/js/comm/api.js').API} */ (/** @type {unknown} */ ({
+                termsFind: async (/** @type {string} */ searchText) => {
+                    expect(searchText).toBe('𤾓𢆥𥪞𡎝');
+                    return {dictionaryEntries: [{}], originalTextLength: matchedTerm.length};
+                },
+            })),
+            node: /** @type {Window} */ (/** @type {unknown} */ (window)),
+            browser: null,
+            getSearchContext: () => { throw new Error('Unexpected search context request'); },
+            textSourceGenerator: /** @type {import('../ext/js/dom/text-source-generator.js').TextSourceGenerator} */ (/** @type {unknown} */ ({
+                extractSentence: () => ({text: '', offset: 0}),
+            })),
+        });
+        scanner.setOptions({scanLength: 4});
+
+        // eslint-disable-next-line no-underscore-dangle
+        await scanner._findTermDictionaryEntries(source, /** @type {import('settings').OptionsContext} */ (/** @type {unknown} */ ({})));
+
+        expect(source.text()).toBe(matchedTerm);
+        expect(source.range.toString()).toBe(matchedTerm);
+        textNode.remove();
     });
 });

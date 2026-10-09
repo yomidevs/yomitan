@@ -1267,7 +1267,8 @@ export class TextScanner extends EventDispatcher {
         const {dictionaryEntries, originalTextLength} = await this._api.termsFind(searchText, details, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
-        textSource.setEndOffset(originalTextLength, false, layoutAwareScan);
+        const matchCodePointLength = [...searchText.substring(0, originalTextLength)].length;
+        textSource.setEndOffset(matchCodePointLength, false, layoutAwareScan);
         const sentence = this._textSourceGenerator.extractSentence(
             textSource,
             layoutAwareScan,
