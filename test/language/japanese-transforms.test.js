@@ -1580,6 +1580,11 @@ const tests = [
             {term: '思う', source: '思はれる', rule: 'v5', reasons: ['passive']},
             {term: '思う', source: '思ひます', rule: 'v5', reasons: ['-ます']},
             {term: '思う', source: '思はう', rule: 'v5', reasons: ['volitional']},
+            {term: '思う', source: '思ひなさい', rule: 'v5', reasons: ['-なさい']},
+            {term: '思う', source: '思ひすぎる', rule: 'v5', reasons: ['-すぎる']},
+            {term: '思う', source: '思ひ過ぎる', rule: 'v5', reasons: ['-過ぎる']},
+            {term: '思う', source: '思ひたい', rule: 'v5', reasons: ['-たい']},
+            {term: '思う', source: '思ひやがる', rule: 'v5', reasons: ['-やがる']},
         ],
     },
     {
