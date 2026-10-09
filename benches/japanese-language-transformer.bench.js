@@ -290,6 +290,11 @@ describe('japanese language transformer', () => {
             '思ひさう',
             '思ひやしない',
             '思ひやしません',
+            '思ひなさい',
+            '思ひすぎる',
+            '思ひ過ぎる',
+            '思ひたい',
+            '思ひやがる',
         ];
 
         const basicTransformations = [...adjectiveInflections, ...verbInflections, ...inflectionCombinations];

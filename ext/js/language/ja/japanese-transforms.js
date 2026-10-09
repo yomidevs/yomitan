@@ -418,6 +418,7 @@ export const japaneseTransforms = {
             rules: [
                 suffixInflection('なさい', 'る', ['-なさい'], ['v1']),
                 suffixInflection('いなさい', 'う', ['-なさい'], ['v5']),
+                suffixInflection('ひなさい', 'う', ['-なさい'], ['v5']),
                 suffixInflection('きなさい', 'く', ['-なさい'], ['v5']),
                 suffixInflection('ぎなさい', 'ぐ', ['-なさい'], ['v5']),
                 suffixInflection('しなさい', 'す', ['-なさい'], ['v5']),
@@ -497,6 +498,7 @@ export const japaneseTransforms = {
                 suffixInflection('すぎる', 'い', ['v1'], ['adj-i']),
                 suffixInflection('すぎる', 'る', ['v1'], ['v1']),
                 suffixInflection('いすぎる', 'う', ['v1'], ['v5']),
+                suffixInflection('ひすぎる', 'う', ['v1'], ['v5']),
                 suffixInflection('きすぎる', 'く', ['v1'], ['v5']),
                 suffixInflection('ぎすぎる', 'ぐ', ['v1'], ['v5']),
                 suffixInflection('しすぎる', 'す', ['v1'], ['v5']),
@@ -528,6 +530,7 @@ export const japaneseTransforms = {
                 suffixInflection('過ぎる', 'い', ['v1'], ['adj-i']),
                 suffixInflection('過ぎる', 'る', ['v1'], ['v1']),
                 suffixInflection('い過ぎる', 'う', ['v1'], ['v5']),
+                suffixInflection('ひ過ぎる', 'う', ['v1'], ['v5']),
                 suffixInflection('き過ぎる', 'く', ['v1'], ['v5']),
                 suffixInflection('ぎ過ぎる', 'ぐ', ['v1'], ['v5']),
                 suffixInflection('し過ぎる', 'す', ['v1'], ['v5']),
@@ -559,6 +562,7 @@ export const japaneseTransforms = {
             rules: [
                 suffixInflection('たい', 'る', ['adj-i'], ['v1']),
                 suffixInflection('いたい', 'う', ['adj-i'], ['v5']),
+                suffixInflection('ひたい', 'う', ['adj-i'], ['v5']),
                 suffixInflection('きたい', 'く', ['adj-i'], ['v5']),
                 suffixInflection('ぎたい', 'ぐ', ['adj-i'], ['v5']),
                 suffixInflection('したい', 'す', ['adj-i'], ['v5']),
@@ -1549,6 +1553,7 @@ export const japaneseTransforms = {
             rules: [
                 suffixInflection('やがる', 'る', ['v5'], ['v1']),
                 suffixInflection('いやがる', 'う', ['v5'], ['v5']),
+                suffixInflection('ひやがる', 'う', ['v5'], ['v5']),
                 suffixInflection('きやがる', 'く', ['v5'], ['v5']),
                 suffixInflection('ぎやがる', 'ぐ', ['v5'], ['v5']),
                 suffixInflection('しやがる', 'す', ['v5'], ['v5']),
