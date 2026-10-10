@@ -19,7 +19,6 @@
 import {readFileSync} from 'fs';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {dirname, join, resolve} from 'path';
-import {parseJson} from '../../dev/json.js';
 
 const extDir = join(dirname(fileURLToPath(import.meta.url)), '../../ext');
 
@@ -32,21 +31,46 @@ export const chrome = {
     },
 };
 
-/** @type {import('test/mocks').FetchMock} */
+/**
+ * @param {string} filePath
+ * @returns {string}
+ */
+function getContentType(filePath) {
+    if (filePath.endsWith('.json')) { return 'application/json'; }
+    if (filePath.endsWith('.wasm')) { return 'application/wasm'; }
+    if (filePath.endsWith('.mjs') || filePath.endsWith('.js')) { return 'text/javascript'; }
+    if (filePath.endsWith('.css')) { return 'text/css'; }
+    if (filePath.endsWith('.html')) { return 'text/html'; }
+    if (filePath.endsWith('.svg')) { return 'image/svg+xml'; }
+    if (filePath.endsWith('.ttf')) { return 'font/ttf'; }
+    return 'application/octet-stream';
+}
+
+/**
+ * @param {string|URL|Request} url
+ * @returns {Promise<Response>}
+ */
 export async function fetch(url) {
+    let requestUrl;
+    if (typeof url === 'string') {
+        requestUrl = url;
+    } else if (url instanceof URL) {
+        requestUrl = url.href;
+    } else {
+        requestUrl = url.url;
+    }
+
     let filePath;
     try {
-        filePath = fileURLToPath(url);
+        filePath = fileURLToPath(requestUrl);
     } catch (e) {
-        filePath = resolve(extDir, url.replace(/^[/\\]/, ''));
+        filePath = resolve(extDir, requestUrl.replace(/^[/\\]/, ''));
     }
     await Promise.resolve();
     const content = readFileSync(filePath, {encoding: null});
-    return {
-        ok: true,
+    return new Response(content, {
         status: 200,
         statusText: 'OK',
-        text: async () => content.toString('utf8'),
-        json: async () => parseJson(content.toString('utf8')),
-    };
+        headers: {'Content-Type': getContentType(filePath)},
+    });
 }
