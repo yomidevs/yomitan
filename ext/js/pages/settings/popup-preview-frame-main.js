@@ -19,9 +19,12 @@
 import {PopupFactory} from '../../app/popup-factory.js';
 import {Application} from '../../application.js';
 import {HotkeyHandler} from '../../input/hotkey-handler.js';
+import {applyI18nToDocument} from '../../language/i18n-util.js';
 import {PopupPreviewFrame} from './popup-preview-frame.js';
 
 await Application.main(true, async (application) => {
+    applyI18nToDocument();
+
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 

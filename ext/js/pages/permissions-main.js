@@ -20,6 +20,7 @@ import {Application} from '../application.js';
 import {promiseTimeout} from '../core/utilities.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {applyI18nToDocument} from '../language/i18n-util.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
 import {ModalController} from './settings/modal-controller.js';
 import {PermissionsOriginController} from './settings/permissions-origin-controller.js';
@@ -87,6 +88,8 @@ function setupPermissionsToggles() {
 }
 
 await Application.main(true, async (application) => {
+    applyI18nToDocument();
+
     const modalController = new ModalController([]);
     await modalController.prepare();
 

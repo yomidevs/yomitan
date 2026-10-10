@@ -21,6 +21,7 @@ import {Application} from '../application.js';
 import {getAllPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {HotkeyUtil} from '../input/hotkey-util.js';
+import {applyI18nToDocument, getMessage} from '../language/i18n-util.js';
 
 class DisplayController {
     /**
@@ -39,6 +40,7 @@ class DisplayController {
 
     /** */
     async prepare() {
+        applyI18nToDocument();
         this._themeController.prepare();
 
         const manifest = chrome.runtime.getManifest();
@@ -102,12 +104,14 @@ class DisplayController {
         }
 
         for (let i = 0; i < modifierKeyHint.length; i++) {
-            modifierKeyHint[i].textContent = currentModifierKey ? 'Hold ' : 'Hover over text to scan';
             if (currentModifierKey) {
+                modifierKeyHint[i].textContent = getMessage('actionPopup_scanHintHoldPrefix') || 'Hold ';
                 const em = document.createElement('em');
                 em.textContent = modifierKeys[currentModifierKey];
                 modifierKeyHint[i].appendChild(em);
-                modifierKeyHint[i].appendChild(document.createTextNode(' to scan'));
+                modifierKeyHint[i].appendChild(document.createTextNode(getMessage('actionPopup_scanHintHoldSuffix') || ' to scan'));
+            } else {
+                modifierKeyHint[i].textContent = getMessage('actionPopup_scanHintHover') || 'Hover over text to scan';
             }
         }
     }
@@ -343,7 +347,7 @@ class DisplayController {
 
         if (enabledCount === 0) {
             for (let i = 0; i < tooltip.length; i++) {
-                tooltip[i].innerHTML = 'No dictionary enabled';
+                tooltip[i].textContent = getMessage('js_noDictionaryEnabled') || 'No dictionary enabled';
                 tooltip[i].classList.add('enable-dictionary-tooltip');
             }
         }

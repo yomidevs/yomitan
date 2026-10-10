@@ -261,7 +261,7 @@ export class AnkiDeckGeneratorController {
         let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n#deck column:2\n#tags column:3\n';
         let index = 0;
         requestAnimationFrame(() => {
-            this._updateProgressBar(true, 'Exporting to File...', 0, terms.length, true);
+            this._updateProgressBar(true, (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_exportingToFile')) || 'Exporting to File...', 0, terms.length, true);
             setTimeout(async () => {
                 for (const value of terms) {
                     if (!value) { continue; }
@@ -318,7 +318,7 @@ export class AnkiDeckGeneratorController {
         let notes = [];
         let index = 0;
         requestAnimationFrame(() => {
-            this._updateProgressBar(true, 'Sending to Anki...', 0, terms.length, true);
+            this._updateProgressBar(true, (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_sendingToAnki')) || 'Sending to Anki...', 0, terms.length, true);
             setTimeout(async () => {
                 for (const value of terms) {
                     if (!value) { continue; }
@@ -367,12 +367,28 @@ export class AnkiDeckGeneratorController {
             }
             const addNotesResult = await this._ankiController.addNotes(notes);
             if (addNotesResult === null || addNotesResult.includes(null)) {
-                this._updateProgressBarError('Ankiconnect error: Failed to add cards');
+                {
+                    let err = 'Ankiconnect error: Failed to add cards';
+                    try {
+                        const m = chrome.i18n.getMessage('js_ankiConnectFailedAddCards');
+                        if (m) { err = m; }
+                    } catch (e) {
+                        // NOP
+                    }
+                    this._updateProgressBarError(err);
+                }
                 return false;
             }
         } catch (error) {
             if (error instanceof Error) {
-                this._updateProgressBarError('Ankiconnect error: ' + error.message + '');
+                let err = 'Ankiconnect error: ' + error.message;
+                try {
+                    const m = chrome.i18n.getMessage('js_ankiConnectError', [error.message]);
+                    if (m) { err = m; }
+                } catch (e) {
+                    // NOP
+                }
+                this._updateProgressBarError(err);
                 log.error(error);
                 return false;
             }

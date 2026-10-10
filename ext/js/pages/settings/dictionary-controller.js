@@ -27,6 +27,20 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 
+/**
+ * @param {string} key
+ * @param {string} fallback
+ * @returns {string}
+ */
+function getI18nLabel(key, fallback) {
+    try {
+        const m = chrome.i18n.getMessage(key);
+        return m || fallback;
+    } catch (e) {
+        return fallback;
+    }
+}
+
 class DictionaryEntry {
     /**
      * @param {DictionaryController} dictionaryController
@@ -344,21 +358,21 @@ class DictionaryEntry {
     _setupDetails(detailsTable) {
         /** @type {Partial<Record<keyof (typeof this._dictionaryInfo & typeof this._dictionaryInfo.counts), string>>} */
         const targets = {
-            author: 'Author',
-            url: 'URL',
-            description: 'Description',
-            attribution: 'Attribution',
-            sourceLanguage: 'Source Language',
-            targetLanguage: 'Target Language',
-            terms: 'Term Count',
-            termMeta: 'Term Meta Count',
-            kanji: 'Kanji Count',
-            kanjiMeta: 'Kanji Meta Count',
-            tagMeta: 'Tag Count',
-            media: 'Media Count',
-            frequencyMode: 'Frequency Mode',
-            prefixWildcardsSupported: 'Prefix Wildcards Enabled',
-            importSuccess: 'Import Success',
+            author: getI18nLabel('js_dictAuthor', 'Author'),
+            url: getI18nLabel('js_dictUrl', 'URL'),
+            description: getI18nLabel('js_dictDescription', 'Description'),
+            attribution: getI18nLabel('js_dictAttribution', 'Attribution'),
+            sourceLanguage: getI18nLabel('js_dictSourceLanguage', 'Source Language'),
+            targetLanguage: getI18nLabel('js_dictTargetLanguage', 'Target Language'),
+            terms: getI18nLabel('js_dictTermCount', 'Term Count'),
+            termMeta: getI18nLabel('js_dictTermMetaCount', 'Term Meta Count'),
+            kanji: getI18nLabel('js_dictKanjiCount', 'Kanji Count'),
+            kanjiMeta: getI18nLabel('js_dictKanjiMetaCount', 'Kanji Meta Count'),
+            tagMeta: getI18nLabel('js_dictTagCount', 'Tag Count'),
+            media: getI18nLabel('js_dictMediaCount', 'Media Count'),
+            frequencyMode: getI18nLabel('js_dictFrequencyMode', 'Frequency Mode'),
+            prefixWildcardsSupported: getI18nLabel('js_dictPrefixWildcards', 'Prefix Wildcards Enabled'),
+            importSuccess: getI18nLabel('js_dictImportSuccess', 'Import Success'),
         };
 
         const dictionaryInfo = {...this._dictionaryInfo, ...this._dictionaryInfo.counts};
@@ -386,7 +400,11 @@ class DictionaryEntry {
 
             labelElement.textContent = `${label}:`;
             if (this._databaseCounts && this._databaseCounts[key]) {
-                displayText = 'Expected: ' + displayText + ' (Database: ' + this._databaseCounts[key] + ')';
+                {
+                    const expected = getI18nLabel('js_dictExpected', 'Expected');
+                    const database = getI18nLabel('js_dictDatabase', 'Database');
+                    displayText = `${expected}: ${displayText} (${database}: ${this._databaseCounts[key]})`;
+                }
             }
             infoElement.textContent = displayText;
             fragment.appendChild(details);
@@ -540,12 +558,12 @@ class DictionaryExtraInfo {
     _setupDetails(detailsTable) {
         /** @type {Partial<Record<keyof (typeof this._totalCounts), string>>} */
         const targets = {
-            terms: 'Term Count',
-            termMeta: 'Term Meta Count',
-            kanji: 'Kanji Count',
-            kanjiMeta: 'Kanji Meta Count',
-            tagMeta: 'Tag Count',
-            media: 'Media Count',
+            terms: getI18nLabel('js_dictTermCount', 'Term Count'),
+            termMeta: getI18nLabel('js_dictTermMetaCount', 'Term Meta Count'),
+            kanji: getI18nLabel('js_dictKanjiCount', 'Kanji Count'),
+            kanjiMeta: getI18nLabel('js_dictKanjiMetaCount', 'Kanji Meta Count'),
+            tagMeta: getI18nLabel('js_dictTagCount', 'Tag Count'),
+            media: getI18nLabel('js_dictMediaCount', 'Media Count'),
         };
 
         const fragment = document.createDocumentFragment();
@@ -1158,7 +1176,7 @@ export class DictionaryController {
             let option = document.createElement('option');
             option.className = 'text-muted';
             option.value = '';
-            option.textContent = 'Not selected';
+            option.textContent = (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_notSelected')) || 'Not selected';
             fragment.appendChild(option);
 
             for (const {title, sequenced} of dictionaries) {
@@ -1186,7 +1204,22 @@ export class DictionaryController {
             const updateCount = (await Promise.all(updateChecks)).reduce((sum, value) => (sum + (value ? 1 : 0)), 0);
             if (this._checkUpdatesButton !== null) {
                 hasUpdates = !!updateCount;
-                this._checkUpdatesButton.textContent = hasUpdates ? `${updateCount} update${updateCount > 1 ? 's' : ''}` : 'No updates';
+                {
+                    let text = hasUpdates ? `${updateCount} update${updateCount > 1 ? 's' : ''}` : 'No updates';
+                    try {
+                        if (hasUpdates) {
+                            const key = updateCount > 1 ? 'js_updatesCountPlural' : 'js_updatesCount';
+                            const m = chrome.i18n.getMessage(key, [String(updateCount)]);
+                            if (m) { text = m; }
+                        } else {
+                            const m = chrome.i18n.getMessage('js_noUpdates');
+                            if (m) { text = m; }
+                        }
+                    } catch (e) {
+                        // NOP
+                    }
+                    this._checkUpdatesButton.textContent = text;
+                }
             }
         } finally {
             this._setButtonsEnabled(true);
@@ -1344,7 +1377,10 @@ export class DictionaryController {
             onProgress({processed: 0, count: 1, storeCount: 1, storesProcesed: 0});
 
             for (const progress of progressContainers) { progress.hidden = false; }
-            for (const label of infoLabels) { label.textContent = 'Deleting dictionary...'; }
+            {
+                const deleting = (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_deletingDictionary')) || 'Deleting dictionary...';
+                for (const label of infoLabels) { label.textContent = deleting; }
+            }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
 
             await this._deleteDictionaryInternal(dictionaryTitle, onProgress);

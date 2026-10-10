@@ -278,14 +278,16 @@ export class QueryParser extends EventDispatcher {
             option.value = parseResult.id;
             switch (parseResult.source) {
                 case 'scanning-parser':
-                    option.textContent = 'Scanning parser';
+                    option.textContent = (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_scanningParser')) || 'Scanning parser';
                     break;
                 case 'mecab':
                     option.textContent = `MeCab: ${parseResult.dictionary}`;
                     break;
-                default:
-                    option.textContent = `Unknown source: ${parseResult.source}`;
+                default: {
+                    const unknown = (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_unknownSource', [String(parseResult.source)])) || `Unknown source: ${parseResult.source}`;
+                    option.textContent = unknown;
                     break;
+                }
             }
             fragment.appendChild(option);
 

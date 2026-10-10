@@ -27,6 +27,7 @@ import {getRequiredPermissionsForAnkiFieldValue, hasPermissions, setPermissionsG
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
+import {localizeCardFormatName} from '../../language/i18n-util.js';
 
 export class AnkiController {
     /**
@@ -496,7 +497,19 @@ export class AnkiController {
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsContainer).hidden = true;
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsToggle).hidden = true;
         /** @type {HTMLElement} */ (this._ankiErrorInvalidResponseInfo).hidden = true;
-        ankiErrorMessageNode.textContent = (this._ankiConnect.enabled ? 'Connected' : 'Not enabled');
+        {
+            let connected = 'Connected';
+            let notEnabled = 'Not enabled';
+            try {
+                const c = chrome.i18n.getMessage('js_ankiConnected');
+                const n = chrome.i18n.getMessage('js_ankiNotEnabled');
+                if (c) { connected = c; }
+                if (n) { notEnabled = n; }
+            } catch (e) {
+                // NOP
+            }
+            ankiErrorMessageNode.textContent = (this._ankiConnect.enabled ? connected : notEnabled);
+        }
         ankiErrorMessageNode.classList.remove('danger-text');
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsNode).textContent = '';
         this._ankiError = null;
@@ -674,7 +687,7 @@ export class AnkiController {
 
         /** @type {HTMLElement} */
         const labelNode = querySelectorNotNull(content, '.tab-label');
-        labelNode.textContent = cardFormat.name;
+        labelNode.textContent = localizeCardFormatName(cardFormat.name);
 
         tabsContainer.appendChild(content);
 
@@ -737,7 +750,7 @@ export class AnkiController {
         const cardFormat = this._getCardFormat(cardFormatIndex);
         if (cardFormat === null) { return; }
 
-        /** @type {HTMLElement} */ (this._cardFormatRemoveName).textContent = cardFormat.name;
+        /** @type {HTMLElement} */ (this._cardFormatRemoveName).textContent = localizeCardFormatName(cardFormat.name);
         /** @type {import('./modal.js').Modal} */ (this._cardFormatRemoveModal).node.dataset.cardFormatIndex = `${cardFormatIndex}`;
         /** @type {import('./modal.js').Modal} */ (this._cardFormatRemoveModal).setVisible(true);
     }

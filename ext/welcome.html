@@ -24,35 +24,35 @@
 <div class="content-center">
     <span tabindex="-1" id="content-scroll-focus"></span>
 
-    <h1>Welcome to Yomitan!</h1>
+    <h1 data-i18n="ui_welcome_to_yomitan">Welcome to Yomitan!</h1>
 
-    <h2><strong>Recommended Permissions &#40;Important&#41;</strong></h2>
+    <h2><strong data-i18n="ui_recommended_permissions_important">Recommended Permissions (Important)</strong></h2>
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Enable recommended permissions</div>
-                <div class="settings-item-description">This will allow Yomitan to scan text from most sites.</div>
+                <div data-i18n="ui_enable_recommended_permissions" class="settings-item-label">Enable recommended permissions</div>
+                <div data-i18n="ui_this_will_allow_yomitan_to_scan_text_from_most_s" class="settings-item-description">This will allow Yomitan to scan text from most sites.</div>
             </div>
             <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" id="recommended-permissions-toggle" data-origin="&lt;all_urls&gt;"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                <label class="toggle"><input type="checkbox" id="recommended-permissions-toggle" data-origin="<all_urls>"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Enable optional permissions</div>
-                <div class="settings-item-description">This will allow Yomitan to read the clipboard and communicate with external programs.</div>
+                <div data-i18n="ui_enable_optional_permissions" class="settings-item-label">Enable optional permissions</div>
+                <div data-i18n="ui_this_will_allow_yomitan_to_read_the_clipboard_an" class="settings-item-description">This will allow Yomitan to read the clipboard and communicate with external programs.</div>
             </div>
             <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" id="optional-permissions-toggle" data-origin="&lt;all_urls&gt;"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                <label class="toggle"><input type="checkbox" id="optional-permissions-toggle" data-origin="<all_urls>"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-description" data-hide-for-browser="firefox firefox-mobile">Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a> and the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings page</a>.</div>
-                <div class="settings-item-description" data-show-for-browser="firefox firefox-mobile">Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a> and the web browser's extension settings page.</div>
-                <div class="danger-text margin-above" id="permissions-disabled" hidden><strong>Yomitan features will be limited if the recommended permissions are not enabled.</strong></div>
-                <div class="success-text margin-above" id="recommended-permissions-enabled" hidden><strong>Essential Yomitan features are available.</strong></div>
-                <div class="success-text margin-above" id="full-permissions-enabled" hidden><strong>All Yomitan features are available.</strong></div>
+                <div data-i18n-html="html_further_configuration_is_available_on_th" class="settings-item-description" data-hide-for-browser="firefox firefox-mobile">Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a> and the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings page</a>.</div>
+                <div data-i18n-html="html_further_configuration_is_available_on_th_2" class="settings-item-description" data-show-for-browser="firefox firefox-mobile">Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a> and the web browser's extension settings page.</div>
+                <div class="danger-text margin-above" id="permissions-disabled" hidden><strong data-i18n="ui_yomitan_features_will_be_limited_if_the_recommen">Yomitan features will be limited if the recommended permissions are not enabled.</strong></div>
+                <div class="success-text margin-above" id="recommended-permissions-enabled" hidden><strong data-i18n="ui_essential_yomitan_features_are_available">Essential Yomitan features are available.</strong></div>
+                <div class="success-text margin-above" id="full-permissions-enabled" hidden><strong data-i18n="ui_all_yomitan_features_are_available">All Yomitan features are available.</strong></div>
                 <div id="recommended-permissions-error" class="margin-above danger-text" hidden></div>
             </div>
         </div></div>
@@ -62,7 +62,7 @@
     <div class="settings-group settings-group-top-margin warn-custom-templates-notification">
       <div class="settings-item">
         <div class="settings-item-inner settings-item-inner-wrappable"><div class="settings-item-left"><div class="settings-item-label">
-              <p>
+              <p data-i18n-html="html_there_are_custom_anki_templates_in_your_">
                 There are custom Anki templates in your settings. Note that <a href="https://yomitan.wiki/yomichan-migration/#custom-templates" target="_blank" rel="noopener noreferrer">some syntax has changed from previous versions of Yomitan.</a>
                 Please ensure that your custom templates are using the updated syntax.
               </p>
@@ -71,14 +71,14 @@
     </div>
 
     <!-- Content -->
-    <h2><strong>Import Dictionaries &#40;Important&#41;</strong></h2>
+    <h2><strong data-i18n="ui_import_dictionaries_important">Import Dictionaries (Important)</strong></h2>
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
-                <div class="settings-item-label">
+                <div data-i18n="ui_language" class="settings-item-label">
                     Language
                 </div>
-                <div class="settings-item-description">
+                <div data-i18n="ui_language_of_the_text_that_is_being_looked_up" class="settings-item-description">
                     Language of the text that is being looked up.
                 </div>
             </div>
@@ -89,7 +89,7 @@
         <div class="settings-item">
             <div class="settings-item settings-item-button" data-modal-action="show,recommended-dictionaries"><div class="settings-item-inner">
                 <div class="settings-item-left">
-                    <div class="settings-item-label">Get recommended dictionaries&hellip;</div>
+                    <div data-i18n="ui_get_recommended_dictionaries" class="settings-item-label">Get recommended dictionaries…</div>
                 </div>
                 <div class="settings-item-right open-panel-button-container">
                     <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -99,7 +99,7 @@
         <div class="settings-item">
             <div class="settings-item settings-item-button" data-modal-action="show,dictionaries"><div class="settings-item-inner">
                 <div class="settings-item-left">
-                    <div class="settings-item-label">Configure Installed and enabled dictionaries&hellip;</div>
+                    <div data-i18n="ui_configure_installed_and_enabled_dictionaries_2" class="settings-item-label">Configure Installed and enabled dictionaries…</div>
                 </div>
                 <div class="settings-item-right open-panel-button-container">
                     <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -109,15 +109,15 @@
     </div>
 
     <!-- Data Transmission -->
-    <h2><strong>Data Transmission</strong></h2>
+    <h2><strong data-i18n="ui_data_transmission">Data Transmission</strong></h2>
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Enable audio playback for terms</div>
-                <div class="settings-item-description">Show a clickable speaker icon next to search results.</div>
+                <div data-i18n="ui_enable_audio_playback_for_terms" class="settings-item-label">Enable audio playback for terms</div>
+                <div data-i18n="ui_show_a_clickable_speaker_icon_next_to_search_res" class="settings-item-description">Show a clickable speaker icon next to search results.</div>
                 <div class="settings-item-description">
-                    This option may send term, reading, and/or language outside of Yomitan to fetch audio when the speaker icon is clicked. Personally identifying information is never sent<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.
-                    <div data-show-for-browser="firefox firefox-mobile">Disabling this option will disallow pronunciation audio playback for any terms searched.</div>
+                    <span data-i18n-html="html_audio_option_may_send_welcome">This option may send term, reading, and/or language outside of Yomitan to fetch audio when the speaker icon is clicked. Personally identifying information is never sent<span data-show-for-browser="firefox firefox-mobile"> (<a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/privacy/">Privacy Policy</a>)</span>.</span>
+                    <div data-i18n="ui_disabling_this_option_will_disallow_pronunciatio" data-show-for-browser="firefox firefox-mobile">Disabling this option will disallow pronunciation audio playback for any terms searched.</div>
                 </div>
             </div>
             <div class="settings-item-right">
@@ -126,11 +126,11 @@
         </div></div>
     </div>
 
-    <h2>Here are some basics to get started</h2>
+    <h2 data-i18n="ui_here_are_some_basics_to_get_started">Here are some basics to get started</h2>
     <div class="settings-group">
         <a href="https://yomitan.wiki/" rel="noopener noreferrer" class="settings-item settings-item-button"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label outer-link"><strong>New to Yomitan? Head to Yomitan Wiki!</strong></div>
+                <div class="settings-item-label outer-link"><strong data-i18n="ui_new_to_yomitan_head_to_yomitan_wiki">New to Yomitan? Head to Yomitan Wiki!</strong></div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -138,7 +138,7 @@
         </div></a>
         <a href="/quick-start-guide.html" rel="noopener" class="settings-item settings-item-button"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Yomitan Quick Start Guide</div>
+                <div data-i18n="ui_yomitan_quick_start_guide" class="settings-item-label">Yomitan Quick Start Guide</div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -146,11 +146,11 @@
         </div></a>
     </div>
 
-    <h2>Basic customization</h2>
+    <h2 data-i18n="ui_basic_customization">Basic customization</h2>
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Show this welcome guide on browser startup</div>
+                <div data-i18n="ui_show_this_welcome_guide_on_browser_startup" class="settings-item-label">Show this welcome guide on browser startup</div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="general.showGuide"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -159,8 +159,8 @@
         <div class="settings-item">
             <div class="settings-item-inner settings-item-inner-wrappable">
                 <div class="settings-item-left">
-                    <div class="settings-item-label">Scan modifier key</div>
-                    <div class="settings-item-description">Hold a key while moving the cursor to scan text.</div>
+                    <div data-i18n="ui_scan_modifier_key" class="settings-item-label">Scan modifier key</div>
+                    <div data-i18n="ui_hold_a_key_while_moving_the_cursor_to_scan_text" class="settings-item-description">Hold a key while moving the cursor to scan text.</div>
                 </div>
                 <div class="settings-item-right">
                     <select id="main-scan-modifier-key"></select>
@@ -169,8 +169,8 @@
         </div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Scan using middle mouse button</div>
-                <div class="settings-item-description">Hold the middle mouse button while moving the cursor to scan text.</div>
+                <div data-i18n="ui_scan_using_middle_mouse_button" class="settings-item-label">Scan using middle mouse button</div>
+                <div data-i18n="ui_hold_the_middle_mouse_button_while_moving_the_cu" class="settings-item-description">Hold the middle mouse button while moving the cursor to scan text.</div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" id="middle-mouse-button-scan"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -178,21 +178,21 @@
         </div></div>
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
-                <div class="settings-item-label">Theme</div>
-                <div class="settings-item-description">Adjust the style of Yomitan.</div>
+                <div data-i18n="ui_theme" class="settings-item-label">Theme</div>
+                <div data-i18n="ui_adjust_the_style_of_yomitan" class="settings-item-description">Adjust the style of Yomitan.</div>
             </div>
             <div class="settings-item-right">
                 <select data-setting="general.popupTheme" class="short-width">
-                    <option value="site">Auto</option>
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                    <option value="browser">Browser</option>
+                    <option data-i18n="ui_auto" value="site">Auto</option>
+                    <option data-i18n="ui_light" value="light">Light</option>
+                    <option data-i18n="ui_dark" value="dark">Dark</option>
+                    <option data-i18n="ui_browser" value="browser">Browser</option>
                 </select>
             </div>
         </div></div>
         <a href="/settings.html" rel="noopener" class="settings-item settings-item-button"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">More customization options are available on the Settings page</div>
+                <div data-i18n="ui_more_customization_options_are_available_on_the_" class="settings-item-label">More customization options are available on the Settings page</div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -210,7 +210,7 @@
 <!-- Auxiliary content -->
 <div class="status-footer-container" hidden><div class="status-footer-container2">
     <div class="status-footer">
-        <div class="status-footer-header"><div class="status-footer-header-label">Tasks in progress:</div><a tabindex="0" class="status-footer-header-close">Close</a></div>
+        <div class="status-footer-header"><div data-i18n="ui_tasks_in_progress" class="status-footer-header-label">Tasks in progress:</div><a data-i18n="ui_close" tabindex="0" class="status-footer-header-close">Close</a></div>
         <div class="status-footer-item dictionary-delete-progress" hidden>
             <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
             <div class="progress-bar-track"><div class="progress-bar danger"></div></div>
