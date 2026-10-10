@@ -65,6 +65,14 @@ export type FindTermsOptions = {
      */
     deinflect: boolean;
     /**
+     * Whether or not masked lookup should be performed.
+     */
+    enableFusejiLookup: boolean;
+    /**
+     * The set of characters which should be treated as gap markers in masked lookup.
+     */
+    fusejiTriggers?: string;
+    /**
      * The reading which will be sorted to the top of the results, if provided as a query parameter.
      */
     primaryReading: string;

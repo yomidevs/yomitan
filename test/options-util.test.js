@@ -106,6 +106,8 @@ function createProfileOptionsTestData1() {
             convertHiraganaToKatakana: 'false',
             convertKatakanaToHiragana: 'variant',
             collapseEmphaticSequences: 'false',
+            enableFusejiLookup: false,
+            fusejiTriggers: '◯○〇●',
         },
         dictionaries: {
             'Test Dictionary 1': {
@@ -467,6 +469,8 @@ function createProfileOptionsUpdatedTestData1() {
         },
         translation: {
             searchResolution: 'letter',
+            enableFusejiLookup: false,
+            fusejiTriggers: '◯○〇●',
             textReplacements: {
                 searchOriginal: true,
                 groups: [],
@@ -707,7 +711,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 77,
+        version: 78,
         global: {
             database: {
                 prefixWildcardsSupported: false,
