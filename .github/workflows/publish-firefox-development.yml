@@ -94,7 +94,7 @@ jobs:
           git commit -a -m "${{ github.ref_name }}"
 
       - name: Push changes
-        uses: ad-m/github-push-action@d91a481090679876dfc4178fef17f286781251df # pin@master
+        uses: ad-m/github-push-action@881a6320fdb16eb5318c5054f31c218aec2b324c # pin@master
         with:
           branch: metadata
 
