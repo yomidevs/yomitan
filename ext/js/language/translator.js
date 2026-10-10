@@ -18,6 +18,7 @@
 
 import {safePerformance} from '../core/safe-performance.js';
 import {applyTextReplacement} from '../general/regex-util.js';
+import {getGrammarWildcardBoundaryPositions, matchesGrammarWildcard} from './grammar-wildcard.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {isCodePointKorean} from './ko/korean.js';
 import {LanguageTransformer} from './language-transformer.js';
@@ -264,18 +265,16 @@ export class Translator {
         let originalTextLength = 0;
         /** @type {import('translation-internal').TermDictionaryEntry[]} */
         const dictionaryEntries = [];
-        const ids = new Set();
+        /** @type {Map<number, number>} */
+        const entryIndices = new Map();
         for (const {databaseEntries, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates} of deinflections) {
             if (databaseEntries.length === 0) { continue; }
             originalTextLength = Math.max(originalTextLength, originalText.length);
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
-                if (ids.has(id)) {
-                    const existingEntryInfo = this._findExistingEntry(dictionaryEntries, id);
-                    if (!existingEntryInfo) {
-                        continue;
-                    }
-                    const {existingEntry, existingIndex} = existingEntryInfo;
+                const existingIndex = entryIndices.get(id);
+                if (typeof existingIndex !== 'undefined') {
+                    const existingEntry = dictionaryEntries[existingIndex];
 
                     const existingTransformedText = existingEntry.headwords[0].sources[0].transformedText;
                     const existingTransformedLength = existingTransformedText.length;
@@ -284,7 +283,7 @@ export class Translator {
                     }
                     if (transformedText.length > existingTransformedLength) {
                         if (originalText !== existingTransformedText) {
-                            dictionaryEntries.splice(existingIndex, 1, this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading));
+                            dictionaryEntries[existingIndex] = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading);
                         }
                     } else {
                         this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
@@ -292,30 +291,12 @@ export class Translator {
                     }
                 } else {
                     const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading);
+                    entryIndices.set(id, dictionaryEntries.length);
                     dictionaryEntries.push(dictionaryEntry);
-                    ids.add(id);
                 }
             }
         }
         return {dictionaryEntries, originalTextLength};
-    }
-
-    /**
-     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
-     * @param {number} id
-     * @returns {{existingEntry: import('translation-internal').TermDictionaryEntry, existingIndex: number} | null}
-     */
-    _findExistingEntry(dictionaryEntries, id) {
-        let existingIndex = null;
-        let existingEntry = null;
-        for (const [index, entry] of dictionaryEntries.entries()) {
-            if (entry.definitions.some((definition) => definition.id === id)) {
-                existingIndex = index;
-                existingEntry = entry;
-                return {existingEntry, existingIndex};
-            }
-        }
-        return null;
     }
 
     /**
@@ -401,8 +382,14 @@ export class Translator {
 
         await this._addEntriesToDeinflections(language, deinflections, enabledDictionaryMap, matchType);
 
+        if (options.enableGrammarWildcards && language === 'ja' && matchType === 'exact') {
+            // Repeated endings across many rows can exceed the function argument limit.
+            const grammarDeinflections = await this._getGrammarWildcardDeinflections(deinflections, options);
+            for (const deinflection of grammarDeinflections) { deinflections.push(deinflection); }
+        }
+
         const dictionaryDeinflections = await this._getDictionaryDeinflections(language, deinflections, enabledDictionaryMap, matchType);
-        deinflections.push(...dictionaryDeinflections);
+        for (const deinflection of dictionaryDeinflections) { deinflections.push(deinflection); }
 
         for (const deinflection of deinflections) {
             for (const entry of deinflection.databaseEntries) {
@@ -415,6 +402,77 @@ export class Translator {
         safePerformance.mark('translator:getDeinflections:end');
         safePerformance.measure('translator:getDeinflections', 'translator:getDeinflections:start', 'translator:getDeinflections:end');
         return deinflections;
+    }
+
+    /**
+     * Searches existing dictionary patterns without generating deinflection variants.
+     * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
+     * @param {import('translation').FindTermsOptions} options
+     * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
+     */
+    async _getGrammarWildcardDeinflections(deinflections, {language, enabledDictionaryMap}) {
+        if (enabledDictionaryMap.size === 0) { return []; }
+        const groups = this._groupDeinflectionsByTerm(deinflections);
+        /** @type {Set<string>} */
+        const prefixes = new Set();
+        for (const text of groups.keys()) {
+            let prefix = '';
+            for (const character of text) {
+                prefix += character;
+                // A pattern needs at least one gap character and a literal suffix.
+                if (text.length - prefix.length < 2) { break; }
+                prefixes.add(`${prefix}～`);
+            }
+        }
+        if (prefixes.size === 0) { return []; }
+        const entries = await this._database.findTermsBulk([...prefixes], enabledDictionaryMap, 'prefix');
+        /** @type {Map<string, number[]>} */
+        const boundaryPositions = new Map();
+        /**
+         * @param {string} text
+         * @returns {number[]}
+         */
+        const getBoundaries = (text) => {
+            let positions = boundaryPositions.get(text);
+            if (typeof positions === 'undefined') {
+                positions = getGrammarWildcardBoundaryPositions(text);
+                boundaryPositions.set(text, positions);
+            }
+            return positions;
+        };
+        /** @type {import('translation-internal').DatabaseDeinflection[]} */
+        const results = [];
+        for (const entry of entries) {
+            const {partsOfSpeechFilter} = /** @type {import('translation').FindTermDictionary} */ (enabledDictionaryMap.get(entry.dictionary));
+            const definitionConditions = this._multiLanguageTransformer.getConditionFlagsFromPartsOfSpeech(language, entry.rules);
+            const termParts = entry.term.split('～');
+            const readingParts = entry.reading.split('～');
+            for (const [text, sources] of groups) {
+                const positions = getBoundaries(text);
+                const termMatches = matchesGrammarWildcard(text, termParts, positions);
+                if (!termMatches && !matchesGrammarWildcard(text, readingParts, positions)) { continue; }
+                const pattern = termMatches ? entry.term : entry.reading;
+                for (const source of sources) {
+                    if (partsOfSpeechFilter && !LanguageTransformer.conditionsMatch(source.conditions, definitionConditions)) { continue; }
+                    // Replacements must not erase a boundary and join unrelated statements.
+                    if (source.originalText !== text) {
+                        const originalPositions = getBoundaries(source.originalText);
+                        if (originalPositions.length > 0 && !matchesGrammarWildcard(source.originalText, termMatches ? termParts : readingParts, originalPositions)) { continue; }
+                    }
+                    const result = this._createDeinflection(
+                        source.originalText,
+                        source.transformedText,
+                        pattern,
+                        source.conditions,
+                        source.textProcessorRuleChainCandidates,
+                        source.inflectionRuleChainCandidates,
+                    );
+                    result.databaseEntries.push({...entry, matchType: 'exact', matchSource: termMatches ? 'term' : 'reading'});
+                    results.push(result);
+                }
+            }
+        }
+        return results;
     }
 
     /**
