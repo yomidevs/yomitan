@@ -369,6 +369,37 @@ export function compareRevisions(current, latest) {
     return false;
 }
 
+/**
+ * @param {import('dictionary').DictionaryEntry} dictionaryEntry
+ * @returns {import('dictionary-data-util').PrimaryHeadword}
+ */
+export function getPrimaryHeadword(dictionaryEntry) {
+    const {type} = dictionaryEntry;
+    if (type === 'kanji') {
+        const {character} = dictionaryEntry;
+        return {type, character};
+    }
+
+    const {headwords} = dictionaryEntry;
+    let bestIndex = -1;
+    for (let i = 0, ii = headwords.length; i < ii; ++i) {
+        const {term, reading, sources} = headwords[i];
+        for (const {deinflectedText} of sources) {
+            if (term === deinflectedText) {
+                bestIndex = i;
+                i = ii;
+                break;
+            } else if (reading === deinflectedText && bestIndex < 0) {
+                bestIndex = i;
+                break;
+            }
+        }
+    }
+
+    const {term, reading} = headwords[Math.max(0, bestIndex)];
+    return {type, term, reading};
+}
+
 // Private
 
 /**

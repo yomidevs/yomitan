@@ -18,6 +18,7 @@
 
 import {ExtensionError} from '../core/extension-error.js';
 import {deferPromise, sanitizeCSS} from '../core/utilities.js';
+import {getPrimaryHeadword} from '../dictionary/dictionary-data-util.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana} from '../language/ja/japanese.js';
 import {cloneFieldMarkerPattern, getRootDeckName} from './anki-util.js';
 
@@ -149,37 +150,6 @@ export class AnkiNoteBuilder {
     }) {
         const commonData = this._createData(dictionaryEntry, cardFormat, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0, dictionaryStylesMap);
         return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
-    }
-
-    /**
-     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
-     * @returns {import('api').InjectAnkiNoteMediaDefinitionDetails}
-     */
-    getDictionaryEntryDetailsForNote(dictionaryEntry) {
-        const {type} = dictionaryEntry;
-        if (type === 'kanji') {
-            const {character} = dictionaryEntry;
-            return {type, character};
-        }
-
-        const {headwords} = dictionaryEntry;
-        let bestIndex = -1;
-        for (let i = 0, ii = headwords.length; i < ii; ++i) {
-            const {term, reading, sources} = headwords[i];
-            for (const {deinflectedText} of sources) {
-                if (term === deinflectedText) {
-                    bestIndex = i;
-                    i = ii;
-                    break;
-                } else if (reading === deinflectedText && bestIndex < 0) {
-                    bestIndex = i;
-                    break;
-                }
-            }
-        }
-
-        const {term, reading} = headwords[Math.max(0, bestIndex)];
-        return {type, term, reading};
     }
 
     /**
@@ -428,7 +398,7 @@ export class AnkiNoteBuilder {
         }
 
         // Generate request data
-        const dictionaryEntryDetails = this.getDictionaryEntryDetailsForNote(dictionaryEntry);
+        const dictionaryEntryDetails = getPrimaryHeadword(dictionaryEntry);
         /** @type {?import('api').InjectAnkiNoteMediaAudioDetails} */
         let audioDetails = null;
         /** @type {?import('api').InjectAnkiNoteMediaScreenshotDetails} */

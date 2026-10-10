@@ -125,6 +125,10 @@ export function hasRequiredPermissionsForOptions(permissions, options) {
         return false;
     }
 
+    if (!permissionsSet.has('cookies') && options.bunpro.enable) {
+        return false;
+    }
+
     if (!permissionsSet.has('clipboardRead')) {
         if (options.clipboard.enableBackgroundMonitor || options.clipboard.enableSearchPageMonitor) {
             return false;

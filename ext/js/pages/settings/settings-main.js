@@ -25,6 +25,7 @@ import {AnkiDeckGeneratorController} from './anki-deck-generator-controller.js';
 import {AnkiTemplatesController} from './anki-templates-controller.js';
 import {AudioController} from './audio-controller.js';
 import {BackupController} from './backup-controller.js';
+import {BunproController} from './bunpro-controller.js';
 import {CollapsibleDictionaryController} from './collapsible-dictionary-controller.js';
 import {DictionaryController} from './dictionary-controller.js';
 import {DictionaryImportController} from './dictionary-import-controller.js';
@@ -133,6 +134,9 @@ await Application.main(true, async (application) => {
 
     const ankiTemplatesController = new AnkiTemplatesController(application, settingsController, modalController, ankiController);
     preparePromises.push(ankiTemplatesController.prepare());
+
+    const bunproController = new BunproController(settingsController);
+    preparePromises.push(bunproController.prepare());
 
     const scanInputsController = new ScanInputsController(settingsController);
     preparePromises.push(scanInputsController.prepare());

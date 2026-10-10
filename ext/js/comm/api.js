@@ -443,6 +443,51 @@ export class API {
         return this._invoke('fetchLocalAudioData', {url});
     }
 
+    /**
+     * @returns {Promise<import('api').ApiReturn<'getBunproStatus'>>}
+     */
+    getBunproStatus() {
+        return this._invoke('getBunproStatus', void 0);
+    }
+
+    /**
+     * @returns {Promise<import('api').ApiReturn<'saveBunproBrowserLogin'>>}
+     */
+    saveBunproBrowserLogin() {
+        return this._invoke('saveBunproBrowserLogin', void 0);
+    }
+
+    /**
+     * @param {import('api').ApiParam<'saveBunproToken', 'token'>} token
+     * @returns {Promise<import('api').ApiReturn<'saveBunproToken'>>}
+     */
+    saveBunproToken(token) {
+        return this._invoke('saveBunproToken', {token});
+    }
+
+    /**
+     * @returns {Promise<import('api').ApiReturn<'clearBunproToken'>>}
+     */
+    clearBunproToken() {
+        return this._invoke('clearBunproToken', void 0);
+    }
+
+    /**
+     * @param {import('api').ApiParam<'findBunproMatches', 'queries'>} queries
+     * @returns {Promise<import('api').ApiReturn<'findBunproMatches'>>}
+     */
+    findBunproMatches(queries) {
+        return this._invoke('findBunproMatches', {queries});
+    }
+
+    /**
+     * @param {import('api').ApiParam<'addToBunpro', 'match'>} match
+     * @returns {Promise<import('api').ApiReturn<'addToBunpro'>>}
+     */
+    addToBunpro(match) {
+        return this._invoke('addToBunpro', {match});
+    }
+
     // Utilities
 
     /**

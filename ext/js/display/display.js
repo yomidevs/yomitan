@@ -1256,6 +1256,7 @@ export class Display extends EventDispatcher {
     _updateDocumentOptions(options) {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
+        data.bunproEnabled = `${options.bunpro.enable}`;
         data.language = options.general.language;
         data.resultOutputMode = `${options.general.resultOutputMode}`;
         data.glossaryLayoutMode = `${options.general.glossaryLayoutMode}`;
