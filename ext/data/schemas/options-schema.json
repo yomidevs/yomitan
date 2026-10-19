@@ -71,6 +71,7 @@
                             "dictionaries",
                             "parsing",
                             "anki",
+                            "bunpro",
                             "sentenceParsing",
                             "inputs",
                             "clipboard",
@@ -1370,6 +1371,18 @@
                                         "type": "integer",
                                         "default": 1000,
                                         "minimum": 0
+                                    }
+                                }
+                            },
+                            "bunpro": {
+                                "type": "object",
+                                "required": [
+                                    "enable"
+                                ],
+                                "properties": {
+                                    "enable": {
+                                        "type": "boolean",
+                                        "default": false
                                     }
                                 }
                             },

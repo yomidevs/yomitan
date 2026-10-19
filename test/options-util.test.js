@@ -614,6 +614,9 @@ function createProfileOptionsUpdatedTestData1() {
             autoSearchContent: true,
             maximumSearchLength: 1000,
         },
+        bunpro: {
+            enable: false,
+        },
         accessibility: {
             forceGoogleDocsHtmlRendering: false,
         },
@@ -707,7 +710,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 77,
+        version: 78,
         global: {
             database: {
                 prefixWildcardsSupported: false,
@@ -741,6 +744,19 @@ describe('OptionsUtil', () => {
         const optionsUpdated = structuredClone(await optionsUtil.update(options));
         const optionsExpected = createOptionsUpdatedTestData1();
         expect(optionsUpdated).toStrictEqual(optionsExpected);
+    });
+
+    test('Version 78 adds bunpro.enable to every profile', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = /** @type {import('core').SafeAny} */ (createOptionsUpdatedTestData1());
+        options.version = 77;
+        delete options.profiles[0].options.bunpro;
+        const optionsUpdated = structuredClone(await optionsUtil.update(options));
+
+        expect(optionsUpdated.version).toStrictEqual(78);
+        expect(optionsUpdated.profiles[0].options.bunpro).toStrictEqual({enable: false});
     });
 
     test('CumulativeFieldTemplatesUpdates', async () => {

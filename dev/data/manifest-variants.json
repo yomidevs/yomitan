@@ -73,7 +73,8 @@
         ],
         "optional_permissions": [
             "clipboardRead",
-            "nativeMessaging"
+            "nativeMessaging",
+            "cookies"
         ],
         "host_permissions": [
             "<all_urls>"
