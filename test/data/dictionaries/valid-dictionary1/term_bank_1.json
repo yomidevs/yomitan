@@ -352,5 +352,10 @@
     ["oppidum", "", "n", "n2s", 5, ["oppidum definition - town"], 26, ""],
     ["oppido", "oppidō", "adv", "adv", 5, ["oppido definition - very"], 27, ""],
     ["oppido", "", "", "", 1, [["oppidum", ["ablative"]]], 28, ""],
-    ["oppidorum", "", "", "", 1, [["oppidum", ["genitive plural"]]], 29, ""]
+    ["oppidorum", "", "", "", 1, [["oppidum", ["genitive plural"]]], 29, ""],
+    ["マ", "マ", "n", "n", 1, ["ma definition"], 200, ""],
+    ["マギ", "マギ", "n", "n", 1, ["magi definition"], 202, ""],
+    ["マキマ", "マキマ", "n", "n", 1, ["makima definition"], 203, ""],
+    ["マクドナルド", "マクドナルド", "n", "n", 1, ["makudonarudo definition"], 201, ""],
+    ["まくどなるど", "まくどなるど", "n", "n", 1, ["makudonarudo hiragana definition"], 204, ""]
 ]

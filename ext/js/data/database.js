@@ -217,6 +217,33 @@ export class Database {
     }
 
     /**
+     * Collects the primary keys whose index key satisfies `keyPredicate`. Reads only index keys (no record
+     * values), so it is cheaper than {@link Database.getAll} when most of the range is discarded.
+     * @param {IDBObjectStore|IDBIndex} objectStoreOrIndex
+     * @param {?IDBValidKey|IDBKeyRange} query
+     * @param {(key: IDBValidKey) => boolean} keyPredicate
+     * @param {(primaryKeys: IDBValidKey[]) => void} onSuccess
+     * @param {(reason?: unknown) => void} onError
+     */
+    getPrimaryKeysWhere(objectStoreOrIndex, query, keyPredicate, onSuccess, onError) {
+        /** @type {IDBValidKey[]} */
+        const results = [];
+        const request = objectStoreOrIndex.openKeyCursor(query, 'next');
+        request.onerror = (e) => onError(/** @type {IDBRequest<?IDBCursor>} */ (e.target).error);
+        request.onsuccess = (e) => {
+            const cursor = /** @type {IDBRequest<?IDBCursor>} */ (e.target).result;
+            if (cursor) {
+                if (keyPredicate(cursor.key)) {
+                    results.push(cursor.primaryKey);
+                }
+                cursor.continue();
+            } else {
+                onSuccess(results);
+            }
+        };
+    }
+
+    /**
      * @template [TPredicateArg=unknown]
      * @template [TResult=unknown]
      * @template [TResultDefault=unknown]

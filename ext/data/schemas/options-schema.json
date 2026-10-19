@@ -855,7 +855,9 @@
                                 "type": "object",
                                 "required": [
                                     "textReplacements",
-                                    "searchResolution"
+                                    "searchResolution",
+                                    "enableFusejiLookup",
+                                    "fusejiTriggers"
                                 ],
                                 "properties": {
                                     "searchResolution": {
@@ -865,6 +867,14 @@
                                             "word"
                                         ],
                                         "default": "letter"
+                                    },
+                                    "enableFusejiLookup": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "fusejiTriggers": {
+                                        "type": "string",
+                                        "default": "◯○〇●"
                                     },
                                     "textReplacements": {
                                         "type": "object",
