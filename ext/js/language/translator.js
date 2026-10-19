@@ -17,6 +17,8 @@
  */
 
 import {safePerformance} from '../core/safe-performance.js';
+import {getFrequencyHarmonic} from '../data/anki-note-data-creator.js';
+import {SORT_FREQUENCY_DICTIONARY_AVERAGE} from '../data/sort-frequency-dictionary.js';
 import {applyTextReplacement} from '../general/regex-util.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {isCodePointKorean} from './ko/korean.js';
@@ -105,7 +107,10 @@ export class Translator {
             this._removeExcludedDefinitions(dictionaryEntries, excludeDictionaryDefinitions);
         }
 
-        if (mode !== 'simple' || useAllFrequencyDictionaries) {
+        const sortByAverageFrequency = sortFrequencyDictionary === SORT_FREQUENCY_DICTIONARY_AVERAGE;
+
+        if (mode !== 'simple' || useAllFrequencyDictionaries || sortByAverageFrequency) {
+            // Sorting by the average frequency requires the metadata of every enabled frequency dictionary
             await this._addTermMeta(dictionaryEntries, enabledDictionaryMap, tagAggregator);
             await this._expandTagGroupsAndGroup(tagAggregator.getTagExpansionTargets());
         } else {
@@ -120,7 +125,9 @@ export class Translator {
             }
         }
 
-        if (sortFrequencyDictionary !== null) {
+        if (sortByAverageFrequency) {
+            this._updateSortFrequenciesHarmonic(dictionaryEntries, sortFrequencyDictionaryOrder === 'ascending');
+        } else if (sortFrequencyDictionary !== null) {
             this._updateSortFrequencies(dictionaryEntries, sortFrequencyDictionary, sortFrequencyDictionaryOrder === 'ascending');
         }
         if (dictionaryEntries.length > 1) {
@@ -2375,6 +2382,52 @@ export class Translator {
             }
             frequencyMap.clear();
         }
+    }
+
+    /**
+     * Assigns `frequencyOrder` based on the harmonic average frequency across all frequency
+     * dictionaries. The harmonic value used here is identical to the "Average" value shown in the
+     * frequency display (see `getFrequencyHarmonic`), so sorting matches what the user sees.
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
+     * @param {boolean} ascending
+     */
+    _updateSortFrequenciesHarmonic(dictionaryEntries, ascending) {
+        for (const dictionaryEntry of dictionaryEntries) {
+            const {definitions, headwords} = dictionaryEntry;
+            // Frequencies must be grouped by dictionary (as they are for display) so the harmonic
+            // average counts at most one value per dictionary.
+            this._sortTermDictionaryEntrySimpleData(dictionaryEntry.frequencies);
+
+            const headwordIndices = [];
+            for (let i = 0, ii = headwords.length; i < ii; ++i) { headwordIndices.push(i); }
+            dictionaryEntry.frequencyOrder = this._getHarmonicFrequencyOrder(dictionaryEntry, headwordIndices, ascending);
+
+            for (const definition of definitions) {
+                definition.frequencyOrder = this._getHarmonicFrequencyOrder(dictionaryEntry, definition.headwordIndices, ascending);
+            }
+        }
+    }
+
+    /**
+     * @param {import('translation-internal').TermDictionaryEntry} dictionaryEntry
+     * @param {number[]} headwordIndices
+     * @param {boolean} ascending
+     * @returns {number}
+     */
+    _getHarmonicFrequencyOrder(dictionaryEntry, headwordIndices, ascending) {
+        let frequencyMin = Number.MAX_SAFE_INTEGER;
+        let frequencyMax = Number.MIN_SAFE_INTEGER;
+        for (const headwordIndex of headwordIndices) {
+            const frequency = getFrequencyHarmonic(dictionaryEntry, headwordIndex, null);
+            if (frequency < 0) { continue; }
+            frequencyMin = Math.min(frequencyMin, frequency);
+            frequencyMax = Math.max(frequencyMax, frequency);
+        }
+        return (
+            frequencyMin <= frequencyMax ?
+                (ascending ? frequencyMin : -frequencyMax) :
+                (ascending ? Number.MAX_SAFE_INTEGER : 0)
+        );
     }
 
     /**
