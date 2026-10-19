@@ -20,13 +20,15 @@ import {vi} from 'vitest';
  *
  */
 export function setupStubs() {
+    vi.stubGlobal('yomitanRequireOpfs', false);
     vi.stubGlobal('self', {
         constructor: {
             name: 'Window',
         },
     });
 
-    // eslint-disable-next-line jsdoc/require-jsdoc
+
+    /** @returns {{addEventListener: () => void, terminate: () => void}} */
     function Worker() {
         return {
             addEventListener: () => {},
