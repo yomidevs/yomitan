@@ -109,31 +109,6 @@ export class BackupController {
 
     /**
      * @param {Date} date
-     * @param {string} dateSeparator
-     * @param {string} dateTimeSeparator
-     * @param {string} timeSeparator
-     * @param {number} resolution
-     * @returns {string}
-     */
-    _getSettingsExportDateString(date, dateSeparator, dateTimeSeparator, timeSeparator, resolution) {
-        const values = [
-            date.getUTCFullYear().toString(),
-            dateSeparator,
-            (date.getUTCMonth() + 1).toString().padStart(2, '0'),
-            dateSeparator,
-            date.getUTCDate().toString().padStart(2, '0'),
-            dateTimeSeparator,
-            date.getUTCHours().toString().padStart(2, '0'),
-            timeSeparator,
-            date.getUTCMinutes().toString().padStart(2, '0'),
-            timeSeparator,
-            date.getUTCSeconds().toString().padStart(2, '0'),
-        ];
-        return values.slice(0, resolution * 2 - 1).join('');
-    }
-
-    /**
-     * @param {Date} date
      * @returns {Promise<import('backup-controller').BackupData>}
      */
     async _getSettingsExportData(date) {
@@ -151,7 +126,7 @@ export class BackupController {
 
         return {
             version: this._currentVersion,
-            date: this._getSettingsExportDateString(date, '-', ' ', ':', 6),
+            date: getSettingsExportDateString(date, '-', ' ', ':', 6),
             url: chrome.runtime.getURL('/'),
             manifest: chrome.runtime.getManifest(),
             environment,
@@ -214,22 +189,9 @@ export class BackupController {
         }
         this._settingsExportToken = null;
 
-        const fileName = `yomitan-settings-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
+        const fileName = `yomitan-settings-${getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
         const blob = new Blob([JSON.stringify(data, null, 4)], {type: 'application/json'});
         this._saveBlob(blob, fileName);
-    }
-
-    /**
-     * @param {File} file
-     * @returns {Promise<ArrayBuffer>}
-     */
-    _readFileArrayBuffer(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(/** @type {ArrayBuffer} */ (reader.result));
-            reader.onerror = () => reject(reader.error);
-            reader.readAsArrayBuffer(file);
-        });
     }
 
     // Importing
@@ -404,7 +366,7 @@ export class BackupController {
     async _importSettingsFile(file) {
         if (this._optionsUtil === null) { throw new Error('OptionsUtil invalid'); }
 
-        const dataString = arrayBufferUtf8Decode(await this._readFileArrayBuffer(file));
+        const dataString = arrayBufferUtf8Decode(await readFileArrayBuffer(file));
         /** @type {import('backup-controller').BackupData} */
         const data = parseJson(dataString);
 
@@ -598,7 +560,7 @@ export class BackupController {
             /** @type {import('core').TokenObject} */
             const token = {};
             this._settingsExportDatabaseToken = token;
-            const fileName = `yomitan-dictionaries-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
+            const fileName = `yomitan-dictionaries-${getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
             const data = await this._exportDatabase(this._dictionariesDatabaseName);
             const blob = new Blob([data], {type: 'application/json'});
             this._saveBlob(blob, fileName);
@@ -691,4 +653,42 @@ export class BackupController {
             this._settingsExportDatabaseToken = null;
         }
     }
+}
+
+/**
+ * @param {Date} date
+ * @param {string} dateSeparator
+ * @param {string} dateTimeSeparator
+ * @param {string} timeSeparator
+ * @param {number} resolution
+ * @returns {string}
+ */
+export function getSettingsExportDateString(date, dateSeparator, dateTimeSeparator, timeSeparator, resolution) {
+    const values = [
+        date.getUTCFullYear().toString(),
+        dateSeparator,
+        (date.getUTCMonth() + 1).toString().padStart(2, '0'),
+        dateSeparator,
+        date.getUTCDate().toString().padStart(2, '0'),
+        dateTimeSeparator,
+        date.getUTCHours().toString().padStart(2, '0'),
+        timeSeparator,
+        date.getUTCMinutes().toString().padStart(2, '0'),
+        timeSeparator,
+        date.getUTCSeconds().toString().padStart(2, '0'),
+    ];
+    return values.slice(0, resolution * 2 - 1).join('');
+}
+
+/**
+ * @param {File} file
+ * @returns {Promise<ArrayBuffer>}
+ */
+export function readFileArrayBuffer(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(/** @type {ArrayBuffer} */ (reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsArrayBuffer(file);
+    });
 }
