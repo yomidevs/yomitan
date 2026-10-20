@@ -19,6 +19,7 @@ import {afterAll, describe, expect, test, vi} from 'vitest';
 import {Application} from '../ext/js/application.js';
 import {API} from '../ext/js/comm/api.js';
 import {CrossFrameAPI} from '../ext/js/comm/cross-frame-api.js';
+import {createAnkiNoteData} from '../ext/js/data/anki-note-data-creator.js';
 import {DisplayAudio} from '../ext/js/display/display-audio.js';
 import {Display} from '../ext/js/display/display.js';
 import {SearchDisplayController} from '../ext/js/display/search-display-controller.js';
@@ -60,24 +61,53 @@ const queryInput = querySelectorNotNull(document, '#search-textbox');
 
 const focusSpy = vi.spyOn(queryInput, 'focus');
 
-describe('Dictionary lookup', () => {
+describe('Search query', () => {
     test.each([
         [' 具'],
         ['  具'],
         ['　具'],
         ['\t具'],
-    ])('should ignore leading whitespace in query %j', async (query) => {
-        const termsFindSpy = vi.spyOn(api, 'termsFind').mockResolvedValue({dictionaryEntries: [], originalTextLength: 0});
-        const kanjiFindSpy = vi.spyOn(api, 'kanjiFind').mockResolvedValue([]);
+        ['具 '],
+        [' 具\n'],
+    ])('should ignore surrounding whitespace in query %j', (inputText) => {
+        const setContentSpy = vi.spyOn(display, 'setContent').mockImplementation(() => {});
 
+        queryInput.value = inputText;
         // eslint-disable-next-line no-underscore-dangle
-        await display._findDictionaryEntries(false, query, '', true, {depth: 0, url: ''});
+        searchDisplayController._search(false, 'new', true, null);
 
-        expect(termsFindSpy.mock.calls[0][0]).toBe('具');
-        expect(kanjiFindSpy.mock.calls[0][0]).toBe('具');
+        expect(setContentSpy).toHaveBeenCalledTimes(1);
+        const {params: {query}, state} = setContentSpy.mock.calls[0][0];
+        const sentence = state?.sentence;
+        expect(query).toBe('具');
+        expect(sentence).toStrictEqual({text: '具', offset: 0});
 
-        termsFindSpy.mockRestore();
-        kanjiFindSpy.mockRestore();
+        // The Anki cloze is built from the sentence, so the looked up text must end up in its body
+        const noteData = createAnkiNoteData('cloze-body', {
+            dictionaryEntry: {
+                type: 'kanji',
+                character: '具',
+                dictionary: 'Test Dictionary',
+                dictionaryIndex: 0,
+                dictionaryAlias: 'Test Dictionary',
+                onyomi: [],
+                kunyomi: [],
+                tags: [],
+                stats: {},
+                definitions: [],
+                frequencies: [],
+            },
+            resultOutputMode: 'split',
+            cardFormat: {type: 'kanji', name: 'test', deck: 'deck', model: 'model', fields: {}, icon: 'big-circle'},
+            glossaryLayoutMode: 'default',
+            compactTags: false,
+            context: {url: '', documentTitle: '', query: `${query}`, fullQuery: `${query}`, sentence: {...sentence}},
+            dictionaryStylesMap: new Map(),
+        });
+        const {cloze} = /** @type {import('anki-templates').KanjiDictionaryEntry} */ (noteData.definition);
+        expect(cloze).toStrictEqual({sentence: '具', prefix: '', body: '具', bodyKana: '具', suffix: ''});
+
+        setContentSpy.mockRestore();
     });
 });
 
