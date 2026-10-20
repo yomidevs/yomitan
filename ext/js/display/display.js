@@ -1332,6 +1332,7 @@ export class Display extends EventDispatcher {
     async _findDictionaryEntries(isKanji, source, primaryReading, wildcardsEnabled, optionsContext) {
         /** @type {import('dictionary').DictionaryEntry[]} */
         let dictionaryEntries = [];
+        source = source.trimStart();
         const {findDetails, source: source2} = this._getFindDetails(source, primaryReading, wildcardsEnabled);
         if (isKanji) {
             dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);

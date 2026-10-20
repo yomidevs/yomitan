@@ -60,6 +60,27 @@ const queryInput = querySelectorNotNull(document, '#search-textbox');
 
 const focusSpy = vi.spyOn(queryInput, 'focus');
 
+describe('Dictionary lookup', () => {
+    test.each([
+        [' 具'],
+        ['  具'],
+        ['　具'],
+        ['\t具'],
+    ])('should ignore leading whitespace in query %j', async (query) => {
+        const termsFindSpy = vi.spyOn(api, 'termsFind').mockResolvedValue({dictionaryEntries: [], originalTextLength: 0});
+        const kanjiFindSpy = vi.spyOn(api, 'kanjiFind').mockResolvedValue([]);
+
+        // eslint-disable-next-line no-underscore-dangle
+        await display._findDictionaryEntries(false, query, '', true, {depth: 0, url: ''});
+
+        expect(termsFindSpy.mock.calls[0][0]).toBe('具');
+        expect(kanjiFindSpy.mock.calls[0][0]).toBe('具');
+
+        termsFindSpy.mockRestore();
+        kanjiFindSpy.mockRestore();
+    });
+});
+
 describe('Keyboard Event Handling', () => {
     afterAll(() => teardown(global));
 
