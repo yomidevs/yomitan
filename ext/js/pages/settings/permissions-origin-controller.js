@@ -119,9 +119,14 @@ export class PermissionsOriginController {
 
     /**
      * @param {string} origin
+     * @param {import('popup-menu').MenuCloseEvent} e
      */
-    _onOriginMenuClose(origin) {
-        void this._setOriginPermissionEnabled(origin, false);
+    _onOriginMenuClose(origin, e) {
+        switch (e.detail.action) {
+            case 'remove':
+                void this._setOriginPermissionEnabled(origin, false);
+                break;
+        }
     }
 
     /** */
