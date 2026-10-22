@@ -613,6 +613,12 @@ a.heading-link-light {
 .settings-item-description {
     color: var(--text-color-light2);
 }
+.settings-item-description.danger-text {
+    color: var(--danger-color);
+}
+.settings-item-description.success-text {
+    color: var(--success-color);
+}
 .settings-item-right.open-panel-button-container {
     padding: 0.25em 1em 0.25em 0.75em;
     max-height: calc(var(--settings-group-right-max-height) + var(--settings-group-inner-vertical-padding) * 2);
@@ -1848,6 +1854,35 @@ code.anki-field-marker {
     resize: none;
     min-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
 }
+#bunpro-token-input {
+    /* 32-char Bunpro token (e.g. 2aeb00145f896187784526dd5feaeaa9) plus space before Show/Hide. */
+    --bunpro-token-input-chars: 32;
+    flex: 0 0 auto;
+    width: calc(var(--bunpro-token-input-chars) * 1ch + 1.35em);
+    min-width: 0;
+    padding-right: 0.85em;
+    overflow-x: auto;
+    font-variant-ligatures: none;
+    font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+}
+#bunpro-toggle-token-visibility {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    /* Keep the group width stable when the label flips between Show and Hide. */
+    min-width: 4.25em;
+    justify-content: center;
+    padding-left: 0.75em;
+    padding-right: 0.75em;
+}
+#bunpro-save-token,
+#bunpro-clear-token {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+#bunpro-token-settings>.settings-item-children:has(>#bunpro-token-error[hidden]) {
+    display: none;
+}
+
 #generate-anki-notes-test-text-input {
     width: 100%;
 }
