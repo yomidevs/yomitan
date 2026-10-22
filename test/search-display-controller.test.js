@@ -73,9 +73,7 @@ describe('Search query', () => {
         // eslint-disable-next-line no-underscore-dangle
         searchDisplayController._search(false, 'new', true, null);
 
-        const windowParams = window.location.search.split('?')[1];
-        const searchParams = new URLSearchParams(windowParams);
-        const queryString = searchParams.get('query');
+        const queryString = new URL(window.location.href).searchParams.get('query');
 
         expect(queryString).toBe('具');
     });
