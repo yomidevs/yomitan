@@ -90,9 +90,9 @@ export class PermissionsOriginController {
             /** @type {HTMLInputElement} */
             const input = querySelectorNotNull(node, '.permissions-origin-input');
             /** @type {HTMLElement} */
-            const menuButton = querySelectorNotNull(node, '.permissions-origin-button');
+            const deleteButton = querySelectorNotNull(node, '#permissions-origin-remove');
             input.value = origin;
-            this._eventListeners.addEventListener(menuButton, 'menuClose', this._onOriginMenuClose.bind(this, origin), false);
+            this._eventListeners.addEventListener(deleteButton, 'click', this._onDeleteButtonClick.bind(this, origin), false);
             this._originContainerChildren.push(...node.childNodes);
             fragment.appendChild(node);
             any = true;
@@ -120,7 +120,7 @@ export class PermissionsOriginController {
     /**
      * @param {string} origin
      */
-    _onOriginMenuClose(origin) {
+    _onDeleteButtonClick(origin) {
         void this._setOriginPermissionEnabled(origin, false);
     }
 
