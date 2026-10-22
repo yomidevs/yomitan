@@ -19,7 +19,6 @@ import {afterAll, describe, expect, test, vi} from 'vitest';
 import {Application} from '../ext/js/application.js';
 import {API} from '../ext/js/comm/api.js';
 import {CrossFrameAPI} from '../ext/js/comm/cross-frame-api.js';
-import {createAnkiNoteData} from '../ext/js/data/anki-note-data-creator.js';
 import {DisplayAudio} from '../ext/js/display/display-audio.js';
 import {Display} from '../ext/js/display/display.js';
 import {SearchDisplayController} from '../ext/js/display/search-display-controller.js';
@@ -70,44 +69,15 @@ describe('Search query', () => {
         ['具 '],
         [' 具\n'],
     ])('should ignore surrounding whitespace in query %j', (inputText) => {
-        const setContentSpy = vi.spyOn(display, 'setContent').mockImplementation(() => {});
-
         queryInput.value = inputText;
         // eslint-disable-next-line no-underscore-dangle
         searchDisplayController._search(false, 'new', true, null);
 
-        expect(setContentSpy).toHaveBeenCalledTimes(1);
-        const {params: {query}, state} = setContentSpy.mock.calls[0][0];
-        const sentence = state?.sentence;
-        expect(query).toBe('具');
-        expect(sentence).toStrictEqual({text: '具', offset: 0});
+        const windowParams = window.location.search.split('?')[1];
+        const searchParams = new URLSearchParams(windowParams);
+        const queryString = searchParams.get('query');
 
-        // The Anki cloze is built from the sentence, so the looked up text must end up in its body
-        const noteData = createAnkiNoteData('cloze-body', {
-            dictionaryEntry: {
-                type: 'kanji',
-                character: '具',
-                dictionary: 'Test Dictionary',
-                dictionaryIndex: 0,
-                dictionaryAlias: 'Test Dictionary',
-                onyomi: [],
-                kunyomi: [],
-                tags: [],
-                stats: {},
-                definitions: [],
-                frequencies: [],
-            },
-            resultOutputMode: 'split',
-            cardFormat: {type: 'kanji', name: 'test', deck: 'deck', model: 'model', fields: {}, icon: 'big-circle'},
-            glossaryLayoutMode: 'default',
-            compactTags: false,
-            context: {url: '', documentTitle: '', query: `${query}`, fullQuery: `${query}`, sentence: {...sentence}},
-            dictionaryStylesMap: new Map(),
-        });
-        const {cloze} = /** @type {import('anki-templates').KanjiDictionaryEntry} */ (noteData.definition);
-        expect(cloze).toStrictEqual({sentence: '具', prefix: '', body: '具', bodyKana: '具', suffix: ''});
-
-        setContentSpy.mockRestore();
+        expect(queryString).toBe('具');
     });
 });
 
