@@ -26,6 +26,7 @@ describe('Japanese utility functions', () => {
         const data = [
             ['力方', true],
             ['\u53f1\u{20b9f}', true],
+            ['\u{32421}\u{33345}', true],
             ['かたカタ々kata、。？,.?', false],
             ['逸逸', true],
         ];
@@ -61,6 +62,7 @@ describe('Japanese utility functions', () => {
         const data = [
             ['かたカタ力方々、。？', true],
             ['\u53f1\u{20b9f}', true],
+            ['\u{32421}\u{33345}', true],
             ['kata,.?', false],
             ['逸逸', true],
         ];
