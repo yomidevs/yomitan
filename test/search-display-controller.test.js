@@ -60,6 +60,25 @@ const queryInput = querySelectorNotNull(document, '#search-textbox');
 
 const focusSpy = vi.spyOn(queryInput, 'focus');
 
+describe('Search query', () => {
+    test.each([
+        [' 具'],
+        ['  具'],
+        ['　具'],
+        ['\t具'],
+        ['具 '],
+        [' 具\n'],
+    ])('should ignore surrounding whitespace in query %j', (inputText) => {
+        queryInput.value = inputText;
+        // eslint-disable-next-line no-underscore-dangle
+        searchDisplayController._search(false, 'new', true, null);
+
+        const queryString = new URL(window.location.href).searchParams.get('query');
+
+        expect(queryString).toBe('具');
+    });
+});
+
 describe('Keyboard Event Handling', () => {
     afterAll(() => teardown(global));
 
