@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-title-key="actionPopup_pageTitle">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -16,16 +16,16 @@
     <script src="/js/pages/action-popup-main.js" type="module"></script>
 </head>
 <body>
-    <div id="loading">
+    <div id="loading" data-i18n="actionPopup_loading">
         Loading...
     </div>
     <div id="action-popup">
         <div class="action-container action-select-profile" hidden>
             <div class="action-item-left">
-                <h2 class="action-title">Profile</h2>
+                <h2 class="action-title" data-i18n="actionPopup_profile">Profile</h2>
             </div>
             <div class="action-item-right">
-                <select tabindex="0"  class="profile-select" id="profile-select">
+                <select tabindex="0" class="profile-select" id="profile-select">
                 </select>
             </div>
         </div>
@@ -34,26 +34,27 @@
                 <label class="toggle">
                     <input tabindex="0" type="checkbox" class="enable-search">
                     <div class="toggle-group">
-                        <span class="toggle-on">On</span>
-                        <span class="toggle-off">Off</span>
+                        <span class="toggle-on" data-i18n="actionPopup_on">On</span>
+                        <span class="toggle-off" data-i18n="actionPopup_off">Off</span>
                         <span class="toggle-handle"></span>
                     </div>
                 </label>
-                <p class="tooltip">Hover over text to scan</p>
+                <p class="tooltip" data-i18n="actionPopup_scanHintHover">Hover over text to scan</p>
             </div>
         </div>
         <div class="action-container action-buttons">
-            <button tabindex="0" type="button" class="low-emphasis action-open-settings" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
+            <button tabindex="0" type="button" class="low-emphasis action-open-settings" title="Settings" data-i18n-title="actionPopup_settingsTitle" data-hotkey="[&quot;global:openSettingsPage&quot;,&quot;title&quot;,&quot;i18n:actionPopup_settingsTitleHotkey&quot;]">
                 <div class="action-icon">
                     <span class="icon" data-icon="cog"></span>
                 </div>
             </button>
-            <button tabindex="0" type="button" class="low-emphasis action-open-search" title="Search&#010;Shift+click to open here" data-hotkey='["global:openSearchPage","title","Search ({0})\nShift+click to open here"]'>
+            <button tabindex="0" type="button" class="low-emphasis action-open-search" title="Search
+Shift+click to open here" data-i18n-title="actionPopup_searchTitle" data-hotkey="[&quot;global:openSearchPage&quot;,&quot;title&quot;,&quot;i18n:actionPopup_searchTitleHotkey&quot;]">
                 <div class="action-icon">
                     <span class="icon" data-icon="magnifying-glass"></span>
                 </div>
             </button>
-            <button tabindex="0" type="button" class="low-emphasis action-open-info" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'>
+            <button tabindex="0" type="button" class="low-emphasis action-open-info" title="Information" data-i18n-title="actionPopup_infoTitle" data-hotkey="[&quot;global:openInfoPage&quot;,&quot;title&quot;,&quot;i18n:actionPopup_infoTitleHotkey&quot;]">
                 <div class="action-icon">
                     <span class="icon" data-icon="question-mark-circle"></span>
                 </div>

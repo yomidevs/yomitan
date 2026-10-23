@@ -17,6 +17,7 @@
  */
 
 import {fetchText} from '../core/fetch-utilities.js';
+import {applyI18nToRoot} from '../language/i18n-util.js';
 
 export class HtmlTemplateCollection {
     constructor() {
@@ -45,6 +46,8 @@ export class HtmlTemplateCollection {
             const match = pattern.exec(template.id);
             if (match === null) { continue; }
             this._prepareTemplate(template);
+            // Localize template content once so every instantiate() clone is translated.
+            applyI18nToRoot(template.content);
             this._templates.set(match[1], template);
         }
     }

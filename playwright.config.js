@@ -30,7 +30,7 @@ export default defineConfig({
     testDir: './test/playwright',
     snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
     /* Maximum time one test can run for. */
-    timeout: 60 * 60 * 1000,
+    timeout: 2 * 60 * 1000,
     expect: {
         /**
          * Maximum time expect() should wait for the condition to be met.

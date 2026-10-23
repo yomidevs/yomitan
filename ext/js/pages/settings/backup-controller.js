@@ -584,7 +584,13 @@ export class BackupController {
     async _onSettingsExportDatabaseClick() {
         if (this._settingsExportDatabaseToken !== null) {
             // An existing import or export is in progress.
-            this._databaseExportImportErrorMessage('An export or import operation is already in progress. Please wait till it is over.', true);
+            this._databaseExportImportErrorMessage((() => {
+                try {
+                    return chrome.i18n.getMessage('js_backupOpInProgress') || 'An export or import operation is already in progress. Please wait till it is over.';
+                } catch (error2) {
+                    return 'An export or import operation is already in progress. Please wait till it is over.';
+                }
+            })(), true);
             return;
         }
 
@@ -604,7 +610,13 @@ export class BackupController {
             this._saveBlob(blob, fileName);
         } catch (error) {
             log.log(error);
-            this._databaseExportImportErrorMessage('Errors encountered while exporting. Please try again. Restart the browser if it continues to fail.');
+            this._databaseExportImportErrorMessage((() => {
+                try {
+                    return chrome.i18n.getMessage('js_backupExportErrors') || 'Errors encountered while exporting. Please try again. Restart the browser if it continues to fail.';
+                } catch (error2) {
+                    return 'Errors encountered while exporting. Please try again. Restart the browser if it continues to fail.';
+                }
+            })());
         } finally {
             pageExitPrevention.end();
             this._settingsExportDatabaseToken = null;
@@ -625,12 +637,30 @@ export class BackupController {
         const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
         messageContainer.style.display = 'block';
         messageContainer.style.color = '#4169e1';
-        messageContainer.textContent = `Import Progress: ${completedRows} of ${totalRows} rows completed`;
+        {
+            let progress = `Import Progress: ${completedRows} of ${totalRows} rows completed`;
+            try {
+                const m = chrome.i18n.getMessage('js_importProgress', [String(completedRows), String(totalRows)]);
+                if (m) { progress = m; }
+            } catch (error2) {
+                // NOP
+            }
+            messageContainer.textContent = progress;
+        }
 
         if (done) {
             log.log('Done importing.');
             messageContainer.style.color = '#006633';
-            messageContainer.textContent = 'Done importing. You will need to re-enable the dictionaries and refresh afterward. If you run into issues, please restart the browser. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.';
+            {
+                let doneMsg = 'Done importing. You will need to re-enable the dictionaries and refresh afterward. If you run into issues, please restart the browser. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.';
+                try {
+                    const m = chrome.i18n.getMessage('js_backupDoneImporting');
+                    if (m) { doneMsg = m; }
+                } catch (error2) {
+                    // NOP
+                }
+                messageContainer.textContent = doneMsg;
+            }
         }
     }
 
@@ -660,7 +690,13 @@ export class BackupController {
     async _onSettingsImportDatabaseChange(e) {
         if (this._settingsExportDatabaseToken !== null) {
             // An existing import or export is in progress.
-            this._databaseExportImportErrorMessage('An export or import operation is already in progress. Please wait till it is over.', true);
+            this._databaseExportImportErrorMessage((() => {
+                try {
+                    return chrome.i18n.getMessage('js_backupOpInProgress') || 'An export or import operation is already in progress. Please wait till it is over.';
+                } catch (error2) {
+                    return 'An export or import operation is already in progress. Please wait till it is over.';
+                }
+            })(), true);
             return;
         }
 
@@ -685,7 +721,13 @@ export class BackupController {
             /** @type {HTMLElement} */
             const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
             messageContainer.style.color = 'red';
-            this._databaseExportImportErrorMessage('Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.');
+            this._databaseExportImportErrorMessage((() => {
+                try {
+                    return chrome.i18n.getMessage('js_backupImportErrors') || 'Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.';
+                } catch (error2) {
+                    return 'Encountered errors when importing. Please restart the browser and try again. If it continues to fail, reinstall Yomitan and import dictionaries one-by-one.';
+                }
+            })());
         } finally {
             pageExitPrevention.end();
             this._settingsExportDatabaseToken = null;

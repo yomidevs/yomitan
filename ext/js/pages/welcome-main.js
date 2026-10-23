@@ -19,6 +19,7 @@
 import {Application} from '../application.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {applyI18nToDocument} from '../language/i18n-util.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
 import {DataTransmissionConsentController} from './settings/data-transmission-consent-controller.js';
 import {DictionaryController} from './settings/dictionary-controller.js';
@@ -62,6 +63,8 @@ async function checkNeedsCustomTemplatesWarning() {
 }
 
 await Application.main(true, async (application) => {
+    applyI18nToDocument();
+
     const modalController = new ModalController(['shared-modals', 'settings-modals']);
     await modalController.prepare();
 

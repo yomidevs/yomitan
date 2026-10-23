@@ -416,7 +416,7 @@ export class DisplayGenerator {
                         link.href = referenceUrl;
                         link.target = '_blank';
                         link.rel = 'noreferrer noopener';
-                        link.textContent = 'More info';
+                        link.textContent = (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_moreInfo')) || 'More info';
                     }
                 }
                 this._setTextContent(div, message);

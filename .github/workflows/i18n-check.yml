@@ -1,0 +1,63 @@
+name: i18n Check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'ext/_locales/**'
+      - 'dev/bin/i18n-check.js'
+      - '.github/workflows/i18n-check.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'ext/_locales/**'
+      - 'dev/bin/i18n-check.js'
+      - '.github/workflows/i18n-check.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-i18n:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@v4
+
+      - name: Check i18n synchronization
+        id: i18n
+        run: node dev/bin/i18n-check.js
+        continue-on-error: true
+
+      - name: Job summary
+        if: always()
+        run: |
+          if [ "${{ steps.i18n.outcome }}" = "success" ]; then
+            echo "✅ All non-default locales are in sync with en." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "❌ Locale files are out of sync. See log and PR comment." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            🔍 **i18n check**
+
+            ${{ steps.i18n.outputs.summary != '' && steps.i18n.outputs.summary || '✅ All locales are in sync with `en`.' }}
+
+            — **Keys** in `ext/_locales/*/messages.json` must match `en` (otherwise the check fails).
+            — Strings still identical to English (except brands/tech tokens) are reported as **WARN** / "still in English".
+          comment_tag: i18n-check
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail if out of sync
+        if: steps.i18n.outcome != 'success'
+        run: exit 1

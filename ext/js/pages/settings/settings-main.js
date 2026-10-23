@@ -19,6 +19,7 @@
 import {Application} from '../../application.js';
 import {DocumentFocusController} from '../../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
+import {applyI18nToDocument} from '../../language/i18n-util.js';
 import {ExtensionContentController} from '../common/extension-content-controller.js';
 import {AnkiController} from './anki-controller.js';
 import {AnkiDeckGeneratorController} from './anki-deck-generator-controller.js';
@@ -62,6 +63,8 @@ async function setupGenericSettingController(genericSettingController) {
 }
 
 await Application.main(true, async (application) => {
+    applyI18nToDocument();
+
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 

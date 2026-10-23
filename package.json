@@ -26,6 +26,7 @@
         "test:json": "npm run test:json:format && npm run test:json:types",
         "test:json:format": "npx eslint '**/*.json'",
         "test:json:types": "vitest run --config test/data/vitest.json.config.json",
+        "test:i18n": "node ./dev/bin/i18n-check.js",
         "test:css": "npx stylelint \"ext/**/*.css\" \"test/**/*.css\" \"dev/**/*.css\"",
         "test:html": "npx html-validate \"ext/**/*.html\" \"test/**/*.html\" \"dev/**/*.html\"",
         "test:md": "prettier . --check",
