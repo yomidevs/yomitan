@@ -12,7 +12,9 @@ Scripts can be executed by running `npm run <name>`.
   CSS rule overrides and exclusions can be set in `dev/data/structured-content-overrides.css`.
 
 - `bench`
-  Runs performance benchmarks.
+  Runs the performance benchmarks in the [benches](../../benches/) folder with [Vitest](https://vitest.dev/).
+
+  The same command is run in CI by [CodSpeed](https://codspeed.io), which measures every benchmark on each pull request and reports the performance changes. Benchmarks can also be measured locally the same way CI does with the [CodSpeed CLI](https://codspeed.io/docs/cli): `codspeed run --mode simulation -- npm run bench`.
 
 - `build`
   Builds packages for all of the primary build targets and outputs them to the builds folder in the root project directory.
