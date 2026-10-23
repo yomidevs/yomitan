@@ -29,8 +29,5 @@
 input[type=text].permissions-origin-input {
     width: auto;
     justify-self: stretch;
-}
-.permissions-origin-button {
-    justify-self: center;
-    margin-left: 0.5em;
+    margin: 0.15em 0.5em;
 }

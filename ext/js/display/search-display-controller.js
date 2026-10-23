@@ -612,7 +612,7 @@ export class SearchDisplayController {
     _search(animate, historyMode, lookup, flags) {
         this._updateSearchText();
 
-        const query = this._queryInput.value;
+        const query = this._queryInput.value.trim();
         const depth = this._display.depth;
         const url = window.location.href;
         const documentTitle = document.title;

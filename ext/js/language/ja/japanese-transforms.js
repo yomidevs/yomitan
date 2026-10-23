@@ -418,6 +418,7 @@ export const japaneseTransforms = {
             rules: [
                 suffixInflection('なさい', 'る', ['-なさい'], ['v1']),
                 suffixInflection('いなさい', 'う', ['-なさい'], ['v5']),
+                suffixInflection('ひなさい', 'う', ['-なさい'], ['v5']),
                 suffixInflection('きなさい', 'く', ['-なさい'], ['v5']),
                 suffixInflection('ぎなさい', 'ぐ', ['-なさい'], ['v5']),
                 suffixInflection('しなさい', 'す', ['-なさい'], ['v5']),
@@ -497,6 +498,7 @@ export const japaneseTransforms = {
                 suffixInflection('すぎる', 'い', ['v1'], ['adj-i']),
                 suffixInflection('すぎる', 'る', ['v1'], ['v1']),
                 suffixInflection('いすぎる', 'う', ['v1'], ['v5']),
+                suffixInflection('ひすぎる', 'う', ['v1'], ['v5']),
                 suffixInflection('きすぎる', 'く', ['v1'], ['v5']),
                 suffixInflection('ぎすぎる', 'ぐ', ['v1'], ['v5']),
                 suffixInflection('しすぎる', 'す', ['v1'], ['v5']),
@@ -528,6 +530,7 @@ export const japaneseTransforms = {
                 suffixInflection('過ぎる', 'い', ['v1'], ['adj-i']),
                 suffixInflection('過ぎる', 'る', ['v1'], ['v1']),
                 suffixInflection('い過ぎる', 'う', ['v1'], ['v5']),
+                suffixInflection('ひ過ぎる', 'う', ['v1'], ['v5']),
                 suffixInflection('き過ぎる', 'く', ['v1'], ['v5']),
                 suffixInflection('ぎ過ぎる', 'ぐ', ['v1'], ['v5']),
                 suffixInflection('し過ぎる', 'す', ['v1'], ['v5']),
@@ -559,6 +562,7 @@ export const japaneseTransforms = {
             rules: [
                 suffixInflection('たい', 'る', ['adj-i'], ['v1']),
                 suffixInflection('いたい', 'う', ['adj-i'], ['v5']),
+                suffixInflection('ひたい', 'う', ['adj-i'], ['v5']),
                 suffixInflection('きたい', 'く', ['adj-i'], ['v5']),
                 suffixInflection('ぎたい', 'ぐ', ['adj-i'], ['v5']),
                 suffixInflection('したい', 'す', ['adj-i'], ['v5']),
@@ -1549,6 +1553,7 @@ export const japaneseTransforms = {
             rules: [
                 suffixInflection('やがる', 'る', ['v5'], ['v1']),
                 suffixInflection('いやがる', 'う', ['v5'], ['v5']),
+                suffixInflection('ひやがる', 'う', ['v5'], ['v5']),
                 suffixInflection('きやがる', 'く', ['v5'], ['v5']),
                 suffixInflection('ぎやがる', 'ぐ', ['v5'], ['v5']),
                 suffixInflection('しやがる', 'す', ['v5'], ['v5']),
@@ -1563,6 +1568,75 @@ export const japaneseTransforms = {
                 suffixInflection('きやがる', 'くる', ['v5'], ['vk']),
                 suffixInflection('来やがる', '来る', ['v5'], ['vk']),
                 suffixInflection('來やがる', '來る', ['v5'], ['vk']),
+            ],
+        },
+        '-やしない': {
+            name: '-やしない',
+            description: '1. Expresses dissatisfaction or blame.\n' +
+            '2. Strongly denies an obvious fact.\n' +
+            'Usage: Attach やしない to the continuative form (連用形) of verbs. It itself conjugates as an i-adjective.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～やしない',
+                    description: '強い否定に加え、主観的な不満が現れる表現です。その事態に対する話者の非難の気持ちを含みます。\n' +
+                    '1. 不満や非難の気持ちを表す\n' +
+                    '2. 当たり前の事実を強く否定する',
+                },
+            ],
+            rules: [
+                suffixInflection('やしない', 'る', ['adj-i'], ['v1']),
+                suffixInflection('いやしない', 'う', ['adj-i'], ['v5']),
+                suffixInflection('ひやしない', 'う', ['adj-i'], ['v5']),
+                suffixInflection('きやしない', 'く', ['adj-i'], ['v5']),
+                suffixInflection('ぎやしない', 'ぐ', ['adj-i'], ['v5']),
+                suffixInflection('しやしない', 'す', ['adj-i'], ['v5']),
+                suffixInflection('ちやしない', 'つ', ['adj-i'], ['v5']),
+                suffixInflection('にやしない', 'ぬ', ['adj-i'], ['v5']),
+                suffixInflection('びやしない', 'ぶ', ['adj-i'], ['v5']),
+                suffixInflection('みやしない', 'む', ['adj-i'], ['v5']),
+                suffixInflection('りやしない', 'る', ['adj-i'], ['v5']),
+                suffixInflection('じやしない', 'ずる', ['adj-i'], ['vz']),
+                suffixInflection('しやしない', 'する', ['adj-i'], ['vs']),
+                suffixInflection('為やしない', '為る', ['adj-i'], ['vs']),
+                suffixInflection('きやしない', 'くる', ['adj-i'], ['vk']),
+                suffixInflection('来やしない', '来る', ['adj-i'], ['vk']),
+                suffixInflection('來やしない', '來る', ['adj-i'], ['vk']),
+            ],
+        },
+        '-やしません': {
+            name: '-やしません',
+            description: 'Polite form of -やしない.\n' +
+            '1. Expresses dissatisfaction or blame.\n' +
+            '2. Strongly denies an obvious fact.\n' +
+            'Usage: Attach やしません to the continuative form (連用形) of verbs.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～やしません',
+                    description: '「～やしない」の丁寧形。\n' +
+                    '1. 不満や非難の気持ちを表す\n' +
+                    '2. 当たり前の事実を強く否定する',
+                },
+            ],
+            rules: [
+                suffixInflection('やしません', 'る', ['-ません'], ['v1']),
+                suffixInflection('いやしません', 'う', ['-ません'], ['v5']),
+                suffixInflection('ひやしません', 'う', ['-ません'], ['v5']),
+                suffixInflection('きやしません', 'く', ['-ません'], ['v5']),
+                suffixInflection('ぎやしません', 'ぐ', ['-ません'], ['v5']),
+                suffixInflection('しやしません', 'す', ['-ません'], ['v5']),
+                suffixInflection('ちやしません', 'つ', ['-ません'], ['v5']),
+                suffixInflection('にやしません', 'ぬ', ['-ません'], ['v5']),
+                suffixInflection('びやしません', 'ぶ', ['-ません'], ['v5']),
+                suffixInflection('みやしません', 'む', ['-ません'], ['v5']),
+                suffixInflection('りやしません', 'る', ['-ません'], ['v5']),
+                suffixInflection('じやしません', 'ずる', ['-ません'], ['vz']),
+                suffixInflection('しやしません', 'する', ['-ません'], ['vs']),
+                suffixInflection('為やしません', '為る', ['-ません'], ['vs']),
+                suffixInflection('きやしません', 'くる', ['-ません'], ['vk']),
+                suffixInflection('来やしません', '来る', ['-ません'], ['vk']),
+                suffixInflection('來やしません', '來る', ['-ません'], ['vk']),
             ],
         },
         '-え': {
