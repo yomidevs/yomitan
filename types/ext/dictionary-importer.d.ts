@@ -36,11 +36,33 @@ export type ProgressData = {
 export type ImportResult = {
     result: Summary | null;
     errors: Error[];
+    fallbackDatabaseContentBase64?: string | null;
+    debug?: ImportDebug;
+};
+
+export type ImportDebug = {
+    phaseTimings: ImportPhaseTiming[];
+};
+
+export type ImportPhaseTiming = {
+    phase: string;
+    elapsedMs: number;
+    details?: Record<string, string | number | boolean | null>;
 };
 
 export type ImportDetails = {
     prefixWildcardsSupported: boolean;
     yomitanVersion: string;
+    existingDatabaseContentBase64?: string;
+    useImportSession?: boolean;
+    finalizeImportSession?: boolean;
+    forceMemoryOnly?: boolean;
+    skipImageMetadata?: boolean;
+    skipMediaImport?: boolean;
+    mediaResolutionConcurrency?: number;
+    debugImportLogging?: boolean;
+    enableTermEntryContentDedup?: boolean;
+    termContentStorageMode?: 'baseline' | 'raw-bytes';
 };
 
 export type Summary = {

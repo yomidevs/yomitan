@@ -21,7 +21,7 @@ Below are a few guidelines to ensure contributions have a good level of quality 
 
 ## Setup
 
-Yomitan uses [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) tools for building and testing.
+Yomitan uses [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) tools for building and testing. The build also compiles bundled dictionary wasm assets, so you need a wasm32-capable compiler such as `clang` or `zig` available on `PATH` (or pointed to by `YOMITAN_CLANG`/`CLANG`).
 After installing these, the development environment can be set up by running `npm ci` and subsequently `npm run build`.
 
 ## Testing
