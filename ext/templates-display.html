@@ -208,7 +208,10 @@
 
 <template id="action-button-container-template">
     <div class="action-button-container">
-        <button type="button" class="action-button" data-action="save-note" title="Add {0}" data-hotkey='["saveNote","title","Add {0} ({0})"]'>
+        <button type="button" class="action-button" data-action="add-note" title="Add {0}" data-hotkey='["saveNote","title","Add {0} ({0})"]'>
+            <span class="action-icon icon color-icon" data-icon=""></span>
+        </button>
+        <button type="button" class="action-button note-action-button-update" data-action="update-note" title="Update existing note" hidden disabled>
             <span class="action-icon icon color-icon" data-icon=""></span>
         </button>
     </div>

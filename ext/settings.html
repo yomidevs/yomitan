@@ -1992,14 +1992,17 @@
                                 <option value="prevent">Prevent adding</option>
                                 <option value="overwrite">Allow overwriting</option>
                                 <option value="new">Allow adding</option>
+                                <option value="new-and-overwrite">Allow adding and updating</option>
                             </select>
                         </div>
                     </div>
                     <div class="settings-item-children more" hidden>
                         <ul class="warning-text">
-                            <li class="danger-text">Overwriting a card can result in the loss of data.</li>
-                            <li>Duplicate cards of a different note type cannot be overwritten.</li>
-                            <li>If there are multiple duplicate cards, the first card found will be overwritten.</li>
+                            <li class="danger-text">Updating a note can result in the loss of field data. Its identity and review scheduling are preserved.</li>
+                            <li>Only duplicate notes with the configured note type and expected fields can be updated.</li>
+                            <li>If there are multiple duplicates, the first available compatible note in Anki’s returned order will be updated. Missing or incompatible notes are skipped.</li>
+                            <li><em>Allow adding and updating</em> shows separate Add duplicate and Update existing note buttons. Add-note hotkeys add a note; use the Update button to update a duplicate.</li>
+                            <li><em>Fill if empty</em> preserves all nonempty values, including broken content. Choose another overwrite policy to replace them.</li>
                             <li>You can customize overwriting for each field in the <code>Configure Anki card format&hellip;</code> menu.</li>
                         </ul>
                         <p>

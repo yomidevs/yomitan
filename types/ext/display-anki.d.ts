@@ -20,6 +20,8 @@ import type * as AnkiNoteBuilder from './anki-note-builder';
 import type * as AnkiTemplates from './anki-templates';
 import type * as Settings from './settings';
 
+export type NoteAction = 'add-note' | 'update-note';
+
 export type LogData = {
     ankiNoteData: AnkiTemplates.NoteData | undefined;
     ankiNoteDataException: Error | undefined;

@@ -1144,7 +1144,7 @@
                                     },
                                     "duplicateBehavior": {
                                         "type": "string",
-                                        "enum": ["prevent", "overwrite", "new"],
+                                        "enum": ["prevent", "overwrite", "new", "new-and-overwrite"],
                                         "default": "new"
                                     },
                                     "fieldTemplates": {

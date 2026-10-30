@@ -669,10 +669,10 @@ button.sidebar-button.sidebar-button-highlight {
     z-index: -1;
 }
 
-.note-actions-container .action-button-container:first-child {
+.note-actions-container .action-button-container:first-child:not([data-duplicate-behavior=new-and-overwrite]) {
     flex-direction: row-reverse;
 }
-.note-actions-container .action-button-container:first-child::after {
+.note-actions-container .action-button-container:first-child:not([data-duplicate-behavior=new-and-overwrite])::after {
     top: calc(50% - 0.5px);
     left: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 0.5);
     right: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 0.5);
@@ -715,6 +715,8 @@ button.action-button[hidden] {
         -webkit-filter var(--animation-duration) linear,
         background-color var(--animation-duration) linear;
 }
+/* Hidden note actions must not extend the connector past the visible buttons. */
+.note-actions-container button.action-button[hidden],
 button.action-button-collapsible[hidden] {
     display: none;
 }
@@ -2051,7 +2053,8 @@ button.footer-notification-close-button {
     display: none;
 }
 :root[data-anki-enabled=false] .action-button[data-action=view-note],
-:root[data-anki-enabled=false] .action-button[data-action=save-note] {
+:root[data-anki-enabled=false] .action-button[data-action=add-note],
+:root[data-anki-enabled=false] .action-button[data-action=update-note] {
     display: none;
 }
 
