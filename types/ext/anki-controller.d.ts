@@ -25,3 +25,5 @@ export type FieldEntry = {
     inputField: HTMLInputElement;
     fieldNameContainerNode: HTMLElement;
 };
+
+export type FieldMenuTarget = 'anki-card-term-field-menu' | 'anki-card-kanji-field-menu' | 'anki-card-all-field-menu';

@@ -386,7 +386,7 @@ export class AnkiController {
      * @param {import('settings').DictionariesOptions} dictionaries
      */
     async _setupFieldMenus(dictionaries) {
-        /** @type {[types: import('dictionary').DictionaryEntryType[], templateName: string][]} */
+        /** @type {[types: import('dictionary').DictionaryEntryType[], templateName: import('anki-controller').FieldMenuTarget][]} */
         const fieldMenuTargets = [
             [['term'], 'anki-card-term-field-menu'],
             [['kanji'], 'anki-card-kanji-field-menu'],
@@ -652,7 +652,18 @@ export class AnkiController {
 
         this._cardFormatDeleteButton.disabled = ankiOptions.cardFormats.length <= 1;
 
-        this._setCardFormatIndex(this._cardFormatIndex, 'anki-card-term-field-menu');
+        /** @type {import('anki-controller').FieldMenuTarget} */
+        let cardFieldMenuTarget = 'anki-card-all-field-menu';
+        switch (ankiOptions.cardFormats[this._cardFormatIndex].type) {
+            case 'term':
+                cardFieldMenuTarget = 'anki-card-term-field-menu';
+                break;
+            case 'kanji':
+                cardFieldMenuTarget = 'anki-card-kanji-field-menu';
+                break;
+        }
+
+        this._setCardFormatIndex(this._cardFormatIndex, cardFieldMenuTarget);
     }
 
     /**
