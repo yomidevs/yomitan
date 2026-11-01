@@ -20,6 +20,11 @@ import {computeZoomScale, isPointInAnyRect} from '../dom/document-util.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
 
 /**
+ * Matches characters of scripts which are written without spaces between words.
+ */
+const noSpaceScriptCharacterPattern = /[\p{Script_Extensions=Han}\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}\u3000-\u303f\uff00-\uffef]/u;
+
+/**
  * This class is a helper for handling Google Docs content in content scripts.
  */
 export class GoogleDocsUtil {
@@ -92,8 +97,8 @@ export class GoogleDocsUtil {
         for (const rect of rects) {
             const label = rect.getAttribute('aria-label');
             if (typeof label !== 'string' || label.length === 0) { continue; }
-            if (previous !== null && this._hasGapBetween(previous, rect) && !/\s$/.test(text) && !/^\s/.test(label)) {
-                text += ' ';
+            if (previous !== null) {
+                text += this._getSeparator(previous, rect, text, label);
             }
             if (rect === element) {
                 start = text.length;
@@ -106,20 +111,56 @@ export class GoogleDocsUtil {
     }
 
     /**
-     * Checks whether there is horizontal space between two adjacent <rect> elements on the same line,
-     * which indicates whitespace that isn't otherwise present in the aria-label attributes.
+     * Gets the whitespace which should be inserted between the text of two adjacent <rect> elements.
+     * Google Docs omits whitespace from the aria-label attributes at line wraps,
+     * and between words which are rendered as separate <rect> elements (e.g. right-to-left text).
      * @param {Element} rect1
      * @param {Element} rect2
-     * @returns {boolean}
+     * @param {string} text The text preceding `rect2`, ending with the text of `rect1`.
+     * @param {string} label The text of `rect2`.
+     * @returns {string}
      */
-    _hasGapBetween(rect1, rect2) {
-        if (rect1.getAttribute('transform') !== rect2.getAttribute('transform')) { return false; }
-        const x1 = Number.parseFloat(rect1.getAttribute('x') || '');
-        const width1 = Number.parseFloat(rect1.getAttribute('width') || '');
-        const height1 = Number.parseFloat(rect1.getAttribute('height') || '');
-        const x2 = Number.parseFloat(rect2.getAttribute('x') || '');
-        if (!Number.isFinite(x1) || !Number.isFinite(width1) || !Number.isFinite(height1) || !Number.isFinite(x2)) { return false; }
-        return x2 - (x1 + width1) > height1 * 0.1;
+    _getSeparator(rect1, rect2, text, label) {
+        if (/\s$/.test(text) || /^\s/.test(label)) { return ''; }
+
+        if (rect1.getAttribute('transform') !== rect2.getAttribute('transform')) {
+            // Line wrap
+            const lastCharacter = /.$/su.exec(text)?.[0] ?? '';
+            const firstCharacter = /^./su.exec(label)?.[0] ?? '';
+            if (
+                noSpaceScriptCharacterPattern.test(lastCharacter) ||
+                noSpaceScriptCharacterPattern.test(firstCharacter) ||
+                /[-\u00ad\u2010]/.test(lastCharacter)
+            ) {
+                return '';
+            }
+            return ' ';
+        }
+
+        // Same line; the gap is measured in both directions to support right-to-left text
+        const bounds1 = this._getRectBounds(rect1);
+        const bounds2 = this._getRectBounds(rect2);
+        if (bounds1 === null || bounds2 === null) { return ''; }
+        const gap = Math.max(
+            bounds2.x - (bounds1.x + bounds1.width),
+            bounds1.x - (bounds2.x + bounds2.width),
+        );
+        if (gap > bounds1.height * 0.1 && !/^[\p{Pe}\p{Pf}\p{Po}]/u.test(label)) {
+            return ' ';
+        }
+        return '';
+    }
+
+    /**
+     * @param {Element} rect
+     * @returns {?{x: number, width: number, height: number}}
+     */
+    _getRectBounds(rect) {
+        const x = Number.parseFloat(rect.getAttribute('x') || '');
+        const width = Number.parseFloat(rect.getAttribute('width') || '');
+        const height = Number.parseFloat(rect.getAttribute('height') || '');
+        if (!Number.isFinite(x) || !Number.isFinite(width) || !Number.isFinite(height)) { return null; }
+        return {x, width, height};
     }
 
     /**
