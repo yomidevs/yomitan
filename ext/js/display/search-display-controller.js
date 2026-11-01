@@ -81,6 +81,7 @@ export class SearchDisplayController {
             ['searchDisplayControllerGetMode', this._onMessageGetMode.bind(this)],
             ['searchDisplayControllerSetMode', this._onMessageSetMode.bind(this)],
             ['searchDisplayControllerUpdateSearchQuery', this._onExternalSearchUpdate.bind(this)],
+            ['searchDisplayControllerSelectSearch', this._onExternalSearchSelect.bind(this)],
         ]);
     }
 
@@ -345,6 +346,12 @@ export class SearchDisplayController {
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
     _onExternalSearchUpdate({text, animate}) {
         void this._updateSearchFromClipboard(text, animate, false);
+    }
+
+    /** */
+    _onExternalSearchSelect() {
+        this._queryInput.focus();
+        this._queryInput.select();
     }
 
     /**

@@ -45,6 +45,10 @@ export type ApiSurface = {
         };
         return: void;
     };
+    searchDisplayControllerSelectSearch: {
+        params: void;
+        return: void;
+    };
     applicationIsReady: {
         params: void;
         return: boolean;
