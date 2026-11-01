@@ -635,7 +635,7 @@ export class AnkiController {
             tabsContainer.removeChild(tabsContainer.firstChild);
         }
 
-        if (this._cardFormatIndex > ankiOptions.cardFormats.length) {
+        if (this._cardFormatIndex >= ankiOptions.cardFormats.length) {
             this._cardFormatIndex = ankiOptions.cardFormats.length - 1;
         }
         if (this._cardFormatIndex < 0) {
