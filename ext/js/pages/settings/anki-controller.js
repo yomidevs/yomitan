@@ -774,6 +774,11 @@ export class AnkiController {
         const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const value = node.value;
         this._ankiCardPrimary.dataset.ankiCardMenu = `anki-card-${value}-field-menu`;
+        /** @type {HTMLInputElement?} */
+        const activeTab = this._ankiCardsTabs.children[this._cardFormatIndex].querySelector('[data-anki-card-menu]');
+        if (activeTab !== null) {
+            activeTab.dataset.ankiCardMenu = `anki-card-${value}-field-menu`;
+        }
     }
 
     /**
