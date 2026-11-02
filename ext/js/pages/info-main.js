@@ -21,6 +21,7 @@ import {Application} from '../application.js';
 import {promiseTimeout} from '../core/utilities.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {applyI18nToDocument} from '../language/i18n-util.js';
 import {BackupController} from './settings/backup-controller.js';
 import {SettingsController} from './settings/settings-controller.js';
 
@@ -117,6 +118,8 @@ async function showDictionaryInfo(api) {
 }
 
 await Application.main(true, async (application) => {
+    applyI18nToDocument();
+
     const settingsController = new SettingsController(application);
     await settingsController.prepare();
 

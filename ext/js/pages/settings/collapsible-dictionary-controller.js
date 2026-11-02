@@ -131,7 +131,7 @@ export class CollapsibleDictionaryController {
 
         const option = document.createElement('option');
         option.value = 'varies';
-        option.textContent = 'Varies';
+        option.textContent = (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_varies')) || 'Varies';
         option.disabled = true;
         select.appendChild(option);
 

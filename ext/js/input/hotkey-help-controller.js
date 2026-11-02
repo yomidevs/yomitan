@@ -72,10 +72,14 @@ export class HotkeyHelpController {
                 if (typeof hotkey !== 'undefined') {
                     value = multipleValues ? values[i] : values;
                     if (typeof value === 'string') {
-                        value = value.replace(replacementPattern, hotkey);
+                        const resolved = this._resolveI18nValue(value);
+                        value = resolved.replace(replacementPattern, hotkey);
                     }
                 } else {
                     value = defaultAttributeValues[i];
+                    if (typeof value === 'string') {
+                        value = this._resolveI18nValue(value);
+                    }
                 }
 
                 if (typeof value === 'string') {
@@ -121,6 +125,22 @@ export class HotkeyHelpController {
             if (typeof name !== 'string' || typeof shortcut !== 'string' || shortcut.length === 0) { continue; }
             const {key, modifiers} = this._hotkeyUtil.convertCommandToInput(shortcut);
             commandMap.set(name, this._hotkeyUtil.getInputDisplayValue(key, modifiers));
+        }
+    }
+
+    /**
+     * Resolve `i18n:messageKey` placeholders used in data-hotkey value templates.
+     * @param {string} value
+     * @returns {string}
+     */
+    _resolveI18nValue(value) {
+        if (!value.startsWith('i18n:')) { return value; }
+        const key = value.slice(5);
+        try {
+            const message = chrome.i18n.getMessage(key);
+            return message || value;
+        } catch (e) {
+            return value;
         }
     }
 

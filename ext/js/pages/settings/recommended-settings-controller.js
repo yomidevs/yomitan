@@ -129,6 +129,22 @@ export class RecommendedSettingsController {
      */
     _renderLabel(template, setting) {
         const label = querySelectorNotNull(template, '.settings-item-label');
+        /**
+         * @param {string} key
+         * @param {string} fallback
+         * @param {string[]} [subs]
+         * @returns {string}
+         */
+        const msg = (key, fallback, subs) => {
+            try {
+                const m = typeof subs === 'undefined' ?
+                    chrome.i18n.getMessage(key) :
+                    chrome.i18n.getMessage(key, subs);
+                return m || fallback;
+            } catch (e) {
+                return fallback;
+            }
+        };
 
         const {modification} = setting;
         switch (modification.action) {
@@ -139,9 +155,9 @@ export class RecommendedSettingsController {
                 const valueCodeElement = document.createElement('code');
                 valueCodeElement.textContent = JSON.stringify(value, null, 2);
 
-                label.appendChild(document.createTextNode('Setting '));
+                label.appendChild(document.createTextNode(msg('js_recSetting', 'Setting ')));
                 label.appendChild(pathCodeElement);
-                label.appendChild(document.createTextNode(' = '));
+                label.appendChild(document.createTextNode(msg('js_recEquals', ' = ')));
                 label.appendChild(valueCodeElement);
                 break;
             }
@@ -150,7 +166,7 @@ export class RecommendedSettingsController {
                 const pathCodeElement = document.createElement('code');
                 pathCodeElement.textContent = path;
 
-                label.appendChild(document.createTextNode('Deleting '));
+                label.appendChild(document.createTextNode(msg('js_recDeleting', 'Deleting ')));
                 label.appendChild(pathCodeElement);
                 break;
             }
@@ -161,9 +177,9 @@ export class RecommendedSettingsController {
                 const path2CodeElement = document.createElement('code');
                 path2CodeElement.textContent = path2;
 
-                label.appendChild(document.createTextNode('Swapping '));
+                label.appendChild(document.createTextNode(msg('js_recSwapping', 'Swapping ')));
                 label.appendChild(path1CodeElement);
-                label.appendChild(document.createTextNode(' and '));
+                label.appendChild(document.createTextNode(msg('js_recAnd', ' and ')));
                 label.appendChild(path2CodeElement);
                 break;
             }
@@ -172,9 +188,13 @@ export class RecommendedSettingsController {
                 const pathCodeElement = document.createElement('code');
                 pathCodeElement.textContent = path;
 
-                label.appendChild(document.createTextNode('Splicing '));
+                label.appendChild(document.createTextNode(msg('js_recSplicing', 'Splicing ')));
                 label.appendChild(pathCodeElement);
-                label.appendChild(document.createTextNode(` at ${start} deleting ${deleteCount} items and inserting ${items.length} items`));
+                label.appendChild(document.createTextNode(msg(
+                    'js_recSpliceDetail',
+                    ` at ${start} deleting ${deleteCount} items and inserting ${items.length} items`,
+                    [String(start), String(deleteCount), String(items.length)],
+                )));
                 break;
             }
             case 'push': {
@@ -182,7 +202,11 @@ export class RecommendedSettingsController {
                 const pathCodeElement = document.createElement('code');
                 pathCodeElement.textContent = path;
 
-                label.appendChild(document.createTextNode(`Pushing ${items.length} items to `));
+                label.appendChild(document.createTextNode(msg(
+                    'js_recPushing',
+                    `Pushing ${items.length} items to `,
+                    [String(items.length)],
+                )));
                 label.appendChild(pathCodeElement);
                 break;
             }

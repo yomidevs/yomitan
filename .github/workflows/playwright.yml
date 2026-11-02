@@ -129,10 +129,22 @@ jobs:
           merge-multiple: true
 
       - name: Merge into HTML Report
-        run: npx playwright merge-reports --reporter html ./all-blob-reports
+        run: |
+          mkdir -p ./all-blob-reports
+          if [ -n "$(ls -A ./all-blob-reports 2>/dev/null)" ]; then
+            npx playwright merge-reports --reporter html ./all-blob-reports
+          else
+            mkdir -p playwright-report
+          fi
 
       - name: Merge into JSON Report
-        run: npx playwright merge-reports --reporter json ./all-blob-reports > playwright-results.json
+        run: |
+          mkdir -p ./all-blob-reports
+          if [ -n "$(ls -A ./all-blob-reports 2>/dev/null)" ]; then
+            npx playwright merge-reports --reporter json ./all-blob-reports > playwright-results.json
+          else
+            echo "[]" > playwright-results.json
+          fi
 
       - uses: actions/upload-artifact@v6
         with:
@@ -168,7 +180,8 @@ jobs:
 
       - name: '[PR] Calculate if any shard failed to download master screenshots'
         run: |
-          if grep -q "failure" master-screenshots-outcomes/*; then
+          mkdir -p master-screenshots-outcomes
+          if grep -q "failure" master-screenshots-outcomes/* 2>/dev/null; then
             echo "failure" > master-screenshots-outcome
           else
             echo "success" > master-screenshots-outcome
@@ -191,7 +204,9 @@ jobs:
           merge-multiple: true
 
       - name: Merge playwright output files
-        run: cat playwright-outputs/* > playwright-output
+        run: |
+          mkdir -p playwright-outputs
+          cat playwright-outputs/* 2>/dev/null > playwright-output || touch playwright-output
 
       - uses: actions/upload-artifact@v6
         with:

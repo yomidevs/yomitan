@@ -14,3 +14,7 @@ dictionaries/
 ext/manifest.json
 
 ext/lib/*
+
+# Local PR body drafts (not for upstream)
+PR_RUSSIAN_I18N.md
+

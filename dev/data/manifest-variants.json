@@ -1,9 +1,10 @@
 {
     "manifest": {
         "manifest_version": 3,
-        "name": "Yomitan Popup Dictionary",
+        "name": "__MSG_extensionName__",
         "version": "$YOMITAN_VERSION",
-        "description": "Popup dictionary for language learning",
+        "default_locale": "en",
+        "description": "__MSG_extensionDescription__",
         "author": {
             "email": "themoeway@googlegroups.com"
         },
@@ -26,7 +27,7 @@
                 "64": "images/icon64.png",
                 "128": "images/icon128.png"
             },
-            "default_title": "Yomitan",
+            "default_title": "__MSG_extensionActionTitle__",
             "default_popup": "action-popup.html"
         },
         "background": {
@@ -83,25 +84,25 @@
                 "suggested_key": {
                     "default": "Alt+Delete"
                 },
-                "description": "Toggle text scanning on/off"
+                "description": "__MSG_commandToggleTextScanning__"
             },
             "openInfoPage": {
-                "description": "Open the info page"
+                "description": "__MSG_commandOpenInfoPage__"
             },
             "openSettingsPage": {
-                "description": "Open the settings page"
+                "description": "__MSG_commandOpenSettingsPage__"
             },
             "openSearchPage": {
                 "suggested_key": {
                     "default": "Alt+Insert"
                 },
-                "description": "Open the search page in a new tab"
+                "description": "__MSG_commandOpenSearchPage__"
             },
             "openSearchPageCurrentTab": {
-                "description": "Open the search page in the current tab"
+                "description": "__MSG_commandOpenSearchPageCurrentTab__"
             },
             "openPopupWindow": {
-                "description": "Open the popup window"
+                "description": "__MSG_commandOpenPopupWindow__"
             }
         },
         "web_accessible_resources": [
@@ -142,22 +143,18 @@
             "fileName": "yomitan-chrome-dev.zip",
             "modifications": [
                 {
-                    "action": "replace",
+                    "action": "set",
                     "path": [
                         "name"
                     ],
-                    "pattern": "^.*$",
-                    "patternFlags": "",
-                    "replacement": "$& (development build)"
+                    "value": "__MSG_extensionNameDev__"
                 },
                 {
-                    "action": "replace",
+                    "action": "set",
                     "path": [
                         "description"
                     ],
-                    "pattern": "^(.*)(?:\\.\\s*)?$",
-                    "patternFlags": "",
-                    "replacement": "$1. This is a development build."
+                    "value": "__MSG_extensionDescriptionDev__"
                 }
             ]
         },
@@ -284,22 +281,18 @@
             "fileName": "yomitan-firefox-dev.zip",
             "modifications": [
                 {
-                    "action": "replace",
+                    "action": "set",
                     "path": [
                         "name"
                     ],
-                    "pattern": "^.*$",
-                    "patternFlags": "",
-                    "replacement": "$& (development build)"
+                    "value": "__MSG_extensionNameDev__"
                 },
                 {
-                    "action": "replace",
+                    "action": "set",
                     "path": [
                         "description"
                     ],
-                    "pattern": "^(.*)(?:\\.\\s*)?$",
-                    "patternFlags": "",
-                    "replacement": "$1. This is a development build."
+                    "value": "__MSG_extensionDescriptionDev__"
                 },
                 {
                     "action": "set",

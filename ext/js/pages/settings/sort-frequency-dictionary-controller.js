@@ -104,7 +104,7 @@ export class SortFrequencyDictionaryController {
         const fragment = document.createDocumentFragment();
         let option = document.createElement('option');
         option.value = '';
-        option.textContent = 'None';
+        option.textContent = (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_none')) || 'None';
         fragment.appendChild(option);
         for (const {title, counts} of dictionaries) {
             if (counts && counts.termMeta && counts.termMeta.freq > 0) {
