@@ -229,6 +229,12 @@ export type DeleteDictionaryProgressCallback = (data: DeleteDictionaryProgressDa
 
 export type MatchType = Dictionary.TermSourceMatchType;
 
+/** Forward fuseji pattern: `chars` are the code points; `isMask[i]` marks a wildcard position. */
+export type MaskedPattern = {
+    chars: string[];
+    isMask: boolean[];
+};
+
 export type MatchSource = Dictionary.TermSourceMatchSource;
 
 export type DictionaryAndQueryRequest = {

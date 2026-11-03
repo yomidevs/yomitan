@@ -103,6 +103,51 @@ function countKanjiWithCharacter(kanji, character) {
     return i;
 }
 
+/**
+ * @param {import('dictionary-database').TermEntry[]} dictionaryDatabaseEntries
+ * @param {import('dictionary-database').MatchType} matchType
+ * @returns {number}
+ */
+function countDictionaryDatabaseEntriesWithMatchType(dictionaryDatabaseEntries, matchType) {
+    return dictionaryDatabaseEntries.reduce((i, v) => (i + (v.matchType === matchType ? 1 : 0)), 0);
+}
+
+/**
+ * @param {import('dictionary-database').TermEntry[]} dictionaryDatabaseEntries
+ * @param {import('dictionary-database').MatchSource} matchSource
+ * @returns {number}
+ */
+function countDictionaryDatabaseEntriesWithMatchSource(dictionaryDatabaseEntries, matchSource) {
+    return dictionaryDatabaseEntries.reduce((i, v) => (i + (v.matchSource === matchSource ? 1 : 0)), 0);
+}
+
+/**
+ * Builds the `(pattern, keyMatcher)` pair that {@link DictionaryDatabase.findTermsByMaskedQueryBulk} expects
+ * from a masked query string, mirroring what the translator constructs. Characters in `triggers` act as
+ * single-character wildcards; a candidate matches if it is no longer than the pattern and every literal it
+ * spans is equal (leading-portion / partial match).
+ * @param {string} maskedText
+ * @param {string} triggers
+ * @returns {{pattern: import('dictionary-database').MaskedPattern, keyMatcher: (term: string) => boolean}}
+ */
+function createMaskedQuery(maskedText, triggers) {
+    const triggerSet = new Set(triggers);
+    const chars = [...maskedText];
+    const isMask = chars.map((character) => triggerSet.has(character));
+    /** @type {import('dictionary-database').MaskedPattern} */
+    const pattern = {chars, isMask};
+    /** @type {(term: string) => boolean} */
+    const keyMatcher = (term) => {
+        const termChars = [...term];
+        if (termChars.length > chars.length) { return false; }
+        for (let i = 0; i < termChars.length; ++i) {
+            if (!isMask[i] && chars[i] !== termChars[i]) { return false; }
+        }
+        return true;
+    };
+    return {pattern, keyMatcher};
+}
+
 
 /** */
 describe('Database', () => {
@@ -268,6 +313,27 @@ describe('Database', () => {
                     expect.soft(results.length).toStrictEqual(expectedResults.total);
                     for (const [mode, count] of expectedResults.modes) {
                         expect.soft(countMetasWithMode(results, mode)).toStrictEqual(count);
+                    }
+                }
+            }
+
+            // Test findTermsByMaskedQueryBulk
+            for (const {inputs, expectedResults} of testData.tests.findTermsByMaskedQueryBulk) {
+                for (const {maskedText, triggers, anchor, matchType, usePattern} of inputs) {
+                    const {pattern, keyMatcher} = createMaskedQuery(maskedText, triggers);
+                    const results = await dictionaryDatabase.findTermsByMaskedQueryBulk(anchor, matchType, titles, keyMatcher, usePattern ? pattern : null);
+                    expect.soft(results.length).toStrictEqual(expectedResults.total);
+                    for (const [term, count] of expectedResults.terms) {
+                        expect.soft(countDictionaryDatabaseEntriesWithTerm(results, term)).toStrictEqual(count);
+                    }
+                    for (const [reading, count] of expectedResults.readings) {
+                        expect.soft(countDictionaryDatabaseEntriesWithReading(results, reading)).toStrictEqual(count);
+                    }
+                    for (const [type, count] of expectedResults.matchTypes ?? []) {
+                        expect.soft(countDictionaryDatabaseEntriesWithMatchType(results, type)).toStrictEqual(count);
+                    }
+                    for (const [source, count] of expectedResults.matchSources ?? []) {
+                        expect.soft(countDictionaryDatabaseEntriesWithMatchSource(results, source)).toStrictEqual(count);
                     }
                 }
             }
