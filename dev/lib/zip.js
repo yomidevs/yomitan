@@ -29,4 +29,4 @@
  * As a workaround, testing zip data can be generated using {level: 0} compression.
  */
 
-export * from '@zip.js/zip.js/lib/zip.js';
+export * from '@zip.js/zip.js/lib/zip-native.js';
