@@ -152,7 +152,7 @@ await Application.main(true, async (application) => {
     const languagesController = new LanguagesController(settingsController);
     preparePromises.push(languagesController.prepare());
 
-    const translationTextReplacementsController = new TranslationTextReplacementsController(settingsController);
+    const translationTextReplacementsController = new TranslationTextReplacementsController(settingsController, modalController);
     preparePromises.push(translationTextReplacementsController.prepare());
 
     const sentenceTerminationCharactersController = new SentenceTerminationCharactersController(settingsController);

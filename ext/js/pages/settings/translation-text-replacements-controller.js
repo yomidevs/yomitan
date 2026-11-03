@@ -17,58 +17,70 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
+import {parseJson} from '../../core/json.js';
+import {log} from '../../core/log.js';
+import {isObjectNotArray} from '../../core/object-utilities.js';
+import {toError} from '../../core/to-error.js';
+import {arrayBufferUtf8Decode} from '../../data/array-buffer-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
+import {getSettingsExportDateString, readFileArrayBuffer} from './backup-controller.js';
 
 export class TranslationTextReplacementsController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
+     * @param {import('./modal-controller.js').ModalController} modalController
      */
-    constructor(settingsController) {
+    constructor(settingsController, modalController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {import('./modal-controller.js').ModalController} */
+        this._modalController = modalController;
         /** @type {HTMLElement} */
         this._entryContainer = querySelectorNotNull(document, '#translation-text-replacement-list');
         /** @type {TranslationTextReplacementsEntry[]} */
         this._entries = [];
+        /** @type {?HTMLElement} */
+        this._statusNode = null;
+        /** @type {?() => void} */
+        this._exportRevoke = null;
+        /** @type {number} */
+        this._currentVersion = 0;
     }
 
     /** */
     async prepare() {
         /** @type {HTMLButtonElement} */
         const addButton = querySelectorNotNull(document, '#translation-text-replacement-add');
+        /** @type {HTMLButtonElement} */
+        const importButton = querySelectorNotNull(document, '#translation-text-replacement-import-button');
+        /** @type {HTMLInputElement} */
+        const importFileInput = querySelectorNotNull(document, '#translation-text-replacement-import-file');
+        /** @type {HTMLButtonElement} */
+        const exportButton = querySelectorNotNull(document, '#translation-text-replacement-export-button');
+        /** @type {HTMLElement} */
+        const statusNode = querySelectorNotNull(document, '#translation-text-replacement-import-status');
+
+        this._statusNode = statusNode;
 
         addButton.addEventListener('click', this._onAdd.bind(this), false);
+        importButton.addEventListener('click', this._onImportClick.bind(this), false);
+        importFileInput.addEventListener('change', this._onImportFileChange.bind(this), false);
+        exportButton.addEventListener('click', this._onExportClick.bind(this), false);
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+
+        if (this._modalController !== null) {
+            const modal = this._modalController.getModal('translation-text-replacement-patterns');
+            if (modal !== null) {
+                modal.on('visibilityChanged', this._onModalVisibilityChanged.bind(this));
+            }
+        }
 
         await this._updateOptions();
     }
 
     /** */
     async addGroup() {
-        const options = await this._settingsController.getOptions();
-        const {groups} = options.translation.textReplacements;
-        const newEntry = this._createNewEntry();
-        /** @type {import('settings-modifications').Modification} */
-        const target = (
-            (groups.length === 0) ?
-            {
-                action: 'splice',
-                path: 'translation.textReplacements.groups',
-                start: 0,
-                deleteCount: 0,
-                items: [[newEntry]],
-            } :
-            {
-                action: 'splice',
-                path: 'translation.textReplacements.groups[0]',
-                start: groups[0].length,
-                deleteCount: 0,
-                items: [newEntry],
-            }
-        );
-
-        await this._settingsController.modifyProfileSettings([target]);
-        await this._updateOptions();
+        await this._appendEntries([this._createNewEntry()]);
     }
 
     /**
@@ -136,6 +148,15 @@ export class TranslationTextReplacementsController {
         void this.addGroup();
     }
 
+    /**
+     * @param {import('panel-element').EventArgument<'visibilityChanged'>} details
+     */
+    _onModalVisibilityChanged({visible}) {
+        if (visible) {
+            this._setStatus(null, false);
+        }
+    }
+
     /** */
     async _updateOptions() {
         const options = await this._settingsController.getOptions();
@@ -148,6 +169,237 @@ export class TranslationTextReplacementsController {
      */
     _createNewEntry() {
         return {pattern: '', ignoreCase: false, replacement: ''};
+    }
+
+    /**
+     * @param {import('settings').TranslationTextReplacementGroup[]} entries
+     */
+    async _appendEntries(entries) {
+        if (entries.length === 0) { return; }
+
+        const options = await this._settingsController.getOptions();
+        const {groups} = options.translation.textReplacements;
+        /** @type {import('settings-modifications').Modification} */
+        const target = (
+            (groups.length === 0) ?
+            {
+                action: 'splice',
+                path: 'translation.textReplacements.groups',
+                start: 0,
+                deleteCount: 0,
+                items: [entries],
+            } :
+            {
+                action: 'splice',
+                path: 'translation.textReplacements.groups[0]',
+                start: groups[0].length,
+                deleteCount: 0,
+                items: entries,
+            }
+        );
+
+        await this._settingsController.modifyProfileSettings([target]);
+        await this._updateOptions();
+    }
+
+    /** */
+    _onExportClick() {
+        void this._exportPatterns();
+    }
+
+    /** */
+    async _exportPatterns() {
+        this._setStatus(null, false);
+
+        if (this._exportRevoke !== null) {
+            this._exportRevoke();
+            this._exportRevoke = null;
+        }
+
+        const options = await this._settingsController.getOptions();
+        const {groups} = options.translation.textReplacements;
+        const patterns = groups.length > 0 ? groups[0] : [];
+        if (patterns.length === 0) {
+            this._setStatus('There are no text replacement patterns to export.', true);
+            return;
+        }
+
+        const date = new Date(Date.now());
+        /** @type {import('translation-text-replacements-controller').TextReplacementsBackupData} */
+        const data = {
+            version: this._currentVersion,
+            patterns: patterns.map(({pattern, ignoreCase, replacement}) => ({pattern, ignoreCase, replacement})),
+        };
+
+        const fileName = `yomitan-text-replacements-${getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
+        const blob = new Blob([JSON.stringify(data, null, 4)], {type: 'application/json'});
+        this._saveBlob(blob, fileName);
+        this._setStatus(`Exported ${patterns.length} ${patterns.length === 1 ? 'pattern' : 'patterns'}.`, false);
+    }
+
+    /**
+     * @param {Blob} blob
+     * @param {string} fileName
+     */
+    _saveBlob(blob, fileName) {
+        const blobUrl = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = fileName;
+        a.rel = 'noopener';
+        a.target = '_blank';
+
+        const revoke = () => {
+            URL.revokeObjectURL(blobUrl);
+            a.href = '';
+            this._exportRevoke = null;
+        };
+        this._exportRevoke = revoke;
+
+        a.dispatchEvent(new MouseEvent('click'));
+        setTimeout(revoke, 60000);
+    }
+
+    /** */
+    _onImportClick() {
+        this._setStatus(null, false);
+        /** @type {HTMLElement} */
+        const element = querySelectorNotNull(document, '#translation-text-replacement-import-file');
+        element.click();
+    }
+
+    /**
+     * @param {Event} e
+     */
+    async _onImportFileChange(e) {
+        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const files = element.files;
+        if (files === null || files.length === 0) { return; }
+
+        const file = files[0];
+        element.value = '';
+        try {
+            const {added, skipped} = await this._importPatternsFile(file);
+            const parts = [`Imported ${added} ${added === 1 ? 'pattern' : 'patterns'}.`];
+            if (skipped > 0) {
+                parts.push(`Skipped ${skipped} already present.`);
+            }
+            this._setStatus(parts.join(' '), false);
+        } catch (error) {
+            const error2 = toError(error);
+            log.error(error2);
+            this._setStatus(`Import failed: ${error2.message}`, true);
+        }
+    }
+
+    /**
+     * @param {File} file
+     * @returns {Promise<import('translation-text-replacements-controller').ImportResult>}
+     */
+    async _importPatternsFile(file) {
+        const dataString = arrayBufferUtf8Decode(await readFileArrayBuffer(file));
+        /** @type {unknown} */
+        const data = parseJson(dataString);
+        const patterns = this._parseImportedPatterns(data);
+
+        const options = await this._settingsController.getOptions();
+        const {groups} = options.translation.textReplacements;
+        const existing = new Set((groups.length > 0 ? groups[0] : []).map((entry) => this._getEntryKey(entry)));
+
+        /** @type {import('settings').TranslationTextReplacementGroup[]} */
+        const entries = [];
+        let skipped = 0;
+        for (const entry of patterns) {
+            const key = this._getEntryKey(entry);
+            if (existing.has(key)) {
+                ++skipped;
+                continue;
+            }
+            existing.add(key);
+            entries.push(entry);
+        }
+
+        await this._appendEntries(entries);
+        return {added: entries.length, skipped};
+    }
+
+    /**
+     * @param {unknown} data
+     * @returns {import('settings').TranslationTextReplacementGroup[]}
+     * @throws {Error}
+     */
+    _parseImportedPatterns(data) {
+        /** @type {unknown} */
+        let rawPatterns;
+        if (Array.isArray(data)) {
+            rawPatterns = data;
+        } else if (isObjectNotArray(data)) {
+            const version = data.version;
+            if (typeof version === 'number' && version > this._currentVersion) {
+                throw new Error(`Unsupported version: ${version}`);
+            }
+            rawPatterns = data.patterns;
+        }
+        if (!Array.isArray(rawPatterns)) {
+            throw new Error('Expected an array of patterns, or an object with a "patterns" array');
+        }
+
+        /** @type {import('settings').TranslationTextReplacementGroup[]} */
+        const result = [];
+        for (let i = 0, ii = rawPatterns.length; i < ii; ++i) {
+            result.push(this._parseImportedPattern(rawPatterns[i], `Pattern ${i + 1}`));
+        }
+        return result;
+    }
+
+    /**
+     * @param {unknown} entry
+     * @param {string} label
+     * @returns {import('settings').TranslationTextReplacementGroup}
+     * @throws {Error}
+     */
+    _parseImportedPattern(entry, label) {
+        if (!isObjectNotArray(entry)) {
+            throw new Error(`${label} is not an object`);
+        }
+        const {pattern, ignoreCase, replacement} = entry;
+        if (typeof pattern !== 'string') {
+            throw new Error(`${label} is missing a string "pattern" field`);
+        }
+        if (typeof replacement !== 'string') {
+            throw new Error(`${label} is missing a string "replacement" field`);
+        }
+        if (typeof ignoreCase !== 'undefined' && typeof ignoreCase !== 'boolean') {
+            throw new Error(`${label} has a non-boolean "ignoreCase" field`);
+        }
+        try {
+            // eslint-disable-next-line no-new
+            new RegExp(pattern, 'g');
+        } catch (e) {
+            throw new Error(`${label} is not a valid regular expression: ${pattern}`);
+        }
+        return {pattern, ignoreCase: ignoreCase === true, replacement};
+    }
+
+    /**
+     * @param {import('settings').TranslationTextReplacementGroup} entry
+     * @returns {string}
+     */
+    _getEntryKey({pattern, ignoreCase, replacement}) {
+        return JSON.stringify([pattern, ignoreCase, replacement]);
+    }
+
+    /**
+     * @param {?string} message
+     * @param {boolean} isError
+     */
+    _setStatus(message, isError) {
+        const node = this._statusNode;
+        if (node === null) { return; }
+        node.textContent = message !== null ? message : '';
+        node.hidden = (message === null);
+        node.classList.toggle('danger-text', isError);
     }
 }
 
