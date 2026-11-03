@@ -2766,6 +2766,7 @@ export class Backend {
             translation: {
                 textReplacements: textReplacementsOptions,
                 searchResolution,
+                enableGrammarWildcards,
             },
         } = options;
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
@@ -2790,6 +2791,7 @@ export class Backend {
             sortFrequencyDictionaryOrder,
             removeNonJapaneseCharacters: !alphanumeric,
             searchResolution,
+            enableGrammarWildcards,
             textReplacements,
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
