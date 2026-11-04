@@ -614,6 +614,10 @@ function createProfileOptionsUpdatedTestData1() {
             autoSearchContent: true,
             maximumSearchLength: 1000,
         },
+        bunpro: {
+            enable: false,
+            colorStudyModes: false,
+        },
         accessibility: {
             forceGoogleDocsHtmlRendering: false,
         },
@@ -707,7 +711,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 77,
+        version: 79,
         global: {
             database: {
                 prefixWildcardsSupported: false,
@@ -741,6 +745,32 @@ describe('OptionsUtil', () => {
         const optionsUpdated = structuredClone(await optionsUtil.update(options));
         const optionsExpected = createOptionsUpdatedTestData1();
         expect(optionsUpdated).toStrictEqual(optionsExpected);
+    });
+
+    test('Version 78 adds bunpro.enable to every profile', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = /** @type {import('core').SafeAny} */ (createOptionsUpdatedTestData1());
+        options.version = 77;
+        delete options.profiles[0].options.bunpro;
+        const optionsUpdated = structuredClone(await optionsUtil.update(options));
+
+        expect(optionsUpdated.version).toStrictEqual(79);
+        expect(optionsUpdated.profiles[0].options.bunpro).toStrictEqual({enable: false, colorStudyModes: false});
+    });
+
+    test('Version 79 adds bunpro.colorStudyModes', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = /** @type {import('core').SafeAny} */ (createOptionsUpdatedTestData1());
+        options.version = 78;
+        options.profiles[0].options.bunpro = {enable: true};
+        const optionsUpdated = structuredClone(await optionsUtil.update(options));
+
+        expect(optionsUpdated.version).toStrictEqual(79);
+        expect(optionsUpdated.profiles[0].options.bunpro).toStrictEqual({enable: true, colorStudyModes: false});
     });
 
     test('CumulativeFieldTemplatesUpdates', async () => {
