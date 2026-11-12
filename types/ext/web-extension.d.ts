@@ -18,3 +18,8 @@
 export type Events = {
     unloaded: Record<string, never>;
 };
+
+export type FirefoxCommands = typeof browser.commands & {
+    update: (detail: {name: string, shortcut: string}) => Promise<void>;
+    reset: (name: string) => Promise<void>;
+};

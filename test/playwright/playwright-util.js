@@ -23,6 +23,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const root = path.join(dirname, '..', '..');
 
+/** @type {import('@playwright/test').TestType<import('@playwright/test').PlaywrightTestArgs & import('@playwright/test').PlaywrightTestOptions & {extensionId: string}, import('@playwright/test').PlaywrightWorkerArgs & import('@playwright/test').PlaywrightWorkerOptions>} */
 export const test = base.extend({
     // eslint-disable-next-line no-empty-pattern
     context: async ({}, /** @type {(r: import('playwright').BrowserContext) => Promise<void>} */ use) => {
