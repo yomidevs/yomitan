@@ -15,9 +15,4 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * The native build provides a JavaScript compression fallback and does not require
- * loading the zip.js WebAssembly module under extension content security policies.
- */
-
 export * from '@zip.js/zip.js/lib/zip-core-native.js';
