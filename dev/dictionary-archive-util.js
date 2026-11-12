@@ -24,15 +24,15 @@ import {parseJson} from './json.js';
  * Creates a zip archive from the given dictionary directory.
  * @param {string} dictionaryDirectory
  * @param {string} [dictionaryName]
+ * @param {number} [compressionLevel]
  * @returns {Promise<ArrayBuffer>}
  */
-export async function createDictionaryArchiveData(dictionaryDirectory, dictionaryName) {
+export async function createDictionaryArchiveData(dictionaryDirectory, dictionaryName, compressionLevel = 0) {
     const fileNames = readdirSync(dictionaryDirectory);
     const zipFileWriter = new BlobWriter();
-    // Level 0 compression used since decompression in the node environment is not supported.
-    // See dev/lib/zip.js for more details.
     const zipWriter = new ZipWriter(zipFileWriter, {
-        level: 0,
+        level: compressionLevel,
+        useWebWorkers: false,
     });
     for (const fileName of fileNames) {
         if (/\.json$/.test(fileName)) {
@@ -57,7 +57,7 @@ export async function createDictionaryArchiveData(dictionaryDirectory, dictionar
  * @returns {Promise<string>}
  */
 export async function readArchiveEntryDataString(entry) {
-    if (typeof entry.getData === 'undefined') { throw new Error('Cannot get index data'); }
+    if (entry.directory) { throw new Error('Cannot get index data'); }
     return await entry.getData(new TextWriter());
 }
 
@@ -77,7 +77,7 @@ export async function readArchiveEntryDataJson(entry) {
  */
 export async function getDictionaryArchiveEntries(data) {
     const zipFileReader = new Uint8ArrayReader(new Uint8Array(data));
-    const zipReader = new ZipReader(zipFileReader);
+    const zipReader = new ZipReader(zipFileReader, {useWebWorkers: false});
     return await zipReader.getEntries();
 }
 
