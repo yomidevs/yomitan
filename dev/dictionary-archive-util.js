@@ -24,14 +24,13 @@ import {parseJson} from './json.js';
  * Creates a zip archive from the given dictionary directory.
  * @param {string} dictionaryDirectory
  * @param {string} [dictionaryName]
- * @param {number} [compressionLevel]
  * @returns {Promise<ArrayBuffer>}
  */
-export async function createDictionaryArchiveData(dictionaryDirectory, dictionaryName, compressionLevel = 0) {
+export async function createDictionaryArchiveData(dictionaryDirectory, dictionaryName) {
     const fileNames = readdirSync(dictionaryDirectory);
     const zipFileWriter = new BlobWriter();
     const zipWriter = new ZipWriter(zipFileWriter, {
-        level: compressionLevel,
+        level: 0,
         useWebWorkers: false,
     });
     for (const fileName of fileNames) {

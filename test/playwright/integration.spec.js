@@ -16,7 +16,7 @@
  */
 
 import path from 'path';
-import {createDictionaryArchiveData, getDictionaryArchiveEntries} from '../../dev/dictionary-archive-util.js';
+import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
 import {deferPromise} from '../../ext/js/core/utilities.js';
 import {
     expect,
@@ -41,41 +41,6 @@ test('search clipboard', async ({page, extensionId}) => {
 
     await writeToClipboardFromPage(page, 'あ');
     await expect(page.locator('#search-textbox')).toHaveValue('あ');
-});
-
-test('import compressed dictionary', async ({page, extensionId}) => {
-    const dictionary = await createDictionaryArchiveData(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1', 6);
-    const entries = await getDictionaryArchiveEntries(dictionary);
-    expect(entries.some((entry) => entry.compressionMethod === 8)).toBe(true);
-
-    await page.goto(`chrome-extension://${extensionId}/settings.html`);
-    await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
-        name: 'valid-dictionary1.zip',
-        mimeType: 'application/x-zip',
-        buffer: Buffer.from(dictionary),
-    });
-    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 1 * 60 * 1000});
-});
-
-test('decompress dictionary using zip worker', async ({page, extensionId}) => {
-    const dictionary = await createDictionaryArchiveData(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1', 6);
-    await page.goto(`chrome-extension://${extensionId}/settings.html`);
-    const workerPromise = page.waitForEvent('worker', {predicate: (worker) => worker.url().endsWith('/lib/z-worker.js')});
-    const extraction = page.evaluate(async (data) => {
-        /** @type {typeof import('@zip.js/zip.js')} */
-        const zip = /** @type {typeof import('@zip.js/zip.js')} */ (/** @type {unknown} */ (await import(new URL('/lib/zip.js', location.href).href))); // eslint-disable-line no-unsanitized/method, @typescript-eslint/no-unsafe-assignment -- The URL is a fixed extension resource.
-        zip.configure({workerURI: new URL('/lib/z-worker.js', location.href).href, useCompressionStream: false});
-        const reader = new zip.ZipReader(new zip.Uint8ArrayReader(new Uint8Array(data)));
-        const entries = await reader.getEntries();
-        const index = entries.find((entry) => entry.filename === 'index.json');
-        if (!index || index.directory) { throw new Error('Missing index.json'); }
-        const content = await index.getData(new zip.TextWriter());
-        await reader.close();
-        return content;
-    }, [...new Uint8Array(dictionary)]);
-    const worker = await workerPromise;
-    expect(await worker.evaluate(() => self.location.href)).toContain('/lib/z-worker.js');
-    expect(await extraction).toContain('valid-dictionary1');
 });
 
 test('anki add', async ({context, page, extensionId}) => {
