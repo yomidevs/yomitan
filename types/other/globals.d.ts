@@ -17,6 +17,12 @@
 
 declare global {
     function clearTimeout(timeoutId: NodeJS.Timeout | string | number | undefined): void;
+
+    const ImageDecoder: {
+        new(init: ImageDecoderInit): {
+            decode(options?: ImageDecodeOptions): Promise<ImageDecodeResult>;
+        };
+    };
 }
 
 export { };

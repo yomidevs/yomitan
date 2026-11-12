@@ -22,6 +22,8 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
+/** @typedef {typeof browser.commands & {update: (detail: {name: string, shortcut: string}) => Promise<void>, reset: (name: string) => Promise<void>}} FirefoxCommands */
+
 export class ExtensionKeyboardShortcutController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
@@ -101,7 +103,7 @@ export class ExtensionKeyboardShortcutController {
     async updateCommand(name, key, modifiers) {
         // Firefox-only; uses Promise API
         const shortcut = this._hotkeyUtil.convertInputToCommand(key, modifiers);
-        await browser.commands.update({name, shortcut});
+        await /** @type {FirefoxCommands} */ (browser.commands).update({name, shortcut});
     }
 
     /**
@@ -111,7 +113,7 @@ export class ExtensionKeyboardShortcutController {
         return (
             typeof browser === 'object' && browser !== null &&
             typeof browser.commands === 'object' && browser.commands !== null &&
-            typeof browser.commands.reset === 'function'
+            typeof /** @type {FirefoxCommands} */ (browser.commands).reset === 'function'
         );
     }
 
@@ -122,7 +124,7 @@ export class ExtensionKeyboardShortcutController {
         return (
             typeof browser === 'object' && browser !== null &&
             typeof browser.commands === 'object' && browser.commands !== null &&
-            typeof browser.commands.update === 'function'
+            typeof /** @type {FirefoxCommands} */ (browser.commands).update === 'function'
         );
     }
 
@@ -235,7 +237,7 @@ export class ExtensionKeyboardShortcutController {
      */
     async _resetCommand(name) {
         // Firefox-only; uses Promise API
-        await browser.commands.reset(name);
+        await /** @type {FirefoxCommands} */ (browser.commands).reset(name);
     }
 }
 
