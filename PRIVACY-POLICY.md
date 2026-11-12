@@ -42,6 +42,10 @@ Yomitan provides an option to expose data to other applications through an API.
 
 Local applications may request data from Yomitan through the Yomitan API for external use. The Yomitan API is not accessible by other devices.
 
+## Bunpro (disabled by default)
+
+When Bunpro integration is enabled, Yomitan sends the **term, reading, and JMdict id** of looked-up Japanese dictionary entries to [Bunpro](https://bunpro.jp/) (`api.bunpro.jp`) to find a matching review item and its level. Adding or removing an item sends that item's Bunpro id. The API key the user pastes is sent with those requests and is stored only on the device. Yomitan does not read Bunpro cookies.
+
 ## Mecab (disabled by default)
 
 [Mecab](https://taku910.github.io/mecab/) connectivity is available for text parsing. Yomitan may send **search query text** to Mecab for parsing. Personally identifying information is never sent.

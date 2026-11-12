@@ -19,6 +19,7 @@
 import {getAnkiCompactGlossStyles} from '../../data/anki-compact-gloss-style.js';
 import {addScopeToCssLegacy} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../dictionary/dictionary-data-util.js';
+import {getTermDictionaryEntrySequence} from '../dictionary/term-dictionary-entry-sequence.js';
 import {distributeFurigana, distributeFuriganaInflected} from '../language/ja/japanese.js';
 
 /**
@@ -1023,26 +1024,4 @@ function getTermHeadwordFuriganaSegments(term, reading) {
         result.push({text, furigana: reading2});
     }
     return result;
-}
-
-/**
- * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
- * @returns {number}
- */
-function getTermDictionaryEntrySequence(dictionaryEntry) {
-    let hasSequence = false;
-    let mainSequence = -1;
-    if (!dictionaryEntry.isPrimary) { return mainSequence; }
-    for (const {sequences} of dictionaryEntry.definitions) {
-        const sequence = sequences[0];
-        if (!hasSequence) {
-            mainSequence = sequence;
-            hasSequence = true;
-            if (mainSequence === -1) { break; }
-        } else if (mainSequence !== sequence) {
-            mainSequence = -1;
-            break;
-        }
-    }
-    return mainSequence;
 }
