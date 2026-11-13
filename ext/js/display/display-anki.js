@@ -24,6 +24,7 @@ import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
 import {getDynamicTemplates} from '../data/anki-template-util.js';
 import {INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
+import {getPrimaryHeadword} from '../dictionary/dictionary-data-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
@@ -433,7 +434,7 @@ export class DisplayAnki {
         try {
             for (let i = 0, ii = len; i < ii; ++i) {
                 const {type} = dictionaryEntries[i];
-                const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntries[i]);
+                const details = getPrimaryHeadword(dictionaryEntries[i]);
                 for (const [cardFormatIndex, cardFormat] of this._cardFormats.entries()) {
                     if (cardFormat.type !== type) { continue; }
                     const skeleton = skeletonNoteTemplates[cardFormatIndex];
@@ -1229,7 +1230,7 @@ export class DisplayAnki {
         const template = this._ankiFieldTemplates;
         if (typeof template !== 'string') { throw new Error('Invalid template'); }
         const contentOrigin = this._display.getContentOrigin();
-        const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntry);
+        const details = getPrimaryHeadword(dictionaryEntry);
         const audioDetails = this._getAnkiNoteMediaAudioDetails(details);
         const optionsContext = this._display.getOptionsContext();
         const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(this._dictionaries);

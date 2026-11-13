@@ -39,6 +39,10 @@ export type Events = {
         options: Settings.ProfileOptions;
         optionsContext: Settings.OptionsContext;
     };
+    /** A setting write from this page finished. The page ignores its own options echo, so listeners use this instead. */
+    settingsModified: {
+        paths: string[];
+    };
     optionsContextChanged: Record<string, never>;
     permissionsChanged: {
         permissions: chrome.permissions.Permissions;
