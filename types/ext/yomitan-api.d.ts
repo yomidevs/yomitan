@@ -16,6 +16,7 @@
  */
 
 import type * as Dictionary from './dictionary';
+import type * as EventListenerCollection from './event-listener-collection';
 
 export type termEntriesInput = {
     term: string | string[];
@@ -68,4 +69,10 @@ export type apiAudioMediaDetails = {
     mediaType: string;
     content: AudioBinaryBase64;
     ankiFilename: string;
+};
+
+export type apiPort = {
+    onMessage: EventListenerCollection.ExtensionEvent<(message: unknown, port: chrome.runtime.Port) => void>;
+    onDisconnect: EventListenerCollection.ExtensionEvent<(port: chrome.runtime.Port) => void>;
+    disconnect: () => void;
 };

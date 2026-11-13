@@ -131,7 +131,8 @@
                                     "lineHeight",
                                     "enableYomitanApi",
                                     "yomitanApiServer",
-                                    "yomitanApiAllowCssSanitizationBypass"
+                                    "yomitanApiAllowCssSanitizationBypass",
+                                    "externallyConnectableExtensionIds"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -357,6 +358,13 @@
                                     "yomitanApiAllowCssSanitizationBypass": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "externallyConnectableExtensionIds": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "default": []
                                     }
                                 }
                             },

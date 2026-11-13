@@ -155,6 +155,7 @@ export type GeneralOptions = {
     stickySearchHeader: boolean;
     enableYomitanApi: boolean;
     yomitanApiAllowCssSanitizationBypass: boolean;
+    externallyConnectableExtensionIds: string[];
 };
 
 export type PopupWindowOptions = {
