@@ -1693,6 +1693,33 @@
             <button type="button" class="low-emphasis" data-modal-action="hide" id="accept-data-transmission">Agree to data transmission<br>(enable audio playback)</button>
         </div>
     </div></div>
+
+    <!-- Externally Connectable Extension IDs -->
+    <div id="externally-connectable-extension-ids-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Externally Connectable Extension IDs</div>
+        </div>
+        <div class="modal-body">
+            <div class="settings-item">
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Extension IDs</div>
+                    </div>
+                </div>
+                <div class="settings-item-children">
+                    <div id="externally-connectable-extension-id-list" class="generic-list">
+                        <div class="externally-connectable-extension-id-index generic-list-index-prefix"></div>
+                        <input type="text" class="externally-connectable-extension-id-input horizontal-flex-fill" autocomplete="off" spellcheck="false" id="externally-connectable-extension-id-new-input">
+                        <button type="button" class="low-emphasis externally-connectable-extension-id-button" id="externally-connectable-extension-id-add">Add</button>
+                    </div>
+                    <div id="externally-connectable-extension-id-error" class="margin-above danger-text" hidden></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
 </template>
 
 </body></html>

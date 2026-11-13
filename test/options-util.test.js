@@ -317,6 +317,7 @@ function createProfileOptionsUpdatedTestData1() {
             enableYomitanApi: false,
             yomitanApiServer: 'http://127.0.0.1:19633',
             yomitanApiAllowCssSanitizationBypass: false,
+            externallyConnectableExtensionIds: [],
         },
         audio: {
             enabled: true,
