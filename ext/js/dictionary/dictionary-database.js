@@ -314,6 +314,230 @@ export class DictionaryDatabase {
     }
 
     /**
+     * Finds fuseji (masked) term records from one unmasked anchor, keeping records whose expression OR reading
+     * fits the masked `pattern`. With a `pattern`, skip-scans the anchor range via the pattern's literals;
+     * without one, falls back to a plain key-cursor scan (the reference path).
+     *
+     * Suffix anchors scan the reverse indices, where the sub-pattern (masks + anchor) is reversed so the same
+     * skip-scan applies; `keyMatcher` then guards each hit, as the reverse range over-includes other lengths.
+     * @param {string} anchor Unmasked prefix/suffix literal bounding the index range.
+     * @param {import('dictionary-database').MatchType} matchType
+     * @param {import('dictionary-database').DictionarySet} dictionaries
+     * @param {(term: string) => boolean} keyMatcher Tests a forward expression/reading against the pattern.
+     * @param {?import('dictionary-database').MaskedPattern} [pattern] Forward masked pattern; enables skip-scan.
+     * @returns {Promise<import('dictionary-database').TermEntry[]>}
+     */
+    findTermsByMaskedQueryBulk(anchor, matchType, dictionaries, keyMatcher, pattern = null) {
+        if (pattern === null) {
+            return this._fusejiFindViaCursor(anchor, matchType, dictionaries, keyMatcher);
+        }
+        return new Promise((resolve, reject) => {
+            const isSuffix = (matchType === 'suffix');
+            const indexNames = isSuffix ? ['expressionReverse', 'readingReverse'] : ['expression', 'reading'];
+            const query = isSuffix ? this._createBoundQuery2(anchor) : this._createBoundQuery1(anchor);
+            // Reverse-index scan needs the pattern in reversed key space; guard hits with the forward matcher.
+            const scanPattern = isSuffix ? this._reverseMaskedSubPattern(pattern, anchor) : pattern;
+            /** @type {?(key: string) => boolean} */
+            const recordGuard = isSuffix ? (key) => keyMatcher(stringReverse(key)) : null;
+
+            const transaction = this._db.transaction(['terms'], 'readonly');
+            const objectStore = transaction.objectStore('terms');
+
+            // Survivor -> matching index; lower index wins so expression (0) beats reading (1) for matchSource.
+            /** @type {Map<IDBValidKey, number>} */
+            const primaryKeyToIndexIndex = new Map();
+            let completed = 0;
+
+            for (let j = 0; j < indexNames.length; ++j) {
+                const indexIndex = j;
+                this._fusejiSkipScanIndex(objectStore, indexNames[j], query, scanPattern, recordGuard, (primaryKeys) => {
+                    for (const primaryKey of primaryKeys) {
+                        const existing = primaryKeyToIndexIndex.get(primaryKey);
+                        if (existing === void 0 || indexIndex < existing) {
+                            primaryKeyToIndexIndex.set(primaryKey, indexIndex);
+                        }
+                    }
+                    if (++completed >= indexNames.length) {
+                        this._fusejiFetchAndBuild(objectStore, primaryKeyToIndexIndex, anchor, matchType, dictionaries, resolve, reject);
+                    }
+                }, reject);
+            }
+        });
+    }
+
+    /**
+     * Reverses the masks-plus-anchor slice (positions `0 .. lastMask + anchorLength`) of a forward pattern
+     * into reverse-index key space for a suffix scan.
+     * @param {import('dictionary-database').MaskedPattern} pattern Forward masked pattern.
+     * @param {string} anchor
+     * @returns {import('dictionary-database').MaskedPattern}
+     */
+    _reverseMaskedSubPattern(pattern, anchor) {
+        const {chars, isMask} = pattern;
+        let lastMask = -1;
+        for (let i = 0; i < isMask.length; ++i) {
+            if (isMask[i]) { lastMask = i; }
+        }
+        const subLength = lastMask + 1 + [...anchor].length;
+        return {
+            chars: chars.slice(0, subLength).reverse(),
+            isMask: isMask.slice(0, subLength).reverse(),
+        };
+    }
+
+    /**
+     * Reference path (no pattern): plain key-cursor scan of the anchor range, keeping every matching key.
+     * @param {string} anchor
+     * @param {import('dictionary-database').MatchType} matchType
+     * @param {import('dictionary-database').DictionarySet} dictionaries
+     * @param {(term: string) => boolean} keyMatcher
+     * @returns {Promise<import('dictionary-database').TermEntry[]>}
+     */
+    _fusejiFindViaCursor(anchor, matchType, dictionaries, keyMatcher) {
+        return new Promise((resolve, reject) => {
+            const isSuffix = (matchType === 'suffix');
+            const indexNames = isSuffix ? ['expressionReverse', 'readingReverse'] : ['expression', 'reading'];
+            const query = isSuffix ? this._createBoundQuery2(anchor) : this._createBoundQuery1(anchor);
+
+            const transaction = this._db.transaction(['terms'], 'readonly');
+            const objectStore = transaction.objectStore('terms');
+
+            /** @type {Map<IDBValidKey, number>} */
+            const primaryKeyToIndexIndex = new Map();
+            let completed = 0;
+
+            for (let j = 0; j < indexNames.length; ++j) {
+                const indexIndex = j;
+                /** @type {(key: IDBValidKey) => boolean} */
+                const keyPredicate = (key) => keyMatcher(isSuffix ? stringReverse(/** @type {string} */ (key)) : /** @type {string} */ (key));
+                /** @type {(primaryKeys: IDBValidKey[]) => void} */
+                const onKeys = (primaryKeys) => {
+                    for (const primaryKey of primaryKeys) {
+                        const existing = primaryKeyToIndexIndex.get(primaryKey);
+                        if (existing === void 0 || indexIndex < existing) {
+                            primaryKeyToIndexIndex.set(primaryKey, indexIndex);
+                        }
+                    }
+                    if (++completed >= indexNames.length) {
+                        this._fusejiFetchAndBuild(objectStore, primaryKeyToIndexIndex, anchor, matchType, dictionaries, resolve, reject);
+                    }
+                };
+                this._db.getPrimaryKeysWhere(objectStore.index(indexNames[j]), query, keyPredicate, onKeys, reject);
+            }
+        });
+    }
+
+    /**
+     * Skip-scan over one index: seeks the required char at literal positions, enumerates the chars present at
+     * mask positions, and skips non-matching subtrees. A match is any key no longer than the pattern that
+     * satisfies every literal it spans (and `recordGuard`, if set).
+     * @param {IDBObjectStore} objectStore
+     * @param {string} indexName
+     * @param {?IDBValidKey|IDBKeyRange} query Anchor range bound (forward for prefix, reversed for suffix).
+     * @param {import('dictionary-database').MaskedPattern} pattern Pattern in this index's key space.
+     * @param {?(key: string) => boolean} recordGuard Extra filter on matched keys, or `null` to record all.
+     * @param {(primaryKeys: IDBValidKey[]) => void} onComplete
+     * @param {(reason?: unknown) => void} onError
+     */
+    _fusejiSkipScanIndex(objectStore, indexName, query, pattern, recordGuard, onComplete, onError) {
+        const {chars: patternChars, isMask} = pattern;
+        const patternLength = patternChars.length;
+        const index = objectStore.index(indexName);
+        const request = index.openKeyCursor(query, 'next');
+        /** @type {IDBValidKey[]} */
+        const primaryKeys = [];
+        request.onerror = (e) => onError(/** @type {IDBRequest<?IDBCursor>} */ (e.target).error);
+        request.onsuccess = (e) => {
+            const cursor = /** @type {IDBRequest<?IDBCursor>} */ (e.target).result;
+            if (cursor === null) {
+                onComplete(primaryKeys);
+                return;
+            }
+            const key = /** @type {string} */ (cursor.key);
+            const keyChars = [...key];
+            const keyLength = keyChars.length;
+
+            // first pattern violation in the key, if any.
+            let violation = -1;
+            const checkLength = Math.min(keyLength, patternLength);
+            for (let i = 0; i < checkLength; ++i) {
+                if (!isMask[i] && patternChars[i] !== keyChars[i]) {
+                    violation = i;
+                    break;
+                }
+            }
+
+            if (violation === -1) {
+                if (keyLength <= patternLength) {
+                    // match: record (if it passes the guard), then step to the next key.
+                    if (recordGuard === null || recordGuard(key)) { primaryKeys.push(cursor.primaryKey); }
+                    cursor.continue();
+                } else {
+                    // longer than the pattern: skip this subtree.
+                    cursor.continue(keyChars.slice(0, patternLength).join('') + '\uffff');
+                }
+                return;
+            }
+
+            // literal below the required char: seek forward to it.
+            if (keyChars[violation] < patternChars[violation]) {
+                cursor.continue(keyChars.slice(0, violation).join('') + patternChars[violation]);
+                return;
+            }
+
+            // literal already past the required char: carry to the nearest preceding mask and skip its subtree.
+            let carry = -1;
+            for (let i = violation - 1; i >= 0; --i) {
+                if (isMask[i]) {
+                    carry = i;
+                    break;
+                }
+            }
+            if (carry === -1) {
+                onComplete(primaryKeys);
+                return;
+            }
+            cursor.continue(keyChars.slice(0, carry + 1).join('') + '\uffff');
+        };
+    }
+
+    /**
+     * Fetches the survivor records, filters by dictionary, builds term entries, and resolves.
+     * @param {IDBObjectStore} objectStore
+     * @param {Map<IDBValidKey, number>} primaryKeyToIndexIndex Survivor -> matching index (0 expression, 1 reading).
+     * @param {string} anchor
+     * @param {import('dictionary-database').MatchType} matchType
+     * @param {import('dictionary-database').DictionarySet} dictionaries
+     * @param {(results: import('dictionary-database').TermEntry[]) => void} resolve
+     * @param {(reason?: unknown) => void} reject
+     */
+    _fusejiFetchAndBuild(objectStore, primaryKeyToIndexIndex, anchor, matchType, dictionaries, resolve, reject) {
+        const entries = [...primaryKeyToIndexIndex];
+        if (entries.length === 0) {
+            resolve([]);
+            return;
+        }
+        /** @type {import('dictionary-database').TermEntry[]} */
+        const results = [];
+        let remaining = entries.length;
+        for (const [primaryKey, indexIndex] of entries) {
+            const request = objectStore.get(primaryKey);
+            request.onerror = (e) => reject(/** @type {IDBRequest} */ (e.target).error);
+            request.onsuccess = (e) => {
+                const row = /** @type {IDBRequest<?import('dictionary-database').DatabaseTermEntryWithId>} */ (e.target).result;
+                if (row !== null && row !== void 0 && dictionaries.has(row.dictionary)) {
+                    /** @type {import('dictionary-database').FindMultiBulkData<string>} */
+                    const data = {item: anchor, itemIndex: 0, indexIndex};
+                    results.push(this._createTermGeneric(matchType, row, data));
+                }
+                if (--remaining === 0) {
+                    resolve(results);
+                }
+            };
+        }
+    }
+
+    /**
      * @param {import('dictionary-database').TermExactRequest[]} termList
      * @param {import('dictionary-database').DictionarySet} dictionaries
      * @returns {Promise<import('dictionary-database').TermEntry[]>}

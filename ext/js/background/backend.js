@@ -2766,6 +2766,8 @@ export class Backend {
             translation: {
                 textReplacements: textReplacementsOptions,
                 searchResolution,
+                enableFusejiLookup,
+                fusejiTriggers,
             },
         } = options;
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
@@ -2791,6 +2793,8 @@ export class Backend {
             removeNonJapaneseCharacters: !alphanumeric,
             searchResolution,
             textReplacements,
+            enableFusejiLookup,
+            fusejiTriggers,
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
             language,
