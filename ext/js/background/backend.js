@@ -46,6 +46,8 @@ import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
 
+const MAX_PENDING_EXTERNAL_MESSAGES = 10;
+
 /**
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
@@ -517,10 +519,17 @@ export class Backend {
     _onExternalConnect(port) {
         /** @type {unknown[]} */
         const pendingMessages = [];
-        /** @type {(message: unknown) => void} */
-        const onTemporaryMessage = (message) => { pendingMessages.push(message); };
-        port.onMessage.addListener(onTemporaryMessage);
         let disconnected = false;
+        /** @type {(message: unknown) => void} */
+        const onTemporaryMessage = (message) => {
+            if (pendingMessages.length >= MAX_PENDING_EXTERNAL_MESSAGES) {
+                disconnected = true;
+                port.disconnect();
+                return;
+            }
+            pendingMessages.push(message);
+        };
+        port.onMessage.addListener(onTemporaryMessage);
         const onDisconnect = () => { disconnected = true; };
         port.onDisconnect.addListener(onDisconnect);
         this._prepareCompletePromise.then(
