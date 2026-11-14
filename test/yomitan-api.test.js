@@ -111,6 +111,18 @@ describe('ExternalExtensionPort', () => {
         expect(authorizedPort.disconnect).not.toHaveBeenCalled();
         expect(received).toStrictEqual([{action: 'yomitanVersion', params: {}, body: ''}]);
     });
+
+    test('Replays queued messages', () => {
+        const port = new ExternalExtensionPort(() => ['id-a']);
+        const clientPort = createClientPort('id-a');
+        /** @type {unknown[]} */
+        const received = [];
+        port.onMessage.addListener((message) => { received.push(message); });
+
+        port.handleConnect(clientPort, [{action: 'yomitanVersion', params: {}, body: ''}]);
+
+        expect(received).toStrictEqual([{action: 'yomitanVersion', params: {}, body: ''}]);
+    });
 });
 
 describe('NativeComponentPort', () => {
@@ -147,7 +159,6 @@ describe('NativeComponentPort', () => {
         await yomitanApi.setEnabled(true);
 
         const rawListener = nativePort.onMessage.addListener.mock.calls[0][0];
-        // Firefox invokes `onMessage` listeners with the message only.
         rawListener({action: 'yomitanVersion', params: {}, body: '', requestId: 'request-1'});
         await new Promise((resolve) => { setTimeout(resolve, 0); });
 

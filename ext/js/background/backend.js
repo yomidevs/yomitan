@@ -280,8 +280,7 @@ export class Backend {
         chrome.runtime.onInstalled.addListener(this._onInstalled.bind(this));
 
         if (isObjectNotArray(chrome.runtime) && isObjectNotArray(chrome.runtime.onConnectExternal)) {
-            const onConnectExternal = this._onWebExtensionEventWrapper(this._onExternalConnect.bind(this));
-            chrome.runtime.onConnectExternal.addListener(onConnectExternal);
+            chrome.runtime.onConnectExternal.addListener(this._onExternalConnect.bind(this));
         }
     }
 
@@ -516,9 +515,27 @@ export class Backend {
      * @param {chrome.runtime.Port} port
      */
     _onExternalConnect(port) {
+        /** @type {unknown[]} */
+        const pendingMessages = [];
+        /** @type {(message: unknown) => void} */
+        const onTemporaryMessage = (message) => { pendingMessages.push(message); };
+        port.onMessage.addListener(onTemporaryMessage);
+        this._prepareCompletePromise.then(
+            () => { this._admitExternalConnect(port, pendingMessages, onTemporaryMessage); },
+            () => { port.disconnect(); },
+        );
+    }
+
+    /**
+     * @param {chrome.runtime.Port} port
+     * @param {unknown[]} pendingMessages
+     * @param {(message: unknown) => void} onTemporaryMessage
+     */
+    _admitExternalConnect(port, pendingMessages, onTemporaryMessage) {
+        port.onMessage.removeListener(onTemporaryMessage);
         const externalExtensionPort = this._externalExtensionPort;
         if (externalExtensionPort !== null) {
-            externalExtensionPort.handleConnect(port);
+            externalExtensionPort.handleConnect(port, pendingMessages);
         } else {
             port.disconnect();
         }
