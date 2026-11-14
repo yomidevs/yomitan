@@ -73,32 +73,6 @@ function deliverMessage(port, clientPort, message) {
 }
 
 describe('ExternalExtensionPort', () => {
-    /** @type {((port: unknown) => void)[]} */
-    let connectListeners;
-
-    beforeEach(() => {
-        connectListeners = [];
-        /** @type {{runtime: {onConnectExternal: {addListener: (listener: (port: unknown) => void) => void, removeListener: (listener: (port: unknown) => void) => void}}}} */
-        const chromeStub = {
-            runtime: {
-                onConnectExternal: {
-                    addListener: (listener) => {
-                        connectListeners.push(listener);
-                    },
-                    removeListener: (listener) => {
-                        connectListeners = connectListeners.filter((registeredListener) => registeredListener !== listener);
-                    },
-                },
-            },
-        };
-        vi.stubGlobal('chrome', chromeStub);
-    });
-
-    afterEach(() => {
-        vi.unstubAllGlobals();
-        vi.restoreAllMocks();
-    });
-
     test.each(/** @type {[string, string|void, number][]} */ ([
         ['Admits authorized sender', 'id-a', 0],
         ['Rejects unauthorized sender', 'id-b', 1],
@@ -107,7 +81,7 @@ describe('ExternalExtensionPort', () => {
         const port = new ExternalExtensionPort(() => ['id-a']);
         const clientPort = createClientPort(senderId);
 
-        connectListeners[0](clientPort);
+        port.handleConnect(clientPort);
 
         expect(clientPort.disconnect).toHaveBeenCalledTimes(expectedDisconnectCount);
 
@@ -125,8 +99,8 @@ describe('ExternalExtensionPort', () => {
         const evictedPort = createClientPort('id-a');
         const authorizedPort = createClientPort('id-b');
 
-        connectListeners[0](evictedPort);
-        connectListeners[0](authorizedPort);
+        port.handleConnect(evictedPort);
+        port.handleConnect(authorizedPort);
         expect(evictedPort.disconnect).not.toHaveBeenCalled();
         expect(authorizedPort.disconnect).not.toHaveBeenCalled();
 

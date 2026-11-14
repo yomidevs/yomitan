@@ -76,3 +76,10 @@ export type apiPort = {
     onDisconnect: EventListenerCollection.ExtensionEvent<(port: chrome.runtime.Port) => void>;
     disconnect: () => void;
 };
+
+export type apiExternalConnectionPort = {
+    sender?: {id?: string} | undefined;
+    disconnect: () => void;
+    onDisconnect: {addListener: (listener: (port: chrome.runtime.Port) => void) => void};
+    onMessage: {addListener: (listener: (message: unknown, port: chrome.runtime.Port) => void) => void};
+};

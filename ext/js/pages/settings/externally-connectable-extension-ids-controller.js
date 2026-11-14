@@ -36,6 +36,8 @@ export class ExternallyConnectableExtensionIdsController {
         this._enableCheckbox = querySelectorNotNull(document, '#enable-externally-connectable-extensions');
         /** @type {RegExp[]} */
         this._extensionIdRegexes = [];
+        /** @type {boolean} */
+        this._inProgress = false;
     }
 
     /** */
@@ -71,28 +73,34 @@ export class ExternallyConnectableExtensionIdsController {
 
     /** */
     async _onAddButtonClick() {
-        let isExtensionIdValid = false;
-        for (const regex of this._extensionIdRegexes) {
-            if (regex.test(this._addInput.value)) {
-                isExtensionIdValid = true;
-                break;
+        if (this._inProgress) { return; }
+        this._inProgress = true;
+        try {
+            let isExtensionIdValid = false;
+            for (const regex of this._extensionIdRegexes) {
+                if (regex.test(this._addInput.value)) {
+                    isExtensionIdValid = true;
+                    break;
+                }
             }
+
+            if (!isExtensionIdValid) {
+                this._errorContainer.hidden = false;
+                return;
+            }
+
+            this._errorContainer.hidden = true;
+
+            await this._settingsController.modifyProfileSettings([{
+                action: 'push',
+                path: 'general.externallyConnectableExtensionIds',
+                items: [this._addInput.value],
+            }]);
+            this._addInput.value = '';
+            await this._updateOptions();
+        } finally {
+            this._inProgress = false;
         }
-
-        if (!isExtensionIdValid) {
-            this._errorContainer.hidden = false;
-            return;
-        }
-
-        this._errorContainer.hidden = true;
-
-        await this._settingsController.modifyProfileSettings([{
-            action: 'push',
-            path: 'general.externallyConnectableExtensionIds',
-            items: [this._addInput.value],
-        }]);
-        this._addInput.value = '';
-        await this._updateOptions();
     }
 
     /** */
@@ -125,7 +133,7 @@ export class ExternallyConnectableExtensionIdsController {
             input.value = extensionId;
             /** @type {HTMLButtonElement} */
             const deleteButton = querySelectorNotNull(extensionIdElement, '.externally-connectable-extension-id-button');
-            deleteButton.addEventListener('click', this._onDeleteClick.bind(this, i));
+            deleteButton.addEventListener('click', this._onDeleteClick.bind(this, i, deleteButton));
             this._extensionIdListChildren.push(...extensionIdElement.children);
             fragment.appendChild(extensionIdElement);
         }
@@ -135,15 +143,26 @@ export class ExternallyConnectableExtensionIdsController {
 
     /**
      * @param {number} index
+     * @param {HTMLButtonElement} deleteButton
      */
-    async _onDeleteClick(index) {
-        await this._settingsController.modifyProfileSettings([{
-            action: 'splice',
-            path: 'general.externallyConnectableExtensionIds',
-            start: index,
-            deleteCount: 1,
-            items: [],
-        }]);
-        await this._updateOptions();
+    async _onDeleteClick(index, deleteButton) {
+        if (this._inProgress) { return; }
+        this._inProgress = true;
+        try {
+            deleteButton.disabled = true;
+            await this._settingsController.modifyProfileSettings([{
+                action: 'splice',
+                path: 'general.externallyConnectableExtensionIds',
+                start: index,
+                deleteCount: 1,
+                items: [],
+            }]);
+            await this._updateOptions();
+        } finally {
+            this._inProgress = false;
+            if (deleteButton.isConnected) {
+                deleteButton.disabled = false;
+            }
+        }
     }
 }

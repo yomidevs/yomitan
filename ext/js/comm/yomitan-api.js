@@ -713,23 +713,21 @@ export class ExternalExtensionPort {
         this._ports = [];
         /** @type {((message: unknown, port: chrome.runtime.Port) => void)[]} */
         this._messageListeners = [];
-        /** @type {(port: chrome.runtime.Port) => void} */
-        this._connectExternalListener = this._onConnectExternal.bind(this);
-        chrome.runtime.onConnectExternal.addListener(this._connectExternalListener);
     }
 
     /**
-     * @param {chrome.runtime.Port} port
+     * @param {import('yomitan-api.js').apiExternalConnectionPort} port
      */
-    _onConnectExternal(port) {
+    handleConnect(port) {
         const externallyConnectableExtensionIds = this._externallyConnectableExtensionIdsProvider();
         this._syncPorts(externallyConnectableExtensionIds);
         if (typeof port.sender?.id === 'undefined' || !externallyConnectableExtensionIds.includes(port.sender.id)) {
             port.disconnect();
             return;
         }
-        this._ports.push(port);
-        port.onDisconnect.addListener((p) => {
+        const chromePort = /** @type {chrome.runtime.Port} */ (port);
+        this._ports.push(chromePort);
+        chromePort.onDisconnect.addListener((p) => {
             for (let i = 0; i < this._ports.length; i++) {
                 if (this._ports[i] === p) {
                     this._ports.splice(i, 1);
@@ -738,7 +736,7 @@ export class ExternalExtensionPort {
             }
         });
         // Firefox doesn't call onMessage with the port, so we capture it here
-        port.onMessage.addListener(this._onMessage.bind(this, port));
+        chromePort.onMessage.addListener(this._onMessage.bind(this, chromePort));
     }
 
     /**
@@ -816,6 +814,5 @@ export class ExternalExtensionPort {
         }
         this._messageListeners = [];
         this._ports = [];
-        chrome.runtime.onConnectExternal.removeListener(this._connectExternalListener);
     }
 }
