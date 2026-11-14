@@ -401,7 +401,7 @@ function contractedParticle(particle, minSyllables, conditionsOut) {
     const precedingSyllables = '(?:[ㅏ-ㅣ]+[ㄱ-ㅎ]+)'.repeat(minSyllables - 1);
     return {
         type: 'suffix',
-        isInflected: new RegExp(`${precedingSyllables}[ㅏ-ㅣ]${particle}$`),
+        isInflected: new RegExp(`${precedingSyllables}[ㅏ-ㅣ]+${particle}$`),
         deinflected: '',
         deinflect: (text) => text.slice(0, -particle.length),
         conditionsIn: [],

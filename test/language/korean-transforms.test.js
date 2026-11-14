@@ -885,6 +885,8 @@ const tests = [
             {term: '아버지', source: '아버진',        rule: 'n', reasons: ['ㄴ']},
             {term: '비행기', source: '비행길',        rule: 'n', reasons: ['ㄹ']},
             {term: '대학교', source: '대학굘',        rule: 'n', reasons: ['ㄹ']},
+            {term: '전시회', source: '전시횐',        rule: 'n', reasons: ['ㄴ']},
+            {term: '전시회', source: '전시횔',        rule: 'n', reasons: ['ㄹ']},
             {term: '하다', source: '하진',        rule: 'v', reasons: ['-진']},
             {term: '먹다', source: '먹진',        rule: 'v', reasons: ['-진']},
             {term: '하다', source: '했진',        rule: 'v', reasons: ['-았/었', '-진']},
@@ -918,7 +920,7 @@ const tests = [
             {term: '친구', source: '친군',     rule: 'n', reasons: ['ㄴ']},
             {term: '나', source: '난',     rule: 'n', reasons: ['ㄴ']},
             {term: '나', source: '난',     rule: 'v', reasons: ['ㄴ']},
-            {term: '나다', source: '난',     rule: 'v', reasons: ['ㄴ', '어간']},
+            {term: '나다', source: '난',     rule: 'v', reasons: ['어간', 'ㄴ']},
             {term: '사람', source: '사람ㄴ',     rule: 'pn', reasons: ['ㄴ']},
 
             // 있다/없다/아니다 rules only produce adjectives
