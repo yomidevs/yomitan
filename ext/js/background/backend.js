@@ -48,6 +48,8 @@ import {injectStylesheet} from './script-manager.js';
 
 const MAX_PENDING_EXTERNAL_MESSAGES = 10;
 
+const MAX_PENDING_EXTERNAL_CONNECTION_PORTS = 10;
+
 /**
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
@@ -215,6 +217,8 @@ export class Backend {
         this._nativeComponentYomitanApi = new YomitanApi(this._apiMap, this._offscreen, () => new NativeComponentPort());
         /** @type {string[]} */
         this._externallyConnectableExtensionIds = [];
+        /** @type {Set<chrome.runtime.Port>} */
+        this._pendingExternalConnectionPorts = new Set();
         /** @type {?ExternalExtensionPort} */
         this._externalExtensionPort = null;
         /** @type {YomitanApi} */
@@ -517,6 +521,11 @@ export class Backend {
      * @param {chrome.runtime.Port} port
      */
     _onExternalConnect(port) {
+        if (this._pendingExternalConnectionPorts.size >= MAX_PENDING_EXTERNAL_CONNECTION_PORTS) {
+            port.disconnect();
+            return;
+        }
+        this._pendingExternalConnectionPorts.add(port);
         /** @type {unknown[]} */
         const pendingMessages = [];
         let disconnected = false;
@@ -534,10 +543,14 @@ export class Backend {
         port.onDisconnect.addListener(onDisconnect);
         this._prepareCompletePromise.then(
             () => {
+                this._pendingExternalConnectionPorts.delete(port);
                 if (disconnected) { return; }
                 this._admitExternalConnect(port, pendingMessages, onTemporaryMessage, onDisconnect);
             },
-            () => { port.disconnect(); },
+            () => {
+                this._pendingExternalConnectionPorts.delete(port);
+                port.disconnect();
+            },
         );
     }
 
