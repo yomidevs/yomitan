@@ -15,30 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Hangul} from '../../../lib/hangul-js.js';
 import {suffixInflection} from '../language-transforms.js';
-
-/**
- * Removes a particle that has contracted into the final syllable of a word (나 + 는 → 난, 이거 + 를 → 이걸).
- * The particle is only removed after a vowel, and only if the word is at least `minSyllables` syllables long.
- * Short nouns are excluded this way because most of them collide with unrelated words (시간 → 시가, 사실 → 사시).
- * @template {string} TCondition
- * @param {string} particle
- * @param {number} minSyllables
- * @param {TCondition[]} conditionsOut
- * @returns {import('language-transformer').SuffixRule<TCondition>}
- */
-function contractedParticle(particle, minSyllables, conditionsOut) {
-    // In disassembled text every syllable has exactly one run of vowels.
-    const precedingSyllables = '(?:[ㅏ-ㅣ]+[ㄱ-ㅎ]+)'.repeat(minSyllables - 1);
-    return {
-        type: 'suffix',
-        isInflected: new RegExp(`${precedingSyllables}[ㅏ-ㅣ]${particle}$`),
-        deinflected: '',
-        deinflect: (text) => text.slice(0, -particle.length),
-        conditionsIn: [],
-        conditionsOut,
-    };
-}
 
 const conditions = {
     v: {
@@ -141,51 +119,770 @@ const conditions = {
     },
 };
 
-/** @type {import('language-transformer').LanguageTransformDescriptor<keyof typeof conditions>} */
+/** @typedef {keyof typeof conditions} Condition */
+/** @typedef {import('language-transformer').SuffixRule<Condition>} Rule */
+
+// Parts of speech that an ending can attach to.
+/** @type {Condition[]} */
+const V = ['v'];
+/** @type {Condition[]} */
+const A = ['adj'];
+/** @type {Condition[]} */
+const I = ['ida'];
+/** @type {Condition[]} */
+const VA = ['v', 'adj'];
+/** @type {Condition[]} */
+const VI = ['v', 'ida'];
+/** @type {Condition[]} */
+const AI = ['adj', 'ida'];
+/** @type {Condition[]} */
+const VAI = ['v', 'adj', 'ida'];
+
+/**
+ * The text preprocessor disassembles Hangul into jamo before the transforms are applied (먹어서 → ㅁㅓㄱㅇㅓㅅㅓ),
+ * so every rule has to match and produce jamo. The rules in this file are written in Hangul and converted here,
+ * with the same function the preprocessor uses. A lone jamo stands for itself, which is how a final consonant
+ * or a bare vowel is written: 'ㄹ까' is ㄹㄲㅏ and 'ㅘ서' is ㅗㅏㅅㅓ.
+ * @param {string} text
+ * @returns {string}
+ */
+function toJamo(text) {
+    return Hangul.disassemble(text, false).join('');
+}
+
+/**
+ * A single rule, written in Hangul.
+ * @param {string} inflected
+ * @param {string} deinflected
+ * @param {Condition[]} conditionsIn
+ * @param {Condition[]} conditionsOut
+ * @returns {Rule}
+ */
+function suffix(inflected, deinflected, conditionsIn, conditionsOut) {
+    return suffixInflection(toJamo(inflected), toJamo(deinflected), conditionsIn, conditionsOut);
+}
+
+/**
+ * @param {Condition[]} pos
+ * @returns {Condition[]}
+ */
+function exceptIda(pos) {
+    return pos.filter((condition) => condition !== 'ida');
+}
+
+/**
+ * A stem-final ㄹ drops before endings that start with ㄴ, ㅂ, ㅅ, 오 or a final ㄹ (살다 → 사는, 삽니다, 사세요, 사오, 살).
+ * @param {string} ending
+ * @returns {boolean}
+ */
+function dropsRieul(ending) {
+    return /^(?:[ㄴㅂㅅ]|ㅇㅗ|ㄹ(?![ㅏ-ㅣ]))/.test(toJamo(ending));
+}
+
+/**
+ * An ending, or the form of an ending, that is only used after a consonant-final stem and that ㄹ-stems never take:
+ * -습니다 (먹습니다), -는다 (먹는다), -소 (먹소), -사오- (먹사오니).
+ * @param {string} ending
+ * @param {Condition[]} pos Parts of speech the ending attaches to.
+ * @param {Condition[]} [prefinals] Pre-final endings the ending can follow (갔습니다).
+ * @returns {Rule[]}
+ */
+function afterConsonant(ending, pos, prefinals = []) {
+    /** @type {Rule[]} */
+    const rules = [];
+    if (pos.length > 0) { rules.push(suffix(ending, '다', [], pos)); }
+    if (prefinals.length > 0) { rules.push(suffix(ending, '', [], prefinals)); }
+    return rules;
+}
+
+/**
+ * An ending that has the same form after every stem: -고 (가고, 먹고), -지만, -는 (가는, 먹는, 사는).
+ * @param {string} ending
+ * @param {Condition[]} pos Parts of speech the ending attaches to.
+ * @param {Condition[]} [prefinals] Pre-final endings the ending can follow (갔고, 가시고).
+ * @returns {Rule[]}
+ */
+function plain(ending, pos, prefinals = []) {
+    const rules = afterConsonant(ending, pos, prefinals);
+    const rieulPos = exceptIda(pos);
+    if (dropsRieul(ending) && rieulPos.length > 0) { rules.push(suffix(ending, 'ㄹ다', [], rieulPos)); }
+    return rules;
+}
+
+/**
+ * An ending that takes 으 after a consonant-final stem: -(으)면 (가면, 먹으면), -(으)니까, -(으)ㄹ까.
+ * Covers the ㅂ, ㅅ, ㄷ and ㅎ irregular stems (도우면, 지으면, 들으면, 그러면) and ㄹ-stems (살면, 사니까).
+ * @param {string} ending The ending without 으.
+ * @param {Condition[]} pos Parts of speech the ending attaches to.
+ * @param {Condition[]} [prefinals] Pre-final endings the ending follows directly (가시면).
+ * @param {Condition[]} [euPrefinals] Pre-final endings the ending follows with 으 (갔으면).
+ * @returns {Rule[]}
+ */
+function eu(ending, pos, prefinals = [], euPrefinals = []) {
+    const rules = plain(ending, pos, prefinals);
+    const consonantPos = exceptIda(pos);
+    if (consonantPos.length > 0) {
+        rules.push(
+            suffix('으' + ending, '다', [], consonantPos),
+            suffix('우' + ending, 'ㅂ다', [], consonantPos),
+            suffix('으' + ending, 'ㅅ다', [], consonantPos),
+            suffix('ㄹ으' + ending, 'ㄷ다', [], consonantPos),
+        );
+    }
+    if (pos.includes('adj')) { rules.push(suffix(ending, 'ㅎ다', [], A)); }
+    if (euPrefinals.length > 0) { rules.push(suffix('으' + ending, '', [], euPrefinals)); }
+    return rules;
+}
+
+/**
+ * An ending that is -ㅂ… after a vowel-final stem and -습… after a consonant-final one: -(스)ㅂ니다 (갑니다, 먹습니다, 갔습니다).
+ * @param {string} ending The ending without the leading ㅂ / 습.
+ * @returns {Rule[]}
+ */
+function seup(ending) {
+    return [
+        ...plain('ㅂ' + ending, VAI, ['eusi']),
+        ...afterConsonant('습' + ending, VA, ['p', 'f']),
+    ];
+}
+
+/**
+ * 있다 and 없다 take the verb form of an ending even where they are adjectives (맛있는, 재미없는데).
+ * @param {string} ending
+ * @returns {Rule[]}
+ */
+function existential(ending) {
+    return [
+        suffix('있' + ending, '있다', [], A),
+        suffix('없' + ending, '없다', [], A),
+    ];
+}
+
+/**
+ * An ending that is -(으)ㄴ… after adjectives and 이다 and -는… after verbs: -(으/느)ㄴ데 (예쁜데, 좋은데, 가는데, 갔는데).
+ * @param {string} ending The ending without the leading ㄴ / 는.
+ * @param {Condition[]} pos Parts of speech that take the -(으)ㄴ… form.
+ * @param {Condition[]} [prefinals] Pre-final endings the -(으)ㄴ… form can follow.
+ * @returns {Rule[]}
+ */
+function euNeun(ending, pos, prefinals = ['eusi']) {
+    return [
+        ...eu('ㄴ' + ending, pos, prefinals),
+        ...plain('는' + ending, V, ['p', 'f', 'eusi']),
+        ...existential('는' + ending),
+    ];
+}
+
+/**
+ * An ending built on the plain declarative -((느)ㄴ)다: -((느)ㄴ)다고 (간다고, 먹는다고, 예쁘다고, 갔다고).
+ * @param {string} ending The ending without the leading ㄴ / 는.
+ * @param {Condition[]} pos Parts of speech that take the ending as it is.
+ * @param {Condition[]} [ndaPos] Parts of speech that take the -ㄴ… form.
+ * @returns {Rule[]}
+ */
+function nda(ending, pos, ndaPos = V) {
+    return [
+        ...plain('ㄴ' + ending, ndaPos, ['eusi']),
+        ...afterConsonant('는' + ending, V),
+        ...plain(ending, pos, ['p', 'f', 'eusi']),
+    ];
+}
+
+/**
+ * 아니다 with an ending that is otherwise only used with 이다 (아니라서, 아니로구나).
+ * @param {string} ending
+ * @returns {Rule}
+ */
+function anida(ending) {
+    return suffix('아니' + ending, '아니다', [], A);
+}
+
+/**
+ * An ending that only attaches to 이다 and 아니다: -라서 (이라서, 아니라서), -로구나.
+ * @param {string} ending
+ * @param {Condition[]} [prefinals] Pre-final endings the ending can follow (이시라서).
+ * @returns {Rule[]}
+ */
+function copula(ending, prefinals = []) {
+    return [anida(ending), ...afterConsonant(ending, I, prefinals)];
+}
+
+/**
+ * How 아/어 combines with the end of a stem, as [inflected, deinflected, parts of speech].
+ * @type {[inflected: string, deinflected: string, pos: Condition[]][]}
+ */
+const aeoStems = [
+    ['아', '다', VA], // 잡아 → 잡다
+    ['어', '다', VAI], // 먹어 → 먹다
+    ['ㅘ', 'ㅗ다', VA], // 봐 → 보다
+    ['ㅝ', 'ㅜ다', VA], // 줘 → 주다
+    ['ㅙ', 'ㅚ다', VA], // 돼 → 되다
+    ['ㅕ', 'ㅣ다', VA], // 마셔 → 마시다
+    ['여', '이다', VAI], // 보여 → 보이다
+    ['해', '하다', VA], // 해 → 하다
+    ['하여', '하다', VA], // 하여 → 하다
+    ['ㅏ', 'ㅡ다', VA], // 바빠 → 바쁘다
+    ['ㅓ', 'ㅡ다', VA], // 써 → 쓰다
+    ['와', 'ㅂ다', VA], // 도와 → 돕다
+    ['워', 'ㅂ다', VA], // 추워 → 춥다
+    ['아', 'ㅅ다', VA], // 나아 → 낫다
+    ['어', 'ㅅ다', VA], // 지어 → 짓다
+    ['ㄹ아', 'ㄷ다', VA], // 깨달아 → 깨닫다
+    ['ㄹ어', 'ㄷ다', VA], // 들어 → 듣다
+    ['ㄹ라', '르다', VA], // 몰라 → 모르다
+    ['ㄹ러', '르다', VA], // 불러 → 부르다
+    ['르러', '르다', VA], // 이르러 → 이르다
+    ['ㅐ', 'ㅏㅎ다', A], // 파래 → 파랗다
+    ['ㅐ', 'ㅓㅎ다', A], // 그래 → 그렇다
+    ['ㅔ', 'ㅓㅎ다', A], // 꺼메 → 꺼멓다
+    ['ㅒ', 'ㅑㅎ다', A], // 하얘 → 하얗다
+    ['ㅖ', 'ㅕㅎ다', A], // 허예 → 허옇다
+    ['래', '러다', V], // 그래 → 그러다
+    ['놔', '놓다', V], // 놔 → 놓다
+    ['퍼', '푸다', V], // 퍼 → 푸다
+];
+
+/**
+ * Stem-final vowels that absorb 아/어, so that the ending follows the stem directly (가서, 서서, 보내서, 세서, 켜서).
+ * ㅚ is not one of them (되어서 → 돼서), but 되서 is a common misspelling.
+ */
+const aeoContractedVowels = ['ㅏ', 'ㅓ', 'ㅐ', 'ㅔ', 'ㅕ', 'ㅚ'];
+
+/**
+ * An ending that starts with 아/어: -아/어서 (잡아서, 먹어서, 해서, 가서).
+ * @param {string} ending The ending without 아/어.
+ * @param {object} [options]
+ * @param {boolean} [options.contracted] Whether the ending can follow a stem that has absorbed 아/어 (가서).
+ * @param {boolean} [options.ida] Whether the ending attaches to 이다 (이어서, 여서).
+ * @param {Condition[]} [options.prefinals] Pre-final endings the ending can follow (갔어도).
+ * @param {boolean} [options.honorific] Whether the ending can follow -(으)시- (하셔서, 하시어서).
+ * @returns {Rule[]}
+ */
+function aeo(ending, {contracted = true, ida = true, prefinals = [], honorific = false} = {}) {
+    const rules = aeoStems.map(([inflected, deinflected, pos]) => suffix(inflected + ending, deinflected, [], ida ? pos : exceptIda(pos)));
+    if (contracted) {
+        for (const vowel of aeoContractedVowels) {
+            rules.push(suffix(vowel + ending, vowel + '다', [], VA));
+        }
+    }
+    if (prefinals.length > 0) { rules.push(suffix('어' + ending, '', [], prefinals)); }
+    if (honorific) {
+        rules.push(
+            suffix('셔' + ending, '시', [], ['eusi']),
+            suffix('시어' + ending, '시', [], ['eusi']),
+        );
+    }
+    return rules;
+}
+
+/**
+ * Makes rules apply only inside a chain, to text left behind by an outer rule with one of the given conditions.
+ * This is how pre-final endings work: -(으)면 leaves 가시 with the condition `eusi`, which -(으)시 then accepts.
+ * @param {Condition[]} conditionsIn
+ * @param {Rule[]} rules
+ * @returns {Rule[]}
+ */
+function chain(conditionsIn, rules) {
+    return rules.map((rule) => ({...rule, conditionsIn}));
+}
+
+/**
+ * Removes a particle that has contracted into the final syllable of a word (나 + 는 → 난, 이거 + 를 → 이걸).
+ * The particle is only removed after a vowel, and only if the word is at least `minSyllables` syllables long.
+ * Short nouns are excluded this way because most of them collide with unrelated words (시간 → 시가, 사실 → 사시).
+ * @param {string} particle
+ * @param {number} minSyllables
+ * @param {Condition[]} conditionsOut
+ * @returns {Rule}
+ */
+function contractedParticle(particle, minSyllables, conditionsOut) {
+    // In disassembled text every syllable has exactly one run of vowels.
+    const precedingSyllables = '(?:[ㅏ-ㅣ]+[ㄱ-ㅎ]+)'.repeat(minSyllables - 1);
+    return {
+        type: 'suffix',
+        isInflected: new RegExp(`${precedingSyllables}[ㅏ-ㅣ]${particle}$`),
+        deinflected: '',
+        deinflect: (text) => text.slice(0, -particle.length),
+        conditionsIn: [],
+        conditionsOut,
+    };
+}
+
+const stemFinals = 'ㅂㅃㅈㅉㄷㄸㄱㄲㅅㅆㅁㄴㅇㄹㅎㅋㅌㅊㅍㅛㅕㅑㅐㅒㅔㅖㅗㅓㅏㅣㅠㅜㅡ';
+
+/**
+ * The rules of every ending, keyed by the name of the ending.
+ * @type {{[name: string]: Rule[]}}
+ */
+const endings = {
+    '-거나': plain('거나', VAI, ['p', 'f', 'euob', 'eusi']),
+    '-거늘': plain('거늘', VAI, ['p', 'f', 'euob', 'eusi']),
+    '-거니': plain('거니', VAI, ['p', 'f', 'euob', 'eusi']),
+    '-거니와': plain('거니와', VAI, ['p', 'f', 'eusi']),
+    '-거던': plain('거던', VAI, ['p', 'f', 'eusi']),
+    '-거드면': plain('거드면', VAI, ['p', 'f', 'eusi']),
+    '-거든': plain('거든', VAI, ['p', 'f', 'eusi']),
+    '-거들랑': plain('거들랑', VAI, ['p', 'f', 'eusi']),
+    '-거라': plain('거라', V),
+    '-건': plain('건', VAI, ['p', 'f', 'euob', 'eusi']),
+    '-건대': plain('건대', V, ['p', 'eusi', 'jaob']),
+    '-건마는': plain('건마는', VAI, ['p', 'f', 'eusi']),
+    '-건만': plain('건만', VAI, ['p', 'f', 'eusi']),
+    '-걸랑': plain('걸랑', VAI, ['p', 'f', 'eusi']),
+    '-것다': plain('것다', VAI, ['p', 'eusi']),
+    '-것마는': plain('것마는', VAI, ['p', 'f', 'eusi']),
+    '-게': plain('게', VAI, ['p', 'eusi']),
+    '-게끔': plain('게끔', VA, ['eusi']),
+    '-게나': plain('게나', V, ['eusi']),
+    '-게시리': plain('게시리', VA, ['eusi']),
+    '-겠': chain(['f'], plain('겠', VAI, ['p', 'eusi'])),
+    '-고': plain('고', VAI, ['p', 'f', 'eusi', 'saob', 'euob', 'euo', 'sab', 'jaob', 'jab']),
+    '-고는 하다': chain(['v'], plain('고는 하다', V, ['eusi'])),
+    '-곤 하다': chain(['v'], plain('곤 하다', V, ['eusi'])),
+    '-고는': plain('고는', VA, ['eusi']),
+    '-곤': plain('곤', VA, ['eusi']),
+    '-고도': plain('고도', VAI, ['eusi']),
+    '-고말고': plain('고말고', VAI, ['p', 'eusi']),
+    '-고서': [...plain('고서', V, ['eusi']), anida('고서')],
+    '-고야': plain('고야', V, ['eusi']),
+    '-고자': [...plain('고자', V, ['eusi']), ...existential('고자')],
+    '-고저': [...plain('고저', V, ['eusi']), ...existential('고저')],
+    '-관데': plain('관데', VAI, ['p', 'eusi']),
+    '-구나': plain('구나', AI, ['p', 'f', 'eusi']),
+    '-구려': plain('구려', VAI, ['p', 'f', 'eusi']),
+    '-구료': plain('구료', VAI, ['p', 'f', 'eusi']),
+    '-구만': plain('구만', VAI, ['p', 'f', 'eusi']),
+    '-구먼': plain('구먼', VAI, ['p', 'f', 'eusi']),
+    '-구면': plain('구면', VAI, ['p', 'f', 'eusi']),
+    '-군': plain('군', VAI, ['p', 'f', 'eusi']),
+    '-기': plain('기', VAI, ['p', 'f', 'eusi']),
+    '-기로': plain('기로', VAI, ['p', 'f', 'eusi']),
+    '-기로니': plain('기로니', VAI),
+    '-기로서': plain('기로서', VAI, ['p']),
+    '-기로서니': plain('기로서니', VAI, ['p']),
+    '-기로선들': plain('기로선들', VAI, ['p']),
+    '-기에': plain('기에', VAI, ['p', 'f', 'eusi']),
+    '-긴': plain('긴', VAI, ['p', 'f', 'eusi']),
+    '-길': plain('길', VAI, ['p', 'f', 'eusi']),
+    '-길래': plain('길래', VAI, ['p', 'eusi']),
+    '-(으)ㄹ': eu('ㄹ', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ거나': eu('ㄹ거나', VAI, ['eusi'], ['p', 'f']),
+    '-(으)ㄹ걸': eu('ㄹ걸', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ게': eu('ㄹ게', V),
+    '-(으)ㄹ 거야': eu('ㄹ 거야', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ 거예요': eu('ㄹ 거예요', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ 것이다': eu('ㄹ 것이다', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ 것입니다': eu('ㄹ 것입니다', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ 거다': eu('ㄹ 거다', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ 겁니다': eu('ㄹ 겁니다', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ께': eu('ㄹ께', VAI),
+    '-(으)나': eu('나', VAI, ['p', 'f', 'eusi', 'sao'], ['p', 'f']),
+    '-나니': plain('나니', V, ['p', 'f', 'eusi', 'sab', 'euob']),
+    '-(으)나마': eu('나마', VAI, ['eusi'], ['p', 'f']),
+    '-나이까': plain('나이까', VA, ['p', 'f', 'eusi', 'saob', 'euob']),
+    '-나이다': plain('나이다', VA, ['p', 'f', 'eusi', 'saob', 'jaob', 'jab', 'euob']),
+    '-남': plain('남', V, ['p', 'f', 'eusi']),
+    '-(으)냐': eu('냐', VAI, ['p', 'f', 'eusi'], ['p', 'f', 'eusi']),
+    '-(으)냐고': eu('냐고', VAI, ['p', 'f', 'eusi'], ['p', 'f', 'eusi']),
+    '-너라': afterConsonant('너라', V),
+    '-네': [...plain('네', VAI, ['p', 'f', 'eusi']), suffix('네', 'ㅎ다', [], A)],
+    '-노니': plain('노니', V, ['p', 'f', 'eusi', 'sab', 'euob']),
+    '-노라': plain('노라', V, ['p', 'f']),
+    '-노라고': plain('노라고', V),
+    '-노라니': plain('노라니', VA),
+    '-노라니까': plain('노라니까', VA),
+    '-노라면': [...plain('노라면', V, ['eusi']), ...existential('노라면')],
+    '-(으)뇨': eu('뇨', VAI, ['eusi']),
+    '-누': plain('누', VA, ['p', 'f']),
+    '-누나': plain('누나', V, ['eusi']),
+    '-누만': plain('누만', V, ['eusi']),
+    '-누먼': plain('누먼', V, ['eusi']),
+    '-느냐': plain('느냐', VA, ['p', 'f', 'eusi']),
+    '-느냐고': plain('느냐고', VA, ['p', 'f', 'eusi']),
+    '-느뇨': plain('느뇨', VA, ['p', 'f', 'eusi']),
+    '-느니': plain('느니', VA, ['p', 'f', 'eusi']),
+    '-느니만': chain(['v'], plain('느니만 못하다', VA)),
+    '-느라': plain('느라', V, ['eusi']),
+    '-느라고': plain('느라고', V, ['eusi']),
+    '-는': [...plain('는', V, ['eusi', 'f']), ...existential('는')],
+    '-(으)ㄴ': eu('ㄴ', VAI, ['eusi', 'f']),
+    '-(으/느)ㄴ가': euNeun('가', AI),
+    '-(으/느)ㄴ감': euNeun('감', AI),
+    '-(으/느)ㄴ걸': euNeun('걸', VAI),
+    '-(으/느)ㄴ고': euNeun('고', AI),
+    '-는구나': plain('는구나', V, ['eusi']),
+    '-는구려': plain('는구려', V, ['eusi']),
+    '-는구료': plain('는구료', V, ['eusi']),
+    '-는구만': plain('는구만', V, ['eusi']),
+    '-는구먼': plain('는구먼', V, ['eusi']),
+    '-는구면': plain('는구면', V, ['eusi']),
+    '-는군': plain('는군', V, ['eusi']),
+    '-는궈니': [...plain('는궈니', V, ['p', 'f', 'eusi']), ...existential('는궈니')],
+    '-는과니': [...plain('는과니', V, ['p', 'f', 'eusi']), ...existential('는과니')],
+    '-(느)ㄴ다': [...plain('ㄴ다', V, ['eusi']), ...afterConsonant('는다', V)],
+    '-((느)ㄴ)다고': nda('다고', A),
+    '-((느)ㄴ)다나': nda('다나', A),
+    '-((느)ㄴ)다네': nda('다네', A),
+    '-((느)ㄴ)다느니': nda('다느니', A),
+    '-((느)ㄴ)다니': nda('다니', VA),
+    '-((느)ㄴ)다니까': nda('다니까', A),
+    '-((느)ㄴ)다더라': nda('다더라', A),
+    '-((느)ㄴ)다마는': nda('다마는', A, VI),
+    '-((느)ㄴ)다만': nda('다만', A, VI),
+    '-((느)ㄴ)다며': nda('다며', A),
+    '-((느)ㄴ)다면': nda('다면', A),
+    '-((느)ㄴ)다면서': nda('다면서', A),
+    '-((느)ㄴ)다손': nda('다손', A),
+    '-((느)ㄴ)다오': nda('다오', VA),
+    '-((느)ㄴ)다지': nda('다지', A),
+    '-((느)ㄴ)단다': nda('단다', A),
+    '-((느)ㄴ)담': nda('담', A),
+    '-((느)ㄴ)답니까': nda('답니까', VA),
+    '-((느)ㄴ)답니다': nda('답니다', VA),
+    '-((느)ㄴ)답시고': nda('답시고', VA),
+    '-((느)ㄴ)대': nda('대', VA),
+    '-((느)ㄴ)대요': [...nda('대요', VA, VI), ...existential('는대요')],
+    '-((느)ㄴ)댄다': nda('댄다', VA),
+    '-(으/느)ㄴ데': euNeun('데', AI, ['eusi', 'sao']),
+    '-(으/느)ㄴ뎁쇼': euNeun('뎁쇼', AI),
+    '-는도다': plain('는도다', V),
+    '-(으/느)ㄴ바': euNeun('바', VAI),
+    '-(으/느)ㄴ지': euNeun('지', AI),
+    '-(으/느)ㄴ지고': euNeun('지고', VAI),
+    '-(으/느)ㄴ지라': euNeun('지라', VAI),
+    '-(으)니': eu('니', VAI, ['p', 'f', 'eusi', 'euo', 'sao', 'jao'], ['p', 'f']),
+    '-(으)니까': eu('니까', VAI, ['eusi'], ['p', 'f']),
+    '-(으)니까느루': eu('니까느루', VAI, ['eusi'], ['p', 'f']),
+    '-(으)니까는': eu('니까는', VAI, ['eusi'], ['p', 'f']),
+    '-(으)니깐': eu('니깐', VAI, ['eusi'], ['p', 'f']),
+    '-(으/느)니라': [...eu('니라', AI, ['eusi'], ['p', 'f', 'eusi']), ...plain('느니라', VA, ['p', 'f', 'eusi'])],
+    '-(으/느)니만치': [...eu('니만치', VAI, ['eusi'], ['p', 'f']), ...plain('느니만치', VA, ['eusi'])],
+    '-(으/느)니만큼': [...eu('니만큼', VAI, ['eusi'], ['p', 'f']), ...plain('느니만큼', VA, ['eusi'])],
+    '-다': [suffix('다', '', [], ['p', 'f', 'eusi'])],
+    '-다가': plain('다가', VA, ['p', 'eusi']),
+    '-다가는': plain('다가는', VAI, ['p', 'f', 'eusi']),
+    '-다간': plain('다간', VA, ['p', 'f', 'eusi']),
+    '-다마다': plain('다마다', VAI, ['p', 'eusi']),
+    '-다시피': [...plain('다시피', VA, ['p', 'f', 'eusi']), ...existential('다시피')],
+    '-단': plain('단', VAI, ['p', 'f', 'eusi']),
+    '-더': chain(['do'], plain('더', VAI, ['p', 'f', 'eusi'])),
+    '-더구나': plain('더구나', VAI, ['p', 'f', 'eusi']),
+    '-더구려': plain('더구려', VAI, ['p', 'f', 'eusi']),
+    '-더구료': plain('더구료', VAI, ['p', 'f', 'eusi']),
+    '-더구만': plain('더구만', VAI, ['p', 'f', 'eusi']),
+    '-더구먼': plain('더구먼', VAI, ['p', 'f', 'eusi']),
+    '-더구면': plain('더구면', VAI, ['p', 'f', 'eusi']),
+    '-더군': plain('더군', VAI, ['p', 'f', 'eusi']),
+    '-더냐': plain('더냐', VAI, ['p', 'f', 'eusi']),
+    '-더뇨': plain('더뇨', VAI, ['p', 'f', 'eusi']),
+    '-더니': plain('더니', VAI, ['p', 'f', 'eusi', 'euob', 'euo', 'sab']),
+    '-더니라': plain('더니라', VAI, ['p', 'f', 'eusi']),
+    '-더니마는': plain('더니마는', VAI, ['p', 'f', 'eusi']),
+    '-더니만': plain('더니만', VAI, ['p', 'f', 'eusi']),
+    '-더니이까': plain('더니이까', VAI, ['p', 'f', 'eusi']),
+    '-더니이다': plain('더니이다', VAI, ['p', 'f', 'eusi']),
+    '-더라도': plain('더라도', VAI, ['p', 'f', 'eusi']),
+    '-더이까': plain('더이까', VAI, ['p', 'f', 'eusi']),
+    '-더이다': plain('더이다', VAI, ['p', 'f', 'eusi']),
+    '-던': plain('던', VAI, ['p', 'f', 'eusi']),
+    '-던가': plain('던가', VAI, ['p', 'f', 'eusi']),
+    '-던감': plain('던감', VAI, ['p', 'f', 'eusi']),
+    '-던걸': plain('던걸', VAI, ['p', 'f', 'eusi']),
+    '-던고': plain('던고', VAI, ['p', 'f', 'eusi']),
+    '-던데': plain('던데', VAI, ['p', 'f', 'eusi']),
+    '-던들': [suffix('던들', '', [], ['p'])],
+    '-던바': plain('던바', VAI, ['p', 'f', 'eusi']),
+    '-던지': plain('던지', VAI, ['p', 'f', 'eusi']),
+    '-데': plain('데', VAI, ['p', 'f', 'eusi']),
+    '-데요': plain('데요', VAI, ['p', 'f', 'eusi']),
+    '-도다': plain('도다', VAI, ['p', 'f', 'eusi']),
+    '-도록': plain('도록', VA, ['eusi']),
+    '-(으)되': eu('되', VAI, ['eusi'], ['p', 'f']),
+    '-드구나': plain('드구나', VAI, ['p', 'f', 'eusi']),
+    '-드구료': plain('드구료', VAI, ['p', 'f', 'eusi']),
+    '-드구면': plain('드구면', VAI, ['p', 'f', 'eusi']),
+    '-드군': plain('드군', VAI, ['p', 'f', 'eusi']),
+    '-드냐': plain('드냐', VAI, ['p', 'f', 'eusi']),
+    '-드니': plain('드니', VAI, ['p', 'f', 'eusi']),
+    '-드니라': plain('드니라', VAI, ['p', 'f', 'eusi']),
+    '-드라': plain('드라', VAI, ['p', 'f', 'eusi']),
+    '-드라도': plain('드라도', VAI, ['p', 'f', 'eusi']),
+    '-드라면': [suffix('드라면', '', [], ['p'])],
+    '-드래도': plain('드래도', VAI, ['p', 'f', 'eusi']),
+    '-든': plain('든', VAI, ['p', 'eusi']),
+    '-든가': plain('든가', VAI, ['p', 'eusi']),
+    '-든걸': plain('든걸', VAI, ['p', 'f', 'eusi']),
+    '-든고': plain('든고', VAI, ['p', 'f', 'eusi']),
+    '-든데': plain('든데', VAI, ['p', 'f', 'eusi']),
+    '-든들': [suffix('든들', '', [], ['p'])],
+    '-든지': plain('든지', VAI, ['p', 'eusi']),
+    '-듯': plain('듯', VAI, ['p', 'f', 'eusi']),
+    '-듯이': plain('듯이', VAI, ['p', 'f', 'eusi']),
+    '-디': plain('디', VAI, ['p', 'f', 'eusi']),
+    '-(으)라': [...eu('라', VI, ['eusi', 'do']), anida('라')],
+    '-(으)라고': [...eu('라고', VI, ['eusi', 'do']), anida('라고')],
+    '-(으)라구': [...eu('라구', VI, ['eusi', 'do']), anida('라구')],
+    '-(으)라나': [...eu('라나', VI, ['eusi', 'do']), anida('라나')],
+    '-(으)라네': [...eu('라네', VI, ['eusi', 'do']), anida('라네')],
+    '-(으)라느니': [...eu('라느니', VI, ['eusi', 'do']), anida('라느니')],
+    '-(으)라니': [...eu('라니', VI, ['eusi', 'do']), anida('라니')],
+    '-(으)라니까': [...eu('라니까', VI, ['eusi', 'do']), anida('라니까')],
+    '-라도': copula('라도'),
+    '-(으)라며': [...eu('라며', VI, ['eusi', 'do']), anida('라며')],
+    '-(으)라면': [...eu('라면', VI, ['eusi', 'do']), anida('라면')],
+    '-(으)라면서': [...eu('라면서', VI, ['eusi', 'do']), anida('라면서')],
+    '-라서': copula('라서', ['eusi']),
+    '-(으)라손': [...eu('라손', VI, ['eusi', 'do']), anida('라손')],
+    '-라야': copula('라야', ['eusi']),
+    '-라야만': copula('라야만', ['eusi']),
+    '-(으)라오': [...eu('라오', VI, ['eusi', 'do']), anida('라오')],
+    '-(으)라지': [...eu('라지', VI, ['eusi', 'do']), anida('라지')],
+    '-(으)락': eu('락', VA),
+    '-(으)란': [...eu('란', VI, ['eusi', 'do']), anida('란')],
+    '-(으)란다': [...eu('란다', VI, ['eusi', 'do']), anida('란다')],
+    '-(으)람': [...eu('람', VI, ['eusi', 'do']), anida('람')],
+    '-(으)랍니까': [...eu('랍니까', VI, ['eusi', 'do']), anida('랍니까')],
+    '-(으)랍니다': [...eu('랍니다', VI, ['eusi', 'do']), anida('랍니다')],
+    '-랍시고': copula('랍시고', ['eusi']),
+    '-(으)래': [...eu('래', VI, ['eusi', 'do']), anida('래')],
+    '-(으)래요': [...eu('래요', VI, ['eusi', 'do']), anida('래요')],
+    '-(으)랴': eu('랴', VAI, ['eusi'], ['p', 'f']),
+    '-(으)러': eu('러', VI, ['eusi']),
+    '-러니': copula('러니', ['eusi']),
+    '-러니라': copula('러니라', ['eusi']),
+    '-러니이까': copula('러니이까', ['eusi']),
+    '-러니이다': copula('러니이다', ['eusi']),
+    '-러라': copula('러라', ['eusi']),
+    '-러이까': copula('러이까', ['eusi']),
+    '-러이다': copula('러이다', ['eusi']),
+    '-런가': copula('런가', ['eusi']),
+    '-런들': copula('런들', ['eusi']),
+    '-(으)려': eu('려', V, ['eusi'], ['p']),
+    '-(으)려거든': eu('려거든', V, ['eusi'], ['p']),
+    '-(으)려고': eu('려고', VA, ['eusi'], ['p']),
+    '-(으)려나': eu('려나', VAI, ['eusi'], ['p']),
+    '-(으)려니': eu('려니', VAI, ['eusi'], ['p']),
+    '-(으)려니와': eu('려니와', VAI, ['eusi'], ['p']),
+    '-(으)려든': eu('려든', V, ['eusi'], ['p']),
+    '-(으)려마': eu('려마', V, ['eusi'], ['p']),
+    '-(으)려면': eu('려면', VAI, ['eusi'], ['p']),
+    '-(으)려무나': eu('려무나', V, ['eusi'], ['p']),
+    '-(으)련': eu('련', V, ['eusi'], ['p']),
+    '-(으)련마는': eu('련마는', VAI, ['eusi'], ['p']),
+    '-(으)련만': eu('련만', VAI, ['eusi'], ['p']),
+    '-(으)렴': eu('렴', V, ['eusi'], ['p']),
+    '-(으)렵니까': eu('렵니까', V, ['eusi'], ['p']),
+    '-(으)렵니다': eu('렵니다', V, ['eusi'], ['p']),
+    '-(으)렷다': eu('렷다', VAI, ['eusi'], ['p']),
+    '-로고': copula('로고', ['eusi']),
+    '-로고나': copula('로고나', ['eusi']),
+    '-로구나': copula('로구나', ['eusi']),
+    '-로구려': copula('로구려', ['eusi']),
+    '-로구료': copula('로구료', ['eusi']),
+    '-로구만': copula('로구만', ['eusi']),
+    '-로구먼': copula('로구먼', ['eusi']),
+    '-로구면': copula('로구면', ['eusi']),
+    '-로군': copula('로군', ['eusi']),
+    '-로다': copula('로다', ['eusi']),
+    '-로되': copula('로되', ['eusi']),
+    '-로라': copula('로라', ['eusi']),
+    '-로서니': copula('로서니', ['eusi']),
+    '-로세': copula('로세', ['eusi']),
+    '-(으)리': eu('리', VAI, ['eusi', 'euo'], ['p']),
+    '-(으)리까': eu('리까', VAI, ['eusi', 'euo'], ['p']),
+    '-(으)리니': eu('리니', VAI, ['eusi', 'euo'], ['p']),
+    '-(으)리니라': eu('리니라', VAI, ['eusi', 'euo'], ['p']),
+    '-(으)리다': eu('리다', VAI, ['eusi', 'euo'], ['p']),
+    '-(으)리라': eu('리라', VAI, ['eusi'], ['p']),
+    '-(으)리로다': eu('리로다', VAI, ['eusi', 'euo'], ['p']),
+    '-(으)리만치': eu('리만치', VAI, ['eusi', 'euo'], ['p']),
+    '-(으)리만큼': eu('리만큼', VAI, ['eusi', 'euo'], ['p']),
+    '-(으)리오': eu('리오', VAI, ['eusi', 'euo'], ['p']),
+    '-(으)마': eu('마', V),
+    '-(으)매': eu('매', VAI, ['eusi'], ['p', 'f']),
+    '-(으)며': eu('며', VAI, ['eusi'], ['p', 'f']),
+    '-(으)면': eu('면', VAI, ['eusi', 'euo', 'jao'], ['p', 'f']),
+    '-(으)면서': eu('면서', VAI, ['eusi'], ['p', 'f']),
+    '-(으)므로': eu('므로', VAI, ['eusi'], ['p', 'f']),
+    '-(으)사': eu('사', VA),
+    '-사오': chain(['sao'], afterConsonant('사오', VA, ['p', 'f'])),
+    '-사오니까': afterConsonant('사오니까', VA, ['p', 'f']),
+    '-사오리까': afterConsonant('사오리까', VA, ['p', 'f']),
+    '-사오리다': afterConsonant('사오리다', VA, ['p', 'f']),
+    '-사오리이까': afterConsonant('사오리이까', VA, ['p', 'f']),
+    '-사오리이다': afterConsonant('사오리이다', VA, ['p', 'f']),
+    '-사오이다': afterConsonant('사오이다', VA, ['p', 'f']),
+    '-사옵': chain(['saob'], afterConsonant('사옵', VA, ['p', 'f'])),
+    '-사옵니까': afterConsonant('사옵니까', VA, ['p', 'f']),
+    '-사옵니다': afterConsonant('사옵니다', VA, ['p', 'f']),
+    '-사옵디까': afterConsonant('사옵디까', VA, ['p', 'f']),
+    '-사옵디다': afterConsonant('사옵디다', VA, ['p', 'f']),
+    '-사와': afterConsonant('사와', VA, ['p', 'f']),
+    '-사외다': afterConsonant('사외다', VA, ['p', 'f']),
+    '-(으)사이다': eu('사이다', VA),
+    '-삽': chain(['sab'], afterConsonant('삽', VA, ['p', 'f'])),
+    '-(으)세': eu('세', V),
+    '-세나': plain('세나', V),
+    '-(으)세요': eu('세요', VAI),
+    '-(으)셔요': eu('셔요', VAI),
+    '-소': afterConsonant('소', VA, ['p', 'f']),
+    '-소다': afterConsonant('소다', VA, ['p', 'f']),
+    '-(으)소서': eu('소서', VA),
+    '-소이까': afterConsonant('소이까', VAI, ['p', 'f']),
+    '-소이다': afterConsonant('소이다', VA, ['p', 'f']),
+    '-쇠다': afterConsonant('쇠다', VA, ['p', 'f']),
+    '-(스)ㅂ네': seup('네'),
+    '-(스)ㅂ늰다': seup('늰다'),
+    '-(스)ㅂ니까': seup('니까'),
+    '-(스)ㅂ니다': seup('니다'),
+    '-(스)ㅂ디까': seup('디까'),
+    '-(스)ㅂ디다': seup('디다'),
+    '-(스)ㅂ딘다': seup('딘다'),
+    '-(스)ㅂ죠': seup('죠'),
+    '-(스)ㅂ지요': seup('지요'),
+    '-(으)시': chain(['eusi'], eu('시', VAI, ['saob', 'euob', 'jaob'])),
+    '-(으)시압': eu('시압', V),
+    '-(으)시어요': eu('시어요', VAI),
+    '-(으)십사': eu('십사', V),
+    '-(으)십시다': eu('십시다', V),
+    '-(으)십시오': eu('십시오', V),
+    '-아/어': aeo('', {contracted: false, prefinals: ['p', 'f'], honorific: true}),
+    '-아/어다': aeo('다', {contracted: false, prefinals: ['p', 'f']}),
+    '-아/어다가': aeo('다가', {prefinals: ['p', 'f']}),
+    '-아/어도': aeo('도', {prefinals: ['p', 'f'], honorific: true}),
+    '-아/어라': aeo('라', {prefinals: ['p', 'f']}),
+    '-아/어서': aeo('서', {prefinals: ['p', 'f'], honorific: true}),
+    '-아/어선': aeo('선', {prefinals: ['p', 'f'], honorific: true}),
+    '-아/어야': aeo('야', {prefinals: ['p', 'f'], honorific: true}),
+    '-아/어야겠': chain(['f'], aeo('야겠', {honorific: true})),
+    '-아/어야만': aeo('야만', {prefinals: ['p', 'f'], honorific: true}),
+    '-아/어야지': aeo('야지', {prefinals: ['p', 'f'], honorific: true}),
+    '-아/어요': [...aeo('요', {prefinals: ['p', 'f']}), suffix('에요', '다', [], AI), suffix('예요', '이다', [], AI)],
+    '-아/어지이다': aeo('지이다', {prefinals: ['p', 'f']}),
+    '-아/어지다': chain(['v'], aeo('지다', {ida: false, prefinals: ['p', 'f']})),
+    '-았/었': chain(['p'], aeo('ㅆ', {honorific: true})),
+    '-았/었었': chain(['p'], aeo('ㅆ었', {honorific: true})),
+    '-았/었자': aeo('ㅆ자', {honorific: true}),
+    '-야': [suffix('아니야', '아니다', [], A), suffix('이야', '이다', [], I)],
+    '-언마는': [suffix('아니언마는', '아니다', [], A), suffix('이언마는', '이다', [], I), suffix('언마는', '', [], ['eusi'])],
+    '-언만': plain('언만', VAI, ['p', 'f', 'eusi']),
+    '-언정': [suffix('아니언정', '아니다', [], A), suffix('이언정', '이다', [], I), suffix('언정', '', [], ['eusi'])],
+    '-에라': [suffix('에라', '', [], ['p'])],
+    '-(으)오': chain(['euo'], eu('오', VA, ['eusi'], ['p', 'f'])),
+    '-(으)오니까': eu('오니까', VA, ['eusi'], ['p', 'f']),
+    '-(으)오리이까': eu('오리이까', VA, ['eusi']),
+    '-(으)오리이다': eu('오리이다', VA, ['eusi']),
+    '-오이까': plain('오이까', VAI, ['eusi']),
+    '-(으)오이다': eu('오이다', VA, ['eusi'], ['p', 'f']),
+    '-올습니다': [suffix('아니올습니다', '아니다', [], A), suffix('이올습니다', '이다', [], I)],
+    '-올시다': [suffix('아니올시다', '아니다', [], A), suffix('이올시다', '이다', [], I)],
+    '-(으)옵': chain(['euob'], eu('옵', VAI, ['eusi'], ['p', 'f'])),
+    '-(으)옵니까': eu('옵니까', VAI, ['eusi'], ['p', 'f']),
+    '-(으)옵니다': eu('옵니다', VAI, ['eusi'], ['p', 'f']),
+    '-(으)옵디까': eu('옵디까', VAI, ['eusi'], ['p', 'f']),
+    '-(으)옵디다': eu('옵디다', VAI, ['eusi'], ['p', 'f']),
+    '-(으)옵소서': eu('옵소서', VAI, ['eusi'], ['p', 'f']),
+    '-(으)와': eu('와', VAI, ['eusi', 'euo', 'jao'], ['p', 'f']),
+    '-(으)외다': eu('외다', VAI, ['eusi'], ['p', 'f']),
+    '-요': copula('요'),
+    '-(으)우': [...eu('우', VAI, ['eusi'], ['p', 'f']), suffix('우', 'ㄹ다', [], VA)],
+    '-(으)이': [suffix('이', '다', [], A), suffix('이', 'ㄹ다', [], A), suffix('으이', '다', [], A), suffix('우이', 'ㅂ다', [], A)],
+    '-(으)ㄴ들': eu('ㄴ들', VAI, ['eusi']),
+    '-(으)ㄴ즉': eu('ㄴ즉', VAI, ['eusi'], ['p']),
+    '-(으)ㄴ즉슨': eu('ㄴ즉슨', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ까': eu('ㄹ까', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ깝쇼': eu('ㄹ깝쇼', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ꼬': eu('ㄹ꼬', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ는지': eu('ㄹ는지', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ데라니': eu('ㄹ데라니', A, ['eusi']),
+    '-(으)ㄹ라': eu('ㄹ라', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ라고': eu('ㄹ라고', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ라치면': eu('ㄹ라치면', V, ['eusi']),
+    '-(으)ㄹ락': eu('ㄹ락 말락', V, ['eusi'], ['p']),
+    '-(으)ㄹ래': eu('ㄹ래', V, ['eusi']),
+    '-(으)ㄹ러니': eu('ㄹ러니', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ러라': eu('ㄹ러라', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ런가': eu('ㄹ런가', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ런고': eu('ㄹ런고', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ런지': eu('ㄹ런지', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ레': eu('ㄹ레', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ레라': eu('ㄹ레라', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ려고': eu('ㄹ려고', V, ['eusi']),
+    '-(으)ㄹ망정': eu('ㄹ망정', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ밖에': eu('ㄹ밖에', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ뿐더러': eu('ㄹ뿐더러', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ사': eu('ㄹ사', A),
+    '-(으)ㄹ새': eu('ㄹ새', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ세': eu('ㄹ세', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ세라': eu('ㄹ세라', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ세말이지': eu('ㄹ세말이지', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ소냐': eu('ㄹ소냐', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ손가': eu('ㄹ손가', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ수록': eu('ㄹ수록', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ시': eu('ㄹ시', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ시고': eu('ㄹ시고', AI, ['eusi'], ['p']),
+    '-(으)ㄹ싸록': eu('ㄹ싸록', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ쏘냐': eu('ㄹ쏘냐', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ쏜가': eu('ㄹ쏜가', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ이만큼': eu('ㄹ이만큼', VAI, ['eusi', 'euo'], ['p']),
+    '-(으)ㄹ작시면': eu('ㄹ작시면', V, ['eusi']),
+    '-(으)ㄹ지': eu('ㄹ지', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ지나': eu('ㄹ지나', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ지니': eu('ㄹ지니', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ지니라': eu('ㄹ지니라', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ지라': eu('ㄹ지라', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ지라도': eu('ㄹ지라도', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ지로다': eu('ㄹ지로다', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ지며': eu('ㄹ지며', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ지어다': eu('ㄹ지어다', V, ['eusi']),
+    '-(으)ㄹ지언정': eu('ㄹ지언정', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ진대': eu('ㄹ진대', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ진대는': eu('ㄹ진대는', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ진댄': eu('ㄹ진댄', VAI, ['eusi'], ['p']),
+    '-(으)ㄹ진저': eu('ㄹ진저', VAI, ['eusi'], ['p']),
+    '-(으)ㅁ': eu('ㅁ', VAI, ['eusi'], ['p', 'f']),
+    '-(으)ㅁ세': eu('ㅁ세', V),
+    '-(으)ㅁ도': eu('ㅁ도', VAI, ['eusi'], ['p', 'f']),
+    '-(으)ㅁ에랴': eu('ㅁ에랴', VAI, ['eusi'], ['p', 'f']),
+    '-(으)ㅂ쇼': eu('ㅂ쇼', V),
+    '-(으)ㅂ시다': eu('ㅂ시다', V),
+    '-(으)ㅂ시오': eu('ㅂ시오', V),
+    '-자': plain('자', VI),
+    '-자고': plain('자고', V),
+    '-자구': plain('자구', V),
+    '-자꾸나': plain('자꾸나', V),
+    '-자느니': plain('자느니', V),
+    '-자니까': plain('자니까', V),
+    '-자마자': plain('자마자', V, ['eusi']),
+    '-자며': plain('자며', V),
+    '-자면': plain('자면', V),
+    '-자면서': plain('자면서', V),
+    '-자손': plain('자손', V),
+    '-자오': chain(['jao'], plain('자오', V)),
+    '-자옵': chain(['jaob'], plain('자옵', V)),
+    '-잡': chain(['jab'], plain('잡', V)),
+    '-잖': chain(['v', 'adj'], plain('잖다', VAI, ['p', 'f', 'eusi'])),
+    '-죠': plain('죠', VAI, ['p', 'f', 'eusi']),
+    '-지': plain('지', VAI, ['p', 'f', 'eusi']),
+    '-지마는': plain('지마는', VAI, ['p', 'f', 'eusi']),
+    '-지만': plain('지만', VAI, ['p', 'f', 'euo', 'euob', 'eusi']),
+    '-지만서도': plain('지만서도', VAI, ['p', 'f', 'eusi']),
+    '-지요': plain('지요', VAI, ['p', 'f', 'eusi']),
+    '-진': plain('진', VAI, ['p', 'f', 'eusi']),
+    '-질': plain('질', VAI, ['p', 'f', 'eusi']),
+};
+
+/** @type {import('language-transformer').LanguageTransformDescriptor<Condition>} */
 export const koreanTransforms = {
     language: 'ko',
     conditions,
     transforms: {
-        '어간': {
+        어간: {
             name: '어간',
             description: 'Stem',
-            rules: [
-                suffixInflection('ㅂ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅃ', 'ㅃㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅈ', 'ㅈㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅉ', 'ㅉㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄸ', 'ㄸㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄱ', 'ㄱㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄲ', 'ㄲㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅆ', 'ㅆㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁ', 'ㅁㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴ', 'ㄴㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇ', 'ㅇㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎ', 'ㅎㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅋ', 'ㅋㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅌ', 'ㅌㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅊ', 'ㅊㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅍ', 'ㅍㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅛ', 'ㅛㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅑ', 'ㅑㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅒ', 'ㅒㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅖ', 'ㅖㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅏ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅣ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅠ', 'ㅠㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅡ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-            ],
+            rules: [...stemFinals].map((final) => suffixInflection(final, final + 'ㄷㅏ', [], VA)),
         },
-        'ㄴ': {
+        ㄴ: {
             name: 'ㄴ',
             description: 'Contraction of the topic particle 는',
             rules: [
@@ -193,7 +890,7 @@ export const koreanTransforms = {
                 contractedParticle('ㄴ', 3, ['n']),
             ],
         },
-        'ㄹ': {
+        ㄹ: {
             name: 'ㄹ',
             description: 'Contraction of the object particle 를',
             rules: [
@@ -201,5068 +898,6 @@ export const koreanTransforms = {
                 contractedParticle('ㄹ', 3, ['n']),
             ],
         },
-        '-거나': {
-            name: '-거나',
-            rules: [
-                suffixInflection('ㄱㅓㄴㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅏ', '', [], ['p', 'f', 'euob', 'eusi']),
-            ],
-        },
-        '-거늘': {
-            name: '-거늘',
-            rules: [
-                suffixInflection('ㄱㅓㄴㅡㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅡㄹ', '', [], ['p', 'f', 'euob', 'eusi']),
-            ],
-        },
-        '-거니': {
-            name: '-거니',
-            rules: [
-                suffixInflection('ㄱㅓㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅣ', '', [], ['p', 'f', 'euob', 'eusi']),
-            ],
-        },
-        '-거니와': {
-            name: '-거니와',
-            rules: [
-                suffixInflection('ㄱㅓㄴㅣㅇㅗㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅣㅇㅗㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-거던': {
-            name: '-거던',
-            rules: [
-                suffixInflection('ㄱㅓㄷㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄷㅓㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-거드면': {
-            name: '-거드면',
-            rules: [
-                suffixInflection('ㄱㅓㄷㅡㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄷㅡㅁㅕㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-거든': {
-            name: '-거든',
-            rules: [
-                suffixInflection('ㄱㅓㄷㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄷㅡㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-거들랑': {
-            name: '-거들랑',
-            rules: [
-                suffixInflection('ㄱㅓㄷㅡㄹㄹㅏㅇ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄷㅡㄹㄹㅏㅇ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-거라': {
-            name: '-거라',
-            rules: [
-                suffixInflection('ㄱㅓㄹㅏ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-건': {
-            name: '-건',
-            rules: [
-                suffixInflection('ㄱㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴ', '', [], ['p', 'f', 'euob', 'eusi']),
-            ],
-        },
-        '-건대': {
-            name: '-건대',
-            rules: [
-                suffixInflection('ㄱㅓㄴㄷㅐ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄱㅓㄴㄷㅐ', '', [], ['p', 'eusi', 'jaob']),
-            ],
-        },
-        '-건마는': {
-            name: '-건마는',
-            rules: [
-                suffixInflection('ㄱㅓㄴㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-건만': {
-            name: '-건만',
-            rules: [
-                suffixInflection('ㄱㅓㄴㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-걸랑': {
-            name: '-걸랑',
-            rules: [
-                suffixInflection('ㄱㅓㄹㄹㅏㅇ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄹㄹㅏㅇ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-것다': {
-            name: '-것다',
-            rules: [
-                suffixInflection('ㄱㅓㅅㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㅅㄷㅏ', '', [], ['p', 'eusi']),
-            ],
-        },
-        '-것마는': {
-            name: '-것마는',
-            rules: [
-                suffixInflection('ㄱㅓㅅㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㅅㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-게': {
-            name: '-게',
-            rules: [
-                suffixInflection('ㄱㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅔ', '', [], ['p', 'eusi']),
-            ],
-        },
-        '-게끔': {
-            name: '-게끔',
-            rules: [
-                suffixInflection('ㄱㅔㄲㅡㅁ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄱㅔㄲㅡㅁ', '', [], ['eusi']),
-            ],
-        },
-        '-게나': {
-            name: '-게나',
-            rules: [
-                suffixInflection('ㄱㅔㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄱㅔㄴㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-게시리': {
-            name: '-게시리',
-            rules: [
-                suffixInflection('ㄱㅔㅅㅣㄹㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄱㅔㅅㅣㄹㅣ', '', [], ['eusi']),
-            ],
-        },
-        '-겠': {
-            name: '-겠',
-            rules: [
-                suffixInflection('ㄱㅔㅆ', 'ㄷㅏ', ['f'], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅔㅆ', '', ['f'], ['p', 'eusi']),
-            ],
-        },
-        '-고': {
-            name: '-고',
-            rules: [
-                suffixInflection('ㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅗ', '', [], ['p', 'f', 'eusi', 'saob', 'euob', 'euo', 'sab', 'jaob', 'jab']),
-            ],
-        },
-        '-고는 하다': {
-            name: '-고는 하다',
-            rules: [
-                suffixInflection('ㄱㅗㄴㅡㄴ ㅎㅏㄷㅏ', 'ㄷㅏ', ['v'], ['v']),
-                suffixInflection('ㄱㅗㄴㅡㄴ ㅎㅏㄷㅏ', '', ['v'], ['eusi']),
-            ],
-        },
-        '-곤 하다': {
-            name: '-곤 하다',
-            rules: [
-                suffixInflection('ㄱㅗㄴ ㅎㅏㄷㅏ', 'ㄷㅏ', ['v'], ['v']),
-                suffixInflection('ㄱㅗㄴ ㅎㅏㄷㅏ', '', ['v'], ['eusi']),
-            ],
-        },
-        '-고는': {
-            name: '-고는',
-            rules: [
-                suffixInflection('ㄱㅗㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄱㅗㄴㅡㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-곤': {
-            name: '-곤',
-            rules: [
-                suffixInflection('ㄱㅗㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄱㅗㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-고도': {
-            name: '-고도',
-            rules: [
-                suffixInflection('ㄱㅗㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅗㄷㅗ', '', [], ['eusi']),
-            ],
-        },
-        '-고말고': {
-            name: '-고말고',
-            rules: [
-                suffixInflection('ㄱㅗㅁㅏㄹㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅗㅁㅏㄹㄱㅗ', '', [], ['p', 'eusi']),
-            ],
-        },
-        '-고서': {
-            name: '-고서',
-            rules: [
-                suffixInflection('ㄱㅗㅅㅓ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄱㅗㅅㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅏㄴㅣㄱㅗㅅㅓ', 'ㅇㅏㄴㅣㄷㅏ', [], ['adj']),
-            ],
-        },
-        '-고야': {
-            name: '-고야',
-            rules: [
-                suffixInflection('ㄱㅗㅇㅑ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄱㅗㅇㅑ', '', [], ['eusi']),
-            ],
-        },
-        '-고자': {
-            name: '-고자',
-            rules: [
-                suffixInflection('ㄱㅗㅈㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄱㅗㅈㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅣㅆㄱㅗㅈㅏ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄱㅗㅈㅏ', '없다', [], []),
-            ],
-        },
-        '-고저': {
-            name: '-고저',
-            rules: [
-                suffixInflection('ㄱㅗㅈㅓ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄱㅗㅈㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅣㅆㄱㅗㅈㅓ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄱㅗㅈㅓ', '없다', [], []),
-            ],
-        },
-        '-관데': {
-            name: '-관데',
-            rules: [
-                suffixInflection('ㄱㅗㅏㄴㄷㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅗㅏㄴㄷㅔ', '', [], ['p', 'eusi']),
-            ],
-        },
-        '-구나': {
-            name: '-구나',
-            rules: [
-                suffixInflection('ㄱㅜㄴㅏ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㄱㅜㄴㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-구려': {
-            name: '-구려',
-            rules: [
-                suffixInflection('ㄱㅜㄹㅕ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㄹㅕ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-구료': {
-            name: '-구료',
-            rules: [
-                suffixInflection('ㄱㅜㄹㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㄹㅛ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-구만': {
-            name: '-구만',
-            rules: [
-                suffixInflection('ㄱㅜㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-구먼': {
-            name: '-구먼',
-            rules: [
-                suffixInflection('ㄱㅜㅁㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㅁㅓㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-구면': {
-            name: '-구면',
-            rules: [
-                suffixInflection('ㄱㅜㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㅁㅕㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-군': {
-            name: '-군',
-            rules: [
-                suffixInflection('ㄱㅜㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-기': {
-            name: '-기',
-            rules: [
-                suffixInflection('ㄱㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-기로': {
-            name: '-기로',
-            rules: [
-                suffixInflection('ㄱㅣㄹㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄹㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-기로니': {
-            name: '-기로니',
-            rules: [
-                suffixInflection('ㄱㅣㄹㅗㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-            ],
-        },
-        '-기로서': {
-            name: '-기로서',
-            rules: [
-                suffixInflection('ㄱㅣㄹㅗㅅㅓ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄹㅗㅅㅓ', '', [], ['p']),
-            ],
-        },
-        '-기로서니': {
-            name: '-기로서니',
-            rules: [
-                suffixInflection('ㄱㅣㄹㅗㅅㅓㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄹㅗㅅㅓㄴㅣ', '', [], ['p']),
-            ],
-        },
-        '-기로선들': {
-            name: '-기로선들',
-            rules: [
-                suffixInflection('ㄱㅣㄹㅗㅅㅓㄴㄷㅡㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄹㅗㅅㅓㄴㄷㅡㄹ', '', [], ['p']),
-            ],
-        },
-        '-기에': {
-            name: '-기에',
-            rules: [
-                suffixInflection('ㄱㅣㅇㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㅇㅔ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-긴': {
-            name: '-긴',
-            rules: [
-                suffixInflection('ㄱㅣㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-길': {
-            name: '-길',
-            rules: [
-                suffixInflection('ㄱㅣㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄹ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-길래': {
-            name: '-길래',
-            rules: [
-                suffixInflection('ㄱㅣㄹㄹㅐ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄹㄹㅐ', '', [], ['p', 'eusi']),
-            ],
-        },
-        '-(으)ㄹ': {
-            name: '-(으)ㄹ',
-            rules: [
-                suffixInflection('ㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ거나': {
-            name: '-(으)ㄹ거나',
-            rules: [
-                suffixInflection('ㄹㄱㅓㄴㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄱㅓㄴㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄱㅓㄴㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄱㅓㄴㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄱㅓㄴㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄱㅓㄴㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄱㅓㄴㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄱㅓㄴㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄱㅓㄴㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)ㄹ걸': {
-            name: '-(으)ㄹ걸',
-            rules: [
-                suffixInflection('ㄹㄱㅓㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄱㅓㄹ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄱㅓㄹ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄱㅓㄹ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄱㅓㄹ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄱㅓㄹ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄱㅓㄹ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄱㅓㄹ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄱㅓㄹ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ게': {
-            name: '-(으)ㄹ게',
-            rules: [
-                suffixInflection('ㄹㄱㅔ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄱㅔ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㄱㅔ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㄱㅔ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㄱㅔ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㄱㅔ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-(으)ㄹ 거야': {
-            name: '-(으)ㄹ 거야',
-            rules: [
-                suffixInflection('ㄹ ㄱㅓㅇㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹ ㄱㅓㅇㅑ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅇㅑ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹ ㄱㅓㅇㅑ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅇㅑ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㅇㅑ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅇㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㅇㅑ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅇㅑ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ 거예요': {
-            name: '-(으)ㄹ 거예요',
-            rules: [
-                suffixInflection('ㄹ ㄱㅓㅇㅖㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹ ㄱㅓㅇㅖㅇㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅇㅖㅇㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹ ㄱㅓㅇㅖㅇㅛ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅇㅖㅇㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㅇㅖㅇㅛ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅇㅖㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㅇㅖㅇㅛ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅇㅖㅇㅛ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ 것이다': {
-            name: '-(으)ㄹ 것이다',
-            rules: [
-                suffixInflection('ㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㅅㅇㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅅㅇㅣㄷㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ 것입니다': {
-            name: '-(으)ㄹ 것입니다',
-            rules: [
-                suffixInflection('ㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ 거다': {
-            name: '-(으)ㄹ 거다',
-            rules: [
-                suffixInflection('ㄹ ㄱㅓㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹ ㄱㅓㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹ ㄱㅓㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㄷㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ 겁니다': {
-            name: '-(으)ㄹ 겁니다',
-            rules: [
-                suffixInflection('ㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹ ㄱㅓㅂㄴㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹ ㄱㅓㅂㄴㅣㄷㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ께': {
-            name: '-(으)ㄹ께',
-            rules: [
-                suffixInflection('ㄹㄲㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄲㅔ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄲㅔ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄲㅔ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄲㅔ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄲㅔ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄲㅔ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-            ],
-        },
-        '-(으)나': {
-            name: '-(으)나',
-            rules: [
-                suffixInflection('ㄴㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㄴㅏ', '', [], ['p', 'f', 'eusi', 'sao']),
-            ],
-        },
-        '-나니': {
-            name: '-나니',
-            rules: [
-                suffixInflection('ㄴㅏㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅏㄴㅣ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅏㄴㅣ', '', [], ['p', 'f', 'eusi', 'sab', 'euob']),
-            ],
-        },
-        '-(으)나마': {
-            name: '-(으)나마',
-            rules: [
-                suffixInflection('ㄴㅏㅁㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅏㅁㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅏㅁㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅏㅁㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅏㅁㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅏㅁㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅏㅁㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅏㅁㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅏㅁㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-나이까': {
-            name: '-나이까',
-            rules: [
-                suffixInflection('ㄴㅏㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅏㅇㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅏㅇㅣㄲㅏ', '', [], ['p', 'f', 'eusi', 'saob', 'euob']),
-            ],
-        },
-        '-나이다': {
-            name: '-나이다',
-            rules: [
-                suffixInflection('ㄴㅏㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅏㅇㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅏㅇㅣㄷㅏ', '', [], ['p', 'f', 'eusi', 'saob', 'jaob', 'jab', 'euob']),
-            ],
-        },
-        '-남': {
-            name: '-남',
-            rules: [
-                suffixInflection('ㄴㅏㅁ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅏㅁ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅏㅁ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-(으)냐': {
-            name: '-(으)냐',
-            rules: [
-                suffixInflection('ㄴㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅑ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅑ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅑ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅑ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅑ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅑ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅡㄴㅑ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-(으)냐고': {
-            name: '-(으)냐고',
-            rules: [
-                suffixInflection('ㄴㅑㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅑㄱㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅑㄱㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅑㄱㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅑㄱㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅑㄱㅗ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅑㄱㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅑㄱㅗ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅡㄴㅑㄱㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-너라': {
-            name: '-너라',
-            rules: [
-                suffixInflection('ㄴㅓㄹㅏ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-네': {
-            name: '-네',
-            rules: [
-                suffixInflection('ㄴㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄴㅔ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅔ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅔ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-노니': {
-            name: '-노니',
-            rules: [
-                suffixInflection('ㄴㅗㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㄴㅣ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㄴㅣ', '', [], ['p', 'f', 'eusi', 'sab', 'euob']),
-            ],
-        },
-        '-노라': {
-            name: '-노라',
-            rules: [
-                suffixInflection('ㄴㅗㄹㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㄹㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㄹㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-노라고': {
-            name: '-노라고',
-            rules: [
-                suffixInflection('ㄴㅗㄹㅏㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㄹㅏㄱㅗ', 'ㄹㄷㅏ', [], ['v']),
-            ],
-        },
-        '-노라니': {
-            name: '-노라니',
-            rules: [
-                suffixInflection('ㄴㅗㄹㅏㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅗㄹㅏㄴㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-            ],
-        },
-        '-노라니까': {
-            name: '-노라니까',
-            rules: [
-                suffixInflection('ㄴㅗㄹㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅗㄹㅏㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-            ],
-        },
-        '-노라면': {
-            name: '-노라면',
-            rules: [
-                suffixInflection('ㄴㅗㄹㅏㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㄹㅏㅁㅕㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㄹㅏㅁㅕㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅗㄹㅏㅁㅕㄴ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅗㄹㅏㅁㅕㄴ', '없다', [], []),
-            ],
-        },
-        '-(으)뇨': {
-            name: '-(으)뇨',
-            rules: [
-                suffixInflection('ㄴㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅛ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅛ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅛ', '', [], ['eusi']),
-            ],
-        },
-        '-누': {
-            name: '-누',
-            rules: [
-                suffixInflection('ㄴㅜ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅜ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅜ', '', [], ['p', 'f']),
-            ],
-        },
-        '-누나': {
-            name: '-누나',
-            rules: [
-                suffixInflection('ㄴㅜㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅜㄴㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅜㄴㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-누만': {
-            name: '-누만',
-            rules: [
-                suffixInflection('ㄴㅜㅁㅏㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅜㅁㅏㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅜㅁㅏㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-누먼': {
-            name: '-누먼',
-            rules: [
-                suffixInflection('ㄴㅜㅁㅓㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅜㅁㅓㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅜㅁㅓㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-느냐': {
-            name: '-느냐',
-            rules: [
-                suffixInflection('ㄴㅡㄴㅑ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅑ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅑ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-느냐고': {
-            name: '-느냐고',
-            rules: [
-                suffixInflection('ㄴㅡㄴㅑㄱㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅑㄱㅗ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅑㄱㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-느뇨': {
-            name: '-느뇨',
-            rules: [
-                suffixInflection('ㄴㅡㄴㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅛ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-느니': {
-            name: '-느니',
-            rules: [
-                suffixInflection('ㄴㅡㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅣ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-느니만': {
-            name: '-느니만',
-            rules: [
-                suffixInflection('ㄴㅡㄴㅣㅁㅏㄴ ㅁㅗㅅㅎㅏㄷㅏ', 'ㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅣㅁㅏㄴ ㅁㅗㅅㅎㅏㄷㅏ', 'ㄹㄷㅏ', ['v'], ['v', 'adj']),
-            ],
-        },
-        '-느라': {
-            name: '-느라',
-            rules: [
-                suffixInflection('ㄴㅡㄹㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄹㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄹㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-느라고': {
-            name: '-느라고',
-            rules: [
-                suffixInflection('ㄴㅡㄹㅏㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄹㅏㄱㅗ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄹㅏㄱㅗ', '', [], ['eusi']),
-            ],
-        },
-        '-는': {
-            name: '-는',
-            rules: [
-                suffixInflection('ㄴㅡㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴ', '', [], ['eusi', 'f']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴ', '있다', [], ['adj']),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴ', '없다', [], ['adj']),
-            ],
-        },
-        '-(으)ㄴ': {
-            name: '-(으)ㄴ',
-            rules: [
-                suffixInflection('ㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄴ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴ', '', [], ['eusi', 'f']),
-            ],
-        },
-        '-(으/느)ㄴ가': {
-            name: '-(으/느)ㄴ가',
-            rules: [
-                suffixInflection('ㄴㄱㅏ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㄴㄱㅏ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅡㄴㄱㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄴㄱㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜㄴㄱㅏ', 'ㅂㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄴㄱㅏ', 'ㅅㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄱㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㄱㅏ', 'ㄷㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄱㅏ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㄱㅏ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㄱㅏ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅏ', '없다', [], []),
-            ],
-        },
-        '-(으/느)ㄴ감': {
-            name: '-(으/느)ㄴ감',
-            rules: [
-                suffixInflection('ㄴㄱㅏㅁ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㄴㄱㅏㅁ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅡㄴㄱㅏㅁ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅏㅁ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄴㄱㅏㅁ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜㄴㄱㅏㅁ', 'ㅂㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄴㄱㅏㅁ', 'ㅅㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄱㅏㅁ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㄱㅏㅁ', 'ㄷㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄱㅏㅁ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㄱㅏㅁ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㄱㅏㅁ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅏㅁ', '없다', [], []),
-            ],
-        },
-        '-(으/느)ㄴ걸': {
-            name: '-(으/느)ㄴ걸',
-            rules: [
-                suffixInflection('ㄴㄱㅓㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄴㄱㅓㄹ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㄱㅓㄹ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅓㄹ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄴㄱㅓㄹ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㄱㅓㄹ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㄱㅓㄹ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㄱㅓㄹ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㄱㅓㄹ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㄱㅓㄹ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㄱㅓㄹ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㄱㅓㄹ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅓㄹ', '없다', [], []),
-            ],
-        },
-        '-(으/느)ㄴ고': {
-            name: '-(으/느)ㄴ고',
-            rules: [
-                suffixInflection('ㄴㄱㅗ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㄴㄱㅗ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅡㄴㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅗ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄴㄱㅗ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜㄴㄱㅗ', 'ㅂㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄴㄱㅗ', 'ㅅㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄱㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㄱㅗ', 'ㄷㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㄱㅗ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㄱㅗ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅗ', '없다', [], []),
-            ],
-        },
-        '-는구나': {
-            name: '-는구나',
-            rules: [
-                suffixInflection('ㄴㅡㄴㄱㅜㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄴㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄴㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-는구려': {
-            name: '-는구려',
-            rules: [
-                suffixInflection('ㄴㅡㄴㄱㅜㄹㅕ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄹㅕ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄹㅕ', '', [], ['eusi']),
-            ],
-        },
-        '-는구료': {
-            name: '-는구료',
-            rules: [
-                suffixInflection('ㄴㅡㄴㄱㅜㄹㅛ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄹㅛ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄹㅛ', '', [], ['eusi']),
-            ],
-        },
-        '-는구만': {
-            name: '-는구만',
-            rules: [
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅏㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅏㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅏㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-는구먼': {
-            name: '-는구먼',
-            rules: [
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅓㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅓㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅓㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-는구면': {
-            name: '-는구면',
-            rules: [
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅕㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅕㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-는군': {
-            name: '-는군',
-            rules: [
-                suffixInflection('ㄴㅡㄴㄱㅜㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-는궈니': {
-            name: '-는궈니',
-            rules: [
-                suffixInflection('ㄴㅡㄴㄱㅜㅓㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅓㄴㅣ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅓㄴㅣ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㄱㅜㅓㄴㅣ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅜㅓㄴㅣ', '없다', [], []),
-            ],
-        },
-        '-는과니': {
-            name: '-는과니',
-            rules: [
-                suffixInflection('ㄴㅡㄴㄱㅗㅏㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅗㅏㄴㅣ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅗㅏㄴㅣ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㄱㅗㅏㄴㅣ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅗㅏㄴㅣ', '없다', [], []),
-            ],
-        },
-        '-(느)ㄴ다': {
-            name: '-(느)ㄴ다',
-            rules: [
-                suffixInflection('ㄴㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-((느)ㄴ)다고': {
-            name: '-((느)ㄴ)다고',
-            rules: [
-                suffixInflection('ㄴㄷㅏㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄱㅗ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㄱㅗ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄱㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다나': {
-            name: '-((느)ㄴ)다나',
-            rules: [
-                suffixInflection('ㄴㄷㅏㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㅏ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㄴㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄴㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다네': {
-            name: '-((느)ㄴ)다네',
-            rules: [
-                suffixInflection('ㄴㄷㅏㄴㅔ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㄴㅔ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㅔ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㅔ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㄴㅔ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄴㅔ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다느니': {
-            name: '-((느)ㄴ)다느니',
-            rules: [
-                suffixInflection('ㄴㄷㅏㄴㅡㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㄴㅡㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㅡㄴㅣ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㅡㄴㅣ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㄴㅡㄴㅣ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄴㅡㄴㅣ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다니': {
-            name: '-((느)ㄴ)다니',
-            rules: [
-                suffixInflection('ㄴㄷㅏㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㅣ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㅣ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㄴㅣ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다니까': {
-            name: '-((느)ㄴ)다니까',
-            rules: [
-                suffixInflection('ㄴㄷㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄴㅣㄲㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다더라': {
-            name: '-((느)ㄴ)다더라',
-            rules: [
-                suffixInflection('ㄴㄷㅏㄷㅓㄹㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㄷㅓㄹㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄷㅓㄹㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄷㅓㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㄷㅓㄹㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄷㅓㄹㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다마는': {
-            name: '-((느)ㄴ)다마는',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁㅏㄴㅡㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁㅏㄴㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다만': {
-            name: '-((느)ㄴ)다만',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅁㅏㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁㅏㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁㅏㄴ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅁㅏㄴ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다며': {
-            name: '-((느)ㄴ)다며',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅁㅕ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅁㅕ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁㅕ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁㅕ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅁㅕ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅕ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다면': {
-            name: '-((느)ㄴ)다면',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁㅕㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁㅕㄴ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅁㅕㄴ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅕㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다면서': {
-            name: '-((느)ㄴ)다면서',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁㅕㄴㅅㅓ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁㅕㄴㅅㅓ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅕㄴㅅㅓ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다손': {
-            name: '-((느)ㄴ)다손',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅅㅗㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅅㅗㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅅㅗㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅅㅗㄴ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅅㅗㄴ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅅㅗㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다오': {
-            name: '-((느)ㄴ)다오',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅇㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅇㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅇㅗ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅇㅗ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅇㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㅇㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)다지': {
-            name: '-((느)ㄴ)다지',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅈㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅈㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅈㅣ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅈㅣ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅈㅣ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅈㅣ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)단다': {
-            name: '-((느)ㄴ)단다',
-            rules: [
-                suffixInflection('ㄴㄷㅏㄴㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㄴㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㄴㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㄴㄷㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄴㄷㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)담': {
-            name: '-((느)ㄴ)담',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅁ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅁ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅁ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅁ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)답니까': {
-            name: '-((느)ㄴ)답니까',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅂㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅂㄴㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㅂㄴㅣㄲㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)답니다': {
-            name: '-((느)ㄴ)답니다',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅂㄴㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅂㄴㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㅂㄴㅣㄷㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)답시고': {
-            name: '-((느)ㄴ)답시고',
-            rules: [
-                suffixInflection('ㄴㄷㅏㅂㅅㅣㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅏㅂㅅㅣㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅂㅅㅣㄱㅗ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏㅂㅅㅣㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㄷㅏㅂㅅㅣㄱㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㅂㅅㅣㄱㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)대': {
-            name: '-((느)ㄴ)대',
-            rules: [
-                suffixInflection('ㄴㄷㅐ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅐ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅐ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅐ', '', [], ['eusi']),
-                suffixInflection('ㄷㅐ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅐ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-((느)ㄴ)대요': {
-            name: '-((느)ㄴ)대요',
-            rules: [
-                suffixInflection('ㄴㄷㅐㅇㅛ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㄴㅡㄴㄷㅐㅇㅛ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅐㅇㅛ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅐㅇㅛ', '', [], ['eusi']),
-                suffixInflection('ㄷㅐㅇㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅐㅇㅛ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㄷㅐㅇㅛ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄷㅐㅇㅛ', '없다', [], []),
-            ],
-        },
-        '-((느)ㄴ)댄다': {
-            name: '-((느)ㄴ)댄다',
-            rules: [
-                suffixInflection('ㄴㄷㅐㄴㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅐㄴㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅐㄴㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅐㄴㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㄷㅐㄴㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅐㄴㄷㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-(으/느)ㄴ데': {
-            name: '-(으/느)ㄴ데',
-            rules: [
-                suffixInflection('ㄴㄷㅔ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㄴㄷㅔ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅡㄴㄷㅔ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅔ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄴㄷㅔ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜㄴㄷㅔ', 'ㅂㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄴㄷㅔ', 'ㅅㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄷㅔ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㄷㅔ', 'ㄷㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄷㅔ', '', [], ['eusi', 'sao']),
-                suffixInflection('ㄴㅡㄴㄷㅔ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㄷㅔ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄷㅔ', '없다', [], []),
-            ],
-        },
-        '-(으/느)ㄴ뎁쇼': {
-            name: '-(으/느)ㄴ뎁쇼',
-            rules: [
-                suffixInflection('ㄴㄷㅔㅂㅅㅛ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㄴㄷㅔㅂㅅㅛ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅡㄴㄷㅔㅂㅅㅛ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅔㅂㅅㅛ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄴㄷㅔㅂㅅㅛ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜㄴㄷㅔㅂㅅㅛ', 'ㅂㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄴㄷㅔㅂㅅㅛ', 'ㅅㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄷㅔㅂㅅㅛ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㄷㅔㅂㅅㅛ', 'ㄷㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄷㅔㅂㅅㅛ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㄷㅔㅂㅅㅛ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㄷㅔㅂㅅㅛ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄷㅔㅂㅅㅛ', '없다', [], []),
-            ],
-        },
-        '-는도다': {
-            name: '-는도다',
-            rules: [
-                suffixInflection('ㄴㅡㄴㄷㅗㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄷㅗㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
-            ],
-        },
-        '-(으/느)ㄴ바': {
-            name: '-(으/느)ㄴ바',
-            rules: [
-                suffixInflection('ㄴㅂㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄴㅂㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅂㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㅂㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄴㅂㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅂㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅂㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅂㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㅂㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅂㅏ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㅂㅏ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅡㄴㅂㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㅂㅏ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅂㅏ', '없다', [], []),
-            ],
-        },
-        '-(으/느)ㄴ지': {
-            name: '-(으/느)ㄴ지',
-            rules: [
-                suffixInflection('ㄴㅈㅣ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㄴㅈㅣ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅡㄴㅈㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㅈㅣ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄴㅈㅣ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜㄴㅈㅣ', 'ㅂㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄴㅈㅣ', 'ㅅㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅈㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㅈㅣ', 'ㄷㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅈㅣ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㅈㅣ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㅈㅣ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅈㅣ', '없다', [], []),
-            ],
-        },
-        '-(으/느)ㄴ지고': {
-            name: '-(으/느)ㄴ지고',
-            rules: [
-                suffixInflection('ㄴㅈㅣㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄴㅈㅣㄱㅗ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅈㅣㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㅈㅣㄱㅗ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄴㅈㅣㄱㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅈㅣㄱㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅈㅣㄱㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅈㅣㄱㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㅈㅣㄱㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅈㅣㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㅈㅣㄱㅗ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㅈㅣㄱㅗ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅈㅣㄱㅗ', '없다', [], []),
-            ],
-        },
-        '-(으/느)ㄴ지라': {
-            name: '-(으/느)ㄴ지라',
-            rules: [
-                suffixInflection('ㄴㅈㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄴㅈㅣㄹㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅈㅣㄹㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㅈㅣㄹㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄴㅈㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅈㅣㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅈㅣㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅈㅣㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㅈㅣㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅈㅣㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㅈㅣㄹㅏ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄴㅡㄴㅈㅣㄹㅏ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅈㅣㄹㅏ', '없다', [], []),
-            ],
-        },
-        '-(으)니': {
-            name: '-(으)니',
-            rules: [
-                suffixInflection('ㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣ', '', [], ['p', 'f']),
-                suffixInflection('ㄴㅣ', '', [], ['p', 'f', 'eusi', 'euo', 'sao', 'jao']),
-            ],
-        },
-        '-(으)니까': {
-            name: '-(으)니까',
-            rules: [
-                suffixInflection('ㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅣㄲㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㄲㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)니까느루': {
-            name: '-(으)니까느루',
-            rules: [
-                suffixInflection('ㄴㅣㄲㅏㄴㅡㄹㅜ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴㅡㄹㅜ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅣㄲㅏㄴㅡㄹㅜ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴㅡㄹㅜ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㄲㅏㄴㅡㄹㅜ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅣㄲㅏㄴㅡㄹㅜ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅣㄲㅏㄴㅡㄹㅜ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㄲㅏㄴㅡㄹㅜ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴㅡㄹㅜ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)니까는': {
-            name: '-(으)니까는',
-            rules: [
-                suffixInflection('ㄴㅣㄲㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅣㄲㅏㄴㅡㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴㅡㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㄲㅏㄴㅡㄴ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅣㄲㅏㄴㅡㄴ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅣㄲㅏㄴㅡㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㄲㅏㄴㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴㅡㄴ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)니깐': {
-            name: '-(으)니깐',
-            rules: [
-                suffixInflection('ㄴㅣㄲㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅣㄲㅏㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㄲㅏㄴ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅣㄲㅏㄴ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅣㄲㅏㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㄲㅏㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으/느)니라': {
-            name: '-(으/느)니라',
-            rules: [
-                suffixInflection('ㄴㅣㄹㅏ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㄴㅣㄹㅏ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅡㄴㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅣㄹㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣㄹㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜㄴㅣㄹㅏ', 'ㅂㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄴㅣㄹㅏ', 'ㅅㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅣㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㅣㄹㅏ', 'ㄷㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅣㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㄹㅏ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㄴㅡㄴㅣㄹㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-(으/느)니만치': {
-            name: '-(으/느)니만치',
-            rules: [
-                suffixInflection('ㄴㅣㅁㅏㄴㅊㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄴㅣㅁㅏㄴㅊㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅣㅁㅏㄴㅊㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅣㅁㅏㄴㅊㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅊㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅣㅁㅏㄴㅊㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅊㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㅁㅏㄴㅊㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㅣㅁㅏㄴㅊㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㅁㅏㄴㅊㅣ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㅣㅁㅏㄴㅊㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅊㅣ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으/느)니만큼': {
-            name: '-(으/느)니만큼',
-            rules: [
-                suffixInflection('ㄴㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄴㅣㅁㅏㄴㅋㅡㅁ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅣㅁㅏㄴㅋㅡㅁ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅣㅁㅏㄴㅋㅡㅁ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅋㅡㅁ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㅁㅏㄴㅋㅡㅁ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄴㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅣㅁㅏㄴㅋㅡㅁ', '', [], ['eusi']),
-                suffixInflection('ㄴㅡㄴㅣㅁㅏㄴㅋㅡㅁ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅋㅡㅁ', '', [], ['p', 'f']),
-            ],
-        },
-        '-다': {
-            name: '-다',
-            rules: [
-                suffixInflection('ㄷㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-다가': {
-            name: '-다가',
-            rules: [
-                suffixInflection('ㄷㅏㄱㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㄱㅏ', '', [], ['p', 'eusi']),
-            ],
-        },
-        '-다가는': {
-            name: '-다가는',
-            rules: [
-                suffixInflection('ㄷㅏㄱㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅏㄱㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-다간': {
-            name: '-다간',
-            rules: [
-                suffixInflection('ㄷㅏㄱㅏㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㄱㅏㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-다마다': {
-            name: '-다마다',
-            rules: [
-                suffixInflection('ㄷㅏㅁㅏㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅏㅁㅏㄷㅏ', '', [], ['p', 'eusi']),
-            ],
-        },
-        '-다시피': {
-            name: '-다시피',
-            rules: [
-                suffixInflection('ㄷㅏㅅㅣㅍㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㅅㅣㅍㅣ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅣㅆㄷㅏㅅㅣㅍㅣ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄷㅏㅅㅣㅍㅣ', '없다', [], []),
-            ],
-        },
-        '-단': {
-            name: '-단',
-            rules: [
-                suffixInflection('ㄷㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅏㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더': {
-            name: '-더',
-            rules: [
-                suffixInflection('ㄷㅓ', 'ㄷㅏ', ['do'], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓ', '', ['do'], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더구나': {
-            name: '-더구나',
-            rules: [
-                suffixInflection('ㄷㅓㄱㅜㄴㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㄴㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더구려': {
-            name: '-더구려',
-            rules: [
-                suffixInflection('ㄷㅓㄱㅜㄹㅕ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㄹㅕ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더구료': {
-            name: '-더구료',
-            rules: [
-                suffixInflection('ㄷㅓㄱㅜㄹㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㄹㅛ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더구만': {
-            name: '-더구만',
-            rules: [
-                suffixInflection('ㄷㅓㄱㅜㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더구먼': {
-            name: '-더구먼',
-            rules: [
-                suffixInflection('ㄷㅓㄱㅜㅁㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㅁㅓㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더구면': {
-            name: '-더구면',
-            rules: [
-                suffixInflection('ㄷㅓㄱㅜㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㅁㅕㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더군': {
-            name: '-더군',
-            rules: [
-                suffixInflection('ㄷㅓㄱㅜㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더냐': {
-            name: '-더냐',
-            rules: [
-                suffixInflection('ㄷㅓㄴㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅑ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더뇨': {
-            name: '-더뇨',
-            rules: [
-                suffixInflection('ㄷㅓㄴㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅛ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더니': {
-            name: '-더니',
-            rules: [
-                suffixInflection('ㄷㅓㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣ', '', [], ['p', 'f', 'eusi', 'euob', 'euo', 'sab']),
-            ],
-        },
-        '-더니라': {
-            name: '-더니라',
-            rules: [
-                suffixInflection('ㄷㅓㄴㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣㄹㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더니마는': {
-            name: '-더니마는',
-            rules: [
-                suffixInflection('ㄷㅓㄴㅣㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더니만': {
-            name: '-더니만',
-            rules: [
-                suffixInflection('ㄷㅓㄴㅣㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더니이까': {
-            name: '-더니이까',
-            rules: [
-                suffixInflection('ㄷㅓㄴㅣㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣㅇㅣㄲㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더니이다': {
-            name: '-더니이다',
-            rules: [
-                suffixInflection('ㄷㅓㄴㅣㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣㅇㅣㄷㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더라도': {
-            name: '-더라도',
-            rules: [
-                suffixInflection('ㄷㅓㄹㅏㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄹㅏㄷㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더이까': {
-            name: '-더이까',
-            rules: [
-                suffixInflection('ㄷㅓㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㅇㅣㄲㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-더이다': {
-            name: '-더이다',
-            rules: [
-                suffixInflection('ㄷㅓㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㅇㅣㄷㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-던': {
-            name: '-던',
-            rules: [
-                suffixInflection('ㄷㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-던가': {
-            name: '-던가',
-            rules: [
-                suffixInflection('ㄷㅓㄴㄱㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㄱㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-던감': {
-            name: '-던감',
-            rules: [
-                suffixInflection('ㄷㅓㄴㄱㅏㅁ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㄱㅏㅁ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-던걸': {
-            name: '-던걸',
-            rules: [
-                suffixInflection('ㄷㅓㄴㄱㅓㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㄱㅓㄹ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-던고': {
-            name: '-던고',
-            rules: [
-                suffixInflection('ㄷㅓㄴㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㄱㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-던데': {
-            name: '-던데',
-            rules: [
-                suffixInflection('ㄷㅓㄴㄷㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㄷㅔ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-던들': {
-            name: '-던들',
-            rules: [
-                suffixInflection('ㄷㅓㄴㄷㅡㄹ', '', [], ['p']),
-            ],
-        },
-        '-던바': {
-            name: '-던바',
-            rules: [
-                suffixInflection('ㄷㅓㄴㅂㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅂㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-던지': {
-            name: '-던지',
-            rules: [
-                suffixInflection('ㄷㅓㄴㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅈㅣ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-데': {
-            name: '-데',
-            rules: [
-                suffixInflection('ㄷㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅔ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-데요': {
-            name: '-데요',
-            rules: [
-                suffixInflection('ㄷㅔㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅔㅇㅛ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-도다': {
-            name: '-도다',
-            rules: [
-                suffixInflection('ㄷㅗㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅗㄷㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-도록': {
-            name: '-도록',
-            rules: [
-                suffixInflection('ㄷㅗㄹㅗㄱ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅗㄹㅗㄱ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)되': {
-            name: '-(으)되',
-            rules: [
-                suffixInflection('ㄷㅗㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄷㅗㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅗㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄷㅗㅣ', '', [], ['p', 'f']),
-            ],
-        },
-        '-드구나': {
-            name: '-드구나',
-            rules: [
-                suffixInflection('ㄷㅡㄱㅜㄴㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄱㅜㄴㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-드구료': {
-            name: '-드구료',
-            rules: [
-                suffixInflection('ㄷㅡㄱㅜㄹㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄱㅜㄹㅛ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-드구면': {
-            name: '-드구면',
-            rules: [
-                suffixInflection('ㄷㅡㄱㅜㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄱㅜㅁㅕㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-드군': {
-            name: '-드군',
-            rules: [
-                suffixInflection('ㄷㅡㄱㅜㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄱㅜㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-드냐': {
-            name: '-드냐',
-            rules: [
-                suffixInflection('ㄷㅡㄴㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㅑ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-드니': {
-            name: '-드니',
-            rules: [
-                suffixInflection('ㄷㅡㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㅣ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-드니라': {
-            name: '-드니라',
-            rules: [
-                suffixInflection('ㄷㅡㄴㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㅣㄹㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-드라': {
-            name: '-드라',
-            rules: [
-                suffixInflection('ㄷㅡㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄹㅏ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-드라도': {
-            name: '-드라도',
-            rules: [
-                suffixInflection('ㄷㅡㄹㅏㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄹㅏㄷㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-드라면': {
-            name: '-드라면',
-            rules: [
-                suffixInflection('ㄷㅡㄹㅏㅁㅕㄴ', '', [], ['p']),
-            ],
-        },
-        '-드래도': {
-            name: '-드래도',
-            rules: [
-                suffixInflection('ㄷㅡㄹㅐㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄹㅐㄷㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-든': {
-            name: '-든',
-            rules: [
-                suffixInflection('ㄷㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴ', '', [], ['p', 'eusi']),
-            ],
-        },
-        '-든가': {
-            name: '-든가',
-            rules: [
-                suffixInflection('ㄷㅡㄴㄱㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㄱㅏ', '', [], ['p', 'eusi']),
-            ],
-        },
-        '-든걸': {
-            name: '-든걸',
-            rules: [
-                suffixInflection('ㄷㅡㄴㄱㅓㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㄱㅓㄹ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-든고': {
-            name: '-든고',
-            rules: [
-                suffixInflection('ㄷㅡㄴㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㄱㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-든데': {
-            name: '-든데',
-            rules: [
-                suffixInflection('ㄷㅡㄴㄷㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㄷㅔ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-든들': {
-            name: '-든들',
-            rules: [
-                suffixInflection('ㄷㅡㄴㄷㅡㄹ', '', [], ['p']),
-            ],
-        },
-        '-든지': {
-            name: '-든지',
-            rules: [
-                suffixInflection('ㄷㅡㄴㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㅈㅣ', '', [], ['p', 'eusi']),
-            ],
-        },
-        '-듯': {
-            name: '-듯',
-            rules: [
-                suffixInflection('ㄷㅡㅅ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㅅ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-듯이': {
-            name: '-듯이',
-            rules: [
-                suffixInflection('ㄷㅡㅅㅇㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㅅㅇㅣ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-디': {
-            name: '-디',
-            rules: [
-                suffixInflection('ㄷㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅣ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-(으)라': {
-            name: '-(으)라',
-            rules: [
-                suffixInflection('ㄹㅏ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)라고': {
-            name: '-(으)라고',
-            rules: [
-                suffixInflection('ㄹㅏㄱㅗ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㄱㅗ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㄱㅗ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄱㅗ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㄱㅗ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄱㅗ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)라구': {
-            name: '-(으)라구',
-            rules: [
-                suffixInflection('ㄹㅏㄱㅜ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㄱㅜ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㄱㅜ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㄱㅜ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄱㅜ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㄱㅜ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄱㅜ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)라나': {
-            name: '-(으)라나',
-            rules: [
-                suffixInflection('ㄹㅏㄴㅏ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㄴㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㄴㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄴㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㅏ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)라네': {
-            name: '-(으)라네',
-            rules: [
-                suffixInflection('ㄹㅏㄴㅔ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㄴㅔ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㄴㅔ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㄴㅔ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄴㅔ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㅔ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㅔ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)라느니': {
-            name: '-(으)라느니',
-            rules: [
-                suffixInflection('ㄹㅏㄴㅡㄴㅣ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㄴㅡㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㄴㅡㄴㅣ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㄴㅡㄴㅣ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄴㅡㄴㅣ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㅡㄴㅣ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㅡㄴㅣ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)라니': {
-            name: '-(으)라니',
-            rules: [
-                suffixInflection('ㄹㅏㄴㅣ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㄴㅣ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㄴㅣ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄴㅣ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㅣ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㅣ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)라니까': {
-            name: '-(으)라니까',
-            rules: [
-                suffixInflection('ㄹㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㄴㅣㄲㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㄴㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㅣㄲㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㅣㄲㅏ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-라도': {
-            name: '-라도',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㄷㅗ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄷㅗ', 'ㄷㅏ', [], ['ida']),
-            ],
-        },
-        '-(으)라며': {
-            name: '-(으)라며',
-            rules: [
-                suffixInflection('ㄹㅏㅁㅕ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㅁㅕ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㅁㅕ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㅁㅕ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㅁㅕ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅁㅕ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅁㅕ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)라면': {
-            name: '-(으)라면',
-            rules: [
-                suffixInflection('ㄹㅏㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㅁㅕㄴ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㅁㅕㄴ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㅁㅕㄴ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅁㅕㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅁㅕㄴ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)라면서': {
-            name: '-(으)라면서',
-            rules: [
-                suffixInflection('ㄹㅏㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㅁㅕㄴㅅㅓ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㅁㅕㄴㅅㅓ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㅁㅕㄴㅅㅓ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅁㅕㄴㅅㅓ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅁㅕㄴㅅㅓ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-라서': {
-            name: '-라서',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅅㅓ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅅㅓ', '다', [], ['ida']),
-                suffixInflection('ㄹㅏㅅㅓ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)라손': {
-            name: '-(으)라손',
-            rules: [
-                suffixInflection('ㄹㅏㅅㅗㄴ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㅅㅗㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㅅㅗㄴ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㅅㅗㄴ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㅅㅗㄴ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅅㅗㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅅㅗㄴ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-라야': {
-            name: '-라야',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅇㅑ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅇㅑ', '다', [], ['ida']),
-                suffixInflection('ㄹㅏㅇㅑ', '', [], ['eusi']),
-            ],
-        },
-        '-라야만': {
-            name: '-라야만',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅇㅑㅁㅏㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅇㅑㅁㅏㄴ', '다', [], ['ida']),
-                suffixInflection('ㄹㅏㅇㅑㅁㅏㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)라오': {
-            name: '-(으)라오',
-            rules: [
-                suffixInflection('ㄹㅏㅇㅗ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㅇㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㅇㅗ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㅇㅗ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㅇㅗ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅇㅗ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅇㅗ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)라지': {
-            name: '-(으)라지',
-            rules: [
-                suffixInflection('ㄹㅏㅈㅣ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㅈㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㅈㅣ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㅈㅣ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㅈㅣ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅈㅣ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅈㅣ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)락': {
-            name: '-(으)락',
-            rules: [
-                suffixInflection('ㄹㅏㄱ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅏㄱ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅏㄱ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅏㄱ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅏㄱ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄱ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-            ],
-        },
-        '-(으)란': {
-            name: '-(으)란',
-            rules: [
-                suffixInflection('ㄹㅏㄴ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㄴ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㄴ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄴ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)란다': {
-            name: '-(으)란다',
-            rules: [
-                suffixInflection('ㄹㅏㄴㄷㅏ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㄴㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㄴㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㄴㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄴㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㄷㅏ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)람': {
-            name: '-(으)람',
-            rules: [
-                suffixInflection('ㄹㅏㅁ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㅁ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㅁ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㅁ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㅁ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅁ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅁ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)랍니까': {
-            name: '-(으)랍니까',
-            rules: [
-                suffixInflection('ㄹㅏㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㅂㄴㅣㄲㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㅂㄴㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㅂㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅂㄴㅣㄲㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅂㄴㅣㄲㅏ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)랍니다': {
-            name: '-(으)랍니다',
-            rules: [
-                suffixInflection('ㄹㅏㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅏㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅏㅂㄴㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅏㅂㄴㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅏㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅂㄴㅣㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅂㄴㅣㄷㅏ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-랍시고': {
-            name: '-랍시고',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅏㅂㅅㅣㄱㅗ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅂㅅㅣㄱㅗ', '다', [], ['ida']),
-                suffixInflection('ㄹㅏㅂㅅㅣㄱㅗ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)래': {
-            name: '-(으)래',
-            rules: [
-                suffixInflection('ㄹㅐ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅐ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅐ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅐ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅐ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅐ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅐ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)래요': {
-            name: '-(으)래요',
-            rules: [
-                suffixInflection('ㄹㅐㅇㅛ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅐㅇㅛ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅐㅇㅛ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅐㅇㅛ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅐㅇㅛ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅏㄴㅣㄹㅐㅇㅛ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅐㅇㅛ', '', [], ['eusi', 'do']),
-            ],
-        },
-        '-(으)랴': {
-            name: '-(으)랴',
-            rules: [
-                suffixInflection('ㄹㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅑ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅑ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅑ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅑ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅑ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅑ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)러': {
-            name: '-(으)러',
-            rules: [
-                suffixInflection('ㄹㅓ', 'ㄷㅏ', [], ['v', 'ida']),
-                suffixInflection('ㅇㅡㄹㅓ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅓ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅓ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅓ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅓ', '', [], ['eusi']),
-            ],
-        },
-        '-러니': {
-            name: '-러니',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㅣ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅓㄴㅣ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㅣ', '', [], ['eusi']),
-            ],
-        },
-        '-러니라': {
-            name: '-러니라',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㅣㄹㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅓㄴㅣㄹㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㅣㄹㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-러니이까': {
-            name: '-러니이까',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㅣㅇㅣㄲㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅓㄴㅣㅇㅣㄲㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㅣㅇㅣㄲㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-러니이다': {
-            name: '-러니이다',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㅣㅇㅣㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅓㄴㅣㅇㅣㄷㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㅣㅇㅣㄷㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-러라': {
-            name: '-러라',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅓㄹㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅓㄹㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄹㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-러이까': {
-            name: '-러이까',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅓㅇㅣㄲㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅓㅇㅣㄲㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㅇㅣㄲㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-러이다': {
-            name: '-러이다',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅓㅇㅣㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅓㅇㅣㄷㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㅇㅣㄷㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-런가': {
-            name: '-런가',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㄱㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅓㄴㄱㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㄱㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-런들': {
-            name: '-런들',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㄷㅡㄹ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅓㄴㄷㅡㄹ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㄷㅡㄹ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)려': {
-            name: '-(으)려',
-            rules: [
-                suffixInflection('ㄹㅕ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅕ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅕ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅕ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕ', '', [], ['p']),
-            ],
-        },
-        '-(으)려거든': {
-            name: '-(으)려거든',
-            rules: [
-                suffixInflection('ㄹㅕㄱㅓㄷㅡㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㄱㅓㄷㅡㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅕㄱㅓㄷㅡㄴ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㄱㅓㄷㅡㄴ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅕㄱㅓㄷㅡㄴ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅕㄱㅓㄷㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄱㅓㄷㅡㄴ', '', [], ['p']),
-            ],
-        },
-        '-(으)려고': {
-            name: '-(으)려고',
-            rules: [
-                suffixInflection('ㄹㅕㄱㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅕㄱㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅕㄱㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅕㄱㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄹㅕㄱㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄱㅗ', '', [], ['p']),
-            ],
-        },
-        '-(으)려나': {
-            name: '-(으)려나',
-            rules: [
-                suffixInflection('ㄹㅕㄴㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅕㄴㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄴㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅕㄴㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄴㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)려니': {
-            name: '-(으)려니',
-            rules: [
-                suffixInflection('ㄹㅕㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅕㄴㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅕㄴㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄴㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)려니와': {
-            name: '-(으)려니와',
-            rules: [
-                suffixInflection('ㄹㅕㄴㅣㅇㅗㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅣㅇㅗㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅕㄴㅣㅇㅗㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅣㅇㅗㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄴㅣㅇㅗㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅕㄴㅣㅇㅗㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄴㅣㅇㅗㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅣㅇㅗㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)려든': {
-            name: '-(으)려든',
-            rules: [
-                suffixInflection('ㄹㅕㄷㅡㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㄷㅡㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅕㄷㅡㄴ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㄷㅡㄴ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅕㄷㅡㄴ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅕㄷㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄷㅡㄴ', '', [], ['p']),
-            ],
-        },
-        '-(으)려마': {
-            name: '-(으)려마',
-            rules: [
-                suffixInflection('ㄹㅕㅁㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅕㅁㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅕㅁㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅕㅁㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)려면': {
-            name: '-(으)려면',
-            rules: [
-                suffixInflection('ㄹㅕㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅕㅁㅕㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅕㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㅁㅕㄴ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅕㅁㅕㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㅁㅕㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅕㄴ', '', [], ['p']),
-            ],
-        },
-        '-(으)려무나': {
-            name: '-(으)려무나',
-            rules: [
-                suffixInflection('ㄹㅕㅁㅜㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅜㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅕㅁㅜㄴㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅜㄴㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅕㅁㅜㄴㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅕㅁㅜㄴㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅜㄴㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)련': {
-            name: '-(으)련',
-            rules: [
-                suffixInflection('ㄹㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅕㄴ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㄴ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅕㄴ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅕㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴ', '', [], ['p']),
-            ],
-        },
-        '-(으)련마는': {
-            name: '-(으)련마는',
-            rules: [
-                suffixInflection('ㄹㅕㄴㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅕㄴㅁㅏㄴㅡㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅁㅏㄴㅡㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄴㅁㅏㄴㅡㄴ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅕㄴㅁㅏㄴㅡㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄴㅁㅏㄴㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅁㅏㄴㅡㄴ', '', [], ['p']),
-            ],
-        },
-        '-(으)련만': {
-            name: '-(으)련만',
-            rules: [
-                suffixInflection('ㄹㅕㄴㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅕㄴㅁㅏㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅁㅏㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄴㅁㅏㄴ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅕㄴㅁㅏㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㄴㅁㅏㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅁㅏㄴ', '', [], ['p']),
-            ],
-        },
-        '-(으)렴': {
-            name: '-(으)렴',
-            rules: [
-                suffixInflection('ㄹㅕㅁ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㅁ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅕㅁ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㅁ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅕㅁ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅕㅁ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅁ', '', [], ['p']),
-            ],
-        },
-        '-(으)렵니까': {
-            name: '-(으)렵니까',
-            rules: [
-                suffixInflection('ㄹㅕㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅕㅂㄴㅣㄲㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅕㅂㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅕㅂㄴㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄲㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)렵니다': {
-            name: '-(으)렵니다',
-            rules: [
-                suffixInflection('ㄹㅕㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅕㅂㄴㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅕㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅕㅂㄴㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄷㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)렷다': {
-            name: '-(으)렷다',
-            rules: [
-                suffixInflection('ㄹㅕㅅㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅕㅅㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅕㅅㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅕㅅㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㅅㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅕㅅㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅕㅅㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅅㄷㅏ', '', [], ['p']),
-            ],
-        },
-        '-로고': {
-            name: '-로고',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅗ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄱㅗ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅗ', '', [], ['eusi']),
-            ],
-        },
-        '-로고나': {
-            name: '-로고나',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅗㄴㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄱㅗㄴㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅗㄴㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-로구나': {
-            name: '-로구나',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㄴㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄱㅜㄴㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㄴㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-로구려': {
-            name: '-로구려',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㄹㅕ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄱㅜㄹㅕ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㄹㅕ', '', [], ['eusi']),
-            ],
-        },
-        '-로구료': {
-            name: '-로구료',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㄹㅛ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄱㅜㄹㅛ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㄹㅛ', '', [], ['eusi']),
-            ],
-        },
-        '-로구만': {
-            name: '-로구만',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㅁㅏㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄱㅜㅁㅏㄴ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㅁㅏㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-로구먼': {
-            name: '-로구먼',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㅁㅓㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄱㅜㅁㅓㄴ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㅁㅓㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-로구면': {
-            name: '-로구면',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㅁㅕㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄱㅜㅁㅕㄴ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㅁㅕㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-로군': {
-            name: '-로군',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄱㅜㄴ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-로다': {
-            name: '-로다',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄷㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄷㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-로되': {
-            name: '-로되',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄷㅗㅣ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄷㅗㅣ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄷㅗㅣ', '', [], ['eusi']),
-            ],
-        },
-        '-로라': {
-            name: '-로라',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㄹㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㄹㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄹㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-로서니': {
-            name: '-로서니',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㅅㅓㄴㅣ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㅅㅓㄴㅣ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㅅㅓㄴㅣ', '', [], ['eusi']),
-            ],
-        },
-        '-로세': {
-            name: '-로세',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㄹㅗㅅㅔ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅗㅅㅔ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㅅㅔ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)리': {
-            name: '-(으)리',
-            rules: [
-                suffixInflection('ㄹㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)리까': {
-            name: '-(으)리까',
-            rules: [
-                suffixInflection('ㄹㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅣㄲㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄲㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄲㅏ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㄲㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)리니': {
-            name: '-(으)리니',
-            rules: [
-                suffixInflection('ㄹㅣㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅣㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅣㄴㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅣㄴㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅣㄴㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄴㅣ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㄴㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)리니라': {
-            name: '-(으)리니라',
-            rules: [
-                suffixInflection('ㄹㅣㄴㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅣㄴㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅣㄴㅣㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅣㄴㅣㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄴㅣㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅣㄴㅣㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄴㅣㄹㅏ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㄴㅣㄹㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)리다': {
-            name: '-(으)리다',
-            rules: [
-                suffixInflection('ㄹㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄷㅏ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㄷㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)리라': {
-            name: '-(으)리라',
-            rules: [
-                suffixInflection('ㄹㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅣㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅣㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅣㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅣㄹㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)리로다': {
-            name: '-(으)리로다',
-            rules: [
-                suffixInflection('ㄹㅣㄹㅗㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅣㄹㅗㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅣㄹㅗㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅣㄹㅗㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄹㅗㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅣㄹㅗㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㄹㅗㄷㅏ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㄹㅗㄷㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)리만치': {
-            name: '-(으)리만치',
-            rules: [
-                suffixInflection('ㄹㅣㅁㅏㄴㅊㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅣㅁㅏㄴㅊㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅣㅁㅏㄴㅊㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅣㅁㅏㄴㅊㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㅁㅏㄴㅊㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅣㅁㅏㄴㅊㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㅁㅏㄴㅊㅣ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㅁㅏㄴㅊㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)리만큼': {
-            name: '-(으)리만큼',
-            rules: [
-                suffixInflection('ㄹㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅣㅁㅏㄴㅋㅡㅁ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅣㅁㅏㄴㅋㅡㅁ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㅁㅏㄴㅋㅡㅁ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㅁㅏㄴㅋㅡㅁ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㅁㅏㄴㅋㅡㅁ', '', [], ['p']),
-            ],
-        },
-        '-(으)리오': {
-            name: '-(으)리오',
-            rules: [
-                suffixInflection('ㄹㅣㅇㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄹㅣㅇㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅣㅇㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅣㅇㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㅇㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅣㅇㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅣㅇㅗ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㅇㅗ', '', [], ['p']),
-            ],
-        },
-        '-(으)마': {
-            name: '-(으)마',
-            rules: [
-                suffixInflection('ㅁㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅁㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅁㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅁㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅁㅏ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-(으)매': {
-            name: '-(으)매',
-            rules: [
-                suffixInflection('ㅁㅐ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅁㅐ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅁㅐ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁㅐ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅐ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅁㅐ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅐ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㅐ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)며': {
-            name: '-(으)며',
-            rules: [
-                suffixInflection('ㅁㅕ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅁㅕ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅁㅕ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁㅕ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅕ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅁㅕ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅕ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㅕ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)면': {
-            name: '-(으)면',
-            rules: [
-                suffixInflection('ㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅁㅕㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁㅕㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅕㄴ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅁㅕㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅕㄴ', '', [], ['eusi', 'euo', 'jao']),
-                suffixInflection('ㅇㅡㅁㅕㄴ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)면서': {
-            name: '-(으)면서',
-            rules: [
-                suffixInflection('ㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅁㅕㄴㅅㅓ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁㅕㄴㅅㅓ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅕㄴㅅㅓ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅁㅕㄴㅅㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅕㄴㅅㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㅕㄴㅅㅓ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)므로': {
-            name: '-(으)므로',
-            rules: [
-                suffixInflection('ㅁㅡㄹㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅁㅡㄹㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅁㅡㄹㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁㅡㄹㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅡㄹㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅁㅡㄹㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅡㄹㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㅡㄹㅗ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)사': {
-            name: '-(으)사',
-            rules: [
-                suffixInflection('ㅅㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅅㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅅㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅅㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅅㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-            ],
-        },
-        '-사오': {
-            name: '-사오',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗ', 'ㄷㅏ', ['sao'], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗ', '', ['sao'], ['p', 'f']),
-            ],
-        },
-        '-사오니까': {
-            name: '-사오니까',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㄴㅣㄲㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사오리까': {
-            name: '-사오리까',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㄲㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사오리다': {
-            name: '-사오리다',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사오리이까': {
-            name: '-사오리이까',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㅇㅣㄲㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사오리이다': {
-            name: '-사오리이다',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㅇㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사오이다': {
-            name: '-사오이다',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅇㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사옵': {
-            name: '-사옵',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㅂ', 'ㄷㅏ', ['saob'], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅂ', '', ['saob'], ['p', 'f']),
-            ],
-        },
-        '-사옵니까': {
-            name: '-사옵니까',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅂㄴㅣㄲㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사옵니다': {
-            name: '-사옵니다',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅂㄴㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사옵디까': {
-            name: '-사옵디까',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㅂㄷㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅂㄷㅣㄲㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사옵디다': {
-            name: '-사옵디다',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㅂㄷㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅂㄷㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사와': {
-            name: '-사와',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-사외다': {
-            name: '-사외다',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅗㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)사이다': {
-            name: '-(으)사이다',
-            rules: [
-                suffixInflection('ㅅㅏㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅅㅏㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅅㅏㅇㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅅㅏㅇㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅅㅏㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-            ],
-        },
-        '-삽': {
-            name: '-삽',
-            rules: [
-                suffixInflection('ㅅㅏㅂ', 'ㄷㅏ', ['sab'], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅂ', '', ['sab'], ['p', 'f']),
-            ],
-        },
-        '-(으)세': {
-            name: '-(으)세',
-            rules: [
-                suffixInflection('ㅅㅔ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅅㅔ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅅㅔ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅅㅔ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㅅㅔ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅅㅔ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-세나': {
-            name: '-세나',
-            rules: [
-                suffixInflection('ㅅㅔㄴㅏ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-(으)세요': {
-            name: '-(으)세요',
-            rules: [
-                suffixInflection('ㅅㅔㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅅㅔㅇㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅅㅔㅇㅛ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅅㅔㅇㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅔㅇㅛ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅅㅔㅇㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅅㅔㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-            ],
-        },
-        '-(으)셔요': {
-            name: '-(으)셔요',
-            rules: [
-                suffixInflection('ㅅㅕㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅅㅕㅇㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅅㅕㅇㅛ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅅㅕㅇㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅕㅇㅛ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅅㅕㅇㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅅㅕㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-            ],
-        },
-        '-소': {
-            name: '-소',
-            rules: [
-                suffixInflection('ㅅㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅗ', '', [], ['p', 'f']),
-            ],
-        },
-        '-소다': {
-            name: '-소다',
-            rules: [
-                suffixInflection('ㅅㅗㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅗㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)소서': {
-            name: '-(으)소서',
-            rules: [
-                suffixInflection('ㅅㅗㅅㅓ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅅㅗㅅㅓ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅅㅗㅅㅓ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅅㅗㅅㅓ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅗㅅㅓ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅅㅗㅅㅓ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅅㅗㅅㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-            ],
-        },
-        '-소이까': {
-            name: '-소이까',
-            rules: [
-                suffixInflection('ㅅㅗㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅅㅗㅇㅣㄲㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-소이다': {
-            name: '-소이다',
-            rules: [
-                suffixInflection('ㅅㅗㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅗㅇㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-쇠다': {
-            name: '-쇠다',
-            rules: [
-                suffixInflection('ㅅㅗㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅗㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(스)ㅂ네': {
-            name: '-(스)ㅂ네',
-            rules: [
-                suffixInflection('ㅂㄴㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅂㄴㅔ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄴㅔ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄴㅔ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄴㅔ', '', [], ['eusi']),
-            ],
-        },
-        '-(스)ㅂ늰다': {
-            name: '-(스)ㅂ늰다',
-            rules: [
-                suffixInflection('ㅂㄴㅡㅣㄴㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅂㄴㅡㅣㄴㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄴㅡㅣㄴㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄴㅡㅣㄴㄷㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄴㅡㅣㄴㄷㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-(스)ㅂ니까': {
-            name: '-(스)ㅂ니까',
-            rules: [
-                suffixInflection('ㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅂㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄴㅣㄲㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄴㅣㄲㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-(스)ㅂ니다': {
-            name: '-(스)ㅂ니다',
-            rules: [
-                suffixInflection('ㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅂㄴㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄴㅣㄷㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄴㅣㄷㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-(스)ㅂ디까': {
-            name: '-(스)ㅂ디까',
-            rules: [
-                suffixInflection('ㅂㄷㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅂㄷㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄷㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄷㅣㄲㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄷㅣㄲㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-(스)ㅂ디다': {
-            name: '-(스)ㅂ디다',
-            rules: [
-                suffixInflection('ㅂㄷㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅂㄷㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄷㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄷㅣㄷㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄷㅣㄷㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-(스)ㅂ딘다': {
-            name: '-(스)ㅂ딘다',
-            rules: [
-                suffixInflection('ㅂㄷㅣㄴㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅂㄷㅣㄴㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄷㅣㄴㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㄷㅣㄴㄷㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄷㅣㄴㄷㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-(스)ㅂ죠': {
-            name: '-(스)ㅂ죠',
-            rules: [
-                suffixInflection('ㅂㅈㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅂㅈㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㅈㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㅈㅛ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㅈㅛ', '', [], ['eusi']),
-            ],
-        },
-        '-(스)ㅂ지요': {
-            name: '-(스)ㅂ지요',
-            rules: [
-                suffixInflection('ㅂㅈㅣㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅂㅈㅣㅇㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㅈㅣㅇㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅡㅂㅈㅣㅇㅛ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㅈㅣㅇㅛ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)시': {
-            name: '-(으)시',
-            rules: [
-                suffixInflection('ㅅㅣ', 'ㄷㅏ', ['eusi'], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅅㅣ', 'ㄷㅏ', ['eusi'], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅅㅣ', 'ㅂㄷㅏ', ['eusi'], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅅㅣ', 'ㅅㄷㅏ', ['eusi'], ['v', 'adj']),
-                suffixInflection('ㅅㅣ', 'ㅎㄷㅏ', ['eusi'], ['adj']),
-                suffixInflection('ㅅㅣ', 'ㄹㄷㅏ', ['eusi'], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅅㅣ', 'ㄷㄷㅏ', ['eusi'], ['v', 'adj']),
-                suffixInflection('ㅅㅣ', '', ['eusi'], ['saob', 'euob', 'jaob']),
-            ],
-        },
-        '-(으)시압': {
-            name: '-(으)시압',
-            rules: [
-                suffixInflection('ㅅㅣㅇㅏㅂ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅅㅣㅇㅏㅂ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅅㅣㅇㅏㅂ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅅㅣㅇㅏㅂ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅅㅣㅇㅏㅂ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅅㅣㅇㅏㅂ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-(으)시어요': {
-            name: '-(으)시어요',
-            rules: [
-                suffixInflection('ㅅㅣㅇㅓㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅅㅣㅇㅓㅇㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅅㅣㅇㅓㅇㅛ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅅㅣㅇㅓㅇㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅣㅇㅓㅇㅛ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅅㅣㅇㅓㅇㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅅㅣㅇㅓㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-            ],
-        },
-        '-(으)십사': {
-            name: '-(으)십사',
-            rules: [
-                suffixInflection('ㅅㅣㅂㅅㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅅㅣㅂㅅㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅅㅣㅂㅅㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅅㅣㅂㅅㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅅㅣㅂㅅㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅅㅣㅂㅅㅏ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-(으)십시다': {
-            name: '-(으)십시다',
-            rules: [
-                suffixInflection('ㅅㅣㅂㅅㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅅㅣㅂㅅㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅅㅣㅂㅅㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅅㅣㅂㅅㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅅㅣㅂㅅㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅅㅣㅂㅅㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-(으)십시오': {
-            name: '-(으)십시오',
-            rules: [
-                suffixInflection('ㅅㅣㅂㅅㅣㅇㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅅㅣㅂㅅㅣㅇㅗ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅅㅣㅂㅅㅣㅇㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅅㅣㅂㅅㅣㅇㅗ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅅㅣㅂㅅㅣㅇㅗ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅅㅣㅂㅅㅣㅇㅗ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-아/어': {
-            name: '-아/어',
-            rules: [
-                suffixInflection('ㅗㅏ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅕ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓ', '', [], ['p', 'f']),
-                suffixInflection('ㅅㅕ', 'ㅅㅣ', [], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓ', 'ㅅㅣ', [], ['eusi']),
-            ],
-        },
-        '-아/어다': {
-            name: '-아/어다',
-            rules: [
-                suffixInflection('ㅗㅏㄷㅏ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㄷㅏ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅕㄷㅏ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㄷㅏ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㄷㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㄷㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㄷㅏ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㄷㅏ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㄷㅏ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㄷㅏ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㄷㅏ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㄷㅏ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㄷㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄷㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㄷㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㄷㅏ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㄷㅏ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㄷㅏ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㄷㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㄷㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-아/어다가': {
-            name: '-아/어다가',
-            rules: [
-                suffixInflection('ㅗㅏㄷㅏㄱㅏ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㄷㅏㄱㅏ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㄷㅏㄱㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅏㄱㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅐㄷㅏㄱㅏ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔㄷㅏㄱㅏ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㄷㅏㄱㅏ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅣㄷㅏㄱㅏ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅏㄷㅏㄱㅏ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㄷㅏㄱㅏ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㄷㅏㄱㅏ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㄷㅏㄱㅏ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㄷㅏㄱㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㄷㅏㄱㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㄷㅏㄱㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㄷㅏㄱㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㄷㅏㄱㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅏㄱㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㄷㅏㄱㅏ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㄷㅏㄱㅏ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㄷㅏㄱㅏ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㄷㅏㄱㅏ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㄷㅏㄱㅏ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㄷㅏㄱㅏ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㄷㅏㄱㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㄷㅏㄱㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㄷㅏㄱㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄷㅏㄱㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㄷㅏㄱㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㄷㅏㄱㅏ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㄷㅏㄱㅏ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㄷㅏㄱㅏ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㄷㅏㄱㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㄷㅏㄱㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅏㄱㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-아/어도': {
-            name: '-아/어도',
-            rules: [
-                suffixInflection('ㅗㅏㄷㅗ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㄷㅗ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㄷㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅏㄷㅗ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㄷㅗ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㄷㅗ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔㄷㅗ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㄷㅗ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅣㄷㅗ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㄷㅗ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㄷㅗ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㄷㅗ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㄷㅗ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㄷㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㄷㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㄷㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㄷㅗ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㄷㅗ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㄷㅗ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㄷㅗ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㄷㅗ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㄷㅗ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㄷㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㄷㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㄷㅗ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄷㅗ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㄷㅗ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㄷㅗ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㄷㅗ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㄷㅗ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㄷㅗ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㄷㅗ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅗ', '', [], ['p', 'f']),
-                suffixInflection('ㅅㅕㄷㅗ', 'ㅅㅣ', [], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓㄷㅗ', 'ㅅㅣ', [], ['eusi']),
-            ],
-        },
-        '-아/어라': {
-            name: '-아/어라',
-            rules: [
-                suffixInflection('ㅗㅏㄹㅏ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㄹㅏ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅏㄹㅏ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㄹㅏ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㄹㅏ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔㄹㅏ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㄹㅏ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅣㄹㅏ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㄹㅏ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㄹㅏ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㄹㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㄹㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㄹㅏ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㄹㅏ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㄹㅏ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㄹㅏ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㄹㅏ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㄹㅏ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㄹㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄹㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㄹㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㄹㅏ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㄹㅏ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㄹㅏ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㄹㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㄹㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄹㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-아/어서': {
-            name: '-아/어서',
-            rules: [
-                suffixInflection('ㅗㅏㅅㅓ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅅㅓ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅅㅓ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅅㅓ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅏㅅㅓ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅅㅓ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅅㅓ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔㅅㅓ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅅㅓ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅣㅅㅓ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅅㅓ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅅㅓ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㅅㅓ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅅㅓ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅅㅓ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅅㅓ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅅㅓ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅅㅓ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅅㅓ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅅㅓ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㅅㅓ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㅅㅓ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㅅㅓ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㅅㅓ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㅅㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅅㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅅㅓ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅅㅓ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅅㅓ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅅㅓ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㅅㅓ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㅅㅓ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㅅㅓ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅅㅓ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅅㅓ', '', [], ['p', 'f']),
-                suffixInflection('ㅅㅕㅅㅓ', 'ㅅㅣ', [], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓㅅㅓ', 'ㅅㅣ', [], ['eusi']),
-            ],
-        },
-        '-아/어선': {
-            name: '-아/어선',
-            rules: [
-                suffixInflection('ㅗㅏㅅㅓㄴ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅅㅓㄴ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅅㅓㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅅㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅏㅅㅓㄴ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅅㅓㄴ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅅㅓㄴ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔㅅㅓㄴ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅅㅓㄴ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅣㅅㅓㄴ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅅㅓㄴ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅅㅓㄴ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㅅㅓㄴ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅅㅓㄴ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅅㅓㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅅㅓㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅅㅓㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅅㅓㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅅㅓㄴ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅅㅓㄴ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㅅㅓㄴ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㅅㅓㄴ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㅅㅓㄴ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㅅㅓㄴ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㅅㅓㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅅㅓㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅅㅓㄴ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅅㅓㄴ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅅㅓㄴ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅅㅓㄴ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㅅㅓㄴ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㅅㅓㄴ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㅅㅓㄴ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅅㅓㄴ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅅㅓㄴ', '', [], ['p', 'f']),
-                suffixInflection('ㅅㅕㅅㅓㄴ', 'ㅅㅣ', [], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓㅅㅓㄴ', 'ㅅㅣ', [], ['eusi']),
-            ],
-        },
-        '-아/어야': {
-            name: '-아/어야',
-            rules: [
-                suffixInflection('ㅗㅏㅇㅑ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅇㅑ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅇㅑ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅏㅇㅑ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅑ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅇㅑ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔㅇㅑ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅇㅑ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅣㅇㅑ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅇㅑ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅇㅑ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㅇㅑ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅇㅑ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅇㅑ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅇㅑ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅇㅑ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅇㅑ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅇㅑ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㅇㅑ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㅇㅑ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㅇㅑ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㅇㅑ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㅇㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅇㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅇㅑ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅇㅑ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅇㅑ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅇㅑ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㅇㅑ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㅇㅑ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㅇㅑ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅑ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑ', '', [], ['p', 'f']),
-                suffixInflection('ㅅㅕㅇㅑ', 'ㅅㅣ', [], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓㅇㅑ', 'ㅅㅣ', [], ['eusi']),
-            ],
-        },
-        '-아/어야겠': {
-            name: '-아/어야겠',
-            rules: [
-                suffixInflection('ㅗㅏㅇㅑㄱㅔㅆ', 'ㅗㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅇㅑㄱㅔㅆ', 'ㅜㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅇㅑㄱㅔㅆ', 'ㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑㄱㅔㅆ', 'ㄷㅏ', ['f'], ['v', 'adj', 'ida']),
-                suffixInflection('ㅏㅇㅑㄱㅔㅆ', 'ㅏㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅑㄱㅔㅆ', 'ㅓㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅐㅇㅑㄱㅔㅆ', 'ㅐㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅔㅇㅑㄱㅔㅆ', 'ㅔㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅕㅇㅑㄱㅔㅆ', 'ㅕㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅗㅣㅇㅑㄱㅔㅆ', 'ㅗㅣㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅕㅇㅑㄱㅔㅆ', 'ㅣㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅇㅑㄱㅔㅆ', 'ㅇㅣㄷㅏ', ['f'], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㅇㅑㄱㅔㅆ', 'ㅎㅏㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅇㅑㄱㅔㅆ', 'ㅎㅏㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅇㅑㄱㅔㅆ', 'ㅂㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅇㅑㄱㅔㅆ', 'ㅂㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅇㅑㄱㅔㅆ', 'ㅅㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑㄱㅔㅆ', 'ㅅㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅇㅑㄱㅔㅆ', 'ㅗㅣㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅐㅇㅑㄱㅔㅆ', 'ㅏㅎㄷㅏ', ['f'], ['adj']),
-                suffixInflection('ㅐㅇㅑㄱㅔㅆ', 'ㅓㅎㄷㅏ', ['f'], ['adj']),
-                suffixInflection('ㅔㅇㅑㄱㅔㅆ', 'ㅓㅎㄷㅏ', ['f'], ['adj']),
-                suffixInflection('ㅖㅇㅑㄱㅔㅆ', 'ㅕㅎㄷㅏ', ['f'], ['adj']),
-                suffixInflection('ㅒㅇㅑㄱㅔㅆ', 'ㅑㅎㄷㅏ', ['f'], ['adj']),
-                suffixInflection('ㄹㅇㅏㅇㅑㄱㅔㅆ', 'ㄷㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅇㅑㄱㅔㅆ', 'ㄷㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅇㅑㄱㅔㅆ', 'ㄹㅡㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅇㅑㄱㅔㅆ', 'ㄹㅡㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅇㅑㄱㅔㅆ', 'ㄹㅡㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅇㅑㄱㅔㅆ', 'ㄹㅓㄷㅏ', ['f'], ['v']),
-                suffixInflection('ㄴㅗㅏㅇㅑㄱㅔㅆ', 'ㄴㅗㅎㄷㅏ', ['f'], ['v']),
-                suffixInflection('ㅍㅓㅇㅑㄱㅔㅆ', 'ㅍㅜㄷㅏ', ['f'], ['v']),
-                suffixInflection('ㅏㅇㅑㄱㅔㅆ', 'ㅡㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅑㄱㅔㅆ', 'ㅡㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅅㅕㅇㅑㄱㅔㅆ', 'ㅅㅣ', ['f'], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓㅇㅑㄱㅔㅆ', 'ㅅㅣ', ['f'], ['eusi']),
-            ],
-        },
-        '-아/어야만': {
-            name: '-아/어야만',
-            rules: [
-                suffixInflection('ㅗㅏㅇㅑㅁㅏㄴ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅇㅑㅁㅏㄴ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅇㅑㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅏㅇㅑㅁㅏㄴ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅑㅁㅏㄴ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅇㅑㅁㅏㄴ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔㅇㅑㅁㅏㄴ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅇㅑㅁㅏㄴ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅣㅇㅑㅁㅏㄴ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅇㅑㅁㅏㄴ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅇㅑㅁㅏㄴ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㅇㅑㅁㅏㄴ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅇㅑㅁㅏㄴ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅇㅑㅁㅏㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅇㅑㅁㅏㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅇㅑㅁㅏㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑㅁㅏㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅇㅑㅁㅏㄴ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅇㅑㅁㅏㄴ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㅇㅑㅁㅏㄴ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㅇㅑㅁㅏㄴ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㅇㅑㅁㅏㄴ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㅇㅑㅁㅏㄴ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㅇㅑㅁㅏㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅇㅑㅁㅏㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅇㅑㅁㅏㄴ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅇㅑㅁㅏㄴ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅇㅑㅁㅏㄴ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅇㅑㅁㅏㄴ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㅇㅑㅁㅏㄴ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㅇㅑㅁㅏㄴ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㅇㅑㅁㅏㄴ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅑㅁㅏㄴ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑㅁㅏㄴ', '', [], ['p', 'f']),
-                suffixInflection('ㅅㅕㅇㅑㅁㅏㄴ', 'ㅅㅣ', [], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓㅇㅑㅁㅏㄴ', 'ㅅㅣ', [], ['eusi']),
-            ],
-        },
-        '-아/어야지': {
-            name: '-아/어야지',
-            rules: [
-                suffixInflection('ㅗㅏㅇㅑㅈㅣ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅇㅑㅈㅣ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅇㅑㅈㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅏㅇㅑㅈㅣ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅑㅈㅣ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅇㅑㅈㅣ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔㅇㅑㅈㅣ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅇㅑㅈㅣ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅣㅇㅑㅈㅣ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅇㅑㅈㅣ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅇㅑㅈㅣ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㅇㅑㅈㅣ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅇㅑㅈㅣ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅇㅑㅈㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅇㅑㅈㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅇㅑㅈㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑㅈㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅇㅑㅈㅣ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅇㅑㅈㅣ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㅇㅑㅈㅣ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㅇㅑㅈㅣ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㅇㅑㅈㅣ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㅇㅑㅈㅣ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㅇㅑㅈㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅇㅑㅈㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅇㅑㅈㅣ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅇㅑㅈㅣ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅇㅑㅈㅣ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅇㅑㅈㅣ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㅇㅑㅈㅣ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㅇㅑㅈㅣ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㅇㅑㅈㅣ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅑㅈㅣ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑㅈㅣ', '', [], ['p', 'f']),
-                suffixInflection('ㅅㅕㅇㅑㅈㅣ', 'ㅅㅣ', [], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓㅇㅑㅈㅣ', 'ㅅㅣ', [], ['eusi']),
-            ],
-        },
-        '-아/어요': {
-            name: '-아/어요',
-            rules: [
-                suffixInflection('ㅗㅏㅇㅛ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅇㅛ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅏㅇㅛ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅛ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅇㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅐㅇㅛ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔㅇㅛ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅇㅛ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅣㅇㅛ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅇㅛ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅇㅛ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅖㅇㅛ', 'ㅇㅣㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㅎㅐㅇㅛ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅇㅛ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅇㅛ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅇㅛ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅇㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅇㅛ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅇㅛ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㅇㅛ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㅇㅛ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㅇㅛ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㅇㅛ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅇㅛ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅇㅛ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅇㅛ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅇㅛ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㅇㅛ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㅇㅛ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㅇㅛ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅛ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅔㅇㅛ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㅇㅓㅇㅛ', '', [], ['p', 'f']),
-            ],
-        },
-        '-아/어지이다': {
-            name: '-아/어지이다',
-            rules: [
-                suffixInflection('ㅗㅏㅈㅣㅇㅣㄷㅏ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅈㅣㅇㅣㄷㅏ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅈㅣㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅈㅣㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅏㅈㅣㅇㅣㄷㅏ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅈㅣㅇㅣㄷㅏ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅈㅣㅇㅣㄷㅏ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅈㅣㅇㅣㄷㅏ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㅈㅣㅇㅣㄷㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅈㅣㅇㅣㄷㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅈㅣㅇㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅈㅣㅇㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅈㅣㅇㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅈㅣㅇㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅈㅣㅇㅣㄷㅏ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅈㅣㅇㅣㄷㅏ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㅈㅣㅇㅣㄷㅏ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㅈㅣㅇㅣㄷㅏ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㅈㅣㅇㅣㄷㅏ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㅈㅣㅇㅣㄷㅏ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㅈㅣㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅈㅣㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅈㅣㅇㅣㄷㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅈㅣㅇㅣㄷㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅈㅣㅇㅣㄷㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅈㅣㅇㅣㄷㅏ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㅈㅣㅇㅣㄷㅏ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㅈㅣㅇㅣㄷㅏ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㅈㅣㅇㅣㄷㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅈㅣㅇㅣㄷㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅈㅣㅇㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-아/어지다': {
-            name: '-아/어지다',
-            rules: [
-                suffixInflection('ㅗㅏㅈㅣㄷㅏ', 'ㅗㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅈㅣㄷㅏ', 'ㅜㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅈㅣㄷㅏ', 'ㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅈㅣㄷㅏ', 'ㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅏㅈㅣㄷㅏ', 'ㅏㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅓㅈㅣㄷㅏ', 'ㅓㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅐㅈㅣㄷㅏ', 'ㅐㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅔㅈㅣㄷㅏ', 'ㅔㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅕㅈㅣㄷㅏ', 'ㅕㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅕㅈㅣㄷㅏ', 'ㅣㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅈㅣㄷㅏ', 'ㅇㅣㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅎㅐㅈㅣㄷㅏ', 'ㅎㅏㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅈㅣㄷㅏ', 'ㅎㅏㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅈㅣㄷㅏ', 'ㅂㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅈㅣㄷㅏ', 'ㅂㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅈㅣㄷㅏ', 'ㅅㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅈㅣㄷㅏ', 'ㅅㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅈㅣㄷㅏ', 'ㅗㅣㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅐㅈㅣㄷㅏ', 'ㅏㅎㄷㅏ', ['v'], ['adj']),
-                suffixInflection('ㅐㅈㅣㄷㅏ', 'ㅓㅎㄷㅏ', ['v'], ['adj']),
-                suffixInflection('ㅔㅈㅣㄷㅏ', 'ㅓㅎㄷㅏ', ['v'], ['adj']),
-                suffixInflection('ㅖㅈㅣㄷㅏ', 'ㅕㅎㄷㅏ', ['v'], ['adj']),
-                suffixInflection('ㅒㅈㅣㄷㅏ', 'ㅑㅎㄷㅏ', ['v'], ['adj']),
-                suffixInflection('ㄹㅇㅏㅈㅣㄷㅏ', 'ㄷㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅈㅣㄷㅏ', 'ㄷㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅈㅣㄷㅏ', 'ㄹㅡㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅈㅣㄷㅏ', 'ㄹㅡㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅈㅣㄷㅏ', 'ㄹㅡㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅈㅣㄷㅏ', 'ㄹㅓㄷㅏ', ['v'], ['v']),
-                suffixInflection('ㄴㅗㅏㅈㅣㄷㅏ', 'ㄴㅗㅎㄷㅏ', ['v'], ['v']),
-                suffixInflection('ㅍㅓㅈㅣㄷㅏ', 'ㅍㅜㄷㅏ', ['v'], ['v']),
-                suffixInflection('ㅏㅈㅣㄷㅏ', 'ㅡㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅓㅈㅣㄷㅏ', 'ㅡㄷㅏ', ['v'], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅈㅣㄷㅏ', '', ['v'], ['p', 'f']),
-            ],
-        },
-        '-았/었': {
-            name: '-았/었',
-            rules: [
-                suffixInflection('ㅐㅆ', 'ㅐㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅔㅆ', 'ㅔㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅕㅆ', 'ㅕㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅗㅣㅆ', 'ㅗㅣㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅗㅏㅆ', 'ㅗㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅆ', 'ㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅏㅆ', 'ㅏㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅆ', 'ㅜㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅆ', 'ㄷㅏ', ['p'], ['v', 'adj', 'ida']),
-                suffixInflection('ㅓㅆ', 'ㅓㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅕㅆ', 'ㅣㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅆ', 'ㅇㅣㄷㅏ', ['p'], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㅆ', 'ㅎㅏㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅆ', 'ㅎㅏㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅆ', 'ㅂㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅆ', 'ㅂㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅆ', 'ㅅㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅆ', 'ㅅㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅆ', 'ㅗㅣㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅐㅆ', 'ㅏㅎㄷㅏ', ['p'], ['adj']),
-                suffixInflection('ㅐㅆ', 'ㅓㅎㄷㅏ', ['p'], ['adj']),
-                suffixInflection('ㅔㅆ', 'ㅓㅎㄷㅏ', ['p'], ['adj']),
-                suffixInflection('ㅖㅆ', 'ㅕㅎㄷㅏ', ['p'], ['adj']),
-                suffixInflection('ㅒㅆ', 'ㅑㅎㄷㅏ', ['p'], ['adj']),
-                suffixInflection('ㄹㅇㅏㅆ', 'ㄷㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅆ', 'ㄷㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅆ', 'ㄹㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅆ', 'ㄹㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅆ', 'ㄹㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅆ', 'ㄹㅓㄷㅏ', ['p'], ['v']),
-                suffixInflection('ㄴㅗㅏㅆ', 'ㄴㅗㅎㄷㅏ', ['p'], ['v']),
-                suffixInflection('ㅍㅓㅆ', 'ㅍㅜㄷㅏ', ['p'], ['v']),
-                suffixInflection('ㅏㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅓㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅅㅕㅆ', 'ㅅㅣ', ['p'], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓㅆ', 'ㅅㅣ', ['p'], ['eusi']),
-            ],
-        },
-        '-았/었었': {
-            name: '-았/었었',
-            rules: [
-                suffixInflection('ㅗㅏㅆㅇㅓㅆ', 'ㅗㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅐㅆㅇㅓㅆ', 'ㅐㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅔㅆㅇㅓㅆ', 'ㅔㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅕㅆㅇㅓㅆ', 'ㅕㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅗㅣㅆㅇㅓㅆ', 'ㅗㅣㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅆㅇㅓㅆ', 'ㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅏㅆㅇㅓㅆ', 'ㅏㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅆㅇㅓㅆ', 'ㅜㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅆㅇㅓㅆ', 'ㄷㅏ', ['p'], ['v', 'adj', 'ida']),
-                suffixInflection('ㅓㅆㅇㅓㅆ', 'ㅓㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅕㅆㅇㅓㅆ', 'ㅣㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅆㅇㅓㅆ', 'ㅇㅣㄷㅏ', ['p'], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㅆㅇㅓㅆ', 'ㅎㅏㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅆㅇㅓㅆ', 'ㅎㅏㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅆㅇㅓㅆ', 'ㅂㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅆㅇㅓㅆ', 'ㅂㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅆㅇㅓㅆ', 'ㅅㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅆㅇㅓㅆ', 'ㅅㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅆㅇㅓㅆ', 'ㅗㅣㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅐㅆㅇㅓㅆ', 'ㅏㅎㄷㅏ', ['p'], ['adj']),
-                suffixInflection('ㅐㅆㅇㅓㅆ', 'ㅓㅎㄷㅏ', ['p'], ['adj']),
-                suffixInflection('ㅔㅆㅇㅓㅆ', 'ㅓㅎㄷㅏ', ['p'], ['adj']),
-                suffixInflection('ㅖㅆㅇㅓㅆ', 'ㅕㅎㄷㅏ', ['p'], ['adj']),
-                suffixInflection('ㅒㅆㅇㅓㅆ', 'ㅑㅎㄷㅏ', ['p'], ['adj']),
-                suffixInflection('ㄹㅇㅏㅆㅇㅓㅆ', 'ㄷㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅆㅇㅓㅆ', 'ㄷㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅆㅇㅓㅆ', 'ㄹㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅆㅇㅓㅆ', 'ㄹㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅆㅇㅓㅆ', 'ㄹㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅆㅇㅓㅆ', 'ㄹㅓㄷㅏ', ['p'], ['v']),
-                suffixInflection('ㄴㅗㅏㅆㅇㅓㅆ', 'ㄴㅗㅎㄷㅏ', ['p'], ['v']),
-                suffixInflection('ㅍㅓㅆㅇㅓㅆ', 'ㅍㅜㄷㅏ', ['p'], ['v']),
-                suffixInflection('ㅏㅆㅇㅓㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅓㅆㅇㅓㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅅㅕㅆㅇㅓㅆ', 'ㅅㅣ', ['p'], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓㅆㅇㅓㅆ', 'ㅅㅣ', ['p'], ['eusi']),
-            ],
-        },
-        '-았/었자': {
-            name: '-았/었자',
-            rules: [
-                suffixInflection('ㅗㅏㅆㅈㅏ', 'ㅗㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅆㅈㅏ', 'ㅐㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅔㅆㅈㅏ', 'ㅔㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅆㅈㅏ', 'ㅕㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅣㅆㅈㅏ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅆㅈㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅏㅆㅈㅏ', 'ㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅜㅓㅆㅈㅏ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅆㅈㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅓㅆㅈㅏ', 'ㅓㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅕㅆㅈㅏ', 'ㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅕㅆㅈㅏ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅎㅐㅆㅈㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅎㅏㅇㅕㅆㅈㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏㅆㅈㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅓㅆㅈㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅏㅆㅈㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅆㅈㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅗㅐㅆㅈㅏ', 'ㅗㅣㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅐㅆㅈㅏ', 'ㅏㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅐㅆㅈㅏ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅔㅆㅈㅏ', 'ㅓㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅖㅆㅈㅏ', 'ㅕㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅒㅆㅈㅏ', 'ㅑㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅏㅆㅈㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅓㅆㅈㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㅆㅈㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㅆㅈㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅡㄹㅓㅆㅈㅏ', 'ㄹㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅐㅆㅈㅏ', 'ㄹㅓㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㅏㅆㅈㅏ', 'ㄴㅗㅎㄷㅏ', [], ['v']),
-                suffixInflection('ㅍㅓㅆㅈㅏ', 'ㅍㅜㄷㅏ', [], ['v']),
-                suffixInflection('ㅏㅆㅈㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㅆㅈㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅕㅆㅈㅏ', 'ㅅㅣ', [], ['eusi']),
-            ],
-        },
-        '-야': {
-            name: '-야',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㅇㅑ', 'ㅇㅏㄴㅣㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅣㅇㅑ', 'ㅇㅣㄷㅏ', [], ['ida']),
-            ],
-        },
-        '-언마는': {
-            name: '-언마는',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㅇㅓㄴㅁㅏㄴㅡㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㅇㅣㅇㅓㄴㅁㅏㄴㅡㄴ', '이다', [], ['ida']),
-                suffixInflection('ㅇㅓㄴㅁㅏㄴㅡㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-언만': {
-            name: '-언만',
-            rules: [
-                suffixInflection('ㅇㅓㄴㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅓㄴㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-언정': {
-            name: '-언정',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㅇㅓㄴㅈㅓㅇ', '아니다', [], ['adj']),
-                suffixInflection('ㅇㅣㅇㅓㄴㅈㅓㅇ', '이다', [], ['ida']),
-                suffixInflection('ㅇㅓㄴㅈㅓㅇ', '', [], ['eusi']),
-            ],
-        },
-        '-에라': {
-            name: '-에라',
-            rules: [
-                suffixInflection('ㅇㅔㄹㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)오': {
-            name: '-(으)오',
-            rules: [
-                suffixInflection('ㅇㅗ', 'ㄷㅏ', ['euo'], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗ', 'ㄷㅏ', ['euo'], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗ', 'ㅂㄷㅏ', ['euo'], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗ', 'ㅅㄷㅏ', ['euo'], ['v', 'adj']),
-                suffixInflection('ㅇㅗ', 'ㅎㄷㅏ', ['euo'], ['adj']),
-                suffixInflection('ㅇㅗ', 'ㄹㄷㅏ', ['euo'], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗ', 'ㄷㄷㅏ', ['euo'], ['v', 'adj']),
-                suffixInflection('ㅇㅗ', '', ['euo'], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗ', '', ['euo'], ['p', 'f']),
-            ],
-        },
-        '-(으)오니까': {
-            name: '-(으)오니까',
-            rules: [
-                suffixInflection('ㅇㅗㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㄴㅣㄲㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㄴㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㄴㅣㄲㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㄴㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㄴㅣㄲㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)오리이까': {
-            name: '-(으)오리이까',
-            rules: [
-                suffixInflection('ㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㄹㅣㅇㅣㄲㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)오리이다': {
-            name: '-(으)오리이다',
-            rules: [
-                suffixInflection('ㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㄹㅣㅇㅣㄷㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-오이까': {
-            name: '-오이까',
-            rules: [
-                suffixInflection('ㅇㅗㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅗㅇㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅇㅣㄲㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)오이다': {
-            name: '-(으)오이다',
-            rules: [
-                suffixInflection('ㅇㅗㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㅇㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㅇㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅇㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㅇㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅇㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅇㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-올습니다': {
-            name: '-올습니다',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㅇㅗㄹㅅㅡㅂㄴㅣㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㅇㅣㅇㅗㄹㅅㅡㅂㄴㅣㄷㅏ', '이다', [], ['ida']),
-            ],
-        },
-        '-올시다': {
-            name: '-올시다',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㅇㅗㄹㅅㅣㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㅇㅣㅇㅗㄹㅅㅣㄷㅏ', '이다', [], ['ida']),
-            ],
-        },
-        '-(으)옵': {
-            name: '-(으)옵',
-            rules: [
-                suffixInflection('ㅇㅗㅂ', 'ㄷㅏ', ['euob'], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅇㅗㅂ', 'ㄷㅏ', ['euob'], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㅂ', 'ㅂㄷㅏ', ['euob'], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㅂ', 'ㅅㄷㅏ', ['euob'], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂ', 'ㅎㄷㅏ', ['euob'], ['adj']),
-                suffixInflection('ㅇㅗㅂ', 'ㄹㄷㅏ', ['euob'], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㅂ', 'ㄷㄷㅏ', ['euob'], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂ', '', ['euob'], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂ', '', ['euob'], ['p', 'f']),
-            ],
-        },
-        '-(으)옵니까': {
-            name: '-(으)옵니까',
-            rules: [
-                suffixInflection('ㅇㅗㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㅂㄴㅣㄲㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄴㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂㄴㅣㄲㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㅂㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㅂㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂㄴㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄴㅣㄲㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)옵니다': {
-            name: '-(으)옵니다',
-            rules: [
-                suffixInflection('ㅇㅗㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㅂㄴㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄴㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂㄴㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㅂㄴㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂㄴㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄴㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)옵디까': {
-            name: '-(으)옵디까',
-            rules: [
-                suffixInflection('ㅇㅗㅂㄷㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄷㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㅂㄷㅣㄲㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄷㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂㄷㅣㄲㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㅂㄷㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㅂㄷㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂㄷㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄷㅣㄲㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)옵디다': {
-            name: '-(으)옵디다',
-            rules: [
-                suffixInflection('ㅇㅗㅂㄷㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄷㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㅂㄷㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄷㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂㄷㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㅂㄷㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㅂㄷㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂㄷㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄷㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)옵소서': {
-            name: '-(으)옵소서',
-            rules: [
-                suffixInflection('ㅇㅗㅂㅅㅗㅅㅓ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅇㅗㅂㅅㅗㅅㅓ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㅂㅅㅗㅅㅓ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㅂㅅㅗㅅㅓ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂㅅㅗㅅㅓ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㅂㅅㅗㅅㅓ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㅂㅅㅗㅅㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅂㅅㅗㅅㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂㅅㅗㅅㅓ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)와': {
-            name: '-(으)와',
-            rules: [
-                suffixInflection('ㅇㅗㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅇㅗㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅏ', '', [], ['eusi', 'euo', 'jao']),
-                suffixInflection('ㅇㅡㅇㅗㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)외다': {
-            name: '-(으)외다',
-            rules: [
-                suffixInflection('ㅇㅗㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅇㅗㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅗㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅗㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅗㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅗㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅣㄷㅏ', '', [], ['p', 'f']),
-            ],
-        },
-        '-요': {
-            name: '-요',
-            rules: [
-                suffixInflection('ㅇㅏㄴㅣㅇㅛ', '아니다', [], ['adj']),
-                suffixInflection('ㅇㅛ', 'ㄷㅏ', [], ['ida']),
-            ],
-        },
-        '-(으)우': {
-            name: '-(으)우',
-            rules: [
-                suffixInflection('ㅇㅜ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㅇㅜ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅇㅜ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅇㅜ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅇㅜ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅜ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)이': {
-            name: '-(으)이',
-            rules: [
-                suffixInflection('ㅇㅣ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅣ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㅇㅣ', 'ㄷㅏ', [], ['adj']),
-            ],
-        },
-        '-(으)ㄴ들': {
-            name: '-(으)ㄴ들',
-            rules: [
-                suffixInflection('ㄴㄷㅡㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㄷㅡㄹ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㄷㅡㄹ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㄷㅡㄹ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㄷㅡㄹ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㄷㅡㄹ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㄷㅡㄹ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㄷㅡㄹ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)ㄴ즉': {
-            name: '-(으)ㄴ즉',
-            rules: [
-                suffixInflection('ㄴㅈㅡㄱ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅈㅡㄱ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅈㅡㄱ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅈㅡㄱ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅈㅡㄱ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅈㅡㄱ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅈㅡㄱ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅈㅡㄱ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅈㅡㄱ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄴ즉슨': {
-            name: '-(으)ㄴ즉슨',
-            rules: [
-                suffixInflection('ㄴㅈㅡㄱㅅㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅡㄴㅈㅡㄱㅅㅡㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄴㅈㅡㄱㅅㅡㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅈㅡㄱㅅㅡㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅈㅡㄱㅅㅡㄴ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄴㅈㅡㄱㅅㅡㄴ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㄴㅈㅡㄱㅅㅡㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅈㅡㄱㅅㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅈㅡㄱㅅㅡㄴ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ까': {
-            name: '-(으)ㄹ까',
-            rules: [
-                suffixInflection('ㄹㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄲㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄲㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄲㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄲㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ깝쇼': {
-            name: '-(으)ㄹ깝쇼',
-            rules: [
-                suffixInflection('ㄹㄲㅏㅂㅅㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄲㅏㅂㅅㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄲㅏㅂㅅㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄲㅏㅂㅅㅛ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄲㅏㅂㅅㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄲㅏㅂㅅㅛ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄲㅏㅂㅅㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄲㅏㅂㅅㅛ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄲㅏㅂㅅㅛ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ꼬': {
-            name: '-(으)ㄹ꼬',
-            rules: [
-                suffixInflection('ㄹㄲㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄲㅗ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄲㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄲㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄲㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄲㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄲㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄲㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄲㅗ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ는지': {
-            name: '-(으)ㄹ는지',
-            rules: [
-                suffixInflection('ㄹㄴㅡㄴㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄴㅡㄴㅈㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄴㅡㄴㅈㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄴㅡㄴㅈㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄴㅡㄴㅈㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄴㅡㄴㅈㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄴㅡㄴㅈㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄴㅡㄴㅈㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄴㅡㄴㅈㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ데라니': {
-            name: '-(으)ㄹ데라니',
-            rules: [
-                suffixInflection('ㄹㄷㅔㄹㅏㄴㅣ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㄷㅔㄹㅏㄴㅣ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄹㄷㅔㄹㅏㄴㅣ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜㄹㄷㅔㄹㅏㄴㅣ', 'ㅂㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄹㄷㅔㄹㅏㄴㅣ', 'ㅅㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㄷㅔㄹㅏㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄷㅔㄹㅏㄴㅣ', 'ㄷㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㄷㅔㄹㅏㄴㅣ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)ㄹ라': {
-            name: '-(으)ㄹ라',
-            rules: [
-                suffixInflection('ㄹㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄹㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ라고': {
-            name: '-(으)ㄹ라고',
-            rules: [
-                suffixInflection('ㄹㄹㅏㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄹㅏㄱㅗ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅏㄱㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄹㅏㄱㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅏㄱㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㄱㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅏㄱㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅏㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅏㄱㅗ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ라치면': {
-            name: '-(으)ㄹ라치면',
-            rules: [
-                suffixInflection('ㄹㄹㅏㅊㅣㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅏㅊㅣㅁㅕㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㄹㅏㅊㅣㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㄹㅏㅊㅣㅁㅕㄴ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㄹㅏㅊㅣㅁㅕㄴ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅏㅊㅣㅁㅕㄴ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅏㅊㅣㅁㅕㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)ㄹ락': {
-            name: '-(으)ㄹ락',
-            rules: [
-                suffixInflection('ㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ래': {
-            name: '-(으)ㄹ래',
-            rules: [
-                suffixInflection('ㄹㄹㅐ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅐ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㄹㅐ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㄹㅐ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㄹㅐ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅐ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅐ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)ㄹ러니': {
-            name: '-(으)ㄹ러니',
-            rules: [
-                suffixInflection('ㄹㄹㅓㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄹㅓㄴㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄹㅓㄴㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅓㄴㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄴㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ러라': {
-            name: '-(으)ㄹ러라',
-            rules: [
-                suffixInflection('ㄹㄹㅓㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄹㅓㄹㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄹㅓㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅓㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄹㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ런가': {
-            name: '-(으)ㄹ런가',
-            rules: [
-                suffixInflection('ㄹㄹㅓㄴㄱㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄹㅓㄴㄱㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㄱㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄹㅓㄴㄱㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㄱㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄴㄱㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅓㄴㄱㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄴㄱㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㄱㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ런고': {
-            name: '-(으)ㄹ런고',
-            rules: [
-                suffixInflection('ㄹㄹㅓㄴㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄹㅓㄴㄱㅗ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㄱㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄹㅓㄴㄱㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㄱㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄴㄱㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅓㄴㄱㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄴㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㄱㅗ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ런지': {
-            name: '-(으)ㄹ런지',
-            rules: [
-                suffixInflection('ㄹㄹㅓㄴㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄹㅓㄴㅈㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㅈㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄹㅓㄴㅈㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㅈㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄴㅈㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅓㄴㅈㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅓㄴㅈㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㅈㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ레': {
-            name: '-(으)ㄹ레',
-            rules: [
-                suffixInflection('ㄹㄹㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄹㅔ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅔ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄹㅔ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅔ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅔ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅔ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅔ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅔ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ레라': {
-            name: '-(으)ㄹ레라',
-            rules: [
-                suffixInflection('ㄹㄹㅔㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㄹㅔㄹㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅔㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㄹㅔㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㄹㅔㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅔㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅔㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㄹㅔㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅔㄹㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ려고': {
-            name: '-(으)ㄹ려고',
-            rules: [
-                suffixInflection('ㄹㄹㅕㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅕㄱㅗ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㄹㅕㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㄹㅕㄱㅗ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㄹㅕㄱㅗ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㄹㅕㄱㅗ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅕㄱㅗ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)ㄹ망정': {
-            name: '-(으)ㄹ망정',
-            rules: [
-                suffixInflection('ㄹㅁㅏㅇㅈㅓㅇ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅁㅏㅇㅈㅓㅇ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅁㅏㅇㅈㅓㅇ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅁㅏㅇㅈㅓㅇ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅁㅏㅇㅈㅓㅇ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅁㅏㅇㅈㅓㅇ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅁㅏㅇㅈㅓㅇ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅁㅏㅇㅈㅓㅇ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅁㅏㅇㅈㅓㅇ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ밖에': {
-            name: '-(으)ㄹ밖에',
-            rules: [
-                suffixInflection('ㄹㅂㅏㄲㅇㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅂㅏㄲㅇㅔ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅂㅏㄲㅇㅔ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅂㅏㄲㅇㅔ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅂㅏㄲㅇㅔ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅂㅏㄲㅇㅔ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅂㅏㄲㅇㅔ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅂㅏㄲㅇㅔ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅂㅏㄲㅇㅔ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ뿐더러': {
-            name: '-(으)ㄹ뿐더러',
-            rules: [
-                suffixInflection('ㄹㅃㅜㄴㄷㅓㄹㅓ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅃㅜㄴㄷㅓㄹㅓ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅃㅜㄴㄷㅓㄹㅓ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅃㅜㄴㄷㅓㄹㅓ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅃㅜㄴㄷㅓㄹㅓ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅃㅜㄴㄷㅓㄹㅓ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅃㅜㄴㄷㅓㄹㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅃㅜㄴㄷㅓㄹㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅃㅜㄴㄷㅓㄹㅓ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ사': {
-            name: '-(으)ㄹ사',
-            rules: [
-                suffixInflection('ㄹㅅㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅅㅏ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄹㅅㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜㄹㅅㅏ', 'ㅂㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄹㅅㅏ', 'ㅅㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅅㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅏ', 'ㄷㄷㅏ', [], ['adj']),
-            ],
-        },
-        '-(으)ㄹ새': {
-            name: '-(으)ㄹ새',
-            rules: [
-                suffixInflection('ㄹㅅㅐ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅅㅐ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅐ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅅㅐ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅐ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅐ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅐ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅐ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅐ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ세': {
-            name: '-(으)ㄹ세',
-            rules: [
-                suffixInflection('ㄹㅅㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅅㅔ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅔ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅅㅔ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅔ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅔ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅔ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅔ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅔ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ세라': {
-            name: '-(으)ㄹ세라',
-            rules: [
-                suffixInflection('ㄹㅅㅔㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅅㅔㄹㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅔㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅅㅔㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅔㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅔㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅔㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅔㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅔㄹㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ세말이지': {
-            name: '-(으)ㄹ세말이지',
-            rules: [
-                suffixInflection('ㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ소냐': {
-            name: '-(으)ㄹ소냐',
-            rules: [
-                suffixInflection('ㄹㅅㅗㄴㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅅㅗㄴㅑ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅗㄴㅑ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅅㅗㄴㅑ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅗㄴㅑ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅗㄴㅑ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅗㄴㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅗㄴㅑ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅗㄴㅑ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ손가': {
-            name: '-(으)ㄹ손가',
-            rules: [
-                suffixInflection('ㄹㅅㅗㄴㄱㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅅㅗㄴㄱㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅗㄴㄱㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅅㅗㄴㄱㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅗㄴㄱㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅗㄴㄱㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅗㄴㄱㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅗㄴㄱㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅗㄴㄱㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ수록': {
-            name: '-(으)ㄹ수록',
-            rules: [
-                suffixInflection('ㄹㅅㅜㄹㅗㄱ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅅㅜㄹㅗㄱ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅜㄹㅗㄱ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅅㅜㄹㅗㄱ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅜㄹㅗㄱ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅜㄹㅗㄱ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅜㄹㅗㄱ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅜㄹㅗㄱ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅜㄹㅗㄱ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ시': {
-            name: '-(으)ㄹ시',
-            rules: [
-                suffixInflection('ㄹㅅㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅅㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅅㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅅㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅅㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ시고': {
-            name: '-(으)ㄹ시고',
-            rules: [
-                suffixInflection('ㄹㅅㅣㄱㅗ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㄹㅅㅣㄱㅗ', 'ㄹㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄹㅅㅣㄱㅗ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅜㄹㅅㅣㄱㅗ', 'ㅂㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㄹㅅㅣㄱㅗ', 'ㅅㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅅㅣㄱㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅣㄱㅗ', 'ㄷㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅅㅣㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅣㄱㅗ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ싸록': {
-            name: '-(으)ㄹ싸록',
-            rules: [
-                suffixInflection('ㄹㅆㅏㄹㅗㄱ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅆㅏㄹㅗㄱ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅆㅏㄹㅗㄱ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅆㅏㄹㅗㄱ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅆㅏㄹㅗㄱ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅆㅏㄹㅗㄱ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅆㅏㄹㅗㄱ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅆㅏㄹㅗㄱ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅆㅏㄹㅗㄱ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ쏘냐': {
-            name: '-(으)ㄹ쏘냐',
-            rules: [
-                suffixInflection('ㄹㅆㅗㄴㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅆㅗㄴㅑ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅆㅗㄴㅑ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅆㅗㄴㅑ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅆㅗㄴㅑ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅆㅗㄴㅑ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅆㅗㄴㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅆㅗㄴㅑ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅆㅗㄴㅑ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ쏜가': {
-            name: '-(으)ㄹ쏜가',
-            rules: [
-                suffixInflection('ㄹㅆㅗㄴㄱㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅆㅗㄴㄱㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅆㅗㄴㄱㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅆㅗㄴㄱㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅆㅗㄴㄱㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅆㅗㄴㄱㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅆㅗㄴㄱㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅆㅗㄴㄱㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅆㅗㄴㄱㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ이만큼': {
-            name: '-(으)ㄹ이만큼',
-            rules: [
-                suffixInflection('ㄹㅇㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅇㅣㅁㅏㄴㅋㅡㅁ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅇㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅇㅣㅁㅏㄴㅋㅡㅁ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅇㅣㅁㅏㄴㅋㅡㅁ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅣㅁㅏㄴㅋㅡㅁ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅇㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅣㅁㅏㄴㅋㅡㅁ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅇㅣㅁㅏㄴㅋㅡㅁ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ작시면': {
-            name: '-(으)ㄹ작시면',
-            rules: [
-                suffixInflection('ㄹㅈㅏㄱㅅㅣㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅈㅏㄱㅅㅣㅁㅕㄴ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅈㅏㄱㅅㅣㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅈㅏㄱㅅㅣㅁㅕㄴ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅈㅏㄱㅅㅣㅁㅕㄴ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅏㄱㅅㅣㅁㅕㄴ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅈㅏㄱㅅㅣㅁㅕㄴ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)ㄹ지': {
-            name: '-(으)ㄹ지',
-            rules: [
-                suffixInflection('ㄹㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ지나': {
-            name: '-(으)ㄹ지나',
-            rules: [
-                suffixInflection('ㄹㅈㅣㄴㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㄴㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㄴㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ지니': {
-            name: '-(으)ㄹ지니',
-            rules: [
-                suffixInflection('ㄹㅈㅣㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㄴㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㄴㅣ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅣ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅣ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ지니라': {
-            name: '-(으)ㄹ지니라',
-            rules: [
-                suffixInflection('ㄹㅈㅣㄴㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㄴㅣㄹㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㄴㅣㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅣㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㅣㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㅣㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㅣㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅣㄹㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ지라': {
-            name: '-(으)ㄹ지라',
-            rules: [
-                suffixInflection('ㄹㅈㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㄹㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㄹㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ지라도': {
-            name: '-(으)ㄹ지라도',
-            rules: [
-                suffixInflection('ㄹㅈㅣㄹㅏㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㄹㅏㄷㅗ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅏㄷㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㄹㅏㄷㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅏㄷㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄹㅏㄷㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㄹㅏㄷㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄹㅏㄷㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅏㄷㅗ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ지로다': {
-            name: '-(으)ㄹ지로다',
-            rules: [
-                suffixInflection('ㄹㅈㅣㄹㅗㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㄹㅗㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅗㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㄹㅗㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅗㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄹㅗㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㄹㅗㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄹㅗㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅗㄷㅏ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ지며': {
-            name: '-(으)ㄹ지며',
-            rules: [
-                suffixInflection('ㄹㅈㅣㅁㅕ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㅁㅕ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㅁㅕ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㅁㅕ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㅁㅕ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㅁㅕ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㅁㅕ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㅁㅕ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㅁㅕ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ지어다': {
-            name: '-(으)ㄹ지어다',
-            rules: [
-                suffixInflection('ㄹㅈㅣㅇㅓㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅈㅣㅇㅓㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅈㅣㅇㅓㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㄹㅈㅣㅇㅓㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㄹㅈㅣㅇㅓㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㅇㅓㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅈㅣㅇㅓㄷㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-(으)ㄹ지언정': {
-            name: '-(으)ㄹ지언정',
-            rules: [
-                suffixInflection('ㄹㅈㅣㅇㅓㄴㅈㅓㅇ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㅇㅓㄴㅈㅓㅇ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㅇㅓㄴㅈㅓㅇ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㅇㅓㄴㅈㅓㅇ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㅇㅓㄴㅈㅓㅇ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㅇㅓㄴㅈㅓㅇ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㅇㅓㄴㅈㅓㅇ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㅇㅓㄴㅈㅓㅇ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㅇㅓㄴㅈㅓㅇ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ진대': {
-            name: '-(으)ㄹ진대',
-            rules: [
-                suffixInflection('ㄹㅈㅣㄴㄷㅐ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㄴㄷㅐ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㄴㄷㅐ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㄷㅐ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㄷㅐ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㄷㅐ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ진대는': {
-            name: '-(으)ㄹ진대는',
-            rules: [
-                suffixInflection('ㄹㅈㅣㄴㄷㅐㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㄴㄷㅐㄴㅡㄴ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㄴㄷㅐㄴㅡㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐㄴㅡㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㄷㅐㄴㅡㄴ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㄷㅐㄴㅡㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㄷㅐㄴㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐㄴㅡㄴ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ진댄': {
-            name: '-(으)ㄹ진댄',
-            rules: [
-                suffixInflection('ㄹㅈㅣㄴㄷㅐㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㄴㄷㅐㄴ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㄴㄷㅐㄴ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㄷㅐㄴ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㄷㅐㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㄷㅐㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐㄴ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㄹ진저': {
-            name: '-(으)ㄹ진저',
-            rules: [
-                suffixInflection('ㄹㅈㅣㄴㅈㅓ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅈㅣㄴㅈㅓ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅈㅓ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㄹㅈㅣㄴㅈㅓ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅈㅓ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㅈㅓ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㅈㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅈㅣㄴㅈㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅈㅓ', '', [], ['p']),
-            ],
-        },
-        '-(으)ㅁ': {
-            name: '-(으)ㅁ',
-            rules: [
-                suffixInflection('ㅁ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅁ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅁ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅁ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)ㅁ세': {
-            name: '-(으)ㅁ세',
-            rules: [
-                suffixInflection('ㅁㅅㅔ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅁㅅㅔ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅁㅅㅔ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅁㅅㅔ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅁㅅㅔ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅁㅅㅔ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-(으)ㅁ도': {
-            name: '-(으)ㅁ도',
-            rules: [
-                suffixInflection('ㅁㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅁㄷㅗ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁㄷㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅁㄷㅗ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁㄷㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㄷㅗ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅁㄷㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㄷㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㄷㅗ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)ㅁ에랴': {
-            name: '-(으)ㅁ에랴',
-            rules: [
-                suffixInflection('ㅁㅇㅔㄹㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄹㅁㅇㅔㄹㅑ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁㅇㅔㄹㅑ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅜㅁㅇㅔㄹㅑ', 'ㅂㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㅁㅇㅔㄹㅑ', 'ㅅㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅇㅔㄹㅑ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅁㅇㅔㄹㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅁㅇㅔㄹㅑ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㅇㅔㄹㅑ', '', [], ['p', 'f']),
-            ],
-        },
-        '-(으)ㅂ쇼': {
-            name: '-(으)ㅂ쇼',
-            rules: [
-                suffixInflection('ㅂㅅㅛ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅂㅅㅛ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅂㅅㅛ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅂㅅㅛ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅂㅅㅛ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅂㅅㅛ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-(으)ㅂ시다': {
-            name: '-(으)ㅂ시다',
-            rules: [
-                suffixInflection('ㅂㅅㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅂㅅㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅂㅅㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅂㅅㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅂㅅㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅂㅅㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-(으)ㅂ시오': {
-            name: '-(으)ㅂ시오',
-            rules: [
-                suffixInflection('ㅂㅅㅣㅇㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅂㅅㅣㅇㅗ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅂㅅㅣㅇㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅂㅅㅣㅇㅗ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅂㅅㅣㅇㅗ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅂㅅㅣㅇㅗ', 'ㄷㄷㅏ', [], ['v']),
-            ],
-        },
-        '-자': {
-            name: '-자',
-            rules: [
-                suffixInflection('ㅈㅏ', 'ㄷㅏ', [], ['v', 'ida']),
-            ],
-        },
-        '-자고': {
-            name: '-자고',
-            rules: [
-                suffixInflection('ㅈㅏㄱㅗ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-자구': {
-            name: '-자구',
-            rules: [
-                suffixInflection('ㅈㅏㄱㅜ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-자꾸나': {
-            name: '-자꾸나',
-            rules: [
-                suffixInflection('ㅈㅏㄲㅜㄴㅏ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-자느니': {
-            name: '-자느니',
-            rules: [
-                suffixInflection('ㅈㅏㄴㅡㄴㅣ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-자니까': {
-            name: '-자니까',
-            rules: [
-                suffixInflection('ㅈㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-자마자': {
-            name: '-자마자',
-            rules: [
-                suffixInflection('ㅈㅏㅁㅏㅈㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅈㅏㅁㅏㅈㅏ', '', [], ['eusi']),
-            ],
-        },
-        '-자며': {
-            name: '-자며',
-            rules: [
-                suffixInflection('ㅈㅏㅁㅕ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-자면': {
-            name: '-자면',
-            rules: [
-                suffixInflection('ㅈㅏㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-자면서': {
-            name: '-자면서',
-            rules: [
-                suffixInflection('ㅈㅏㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-자손': {
-            name: '-자손',
-            rules: [
-                suffixInflection('ㅈㅏㅅㅗㄴ', 'ㄷㅏ', [], ['v']),
-            ],
-        },
-        '-자오': {
-            name: '-자오',
-            rules: [
-                suffixInflection('ㅈㅏㅇㅗ', 'ㄷㅏ', ['jao'], ['v']),
-            ],
-        },
-        '-자옵': {
-            name: '-자옵',
-            rules: [
-                suffixInflection('ㅈㅏㅇㅗㅂ', 'ㄷㅏ', ['jaob'], ['v']),
-            ],
-        },
-        '-잡': {
-            name: '-잡',
-            rules: [
-                suffixInflection('ㅈㅏㅂ', 'ㄷㅏ', ['jab'], ['v']),
-            ],
-        },
-        '-잖': {
-            name: '-잖',
-            rules: [
-                suffixInflection('ㅈㅏㄴㅎㄷㅏ', 'ㄷㅏ', ['v', 'adj'], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅏㄴㅎㄷㅏ', '', ['v', 'adj'], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-죠': {
-            name: '-죠',
-            rules: [
-                suffixInflection('ㅈㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅛ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-지': {
-            name: '-지',
-            rules: [
-                suffixInflection('ㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-지마는': {
-            name: '-지마는',
-            rules: [
-                suffixInflection('ㅈㅣㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-지만': {
-            name: '-지만',
-            rules: [
-                suffixInflection('ㅈㅣㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣㅁㅏㄴ', '', [], ['p', 'f', 'euo', 'euob', 'eusi']),
-            ],
-        },
-        '-지만서도': {
-            name: '-지만서도',
-            rules: [
-                suffixInflection('ㅈㅣㅁㅏㄴㅅㅓㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣㅁㅏㄴㅅㅓㄷㅗ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-지요': {
-            name: '-지요',
-            rules: [
-                suffixInflection('ㅈㅣㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣㅇㅛ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-진': {
-            name: '-진',
-            rules: [
-                suffixInflection('ㅈㅣㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣㄴ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
-        '-질': {
-            name: '-질',
-            rules: [
-                suffixInflection('ㅈㅣㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣㄹ', '', [], ['p', 'f', 'eusi']),
-            ],
-        },
+        ...Object.fromEntries(Object.entries(endings).map(([name, rules]) => [name, {name, rules}])),
     },
 };

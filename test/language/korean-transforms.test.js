@@ -825,6 +825,40 @@ const tests = [
         ],
     },
     {
+        category: '있다, 없다, 이다, 아니다',
+        valid: true,
+        tests: [
+            {term: '맛있다', source: '맛있는',        rule: 'adj', reasons: ['-는']},
+            {term: '재미없다', source: '재미없는데',        rule: 'adj', reasons: ['-(으/느)ㄴ데']},
+            {term: '있다', source: '있는가',        rule: 'adj', reasons: ['-(으/느)ㄴ가']},
+            {term: '없다', source: '없는지',        rule: 'adj', reasons: ['-(으/느)ㄴ지']},
+            {term: '있다', source: '있고자',        rule: 'adj', reasons: ['-고자']},
+            {term: '맛있다', source: '맛있는대요',        rule: 'adj', reasons: ['-((느)ㄴ)대요']},
+            {term: '이다', source: '이라서',        rule: 'ida', reasons: ['-라서']},
+            {term: '아니다', source: '아니라서',        rule: 'adj', reasons: ['-라서']},
+            {term: '아니다', source: '아니라고',        rule: 'adj', reasons: ['-(으)라고']},
+            {term: '이다', source: '이야',        rule: 'ida', reasons: ['-야']},
+            {term: '아니다', source: '아니야',        rule: 'adj', reasons: ['-야']},
+            {term: '이다', source: '이에요',        rule: 'ida', reasons: ['-아/어요']},
+            {term: '아니다', source: '아니에요',        rule: 'adj', reasons: ['-아/어요']},
+            {term: '이다', source: '이언정',        rule: 'ida', reasons: ['-언정']},
+            {term: '아니다', source: '아니올시다',        rule: 'adj', reasons: ['-올시다']},
+        ],
+    },
+    {
+        category: 'irregular stems with generated rules',
+        valid: true,
+        tests: [
+            {term: '돕다', source: '도우되',        rule: 'v', reasons: ['-(으)되']},
+            {term: '짓다', source: '지으되',        rule: 'v', reasons: ['-(으)되']},
+            {term: '듣다', source: '들으되',        rule: 'v', reasons: ['-(으)되']},
+            {term: '고맙다', source: '고마우이',        rule: 'adj', reasons: ['-(으)이']},
+            {term: '만들다', source: '만드세나',        rule: 'v', reasons: ['-세나']},
+            {term: '하다', source: '하시었자',        rule: 'v', reasons: ['-(으)시', '-았/었자']},
+            {term: '살다', source: '삶',        rule: 'v', reasons: ['-(으)ㅁ']},
+        ],
+    },
+    {
         category: 'contracted particles',
         valid: true,
         tests: [
@@ -884,6 +918,10 @@ const tests = [
             {term: '나', source: '난',     rule: 'v', reasons: ['ㄴ']},
             {term: '나다', source: '난',     rule: 'v', reasons: ['ㄴ', '어간']},
             {term: '사람', source: '사람ㄴ',     rule: 'pn', reasons: ['ㄴ']},
+
+            // 있다/없다/아니다 rules only produce adjectives
+            {term: '맛있다', source: '맛있는가',     rule: 'ida', reasons: ['-(으/느)ㄴ가']},
+            {term: '아니다', source: '아니라서',     rule: 'v', reasons: ['-라서']},
 
             // ida
             {term: '이다', source: '이서',     rule: 'ida', reasons: ['아/어서']},
