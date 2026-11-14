@@ -16,9 +16,9 @@
  */
 
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
+import {ExternalExtensionPort, NativeComponentPort, YomitanApi} from '../ext/js/comm/yomitan-api.js';
 import {createApiMap} from '../ext/js/core/api-map.js';
 import {log} from '../ext/js/core/log.js';
-import {ExternalExtensionPort, YomitanApi} from '../ext/js/comm/yomitan-api.js';
 
 /**
  * @typedef {object} FakeClientPort
@@ -67,8 +67,8 @@ function deliverMessage(port, clientPort, message) {
     port.onMessage.addListener((receivedMessage) => {
         received.push(receivedMessage);
     });
-    const messageHandler = /** @type {*} */ (clientPort.onMessage.addListener.mock.calls[0][0]);
-    messageHandler(message, clientPort);
+    const messageHandler = /** @type {(message: unknown) => void} */ (clientPort.onMessage.addListener.mock.calls[0][0]);
+    messageHandler(message);
     return received;
 }
 
@@ -136,6 +136,55 @@ describe('ExternalExtensionPort', () => {
         expect(evictedPort.disconnect).toHaveBeenCalledTimes(1);
         expect(authorizedPort.disconnect).not.toHaveBeenCalled();
         expect(received).toStrictEqual([{action: 'yomitanVersion', params: {}, body: ''}]);
+    });
+});
+
+describe('NativeComponentPort', () => {
+    /**
+     * @typedef {object} FakeNativePort
+     * @property {{addListener: import('vitest').Mock<(listener: (message: unknown) => void) => void>, removeListener: import('vitest').Mock<(listener: (message: unknown) => void) => void>}} onMessage
+     * @property {{addListener: import('vitest').Mock<(listener: (port: unknown) => void) => void>, removeListener: import('vitest').Mock<(listener: (port: unknown) => void) => void>}} onDisconnect
+     * @property {import('vitest').Mock<(message: unknown) => void>} postMessage
+     * @property {import('vitest').Mock<() => void>} disconnect
+     */
+
+    test('Responds on native port', async () => {
+        /** @type {FakeNativePort} */
+        const nativePort = {
+            onMessage: {addListener: vi.fn(() => {}), removeListener: vi.fn(() => {})},
+            onDisconnect: {addListener: vi.fn(() => {}), removeListener: vi.fn(() => {})},
+            postMessage: vi.fn(() => {}),
+            disconnect: vi.fn(() => {}),
+        };
+        vi.stubGlobal('chrome', {
+            runtime: {
+                connectNative: () => nativePort,
+                getManifest: () => ({version: '0.0.0.0'}),
+            },
+        });
+
+        const yomitanApi = new YomitanApi(
+            createApiMap([
+                ['optionsGetFull', async () => /** @type {*} */ ({profileCurrent: 0, profiles: []})],
+            ]),
+            null,
+            () => new NativeComponentPort(),
+        );
+        await yomitanApi.setEnabled(true);
+
+        const rawListener = nativePort.onMessage.addListener.mock.calls[0][0];
+        // Firefox invokes `onMessage` listeners with the message only.
+        rawListener({action: 'yomitanVersion', params: {}, body: '', requestId: 'request-1'});
+        await new Promise((resolve) => { setTimeout(resolve, 0); });
+
+        expect(nativePort.postMessage).toHaveBeenCalledWith({
+            action: 'yomitanVersion',
+            params: {},
+            body: '',
+            data: {version: '0.0.0.0'},
+            requestId: 'request-1',
+            responseStatusCode: 200,
+        });
     });
 });
 

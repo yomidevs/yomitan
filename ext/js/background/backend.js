@@ -1565,7 +1565,8 @@ export class Backend {
 
         const yomitanApiEnabled = options.general.enableYomitanApi && enabled;
         void this._nativeComponentYomitanApi.setEnabled(yomitanApiEnabled);
-        void this._extensionToExtensionYomitanApi.setEnabled(yomitanApiEnabled);
+        const externallyConnectableExtensionsEnabled = options.general.enableExternallyConnectableExtensions && enabled;
+        void this._extensionToExtensionYomitanApi.setEnabled(externallyConnectableExtensionsEnabled);
 
         if (options.clipboard.enableBackgroundMonitor && enabled) {
             this._clipboardMonitor.start();
