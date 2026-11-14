@@ -17,6 +17,7 @@
 
 import {Hangul} from '../../../lib/hangul-js.js';
 import {suffixInflection} from '../language-transforms.js';
+import {koreanTransformDescriptions} from './korean-transform-descriptions.js';
 
 const conditions = {
     v: {
@@ -872,6 +873,18 @@ const endings = {
     '-질': plain('질', VAI, ['p', 'f', 'eusi']),
 };
 
+/**
+ * @param {string} name
+ * @param {Rule[]} rules
+ * @returns {import('language-transformer').Transform<Condition>}
+ */
+function createEndingTransform(name, rules) {
+    const senses = koreanTransformDescriptions[name];
+    if (typeof senses === 'undefined') { return {name, rules}; }
+    const description = senses.length === 1 ? senses[0] : senses.map((sense, i) => `${i + 1}. ${sense}`).join('\n');
+    return {name, description, rules};
+}
+
 /** @type {import('language-transformer').LanguageTransformDescriptor<Condition>} */
 export const koreanTransforms = {
     language: 'ko',
@@ -898,6 +911,6 @@ export const koreanTransforms = {
                 contractedParticle('ㄹ', 3, ['n']),
             ],
         },
-        ...Object.fromEntries(Object.entries(endings).map(([name, rules]) => [name, {name, rules}])),
+        ...Object.fromEntries(Object.entries(endings).map(([name, rules]) => [name, createEndingTransform(name, rules)])),
     },
 };

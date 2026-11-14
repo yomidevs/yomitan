@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {describe, expect, test} from 'vitest';
+import {koreanTransformDescriptions} from '../../ext/js/language/ko/korean-transform-descriptions.js';
 import {koreanTransforms} from '../../ext/js/language/ko/korean-transforms.js';
 import {LanguageTransformer} from '../../ext/js/language/language-transformer.js';
 import {Hangul} from '../../ext/lib/hangul-js.js';
@@ -948,3 +950,15 @@ function disassemble(str) {
 const languageTransformer = new LanguageTransformer();
 languageTransformer.addDescriptor(koreanTransforms);
 testLanguageTransformer(languageTransformer, tests, disassemble);
+
+describe('descriptions', () => {
+    test('every description belongs to a transform', () => {
+        const unknownNames = Object.keys(koreanTransformDescriptions).filter((name) => !Object.hasOwn(koreanTransforms.transforms, name));
+        expect(unknownNames).toStrictEqual([]);
+    });
+
+    test('senses are numbered when there are several', () => {
+        expect(koreanTransforms.transforms['-거라'].description).toStrictEqual(koreanTransformDescriptions['-거라'][0]);
+        expect(koreanTransforms.transforms['-(으)면'].description).toMatch(/^1\. .+\n2\. .+/);
+    });
+});
