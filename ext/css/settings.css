@@ -2585,6 +2585,23 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     display: flex;
 }
 
+#externally-connectable-extension-id-list {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto;
+    align-items: center;
+    justify-content: center;
+}
+
+.externally-connectable-extension-id-index {
+    margin: 0 0.5em;
+}
+
+input[type=text].externally-connectable-extension-id-input {
+    width: auto;
+    justify-self: stretch;
+    margin: 0.15em 0.5em;
+}
 
 /* Generic layouts */
 .margin-above {

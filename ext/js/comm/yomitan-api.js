@@ -38,10 +38,13 @@ export class YomitanApi {
     /**
      * @param {import('api').ApiMap} apiMap
      * @param {OffscreenProxy?} offscreen
+     * @param {() => import('yomitan-api.js').apiPort} createPort
      */
-    constructor(apiMap, offscreen) {
-        /** @type {?chrome.runtime.Port} */
+    constructor(apiMap, offscreen, createPort) {
+        /** @type {?import('yomitan-api.js').apiPort} */
         this._port = null;
+        /** @type {() => import('yomitan-api.js').apiPort} */
+        this._createPort = createPort;
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
         /** @type {number} */
@@ -134,163 +137,162 @@ export class YomitanApi {
 
     /**
      * @param {unknown} message
+     * @param {chrome.runtime.Port} port
      */
-    async _onMessage(message) {
+    async _onMessage(message, port) {
         if (typeof message !== 'object' || message === null) { return; }
 
-        if (this._port !== null) {
-            const {action, params, body} = /** @type {import('core').SerializableObject} */ (message);
-            if (typeof action !== 'string' || typeof params !== 'object' || typeof body !== 'string') {
-                this._port.postMessage({action, params, body, data: 'null', responseStatusCode: 400});
-                return;
+        const {action, params, body, requestId} = /** @type {import('core').SerializableObject} */ (message);
+        if (typeof action !== 'string' || typeof params !== 'object' || typeof body !== 'string' || (typeof requestId !== 'undefined' && typeof requestId !== 'string')) {
+            port.postMessage({action, params, body, data: 'null', requestId, responseStatusCode: 400});
+            return;
+        }
+
+        const optionsFull = await this._invoke('optionsGetFull', void 0);
+
+        try {
+            /** @type {?object} */
+            const parsedBody = body.length > 0 ? parseJson(body) : {};
+            if (parsedBody === null) {
+                throw new Error('Invalid request body');
             }
 
-            const optionsFull = await this._invoke('optionsGetFull', void 0);
-
-            try {
-                /** @type {?object} */
-                const parsedBody = body.length > 0 ? parseJson(body) : {};
-                if (parsedBody === null) {
-                    throw new Error('Invalid request body');
+            let result = null;
+            let statusCode = 200;
+            switch (action) {
+                case 'yomitanVersion': {
+                    const {version} = chrome.runtime.getManifest();
+                    result = {version: version};
+                    break;
                 }
-
-                let result = null;
-                let statusCode = 200;
-                switch (action) {
-                    case 'yomitanVersion': {
-                        const {version} = chrome.runtime.getManifest();
-                        result = {version: version};
-                        break;
-                    }
-                    case 'termEntries': {
-                        /** @type {import('yomitan-api.js').termEntriesInput} */
-                        // @ts-expect-error - Allow this to error
-                        const {term} = parsedBody;
-                        if (typeof term === 'string') {
-                            const invokeParams = {
-                                text: term,
-                                details: {},
-                                optionsContext: {index: optionsFull.profileCurrent},
-                            };
-                            result = {...await this._invoke('termsFind', invokeParams), index: 0};
-                        } else if (Array.isArray(term)) {
-                            result = await Promise.all(term.map(async (text, index) => {
-                                const invokeParams = {
-                                    text,
-                                    details: {},
-                                    optionsContext: {index: optionsFull.profileCurrent},
-                                };
-                                return {
-                                    ...(await this._invoke('termsFind', invokeParams)),
-                                    index,
-                                };
-                            }));
-                        } else {
-                            throw new Error('Invalid input for termEntries, expected "term" to be a string or a string array but got ' + typeof term);
-                        }
-                        break;
-                    }
-                    case 'kanjiEntries': {
-                        /** @type {import('yomitan-api.js').kanjiEntriesInput} */
-                        // @ts-expect-error - Allow this to error
-                        const {character} = parsedBody;
+                case 'termEntries': {
+                    /** @type {import('yomitan-api.js').termEntriesInput} */
+                    // @ts-expect-error - Allow this to error
+                    const {term} = parsedBody;
+                    if (typeof term === 'string') {
                         const invokeParams = {
-                            text: character,
+                            text: term,
                             details: {},
                             optionsContext: {index: optionsFull.profileCurrent},
                         };
-                        result = await this._invoke(
-                            'kanjiFind',
-                            invokeParams,
-                        );
-                        break;
+                        result = {...await this._invoke('termsFind', invokeParams), index: 0};
+                    } else if (Array.isArray(term)) {
+                        result = await Promise.all(term.map(async (text, index) => {
+                            const invokeParams = {
+                                text,
+                                details: {},
+                                optionsContext: {index: optionsFull.profileCurrent},
+                            };
+                            return {
+                                ...(await this._invoke('termsFind', invokeParams)),
+                                index,
+                            };
+                        }));
+                    } else {
+                        throw new Error('Invalid input for termEntries, expected "term" to be a string or a string array but got ' + typeof term);
                     }
-                    case 'ankiFields': {
-                        /** @type {import('yomitan-api.js').ankiFieldsInput} */
-                        // @ts-expect-error - Allow this to error
-                        const {text, type, markers, maxEntries, includeMedia} = parsedBody;
-                        const includeAudioMedia = includeMedia && markers.includes('audio');
-
-                        const profileOptions = optionsFull.profiles[optionsFull.profileCurrent].options;
-
-                        const ankiTemplate = await this._getAnkiTemplate(profileOptions);
-                        let dictionaryEntries = await this._getDictionaryEntries(text, type, optionsFull.profileCurrent);
-                        if (maxEntries > 0) {
-                            dictionaryEntries = dictionaryEntries.slice(0, maxEntries);
-                        }
-
-                        // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
-                        const domlessDocument = parseHTML('').document;
-                        // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
-                        const domlessWindow = parseHTML('').window;
-
-                        const dictionaryMedia = includeMedia ? await this._fetchDictionaryMedia(dictionaryEntries) : [];
-                        const audioMedia = includeAudioMedia ? await this._fetchAudio(dictionaryEntries, profileOptions) : [];
-                        const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia, audioMedia, profileOptions, domlessDocument);
-                        const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument, domlessWindow);
-                        await ankiTemplateRenderer.prepare();
-                        const templateRenderer = ankiTemplateRenderer.templateRenderer;
-
-                        /** @type {Array<Record<string, string>>} */
-                        const ankiFieldsResults = [];
-                        for (const commonData of commonDatas) {
-                            /** @type {Record<string, string>} */
-                            const ankiFieldsResult = {};
-                            for (const marker of markers) {
-                                const templateResult = templateRenderer.render(ankiTemplate, {marker: marker, commonData: commonData}, 'ankiNote');
-                                ankiFieldsResult[marker] = templateResult.result;
-                            }
-                            ankiFieldsResults.push(ankiFieldsResult);
-                        }
-                        result = {
-                            fields: ankiFieldsResults,
-                            dictionaryMedia: dictionaryMedia,
-                            audioMedia: audioMedia,
-                        };
-                        break;
-                    }
-                    case 'tokenize': {
-                        /** @type {import('yomitan-api.js').tokenizeInput} */
-                        // @ts-expect-error - Allow this to error
-                        const {text, scanLength, parser} = parsedBody;
-                        if (typeof text !== 'string' && !Array.isArray(text)) {
-                            throw new Error('Invalid input for tokenize, expected "text" to be a string or a string array but got ' + typeof text);
-                        }
-                        if (typeof scanLength !== 'number') {
-                            throw new Error('Invalid input for tokenize, expected "scanLength" to be a number but got ' + typeof scanLength);
-                        }
-                        const invokeParams = {
-                            text: text,
-                            optionsContext: {index: optionsFull.profileCurrent},
-                            scanLength: scanLength,
-                            useInternalParser: parser !== 'mecab',
-                            useMecabParser: parser === 'mecab',
-                            useAllFrequencyDictionaries: true,
-                        };
-                        result = await this._invoke('parseText', invokeParams);
-                        break;
-                    }
-                    case 'ankiCardFormats': {
-                        /** @type {import('yomitan-api.js').ankiCardFormatsInput} */
-                        const {profileIndex} = parsedBody;
-                        const resolvedProfileIndex = typeof profileIndex === 'number' ? profileIndex : optionsFull.profileCurrent;
-                        const profile = optionsFull.profiles[resolvedProfileIndex];
-                        if (typeof profile === 'undefined') {
-                            throw new Error('Invalid input for ankiCardFormats, expected "profileIndex" to be a valid profile index but got ' + profileIndex);
-                        }
-                        const profileOptions = profile.options;
-                        result = profileOptions.anki.cardFormats;
-                        break;
-                    }
-                    default:
-                        statusCode = 400;
+                    break;
                 }
+                case 'kanjiEntries': {
+                    /** @type {import('yomitan-api.js').kanjiEntriesInput} */
+                    // @ts-expect-error - Allow this to error
+                    const {character} = parsedBody;
+                    const invokeParams = {
+                        text: character,
+                        details: {},
+                        optionsContext: {index: optionsFull.profileCurrent},
+                    };
+                    result = await this._invoke(
+                        'kanjiFind',
+                        invokeParams,
+                    );
+                    break;
+                }
+                case 'ankiFields': {
+                    /** @type {import('yomitan-api.js').ankiFieldsInput} */
+                    // @ts-expect-error - Allow this to error
+                    const {text, type, markers, maxEntries, includeMedia} = parsedBody;
+                    const includeAudioMedia = includeMedia && markers.includes('audio');
 
-                this._port.postMessage({action, params, body, data: result, responseStatusCode: statusCode});
-            } catch (error) {
-                log.error(error);
-                this._port.postMessage({action, params, body, data: JSON.stringify(error), responseStatusCode: 500});
+                    const profileOptions = optionsFull.profiles[optionsFull.profileCurrent].options;
+
+                    const ankiTemplate = await this._getAnkiTemplate(profileOptions);
+                    let dictionaryEntries = await this._getDictionaryEntries(text, type, optionsFull.profileCurrent);
+                    if (maxEntries > 0) {
+                        dictionaryEntries = dictionaryEntries.slice(0, maxEntries);
+                    }
+
+                    // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
+                    const domlessDocument = parseHTML('').document;
+                    // @ts-expect-error - `parseHTML` can return `null` but this input has been validated to not be `null`
+                    const domlessWindow = parseHTML('').window;
+
+                    const dictionaryMedia = includeMedia ? await this._fetchDictionaryMedia(dictionaryEntries) : [];
+                    const audioMedia = includeAudioMedia ? await this._fetchAudio(dictionaryEntries, profileOptions) : [];
+                    const commonDatas = await this._createCommonDatas(text, dictionaryEntries, dictionaryMedia, audioMedia, profileOptions, domlessDocument);
+                    const ankiTemplateRenderer = new AnkiTemplateRenderer(domlessDocument, domlessWindow);
+                    await ankiTemplateRenderer.prepare();
+                    const templateRenderer = ankiTemplateRenderer.templateRenderer;
+
+                    /** @type {Array<Record<string, string>>} */
+                    const ankiFieldsResults = [];
+                    for (const commonData of commonDatas) {
+                        /** @type {Record<string, string>} */
+                        const ankiFieldsResult = {};
+                        for (const marker of markers) {
+                            const templateResult = templateRenderer.render(ankiTemplate, {marker: marker, commonData: commonData}, 'ankiNote');
+                            ankiFieldsResult[marker] = templateResult.result;
+                        }
+                        ankiFieldsResults.push(ankiFieldsResult);
+                    }
+                    result = {
+                        fields: ankiFieldsResults,
+                        dictionaryMedia: dictionaryMedia,
+                        audioMedia: audioMedia,
+                    };
+                    break;
+                }
+                case 'tokenize': {
+                    /** @type {import('yomitan-api.js').tokenizeInput} */
+                    // @ts-expect-error - Allow this to error
+                    const {text, scanLength, parser} = parsedBody;
+                    if (typeof text !== 'string' && !Array.isArray(text)) {
+                        throw new Error('Invalid input for tokenize, expected "text" to be a string or a string array but got ' + typeof text);
+                    }
+                    if (typeof scanLength !== 'number') {
+                        throw new Error('Invalid input for tokenize, expected "scanLength" to be a number but got ' + typeof scanLength);
+                    }
+                    const invokeParams = {
+                        text: text,
+                        optionsContext: {index: optionsFull.profileCurrent},
+                        scanLength: scanLength,
+                        useInternalParser: parser !== 'mecab',
+                        useMecabParser: parser === 'mecab',
+                        useAllFrequencyDictionaries: true,
+                    };
+                    result = await this._invoke('parseText', invokeParams);
+                    break;
+                }
+                case 'ankiCardFormats': {
+                    /** @type {import('yomitan-api.js').ankiCardFormatsInput} */
+                    const {profileIndex} = parsedBody;
+                    const resolvedProfileIndex = typeof profileIndex === 'number' ? profileIndex : optionsFull.profileCurrent;
+                    const profile = optionsFull.profiles[resolvedProfileIndex];
+                    if (typeof profile === 'undefined') {
+                        throw new Error('Invalid input for ankiCardFormats, expected "profileIndex" to be a valid profile index but got ' + profileIndex);
+                    }
+                    const profileOptions = profile.options;
+                    result = profileOptions.anki.cardFormats;
+                    break;
+                }
+                default:
+                    statusCode = 400;
             }
+
+            port.postMessage({action, params, body, data: result, requestId, responseStatusCode: statusCode});
+        } catch (error) {
+            log.error(error);
+            port.postMessage({action, params, body, data: JSON.stringify(error), requestId, responseStatusCode: 500});
         }
     }
 
@@ -599,7 +601,7 @@ export class YomitanApi {
      * @returns {Promise<void>}
      */
     async _setupPort() {
-        const port = chrome.runtime.connectNative('yomitan_api');
+        const port = this._createPort();
         this._eventListeners.addListener(port.onMessage, this._onMessage.bind(this));
         this._eventListeners.addListener(port.onDisconnect, this._onDisconnect.bind(this));
         this._port = port;
@@ -645,5 +647,176 @@ export class YomitanApi {
                 reject(e);
             }
         });
+    }
+}
+
+export class NativeComponentPort {
+    constructor() {
+        /** @type {chrome.runtime.Port} */
+        const port = chrome.runtime.connectNative('yomitan_api');
+        /** @type {chrome.runtime.Port} */
+        this._port = port;
+        /** @type {((message: unknown, port: chrome.runtime.Port) => void)[]} */
+        this._messageListeners = [];
+        port.onMessage.addListener((message) => {
+            for (const listener of this._messageListeners) {
+                // Firefox doesn't call onMessage with the port, so we capture it here
+                listener(message, port);
+            }
+        });
+    }
+
+    /**
+     * @returns {import('event-listener-collection').ExtensionEvent<(message: unknown, port: chrome.runtime.Port) => void>}
+     */
+    get onMessage() {
+        return {
+            /**
+             * @param {(message: unknown, port: chrome.runtime.Port) => void} listener
+             */
+            addListener: (listener) => {
+                this._messageListeners.push(listener);
+            },
+            /**
+             * @param {(message: unknown, port: chrome.runtime.Port) => void} listener
+             */
+            removeListener: (listener) => {
+                this._messageListeners = this._messageListeners.filter((registeredListener) => registeredListener !== listener);
+            },
+        };
+    }
+
+    /**
+     * @returns {chrome.events.Event<(port: chrome.runtime.Port) => void>}
+     */
+    get onDisconnect() {
+        return this._port.onDisconnect;
+    }
+
+    /**
+     * @returns {void}
+     */
+    disconnect() {
+        this._messageListeners = [];
+        this._port.disconnect();
+    }
+}
+
+export class ExternalExtensionPort {
+    /**
+     * @param {() => string[]} externallyConnectableExtensionIdsProvider
+     */
+    constructor(externallyConnectableExtensionIdsProvider) {
+        /** @type {() => string[]} */
+        this._externallyConnectableExtensionIdsProvider = externallyConnectableExtensionIdsProvider;
+        /** @type {chrome.runtime.Port[]} */
+        this._ports = [];
+        /** @type {((message: unknown, port: chrome.runtime.Port) => void)[]} */
+        this._messageListeners = [];
+    }
+
+    /**
+     * @param {import('yomitan-api.js').apiExternalConnectionPort} port
+     * @param {unknown[]} [pendingMessages]
+     */
+    handleConnect(port, pendingMessages = []) {
+        const externallyConnectableExtensionIds = this._externallyConnectableExtensionIdsProvider();
+        this._syncPorts(externallyConnectableExtensionIds);
+        if (typeof port.sender?.id === 'undefined' || !externallyConnectableExtensionIds.includes(port.sender.id)) {
+            port.disconnect();
+            return;
+        }
+        const chromePort = /** @type {chrome.runtime.Port} */ (port);
+        this._ports.push(chromePort);
+        chromePort.onDisconnect.addListener((p) => {
+            for (let i = 0; i < this._ports.length; i++) {
+                if (this._ports[i] === p) {
+                    this._ports.splice(i, 1);
+                    break;
+                }
+            }
+        });
+        // Firefox doesn't call onMessage with the port, so we capture it here
+        chromePort.onMessage.addListener(this._onMessage.bind(this, chromePort));
+        for (const message of pendingMessages) {
+            this._onMessage(chromePort, message);
+        }
+    }
+
+    /**
+     * @param {chrome.runtime.Port} port
+     * @param {unknown} message
+     */
+    _onMessage(port, message) {
+        const externallyConnectableExtensionIds = this._externallyConnectableExtensionIdsProvider();
+        this._syncPorts(externallyConnectableExtensionIds);
+        if (typeof port.sender?.id === 'undefined' || !externallyConnectableExtensionIds.includes(port.sender.id)) {
+            port.disconnect();
+            return;
+        }
+        for (const listener of this._messageListeners) {
+            listener(message, port);
+        }
+    }
+
+    /**
+     * @param {string[]} externallyConnectableExtensionIds
+     */
+    _syncPorts(externallyConnectableExtensionIds) {
+        for (let i = this._ports.length - 1; i >= 0; i--) {
+            const port = this._ports[i];
+            if (typeof port.sender?.id === 'undefined' || !externallyConnectableExtensionIds.includes(port.sender.id)) {
+                port.disconnect();
+                this._ports.splice(i, 1);
+            }
+        }
+    }
+
+    /**
+     * @returns {import('event-listener-collection').ExtensionEvent<(message: unknown, port: chrome.runtime.Port) => void>}
+     */
+    get onMessage() {
+        return {
+            /**
+             * @param {(message: unknown, port: chrome.runtime.Port) => void} listener
+             */
+            addListener: (listener) => {
+                this._messageListeners.push(listener);
+            },
+            /**
+             * @param {(message: unknown, port: chrome.runtime.Port) => void} listener
+             */
+            removeListener: (listener) => {
+                for (let i = 0; i < this._messageListeners.length; i++) {
+                    if (this._messageListeners[i] === listener) {
+                        this._messageListeners.splice(i, 1);
+                        break;
+                    }
+                }
+            },
+        };
+    }
+
+    /**
+     * @returns {import('event-listener-collection').ExtensionEvent<(port: chrome.runtime.Port) => void>}
+     */
+    get onDisconnect() {
+        // Individual ports may disconnect but ExternalExtensionPort models a collection of ports
+        // which never fire onDisconnect.
+        return {
+            addListener: () => {},
+            removeListener: () => {},
+        };
+    }
+
+    /**
+     * @returns {void}
+     */
+    disconnect() {
+        for (const port of this._ports) {
+            port.disconnect();
+        }
+        this._messageListeners = [];
+        this._ports = [];
     }
 }
