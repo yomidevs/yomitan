@@ -51,6 +51,9 @@ export class ExternallyConnectableExtensionIdsController {
         if (isFirefox) {
             this._extensionIdRegexes = [/^\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}$/, /^[a-zA-Z0-9-._]*@[a-zA-Z0-9-._]+$/];
             this._errorContainer.textContent = 'Invalid extension ID. IDs must be formatted like "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}" or "name@example.org".';
+        } else if (browser === 'safari') {
+            this._extensionIdRegexes = [];
+            this._errorContainer.textContent = 'Safari does not support connecting from other extensions.';
         } else {
             this._extensionIdRegexes = [/^[a-p]{32}$/];
             this._errorContainer.textContent = 'Invalid extension ID. IDs must be 32 characters long and can only contain the letters a to p.';

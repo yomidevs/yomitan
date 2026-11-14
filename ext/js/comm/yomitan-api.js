@@ -717,8 +717,9 @@ export class ExternalExtensionPort {
 
     /**
      * @param {import('yomitan-api.js').apiExternalConnectionPort} port
+     * @param {unknown[]} [pendingMessages]
      */
-    handleConnect(port) {
+    handleConnect(port, pendingMessages = []) {
         const externallyConnectableExtensionIds = this._externallyConnectableExtensionIdsProvider();
         this._syncPorts(externallyConnectableExtensionIds);
         if (typeof port.sender?.id === 'undefined' || !externallyConnectableExtensionIds.includes(port.sender.id)) {
@@ -737,6 +738,9 @@ export class ExternalExtensionPort {
         });
         // Firefox doesn't call onMessage with the port, so we capture it here
         chromePort.onMessage.addListener(this._onMessage.bind(this, chromePort));
+        for (const message of pendingMessages) {
+            this._onMessage(chromePort, message);
+        }
     }
 
     /**
