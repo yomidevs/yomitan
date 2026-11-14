@@ -520,8 +520,14 @@ export class Backend {
         /** @type {(message: unknown) => void} */
         const onTemporaryMessage = (message) => { pendingMessages.push(message); };
         port.onMessage.addListener(onTemporaryMessage);
+        let disconnected = false;
+        const onDisconnect = () => { disconnected = true; };
+        port.onDisconnect.addListener(onDisconnect);
         this._prepareCompletePromise.then(
-            () => { this._admitExternalConnect(port, pendingMessages, onTemporaryMessage); },
+            () => {
+                if (disconnected) { return; }
+                this._admitExternalConnect(port, pendingMessages, onTemporaryMessage, onDisconnect);
+            },
             () => { port.disconnect(); },
         );
     }
@@ -530,9 +536,11 @@ export class Backend {
      * @param {chrome.runtime.Port} port
      * @param {unknown[]} pendingMessages
      * @param {(message: unknown) => void} onTemporaryMessage
+     * @param {() => void} onDisconnect
      */
-    _admitExternalConnect(port, pendingMessages, onTemporaryMessage) {
+    _admitExternalConnect(port, pendingMessages, onTemporaryMessage, onDisconnect) {
         port.onMessage.removeListener(onTemporaryMessage);
+        port.onDisconnect.removeListener(onDisconnect);
         const externalExtensionPort = this._externalExtensionPort;
         if (externalExtensionPort !== null) {
             externalExtensionPort.handleConnect(port, pendingMessages);
