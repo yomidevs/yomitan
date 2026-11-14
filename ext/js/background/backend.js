@@ -213,8 +213,14 @@ export class Backend {
         this._nativeComponentYomitanApi = new YomitanApi(this._apiMap, this._offscreen, () => new NativeComponentPort());
         /** @type {string[]} */
         this._externallyConnectableExtensionIds = [];
+        /** @type {?ExternalExtensionPort} */
+        this._externalExtensionPort = null;
         /** @type {YomitanApi} */
-        this._extensionToExtensionYomitanApi = new YomitanApi(this._apiMap, this._offscreen, () => new ExternalExtensionPort(() => this._externallyConnectableExtensionIds));
+        this._extensionToExtensionYomitanApi = new YomitanApi(this._apiMap, this._offscreen, () => {
+            const externalExtensionPort = new ExternalExtensionPort(() => this._externallyConnectableExtensionIds);
+            this._externalExtensionPort = externalExtensionPort;
+            return externalExtensionPort;
+        });
         /** @type {CacheMap<string, {originalTextLength: number, textSegments: import('api').ParseTextSegment[]}>} */
         this._textParseCache = new CacheMap(10000, 3600000); // 1 hour idle time, ~32MB per 1000 entries for Japanese
     }
@@ -272,6 +278,11 @@ export class Backend {
         }
 
         chrome.runtime.onInstalled.addListener(this._onInstalled.bind(this));
+
+        if (isObjectNotArray(chrome.runtime) && isObjectNotArray(chrome.runtime.onConnectExternal)) {
+            const onConnectExternal = this._onWebExtensionEventWrapper(this._onExternalConnect.bind(this));
+            chrome.runtime.onConnectExternal.addListener(onConnectExternal);
+        }
     }
 
     /** @type {import('api').PmApiHandler<'connectToDatabaseWorker'>} */
@@ -499,6 +510,18 @@ export class Backend {
     _onInstalled({reason}) {
         if (reason !== 'install') { return; }
         void this._requestPersistentStorage();
+    }
+
+    /**
+     * @param {chrome.runtime.Port} port
+     */
+    _onExternalConnect(port) {
+        const externalExtensionPort = this._externalExtensionPort;
+        if (externalExtensionPort !== null) {
+            externalExtensionPort.handleConnect(port);
+        } else {
+            port.disconnect();
+        }
     }
 
     // Message handlers
@@ -1567,6 +1590,10 @@ export class Backend {
         void this._nativeComponentYomitanApi.setEnabled(yomitanApiEnabled);
         const externallyConnectableExtensionsEnabled = options.general.enableExternallyConnectableExtensions && enabled;
         void this._extensionToExtensionYomitanApi.setEnabled(externallyConnectableExtensionsEnabled);
+        if (!externallyConnectableExtensionsEnabled) {
+            // Connections are rejected while the feature is disabled.
+            this._externalExtensionPort = null;
+        }
 
         if (options.clipboard.enableBackgroundMonitor && enabled) {
             this._clipboardMonitor.start();
