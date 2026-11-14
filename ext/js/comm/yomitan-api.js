@@ -656,13 +656,34 @@ export class NativeComponentPort {
         const port = chrome.runtime.connectNative('yomitan_api');
         /** @type {chrome.runtime.Port} */
         this._port = port;
+        /** @type {((message: unknown, port: chrome.runtime.Port) => void)[]} */
+        this._messageListeners = [];
+        port.onMessage.addListener((message) => {
+            for (const listener of this._messageListeners) {
+                // Firefox doesn't call onMessage with the port, so we capture it here
+                listener(message, port);
+            }
+        });
     }
 
     /**
-     * @returns {chrome.events.Event<(message: any, port: chrome.runtime.Port) => void>}
+     * @returns {import('event-listener-collection').ExtensionEvent<(message: unknown, port: chrome.runtime.Port) => void>}
      */
     get onMessage() {
-        return this._port.onMessage;
+        return {
+            /**
+             * @param {(message: unknown, port: chrome.runtime.Port) => void} listener
+             */
+            addListener: (listener) => {
+                this._messageListeners.push(listener);
+            },
+            /**
+             * @param {(message: unknown, port: chrome.runtime.Port) => void} listener
+             */
+            removeListener: (listener) => {
+                this._messageListeners = this._messageListeners.filter((registeredListener) => registeredListener !== listener);
+            },
+        };
     }
 
     /**
@@ -676,6 +697,7 @@ export class NativeComponentPort {
      * @returns {void}
      */
     disconnect() {
+        this._messageListeners = [];
         this._port.disconnect();
     }
 }
@@ -693,8 +715,6 @@ export class ExternalExtensionPort {
         this._messageListeners = [];
         /** @type {(port: chrome.runtime.Port) => void} */
         this._connectExternalListener = this._onConnectExternal.bind(this);
-        /** @type {(message: unknown, port: chrome.runtime.Port) => void} */
-        this._messageListener = this._onMessage.bind(this);
         chrome.runtime.onConnectExternal.addListener(this._connectExternalListener);
     }
 
@@ -717,14 +737,15 @@ export class ExternalExtensionPort {
                 }
             }
         });
-        port.onMessage.addListener(this._messageListener);
+        // Firefox doesn't call onMessage with the port, so we capture it here
+        port.onMessage.addListener(this._onMessage.bind(this, port));
     }
 
     /**
-     * @param {unknown} message
      * @param {chrome.runtime.Port} port
+     * @param {unknown} message
      */
-    _onMessage(message, port) {
+    _onMessage(port, message) {
         const externallyConnectableExtensionIds = this._externallyConnectableExtensionIdsProvider();
         this._syncPorts(externallyConnectableExtensionIds);
         if (typeof port.sender?.id === 'undefined' || !externallyConnectableExtensionIds.includes(port.sender.id)) {
@@ -793,6 +814,7 @@ export class ExternalExtensionPort {
         for (const port of this._ports) {
             port.disconnect();
         }
+        this._messageListeners = [];
         this._ports = [];
         chrome.runtime.onConnectExternal.removeListener(this._connectExternalListener);
     }

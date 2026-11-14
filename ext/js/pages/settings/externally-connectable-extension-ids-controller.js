@@ -32,6 +32,8 @@ export class ExternallyConnectableExtensionIdsController {
         this._addInput = querySelectorNotNull(document, '#externally-connectable-extension-id-new-input');
         /** @type {HTMLDivElement} */
         this._errorContainer = querySelectorNotNull(document, '#externally-connectable-extension-id-error');
+        /** @type {HTMLInputElement} */
+        this._enableCheckbox = querySelectorNotNull(document, '#enable-externally-connectable-extensions');
         /** @type {RegExp[]} */
         this._extensionIdRegexes = [];
     }
@@ -41,6 +43,7 @@ export class ExternallyConnectableExtensionIdsController {
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         const addButton = querySelectorNotNull(document, '#externally-connectable-extension-id-add');
         addButton.addEventListener('click', this._onAddButtonClick.bind(this));
+        this._enableCheckbox.addEventListener('change', this._onEnableInputChange.bind(this));
         const {browser} = await this._settingsController.application.api.getEnvironmentInfo();
         const isFirefox = browser === 'firefox' || browser === 'firefox-mobile';
         if (isFirefox) {
@@ -50,6 +53,19 @@ export class ExternallyConnectableExtensionIdsController {
             this._extensionIdRegexes = [/^[a-p]{32}$/];
             this._errorContainer.textContent = 'Invalid extension ID. IDs must be 32 characters long and can only contain the letters a to p.';
         }
+        await this._updateOptions();
+    }
+
+    /**
+     * @param {Event} e
+     */
+    async _onEnableInputChange(e) {
+        const element = /** @type {HTMLInputElement} */ (e.target);
+        await this._settingsController.modifyProfileSettings([{
+            action: 'set',
+            path: 'general.enableExternallyConnectableExtensions',
+            value: element.checked,
+        }]);
         await this._updateOptions();
     }
 
@@ -89,7 +105,9 @@ export class ExternallyConnectableExtensionIdsController {
     /**
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
-    async _onOptionsChanged({options: {general: {externallyConnectableExtensionIds}}}) {
+    async _onOptionsChanged({options: {general: {enableExternallyConnectableExtensions, externallyConnectableExtensionIds}}}) {
+        this._enableCheckbox.checked = enableExternallyConnectableExtensions;
+
         for (const node of this._extensionIdListChildren) {
             if (node.parentNode !== null) {
                 node.parentNode.removeChild(node);
