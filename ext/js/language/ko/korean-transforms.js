@@ -17,6 +17,29 @@
 
 import {suffixInflection} from '../language-transforms.js';
 
+/**
+ * Removes a particle that has contracted into the final syllable of a word (나 + 는 → 난, 이거 + 를 → 이걸).
+ * The particle is only removed after a vowel, and only if the word is at least `minSyllables` syllables long.
+ * Short nouns are excluded this way because most of them collide with unrelated words (시간 → 시가, 사실 → 사시).
+ * @template {string} TCondition
+ * @param {string} particle
+ * @param {number} minSyllables
+ * @param {TCondition[]} conditionsOut
+ * @returns {import('language-transformer').SuffixRule<TCondition>}
+ */
+function contractedParticle(particle, minSyllables, conditionsOut) {
+    // In disassembled text every syllable has exactly one run of vowels.
+    const precedingSyllables = '(?:[ㅏ-ㅣ]+[ㄱ-ㅎ]+)'.repeat(minSyllables - 1);
+    return {
+        type: 'suffix',
+        isInflected: new RegExp(`${precedingSyllables}[ㅏ-ㅣ]${particle}$`),
+        deinflected: '',
+        deinflect: (text) => text.slice(0, -particle.length),
+        conditionsIn: [],
+        conditionsOut,
+    };
+}
+
 const conditions = {
     v: {
         name: 'Verb',
@@ -45,6 +68,26 @@ const conditions = {
             {
                 language: 'ko',
                 name: '조사 이다',
+            },
+        ],
+    },
+    n: {
+        name: 'Noun',
+        isDictionaryForm: true,
+        i18n: [
+            {
+                language: 'ko',
+                name: '명사',
+            },
+        ],
+    },
+    pn: {
+        name: 'Pronoun, numeral, bound noun or particle',
+        isDictionaryForm: true,
+        i18n: [
+            {
+                language: 'ko',
+                name: '대명사 / 수사 / 의존 명사 / 조사',
             },
         ],
     },
@@ -140,6 +183,22 @@ export const koreanTransforms = {
                 suffixInflection('ㅠ', 'ㅠㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅜ', 'ㅜㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅡ', 'ㅡㄷㅏ', [], ['v', 'adj']),
+            ],
+        },
+        'ㄴ': {
+            name: 'ㄴ',
+            description: 'Contraction of the topic particle 는',
+            rules: [
+                contractedParticle('ㄴ', 1, ['pn']),
+                contractedParticle('ㄴ', 3, ['n']),
+            ],
+        },
+        'ㄹ': {
+            name: 'ㄹ',
+            description: 'Contraction of the object particle 를',
+            rules: [
+                contractedParticle('ㄹ', 1, ['pn']),
+                contractedParticle('ㄹ', 3, ['n']),
             ],
         },
         '-거나': {
@@ -5189,6 +5248,13 @@ export const koreanTransforms = {
             rules: [
                 suffixInflection('ㅈㅣㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
                 suffixInflection('ㅈㅣㅇㅛ', '', [], ['p', 'f', 'eusi']),
+            ],
+        },
+        '-진': {
+            name: '-진',
+            rules: [
+                suffixInflection('ㅈㅣㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
+                suffixInflection('ㅈㅣㄴ', '', [], ['p', 'f', 'eusi']),
             ],
         },
         '-질': {

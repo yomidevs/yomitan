@@ -825,6 +825,36 @@ const tests = [
         ],
     },
     {
+        category: 'contracted particles',
+        valid: true,
+        tests: [
+            {term: '나', source: '난',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '나', source: '날',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '저', source: '전',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '너', source: '널',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '뭐', source: '뭘',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '거', source: '건',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '거', source: '걸',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '이거', source: '이건',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '그거', source: '그걸',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '우리', source: '우린',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '누구', source: '누굴',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '어디', source: '어딜',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '여기', source: '여긴',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '에서', source: '에선',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '에게', source: '에겐',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '보다', source: '보단',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '까지', source: '까진',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '이야기', source: '이야긴',        rule: 'n', reasons: ['ㄴ']},
+            {term: '아버지', source: '아버진',        rule: 'n', reasons: ['ㄴ']},
+            {term: '비행기', source: '비행길',        rule: 'n', reasons: ['ㄹ']},
+            {term: '대학교', source: '대학굘',        rule: 'n', reasons: ['ㄹ']},
+            {term: '하다', source: '하진',        rule: 'v', reasons: ['-진']},
+            {term: '먹다', source: '먹진',        rule: 'v', reasons: ['-진']},
+            {term: '하다', source: '했진',        rule: 'v', reasons: ['-았/었', '-진']},
+        ],
+    },
+    {
         category: 'invalid deinflections',
         valid: false,
         tests: [
@@ -845,6 +875,15 @@ const tests = [
             {term: '살다', source: '사러',     rule: 'v', reasons: ['-(으)러']},
             {term: '살다', source: '사려고',     rule: 'v', reasons: ['-(으)려고']},
             {term: '갈다', source: '가라',     rule: 'v', reasons: ['-(으)라']},
+
+            // contracted particles: nouns shorter than three syllables, and no chaining into verbs
+            {term: '시가', source: '시간',     rule: 'n', reasons: ['ㄴ']},
+            {term: '사시', source: '사실',     rule: 'n', reasons: ['ㄹ']},
+            {term: '친구', source: '친군',     rule: 'n', reasons: ['ㄴ']},
+            {term: '나', source: '난',     rule: 'n', reasons: ['ㄴ']},
+            {term: '나', source: '난',     rule: 'v', reasons: ['ㄴ']},
+            {term: '나다', source: '난',     rule: 'v', reasons: ['ㄴ', '어간']},
+            {term: '사람', source: '사람ㄴ',     rule: 'pn', reasons: ['ㄴ']},
 
             // ida
             {term: '이다', source: '이서',     rule: 'ida', reasons: ['아/어서']},
