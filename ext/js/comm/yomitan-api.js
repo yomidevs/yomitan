@@ -33,6 +33,36 @@ import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} 
 import {getDictionaryEntryMedia} from '../pages/settings/anki-deck-generator-controller.js';
 import {AnkiTemplateRenderer} from '../templates/anki-template-renderer.js';
 
+/**
+ * The general options returned by `displayOptions`, used by Yomitan to show lookup results.
+ * Only options potentially relevant to clients for display purposes are returned.
+ * @type {import('yomitan-api.js').displayGeneralOptionsKey[]}
+ */
+const DISPLAY_GENERAL_OPTIONS = [
+    'language',
+    'resultOutputMode',
+    'glossaryLayoutMode',
+    'compactTags',
+    'averageFrequency',
+    'frequencyDisplayMode',
+    'termDisplayMode',
+    'showPitchAccentDownstepNotation',
+    'showPitchAccentPositionNotation',
+    'showPitchAccentGraph',
+    'popupDisplayMode',
+    'popupTheme',
+    'popupOuterTheme',
+    'fontFamily',
+    'fontSize',
+    'lineHeight',
+    'popupScalingFactor',
+    'customPopupCss',
+    'customPopupOuterCss',
+    'popupCurrentIndicatorMode',
+    'popupActionBarVisibility',
+    'popupActionBarLocation',
+];
+
 /** */
 export class YomitanApi {
     /**
@@ -280,6 +310,47 @@ export class YomitanApi {
                         }
                         const profileOptions = profile.options;
                         result = profileOptions.anki.cardFormats;
+                        break;
+                    }
+                    case 'dictionaryInfo': {
+                        const {dictionaries} = optionsFull.profiles[optionsFull.profileCurrent].options;
+                        const summaries = await this._invoke('getDictionaryInfo', void 0);
+                        const summaryMap = new Map(summaries.map((summary) => [summary.title, summary]));
+                        /** @type {import('yomitan-api.js').dictionaryInfoResponse} */
+                        const dictionaryInfo = [];
+                        for (const {name, alias, enabled, definitionsCollapsible} of dictionaries) {
+                            const summary = summaryMap.get(name);
+                            if (typeof summary === 'undefined') { continue; }
+                            summaryMap.delete(name);
+                            dictionaryInfo.push({...summary, options: {alias, enabled, definitionsCollapsible}});
+                        }
+                        // Installed dictionaries the profile doesn't list yet, in import order
+                        for (const summary of summaryMap.values()) {
+                            dictionaryInfo.push({...summary, options: null});
+                        }
+                        result = dictionaryInfo;
+                        break;
+                    }
+                    case 'displayOptions': {
+                        const {general, scanning} = optionsFull.profiles[optionsFull.profileCurrent].options;
+                        /** @type {import('yomitan-api.js').displayOptionsResponse} */
+                        const displayOptions = {
+                            general: /** @type {import('yomitan-api.js').displayGeneralOptions} */ (Object.fromEntries(DISPLAY_GENERAL_OPTIONS.map((key) => [key, general[key]]))),
+                            scanning: {
+                                enableSearchTags: scanning.enableSearchTags,
+                            },
+                        };
+                        result = displayOptions;
+                        break;
+                    }
+                    case 'dictionaryMedia': {
+                        /** @type {import('yomitan-api.js').dictionaryMediaInput} */
+                        // @ts-expect-error - Allow this to error
+                        const {targets} = parsedBody;
+                        if (!Array.isArray(targets)) {
+                            throw new Error('Invalid input for dictionaryMedia, expected "targets" to be an array but got ' + typeof targets);
+                        }
+                        result = await this._invoke('getMedia', {targets: targets.map(({dictionary, path}) => ({dictionary, path}))});
                         break;
                     }
                     default:
