@@ -15,7 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type * as Api from './api';
 import type * as Dictionary from './dictionary';
+import type * as DictionaryImporter from './dictionary-importer';
+import type * as Settings from './settings';
 
 export type termEntriesInput = {
     term: string | string[];
@@ -46,6 +49,46 @@ export type tokenizeInput = {
 
 export type ankiCardFormatsInput = {
     profileIndex?: number;
+};
+
+export type dictionaryInfoOptions = Pick<Settings.DictionaryOptions, 'alias' | 'enabled' | 'definitionsCollapsible'>;
+
+export type dictionaryInfoResponse = (DictionaryImporter.Summary & {options: dictionaryInfoOptions | null})[];
+
+export type displayGeneralOptionsKey = (
+    'language' |
+    'resultOutputMode' |
+    'glossaryLayoutMode' |
+    'compactTags' |
+    'averageFrequency' |
+    'frequencyDisplayMode' |
+    'termDisplayMode' |
+    'showPitchAccentDownstepNotation' |
+    'showPitchAccentPositionNotation' |
+    'showPitchAccentGraph' |
+    'popupDisplayMode' |
+    'popupTheme' |
+    'popupOuterTheme' |
+    'fontFamily' |
+    'fontSize' |
+    'lineHeight' |
+    'popupScalingFactor' |
+    'customPopupCss' |
+    'customPopupOuterCss' |
+    'popupCurrentIndicatorMode' |
+    'popupActionBarVisibility' |
+    'popupActionBarLocation'
+);
+
+export type displayGeneralOptions = Pick<Settings.GeneralOptions, displayGeneralOptionsKey>;
+
+export type displayOptionsResponse = {
+    general: displayGeneralOptions;
+    scanning: Pick<Settings.ScanningOptions, 'enableSearchTags'>;
+};
+
+export type dictionaryMediaInput = {
+    targets: Api.GetMediaDetailsTarget[];
 };
 
 export type remoteVersionResponse = {
