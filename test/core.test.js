@@ -16,9 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {webcrypto} from 'node:crypto';
 import {describe, expect, test} from 'vitest';
 import {DynamicProperty} from '../ext/js/core/dynamic-property.js';
 import {deepEqual} from '../ext/js/core/utilities.js';
+
+if (typeof globalThis.crypto === 'undefined') {
+    globalThis.crypto = /** @type {Crypto} */ (/** @type {unknown} */ (webcrypto));
+}
 
 describe('DynamicProperty', () => {
     /** @type {import('test/core').DynamicPropertyTestData} */

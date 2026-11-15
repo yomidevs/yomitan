@@ -606,7 +606,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
         uniqueTerms,
         uniqueReadings,
         definitionTags,
-        definitions: hasDefinitions ? definitions : void 0,
+        ...(hasDefinitions ? {definitions} : {}),
     };
 }
 
