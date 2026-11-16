@@ -83,6 +83,7 @@ function createInfo(noteIds = [10, 20], noteInfos = [createNoteInfo(10), createN
  *   api: Record<'getAnkiNoteInfo' | 'addAnkiNote' | 'updateAnkiNote' | 'isAnkiConnected' | 'suspendAnkiCardsForNote' | 'forceSync', import('vitest').Mock>,
  *   entry: HTMLElement,
  *   details: import('display-anki').DictionaryEntryNoteDetails,
+ *   options: import('settings').ProfileOptions,
  *   button: (action: import('display-anki').NoteAction) => HTMLButtonElement | null,
  *   showErrors: import('vitest').MockInstance,
  * }}
@@ -107,8 +108,15 @@ function setup(behavior = 'new-and-overwrite', info = createInfo()) {
         suspendAnkiCardsForNote: vi.fn(),
         forceSync: vi.fn(),
     };
+    const options = /** @type {import('settings').ProfileOptions} */ (/** @type {unknown} */ ({
+        general: {},
+        dictionaries: [],
+        scanning: {},
+        anki: {enable: true, tags: [], targetTags: [], cardFormats: [createCardFormat()], screenshot: {}, checkForDuplicates: true, duplicateBehavior: behavior, displayTagsAndFlags: 'never'},
+    }));
     const display = {
         application: {api},
+        getOptions: () => options,
         dictionaryEntries: [({type: 'term'})],
         dictionaryEntryNodes: [entry],
         selectedIndex: 0,
@@ -127,7 +135,7 @@ function setup(behavior = 'new-and-overwrite', info = createInfo()) {
         _hotkeyHelpController: {setHotkeyLabel: vi.fn(), getHotkeyLabel: vi.fn(), setupNode: vi.fn()},
     };
     const anki = new DisplayAnki(/** @type {import('../ext/js/display/display.js').Display} */ (/** @type {unknown} */ (display)), /** @type {import('../ext/js/display/display-audio.js').DisplayAudio} */ ({}));
-    anki._cardFormats = [createCardFormat()];
+    anki._cardFormats = options.anki.cardFormats;
     anki._checkForDuplicates = true;
     anki._duplicateBehavior = behavior;
     const details = {cardFormat: anki._cardFormats[0], note: createNote(), errors: [], requirements: [], ...info, ankiError: null};
@@ -140,7 +148,7 @@ function setup(behavior = 'new-and-overwrite', info = createInfo()) {
      * @returns {?HTMLButtonElement}
      */
     const button = (action) => anki._saveButtonFind(0, 0, action);
-    return {anki, api, entry, details, button, showErrors};
+    return {anki, api, entry, details, options, button, showErrors};
 }
 
 /**
@@ -149,6 +157,12 @@ function setup(behavior = 'new-and-overwrite', info = createInfo()) {
 async function finish(promise) {
     await vi.runAllTimersAsync();
     await promise;
+}
+
+/** @param {DisplayAnki} anki */
+function clearContent(anki) {
+    anki._onContentClear();
+    Object.assign(anki._display, {dictionaryEntries: [], dictionaryEntryNodes: []});
 }
 
 describe('Anki duplicate actions', () => {
@@ -219,6 +233,292 @@ describe('Anki duplicate actions', () => {
         expect(button('add-note')?.disabled).toBe(false);
     });
 
+    test.each([
+        ['add-note', 'pending'],
+        ['add-note', 'cooldown'],
+        ['update-note', 'pending'],
+        ['update-note', 'cooldown'],
+    ])('keeps rebuilt controls locked during %s (%s)', async (action, phase) => {
+        const {anki, api, button, entry, options} = setup();
+        const pending = deferPromise();
+        const writeApi = action === 'add-note' ? api.addAnkiNote : api.updateAnkiNote;
+        writeApi.mockImplementation(async () => {
+            await pending.promise;
+            return action === 'add-note' ? 30 : null;
+        });
+        vi.spyOn(anki, '_getAnkiFieldTemplates').mockResolvedValue('template');
+        const originalButton = button('add-note');
+        const write = anki._saveAnkiNote(0, 0, /** @type {import('display-anki').NoteAction} */ (action));
+        await vi.advanceTimersByTimeAsync(0);
+        expect(writeApi).toHaveBeenCalledOnce();
+        if (phase === 'cooldown') {
+            pending.resolve(void 0);
+            await vi.advanceTimersByTimeAsync(0);
+        }
+
+        const updatedOptions = structuredClone(options);
+        const updatedNote = {...createNote(), fields: {Word: 'word', Meaning: 'updated template'}};
+        vi.mocked(anki._createNote).mockResolvedValue({note: updatedNote, errors: [], requirements: []});
+        anki._display.getOptions = () => updatedOptions;
+        anki._onOptionsUpdated({options: updatedOptions});
+        await vi.advanceTimersByTimeAsync(0);
+        expect(button('add-note')).not.toBe(originalButton);
+        expect(button('add-note')?.disabled).toBe(true);
+        expect(button('update-note')?.disabled).toBe(true);
+        button('add-note')?.click();
+        button('update-note')?.click();
+        anki._hotkeySaveAnkiNoteForSelectedEntry('0');
+        await vi.advanceTimersByTimeAsync(0);
+        expect(writeApi).toHaveBeenCalledOnce();
+
+        if (phase === 'pending') {
+            await vi.advanceTimersByTimeAsync(3000);
+            expect(button('add-note')?.disabled).toBe(true);
+            expect(button('update-note')?.disabled).toBe(true);
+        }
+        api.getAnkiNoteInfo.mockImplementation(async () => [createInfo([10, 20, 30])]);
+        pending.resolve(void 0);
+        await finish(write);
+        expect(button('add-note')?.disabled).toBe(false);
+        expect(button('update-note')?.disabled).toBe(false);
+        expect(entry.querySelector('[data-action="view-note"]')?.getAttribute('data-note-ids')).toBe('10 20 30');
+        expect(api.getAnkiNoteInfo).toHaveBeenLastCalledWith([updatedNote], true);
+        expect(api.addAnkiNote).toHaveBeenCalledTimes(action === 'add-note' ? 1 : 0);
+        expect(api.updateAnkiNote).toHaveBeenCalledTimes(action === 'update-note' ? 1 : 0);
+    });
+
+    test.each(['add-note', 'update-note'])('unlocks rebuilt controls after a failed %s', async (action) => {
+        const {anki, api, button, options, showErrors} = setup();
+        const pending = deferPromise();
+        const writeApi = action === 'add-note' ? api.addAnkiNote : api.updateAnkiNote;
+        writeApi.mockImplementationOnce(async () => {
+            await pending.promise;
+            throw new Error('write failed');
+        });
+        vi.spyOn(anki, '_getAnkiFieldTemplates').mockResolvedValue('template');
+        const write = anki._saveAnkiNote(0, 0, /** @type {import('display-anki').NoteAction} */ (action));
+        await vi.advanceTimersByTimeAsync(0);
+        anki._onOptionsUpdated({options});
+        await vi.advanceTimersByTimeAsync(0);
+        expect(button('add-note')?.disabled).toBe(true);
+        pending.resolve(void 0);
+        await finish(write);
+        expect(button('add-note')?.disabled).toBe(false);
+        expect(button('update-note')?.disabled).toBe(false);
+        expect(showErrors).not.toHaveBeenCalled();
+        await finish(anki._saveAnkiNote(0, 0, /** @type {import('display-anki').NoteAction} */ (action)));
+        expect(writeApi).toHaveBeenCalledTimes(2);
+    });
+
+    test.each(['render', 'target lookup'])('unlocks rebuilt controls after cancelling a pending %s', async (phase) => {
+        const {anki, api, button, options} = setup();
+        const pending = deferPromise();
+        if (phase === 'render') {
+            vi.mocked(anki._createNote).mockImplementationOnce(async () => {
+                await pending.promise;
+                return {note: createNote(), requirements: [], errors: []};
+            });
+        } else {
+            api.getAnkiNoteInfo.mockImplementationOnce(async () => {
+                await pending.promise;
+                return [createInfo()];
+            });
+        }
+        vi.spyOn(anki, '_getAnkiFieldTemplates').mockResolvedValue('template');
+        const write = anki._saveAnkiNote(0, 0, 'update-note');
+        await vi.advanceTimersByTimeAsync(0);
+        anki._onOptionsUpdated({options});
+        await vi.advanceTimersByTimeAsync(0);
+        expect(button('add-note')?.disabled).toBe(true);
+        expect(button('update-note')?.disabled).toBe(true);
+        pending.resolve(void 0);
+        await finish(write);
+        expect(button('add-note')?.disabled).toBe(false);
+        expect(button('update-note')?.disabled).toBe(false);
+        expect(api.addAnkiNote).not.toHaveBeenCalled();
+        expect(api.updateAnkiNote).not.toHaveBeenCalled();
+    });
+
+    test('preserves locks when a format moves while keeping other entries independent', async () => {
+        const {anki, api, entry, options} = setup();
+        const format = {...createCardFormat(), name: 'Reading'};
+        options.anki.cardFormats.push(format);
+        const otherEntry = /** @type {HTMLElement} */ (entry.cloneNode(true));
+        querySelectorNotNull(otherEntry, '.note-actions-container').replaceChildren();
+        entry.after(otherEntry);
+        anki._display.dictionaryEntryNodes.push(otherEntry);
+        anki._display.dictionaryEntries.push({...anki._display.dictionaryEntries[0]});
+        api.getAnkiNoteInfo.mockImplementation(async (notes) => notes.map(() => createInfo()));
+        await anki._updateDictionaryEntryDetails();
+
+        const pending = deferPromise();
+        const otherPending = deferPromise();
+        api.addAnkiNote.mockImplementationOnce(async () => {
+            await pending.promise;
+            return 30;
+        }).mockImplementationOnce(async () => {
+            await otherPending.promise;
+            return 40;
+        });
+        const write = anki._saveAnkiNote(0, 1, 'add-note');
+        await vi.advanceTimersByTimeAsync(0);
+        expect(anki._saveButtonFind(0, 0, 'add-note')?.disabled).toBe(false);
+        expect(anki._saveButtonFind(0, 1, 'add-note')?.disabled).toBe(true);
+
+        vi.spyOn(anki, '_getAnkiFieldTemplates').mockResolvedValue('template');
+        const updatedOptions = {...options, anki: {...options.anki, cardFormats: [structuredClone(format)]}};
+        anki._display.getOptions = () => updatedOptions;
+        anki._onOptionsUpdated({options: updatedOptions});
+        await vi.advanceTimersByTimeAsync(0);
+        expect(anki._saveButtonFind(0, 0, 'add-note')?.disabled).toBe(true);
+        expect(anki._saveButtonFind(0, 0, 'update-note')?.disabled).toBe(true);
+        expect(anki._saveButtonFind(1, 0, 'add-note')?.disabled).toBe(false);
+
+        const otherWrite = anki._saveAnkiNote(1, 0, 'add-note');
+        await vi.advanceTimersByTimeAsync(0);
+        expect(api.addAnkiNote).toHaveBeenCalledTimes(2);
+        pending.resolve(void 0);
+        await finish(write);
+        expect(anki._saveButtonFind(0, 0, 'add-note')?.disabled).toBe(false);
+        expect(anki._saveButtonFind(1, 0, 'add-note')?.disabled).toBe(true);
+        otherPending.resolve(void 0);
+        await finish(otherWrite);
+        expect(anki._saveButtonFind(1, 0, 'add-note')?.disabled).toBe(false);
+    });
+
+    test('does not refresh or unlock a new entry when an old write finishes', async () => {
+        const {anki, api} = setup();
+        const pending = deferPromise();
+        const otherPending = deferPromise();
+        api.addAnkiNote.mockImplementationOnce(async () => {
+            await pending.promise;
+            return 30;
+        }).mockImplementationOnce(async () => {
+            await otherPending.promise;
+            return 40;
+        });
+        const write = anki._saveAnkiNote(0, 0, 'add-note');
+        await vi.advanceTimersByTimeAsync(0);
+        const oldEntry = anki._display.dictionaryEntryNodes[0];
+        const dictionaryEntry = {...anki._display.dictionaryEntries[0]};
+        clearContent(anki);
+        const entry = /** @type {HTMLElement} */ (oldEntry.cloneNode(true));
+        querySelectorNotNull(entry, '.note-actions-container').replaceChildren();
+        oldEntry.replaceWith(entry);
+        anki._display.dictionaryEntryNodes.push(entry);
+        anki._display.dictionaryEntries.push(dictionaryEntry);
+        await anki._updateDictionaryEntryDetails();
+        expect(anki._saveButtonFind(0, 0, 'add-note')?.disabled).toBe(false);
+        const otherWrite = anki._saveAnkiNote(0, 0, 'add-note');
+        await vi.advanceTimersByTimeAsync(0);
+        api.getAnkiNoteInfo.mockClear();
+        pending.resolve(void 0);
+        await finish(write);
+        expect(api.getAnkiNoteInfo).not.toHaveBeenCalled();
+        expect(anki._saveButtonFind(0, 0, 'add-note')?.disabled).toBe(true);
+        otherPending.resolve(void 0);
+        await finish(otherWrite);
+        expect(anki._saveButtonFind(0, 0, 'add-note')?.disabled).toBe(false);
+    });
+
+    test.each([0, 1])('keeps the entry locked until both old writes settle (format %s first)', async (first) => {
+        const {anki, api, options} = setup();
+        options.anki.cardFormats.push({...createCardFormat(), name: 'Reading'});
+        api.getAnkiNoteInfo.mockImplementation(async (notes) => notes.map(() => createInfo()));
+        await anki._updateDictionaryEntryDetails();
+        const pending = [deferPromise(), deferPromise()];
+        api.addAnkiNote.mockImplementationOnce(async () => {
+            await pending[0].promise;
+            return 30;
+        }).mockImplementationOnce(async () => {
+            await pending[1].promise;
+            return 40;
+        });
+        const writes = [anki._saveAnkiNote(0, 0, 'add-note'), anki._saveAnkiNote(0, 1, 'add-note')];
+        await vi.advanceTimersByTimeAsync(0);
+        expect(api.addAnkiNote).toHaveBeenCalledTimes(2);
+        vi.spyOn(anki, '_getAnkiFieldTemplates').mockResolvedValue('template');
+        anki._onOptionsUpdated({options});
+        await vi.advanceTimersByTimeAsync(0);
+        pending[first].resolve(void 0);
+        await finish(writes[first]);
+        for (const index of [0, 1]) {
+            expect(anki._saveButtonFind(0, index, 'add-note')?.disabled).toBe(true);
+            expect(anki._saveButtonFind(0, index, 'update-note')?.disabled).toBe(true);
+        }
+        pending[1 - first].resolve(void 0);
+        await finish(writes[1 - first]);
+        for (const index of [0, 1]) {
+            expect(anki._saveButtonFind(0, index, 'add-note')?.disabled).toBe(false);
+            expect(anki._saveButtonFind(0, index, 'update-note')?.disabled).toBe(false);
+        }
+    });
+
+    test.each(['settings', 'navigation', 'disabled'])('discards the final refresh after another %s change', async (change) => {
+        const {anki, api, options, button, entry} = setup();
+        const pending = deferPromise();
+        api.addAnkiNote.mockImplementationOnce(async () => {
+            await pending.promise;
+            return 30;
+        });
+        const write = anki._saveAnkiNote(0, 0, 'add-note');
+        await vi.advanceTimersByTimeAsync(0);
+        vi.spyOn(anki, '_getAnkiFieldTemplates').mockResolvedValue('template');
+        anki._onOptionsUpdated({options});
+        await vi.advanceTimersByTimeAsync(0);
+        const refresh = deferPromise();
+        api.getAnkiNoteInfo.mockImplementationOnce(async () => {
+            await refresh.promise;
+            return [createInfo([30], [createNoteInfo(30)])];
+        });
+        pending.resolve(void 0);
+        await vi.runAllTimersAsync();
+        expect(button('add-note')?.disabled).toBe(true);
+        expect(button('update-note')?.disabled).toBe(true);
+        if (change === 'navigation') {
+            clearContent(anki);
+        } else {
+            const updatedOptions = {...options, anki: {...options.anki, enable: change !== 'disabled'}};
+            anki._display.getOptions = () => updatedOptions;
+            anki._onOptionsUpdated({options: updatedOptions});
+        }
+        await vi.advanceTimersByTimeAsync(0);
+        refresh.resolve(void 0);
+        await finish(write);
+        if (change === 'settings') {
+            expect(button('add-note')?.disabled).toBe(false);
+            expect(button('update-note')?.disabled).toBe(false);
+            expect(entry.querySelector('[data-action="view-note"]')?.getAttribute('data-note-ids')).toBe('10 20');
+        } else {
+            expect(anki._dictionaryEntryDetails).toBeNull();
+            expect(button('add-note')).toBeNull();
+        }
+    });
+
+    test('releases the lock and logs a failure in the final refresh', async () => {
+        const {anki, api, options, button} = setup();
+        const pending = deferPromise();
+        api.addAnkiNote.mockImplementationOnce(async () => {
+            await pending.promise;
+            return 30;
+        });
+        const write = anki._saveAnkiNote(0, 0, 'add-note');
+        await vi.advanceTimersByTimeAsync(0);
+        vi.spyOn(anki, '_getAnkiFieldTemplates').mockResolvedValue('template');
+        anki._onOptionsUpdated({options});
+        await vi.advanceTimersByTimeAsync(0);
+        const error = new Error('render failed');
+        vi.mocked(anki._createNote).mockRejectedValueOnce(error);
+        const logError = vi.spyOn(log, 'error').mockImplementation(() => {});
+        pending.resolve(void 0);
+        await finish(write);
+        expect(button('add-note')?.disabled).toBe(false);
+        expect(button('update-note')?.disabled).toBe(false);
+        expect(logError).toHaveBeenCalledExactlyOnceWith(error);
+        await finish(anki._saveAnkiNote(0, 0, 'add-note'));
+        expect(api.addAnkiNote).toHaveBeenCalledTimes(2);
+    });
+
     test('turns a new note into separate add-duplicate and update actions', async () => {
         const {anki, api, button} = setup('new-and-overwrite', createInfo(null, []));
         expect(button('update-note')).toBeNull();
@@ -279,7 +579,7 @@ describe('Anki duplicate actions', () => {
         }
         const write = anki._saveAnkiNote(0, 0, 'update-note');
         await vi.advanceTimersByTimeAsync(0);
-        anki._onContentClear();
+        clearContent(anki);
         pending.resolve(void 0);
         await finish(write);
         expect(api.updateAnkiNote).toHaveBeenCalledTimes(when === 'after write' ? 1 : 0);
@@ -354,7 +654,7 @@ describe('Anki duplicate actions', () => {
         });
         const write = anki._saveAnkiNote(0, 0, 'add-note');
         await vi.advanceTimersByTimeAsync(0);
-        anki._onContentClear();
+        clearContent(anki);
         pending.resolve(void 0);
         await finish(write);
         expect(anki._dictionaryEntryDetails).toBeNull();

@@ -18,9 +18,17 @@
 import type * as Anki from './anki';
 import type * as AnkiNoteBuilder from './anki-note-builder';
 import type * as AnkiTemplates from './anki-templates';
+import type * as Core from './core';
+import type * as Dictionary from './dictionary';
 import type * as Settings from './settings';
 
 export type NoteAction = 'add-note' | 'update-note';
+
+export type PendingNoteWrite = {
+    dictionaryEntry: Dictionary.DictionaryEntry;
+    cardFormatIndex: number;
+    token: Core.TokenObject;
+};
 
 export type LogData = {
     ankiNoteData: AnkiTemplates.NoteData | undefined;

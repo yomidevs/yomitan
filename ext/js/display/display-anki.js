@@ -64,7 +64,7 @@ export class DisplayAnki {
         this._noteContext = null;
         /** @type {import('core').TokenObject} */
         this._noteContextToken = {};
-        /** @type {Set<HTMLElement>} */
+        /** @type {Set<import('display-anki').PendingNoteWrite>} */
         this._pendingNoteWrites = new Set();
         /** @type {boolean} */
         this._checkForDuplicates = false;
@@ -646,7 +646,7 @@ export class DisplayAnki {
         const duplicate = (this._checkForDuplicates || !combined) && noteIds !== null && noteIds.length > 0;
         const update = duplicate && behavior === 'overwrite';
         const compatible = this._getFirstCompatibleNote(note, noteIds, noteInfos) !== null;
-        const pending = this._pendingNoteWrites.has(container);
+        const pending = this._isNoteWritePending(entryIndex, cardFormatIndex);
         container.dataset.duplicateBehavior = behavior;
         /** @type {HTMLButtonElement} */
         const primaryButton = querySelectorNotNull(container, '.action-button');
@@ -810,6 +810,21 @@ export class DisplayAnki {
     /**
      * @param {number} dictionaryEntryIndex
      * @param {number} cardFormatIndex
+     * @returns {boolean}
+     */
+    _isNoteWritePending(dictionaryEntryIndex, cardFormatIndex) {
+        const dictionaryEntry = this._display.dictionaryEntries[dictionaryEntryIndex];
+        for (const pending of this._pendingNoteWrites) {
+            if (pending.dictionaryEntry !== dictionaryEntry) { continue; }
+            // Settings can reorder or replace formats, so an older context locks the whole entry.
+            if (pending.token !== this._noteContextToken || pending.cardFormatIndex === cardFormatIndex) { return true; }
+        }
+        return false;
+    }
+
+    /**
+     * @param {number} dictionaryEntryIndex
+     * @param {number} cardFormatIndex
      * @param {import('display-anki').NoteAction} action
      */
     async _saveAnkiNote(dictionaryEntryIndex, cardFormatIndex, action) {
@@ -817,13 +832,13 @@ export class DisplayAnki {
         const details = this._dictionaryEntryDetails?.[dictionaryEntryIndex]?.noteMap.get(cardFormatIndex);
         if (typeof dictionaryEntry === 'undefined' || typeof details === 'undefined') { return; }
         const button = this._saveButtonFind(dictionaryEntryIndex, cardFormatIndex, action);
-        const container = button?.parentElement;
-        if (!button || button.disabled || !container || this._pendingNoteWrites.has(container)) { return; }
+        if (!button || button.disabled || this._isNoteWritePending(dictionaryEntryIndex, cardFormatIndex)) { return; }
 
         const token = this._noteContextToken;
         const {requirements, cardFormat} = details;
         const {_suspendNewCards: suspendNewCards, _forceSync: forceSync} = this;
-        this._pendingNoteWrites.add(container);
+        const pendingWrite = {dictionaryEntry, cardFormatIndex, token};
+        this._pendingNoteWrites.add(pendingWrite);
         this._updateNoteButtons(dictionaryEntryIndex, cardFormatIndex, details);
         // Retain the double-click cooldown, but never unlock before the write settles.
         const cooldown = new Promise((resolve) => { setTimeout(resolve, 2500); });
@@ -861,11 +876,21 @@ export class DisplayAnki {
             }
             progressIndicatorVisible.clearOverride(overrideToken);
             await cooldown;
-            this._pendingNoteWrites.delete(container);
-            if (this._noteContextToken === token) {
-                const currentDetails = this._dictionaryEntryDetails?.[dictionaryEntryIndex]?.noteMap.get(cardFormatIndex);
+            try {
+                if (this._noteContextToken !== token && this._display.dictionaryEntries.includes(dictionaryEntry)) {
+                    // Refresh with the current settings before unlocking rebuilt controls.
+                    await this._updateDictionaryEntryDetails();
+                }
+            } catch (e) {
+                log.error(e);
+            } finally {
+                this._pendingNoteWrites.delete(pendingWrite);
+                const currentIndex = this._display.dictionaryEntries.indexOf(dictionaryEntry);
+                const currentDetails = this._dictionaryEntryDetails?.[currentIndex];
                 if (typeof currentDetails !== 'undefined') {
-                    this._updateNoteButtons(dictionaryEntryIndex, cardFormatIndex, currentDetails);
+                    for (const [currentFormatIndex, currentNoteDetails] of currentDetails.noteMap) {
+                        this._updateNoteButtons(currentIndex, currentFormatIndex, currentNoteDetails);
+                    }
                 }
             }
         }
