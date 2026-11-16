@@ -1727,13 +1727,13 @@ select.profile-condition-operator {
     display: none;
 }
 
-#anki-card-primary[data-anki-duplicate-behavior='overwrite'] .anki-card-fields {
+#anki-card-primary:is([data-anki-duplicate-behavior='overwrite'], [data-anki-duplicate-behavior='new-and-overwrite']) .anki-card-fields {
     grid-template-columns: auto 1fr 1fr;
 }
-#anki-card-primary[data-anki-duplicate-behavior='overwrite'] .anki-card-field-overwrite-header {
+#anki-card-primary:is([data-anki-duplicate-behavior='overwrite'], [data-anki-duplicate-behavior='new-and-overwrite']) .anki-card-field-overwrite-header {
     display: block;
 }
-#anki-card-primary[data-anki-duplicate-behavior='overwrite'] .anki-card-field-overwrite-container {
+#anki-card-primary:is([data-anki-duplicate-behavior='overwrite'], [data-anki-duplicate-behavior='new-and-overwrite']) .anki-card-field-overwrite-container {
     display: block;
 }
 

@@ -319,7 +319,7 @@ export class AnkiController {
      * @param {import('settings').AnkiDuplicateBehavior} behavior
      */
     _updateDuplicateBehavior(behavior) {
-        this._duplicateOverwriteWarning.hidden = behavior !== 'overwrite';
+        this._duplicateOverwriteWarning.hidden = behavior !== 'overwrite' && behavior !== 'new-and-overwrite';
         if (this._ankiCardPrimary === null) { return; }
         this._ankiCardPrimary.dataset.ankiDuplicateBehavior = behavior;
     }
