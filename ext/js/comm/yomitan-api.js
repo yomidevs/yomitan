@@ -304,7 +304,8 @@ export class YomitanApi {
             return optionsFull.profileCurrent;
         }
         if (typeof profileIndex !== 'number' || !Number.isInteger(profileIndex) || profileIndex < 0 || profileIndex >= optionsFull.profiles.length) {
-            throw new Error(`Expected "profileIndex" to be a valid profile index but got ${JSON.stringify(profileIndex)}`);
+            const received = typeof profileIndex === 'number' ? String(profileIndex) : typeof profileIndex;
+            throw new Error('Expected "profileIndex" to be a valid profile index but got ' + received);
         }
         return profileIndex;
     }
