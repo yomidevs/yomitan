@@ -166,7 +166,7 @@ export class YomitanApi {
                         /** @type {import('yomitan-api.js').termEntriesInput} */
                         // @ts-expect-error - Allow this to error
                         const {term, profileIndex} = parsedBody;
-                        const resolvedProfileIndex = this._resolveProfileIndex(action, profileIndex, optionsFull);
+                        const resolvedProfileIndex = this._resolveProfileIndex(profileIndex, optionsFull);
                         if (typeof term === 'string') {
                             const invokeParams = {
                                 text: term,
@@ -195,7 +195,7 @@ export class YomitanApi {
                         /** @type {import('yomitan-api.js').kanjiEntriesInput} */
                         // @ts-expect-error - Allow this to error
                         const {character, profileIndex} = parsedBody;
-                        const resolvedProfileIndex = this._resolveProfileIndex(action, profileIndex, optionsFull);
+                        const resolvedProfileIndex = this._resolveProfileIndex(profileIndex, optionsFull);
                         const invokeParams = {
                             text: character,
                             details: {},
@@ -211,7 +211,7 @@ export class YomitanApi {
                         /** @type {import('yomitan-api.js').ankiFieldsInput} */
                         // @ts-expect-error - Allow this to error
                         const {text, type, markers, maxEntries, includeMedia, profileIndex} = parsedBody;
-                        const resolvedProfileIndex = this._resolveProfileIndex(action, profileIndex, optionsFull);
+                        const resolvedProfileIndex = this._resolveProfileIndex(profileIndex, optionsFull);
                         const includeAudioMedia = includeMedia && markers.includes('audio');
 
                         const profileOptions = optionsFull.profiles[resolvedProfileIndex].options;
@@ -256,7 +256,7 @@ export class YomitanApi {
                         /** @type {import('yomitan-api.js').tokenizeInput} */
                         // @ts-expect-error - Allow this to error
                         const {text, scanLength, parser, profileIndex} = parsedBody;
-                        const resolvedProfileIndex = this._resolveProfileIndex(action, profileIndex, optionsFull);
+                        const resolvedProfileIndex = this._resolveProfileIndex(profileIndex, optionsFull);
                         if (typeof text !== 'string' && !Array.isArray(text)) {
                             throw new Error('Invalid input for tokenize, expected "text" to be a string or a string array but got ' + typeof text);
                         }
@@ -277,7 +277,7 @@ export class YomitanApi {
                     case 'ankiCardFormats': {
                         /** @type {import('yomitan-api.js').ankiCardFormatsInput} */
                         const {profileIndex} = parsedBody;
-                        const resolvedProfileIndex = this._resolveProfileIndex(action, profileIndex, optionsFull);
+                        const resolvedProfileIndex = this._resolveProfileIndex(profileIndex, optionsFull);
                         result = optionsFull.profiles[resolvedProfileIndex].options.anki.cardFormats;
                         break;
                     }
@@ -294,18 +294,17 @@ export class YomitanApi {
     }
 
     /**
-     * @param {string} action
      * @param {unknown} profileIndex
      * @param {import('settings').Options} optionsFull
      * @returns {number}
      * @throws {Error}
      */
-    _resolveProfileIndex(action, profileIndex, optionsFull) {
+    _resolveProfileIndex(profileIndex, optionsFull) {
         if (typeof profileIndex === 'undefined') {
             return optionsFull.profileCurrent;
         }
         if (typeof profileIndex !== 'number' || !Number.isInteger(profileIndex) || profileIndex < 0 || profileIndex >= optionsFull.profiles.length) {
-            throw new Error(`Invalid input for ${action}, expected "profileIndex" to be a valid profile index but got ${String(profileIndex)}`);
+            throw new Error(`Expected "profileIndex" to be a valid profile index but got ${String(profileIndex)}`);
         }
         return profileIndex;
     }
