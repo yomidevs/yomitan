@@ -23,7 +23,7 @@
 let cssZoomSupported = null;
 
 /** @type {Set<?string>} */
-const FIREFOX_RECT_EXCLUDED_LANGUAGES = new Set(['th']);
+const FIREFOX_RECT_EXCLUDED_LANGUAGES = new Set(['th', 'lo']);
 
 /**
  * Computes the scaling adjustment that is necessary for client space coordinates based on the
