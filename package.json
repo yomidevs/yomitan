@@ -113,7 +113,7 @@
     },
     "dependencies": {
         "@resvg/resvg-wasm": "^2.6.2",
-        "@zip.js/zip.js": "^2.7.54",
+        "@zip.js/zip.js": "^2.8.26",
         "dexie": "^4.0.10",
         "dexie-export-import": "^4.1.4",
         "hangul-js": "^0.2.6",
