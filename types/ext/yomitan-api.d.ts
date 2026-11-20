@@ -19,6 +19,7 @@ import type * as Dictionary from './dictionary';
 
 export type termEntriesInput = {
     term: string | string[];
+    profileIndex?: number;
 };
 
 export type termEntriesResponse = {
@@ -29,6 +30,7 @@ export type termEntriesResponse = {
 
 export type kanjiEntriesInput = {
     character: string;
+    profileIndex?: number;
 };
 
 export type ankiFieldsInput = {
@@ -37,11 +39,13 @@ export type ankiFieldsInput = {
     markers: [string];
     maxEntries: number;
     includeMedia?: boolean;
+    profileIndex?: number;
 };
 
 export type tokenizeInput = {
     text: string | string[];
     scanLength: number;
+    profileIndex?: number;
 };
 
 export type ankiCardFormatsInput = {

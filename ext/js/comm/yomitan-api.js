@@ -165,12 +165,13 @@ export class YomitanApi {
                     case 'termEntries': {
                         /** @type {import('yomitan-api.js').termEntriesInput} */
                         // @ts-expect-error - Allow this to error
-                        const {term} = parsedBody;
+                        const {term, profileIndex} = parsedBody;
+                        const resolvedProfileIndex = this._resolveProfileIndex(optionsFull, profileIndex, action);
                         if (typeof term === 'string') {
                             const invokeParams = {
                                 text: term,
                                 details: {},
-                                optionsContext: {index: optionsFull.profileCurrent},
+                                optionsContext: {index: resolvedProfileIndex},
                             };
                             result = {...await this._invoke('termsFind', invokeParams), index: 0};
                         } else if (Array.isArray(term)) {
@@ -178,7 +179,7 @@ export class YomitanApi {
                                 const invokeParams = {
                                     text,
                                     details: {},
-                                    optionsContext: {index: optionsFull.profileCurrent},
+                                    optionsContext: {index: resolvedProfileIndex},
                                 };
                                 return {
                                     ...(await this._invoke('termsFind', invokeParams)),
@@ -193,11 +194,11 @@ export class YomitanApi {
                     case 'kanjiEntries': {
                         /** @type {import('yomitan-api.js').kanjiEntriesInput} */
                         // @ts-expect-error - Allow this to error
-                        const {character} = parsedBody;
+                        const {character, profileIndex} = parsedBody;
                         const invokeParams = {
                             text: character,
                             details: {},
-                            optionsContext: {index: optionsFull.profileCurrent},
+                            optionsContext: {index: this._resolveProfileIndex(optionsFull, profileIndex, action)},
                         };
                         result = await this._invoke(
                             'kanjiFind',
@@ -208,13 +209,14 @@ export class YomitanApi {
                     case 'ankiFields': {
                         /** @type {import('yomitan-api.js').ankiFieldsInput} */
                         // @ts-expect-error - Allow this to error
-                        const {text, type, markers, maxEntries, includeMedia} = parsedBody;
+                        const {text, type, markers, maxEntries, includeMedia, profileIndex} = parsedBody;
                         const includeAudioMedia = includeMedia && markers.includes('audio');
 
-                        const profileOptions = optionsFull.profiles[optionsFull.profileCurrent].options;
+                        const resolvedProfileIndex = this._resolveProfileIndex(optionsFull, profileIndex, action);
+                        const profileOptions = optionsFull.profiles[resolvedProfileIndex].options;
 
                         const ankiTemplate = await this._getAnkiTemplate(profileOptions);
-                        let dictionaryEntries = await this._getDictionaryEntries(text, type, optionsFull.profileCurrent);
+                        let dictionaryEntries = await this._getDictionaryEntries(text, type, resolvedProfileIndex);
                         if (maxEntries > 0) {
                             dictionaryEntries = dictionaryEntries.slice(0, maxEntries);
                         }
@@ -252,7 +254,7 @@ export class YomitanApi {
                     case 'tokenize': {
                         /** @type {import('yomitan-api.js').tokenizeInput} */
                         // @ts-expect-error - Allow this to error
-                        const {text, scanLength, parser} = parsedBody;
+                        const {text, scanLength, parser, profileIndex} = parsedBody;
                         if (typeof text !== 'string' && !Array.isArray(text)) {
                             throw new Error('Invalid input for tokenize, expected "text" to be a string or a string array but got ' + typeof text);
                         }
@@ -261,7 +263,7 @@ export class YomitanApi {
                         }
                         const invokeParams = {
                             text: text,
-                            optionsContext: {index: optionsFull.profileCurrent},
+                            optionsContext: {index: this._resolveProfileIndex(optionsFull, profileIndex, action)},
                             scanLength: scanLength,
                             useInternalParser: parser !== 'mecab',
                             useMecabParser: parser === 'mecab',
@@ -273,12 +275,7 @@ export class YomitanApi {
                     case 'ankiCardFormats': {
                         /** @type {import('yomitan-api.js').ankiCardFormatsInput} */
                         const {profileIndex} = parsedBody;
-                        const resolvedProfileIndex = typeof profileIndex === 'number' ? profileIndex : optionsFull.profileCurrent;
-                        const profile = optionsFull.profiles[resolvedProfileIndex];
-                        if (typeof profile === 'undefined') {
-                            throw new Error('Invalid input for ankiCardFormats, expected "profileIndex" to be a valid profile index but got ' + profileIndex);
-                        }
-                        const profileOptions = profile.options;
+                        const profileOptions = optionsFull.profiles[this._resolveProfileIndex(optionsFull, profileIndex, action)].options;
                         result = profileOptions.anki.cardFormats;
                         break;
                     }
@@ -292,6 +289,21 @@ export class YomitanApi {
                 this._port.postMessage({action, params, body, data: JSON.stringify(error), responseStatusCode: 500});
             }
         }
+    }
+
+    /**
+     * @param {import('settings').Options} optionsFull
+     * @param {unknown} profileIndex
+     * @param {string} action
+     * @returns {number}
+     * @throws {Error}
+     */
+    _resolveProfileIndex(optionsFull, profileIndex, action) {
+        const resolvedProfileIndex = typeof profileIndex === 'number' ? profileIndex : optionsFull.profileCurrent;
+        if (typeof optionsFull.profiles[resolvedProfileIndex] === 'undefined') {
+            throw new Error(`Invalid input for ${action}, expected "profileIndex" to be a valid profile index but got ${profileIndex}`);
+        }
+        return resolvedProfileIndex;
     }
 
     /**
