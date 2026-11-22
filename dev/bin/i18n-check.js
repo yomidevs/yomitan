@@ -2,13 +2,24 @@
 /*
  * Copyright (C) 2023-2026  Yomitan Authors
  *
- * Checks that non-default locale message files contain every English key.
- * Exit code 1 if any locale is missing keys (or has invalid JSON).
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {parseJson} from '../json.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const localesRoot = path.join(dirname, '..', '..', 'ext', '_locales');
@@ -17,14 +28,16 @@ const defaultLocale = 'en';
 /**
  * @param {string} filePath
  * @returns {Record<string, unknown>}
+ * @throws {Error}
  */
 function loadMessages(filePath) {
     const raw = fs.readFileSync(filePath, 'utf8');
-    const data = JSON.parse(raw);
+    /** @type {unknown} */
+    const data = parseJson(raw);
     if (data === null || typeof data !== 'object' || Array.isArray(data)) {
         throw new Error(`Expected object in ${filePath}`);
     }
-    return data;
+    return /** @type {Record<string, unknown>} */ (data);
 }
 
 /**
@@ -106,10 +119,7 @@ function check() {
                 return true;
             }
             // Technical / brand-like snippets that may include markup or punctuation
-            if (/iframe|shadow DOM|User agent:|Noto Sans|Meiryo/i.test(msg)) {
-                return true;
-            }
-            return false;
+            return /iframe|shadow DOM|User agent:|Noto Sans|Meiryo/i.test(msg);
         };
 
         let untranslated = 0;
@@ -179,7 +189,6 @@ if (typeof outputPath === 'string' && outputPath.length > 0) {
             return m ? `- **${m[1]}**: missing ${m[2]} key(s)` : null;
         })
         .filter(Boolean);
-    const summary = missingOnly.length > 0 ? `${missingOnly.join('\\n')}\\n` : '';
     fs.appendFileSync(outputPath, `ok=${ok}\n`, 'utf8');
     fs.appendFileSync(outputPath, `summary<<EOF\n${summaryMarkdown}\nEOF\n`, 'utf8');
     fs.appendFileSync(outputPath, `has_missing=${missingOnly.length > 0}\n`, 'utf8');

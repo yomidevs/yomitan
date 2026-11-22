@@ -11,7 +11,6 @@
         {"path": ".claude/settings.local.json", "ignore": true},
         {"path": ".github/actionlint-matcher.json", "ignore": true},
         {"path": "dev/jsconfig.json", "ignore": true},
-        {"path": "dev/i18n-ru-overrides.json", "ignore": true},
         {"path": "ext/manifest.json", "ignore": true},
         {"path": "ext/_locales/en/messages.json", "ignore": true},
         {"path": "ext/_locales/ru/messages.json", "ignore": true},

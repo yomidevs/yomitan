@@ -1,15 +1,26 @@
 #!/usr/bin/env node
-/**
- * Sync recommended-dictionaries.json descriptions into _locales/{en,ru}/messages.json
- * as rec_dict_desc_* keys so every dictionary blurb is translatable via chrome.i18n.
+/*
+ * Copyright (C) 2023-2026  Yomitan Authors
  *
- * Usage: node dev/bin/i18n-sync-recommended-dicts.js
- * Safe to re-run: keeps existing non-English translations when English source is unchanged.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
+import {parseJson} from '../json.js';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const dictPath = path.join(root, 'ext', 'data', 'recommended-dictionaries.json');
@@ -24,7 +35,10 @@ const mapPath = path.join(root, 'ext', 'data', 'recommended-dictionaries-i18n-ke
  * @returns {string}
  */
 export function recommendedDictDescriptionKey(name) {
-    const hash = createHash('sha1').update(name, 'utf8').digest('hex').slice(0, 8);
+    const hash = createHash('sha1')
+        .update(name, 'utf8')
+        .digest('hex')
+        .slice(0, 8);
     let base = name
         .normalize('NFKD')
         .replace(/[\u0300-\u036f]/g, '')
@@ -101,15 +115,24 @@ function autoRu(eng) {
 }
 
 /**
- * @param {Record<string, unknown>} obj
+ * @template T
+ * @param {Record<string, T>} obj
+ * @returns {Record<string, T>}
  */
 function sortObj(obj) {
     return Object.fromEntries(Object.keys(obj).sort().map((k) => [k, obj[k]]));
 }
 
-const dicts = JSON.parse(fs.readFileSync(dictPath, 'utf8'));
-const en = JSON.parse(fs.readFileSync(enPath, 'utf8'));
-const ru = JSON.parse(fs.readFileSync(ruPath, 'utf8'));
+/** @typedef {{message: string, description?: string, placeholders?: Record<string, unknown>}} LocaleMessageEntry */
+/** @typedef {Record<string, LocaleMessageEntry>} LocaleMessages */
+/** @typedef {Record<string, Record<string, {name: string, description: string}[]>>} RecommendedDictionariesData */
+
+/** @type {RecommendedDictionariesData} */
+const dicts = parseJson(fs.readFileSync(dictPath, 'utf8'));
+/** @type {LocaleMessages} */
+const en = parseJson(fs.readFileSync(enPath, 'utf8'));
+/** @type {LocaleMessages} */
+const ru = parseJson(fs.readFileSync(ruPath, 'utf8'));
 
 /** @type {Record<string, string>} */
 const nameToKey = {};
@@ -118,7 +141,7 @@ const keyToEn = new Map();
 
 for (const cats of Object.values(dicts)) {
     for (const list of Object.values(cats)) {
-        for (const item of /** @type {{name: string, description: string}[]} */ (list)) {
+        for (const item of list) {
             const key = recommendedDictDescriptionKey(item.name);
             nameToKey[item.name] = key;
             if (keyToEn.has(key) && keyToEn.get(key) !== item.description) {
