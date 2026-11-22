@@ -15,19 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-/** @type {?AudioContext} */
-let sharedAudioContext = null;
-
-/**
- * @returns {AudioContext}
- */
-function getSharedAudioContext() {
-    if (!sharedAudioContext || sharedAudioContext.state === 'closed') {
-        sharedAudioContext = new AudioContext();
-    }
-    return sharedAudioContext;
-}
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 
 export class WebAudioLocalAudio {
     /**
@@ -44,13 +32,16 @@ export class WebAudioLocalAudio {
         /** @type {number} */
         this._currentTime = 0;
         /** @type {AudioContext} */
-        this._audioContext = getSharedAudioContext();
+        this._audioContext = new AudioContext();
         /** @type {?AudioBufferSourceNode} */
         this._bufferSource = null;
         /** @type {?GainNode} */
         this._gainNode = null;
         /** @type {?AudioBuffer} */
         this._decodedBuffer = null;
+
+        /** @type {EventListenerCollection} */
+        this._bufferSourceEventListeners = new EventListenerCollection();
     }
 
     /** @type {number} */
@@ -86,10 +77,14 @@ export class WebAudioLocalAudio {
      */
     async play() {
         if (!this._decodedBuffer || !this._audioContext) { return; }
+        this._bufferSourceEventListeners.removeAllEventListeners();
+
         if (this._audioContext.state === 'suspended') {
             await this._audioContext.resume();
         }
-        this.pause();
+        if (this._audioContext.state === 'closed') {
+            this._audioContext = new AudioContext();
+        }
 
         this._bufferSource = this._audioContext.createBufferSource();
         this._bufferSource.buffer = this._decodedBuffer;
@@ -100,6 +95,10 @@ export class WebAudioLocalAudio {
         this._bufferSource.connect(this._gainNode);
         this._gainNode.connect(this._audioContext.destination);
         this._bufferSource.start(0, this._currentTime);
+
+        this._bufferSourceEventListeners.addEventListener(this._bufferSource, 'ended', () => {
+            void this._audioContext.close();
+        });
     }
 
     /**

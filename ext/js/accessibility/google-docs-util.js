@@ -20,6 +20,11 @@ import {computeZoomScale, isPointInAnyRect} from '../dom/document-util.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
 
 /**
+ * Matches characters of scripts which are written without spaces between words.
+ */
+const noSpaceScriptCharacterPattern = /[\p{Script_Extensions=Han}\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}\u3000-\u303f\uff00-\uffef]/u;
+
+/**
  * This class is a helper for handling Google Docs content in content scripts.
  */
 export class GoogleDocsUtil {
@@ -44,7 +49,7 @@ export class GoogleDocsUtil {
         if (element !== null && element.matches('.kix-canvas-tile-content svg>g>rect')) {
             const ariaLabel = element.getAttribute('aria-label');
             if (typeof ariaLabel === 'string' && ariaLabel.length > 0) {
-                return this._createRange(element, ariaLabel, x, y, normalizeCssZoom);
+                return this._createRange(element, x, y, normalizeCssZoom);
             }
         }
         return null;
@@ -74,14 +79,100 @@ export class GoogleDocsUtil {
     }
 
     /**
+     * Gets the text of the paragraph containing the given element.
+     *
+     * Google Docs renders each glyph cluster (typically a single character) as its own <rect>,
+     * so the text of the sibling <rect> elements must be combined in order to scan more than one character.
      * @param {Element} element
-     * @param {string} text
+     * @returns {{text: string, start: number, end: number}} The paragraph text, and the range of `element`'s text within it.
+     */
+    _getParagraphText(element) {
+        const {parentElement} = element;
+        const rects = parentElement !== null ? [...parentElement.children].filter((child) => child.matches('rect')) : [element];
+        let text = '';
+        let start = 0;
+        let end = 0;
+        /** @type {?Element} */
+        let previous = null;
+        for (const rect of rects) {
+            const label = rect.getAttribute('aria-label');
+            if (typeof label !== 'string' || label.length === 0) { continue; }
+            if (previous !== null) {
+                text += this._getSeparator(previous, rect, text, label);
+            }
+            if (rect === element) {
+                start = text.length;
+                end = start + label.length;
+            }
+            text += label;
+            previous = rect;
+        }
+        return {text, start, end};
+    }
+
+    /**
+     * Gets the whitespace which should be inserted between the text of two adjacent <rect> elements.
+     * Google Docs omits whitespace from the aria-label attributes at line wraps,
+     * and between words which are rendered as separate <rect> elements (e.g. right-to-left text).
+     * @param {Element} rect1
+     * @param {Element} rect2
+     * @param {string} text The text preceding `rect2`, ending with the text of `rect1`.
+     * @param {string} label The text of `rect2`.
+     * @returns {string}
+     */
+    _getSeparator(rect1, rect2, text, label) {
+        if (/\s$/.test(text) || /^\s/.test(label)) { return ''; }
+
+        if (rect1.getAttribute('transform') !== rect2.getAttribute('transform')) {
+            // Line wrap
+            const lastCharacter = /.$/su.exec(text)?.[0] ?? '';
+            const firstCharacter = /^./su.exec(label)?.[0] ?? '';
+            if (
+                noSpaceScriptCharacterPattern.test(lastCharacter) ||
+                noSpaceScriptCharacterPattern.test(firstCharacter) ||
+                /[-\u00ad\u2010]/.test(lastCharacter)
+            ) {
+                return '';
+            }
+            return ' ';
+        }
+
+        // Same line; the gap is measured in both directions to support right-to-left text
+        const bounds1 = this._getRectBounds(rect1);
+        const bounds2 = this._getRectBounds(rect2);
+        if (bounds1 === null || bounds2 === null) { return ''; }
+        const gap = Math.max(
+            bounds2.x - (bounds1.x + bounds1.width),
+            bounds1.x - (bounds2.x + bounds2.width),
+        );
+        if (gap > bounds1.height * 0.1 && !/^[\p{Pe}\p{Pf}\p{Po}]/u.test(label)) {
+            return ' ';
+        }
+        return '';
+    }
+
+    /**
+     * @param {Element} rect
+     * @returns {?{x: number, width: number, height: number}}
+     */
+    _getRectBounds(rect) {
+        const x = Number.parseFloat(rect.getAttribute('x') || '');
+        const width = Number.parseFloat(rect.getAttribute('width') || '');
+        const height = Number.parseFloat(rect.getAttribute('height') || '');
+        if (!Number.isFinite(x) || !Number.isFinite(width) || !Number.isFinite(height)) { return null; }
+        return {x, width, height};
+    }
+
+    /**
+     * @param {Element} element
      * @param {number} x
      * @param {number} y
      * @param {boolean} normalizeCssZoom
      * @returns {TextSourceRange}
      */
-    _createRange(element, text, x, y, normalizeCssZoom) {
+    _createRange(element, x, y, normalizeCssZoom) {
+        const {text, start, end} = this._getParagraphText(element);
+
         // Create imposter
         const content = document.createTextNode(text);
         const svgText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -99,19 +190,28 @@ export class GoogleDocsUtil {
         this._setImportantStyle(textStyle, 'transform', transform);
         this._setImportantStyle(textStyle, 'font', font);
         this._setImportantStyle(textStyle, 'text-anchor', 'start');
+        this._setImportantStyle(textStyle, 'white-space', 'pre');
         const {parentNode} = element;
         if (parentNode !== null) {
             parentNode.appendChild(svgText);
         }
 
-        // Adjust offset
+        // Adjust offset so that the element's text lines up with the element
         const elementRect = element.getBoundingClientRect();
-        const textRect = svgText.getBoundingClientRect();
-        const yOffset = ((elementRect.top - textRect.top) + (elementRect.bottom - textRect.bottom)) * 0.5;
-        this._setImportantStyle(textStyle, 'transform', `translate(0px,${yOffset}px) ${transform}`);
+        const elementTextRange = document.createRange();
+        elementTextRange.setStart(content, start);
+        elementTextRange.setEnd(content, end);
+        const textRect = elementTextRange.getBoundingClientRect();
+        const width = Number.parseFloat(element.getAttribute('width') || '');
+        const height = Number.parseFloat(element.getAttribute('height') || '');
+        const scaleX = width > 0 && elementRect.width > 0 ? elementRect.width / width : 1;
+        const scaleY = height > 0 && elementRect.height > 0 ? elementRect.height / height : 1;
+        const xOffset = (elementRect.left - textRect.left) / scaleX;
+        const yOffset = (((elementRect.top - textRect.top) + (elementRect.bottom - textRect.bottom)) * 0.5) / scaleY;
+        this._setImportantStyle(textStyle, 'transform', `translate(${xOffset}px,${yOffset}px) ${transform}`);
 
         // Create range
-        const range = this._getRangeWithPoint(content, x, y, normalizeCssZoom);
+        const range = this._getRangeWithPoint(content, x, y, start, end, normalizeCssZoom);
         this._setImportantStyle(textStyle, 'pointer-events', 'none');
         this._setImportantStyle(textStyle, 'opacity', '0');
         return TextSourceRange.createFromImposter(range, svgText, element);
@@ -121,18 +221,18 @@ export class GoogleDocsUtil {
      * @param {Text} textNode
      * @param {number} x
      * @param {number} y
+     * @param {number} start The start of the range of characters to search within.
+     * @param {number} end The end of the range of characters to search within.
      * @param {boolean} normalizeCssZoom
      * @returns {Range}
      */
-    _getRangeWithPoint(textNode, x, y, normalizeCssZoom) {
+    _getRangeWithPoint(textNode, x, y, start, end, normalizeCssZoom) {
         if (normalizeCssZoom) {
             const scale = computeZoomScale(textNode);
             x /= scale;
             y /= scale;
         }
         const range = document.createRange();
-        let start = 0;
-        let end = /** @type {string} */ (textNode.nodeValue).length;
         while (end - start > 1) {
             const mid = Math.floor((start + end) / 2);
             range.setStart(textNode, mid);

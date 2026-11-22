@@ -267,7 +267,7 @@ export class Translator {
         const ids = new Set();
         for (const {databaseEntries, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates} of deinflections) {
             if (databaseEntries.length === 0) { continue; }
-            originalTextLength = Math.max(originalTextLength, originalText.length);
+            originalTextLength = Math.max(originalTextLength, [...originalText].length);
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
                 if (ids.has(id)) {
@@ -278,11 +278,12 @@ export class Translator {
                     const {existingEntry, existingIndex} = existingEntryInfo;
 
                     const existingTransformedText = existingEntry.headwords[0].sources[0].transformedText;
-                    const existingTransformedLength = existingTransformedText.length;
-                    if (transformedText.length < existingTransformedLength) {
+                    const existingTransformedLength = [...existingTransformedText].length;
+                    const transformedTextLength = [...transformedText].length;
+                    if (transformedTextLength < existingTransformedLength) {
                         continue;
                     }
-                    if (transformedText.length > existingTransformedLength) {
+                    if (transformedTextLength > existingTransformedLength) {
                         if (originalText !== existingTransformedText) {
                             dictionaryEntries.splice(existingIndex, 1, this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator, primaryReading));
                         }

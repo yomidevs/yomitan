@@ -2166,7 +2166,7 @@
         "description": "Settings sidebar navigation item."
     },
     "settings_nav_translation": {
-        "message": "Перевод",
+        "message": "Поведение поиска",
         "description": "Settings sidebar navigation item."
     },
     "settings_nav_window": {
@@ -3100,7 +3100,7 @@
         "description": "Auto-extracted UI string (text) from ext/settings.html"
     },
     "ui_dictionary_search_resolution": {
-        "message": "Разрешение поиска по словарю",
+        "message": "Разрешение поиска",
         "description": "Auto-extracted UI string (text) from ext/settings.html"
     },
     "ui_dictionary_type": {

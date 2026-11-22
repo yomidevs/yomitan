@@ -387,7 +387,7 @@ export class AnkiController {
      * @param {import('settings').DictionariesOptions} dictionaries
      */
     async _setupFieldMenus(dictionaries) {
-        /** @type {[types: import('dictionary').DictionaryEntryType[], templateName: string][]} */
+        /** @type {[types: import('dictionary').DictionaryEntryType[], templateName: import('anki-controller').FieldMenuTarget][]} */
         const fieldMenuTargets = [
             [['term'], 'anki-card-term-field-menu'],
             [['kanji'], 'anki-card-kanji-field-menu'],
@@ -648,7 +648,7 @@ export class AnkiController {
             tabsContainer.removeChild(tabsContainer.firstChild);
         }
 
-        if (this._cardFormatIndex > ankiOptions.cardFormats.length) {
+        if (this._cardFormatIndex >= ankiOptions.cardFormats.length) {
             this._cardFormatIndex = ankiOptions.cardFormats.length - 1;
         }
         if (this._cardFormatIndex < 0) {
@@ -665,7 +665,18 @@ export class AnkiController {
 
         this._cardFormatDeleteButton.disabled = ankiOptions.cardFormats.length <= 1;
 
-        this._setCardFormatIndex(this._cardFormatIndex, 'anki-card-term-field-menu');
+        /** @type {import('anki-controller').FieldMenuTarget} */
+        let cardFieldMenuTarget = 'anki-card-all-field-menu';
+        switch (ankiOptions.cardFormats[this._cardFormatIndex].type) {
+            case 'term':
+                cardFieldMenuTarget = 'anki-card-term-field-menu';
+                break;
+            case 'kanji':
+                cardFieldMenuTarget = 'anki-card-kanji-field-menu';
+                break;
+        }
+
+        this._setCardFormatIndex(this._cardFormatIndex, cardFieldMenuTarget);
     }
 
     /**
@@ -776,6 +787,11 @@ export class AnkiController {
         const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const value = node.value;
         this._ankiCardPrimary.dataset.ankiCardMenu = `anki-card-${value}-field-menu`;
+        /** @type {HTMLInputElement?} */
+        const activeTab = this._ankiCardsTabs.children[this._cardFormatIndex].querySelector('[data-anki-card-menu]');
+        if (activeTab !== null) {
+            activeTab.dataset.ankiCardMenu = `anki-card-${value}-field-menu`;
+        }
     }
 
     /**

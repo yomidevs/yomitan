@@ -2166,7 +2166,7 @@
         "description": "Settings sidebar navigation item."
     },
     "settings_nav_translation": {
-        "message": "Translation",
+        "message": "Lookup Behaviour",
         "description": "Settings sidebar navigation item."
     },
     "settings_nav_window": {
@@ -3100,7 +3100,7 @@
         "description": "Auto-extracted UI string (text) from ext/settings.html"
     },
     "ui_dictionary_search_resolution": {
-        "message": "Dictionary search resolution",
+        "message": "Lookup resolution",
         "description": "Auto-extracted UI string (text) from ext/settings.html"
     },
     "ui_dictionary_type": {
