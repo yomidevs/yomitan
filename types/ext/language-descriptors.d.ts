@@ -203,6 +203,9 @@ type AllTextProcessors = {
         };
     };
     ka: Record<string, never>;
+    kk: {
+        pre: CapitalizationPreprocessors;
+    };
     ko: {
         pre: {
             disassembleHangul: TextProcessor;
