@@ -20,6 +20,7 @@ import fs from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe, expect, test, vi} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {OptionsUtil} from '../ext/js/data/options-util.js';
 import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
 import {chrome, fetch} from './mocks/common.js';
@@ -741,6 +742,18 @@ describe('OptionsUtil', () => {
         const optionsUpdated = structuredClone(await optionsUtil.update(options));
         const optionsExpected = createOptionsUpdatedTestData1();
         expect(optionsUpdated).toStrictEqual(optionsExpected);
+    });
+
+    test.each(['prevent', 'new', 'overwrite', 'new-and-overwrite'])('preserves duplicate behavior %s when importing settings', async (behavior) => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+        const options = optionsUtil.getDefault();
+        const originalFields = structuredClone(options.profiles[0].options.anki.cardFormats);
+        options.profiles[0].options.anki.duplicateBehavior = /** @type {import('settings').AnkiDuplicateBehavior} */ (behavior);
+        const imported = await optionsUtil.update(parseJson(JSON.stringify(options)));
+        expect(imported.profiles[0].options.anki.duplicateBehavior).toBe(behavior);
+        expect(imported.profiles[0].options.anki.cardFormats).toEqual(originalFields);
+        expect(optionsUtil.getDefault().profiles[0].options.anki.duplicateBehavior).toBe('new');
     });
 
     test('CumulativeFieldTemplatesUpdates', async () => {

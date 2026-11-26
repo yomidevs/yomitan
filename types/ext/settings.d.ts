@@ -440,7 +440,7 @@ export type AnkiScreenshotFormat = 'png' | 'jpeg';
 
 export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
 
-export type AnkiDuplicateBehavior = 'prevent' | 'overwrite' | 'new';
+export type AnkiDuplicateBehavior = 'prevent' | 'overwrite' | 'new' | 'new-and-overwrite';
 
 export type AnkiDisplayTagsAndFlags = 'never' | 'always' | 'non-standard' | 'custom';
 
