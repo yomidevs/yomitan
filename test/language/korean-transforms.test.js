@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {describe, expect, test} from 'vitest';
+import {koreanTransformDescriptions} from '../../ext/js/language/ko/korean-transform-descriptions.js';
 import {koreanTransforms} from '../../ext/js/language/ko/korean-transforms.js';
 import {LanguageTransformer} from '../../ext/js/language/language-transformer.js';
 import {Hangul} from '../../ext/lib/hangul-js.js';
@@ -739,10 +741,191 @@ const tests = [
         ],
     },
     {
+        category: 'ㄹ다 (ㄹ-drop)',
+        valid: true,
+        tests: [
+            {term: '알다', source: '아는데',     rule: 'v', reasons: ['-(으/느)ㄴ데']},
+            {term: '알다', source: '아는지',     rule: 'v', reasons: ['-(으/느)ㄴ지']},
+            {term: '알다', source: '아는가',     rule: 'v', reasons: ['-(으/느)ㄴ가']},
+            {term: '알다', source: '아느냐',     rule: 'v', reasons: ['-느냐']},
+            {term: '알다', source: '아는구나',     rule: 'v', reasons: ['-는구나']},
+            {term: '만들다', source: '만드느라고',     rule: 'v', reasons: ['-느라고']},
+            {term: '놀다', source: '노는군',     rule: 'v', reasons: ['-는군']},
+            {term: '길다', source: '긴뎁쇼',     rule: 'adj', reasons: ['-(으/느)ㄴ뎁쇼']},
+
+            // ㄹ is kept before endings starting with ㄹ or ㅁ
+            {term: '살다', source: '살면',     rule: 'v', reasons: ['-(으)면']},
+            {term: '살다', source: '살며',     rule: 'v', reasons: ['-(으)며']},
+            {term: '살다', source: '살러',     rule: 'v', reasons: ['-(으)러']},
+            {term: '살다', source: '살려고',     rule: 'v', reasons: ['-(으)려고']},
+            {term: '살다', source: '살라',     rule: 'v', reasons: ['-(으)라']},
+        ],
+    },
+    {
+        category: 'contractions and irregulars',
+        valid: true,
+        tests: [
+            {term: '보다', source: '봐',     rule: 'v', reasons: ['-아/어']},
+            {term: '보다', source: '봤다',     rule: 'v', reasons: ['-았/었', '-다']},
+            {term: '주다', source: '줘요',     rule: 'v', reasons: ['-아/어요']},
+            {term: '되다', source: '돼',     rule: 'v', reasons: ['-아/어']},
+            {term: '되다', source: '됐다',     rule: 'v', reasons: ['-았/었', '-다']},
+            {term: '보내다', source: '보내서',     rule: 'v', reasons: ['-아/어서']},
+            {term: '보내다', source: '보냈다',     rule: 'v', reasons: ['-았/었', '-다']},
+            {term: '켜다', source: '켜도',     rule: 'v', reasons: ['-아/어도']},
+            {term: '세다', source: '세요',     rule: 'v', reasons: ['-아/어요']},
+            {term: '놓다', source: '놔',     rule: 'v', reasons: ['-아/어']},
+            {term: '놓다', source: '놨다',     rule: 'v', reasons: ['-았/었', '-다']},
+            {term: '푸다', source: '퍼',     rule: 'v', reasons: ['-아/어']},
+            {term: '푸다', source: '펐다',     rule: 'v', reasons: ['-았/었', '-다']},
+            {term: '꺼멓다', source: '꺼메',     rule: 'adj', reasons: ['-아/어']},
+            {term: '그러다', source: '그래',     rule: 'v', reasons: ['-아/어']},
+            {term: '그러다', source: '그랬다',     rule: 'v', reasons: ['-았/었', '-다']},
+            {term: '그렇다', source: '그러네',     rule: 'adj', reasons: ['-네']},
+            {term: '듣다', source: '들으며',     rule: 'v', reasons: ['-(으)며']},
+            {term: '듣다', source: '들으람',     rule: 'v', reasons: ['-(으)람']},
+            {term: '이르다', source: '이르렀자',     rule: 'v', reasons: ['-았/었자']},
+        ],
+    },
+    {
+        category: 'pre-final endings',
+        valid: true,
+        tests: [
+            {term: '하다', source: '하셔',     rule: 'v', reasons: ['-(으)시', '-아/어']},
+            {term: '오다', source: '오셔서',     rule: 'v', reasons: ['-(으)시', '-아/어서']},
+            {term: '가다', source: '가셔도',     rule: 'v', reasons: ['-(으)시', '-아/어도']},
+            {term: '가다', source: '가시니',     rule: 'v', reasons: ['-(으)시', '-(으)니']},
+            {term: '하다', source: '하시지만',     rule: 'v', reasons: ['-(으)시', '-지만']},
+            {term: '알다', source: '아시다시피',     rule: 'v', reasons: ['-(으)시', '-다시피']},
+            {term: '하다', source: '하시기로',     rule: 'v', reasons: ['-(으)시', '-기로']},
+            {term: '하다', source: '하실 거예요',     rule: 'v', reasons: ['-(으)시', '-(으)ㄹ 거예요']},
+            {term: '하다', source: '하신답시고',     rule: 'v', reasons: ['-(으)시', '-((느)ㄴ)답시고']},
+            {term: '먹다', source: '먹었니',     rule: 'v', reasons: ['-았/었', '-(으)니']},
+            {term: '하다', source: '하겠니',     rule: 'v', reasons: ['-겠', '-(으)니']},
+            {term: '먹다', source: '먹었을 거야',     rule: 'v', reasons: ['-았/었', '-(으)ㄹ 거야']},
+            {term: '먹다', source: '먹었느니라',     rule: 'v', reasons: ['-았/었', '-(으/느)니라']},
+            {term: '하다', source: '하더래요',     rule: 'v', reasons: ['-더', '-(으)래요']},
+            {term: '좋다', source: '좋다손',     rule: 'adj', reasons: ['-((느)ㄴ)다손']},
+            {term: '좋다', source: '좋으랴',     rule: 'adj', reasons: ['-(으)랴']},
+        ],
+    },
+    {
+        category: 'chained and contracted endings',
+        valid: true,
+        tests: [
+            {term: '춥다', source: '추워졌다',     rule: 'adj', reasons: ['-아/어지다', '-았/었', '-다']},
+            {term: '깨끗하다', source: '깨끗해졌다',     rule: 'adj', reasons: ['-아/어지다', '-았/었', '-다']},
+            {term: '보내다', source: '보내진',     rule: 'v', reasons: ['-아/어지다', '-(으)ㄴ']},
+            {term: '가다', source: '가잖아',     rule: 'v', reasons: ['-잖', '-아/어']},
+            {term: '하다', source: '했잖아요',     rule: 'v', reasons: ['-았/었', '-잖', '-아/어요']},
+            {term: '이다', source: '이잖아',     rule: 'ida', reasons: ['-잖', '-아/어']},
+            {term: '하다', source: '하긴',     rule: 'v', reasons: ['-긴']},
+            {term: '하다', source: '하길',     rule: 'v', reasons: ['-길']},
+            {term: '하다', source: '하질',     rule: 'v', reasons: ['-질']},
+            {term: '하다', source: '해선',     rule: 'v', reasons: ['-아/어선']},
+            {term: '가다', source: '가선',     rule: 'v', reasons: ['-아/어선']},
+        ],
+    },
+    {
+        category: '있다, 없다, 이다, 아니다',
+        valid: true,
+        tests: [
+            {term: '맛있다', source: '맛있는',        rule: 'adj', reasons: ['-는']},
+            {term: '재미없다', source: '재미없는데',        rule: 'adj', reasons: ['-(으/느)ㄴ데']},
+            {term: '있다', source: '있는가',        rule: 'adj', reasons: ['-(으/느)ㄴ가']},
+            {term: '없다', source: '없는지',        rule: 'adj', reasons: ['-(으/느)ㄴ지']},
+            {term: '있다', source: '있고자',        rule: 'adj', reasons: ['-고자']},
+            {term: '맛있다', source: '맛있는대요',        rule: 'adj', reasons: ['-((느)ㄴ)대요']},
+            {term: '이다', source: '이라서',        rule: 'ida', reasons: ['-라서']},
+            {term: '아니다', source: '아니라서',        rule: 'adj', reasons: ['-라서']},
+            {term: '아니다', source: '아니라고',        rule: 'adj', reasons: ['-(으)라고']},
+            {term: '이다', source: '이야',        rule: 'ida', reasons: ['-야']},
+            {term: '아니다', source: '아니야',        rule: 'adj', reasons: ['-야']},
+            {term: '이다', source: '이에요',        rule: 'ida', reasons: ['-아/어요']},
+            {term: '아니다', source: '아니에요',        rule: 'adj', reasons: ['-아/어요']},
+            {term: '이다', source: '이언정',        rule: 'ida', reasons: ['-언정']},
+            {term: '아니다', source: '아니올시다',        rule: 'adj', reasons: ['-올시다']},
+        ],
+    },
+    {
+        category: 'irregular stems with generated rules',
+        valid: true,
+        tests: [
+            {term: '돕다', source: '도우되',        rule: 'v', reasons: ['-(으)되']},
+            {term: '짓다', source: '지으되',        rule: 'v', reasons: ['-(으)되']},
+            {term: '듣다', source: '들으되',        rule: 'v', reasons: ['-(으)되']},
+            {term: '고맙다', source: '고마우이',        rule: 'adj', reasons: ['-(으)이']},
+            {term: '만들다', source: '만드세나',        rule: 'v', reasons: ['-세나']},
+            {term: '하다', source: '하시었자',        rule: 'v', reasons: ['-(으)시', '-았/었자']},
+            {term: '살다', source: '삶',        rule: 'v', reasons: ['-(으)ㅁ']},
+        ],
+    },
+    {
+        category: 'contracted particles',
+        valid: true,
+        tests: [
+            {term: '나', source: '난',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '나', source: '날',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '저', source: '전',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '너', source: '널',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '뭐', source: '뭘',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '거', source: '건',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '거', source: '걸',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '이거', source: '이건',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '그거', source: '그걸',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '우리', source: '우린',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '누구', source: '누굴',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '어디', source: '어딜',        rule: 'pn', reasons: ['ㄹ']},
+            {term: '여기', source: '여긴',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '에서', source: '에선',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '에게', source: '에겐',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '보다', source: '보단',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '까지', source: '까진',        rule: 'pn', reasons: ['ㄴ']},
+            {term: '이야기', source: '이야긴',        rule: 'n', reasons: ['ㄴ']},
+            {term: '아버지', source: '아버진',        rule: 'n', reasons: ['ㄴ']},
+            {term: '비행기', source: '비행길',        rule: 'n', reasons: ['ㄹ']},
+            {term: '대학교', source: '대학굘',        rule: 'n', reasons: ['ㄹ']},
+            {term: '전시회', source: '전시횐',        rule: 'n', reasons: ['ㄴ']},
+            {term: '전시회', source: '전시횔',        rule: 'n', reasons: ['ㄹ']},
+            {term: '하다', source: '하진',        rule: 'v', reasons: ['-진']},
+            {term: '먹다', source: '먹진',        rule: 'v', reasons: ['-진']},
+            {term: '하다', source: '했진',        rule: 'v', reasons: ['-았/었', '-진']},
+        ],
+    },
+    {
         category: 'invalid deinflections',
         valid: false,
         tests: [
             {term: '보다', source: '보십시다',     rule: 'v', reasons: ['-(으)시', '-(으)ㅂ시다']},
+
+            // nouns and particles that must not be read as contracted verb forms
+            {term: '날다', source: '나라',     rule: 'v', reasons: ['-아/어']},
+            {term: '익다', source: '이거',     rule: 'v', reasons: ['-아/어']},
+            {term: '그리다', source: '그래',     rule: 'v', reasons: ['-아/어']},
+            {term: '지다', source: '지도',     rule: 'v', reasons: ['-아/어도']},
+            {term: '속다', source: '속도',     rule: 'v', reasons: ['-아/어도']},
+            {term: '여기다', source: '여기서',     rule: 'v', reasons: ['-아/어서']},
+            {term: '이다', source: '있다',     rule: 'v', reasons: ['-았/었', '-다']},
+            {term: '차다', source: '차의',     rule: 'adj', reasons: ['-(으)이']},
+
+            // ㄹ does not drop before endings starting with ㄹ or ㅁ
+            {term: '갈다', source: '가면',     rule: 'v', reasons: ['-(으)면']},
+            {term: '살다', source: '사러',     rule: 'v', reasons: ['-(으)러']},
+            {term: '살다', source: '사려고',     rule: 'v', reasons: ['-(으)려고']},
+            {term: '갈다', source: '가라',     rule: 'v', reasons: ['-(으)라']},
+
+            // contracted particles: nouns shorter than three syllables, and no chaining into verbs
+            {term: '시가', source: '시간',     rule: 'n', reasons: ['ㄴ']},
+            {term: '사시', source: '사실',     rule: 'n', reasons: ['ㄹ']},
+            {term: '친구', source: '친군',     rule: 'n', reasons: ['ㄴ']},
+            {term: '나', source: '난',     rule: 'n', reasons: ['ㄴ']},
+            {term: '나', source: '난',     rule: 'v', reasons: ['ㄴ']},
+            {term: '나다', source: '난',     rule: 'v', reasons: ['어간', 'ㄴ']},
+            {term: '사람', source: '사람ㄴ',     rule: 'pn', reasons: ['ㄴ']},
+
+            // 있다/없다/아니다 rules only produce adjectives
+            {term: '맛있다', source: '맛있는가',     rule: 'ida', reasons: ['-(으/느)ㄴ가']},
+            {term: '아니다', source: '아니라서',     rule: 'v', reasons: ['-라서']},
 
             // ida
             {term: '이다', source: '이서',     rule: 'ida', reasons: ['아/어서']},
@@ -769,3 +952,15 @@ function disassemble(str) {
 const languageTransformer = new LanguageTransformer();
 languageTransformer.addDescriptor(koreanTransforms);
 testLanguageTransformer(languageTransformer, tests, disassemble);
+
+describe('descriptions', () => {
+    test('every description belongs to a transform', () => {
+        const unknownNames = Object.keys(koreanTransformDescriptions).filter((name) => !Object.hasOwn(koreanTransforms.transforms, name));
+        expect(unknownNames).toStrictEqual([]);
+    });
+
+    test('senses are numbered when there are several', () => {
+        expect(koreanTransforms.transforms['-거라'].description).toStrictEqual(koreanTransformDescriptions['-거라'][0]);
+        expect(koreanTransforms.transforms['-(으)면'].description).toMatch(/^1\. .+\n2\. .+/);
+    });
+});
