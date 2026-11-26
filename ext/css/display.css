@@ -685,6 +685,101 @@ button.sidebar-button.sidebar-button-highlight {
     display: none;
 }
 
+.bunpro-actions-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+.bunpro-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    color: var(--text-color);
+    line-height: 1;
+}
+.bunpro-control[data-reserved=true] {
+    visibility: hidden;
+}
+button.bunpro-status,
+button.bunpro-added,
+button.bunpro-open {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2em;
+    border: 0;
+    margin: 0;
+    padding: var(--action-button-padding);
+    box-sizing: border-box;
+    height: calc(var(--action-button-size) + var(--action-button-padding) * 2);
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-color);
+    font: inherit;
+    font-size: inherit;
+    text-decoration: none;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+button.bunpro-status:hover,
+button.bunpro-status:focus-visible,
+button.bunpro-added:hover,
+button.bunpro-added:focus-visible,
+button.bunpro-open:hover,
+button.bunpro-open:focus-visible {
+    background-color: var(--action-button-hover-color);
+}
+button.bunpro-status:disabled,
+button.bunpro-added:disabled {
+    cursor: default;
+    opacity: 1;
+    color: var(--text-color);
+    background: transparent;
+}
+button.bunpro-status[hidden],
+button.bunpro-added[hidden] {
+    display: none;
+}
+.bunpro-status svg,
+.bunpro-added svg,
+.bunpro-mark {
+    display: block;
+    width: 12px;
+    height: 12px;
+    flex: none;
+}
+.bunpro-mark {
+    width: 13px;
+}
+.bunpro-button-level {
+    color: var(--text-color);
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    text-decoration: none;
+}
+/* Cloze = Anki highlight green; sentences = soft orange. */
+.bunpro-control[data-study-mode=cloze],
+.bunpro-control[data-study-mode=cloze] button.bunpro-status,
+.bunpro-control[data-study-mode=cloze] button.bunpro-added,
+.bunpro-control[data-study-mode=cloze] button.bunpro-status:disabled,
+.bunpro-control[data-study-mode=cloze] button.bunpro-added:disabled,
+.bunpro-control[data-study-mode=cloze] .bunpro-mark,
+.bunpro-control[data-study-mode=cloze] .bunpro-button-level {
+    color: #a5db9b;
+}
+.bunpro-control[data-study-mode=sentences],
+.bunpro-control[data-study-mode=sentences] button.bunpro-status,
+.bunpro-control[data-study-mode=sentences] button.bunpro-added,
+.bunpro-control[data-study-mode=sentences] button.bunpro-status:disabled,
+.bunpro-control[data-study-mode=sentences] button.bunpro-added:disabled,
+.bunpro-control[data-study-mode=sentences] .bunpro-mark,
+.bunpro-control[data-study-mode=sentences] .bunpro-button-level {
+    color: #ddac73;
+}
+
 button.action-button {
     cursor: pointer;
     display: block;
@@ -2052,6 +2147,9 @@ button.footer-notification-close-button {
 }
 :root[data-anki-enabled=false] .action-button[data-action=view-note],
 :root[data-anki-enabled=false] .action-button[data-action=save-note] {
+    display: none;
+}
+:root[data-bunpro-enabled=false] .bunpro-actions-container {
     display: none;
 }
 

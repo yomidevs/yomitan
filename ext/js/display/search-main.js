@@ -24,6 +24,7 @@ import {SettingsController} from '../pages/settings/settings-controller.js';
 import {SettingsDisplayController} from '../pages/settings/settings-display-controller.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
+import {DisplayBunpro} from './display-bunpro.js';
 import {Display} from './display.js';
 import {SearchActionPopupController} from './search-action-popup-controller.js';
 import {SearchDisplayController} from './search-display-controller.js';
@@ -50,6 +51,9 @@ await Application.main(true, async (application) => {
 
     const displayAnki = new DisplayAnki(display, displayAudio);
     displayAnki.prepare();
+
+    const displayBunpro = new DisplayBunpro(display);
+    displayBunpro.prepare();
 
     const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
     await searchDisplayController.prepare();

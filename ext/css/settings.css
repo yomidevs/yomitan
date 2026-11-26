@@ -613,6 +613,21 @@ a.heading-link-light {
 .settings-item-description {
     color: var(--text-color-light2);
 }
+.settings-item-description.danger-text {
+    color: var(--danger-color);
+}
+.settings-item-description.success-text {
+    color: var(--success-color);
+}
+.settings-item-description .bunpro-study-mode-cloze {
+    color: #a5db9b;
+}
+.settings-item-description .bunpro-study-mode-sentences {
+    color: #ddac73;
+}
+.settings-item-description .bunpro-study-mode-translation {
+    color: var(--text-color);
+}
 .settings-item-right.open-panel-button-container {
     padding: 0.25em 1em 0.25em 0.75em;
     max-height: calc(var(--settings-group-right-max-height) + var(--settings-group-inner-vertical-padding) * 2);
@@ -741,6 +756,9 @@ select.short-height {
     display: none;
     font-weight: bold;
     color: #8b0000;
+}
+.bunpro-sequenced-dictionary-warning-text {
+    color: var(--warning-color);
 }
 
 /* Hide progress report until import begins */
@@ -1848,6 +1866,115 @@ code.anki-field-marker {
     resize: none;
     min-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
 }
+#bunpro-token-settings {
+    /* 32-character Bunpro API key plus space before Show/Hide. */
+    --bunpro-token-input-chars: 32;
+    --bunpro-token-input-preferred-width: calc(var(--bunpro-token-input-chars) * 1ch + 1.35em);
+    container-type: inline-size;
+    container-name: bunpro-token;
+    max-width: 100%;
+}
+/* Desktop: one row. Label left, static-width field + Save snug and right-aligned. */
+#bunpro-token-settings>.settings-item-inner {
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+#bunpro-token-settings>.settings-item-inner>.settings-item-left {
+    flex: 1 1 auto;
+    align-self: center;
+    min-width: max-content;
+}
+#bunpro-token-settings>.settings-item-inner>.settings-item-left>.settings-item-label {
+    white-space: nowrap;
+}
+/*
+ * The field may shrink so browsers without container queries (Chromium < 105) keep one
+ * narrower row instead of clipping. Wherever the query applies, the row stacks before it shrinks.
+ */
+#bunpro-token-settings>.settings-item-inner>.settings-item-right {
+    flex: 0 1 auto;
+    align-self: center;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+}
+#bunpro-token-settings .flex-row-nowrap {
+    flex-wrap: nowrap;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    margin-left: 0;
+}
+#bunpro-token-settings .input-group {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+}
+#bunpro-token-input {
+    flex: 0 1 auto;
+    width: var(--bunpro-token-input-preferred-width);
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding-right: 0.85em;
+    overflow-x: auto;
+    font-variant-ligatures: none;
+    font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+}
+/*
+ * Stack only once the row is narrower than label + static field + Show + Save.
+ * Threshold is the measured collision width of that desktop row (see layout check).
+ */
+@container bunpro-token (max-width: 579px) {
+    #bunpro-token-settings>.settings-item-inner {
+        flex-wrap: wrap;
+        align-items: stretch;
+    }
+    #bunpro-token-settings>.settings-item-inner>.settings-item-left {
+        flex: 1 1 100%;
+        min-width: 0;
+        padding-bottom: 0.35em;
+    }
+    #bunpro-token-settings>.settings-item-inner>.settings-item-right {
+        flex: 1 1 100%;
+        width: 100%;
+        max-width: 100%;
+        max-height: none;
+        padding-top: 0.35em;
+    }
+    #bunpro-token-settings .flex-row-nowrap {
+        width: 100%;
+    }
+    #bunpro-token-settings .input-group {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    #bunpro-token-input {
+        flex: 1 1 auto;
+        width: auto;
+        max-width: none;
+        min-width: 0;
+    }
+}
+#bunpro-toggle-token-visibility {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    /* Keep the group width stable when the label flips between Show and Hide. */
+    min-width: 4.25em;
+    justify-content: center;
+    padding-left: 0.75em;
+    padding-right: 0.75em;
+}
+#bunpro-save-token,
+#bunpro-clear-token {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+#bunpro-token-settings>.settings-item-children:has(>#bunpro-token-error[hidden]) {
+    display: none;
+}
+
 #generate-anki-notes-test-text-input {
     width: 100%;
 }

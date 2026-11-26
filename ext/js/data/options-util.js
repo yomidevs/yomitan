@@ -589,6 +589,8 @@ export class OptionsUtil {
             this._updateVersion75,
             this._updateVersion76,
             this._updateVersion77,
+            this._updateVersion78,
+            this._updateVersion79,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1858,6 +1860,33 @@ export class OptionsUtil {
      */
     async _updateVersion77(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v77.handlebars');
+    }
+
+    /**
+     * - Added bunpro.enable.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion78(options) {
+        for (const profile of options.profiles) {
+            profile.options.bunpro = {enable: false};
+        }
+    }
+
+    /**
+     * - Added bunpro.colorStudyModes.
+     * @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion79(options) {
+        for (const profile of options.profiles) {
+            const bunpro = profile.options.bunpro;
+            if (typeof bunpro !== 'object' || bunpro === null) {
+                profile.options.bunpro = {enable: false, colorStudyModes: false};
+                continue;
+            }
+            if (typeof bunpro.colorStudyModes !== 'boolean') {
+                bunpro.colorStudyModes = false;
+            }
+        }
     }
 
     /**

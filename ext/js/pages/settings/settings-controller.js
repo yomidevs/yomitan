@@ -314,7 +314,9 @@ export class SettingsController extends EventDispatcher {
             this._modifyOptionsScope(target2);
             return target2;
         });
-        return await this._application.api.modifySettings(targets2, this._source);
+        const results = await this._application.api.modifySettings(targets2, this._source);
+        this.trigger('settingsModified', {paths: targets2.flatMap(modificationPaths)});
+        return results;
     }
 
     /**
@@ -361,4 +363,13 @@ export class SettingsController extends EventDispatcher {
     _canObservePermissionsChanges() {
         return isObjectNotArray(chrome.permissions) && isObjectNotArray(chrome.permissions.onAdded) && isObjectNotArray(chrome.permissions.onRemoved);
     }
+}
+
+/**
+ * @param {import('settings-modifications').ScopedModification} modification
+ * @returns {string[]}
+ */
+function modificationPaths(modification) {
+    if (modification.action === 'swap') { return [modification.path1, modification.path2]; }
+    return [modification.path];
 }

@@ -250,6 +250,7 @@ body {
 .icon[data-icon=translation]             { --icon-image: url(/images/translation.svg); }
 .icon[data-icon=book]                    { --icon-image: url(/images/book.svg); }
 .icon[data-icon=note-card]               { --icon-image: url(/images/note-card.svg); }
+.icon[data-icon=bunpro]                  { --icon-image: url(/images/bunpro.svg); }
 .icon[data-icon=keyboard]                { --icon-image: url(/images/keyboard.svg); }
 .icon[data-icon=backup]                  { --icon-image: url(/images/backup.svg); }
 .icon[data-icon=lock]                    { --icon-image: url(/images/lock.svg); }

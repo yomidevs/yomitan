@@ -17,6 +17,10 @@
 
 import type * as Dictionary from './dictionary';
 
+export type PrimaryHeadword =
+    | {type: 'term', term: string, reading: string}
+    | {type: 'kanji', character: string};
+
 export type FrequencyData = {
     frequency: number;
     displayValue: string | null;
