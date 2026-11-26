@@ -33,6 +33,7 @@ import {removeDoubleAcuteAccents} from './el/modern-greek-processors.js';
 import {modernGreekTransforms} from './el/modern-greek-transforms.js';
 import {englishTransforms} from './en/english-transforms.js';
 import {esperantoTransforms} from './eo/esperanto-transforms.js';
+import {indonesianTransforms} from './id/indonesian-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
 import {basqueTransforms} from './eu/basque-transforms.js';
 import {apostropheVariants} from './fr/french-text-preprocessors.js';
@@ -321,6 +322,7 @@ const languageDescriptors = [
             ...capitalizationPreprocessors,
             removeAlphabeticDiacritics,
         },
+        languageTransforms: indonesianTransforms,
     },
     {
         iso: 'it',
