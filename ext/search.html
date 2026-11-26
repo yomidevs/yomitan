@@ -29,7 +29,7 @@
                 <div class="search-header-wrapper">
                     <div class="search-header">
                         <div id="intro">
-                            <h1>Yomitan Search</h1>
+                            <h1 data-i18n="ui_yomitan_search">Yomitan Search</h1>
                         </div>
 
                         <div class="scan-disable">
@@ -41,7 +41,7 @@
                                 </div>
                                 <label class="search-option" id="search-option-clipboard-monitor-container">
                                     <label class="toggle"><input type="checkbox" id="clipboard-monitor-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                                    <span class="search-option-label">Clipboard monitor</span>
+                                    <span data-i18n="ui_clipboard_monitor" class="search-option-label">Clipboard monitor</span>
                                 </label>
                                 <div class="search-options-right">
                                     <div class="search-option" id="search-settings-button" data-modal-action="show,search-settings"><span class="icon" data-icon="cog"></span></div>
@@ -73,14 +73,14 @@
 
                     <div id="no-results" hidden>
                         <div class="entry">
-                            <p>No results found.</p>
+                            <p data-i18n="ui_no_results_found">No results found.</p>
                         </div>
                     </div>
 
                     <div id="no-dictionaries" hidden>
                         <div class="entry">
-                            <p>No dictionaries have been installed or enabled yet.</p>
-                            <p><a href="/settings.html#dictionaries" target="_blank">Go to Dictionaries settings.</a></p>
+                            <p data-i18n="ui_no_dictionaries_have_been_installed_or_enabled_y">No dictionaries have been installed or enabled yet.</p>
+                            <p><a data-i18n="ui_go_to_dictionaries_settings" href="/settings.html#dictionaries" target="_blank">Go to Dictionaries settings.</a></p>
                         </div>
                     </div>
                 </div>
@@ -96,12 +96,12 @@
 <!-- Search settings modal -->
 <div id="search-settings-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
     <div class="modal-header">
-        <div class="modal-title">Search Settings</div>
+        <div data-i18n="ui_search_settings" class="modal-title">Search Settings</div>
     </div>
     <div class="modal-body">
         <div class="settings-item" id="query-parser-mode-container" hidden><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">
+                <div data-i18n="ui_parser" class="settings-item-label">
                     Parser
                 </div>
             </div>
@@ -112,7 +112,7 @@
 
         <div class="settings-item" id="search-option-wanakana"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">
+                <div data-i18n="ui_automatic_kana_conversion" class="settings-item-label">
                     Automatic kana conversion
                 </div>
             </div>
@@ -124,10 +124,10 @@
 
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">
+                <div data-i18n="ui_sticky_search_header" class="settings-item-label">
                     Sticky search header
                 </div>
-                <div class="settings-item-description">
+                <div data-i18n="ui_search_header_stays_on_the_page_when_scrolling_d" class="settings-item-description">
                     Search header stays on the page when scrolling down.
                 </div>
             </div>
@@ -137,7 +137,7 @@
         </div></div>
     </div>
     <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
+        <button data-i18n="ui_close" type="button" data-modal-action="hide">Close</button>
     </div>
 </div></div>
 

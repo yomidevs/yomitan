@@ -119,7 +119,7 @@ export class OptionToggleHotkeyHandler {
         n1.textContent = path;
         const n2 = document.createElement('strong');
         n2.textContent = `${value}`;
-        fragment.appendChild(document.createTextNode('Option '));
+        fragment.appendChild(document.createTextNode((typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_optionPrefix')) || 'Option '));
         fragment.appendChild(n1);
         fragment.appendChild(document.createTextNode(' changed to '));
         fragment.appendChild(n2);
@@ -139,7 +139,7 @@ export class OptionToggleHotkeyHandler {
         const n2 = document.createElement('div');
         n2.textContent = message;
         n2.className = 'danger-text';
-        fragment.appendChild(document.createTextNode('Failed to toggle option '));
+        fragment.appendChild(document.createTextNode((typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_failedToggleOption')) || 'Failed to toggle option '));
         fragment.appendChild(n1);
         fragment.appendChild(document.createTextNode(': '));
         fragment.appendChild(n2);

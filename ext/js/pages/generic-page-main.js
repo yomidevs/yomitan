@@ -19,10 +19,13 @@
 import {ThemeController} from '../app/theme-controller.js';
 import {Application} from '../application.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {applyI18nToDocument} from '../language/i18n-util.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
 import {SettingsController} from './settings/settings-controller.js';
 
 await Application.main(true, async (application) => {
+    applyI18nToDocument();
+
     const settingsController = new SettingsController(application);
     await settingsController.prepare();
     /** @type {ThemeController} */

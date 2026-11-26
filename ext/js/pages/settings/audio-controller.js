@@ -407,7 +407,7 @@ class AudioSourceEntry {
 
         let option = document.createElement('option');
         option.value = '';
-        option.textContent = 'None';
+        option.textContent = (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_none')) || 'None';
         fragment.appendChild(option);
 
         for (const {voice} of voices) {

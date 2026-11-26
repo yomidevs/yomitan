@@ -111,7 +111,7 @@ export class StructuredContentGenerator {
         imageContainer.appendChild(overlay);
 
         const linkText = this._createElement('span', 'gloss-image-link-text');
-        linkText.textContent = 'Image';
+        linkText.textContent = (typeof chrome !== 'undefined' && chrome.i18n?.getMessage?.('js_image')) || 'Image';
         node.appendChild(linkText);
 
         if (this._contentManager instanceof DisplayContentManager) {

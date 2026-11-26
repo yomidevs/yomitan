@@ -41,20 +41,20 @@
 
                     <div id="no-results" hidden>
                         <div class="entry">
-                            <p>No results found.</p>
+                            <p data-i18n="ui_no_results_found">No results found.</p>
                         </div>
                     </div>
 
                     <div id="no-dictionaries" hidden>
                         <div class="entry">
-                            <p>No dictionaries have been installed or enabled yet.</p>
-                            <p><a href="/settings.html#dictionaries" target="_top">Go to Dictionaries settings.</a></p>
+                            <p data-i18n="ui_no_dictionaries_have_been_installed_or_enabled_y">No dictionaries have been installed or enabled yet.</p>
+                            <p><a data-i18n="ui_go_to_dictionaries_settings" href="/settings.html#dictionaries" target="_top">Go to Dictionaries settings.</a></p>
                         </div>
                     </div>
                     <div id="error-extension-unloaded" hidden>
                         <div class="entry">
-                            <h1>Yomitan Updated!</h1>
-                            <p>
+                            <h1 data-i18n="ui_yomitan_updated">Yomitan Updated!</h1>
+                            <p data-i18n="ui_the_yomitan_extension_has_been_updated_to_a_new_">
                                 The Yomitan extension has been updated to a new version! In order to continue
                                 viewing definitions on this page, you must reload this tab or restart your browser.
                             </p>
@@ -68,7 +68,7 @@
         <div class="overlay-panel-container">
             <div class="overlay-panel scrollbar" id="profile-panel" hidden>
                 <div class="overlay-panel-inner">
-                    <h3>Default Profile</h3>
+                    <h3 data-i18n="ui_default_profile">Default Profile</h3>
                     <div class="profile-list" id="profile-list"></div>
                 </div>
             </div>
@@ -77,11 +77,11 @@
     <div class="content-sidebar scrollbar" id="content-sidebar">
         <div class="content-sidebar-inner">
             <div class="content-sidebar-top-pre">
-                <button type="button" class="sidebar-button danger" id="close-button" title="Close popup" data-hotkey='["close","title","Close popup ({0})"]'><span class="sidebar-button-icon icon" data-icon="cross"></span></button>
+                <button type="button" class="sidebar-button danger" id="close-button" title="Close popup" data-hotkey="[&quot;close&quot;,&quot;title&quot;,&quot;Close popup ({0})&quot;]"><span class="sidebar-button-icon icon" data-icon="cross"></span></button>
             </div>
             <div class="content-sidebar-top">
-                <button type="button" class="sidebar-button" disabled id="navigate-previous-button" title="Previous definition" data-hotkey='["historyBackward","title","Previous definition ({0})"]'><span class="sidebar-button-icon icon" data-icon="left-chevron"></span></button>
-                <button type="button" class="sidebar-button" disabled id="navigate-next-button" title="Next definition" data-hotkey='["historyForward","title","Next definition ({0})"]'><span class="sidebar-button-icon icon" data-icon="right-chevron"></span></button>
+                <button type="button" class="sidebar-button" disabled id="navigate-previous-button" title="Previous definition" data-hotkey="[&quot;historyBackward&quot;,&quot;title&quot;,&quot;Previous definition ({0})&quot;]"><span class="sidebar-button-icon icon" data-icon="left-chevron"></span></button>
+                <button type="button" class="sidebar-button" disabled id="navigate-next-button" title="Next definition" data-hotkey="[&quot;historyForward&quot;,&quot;title&quot;,&quot;Next definition ({0})&quot;]"><span class="sidebar-button-icon icon" data-icon="right-chevron"></span></button>
             </div>
             <div class="content-sidebar-bottom">
                 <p id="profile-name"></p>
@@ -94,7 +94,7 @@
 <div class="frame-resizer-container">
     <div class="frame-resizer-sizer1"><div class="frame-resizer-sizer2 frame-resizer-sizer2-with-min-size scrollbar"></div></div>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" preserveAspectRatio="none" class="frame-resizer-svg" focusable="false">
-        <path d="M1 0L1 1L0 1Z" class="frame-resizer-handle" id="frame-resizer-handle"/>
+        <path d="M1 0L1 1L0 1Z" class="frame-resizer-handle" id="frame-resizer-handle" />
     </svg>
 </div>
 
