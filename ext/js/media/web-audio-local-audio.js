@@ -80,7 +80,8 @@ export class WebAudioLocalAudio {
         this._bufferSourceEventListeners.removeAllEventListeners();
 
         if (this._audioContext.state === 'suspended') {
-            await this._audioContext.resume();
+            void this._audioContext.close();
+            this._audioContext = new AudioContext();
         }
         if (this._audioContext.state === 'closed') {
             this._audioContext = new AudioContext();
