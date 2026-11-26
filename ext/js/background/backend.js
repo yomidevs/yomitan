@@ -3006,7 +3006,8 @@ export class Backend {
         try {
             if (await navigator.storage.persisted()) { return; }
 
-            const {vendor, version} = await browser.runtime.getBrowserInfo();
+            const firefoxRuntime = /** @type {typeof browser.runtime & {getBrowserInfo: () => Promise<{vendor: string, version: string}>}} */ (browser.runtime);
+            const {vendor, version} = await firefoxRuntime.getBrowserInfo();
             if (vendor !== 'Mozilla') { return; }
 
             const match = /^\d+/.exec(version);

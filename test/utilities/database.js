@@ -26,8 +26,15 @@ export function setupStubs() {
         },
     });
 
-    // eslint-disable-next-line jsdoc/require-jsdoc
-    function Worker() {
+    /**
+     * @param {string|URL} url
+     * @returns {{addEventListener: () => void, terminate: () => void}}
+     * @throws {Error}
+     */
+    function Worker(url) {
+        if (String(url).endsWith('/lib/z-worker.js')) {
+            throw new Error('Web workers are not available in database tests');
+        }
         return {
             addEventListener: () => {},
             terminate: () => {},

@@ -16,33 +16,34 @@ This function can be helpful for debugging values when creating templates.
 <code>{{dumpObject <i>object</i>}}</code>
 
 - _`object`_ <br>
-The object to convert.
+  The object to convert.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  <pre>{{dumpObject .}}</pre>
-  ```
+```handlebars
+<pre>{{dumpObject .}}</pre>
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  <pre>{
-      "key": "value"
-  }</pre>
-  ```
+```html
+<pre>{
+    "key": "value"
+}</pre>
+```
 
 Preview:
 
 <!-- prettier-ignore -->
-  ```html
-  {
-      "key": "value"
-  }
-  ```
+```html
+{
+    "key": "value"
+}
+```
 
 </details>
 
@@ -61,23 +62,24 @@ Converts a definition or expression/reading pair to its furigana representation.
 - _`expression`_ <br>
   The expression to convert.
 - _`reading`_ <br>
-The reading to convert.
+  The reading to convert.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{furigana .}}
-  {{furigana "読む" "よむ"}}
-  ```
+```handlebars
+{{furigana .}}
+{{furigana "読む" "よむ"}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  <ruby>読<rt>よ</rt></ruby>む
-  ```
+```html
+<ruby>読<rt>よ</rt></ruby>む
+```
 
 Preview
 
@@ -99,23 +101,24 @@ Converts a definition or expression/reading pair to its simplified furigana repr
 - _`expression`_ <br>
   The expression to convert.
 - _`reading`_ <br>
-The reading to convert.
+  The reading to convert.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{~furiganaPlain .~}}
-  {{furiganaPlain "読む" "よむ"}}
-  ```
+```handlebars
+{{~furiganaPlain .~}}
+{{furiganaPlain "読む" "よむ"}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  読[よ]む
-  ```
+```html
+読[よ]む
+```
 
 </details>
 
@@ -133,20 +136,20 @@ Replaces newline characters with a forced HTML line break `<br>`.
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{#multiLine~}}
-  some
-  multiline
-  text
-  {{~/multiLine}}
-  ```
+```handlebars
+{{#multiLine~}}
+some
+multiline
+text
+{{~/multiLine}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  some<br>multiline<br>text
-  ```
+```html
+some<br>multiline<br>text
+```
 
 Preview:
 
@@ -170,23 +173,24 @@ Uses a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScr
 - _`flags`_ _(optional)_ <br>
   Optional flags to pass to the [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp) constructor.
 - _`text-to-modify`_ <br>
-The text that the regular expression is applied to.
-If multiple arguments are present, they are all concatenated.
+  The text that the regular expression is applied to.
+  If multiple arguments are present, they are all concatenated.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{#regexReplace "\(([^)]*)\)" "$1" "g"~}}Here is (some) (text) (in) (parentheses){{~/regexReplace}}
-  ```
+```handlebars
+{{#regexReplace "\(([^)]*)\)" "$1" "g"~}}Here is (some) (text) (in) (parentheses){{~/regexReplace}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  Here is some text in parentheses
-  ```
+```html
+Here is some text in parentheses
+```
 
 </details>
 
@@ -205,23 +209,24 @@ Uses a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScr
 - _`flags`_ _(optional)_ <br>
   Optional flags to pass to the [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/RegExp) constructor.
 - _`text-to-modify`_ <br>
-The text that the regular expression is applied to.
-If multiple arguments are present, they are all concatenated.
+  The text that the regular expression is applied to.
+  If multiple arguments are present, they are all concatenated.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{#regexMatch "\(([^)]*)\)" "g"~}}Here is (some) (text) (in) (parentheses){{~/regexMatch}}
-  ```
+```handlebars
+{{#regexMatch "\(([^)]*)\)" "g"~}}Here is (some) (text) (in) (parentheses){{~/regexMatch}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  (some)(text)(in)(parentheses)
-  ```
+```html
+(some)(text)(in)(parentheses)
+```
 
 </details>
 
@@ -239,22 +244,23 @@ Creates a set of all unique tags for the definition and returns a text represent
 - _`isGroupMode`_ _(optional)_ <br>
   Whether or not the display mode is the 'group' mode.
 - _`isMergeMode`_ <br>
-Whether or not the display mode is the 'merge' mode.
+  Whether or not the display mode is the 'merge' mode.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{~mergeTags definition group merge~}}
-  ```
+```handlebars
+{{~mergeTags definition group merge~}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  v5m, vt, JMdict (English)
-  ```
+```html
+v5m, vt, JMdict (English)
+```
 
 </details>
 
@@ -275,22 +281,23 @@ If the iterable is falsy or empty, the `else` condition will be used.
 - _`modification`_ <br>
   The template used to modify the value. The context is changed to the current item of iteration.
 - _`else-modification`_ <br>
-The template used in case the iterable is falsy or empty. The context is unchanged.
+  The template used in case the iterable is falsy or empty. The context is unchanged.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{~#eachUpTo someArray 5}}{{{.}}}<br>{{else}}Empty{{/mergeTags~}}
-  ```
+```handlebars
+{{~#eachUpTo someArray 5}}{{{.}}}<br>{{else}}Empty{{/mergeTags~}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  someArray[0]<br>someArray[1]<br>someArray[2]<br>someArray[3]<br>someArray[4]<br>
-  ```
+```html
+someArray[0]<br>someArray[1]<br>someArray[2]<br>someArray[3]<br>someArray[4]<br>
+```
 
 Preview:
 
@@ -308,22 +315,23 @@ This allows it to be used similar to an [`Array.concat`](https://developer.mozil
 <code>{{spread <i>iterable1</i> <i>iterable2</i> <i>...</i> <i>iterableN</i>}}</code>
 
 - _`iterableN`_ <br>
-A variable amount of iterable objects to combine into a single array.
+  A variable amount of iterable objects to combine into a single array.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{#each (spread array1 array2)}}{{{.}}}<br>{{/each}}
-  ```
+```handlebars
+{{#each (spread array1 array2)}}{{{.}}}<br>{{/each}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  array1[0]<br>array1[1]<br>array2[0]<br>array2[1]<br>
-  ```
+```html
+array1[0]<br>array1[1]<br>array2[0]<br>array2[1]<br>
+```
 
 Preview:
 
@@ -352,24 +360,25 @@ If an unknown operator is specified, the `undefined` value is returned.
 - _`operand2`_ _(Optional)_<br>
   The second operand of the operation.
 - _`operand3`_ _(Optional)_<br>
-The third operand of the operation.
+  The third operand of the operation.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{#if (op "===" value1 value2)}}Values are equal{{/if~}}<br>
-  {{~#op "-" value1}}{{/op~}}<br>
-  {{~op "?:" value1 "a" "b"}}
-  ```
+```handlebars
+{{#if (op "===" value1 value2)}}Values are equal{{/if~}}<br>
+{{~#op "-" value1}}{{/op~}}<br>
+{{~op "?:" value1 "a" "b"}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  Values are equal<br>-32<br>a
-  ```
+```html
+Values are equal<br>-32<br>a
+```
 
 Preview:
 
@@ -386,22 +395,23 @@ Gets a value from the custom state stack.
 <code>{{get <i>name</i>}}</code>
 
 - _`name`_ <br>
-The name of the variable to get.
+  The name of the variable to get.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{get "some-text"}}
-  ```
+```handlebars
+{{get "some-text"}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  This is the value of some-text!
-  ```
+```html
+This is the value of some-text!
+```
 
 </details>
 
@@ -418,22 +428,23 @@ Assigns a value to the custom state stack.
 - _`name`_ <br>
   The name of the variable to assign.
 - _`value`_ <br>
-The value of the variable.
+  The value of the variable.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{#set "some-text"}}This is the value of some-text!{{/set~}}
-  {{~set "some-number" 32}}
-  ```
+```handlebars
+{{#set "some-text"}}This is the value of some-text!{{/set~}}
+{{~set "some-number" 32}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  ```
+```html
+```
 
 </details>
 
@@ -451,29 +462,30 @@ and variable lookups will start from the most recent scope and work backwards un
 - _`name`_ <br>
   The name of the variable to assign.
 - _`value`_ <br>
-The value of the variable.
+  The value of the variable.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{~set "key" 32~}}
-  {{~get "key"~}},
-  {{~#scope~}}
-    {{~#get "key"~}},
-    {{~#set "key" 64~}}
-    {{~#get "key"~}},
-  {{~/scope~}}
-  {{~get "key"~}}
-  ```
+```handlebars
+{{~set "key" 32~}}
+{{~get "key"~}},
+{{~#scope~}}
+  {{~#get "key"~}},
+  {{~#set "key" 64~}}
+  {{~#get "key"~}},
+{{~/scope~}}
+{{~get "key"~}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  32,32,64,32
-  ```
+```html
+32,32,64,32
+```
 
 </details>
 
@@ -489,22 +501,23 @@ Repeatedly gets a property of an object.
 - _`object`_ <br>
   The initial object to use.
 - _`propertyN`_ <br>
-A chain of property names to get on the object.
+  A chain of property names to get on the object.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{property someObject "field" 0 "toString"}}
-  ```
+```handlebars
+{{property someObject "field" 0 "toString"}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  function toString() { [native code] }
-  ```
+```html
+function toString() { [native code] }
+```
 
 </details>
 
@@ -522,16 +535,16 @@ No-op. Returns the inner contents of the template.
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{noop}}Unchanged content{{/noop}}
-  ```
+```handlebars
+{{noop}}Unchanged content{{/noop}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  Unchanged content
-  ```
+```html
+Unchanged content
+```
 
 </details>
 
@@ -549,16 +562,16 @@ Returns whether or not a mora will have a high pitch, given the index of the mor
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{#if (isMoraPitchHigh 1 2)}}High pitch{{else}}Low pitch{{/if}}
-  ```
+```handlebars
+{{#if (isMoraPitchHigh 1 2)}}High pitch{{else}}Low pitch{{/if}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  High pitch
-  ```
+```html
+High pitch
+```
 
 </details>
 
@@ -576,16 +589,16 @@ Returns an array of the mora for a kana string.
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{#each (getKanaMorae "よみたん")}}{{{.}}}<br>{{/each}}
-  ```
+```handlebars
+{{#each (getKanaMorae "よみたん")}}{{{.}}}<br>{{/each}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  よ<br>み<br>た<br>ん<br>
-  ```
+```html
+よ<br>み<br>た<br>ん<br>
+```
 
 Preview:
 
@@ -603,26 +616,27 @@ Returns the type of a value. `#typeof` in the block form will always return `'st
 <code>{{#typeof}}<i>value</i>{{/typeof}}</code><br>
 
 - _`value`_ <br>
-The value to check.
+  The value to check.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{typeof "よみたん"}}
-  {{typeof 1}}
-  {{#typeof}}よみたん{{/typeof}}
-  ```
+```handlebars
+{{typeof "よみたん"}}
+{{typeof 1}}
+{{#typeof}}よみたん{{/typeof}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  string
-  number
-  string
-  ```
+```html
+string
+number
+string
+```
 
 </details>
 
@@ -638,23 +652,24 @@ Joins the arguments to a single string with a separator, flattening any argument
 - _`separator`_ <br>
   The separator string to use between values.
 - _`valueN`_ <br>
-An individual value to join into the resulting string
+  An individual value to join into the resulting string
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{set "index" 32~}}
-  {{~join "_" "yomitan" (get "index") "value"}}
-  ```
+```handlebars
+{{set "index" 32~}}
+{{~join "_" "yomitan" (get "index") "value"}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  yomitan_32_value
-  ```
+```html
+yomitan_32_value
+```
 
 </details>
 
@@ -668,23 +683,24 @@ Joins the arguments to a single string, without flattening arguments that are ar
 <code>{{concat <i>value1</i> <i>value1</i> <i>valueN</i>...}}</code><br>
 
 - _`valueN`_ <br>
-A value to join into the resulting string
+  A value to join into the resulting string
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{set "index" 32~}}
-  {{~concat "yomitan_" (get "index") "_value"}}
-  ```
+```handlebars
+{{set "index" 32~}}
+{{~concat "yomitan_" (get "index") "_value"}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  yomitan_32_value
-  ```
+```html
+yomitan_32_value
+```
 
 </details>
 
@@ -698,22 +714,23 @@ Returns an array representing the different pitch categories for a specific term
 <code>{{pitchCategories @root}}</code><br>
 
 - _`@root`_ <br>
-The argument passed should always be the root data object.
+  The argument passed should always be the root data object.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  [{{#each (pitchCategories @root)}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}]
-  ```
+```handlebars
+[{{#each (pitchCategories @root)}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}]
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  [heiban, kifuku]
-  ```
+```html
+[heiban, kifuku]
+```
 
 </details>
 
@@ -730,22 +747,23 @@ structured-content generation.
 - _`dictionary`_ <br>
   The dictionary that the glossary entry belongs to.
 - _`definitionEntry`_ <br>
-The definition entry object in raw form.
+  The definition entry object in raw form.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
-  ```
+```handlebars
+{{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  Here is the content of a gloss, which may include formatted HTML.
-  ```
+```html
+Here is the content of a gloss, which may include formatted HTML.
+```
 
 </details>
 
@@ -776,47 +794,48 @@ These functions are used together in order to request media and other types of o
 - <code>"popupSelectionText"</code>
 - <code>"textFurigana" <i>japaneseText</i> <i>readingMode="default|hiragana|katakana"</i></code>
 - <code>"dictionaryMedia" <i>fileName</i> <i>dictionary="Dictionary Name"</i></code>
+
 </details>
 <details>
   <summary>Examples:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{#if (hasMedia "audio")}}The audio file name is: {{getMedia "audio"}}{{/if}}
+```handlebars
+{{#if (hasMedia "audio")}}The audio file name is: {{getMedia "audio"}}{{/if}}
 
-  {{#if (hasMedia "screenshot")}}The screenshot file name is: {{getMedia "screenshot"}}{{/if}}
+{{#if (hasMedia "screenshot")}}The screenshot file name is: {{getMedia "screenshot"}}{{/if}}
 
-  {{#if (hasMedia "clipboardImage")}}The clipboard image file name is: {{getMedia "clipboardImage"}}{{/if}}
+{{#if (hasMedia "clipboardImage")}}The clipboard image file name is: {{getMedia "clipboardImage"}}{{/if}}
 
-  {{#if (hasMedia "clipboardText")}}The clipboard text is: {{getMedia "clipboardText"}}{{/if}}
+{{#if (hasMedia "clipboardText")}}The clipboard text is: {{getMedia "clipboardText"}}{{/if}}
 
-  {{#if (hasMedia "popupSelectionText")}}The popup selection text is: {{getMedia "popupSelectionText"}}{{/if}}
+{{#if (hasMedia "popupSelectionText")}}The popup selection text is: {{getMedia "popupSelectionText"}}{{/if}}
 
-  {{#if (hasMedia "textFurigana" "日本語")}}This is an example of text with generated furigana: {{getMedia "textFurigana" "日本語" escape=false}}{{/if}}
+{{#if (hasMedia "textFurigana" "日本語")}}This is an example of text with generated furigana: {{getMedia "textFurigana" "日本語" escape=false}}{{/if}}
 
-  {{#if (hasMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary")}}The remapped file name for image.png is: {{getMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary"}}{{/if}}
-  ```
+{{#if (hasMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary")}}The remapped file name for image.png is: {{getMedia "dictionaryMedia" "image.png" dictionary="Example Dictionary"}}{{/if}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  The audio file name is: yomitan_audio_にほんご_日本語.mp3
+```html
+The audio file name is: yomitan_audio_にほんご_日本語.mp3
 
-  The screenshot file name is: yomitan_browser_screenshot_にほんご_日本語.png
+The screenshot file name is: yomitan_browser_screenshot_にほんご_日本語.png
 
-  The clipboard image file name is: yomitan_clipboard_image_にほんご_日本語.png
+The clipboard image file name is: yomitan_clipboard_image_にほんご_日本語.png
 
-  The clipboard text is: This is the clipboard text
+The clipboard text is: This is the clipboard text
 
-  The selection text is: This is the selection text
+The selection text is: This is the selection text
 
-  The selection text is: This is the selection text
+The selection text is: This is the selection text
 
-  This is an example of text with generated furigana: <ruby>日本語<rt>にほんご</rt></ruby>
+This is an example of text with generated furigana: <ruby>日本語<rt>にほんご</rt></ruby>
 
-  The remapped file name for image.png is: yomitan_dictionary_media_1_にほんご_日本語.png
-  ```
+The remapped file name for image.png is: yomitan_dictionary_media_1_にほんご_日本語.png
+```
 
 </details>
 
@@ -842,15 +861,16 @@ same as the system used for generating popup and search page dictionary entries.
 - _`nasalPositions`_ _(optional)_ <br>
   An array of indices of mora that have a nasal pronunciation.
 - _`devoicePositions`_ _(optional)_ <br>
-An array of indices of mora that are devoiced.
+  An array of indices of mora that are devoiced.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{~pronunciation format='text' reading='よむ' downstepPosition=1~}}
-  ```
+```handlebars
+{{~pronunciation format='text' reading='よむ' downstepPosition=1~}}
+```
 
 </details>
 
@@ -867,29 +887,30 @@ Converts katakana text to hiragana.
 - _`value`_ <br>
   The text to convert.
 - _`keepProlongedSoundMarks`_ _(optional)_ <br>
-Whether or not the `ー` character should be kept or converted to a vowel character.
-Defaults to `false` if not specified.
+  Whether or not the `ー` character should be kept or converted to a vowel character.
+  Defaults to `false` if not specified.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{hiragana "よみたん ヨミたん ヨミタン"}}
-  {{#hiragana}}よみたん ヨミたん ヨミタン{{/hiragana}}
-  {{#hiragana}}ローマ字{{/hiragana}}
-  {{#hiragana keepProlongedSoundMarks=true}}ローマ字{{/hiragana}}
-  ```
+```handlebars
+{{hiragana "よみたん ヨミたん ヨミタン"}}
+{{#hiragana}}よみたん ヨミたん ヨミタン{{/hiragana}}
+{{#hiragana}}ローマ字{{/hiragana}}
+{{#hiragana keepProlongedSoundMarks=true}}ローマ字{{/hiragana}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  よみたん よみたん よみたん
-  よみたん よみたん よみたん
-  ろうま字
-  ろーま字
-  ```
+```html
+よみたん よみたん よみたん
+よみたん よみたん よみたん
+ろうま字
+ろーま字
+```
 
 </details>
 
@@ -904,23 +925,24 @@ Converts hiragana text to katakana.
 <code>{{#katakana}}<i>text</i>{{/katakana}}</code><br>
 
 - _`text`_ <br>
-The text to convert.
+  The text to convert.
+
 </details>
 <details>
   <summary>Example:</summary>
 
 <!-- prettier-ignore -->
-  ```handlebars
-  {{katakana "よみたん ヨミたん ヨミタン"}}
-  {{#katakana}}よみたん ヨミたん ヨミタン{{/katakana}}
-  ```
+```handlebars
+{{katakana "よみたん ヨミたん ヨミタン"}}
+{{#katakana}}よみたん ヨミたん ヨミタン{{/katakana}}
+```
 
 Output:
 
 <!-- prettier-ignore -->
-  ```html
-  ヨミタン ヨミタン ヨミタン
-  ヨミタン ヨミタン ヨミタン
-  ```
+```html
+ヨミタン ヨミタン ヨミタン
+ヨミタン ヨミタン ヨミタン
+```
 
 </details>

@@ -46,7 +46,6 @@ function checkChromeNotAvailable() {
 
 // Set up chrome alias if it's not available (Edge Legacy)
 if (checkChromeNotAvailable()) {
-    // @ts-expect-error - objects should have roughly the same interface
     // eslint-disable-next-line no-global-assign
     chrome = browser;
 }
