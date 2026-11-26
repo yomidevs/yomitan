@@ -102,6 +102,8 @@ Feel free to join us on the [Yomitan Discord](https://discord.gg/YkQrXW6TXF).
 
 2. Run `npm ci` to set up the environment.
 
+   You may need to allow git packages by running `npm config set allow-git=all` or setting an env var before running npm ci `NPM_CONFIG_ALLOW_GIT=all npm ci`.
+
 3. Run `npm run license-report:html` to generate any missing or changed license information.
 
 4. Run `npm run build` for a plain testing build or `npm run-script build -- --all --version {version}` for a release build (replacing `{version}` with a version number).

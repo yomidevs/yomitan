@@ -24,6 +24,8 @@ Below are a few guidelines to ensure contributions have a good level of quality 
 Yomitan uses [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) tools for building and testing.
 After installing these, the development environment can be set up by running `npm ci` and subsequently `npm run build`.
 
+You may need to allow git packages by running `npm config set allow-git=all` or setting an env var before running npm ci `NPM_CONFIG_ALLOW_GIT=all npm ci`.
+
 ## Testing
 
 Unit tests, integration tests, and various other tests can be executed by running `npm test`.
