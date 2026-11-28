@@ -20,7 +20,7 @@ import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
-import {YomitanApi} from '../comm/yomitan-api.js';
+import {ExternalExtensionPort, NativeComponentPort, YomitanApi} from '../comm/yomitan-api.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {fetchText} from '../core/fetch-utilities.js';
@@ -45,6 +45,10 @@ import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, Translato
 import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
+
+const MAX_PENDING_EXTERNAL_MESSAGES = 10;
+
+const MAX_PENDING_EXTERNAL_CONNECTION_PORTS = 10;
 
 /**
  * This class controls the core logic of the extension, including API calls
@@ -181,7 +185,7 @@ export class Backend {
             ['isTabSearchPopup',             this._onApiIsTabSearchPopup.bind(this)],
             ['triggerDatabaseUpdated',       this._onApiTriggerDatabaseUpdated.bind(this)],
             ['testMecab',                    this._onApiTestMecab.bind(this)],
-            ['testYomitanApi',               this._onApiTestYomitanApi.bind(this)],
+            ['testYomitanApi',               this._onApiTestYomitanApiNativeComponent.bind(this)],
             ['isTextLookupWorthy',           this._onApiIsTextLookupWorthy.bind(this)],
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
@@ -210,7 +214,19 @@ export class Backend {
         ]));
 
         /** @type {YomitanApi} */
-        this._yomitanApi = new YomitanApi(this._apiMap, this._offscreen);
+        this._nativeComponentYomitanApi = new YomitanApi(this._apiMap, this._offscreen, () => new NativeComponentPort());
+        /** @type {string[]} */
+        this._externallyConnectableExtensionIds = [];
+        /** @type {Set<chrome.runtime.Port>} */
+        this._pendingExternalConnectionPorts = new Set();
+        /** @type {?ExternalExtensionPort} */
+        this._externalExtensionPort = null;
+        /** @type {YomitanApi} */
+        this._extensionToExtensionYomitanApi = new YomitanApi(this._apiMap, this._offscreen, () => {
+            const externalExtensionPort = new ExternalExtensionPort(() => this._externallyConnectableExtensionIds);
+            this._externalExtensionPort = externalExtensionPort;
+            return externalExtensionPort;
+        });
         /** @type {CacheMap<string, {originalTextLength: number, textSegments: import('api').ParseTextSegment[]}>} */
         this._textParseCache = new CacheMap(10000, 3600000); // 1 hour idle time, ~32MB per 1000 entries for Japanese
     }
@@ -268,6 +284,10 @@ export class Backend {
         }
 
         chrome.runtime.onInstalled.addListener(this._onInstalled.bind(this));
+
+        if (isObjectNotArray(chrome.runtime) && isObjectNotArray(chrome.runtime.onConnectExternal)) {
+            chrome.runtime.onConnectExternal.addListener(this._onExternalConnect.bind(this));
+        }
     }
 
     /** @type {import('api').PmApiHandler<'connectToDatabaseWorker'>} */
@@ -495,6 +515,60 @@ export class Backend {
     _onInstalled({reason}) {
         if (reason !== 'install') { return; }
         void this._requestPersistentStorage();
+    }
+
+    /**
+     * @param {chrome.runtime.Port} port
+     */
+    _onExternalConnect(port) {
+        if (this._pendingExternalConnectionPorts.size >= MAX_PENDING_EXTERNAL_CONNECTION_PORTS) {
+            port.disconnect();
+            return;
+        }
+        this._pendingExternalConnectionPorts.add(port);
+        /** @type {unknown[]} */
+        const pendingMessages = [];
+        let disconnected = false;
+        /** @type {(message: unknown) => void} */
+        const onTemporaryMessage = (message) => {
+            if (pendingMessages.length >= MAX_PENDING_EXTERNAL_MESSAGES) {
+                disconnected = true;
+                port.disconnect();
+                return;
+            }
+            pendingMessages.push(message);
+        };
+        port.onMessage.addListener(onTemporaryMessage);
+        const onDisconnect = () => { disconnected = true; };
+        port.onDisconnect.addListener(onDisconnect);
+        this._prepareCompletePromise.then(
+            () => {
+                this._pendingExternalConnectionPorts.delete(port);
+                if (disconnected) { return; }
+                this._admitExternalConnect(port, pendingMessages, onTemporaryMessage, onDisconnect);
+            },
+            () => {
+                this._pendingExternalConnectionPorts.delete(port);
+                port.disconnect();
+            },
+        );
+    }
+
+    /**
+     * @param {chrome.runtime.Port} port
+     * @param {unknown[]} pendingMessages
+     * @param {(message: unknown) => void} onTemporaryMessage
+     * @param {() => void} onDisconnect
+     */
+    _admitExternalConnect(port, pendingMessages, onTemporaryMessage, onDisconnect) {
+        port.onMessage.removeListener(onTemporaryMessage);
+        port.onDisconnect.removeListener(onDisconnect);
+        const externalExtensionPort = this._externalExtensionPort;
+        if (externalExtensionPort !== null) {
+            externalExtensionPort.handleConnect(port, pendingMessages);
+        } else {
+            port.disconnect();
+        }
     }
 
     // Message handlers
@@ -1044,8 +1118,8 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'testYomitanApi'>} */
-    async _onApiTestYomitanApi({url}) {
-        if (!this._yomitanApi.isEnabled()) {
+    async _onApiTestYomitanApiNativeComponent({url}) {
+        if (!this._nativeComponentYomitanApi.isEnabled()) {
             throw new Error('Yomitan Api not enabled');
         }
 
@@ -1059,21 +1133,21 @@ export class Backend {
             throw new Error('Insufficient permissions');
         }
 
-        const disconnect = !this._yomitanApi.isConnected();
+        const disconnect = !this._nativeComponentYomitanApi.isConnected();
         try {
-            const version = await this._yomitanApi.getRemoteVersion(url);
+            const version = await this._nativeComponentYomitanApi.getRemoteVersion(url);
             if (version === null) {
                 throw new Error('Could not connect to native Yomitan API component');
             }
 
-            const localVersion = this._yomitanApi.getLocalVersion();
+            const localVersion = this._nativeComponentYomitanApi.getLocalVersion();
             if (version !== localVersion) {
                 throw new Error(`Yomitan API component version not supported: ${version}`);
             }
         } finally {
             // Disconnect if the connection was previously disconnected
-            if (disconnect && this._yomitanApi.isEnabled()) {
-                this._yomitanApi.disconnect();
+            if (disconnect && this._nativeComponentYomitanApi.isEnabled()) {
+                this._nativeComponentYomitanApi.disconnect();
             }
         }
 
@@ -1559,7 +1633,14 @@ export class Backend {
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
 
-        void this._yomitanApi.setEnabled(options.general.enableYomitanApi && enabled);
+        const yomitanApiEnabled = options.general.enableYomitanApi && enabled;
+        void this._nativeComponentYomitanApi.setEnabled(yomitanApiEnabled);
+        const externallyConnectableExtensionsEnabled = options.general.enableExternallyConnectableExtensions && enabled;
+        void this._extensionToExtensionYomitanApi.setEnabled(externallyConnectableExtensionsEnabled);
+        if (!externallyConnectableExtensionsEnabled) {
+            // Connections are rejected while the feature is disabled.
+            this._externalExtensionPort = null;
+        }
 
         if (options.clipboard.enableBackgroundMonitor && enabled) {
             this._clipboardMonitor.start();
@@ -1572,6 +1653,7 @@ export class Backend {
         void this._accessibilityController.update(this._getOptionsFull(false));
 
         this._textParseCache.clear();
+        this._externallyConnectableExtensionIds = options.general.externallyConnectableExtensionIds;
 
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
     }

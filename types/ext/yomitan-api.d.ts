@@ -19,6 +19,7 @@ import type * as Api from './api';
 import type * as Dictionary from './dictionary';
 import type * as DictionaryImporter from './dictionary-importer';
 import type * as Settings from './settings';
+import type * as EventListenerCollection from './event-listener-collection';
 
 export type termEntriesInput = {
     term: string | string[];
@@ -111,4 +112,17 @@ export type apiAudioMediaDetails = {
     mediaType: string;
     content: AudioBinaryBase64;
     ankiFilename: string;
+};
+
+export type apiPort = {
+    onMessage: EventListenerCollection.ExtensionEvent<(message: unknown, port: chrome.runtime.Port) => void>;
+    onDisconnect: EventListenerCollection.ExtensionEvent<(port: chrome.runtime.Port) => void>;
+    disconnect: () => void;
+};
+
+export type apiExternalConnectionPort = {
+    sender?: {id?: string} | undefined;
+    disconnect: () => void;
+    onDisconnect: {addListener: (listener: (port: chrome.runtime.Port) => void) => void};
+    onMessage: {addListener: (listener: (message: unknown, port: chrome.runtime.Port) => void) => void};
 };
